@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+    <PackageReference Include="ModelContextProtocol" Version="2.3.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" />
     <ProjectReference Include="..\TiaMcp.Core\TiaMcp.Core.csproj" />
     <ProjectReference Include="..\TiaMcp.Translations\TiaMcp.Translations.csproj" />
