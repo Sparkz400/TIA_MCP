@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "authoredFormat": "native_xml_template_derivation",
+  "requiresNativeAcceptance": true,
+  "namespace": "TiaMcp_UnitA",
+  "references": [
+    {
+      "path": "fixtures/typed-graphical/native/Tgp_TON_Global_FBD.xml",
+      "sha256": "d72564d8dac9fb9fa0cb644882e25a7c5b44cf81c41acd84405701106f0bf844"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_TemplateFB_FBD.xml",
+      "sha256": "1aef75de8bbf6e22e704f10f6b3a5b8c72c5a0e14bdc6ec3ba08ab870e4d0eda"
+    }
+  ],
+  "adaptedFields": [
+    "Access",
+    "AutoNumber",
+    "MemoryLayout presence",
+    "Namespace",
+    "Name",
+    "Number",
+    "GlobalVariable Component Name"
+  ],
+  "sourceSha256": "b924abeca54528d04655ec6396bbbe200d6ee35609194c5e3714f8e167f362ed"
+}

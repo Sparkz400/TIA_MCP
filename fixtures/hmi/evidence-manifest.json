@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "runtimeVerified": false,
+  "qualification": "per-operation reports only; no blanket acceptance",
+  "reports": [
+    {
+      "nativeReport": "artifacts/hmi-native-20261008-d/native-report.json",
+      "sha256": "6dbde8de6d0961e985d64d17abadfeb517d284be59f4f1a2230fc8a16825d182",
+      "completed": true,
+      "profiles": [
+        {
+          "profile": "classic-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 124-0GC01-0AX0/17.0.0.0",
+            "version": "17.0.0.0",
+            "typeName": "TP700 Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Comfort Panel\\7'' Display\\TP700 Comfort\\6AV2 124-0GC01-0AX0"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-d/classic-comfort/baseline.zap21",
+            "sha256": "67fd8e6f1721926250caef1c83e6b7ce7817c634a56dc33b8b17737b37767b70"
+          }
+        },
+        {
+          "profile": "classic-rt-advanced",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 104-0xxxx-xxxx/17.0.0.0",
+            "version": "17.0.0.0",
+            "typeName": "WinCC RT Advanced",
+            "catalogPath": "Root\\PC-Systeme\\SIMATIC HMI Application\\WinCC RT Advanced"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-d/classic-rt-advanced/baseline.zap21",
+            "sha256": "84d4812d8c77d4240e64dd3fcce3bbbdfeb4109bc222d5c14995555836e300d9"
+          }
+        },
+        {
+          "profile": "classic-basic",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 123-2GB03-0AX0/17.0.0.0",
+            "version": "17.0.0.0",
+            "typeName": "KTP700 Basic PN",
+            "catalogPath": "Root\\HMI\\SIMATIC Basic Panel\\7'' Display\\KTP700 Basic\\6AV2 123-2GB03-0AX0"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-d/classic-basic/baseline.zap21",
+            "sha256": "a4b49a0e75cdc0ae042d9d943cbbd8b1252ba2a2d897ac765063d465cf8ff379"
+          }
+        },
+        {
+          "profile": "classic-rt-professional",
+          "status": "blocked",
+          "selectedTarget": null,
+          "reason": "No installed catalog target matches this exact family/device filter."
+        },
+        {
+          "profile": "unified-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 128-3GB06-0AXx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "MTP700 Unified Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Unified Comfort Panel\\7'' Display\\MTP700 Unified Comfort\\6AV2 128-3GB06-0AXx"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-d/unified-comfort/baseline.zap21",
+            "sha256": "9ea62cbd6a73b42c08e69db06b1f731edf115ca94632af32b6a0d90c32065869"
+          }
+        },
+        {
+          "profile": "unified-pc",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 155-xxxxx-xxxx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "WinCC Unified PC RT",
+            "catalogPath": "Root\\PC-Systeme\\SIMATIC HMI Application\\SIMATIC WinCC Unified PC"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-d/unified-pc/baseline.zap21",
+            "sha256": "aed8def42f85b8d1a74002471966bb75e31d05885387d525726ba1adc8367f86"
+          }
+        }
+      ]
+    },
+    {
+      "nativeReport": "artifacts/hmi-native-20261008-e/native-report.json",
+      "sha256": "2d29833c0c8adc9ce760a4a8d839173b4fe3e8a41d3258341c8ca6ab75919249",
+      "completed": true,
+      "profiles": [
+        {
+          "profile": "classic-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 124-0GC01-0AX0/17.0.0.0",
+            "version": "17.0.0.0",
+            "typeName": "TP700 Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Comfort Panel\\7'' Display\\TP700 Comfort\\6AV2 124-0GC01-0AX0"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-e/classic-comfort/baseline.zap21",
+            "sha256": "dec02b7004cc2e201123b05fa9eec2f5621b0eb25b8878649f5e514f4876bf9a"
+          }
+        },
+        {
+          "profile": "unified-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 128-3GB06-0AXx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "MTP700 Unified Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Unified Comfort Panel\\7'' Display\\MTP700 Unified Comfort\\6AV2 128-3GB06-0AXx"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-e/unified-comfort/baseline.zap21",
+            "sha256": "fcc6f35586bb461e4e42ef4e201a626cef356e875abbebbded378d32b3bdd966"
+          }
+        }
+      ]
+    },
+    {
+      "nativeReport": "artifacts/hmi-native-20261008-f/native-report.json",
+      "sha256": "2613f6f4b5e3a801ba6f627dfc3f816266ffa487401302964d570bd340b72de5",
+      "completed": true,
+      "profiles": [
+        {
+          "profile": "classic-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 124-0GC01-0AX0/17.0.0.0",
+            "version": "17.0.0.0",
+            "typeName": "TP700 Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Comfort Panel\\7'' Display\\TP700 Comfort\\6AV2 124-0GC01-0AX0"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-f/classic-comfort/baseline.zap21",
+            "sha256": "13ef938caebe8d62b0ac6891c6032dae29f119d68af9d7224d97b5963e4c5f68"
+          }
+        },
+        {
+          "profile": "unified-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 128-3GB06-0AXx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "MTP700 Unified Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Unified Comfort Panel\\7'' Display\\MTP700 Unified Comfort\\6AV2 128-3GB06-0AXx"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-f/unified-comfort/baseline.zap21",
+            "sha256": "0ef3ad9d9dc54b2a1f848430705000e9f7e98898e5daaba03690631e5daee001"
+          }
+        },
+        {
+          "profile": "unified-pc",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 155-xxxxx-xxxx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "WinCC Unified PC RT",
+            "catalogPath": "Root\\PC-Systeme\\SIMATIC HMI Application\\SIMATIC WinCC Unified PC"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-f/unified-pc/baseline.zap21",
+            "sha256": "573ec83d1ea32f22e63e88b41f5cde34e294c76e5d4b54def077e104fe407366"
+          }
+        }
+      ]
+    },
+    {
+      "nativeReport": "artifacts/hmi-native-20261008-g/native-report.json",
+      "sha256": "27cfcf9fbb43d37496433283e0fbb5d68b203c4614c27b3c0670f6fa34d54dbc",
+      "completed": true,
+      "profiles": [
+        {
+          "profile": "unified-comfort",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 128-3GB06-0AXx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "MTP700 Unified Comfort",
+            "catalogPath": "Root\\HMI\\SIMATIC Unified Comfort Panel\\7'' Display\\MTP700 Unified Comfort\\6AV2 128-3GB06-0AXx"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-g/unified-comfort/baseline.zap21",
+            "sha256": "baa0e3e9dcc1e1fad3f1ed3cdb98e9425c3f56a6148860dbc2282f82b9c0b696"
+          }
+        },
+        {
+          "profile": "unified-pc",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 155-xxxxx-xxxx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "WinCC Unified PC RT",
+            "catalogPath": "Root\\PC-Systeme\\SIMATIC HMI Application\\SIMATIC WinCC Unified PC"
+          },
+          "reason": "Native fixture lifecycle recorded; compare independent inventories through exact bridge binaries before qualifying inspection. Mutations, visual inspection and runtime are separate gates.",
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-g/unified-pc/baseline.zap21",
+            "sha256": "cc91e30bd62be47cec22de2e844a86cde253f367628b27d52a665bee42d31516"
+          }
+        }
+      ]
+    },
+    {
+      "nativeReport": "artifacts/hmi-native-20261008-pc-h/native-report.json",
+      "sha256": "f7459d155199738e9da5ed6620cd1697804607e3e6e61fff2988a35c52a985d3",
+      "completed": true,
+      "profiles": [
+        {
+          "profile": "unified-pc",
+          "status": "observed",
+          "selectedTarget": {
+            "typeIdentifier": "OrderNumber:6AV2 155-xxxxx-xxxx/21.0.1.0",
+            "version": "21.0.1.0",
+            "typeName": "WinCC Unified PC RT",
+            "catalogPath": "Root\\PC-Systeme\\SIMATIC HMI Application\\SIMATIC WinCC Unified PC"
+          },
+          "archive": {
+            "path": "artifacts/hmi-native-20261008-pc-h/unified-pc/baseline.zap21",
+            "sha256": "9883c7ffee10aceb5699b0e5bccbf0044486deaecef8654f30ac654c2e21a745"
+          }
+        }
+      ]
+    }
+  ],
+  "sample": {
+    "source": "artifacts/hmi-native-20261008-d/classic-comfort/baseline_HMI_RT_1_ScreenFolder_Screens_0.xml",
+    "path": "fixtures/hmi/native-classic-screen.xml",
+    "sha256": "b48e664b7aeb7171448fcfded125f2a7fc3ce99548521243e69e7e6cf4f1c2db"
+  },
+  "bridgeQualification": {
+    "report": "artifacts/hmi-bridge-20261008-root-g.json",
+    "sha256": "0162db0bfcef159d02645d0b0b88cc3743ce9a010a80a729e9db5eba183cae37",
+    "scope": "Five exact native profiles read-only inspection/items/explorer; full acceptance false"
+  },
+  "supplementalEvidence": [
+    {
+      "path": "artifacts/hmi-native-f-recovery-audit-20261008.json",
+      "sha256": "4e1f2f65d477658a5b8365af5bd6592a7c0215a8666e2f91abc0611ce715c30e"
+    },
+    {
+      "path": "artifacts/hmi-bridge-20261008-root-i.json",
+      "sha256": "6255934364e8919d05785b5a0d5f525dd45c0e57f0af41b4b0cb699d2ae46839"
+    },
+    {
+      "path": "artifacts/hmi-bridge-20261008-root-i-reassessment-b.json",
+      "sha256": "9e2a7b798fdaf29d8a78428c0dcb3afc5ec0ad1261d309b5bbd6e45d37287e12"
+    },
+    {
+      "path": "artifacts/hmi-native-combined-final-20261008.json",
+      "sha256": "1ae1d866af60a73892a8ee1d376a5720b9bb46be0d351ae0f6f385eaee47c293"
+    }
+  ],
+  "remainingNativeValidation": "Corrected PC interface fixture, latest exact catalog provenance checks and alarm-tag relationship assertions await current-package native comparison. No completed H0-H5 acceptance."
+}

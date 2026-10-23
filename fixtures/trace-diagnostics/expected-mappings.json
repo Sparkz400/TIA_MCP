@@ -1,0 +1,25 @@
+{
+  "fixtureKind": "authoredOfflineOnly",
+  "selectedBlock": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+  "selectedDb": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+  "selectedMemberPath": ["Conv2"],
+  "alternativeMemberPath": ["Conv1"],
+  "signals": [
+    {"id":"enableSource","role":"enable source","db":"DB_IO","memberPath":["Enable2"],"type":"Bool"},
+    {"id":"enable","role":"instance enable","db":"DB_Line","memberPath":["Conv2","Enable"],"type":"Bool"},
+    {"id":"run","role":"internal command","db":"DB_Line","memberPath":["Conv2","RunCmd"],"type":"Bool"},
+    {"id":"final","role":"final output","db":"DB_IO","memberPath":["Final2"],"type":"Bool"},
+    {"id":"feedback","role":"feedback","db":"DB_IO","memberPath":["Feedback2"],"type":"Bool"},
+    {"id":"permit","role":"interlock","db":"DB_IO","memberPath":["Permit2"],"type":"Bool"},
+    {"id":"step","role":"sequence state","db":"DB_Line","memberPath":["Conv2","Step"],"type":"UInt"},
+    {"id":"elapsed","role":"timer elapsed","db":"DB_Line","memberPath":["Conv2","Elapsed"],"type":"Time"},
+    {"id":"timerDone","role":"timer output","db":"DB_Line","memberPath":["Conv2","TimerDone"],"type":"Bool"},
+    {"id":"fault","role":"fault status","db":"DB_Line","memberPath":["Conv2","Fault"],"type":"Bool"},
+    {"id":"override","role":"separate writer guard","db":"DB_IO","memberPath":["Override2"],"type":"Bool"}
+  ],
+  "eventTimesMs": [20,30,40],
+  "expectedPrediction": "supportedPrediction",
+  "expectedMatches": 3,
+  "expectedTransitions": 4,
+  "nativeAcceptance": false
+}

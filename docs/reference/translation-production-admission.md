@@ -1,0 +1,39 @@
+# Exact translation production admission
+
+Production import requires a fixed installation-owned, operator-reviewed admission registry. No registry is installed by this change. The ten offline tools support capture → inspection → proposal → exact approval → candidate → reconciliation. Six normal native tools expose capture, prepare, apply, status, recover and reconcile; all dispatching routes reject missing admission before starting a worker. Neither an uploaded workbook nor an MCP request flag enables a native write. See [the user workflow](translation-host-workflow.md) and [native execution/recovery](translation-native-import.md).
+
+The accepted package-03/package-06 no-op and Main OB1 edit remain [historical native evidence](../verification/translation-native-import-20261016.md). The new [failure packet](../verification/translation-admission-20261016.md) adds separately frozen interruption evidence. These results are not silently reassigned to a newer worker or production assembly.
+
+## Exact instance and evidence binding
+
+`TranslationProductionAdmission` describes an **exact instance proposal**, not a generic Main-comment profile. Its key binds:
+
+- The complete Host deployment inventory digest, including `TiaMcp.Host.dll` and dependencies; the apphost `.exe` alone is insufficient. The translation assembly, worker and installed Siemens API also remain pinned.
+- TIA version, hardware/native identity, exact project resource, complete workbook layout, source/target culture, active cultures, whole-project selection and category inventory.
+- Every original opaque native key, category, complete view path, source state, original target state and permitted resulting target state. Only zero changes or one existing nonempty plain en-GB Main OB1 block-comment change is eligible.
+- Every peer identity and comparison profile, with its semantic digest computed by the actual preservation comparer. Original exports remain retained and hash-verified. The comparer removes only its existing permitted creation-time metadata and exact approved Main English comment leaf; it does not remove project paths, native identities, other languages or arbitrary fields.
+
+Repeated exports of unchanged content can therefore match despite permitted creation-time differences. Real source, target, code, peer, location, language or binary drift still changes the key or fails the underlying workflow. Snapshot/epoch freshness remains a separate per-operation check; equality of an admission key never bypasses a fresh capture, exact approval or durable resource ownership.
+
+Each required receipt must bind the same instance key and source package. Native cases include complete inventory, import/readback, preservation, compile/save/fresh reopen, distinct recovery/fresh reopen, lost restore/import/compile/save/reopen response reconciliation, interruption before dispatch, stale-source refusal, existing-destination refusal and exact process cleanup. Portable cases cover key/binary refusal, stale plan/revision/replay, unsupported write shapes, drift, tampering and cleanup loss. A synthetic callback cannot satisfy a native case.
+
+The fixed path is `<Host installation>/translation-admission/registry.json`, with retained content-addressed `evidence/<sha256>.json` files. The same reviewed entry/evidence is installed alongside the owning worker. No MCP parameter, uploaded file, environment override or caller-selected registry path exists. The Host rejects missing gates, different exact keys or executable inventories, unknown/duplicate fields, altered evidence, links and traversal. The worker independently enforces its fixed installation entry, own image, exact project/PLC selector and retained evidence; the Host performs the complete package, key and case-ledger check.
+
+This is trusted deployment configuration. Its loader verifies receipt integrity and completeness, not the substantive truth of native conclusions. An operator must independently review actual native journals, artifacts and lifetime proofs before installing the proposed entry. No generated receipt supplies a signature or otherwise manufactures review authority. Registry data is excluded from executable identity so qualification and ordinary operation use identical binaries; every deployed executable/dependency remains included.
+
+The explicit local startup argument `--translation-qualification` exposes qualification tools on those same binaries. It is mutually exclusive with component, watch and TestSuite qualification modes, forwarded by the Host to the worker, and cannot be enabled through MCP. Default tool registration contains no qualification surfaces. Qualification-only source-drift fixture actions remain unavailable in normal mode.
+
+## Remaining same-fixture qualification proposal
+
+Fresh fixtures have different exact project/view/native identities. Their failure receipts cannot collectively satisfy one exact instance key. Removing those identities to make the receipts match would require a separately justified profile-equivalence contract; none is asserted here.
+
+The implemented bounded controller uses a new immutable package and one fresh fixture, with explicit queue admission. Capture baseline **B**, approve the exact Main replacement **F**, and retain the full forward instance key. All later forward captures must reproduce that key, including normalized peer content and every opaque key/path; stop on any difference. The ordered cases are interruption before dispatch, source drift, import/compile/save/reopen response loss and restore response loss. At most ten imports and twelve distinct checkpoint restorations are permitted, including the reverse operations below.
+
+1. Run each separately recorded forward failure case from B. Checkpoint once, never redispatch an attempted operation, restore once to its own distinct absent directory, and reconcile the original and recovered copies through fresh reopen.
+2. Import/compile delivery loss may leave the saved original at B. Save/reopen delivery loss may leave it at F. Independently establish which state is present; no unknown or partial state may advance.
+3. After a verified F outcome, prepare a **new reverse operation** from F to B, with exact source/target hashes, fresh caller approval and its own checkpoint. Execute it once through the normal full readback/preservation/compile/save/reopen workflow and independently recover its F checkpoint to another absent directory. This is a newly reviewed mutation, never a retry of the lost forward response.
+4. Reopen the original and require its full forward key to equal the original B→F key before the next case. Restore-to-original/overwrite is never introduced.
+5. The stale-source case needs a separately reviewed qualification-only mutation after retained checkpoint and before the second export: change only the exact German Main source, prove the fresh export refuses before dispatch, then inspect the saved original and restore/reopen the original archive at a new location. If the original is not independently B, retain ownership and stop; do not clear the journal or invent a reset.
+6. Require normal retained-handle exits and zero owned pending resources at each closed window. Freeze the production admission implementation before executing cases whose receipts will enable that implementation. The final prepared B→F plan is retained unattempted, and its exact key must still match. Review/install the candidate registry separately, then prove a normal default-mode lifecycle on the unchanged binary.
+
+No reverse edit, source-drift mutation or registry installation is authorized by an earlier packet. `qualify_translation_import.py --same-instance` and the independent `verify_translation_admission.py` implement this concrete bounded continuation; they need fresh packet admission. Restore-to-original/overwrite remains excluded. Accepted historical fixtures and old packages remain untouched.

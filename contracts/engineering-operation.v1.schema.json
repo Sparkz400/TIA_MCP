@@ -1,0 +1,841 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/engineering-operation.v1.schema.json",
+  "title": "Durable engineering operation; transition and native evidence validation remain mandatory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "revision",
+    "state",
+    "idempotencyKey",
+    "planSha256",
+    "plan",
+    "previousSha256",
+    "recordedAt",
+    "checkpoints",
+    "evidence",
+    "reconciliation",
+    "recoveryDestinations",
+    "recoveryResolutions"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999
+    },
+    "state": {
+      "enum": [
+        "prepared",
+        "acquired",
+        "checkpointIntent",
+        "ready",
+        "dispatchIntent",
+        "outcomeUnknown",
+        "recoveryRequired",
+        "recoveryIntent",
+        "succeeded",
+        "reconciled",
+        "stopped"
+      ]
+    },
+    "idempotencyKey": {
+      "$ref": "#/$defs/text"
+    },
+    "planSha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "plan": {
+      "$ref": "#/$defs/plan"
+    },
+    "previousSha256": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "checkpoints": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/gate"
+      }
+    },
+    "reconciliation": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/reconciliation"
+      }
+    },
+    "recoveryDestinations": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/recoveryDestination"
+      }
+    },
+    "recoveryResolutions": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/recoveryResolution"
+      }
+    },
+    "recoveryTarget": {
+      "$ref": "#/$defs/nativeTarget"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192
+    },
+    "digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "sha256"
+      ],
+      "properties": {
+        "relativePath": {
+          "$ref": "#/$defs/text"
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "object",
+        "snapshot",
+        "contentSha256"
+      ],
+      "properties": {
+        "object": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "projectPath",
+            "plcPath",
+            "scopePath",
+            "objectPath",
+            "kind"
+          ],
+          "properties": {
+            "projectPath": {
+              "$ref": "#/$defs/text"
+            },
+            "plcPath": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/text"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scopePath": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/text"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "objectPath": {
+              "$ref": "#/$defs/text"
+            },
+            "kind": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        },
+        "snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "observationId",
+            "sourceSha256",
+            "tiaVersion"
+          ],
+          "properties": {
+            "observationId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "sourceSha256": {
+              "$ref": "#/$defs/digest"
+            },
+            "tiaVersion": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "contentSha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "nativeTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "projectFilePath",
+        "sessionEpoch",
+        "adapterSha256",
+        "profileSha256",
+        "hardwareIdentity",
+        "nativeIdentity",
+        "offline",
+        "probes"
+      ],
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/reference"
+        },
+        "projectFilePath": {
+          "$ref": "#/$defs/text"
+        },
+        "sessionEpoch": {
+          "$ref": "#/$defs/text"
+        },
+        "adapterSha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "profileSha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "hardwareIdentity": {
+          "$ref": "#/$defs/text"
+        },
+        "nativeIdentity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "offline": {
+          "type": "boolean"
+        },
+        "probes": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "state",
+              "evidenceSha256"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "state": {
+                "enum": [
+                  "observed",
+                  "empty",
+                  "absent",
+                  "blocked",
+                  "failed",
+                  "unknown"
+                ]
+              },
+              "evidenceSha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceKey",
+        "kind",
+        "effect",
+        "recoveryStrategy"
+      ],
+      "properties": {
+        "resourceKey": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "enum": [
+            "project",
+            "library",
+            "workspace",
+            "external"
+          ]
+        },
+        "effect": {
+          "$ref": "#/$defs/text"
+        },
+        "recoveryStrategy": {
+          "enum": [
+            "projectArchiveToNewLocation",
+            "libraryCopyToNewLocation",
+            "immutableWorkspaceVersion",
+            "reconcileExternalCommit",
+            "externalStateReadback"
+          ]
+        },
+        "external": {
+          "$ref": "#/$defs/externalEffect"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "external"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "external"
+            ],
+            "properties": {
+              "resourceKey": {
+                "pattern": "^external:[a-f0-9]{64}(:[a-f0-9]{64})?$"
+              },
+              "recoveryStrategy": {
+                "const": "externalStateReadback"
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "external"
+              ]
+            },
+            "properties": {
+              "recoveryStrategy": {
+                "not": {
+                  "const": "externalStateReadback"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "target",
+        "resources",
+        "inputs",
+        "requiredProbes",
+        "requiredGates"
+      ],
+      "properties": {
+        "operation": {
+          "$ref": "#/$defs/text"
+        },
+        "target": {
+          "$ref": "#/$defs/nativeTarget"
+        },
+        "resources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/resource"
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "requiredProbes": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "requiredGates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "credentials": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/credentialRequirement"
+          }
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate",
+        "artifact"
+      ],
+      "properties": {
+        "gate": {
+          "$ref": "#/$defs/text"
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceKey",
+        "disposition",
+        "recoveryLocation",
+        "evidence"
+      ],
+      "properties": {
+        "resourceKey": {
+          "$ref": "#/$defs/text"
+        },
+        "disposition": {
+          "enum": [
+            "unchanged",
+            "verifiedApplied",
+            "restoredToNewLocation",
+            "externalCommitRetained",
+            "externalBaselineObserved",
+            "externalDesiredStateObserved"
+          ]
+        },
+        "recoveryLocation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "recoveryDestination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceKey",
+        "recoveryLocation"
+      ],
+      "properties": {
+        "resourceKey": {
+          "$ref": "#/$defs/text"
+        },
+        "recoveryLocation": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "recoveryResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceKey",
+        "recoveryLocation",
+        "disposition",
+        "evidence"
+      ],
+      "properties": {
+        "resourceKey": {
+          "$ref": "#/$defs/text"
+        },
+        "recoveryLocation": {
+          "$ref": "#/$defs/text"
+        },
+        "disposition": {
+          "enum": [
+            "verifiedRestored",
+            "verifiedAbsent",
+            "retainedPartial"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "externalSelector": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "externalIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "authority",
+        "ownerId",
+        "resourceKind",
+        "resourceId"
+      ],
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/externalSelector"
+        },
+        "authority": {
+          "$ref": "#/$defs/externalSelector"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/externalSelector"
+        },
+        "resourceKind": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/externalSelector"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/externalSelector"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "resourceKind": {
+              "type": "null"
+            },
+            "resourceId": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "resourceKind": {
+              "type": "string"
+            },
+            "resourceId": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "externalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presence",
+        "sha256"
+      ],
+      "properties": {
+        "presence": {
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "externalEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/externalIdentity"
+        },
+        "before": {
+          "$ref": "#/$defs/externalState"
+        },
+        "after": {
+          "$ref": "#/$defs/externalState"
+        }
+      }
+    },
+    "credentialBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource",
+        "purpose",
+        "subjectId"
+      ],
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/credentialIdentity"
+        },
+        "purpose": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        },
+        "subjectId": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        }
+      }
+    },
+    "credentialReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "vaultId",
+        "credentialId",
+        "bindingSha256",
+        "cipherSha256"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "protected-credential-reference.v1"
+        },
+        "vaultId": {
+          "$ref": "#/$defs/credentialId"
+        },
+        "credentialId": {
+          "$ref": "#/$defs/credentialId"
+        },
+        "bindingSha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "cipherSha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "credentialIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "authority",
+        "ownerId",
+        "resourceKind",
+        "resourceId"
+      ],
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        },
+        "authority": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        },
+        "ownerId": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        },
+        "resourceKind": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/credentialExternalSelector"
+        }
+      }
+    },
+    "credentialId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "credentialExternalSelector": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "credentialRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "usePhase",
+        "reference",
+        "binding"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_.-]*$"
+        },
+        "usePhase": {
+          "enum": [
+            "dispatch",
+            "recovery"
+          ]
+        },
+        "reference": {
+          "$ref": "#/$defs/credentialReference"
+        },
+        "binding": {
+          "$ref": "#/$defs/credentialBinding"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "recoveryTarget"
+        ]
+      },
+      "then": {
+        "properties": {
+          "state": {
+            "enum": [
+              "recoveryIntent",
+              "outcomeUnknown",
+              "reconciled"
+            ]
+          },
+          "plan": {
+            "required": [
+              "credentials"
+            ],
+            "properties": {
+              "credentials": {
+                "contains": {
+                  "properties": {
+                    "usePhase": {
+                      "const": "recovery"
+                    }
+                  },
+                  "required": [
+                    "usePhase"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "recoveryIntent"
+          },
+          "plan": {
+            "required": [
+              "credentials"
+            ]
+          },
+          "recoveryDestinations": {
+            "maxItems": 0
+          }
+        },
+        "required": [
+          "state",
+          "plan",
+          "recoveryDestinations"
+        ]
+      },
+      "then": {
+        "required": [
+          "recoveryTarget"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "projectPath": "D:\\TIAW\\wt02\\s\\TiaMcpScratch_20261015_071342_e395a300\\TiaMcpScratch_20261015_071342_e395a300\\TiaMcpScratch_20261015_071342_e395a300.ap21",
+  "mode": "translations-category-read",
+  "plcName": "ScratchPLC",
+  "processId": 46936,
+  "binarySha256": "ae12065bb44fd8aec3dc5f39b26c0560c6ea4ca264ff2856270d4abe2c13fdd5",
+  "outputDirectory": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-watch-20261015\\translations\\native-category-01",
+  "artifactRoot": "D:\\03_Entwicklung\\TIA_MCP\\artifacts",
+  "sourceFiles": [
+    "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\ExpansionEvidence\\Program.cs",
+    "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\ExpansionEvidence\\TranslationCategoryProbe.cs",
+    "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\ExpansionEvidence\\ExpansionEvidence.csproj"
+  ]
+}

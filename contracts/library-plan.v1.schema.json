@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-plan:v1",
+  "title": "Prepared library preview observation envelope",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "kind",
+    "sessionGeneration",
+    "resources",
+    "selection",
+    "dependencies",
+    "effects",
+    "warnings",
+    "payload",
+    "fingerprint"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "enum": [
+        "library_create",
+        "library_upgrade",
+        "library_copy_elements",
+        "library_instantiate",
+        "library_update_project",
+        "library_integrate",
+        "library_create_type",
+        "library_create_master_copy",
+        "library_edit_version",
+        "library_release_version",
+        "library_discard_version",
+        "library_set_default",
+        "library_type_policy",
+        "library_organize",
+        "library_delete",
+        "library_publish",
+        "library_save",
+        "library_archive"
+      ]
+    },
+    "sessionGeneration": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}(?![\\s\\S])"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:tia-mcp:library-lock:v1#/$defs/source"
+      },
+      "maxItems": 32
+    },
+    "selection": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:tia-mcp:library-lock:v1#/$defs/selection"
+      },
+      "maxItems": 100
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:tia-mcp:library-lock:v1#/$defs/dependency"
+      }
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "payload": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "componentContentPins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+      }
+    },
+    "projectPath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outputAbsent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "upgradeSourceHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "upgradeSourceHashScope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "typeSynchronization": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+      }
+    },
+    "targetPreview": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "updateImpact": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "updateBaseline": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "updateCleanupGuard": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "documentsHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "documentSource": {
+      "type": "object",
+      "required": [
+        "originalDirectory",
+        "snapshotDirectory",
+        "sha256",
+        "hashScope",
+        "ownedSnapshot"
+      ],
+      "properties": {
+        "originalDirectory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshotDirectory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "hashScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ownedSnapshot": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceObject": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "existingRecoveryCheckpoint": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "targetScope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "compileTarget": {
+      "type": "string",
+      "minLength": 1
+    },
+    "compileScope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "compileTargetPaths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "integrationPlan": {
+      "type": "object",
+      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+    },
+    "applySupported": {
+      "const": false
+    },
+    "applyError": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "description": "Prepared library preview envelope and exact metadata pins. Payload, effects and operation-specific analysis remain opaque; validation grants no apply or native qualification authority.",
+  "dependentRequired": {
+    "documentsHash": [
+      "documentSource"
+    ],
+    "documentSource": [
+      "documentsHash"
+    ],
+    "compileTargetPaths": [
+      "compileScope"
+    ],
+    "integrationPlan": [
+      "applySupported",
+      "applyError"
+    ],
+    "applySupported": [
+      "integrationPlan",
+      "applyError"
+    ],
+    "upgradeSourceHash": [
+      "upgradeSourceHashScope"
+    ],
+    "upgradeSourceHashScope": [
+      "upgradeSourceHash"
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-csv-options.v1.schema.json",
+  "type": "object",
+  "required": [
+    "delimiter",
+    "decimalSeparator",
+    "headerRecord",
+    "timeColumn",
+    "timeUnit",
+    "columns",
+    "mode",
+    "clock",
+    "programIdentity",
+    "quality"
+  ],
+  "properties": {
+    "delimiter": {
+      "enum": [
+        ",",
+        ";",
+        "\t"
+      ]
+    },
+    "decimalSeparator": {
+      "enum": [
+        ".",
+        ","
+      ]
+    },
+    "headerRecord": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "timeColumn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "timeUnit": {
+      "enum": [
+        "s",
+        "ms",
+        "us",
+        "ns"
+      ]
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "signalId",
+          "column",
+          "unit"
+        ],
+        "properties": {
+          "signalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "column": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "mode": {
+      "enum": [
+        "synthetic",
+        "polling",
+        "manualNativeExport"
+      ]
+    },
+    "clock": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "programIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "quality": {
+      "$ref": "trace-measurement.v1.schema.json#/properties/quality"
+    },
+    "missingValues": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string"
+      }
+    },
+    "settingsReadbackEvidence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "status": "offline_derived_candidate_unwired",
+  "nativeProfileEnabled": false,
+  "productionApplySupported": false,
+  "nativeNoneExport": false,
+  "captureReport": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\result.json",
+    "sha256": "28e6296a8314651a0ff59962ad410183f518e709acfd41f09f4b0f92d50dfdca"
+  },
+  "derivation": "Exact byte-span removal of one top-level DocumentInfo and its captured separator; no XML reserialization.",
+  "artifacts": {
+    "callee": {
+      "name": "TiaMcpComponentGate",
+      "nativePath": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+      "raw": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\before-storage\\0001.xml",
+        "sha256": "f3e5a17c5cd7fb9ff314c403f5c20d4e41e839bfed5cbcc9d4bb596d50ed40ab",
+        "bytes": 8419
+      },
+      "derived": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\typed-storage-profile\\experiments\\CapturedStorage\\sc01-derived\\callee.xml",
+        "sha256": "c5d51916e73c796702c6afdc8787504e54473046afc4e1ea01a5aa3b5dca96e9",
+        "bytes": 6466
+      },
+      "proof": {
+        "policyId": "sc01-exact-direct-documentinfo-byte-span-v1",
+        "removedStartByte": 88,
+        "removedEndByteExclusive": 2041,
+        "removedBytes": 1953,
+        "removedSha256": "c0ad11bd8163754a8b1c04b437e6710f191a7a741977107953388d9ed1ff45f8",
+        "separator": "Two leading ASCII spaces and the trailing CRLF belonging to the removed DocumentInfo line span.",
+        "reconstructedRawBytesEqual": true,
+        "allBytesOutsideSpanEqual": true
+      }
+    },
+    "type": {
+      "name": "TiaMcpComponentState",
+      "nativePath": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpComponentState",
+      "raw": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\before-storage\\0006.xml",
+        "sha256": "e3547683012fdbfa8f4f6c81bbfc881cb94cc13ba1179ad59d8e843d06bacc8c",
+        "bytes": 3762
+      },
+      "derived": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\typed-storage-profile\\experiments\\CapturedStorage\\sc01-derived\\type.xml",
+        "sha256": "9c2da02b6e351fbc25a1b7755174e3108fc063a1ed0b1dc3078111923c856386",
+        "bytes": 1809
+      },
+      "proof": {
+        "policyId": "sc01-exact-direct-documentinfo-byte-span-v1",
+        "removedStartByte": 88,
+        "removedEndByteExclusive": 2041,
+        "removedBytes": 1953,
+        "removedSha256": "149c058b7341cfb6771d68ada009e47dc422270b43bb06a18d227d1565ab0b87",
+        "separator": "Two leading ASCII spaces and the trailing CRLF belonging to the removed DocumentInfo line span.",
+        "reconstructedRawBytesEqual": true,
+        "allBytesOutsideSpanEqual": true
+      }
+    },
+    "instance": {
+      "name": "TiaMcpComponentStorageCapture",
+      "nativePath": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentStorageCapture",
+      "raw": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\after-storage\\0002.xml",
+        "sha256": "5b81c7fce7f9e87b57a0d33f533b97b9ee3619e6f147b25342ec4e314b071797",
+        "bytes": 5570
+      },
+      "derived": {
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\typed-storage-profile\\experiments\\CapturedStorage\\sc01-derived\\instance.xml",
+        "sha256": "e9fe21dcef085e52008b0a78afaac5af917a54a5c4ac4774f6905376330af976",
+        "bytes": 3617
+      },
+      "proof": {
+        "policyId": "sc01-exact-direct-documentinfo-byte-span-v1",
+        "removedStartByte": 88,
+        "removedEndByteExclusive": 2041,
+        "removedBytes": 1953,
+        "removedSha256": "fedd0d8ba0ccc5d16a7f877a209ca106c2f78269ff79116d7c1bf910573dbbe2",
+        "separator": "Two leading ASCII spaces and the trailing CRLF belonging to the removed DocumentInfo line span.",
+        "reconstructedRawBytesEqual": true,
+        "allBytesOutsideSpanEqual": true
+      }
+    }
+  }
+}

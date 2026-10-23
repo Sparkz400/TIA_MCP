@@ -1,0 +1,21 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Lt_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Lt( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

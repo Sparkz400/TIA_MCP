@@ -1,0 +1,19 @@
+{
+  "kind": "exact-profile-candidate-inputs",
+  "nativeEvidenceReusedFrom": "wa1604/revision-03",
+  "scopeOnly": true,
+  "productionApplyEnabled": false,
+  "rawReviewSha256": "8d022899442622f603926990da53a3723ff71b351daeb416f453f0550b7d714c",
+  "files": [
+    {
+      "path": "profile-candidate-review.json",
+      "sha256": "2262d8f615514490bc6fe5fd1db0e637d910fa624653fc80ee4b2cc64113f550",
+      "bytes": 51665
+    },
+    {
+      "path": "creation.reviewed.xml",
+      "sha256": "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba",
+      "bytes": 3130
+    }
+  ]
+}

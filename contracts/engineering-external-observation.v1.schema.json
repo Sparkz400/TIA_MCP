@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/engineering-external-observation.v1.schema.json",
+  "title": "Trusted provider observation context and retained public bytes; no provider authentication or native qualification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "operationId",
+    "planSha256",
+    "revision",
+    "resourceKey",
+    "phase",
+    "observationId",
+    "state",
+    "stateArtifact"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "engineering-external-observation.v1"
+    },
+    "operationId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "planSha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999
+    },
+    "resourceKey": {
+      "type": "string",
+      "pattern": "^external:[a-f0-9]{64}(:[a-f0-9]{64})?$"
+    },
+    "phase": {
+      "enum": [
+        "checkpoint",
+        "outcome",
+        "reconciliation"
+      ]
+    },
+    "observationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "state": {
+      "$ref": "#/$defs/externalState"
+    },
+    "stateArtifact": {
+      "$ref": "#/$defs/artifact"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8192
+    },
+    "digest": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "sha256"
+      ],
+      "properties": {
+        "relativePath": {
+          "$ref": "#/$defs/text"
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "externalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presence",
+        "sha256"
+      ],
+      "properties": {
+        "presence": {
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    }
+  }
+}

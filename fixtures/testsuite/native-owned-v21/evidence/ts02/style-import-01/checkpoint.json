@@ -1,0 +1,66 @@
+{
+  "mode": "definition-import",
+  "processId": 42956,
+  "projectPath": "D:\\TIAW\\ts02\\s\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4.ap21",
+  "startedAtUtc": "2026-10-15T07:52:54.6616601Z",
+  "beforeModified": false,
+  "servicePresence": "observed",
+  "licenseAvailability": "unknown",
+  "executionAvailability": "notAttempted",
+  "automaticReplay": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "metadata": {
+    "groups": [
+      {
+        "type": "Siemens.Engineering.TestSuite.StyleGuide.StyleGuideSystemGroup",
+        "compositions": [
+          {
+            "name": "RuleSets",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSystemGroup",
+        "compositions": [
+          {
+            "name": "ApplicationTestSets",
+            "creationInfos": [],
+            "definitions": []
+          },
+          {
+            "name": "TestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.SystemTest.SystemTestSystemGroup",
+        "compositions": [
+          {
+            "name": "SystemTestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor"
+        ]
+      }
+    ]
+  },
+  "checkpoint": {
+    "path": "D:\\TIAW\\ts02\\evidence\\style-import-01\\before-testsuite.zap21",
+    "sha256": "c02d635f6a455ab619407b20b2beab002e7218e0ffe28e8310544547e136445a",
+    "bytes": 359469
+  }
+}

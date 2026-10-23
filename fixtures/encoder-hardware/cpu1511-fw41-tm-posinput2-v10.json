@@ -1,0 +1,30 @@
+{
+  "family": "encoder",
+  "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "typeIdentifier": "TO_ExternalEncoder",
+  "version": "10.0",
+  "moduleTypeIdentifier": "OrderNumber:6ES7 551-1AB01-0AB0/V2.0",
+  "channelItemName": "TiaMcp_EncoderHardware",
+  "channelNumber": 0,
+  "channelIoType": "Complex",
+  "hardwareAttributes": [
+    {
+      "itemName": "TiaMcp_EncoderHardware",
+      "channelNumber": 0,
+      "channelType": "Technology",
+      "channelIoType": "Complex",
+      "attributes": {
+        "OperatingMode": "MotionControl"
+      }
+    }
+  ],
+  "dependencies": {
+    "Sensor.Type": 0,
+    "Sensor.Interface.Number": 1,
+    "_Sensor.Interface.Telegram": 83,
+    "_Sensor.DataAdaptionOffline": true
+  },
+  "parameterEdit": {
+    "Sensor.InverseDirection": true
+  }
+}

@@ -1,0 +1,22 @@
+NAMESPACE TiaMcp_UnitA
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpUnit_NumericFC_FBD"
+VAR_INPUT
+ Value : Int;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Result : Int;
+ Returned : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+ "TiaMcp_UnitA.TgpUnit_NumericFC"( Value := #Value, Accumulator := #Accumulator, Result => #Result, Ret_Val => #Returned )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:typed-graphical-change:v1",
+  "title": "Payload of graphical_typed_edit through change_prepare",
+  "description": "Model remains language-specific. Existing targets require the exact returned blockPath. Creation routes use the existing scope/group/namespace coordinator. All instance effects enter the same prepared project change.",
+  "type": "object", "additionalProperties": false, "required": ["model"],
+  "properties": {
+    "model": {"$ref": "typed-graphical-model.schema.json"},
+    "blockPath": {"$ref": "#/$defs/path"}, "scopePath": {"$ref": "#/$defs/path"},
+    "groupPath": {"$ref": "#/$defs/path"}, "namespace": {"type": "string", "maxLength": 4096},
+    "instances": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/instance"}}
+  },
+  "allOf": [
+    {"if": {"properties": {"model": {"properties": {"operation": {"const": "createBlock"}}}}}, "then": {"not": {"required": ["blockPath"]}}, "else": {"required": ["blockPath"]}}
+  ],
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "instance": {
+      "type": "object", "additionalProperties": false, "required": ["key", "kind"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.-]{0,127}(?![\\s\\S])"},
+        "kind": {"enum": ["existingGlobal", "existingMulti", "createGlobal", "createMulti"]},
+        "blockPath": {"$ref": "#/$defs/path"},
+        "components": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+        "name": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,79}(?![\\s\\S])"}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "existingGlobal"}}}, "then": {"required": ["blockPath"], "not": {"anyOf": [{"required": ["components"]}, {"required": ["name"]}]}}},
+        {"if": {"properties": {"kind": {"const": "existingMulti"}}}, "then": {"required": ["components"], "not": {"anyOf": [{"required": ["blockPath"]}, {"required": ["name"]}]}}},
+        {"if": {"properties": {"kind": {"enum": ["createGlobal", "createMulti"]}}}, "then": {"required": ["name"], "not": {"anyOf": [{"required": ["blockPath"]}, {"required": ["components"]}]}}}
+      ]
+    }
+  }
+}

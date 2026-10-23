@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:typed-graphical-profiles:v1",
+  "title": "Deployed typed graphical instruction profile catalog",
+  "description": "Installed-format evidence and exact compatibility predicates. Qualification flags remain independent; nativeFormatValidated is not runtime verification. This catalog is a deployment resource, never caller-supplied change payload.",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "profileVersion", "nativeFormat", "sources", "profiles"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "profileVersion": {"type": "string", "minLength": 1},
+    "nativeFormat": {"type": "object"},
+    "sources": {"type": "array", "maxItems": 4096, "items": {"$ref": "#/$defs/source"}},
+    "profiles": {"type": "array", "maxItems": 4096, "items": {"$ref": "#/$defs/profile"}},
+    "creationTemplates": {"type": "array", "maxItems": 4096, "items": {"$ref": "#/$defs/creationTemplate"}},
+    "globalInstanceTemplates": {"type": "array", "maxItems": 4096, "items": {"$ref": "#/$defs/instanceTemplate"}},
+    "multiInstanceTemplates": {"type": "array", "maxItems": 4096, "items": {"$ref": "#/$defs/multiInstanceTemplate"}}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "source": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/hash"}}},
+    "multiInstanceTemplate": {"type": "object", "additionalProperties": false, "required": ["id", "tiaVersion", "cpuFamily", "route", "path", "sha256", "referenceCalleePath", "referenceCalleeSha256", "memberName"], "properties": {
+      "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
+      "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]},
+      "path": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "sha256": {"$ref": "#/$defs/hash"},
+      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"}, "memberName": {"type": "string", "minLength": 1}}},
+    "creationTemplate": {"type": "object", "additionalProperties": false, "required": ["id", "tiaVersion", "cpuFamily", "route", "language", "blockType", "path", "sha256"], "properties": {
+      "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
+      "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]}, "blockType": {"enum": ["FC", "FB"]},
+      "path": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "sha256": {"$ref": "#/$defs/hash"}}},
+    "instanceTemplate": {"type": "object", "additionalProperties": false, "required": ["id", "tiaVersion", "cpuFamily", "route", "blockType", "path", "sha256"], "properties": {
+      "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
+      "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]}, "blockType": {"const": "InstanceDB"},
+      "path": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "sha256": {"$ref": "#/$defs/hash"},
+      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"}}},
+    "profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "language", "kind", "tiaVersion", "cpuFamily", "route", "nativeName", "nativeTemplateXml", "sourceSha256", "provenance", "nativeFormatValidated", "engineeringVerified", "preservationVerified", "persistenceVerified", "recoveryVerified", "runtimeVerified", "pins"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 256}, "version": {"type": "integer", "minimum": 1},
+        "language": {"enum": ["LAD", "FBD"]},
+        "kind": {"enum": ["powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter"]},
+        "instruction": {"type": ["string", "null"]}, "dataType": {"type": ["string", "null"]},
+        "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
+        "route": {"enum": ["standard", "softwareUnit", "namespace"]},
+        "nativeName": {"type": "string", "minLength": 1}, "nativeTemplateXml": {"type": "string", "minLength": 1},
+        "sourceSha256": {"$ref": "#/$defs/hash"}, "provenance": {"type": "string", "minLength": 1},
+        "nativeFormatValidated": {"type": "boolean"},
+        "readerOnly": {"type": "boolean"},
+        "calleeNameEncoding": {"enum": ["simple", "namespaceQualified", null]},
+        "engineeringVerified": {"type": "boolean"}, "preservationVerified": {"type": "boolean"},
+        "persistenceVerified": {"type": "boolean"}, "recoveryVerified": {"type": "boolean"}, "runtimeVerified": {"type": "boolean"},
+        "instanceType": {"type": ["string", "null"]},
+        "instanceDeclarationXml": {"type": ["string", "null"]},
+        "globalInstanceType": {"type": ["string", "null"]},
+        "globalInstanceTemplateXml": {"type": ["string", "null"]},
+        "globalInstanceSourceSha256": {"anyOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+        "networkTemplateXml": {"type": ["string", "null"]},
+        "pins": {"type": "array", "maxItems": 256, "items": {"$ref": "#/$defs/pin"}}
+      }
+    },
+    "pin": {
+      "type": "object", "additionalProperties": false, "required": ["name", "direction", "dataType", "required"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 128},
+        "direction": {"enum": ["input", "output", "inout"]},
+        "dataType": {"type": "string", "minLength": 1, "maxLength": 256}, "required": {"type": "boolean"}
+      }
+    }
+  }
+}

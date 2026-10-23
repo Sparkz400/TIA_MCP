@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "fixtureId": "typed-ctu-upper-limit-lad",
+      "family": "ctu-upper-limit",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_LAD.xml",
+      "interfaceDependencies": [
+        "Tgp_CTU_LAD"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      },
+      "runtimeBlockName": "Tgp_CTU_LimitDriver_LAD",
+      "runtimeSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_LAD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    Counter : \"Tgp_CTU_LAD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
+          "expectedBlockNames": [
+            "Tgp_CTU_LimitDriver_LAD"
+          ]
+        }
+      ],
+      "runtimeDriverProvenance": {
+        "path": "fixtures/typed-graphical/sources/ctu-limit-driver-lad.scl",
+        "sha256": "03e22d300a216be6d3fab6309b64ce8872bff7a1d0fa7563c9a43b140ad17e3f",
+        "nativeDutCallsPerDriverInvocationAtMost": 1024,
+        "attemptedRisingEdges": 32768,
+        "assertionScope": "Signed Int CTU upper saturation and reset, not exact scan timing."
+      }
+    },
+    {
+      "fixtureId": "typed-ctu-upper-limit-fbd",
+      "family": "ctu-upper-limit",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_FBD.xml",
+      "interfaceDependencies": [
+        "Tgp_CTU_FBD"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      },
+      "runtimeBlockName": "Tgp_CTU_LimitDriver_FBD",
+      "runtimeSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_FBD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    Counter : \"Tgp_CTU_FBD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
+          "expectedBlockNames": [
+            "Tgp_CTU_LimitDriver_FBD"
+          ]
+        }
+      ],
+      "runtimeDriverProvenance": {
+        "path": "fixtures/typed-graphical/sources/ctu-limit-driver-fbd.scl",
+        "sha256": "5a678c35a22e4f7deec6e4dde1d1f26cf673bb5c3c56a66573936288ae5f5807",
+        "nativeDutCallsPerDriverInvocationAtMost": 1024,
+        "attemptedRisingEdges": 32768,
+        "assertionScope": "Signed Int CTU upper saturation and reset, not exact scan timing."
+      }
+    }
+  ]
+}

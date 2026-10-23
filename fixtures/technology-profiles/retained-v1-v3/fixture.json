@@ -1,0 +1,4893 @@
+{
+  "producer": {
+    "correspondingImplementationCommit": "28d4ac9b17436ae9ae5e7f0fe08b30446b9db7c2",
+    "bundleManifestSha256": "3f69fadbdf9da0fe9a1b403043ace25e6d6430e4c62ece0a40951eb6a28c0ec1",
+    "binaryHashes": {
+      "TiaMcp.Host.dll": "060a925f4e2733fafc6a0cc0c6aa88606ab891986eeb0995d83a44a62dc140b7",
+      "TiaMcp.Core.dll": "f5ead9cf938704c2c30afc6c349b50b18c24f1427122c84231a3e19c7ae72d96"
+    }
+  },
+  "files": [
+    {
+      "path": "project-reviews/2b19b7d805c46c50762f01d8262d4143b90bc129310eef2ab57550ee3072c06e.json",
+      "bytes": 2025,
+      "sha256": "2b19b7d805c46c50762f01d8262d4143b90bc129310eef2ab57550ee3072c06e"
+    },
+    {
+      "path": "project-reviews/35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb.json",
+      "bytes": 4479,
+      "sha256": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb"
+    },
+    {
+      "path": "technology-profile-reviews/102a9d5ce30d5447dbf56190da46875f9fbd49ff376ff07f8bcc376e8be1048f.input",
+      "bytes": 6139,
+      "sha256": "102a9d5ce30d5447dbf56190da46875f9fbd49ff376ff07f8bcc376e8be1048f"
+    },
+    {
+      "path": "technology-profile-reviews/10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949.json",
+      "bytes": 9283,
+      "sha256": "10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949"
+    },
+    {
+      "path": "technology-profile-reviews/192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc.source",
+      "bytes": 6,
+      "sha256": "192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc"
+    },
+    {
+      "path": "technology-profile-reviews/4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370.json",
+      "bytes": 40847,
+      "sha256": "4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370"
+    },
+    {
+      "path": "technology-profile-reviews/4e41214c99f5f1580230b9587b5b35a140b2a5277b5abe22da18fc8906241669.input",
+      "bytes": 5085,
+      "sha256": "4e41214c99f5f1580230b9587b5b35a140b2a5277b5abe22da18fc8906241669"
+    },
+    {
+      "path": "technology-profile-reviews/67e70c818e8373f064a0407233fe87da708a907c4b8e5e98004c20cc65a2285e.input",
+      "bytes": 4549,
+      "sha256": "67e70c818e8373f064a0407233fe87da708a907c4b8e5e98004c20cc65a2285e"
+    },
+    {
+      "path": "technology-profile-reviews/70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe.json",
+      "bytes": 41806,
+      "sha256": "70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe"
+    },
+    {
+      "path": "technology-profile-reviews/8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8.source",
+      "bytes": 66,
+      "sha256": "8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8"
+    },
+    {
+      "path": "technology-profile-reviews/90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675.json",
+      "bytes": 10271,
+      "sha256": "90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675"
+    },
+    {
+      "path": "technology-profile-reviews/b4022e537a831bace306fc6d7b9a648ff4bb5f82dd64f1f38ed54aa71d9ad1a9.input",
+      "bytes": 5360,
+      "sha256": "b4022e537a831bace306fc6d7b9a648ff4bb5f82dd64f1f38ed54aa71d9ad1a9"
+    }
+  ],
+  "records": [
+    {
+      "recordId": "10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949",
+      "summary": {
+        "recordId": "10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949",
+        "reviewId": "2b19b7d805c46c50762f01d8262d4143b90bc129310eef2ab57550ee3072c06e",
+        "input": {
+          "path": "technology-profile-reviews/67e70c818e8373f064a0407233fe87da708a907c4b8e5e98004c20cc65a2285e.input",
+          "sha256": "67e70c818e8373f064a0407233fe87da708a907c4b8e5e98004c20cc65a2285e"
+        },
+        "reportArtifact": {
+          "path": "technology-profile-reviews/10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949.json",
+          "sha256": "10848d27c6dec07f70439bf7e65df31ad0989ba6c071367eb16b1162be6d3949"
+        },
+        "summary": {
+          "beforeParameterCount": 3,
+          "afterParameterCount": 3,
+          "beforeRelationshipCount": 5,
+          "afterRelationshipCount": 5,
+          "changedCount": 3,
+          "readOnlyConflictCount": 0,
+          "unknownAccessChangeCount": 0,
+          "unresolvedEndpointCount": 2,
+          "declaredCycleRecordCount": 4
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "nativeExecuted": false,
+        "targetCompatibilityVerified": false,
+        "wholeObjectAnalysisComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "sections": {
+        "observations": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readOnly",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readWrite",
+                "value": {
+                  "kind": "scalar",
+                  "text": "1"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "9007199254740993"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {
+                  "addressBits": 16
+                }
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          }
+        ],
+        "changes": [
+          {
+            "index": 0,
+            "value": {
+              "kind": "parameter",
+              "key": "Mode",
+              "status": "changed",
+              "changedFields": [
+                "value"
+              ],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "kind": "parameter",
+              "key": "Peer",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "kind": "parameter",
+              "key": "Scale",
+              "status": "changed",
+              "changedFields": [
+                "access",
+                "value"
+              ],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "kind": "relationship",
+              "key": "actor",
+              "status": "changed",
+              "changedFields": [
+                "metadata"
+              ],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "kind": "relationship",
+              "key": "back",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "kind": "relationship",
+              "key": "leading",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "kind": "relationship",
+              "key": "missing",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notProposal"
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "kind": "relationship",
+              "key": "off",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notProposal"
+            }
+          }
+        ],
+        "context": [
+          {
+            "index": 0,
+            "value": {
+              "selectionAndAncestors": [
+                {
+                  "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "kind": "technologyObject",
+                  "name": "Axis日本😀",
+                  "parentId": "/projects/Fixture/PLC",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {
+                    "systemLibraryType": "TO_PositioningAxis",
+                    "systemLibraryVersion": "10.0"
+                  }
+                },
+                {
+                  "nodeId": "/projects/Fixture/PLC",
+                  "objectPath": "/projects/Fixture/PLC",
+                  "kind": "plc",
+                  "name": "PLC",
+                  "parentId": "/projects/Fixture",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                },
+                {
+                  "nodeId": "/projects/Fixture",
+                  "objectPath": "/projects/Fixture",
+                  "kind": "project",
+                  "name": "Fixture",
+                  "parentId": null,
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                }
+              ],
+              "ancestorTraversalStopped": false,
+              "ancestorTraversalEnd": "root",
+              "directCapturedEdges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "suppliedFixtureEdge",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ],
+              "directEdgesTruncated": false
+            }
+          }
+        ],
+        "sources": [],
+        "consumers": [],
+        "consumerChanges": [],
+        "impactPaths": [],
+        "impactTraversal": []
+      }
+    },
+    {
+      "recordId": "4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370",
+      "summary": {
+        "recordId": "4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370",
+        "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+        "input": {
+          "path": "technology-profile-reviews/b4022e537a831bace306fc6d7b9a648ff4bb5f82dd64f1f38ed54aa71d9ad1a9.input",
+          "sha256": "b4022e537a831bace306fc6d7b9a648ff4bb5f82dd64f1f38ed54aa71d9ad1a9"
+        },
+        "reportArtifact": {
+          "path": "technology-profile-reviews/4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370.json",
+          "sha256": "4a39f0a8d0dd80cbafee8469488cfdcbe324b16c634dc1b1312c809f9a719370"
+        },
+        "summary": {
+          "beforeParameterCount": 3,
+          "afterParameterCount": 3,
+          "beforeRelationshipCount": 5,
+          "afterRelationshipCount": 5,
+          "changedCount": 3,
+          "readOnlyConflictCount": 1,
+          "unknownAccessChangeCount": 1,
+          "unresolvedEndpointCount": 2,
+          "declaredCycleRecordCount": 4
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "nativeExecuted": false,
+        "targetCompatibilityVerified": false,
+        "wholeObjectAnalysisComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "sections": {
+        "observations": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readOnly",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readWrite",
+                "value": {
+                  "kind": "scalar",
+                  "text": "1"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "9007199254740993"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {
+                  "addressBits": 16
+                }
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          }
+        ],
+        "changes": [
+          {
+            "index": 0,
+            "value": {
+              "kind": "parameter",
+              "key": "Mode",
+              "status": "changed",
+              "changedFields": [
+                "value"
+              ],
+              "proposalAssessment": "accessUnknown"
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "kind": "parameter",
+              "key": "Peer",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "kind": "parameter",
+              "key": "Scale",
+              "status": "changed",
+              "changedFields": [
+                "access",
+                "value"
+              ],
+              "proposalAssessment": "contradictsSuppliedReadOnly"
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "kind": "relationship",
+              "key": "actor",
+              "status": "changed",
+              "changedFields": [
+                "metadata"
+              ],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "kind": "relationship",
+              "key": "back",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "kind": "relationship",
+              "key": "leading",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "kind": "relationship",
+              "key": "missing",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "kind": "relationship",
+              "key": "off",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          }
+        ],
+        "context": [
+          {
+            "index": 0,
+            "value": {
+              "selectionAndAncestors": [
+                {
+                  "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "kind": "technologyObject",
+                  "name": "Axis日本😀",
+                  "parentId": "/projects/Fixture/PLC",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {
+                    "systemLibraryType": "TO_PositioningAxis",
+                    "systemLibraryVersion": "10.0"
+                  }
+                },
+                {
+                  "nodeId": "/projects/Fixture/PLC",
+                  "objectPath": "/projects/Fixture/PLC",
+                  "kind": "plc",
+                  "name": "PLC",
+                  "parentId": "/projects/Fixture",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                },
+                {
+                  "nodeId": "/projects/Fixture",
+                  "objectPath": "/projects/Fixture",
+                  "kind": "project",
+                  "name": "Fixture",
+                  "parentId": null,
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                }
+              ],
+              "ancestorTraversalStopped": false,
+              "ancestorTraversalEnd": "root",
+              "directCapturedEdges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "unsupported",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ],
+              "directEdgesTruncated": false
+            }
+          }
+        ],
+        "sources": [],
+        "consumers": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "parameter",
+                "subjectKey": "Scale",
+                "objectPath": "/projects/Fixture/PLC/technology/Peer",
+                "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "relationship",
+                "subjectKey": "actor",
+                "objectPath": "/projects/Fixture/PLC/hardware/Drive",
+                "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "after",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "parameter",
+                "subjectKey": "Scale",
+                "objectPath": "/projects/Fixture/PLC/blocks/Consumer",
+                "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "consumer": {
+                "id": "new",
+                "subjectKind": "relationship",
+                "subjectKey": "leading",
+                "objectPath": "/projects/Fixture/PLC/technology/Peer",
+                "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          }
+        ],
+        "consumerChanges": [
+          {
+            "index": 0,
+            "value": {
+              "id": "é",
+              "status": "onlyBefore",
+              "changedFields": []
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "id": "new",
+              "status": "onlyAfter",
+              "changedFields": []
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "id": "é",
+              "status": "changed",
+              "changedFields": [
+                "objectPath",
+                "nodeId"
+              ]
+            }
+          }
+        ],
+        "impactPaths": [
+          {
+            "index": 0,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 10,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 11,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 12,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 13,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 14,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 15,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 16,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 17,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 18,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 19,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 20,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 21,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 22,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "impactTraversal": [
+          {
+            "index": 0,
+            "value": {
+              "complete": false,
+              "freshness": "savedSnapshotsOnly",
+              "truncated": true,
+              "truncationReasons": [
+                "impactDepth"
+              ],
+              "limits": {
+                "impactDepth": 3,
+                "maxImpactPaths": 100,
+                "maxImpactEdgeVisits": 5000,
+                "maxImpactPathBytes": 1048576
+              },
+              "returnedPaths": 23,
+              "visitedEdges": 35,
+              "pathBytes": 26895,
+              "excludedEdges": [
+                {
+                  "reviewSide": "before",
+                  "counts": {
+                    "unsupportedRelationshipKind": 1
+                  }
+                },
+                {
+                  "reviewSide": "after",
+                  "counts": {
+                    "unsupportedRelationshipKind": 1
+                  }
+                }
+              ],
+              "supportedRelationshipKinds": [
+                "calls",
+                "dependsOn",
+                "hmiBinding",
+                "instanceOf",
+                "libraryVersion",
+                "reads",
+                "usesType",
+                "writes"
+              ],
+              "policy": "Incoming simple dependency paths, breadth first per changed object, before snapshot then after snapshot. Each path runs from the affected object to the changed object; diamonds retain distinct paths and cycles never repeat an object. Only resolved nativeConfirmed/parsedSupported edges with exact captured endpoints are followed. No cross-snapshot edges are joined.",
+              "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact.",
+              "excludedNodeCount": 0,
+              "rootCount": 4,
+              "consumerPolicy": "Both phases use this same saved review. Roots are the selected TO and exact same-PLC captured objects of declared consumers whose subjects exist in that phase. Incoming saved paths describe context candidates, not effects of proposed parameter/relationship changes. Supplied consumer links are never inserted as captured edges. Other PLCs, virtual nodes, unknown scopes, mismatched and ambiguous identities are excluded. Member existence and native links remain unverified; absent declarations do not prove removal or no impact."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "recordId": "70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe",
+      "summary": {
+        "recordId": "70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe",
+        "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+        "input": {
+          "path": "technology-profile-reviews/102a9d5ce30d5447dbf56190da46875f9fbd49ff376ff07f8bcc376e8be1048f.input",
+          "sha256": "102a9d5ce30d5447dbf56190da46875f9fbd49ff376ff07f8bcc376e8be1048f"
+        },
+        "reportArtifact": {
+          "path": "technology-profile-reviews/70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe.json",
+          "sha256": "70f248a8b803c17f26cb7ef2a9758167c295f8b29166798ca05b6f362b3b4efe"
+        },
+        "summary": {
+          "beforeParameterCount": 3,
+          "afterParameterCount": 3,
+          "beforeRelationshipCount": 5,
+          "afterRelationshipCount": 5,
+          "changedCount": 3,
+          "readOnlyConflictCount": 1,
+          "unknownAccessChangeCount": 1,
+          "unresolvedEndpointCount": 2,
+          "declaredCycleRecordCount": 4
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "nativeExecuted": false,
+        "targetCompatibilityVerified": false,
+        "wholeObjectAnalysisComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "sections": {
+        "observations": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readOnly",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readWrite",
+                "value": {
+                  "kind": "scalar",
+                  "text": "1"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "9007199254740993"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {
+                  "addressBits": 16
+                }
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          }
+        ],
+        "changes": [
+          {
+            "index": 0,
+            "value": {
+              "kind": "parameter",
+              "key": "Mode",
+              "status": "changed",
+              "changedFields": [
+                "value"
+              ],
+              "proposalAssessment": "accessUnknown"
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "kind": "parameter",
+              "key": "Peer",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "kind": "parameter",
+              "key": "Scale",
+              "status": "changed",
+              "changedFields": [
+                "access",
+                "value"
+              ],
+              "proposalAssessment": "contradictsSuppliedReadOnly"
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "kind": "relationship",
+              "key": "actor",
+              "status": "changed",
+              "changedFields": [
+                "metadata"
+              ],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "kind": "relationship",
+              "key": "back",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "kind": "relationship",
+              "key": "leading",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "kind": "relationship",
+              "key": "missing",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "kind": "relationship",
+              "key": "off",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          }
+        ],
+        "context": [
+          {
+            "index": 0,
+            "value": {
+              "selectionAndAncestors": [
+                {
+                  "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "kind": "technologyObject",
+                  "name": "Axis日本😀",
+                  "parentId": "/projects/Fixture/PLC",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {
+                    "systemLibraryType": "TO_PositioningAxis",
+                    "systemLibraryVersion": "10.0"
+                  }
+                },
+                {
+                  "nodeId": "/projects/Fixture/PLC",
+                  "objectPath": "/projects/Fixture/PLC",
+                  "kind": "plc",
+                  "name": "PLC",
+                  "parentId": "/projects/Fixture",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                },
+                {
+                  "nodeId": "/projects/Fixture",
+                  "objectPath": "/projects/Fixture",
+                  "kind": "project",
+                  "name": "Fixture",
+                  "parentId": null,
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                }
+              ],
+              "ancestorTraversalStopped": false,
+              "ancestorTraversalEnd": "root",
+              "directCapturedEdges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "unsupported",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ],
+              "directEdgesTruncated": false
+            }
+          }
+        ],
+        "sources": [
+          {
+            "index": 0,
+            "value": {
+              "label": "é",
+              "purpose": "supplied baseline only",
+              "phase": "before",
+              "fileName": "supplied日本.xml",
+              "bytes": 66,
+              "artifact": {
+                "path": "technology-profile-reviews/8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8.source",
+                "sha256": "8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "label": "é",
+              "purpose": "supplied baseline only",
+              "phase": "before",
+              "fileName": "supplied.bin",
+              "bytes": 6,
+              "artifact": {
+                "path": "technology-profile-reviews/192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc.source",
+                "sha256": "192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "label": "same bytes, another role",
+              "purpose": "declared comparison source",
+              "phase": "after",
+              "fileName": "supplied日本.xml",
+              "bytes": 66,
+              "artifact": {
+                "path": "technology-profile-reviews/8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8.source",
+                "sha256": "8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8"
+              }
+            }
+          }
+        ],
+        "consumers": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "parameter",
+                "subjectKey": "Scale",
+                "objectPath": "/projects/Fixture/PLC/technology/Peer",
+                "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "relationship",
+                "subjectKey": "actor",
+                "objectPath": "/projects/Fixture/PLC/hardware/Drive",
+                "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "after",
+              "consumer": {
+                "id": "é",
+                "subjectKind": "parameter",
+                "subjectKey": "Scale",
+                "objectPath": "/projects/Fixture/PLC/blocks/Consumer",
+                "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "consumer": {
+                "id": "new",
+                "subjectKind": "relationship",
+                "subjectKey": "leading",
+                "objectPath": "/projects/Fixture/PLC/technology/Peer",
+                "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                "member": "DB.Value",
+                "state": "declared",
+                "reason": null
+              },
+              "subjectResolution": "suppliedDeclaration",
+              "objectResolution": "capturedObject",
+              "memberResolution": "notVerified",
+              "nativeLinkVerified": false
+            }
+          }
+        ],
+        "consumerChanges": [
+          {
+            "index": 0,
+            "value": {
+              "id": "é",
+              "status": "onlyBefore",
+              "changedFields": []
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "id": "new",
+              "status": "onlyAfter",
+              "changedFields": []
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "id": "é",
+              "status": "changed",
+              "changedFields": [
+                "objectPath",
+                "nodeId"
+              ]
+            }
+          }
+        ],
+        "impactPaths": [
+          {
+            "index": 0,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/hardware/Drive",
+              "changedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 10,
+            "value": {
+              "reviewSide": "before",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 11,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 12,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 13,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 14,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "changedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 15,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/hardware/Drive",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 16,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 17,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/hardware/Drive",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 18,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 19,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer",
+                "/projects/Fixture/PLC/technology/Axis日本😀"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 20,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Consumer",
+              "distance": 1,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 21,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/blocks/Caller",
+              "distance": 2,
+              "objectPaths": [
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "index": 22,
+            "value": {
+              "reviewSide": "after",
+              "reviewId": "35aa0ffe98e5e89d98664fce89c2b5a556aa5be40f19bfbf626b40b88207a7eb",
+              "changedPath": "/projects/Fixture/PLC/technology/Peer",
+              "changedObjectPath": "/projects/Fixture/PLC/technology/Peer",
+              "change": "suppliedContextRoot",
+              "changedFields": [],
+              "affectedObjectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+              "distance": 3,
+              "objectPaths": [
+                "/projects/Fixture/PLC/technology/Axis日本😀",
+                "/projects/Fixture/PLC/blocks/Caller",
+                "/projects/Fixture/PLC/blocks/Consumer",
+                "/projects/Fixture/PLC/technology/Peer"
+              ],
+              "edges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Caller",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Caller"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                },
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/blocks/Consumer",
+                    "objectPath": "/projects/Fixture/PLC/blocks/Consumer"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Peer",
+                    "objectPath": "/projects/Fixture/PLC/technology/Peer"
+                  },
+                  "kind": "dependsOn",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "impactTraversal": [
+          {
+            "index": 0,
+            "value": {
+              "complete": false,
+              "freshness": "savedSnapshotsOnly",
+              "truncated": true,
+              "truncationReasons": [
+                "impactDepth"
+              ],
+              "limits": {
+                "impactDepth": 3,
+                "maxImpactPaths": 100,
+                "maxImpactEdgeVisits": 5000,
+                "maxImpactPathBytes": 1048576
+              },
+              "returnedPaths": 23,
+              "visitedEdges": 35,
+              "pathBytes": 26895,
+              "excludedEdges": [
+                {
+                  "reviewSide": "before",
+                  "counts": {
+                    "unsupportedRelationshipKind": 1
+                  }
+                },
+                {
+                  "reviewSide": "after",
+                  "counts": {
+                    "unsupportedRelationshipKind": 1
+                  }
+                }
+              ],
+              "supportedRelationshipKinds": [
+                "calls",
+                "dependsOn",
+                "hmiBinding",
+                "instanceOf",
+                "libraryVersion",
+                "reads",
+                "usesType",
+                "writes"
+              ],
+              "policy": "Incoming simple dependency paths, breadth first per changed object, before snapshot then after snapshot. Each path runs from the affected object to the changed object; diamonds retain distinct paths and cycles never repeat an object. Only resolved nativeConfirmed/parsedSupported edges with exact captured endpoints are followed. No cross-snapshot edges are joined.",
+              "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact.",
+              "excludedNodeCount": 0,
+              "rootCount": 4,
+              "consumerPolicy": "Both phases use this same saved review. Roots are the selected TO and exact same-PLC captured objects of declared consumers whose subjects exist in that phase. Incoming saved paths describe context candidates, not effects of proposed parameter/relationship changes. Supplied consumer links are never inserted as captured edges. Other PLCs, virtual nodes, unknown scopes, mismatched and ambiguous identities are excluded. Member existence and native links remain unverified; absent declarations do not prove removal or no impact."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "recordId": "90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675",
+      "summary": {
+        "recordId": "90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675",
+        "reviewId": "2b19b7d805c46c50762f01d8262d4143b90bc129310eef2ab57550ee3072c06e",
+        "input": {
+          "path": "technology-profile-reviews/4e41214c99f5f1580230b9587b5b35a140b2a5277b5abe22da18fc8906241669.input",
+          "sha256": "4e41214c99f5f1580230b9587b5b35a140b2a5277b5abe22da18fc8906241669"
+        },
+        "reportArtifact": {
+          "path": "technology-profile-reviews/90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675.json",
+          "sha256": "90ee543c1fdfd0dbef379c4c8427f8523068294e98d5c4eb7a38bccd67fab675"
+        },
+        "summary": {
+          "beforeParameterCount": 3,
+          "afterParameterCount": 3,
+          "beforeRelationshipCount": 5,
+          "afterRelationshipCount": 5,
+          "changedCount": 3,
+          "readOnlyConflictCount": 1,
+          "unknownAccessChangeCount": 1,
+          "unresolvedEndpointCount": 2,
+          "declaredCycleRecordCount": 4
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "nativeExecuted": false,
+        "targetCompatibilityVerified": false,
+        "wholeObjectAnalysisComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "sections": {
+        "observations": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readOnly",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Scale",
+                "nativeType": "System.Double",
+                "access": "readWrite",
+                "value": {
+                  "kind": "scalar",
+                  "text": "1"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Mode",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "9007199254740993"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "parameter": {
+                "name": "Peer",
+                "nativeType": "System.Double",
+                "access": "unknown",
+                "value": {
+                  "kind": "scalar",
+                  "text": "0"
+                },
+                "metadata": {
+                  "unit": "supplied",
+                  "text": "日本語 😀\nopaque"
+                }
+              }
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "index": 0,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "phase": "before",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "actor",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/hardware/Drive",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {
+                  "addressBits": 16
+                }
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "leading",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/projects/Fixture/PLC/technology/Peer",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "back",
+                "kind": "coupling",
+                "sourcePath": "/projects/Fixture/PLC/technology/Peer",
+                "targetPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetMember": null,
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "capturedObject",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": true
+            }
+          },
+          {
+            "index": 8,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "missing",
+                "kind": "mapping",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": "/unknown",
+                "targetMember": "DB.Member",
+                "state": "declared",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "unresolved",
+              "memberResolution": "notVerified",
+              "inDeclaredCycle": false
+            }
+          },
+          {
+            "index": 9,
+            "value": {
+              "phase": "after",
+              "relationship": {
+                "id": "off",
+                "kind": "hardware",
+                "sourcePath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                "targetPath": null,
+                "targetMember": null,
+                "state": "disconnected",
+                "reason": null,
+                "metadata": {}
+              },
+              "sourceResolution": "capturedObject",
+              "targetResolution": "declaredDisconnected",
+              "memberResolution": "notDeclared",
+              "inDeclaredCycle": false
+            }
+          }
+        ],
+        "changes": [
+          {
+            "index": 0,
+            "value": {
+              "kind": "parameter",
+              "key": "Mode",
+              "status": "changed",
+              "changedFields": [
+                "value"
+              ],
+              "proposalAssessment": "accessUnknown"
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "kind": "parameter",
+              "key": "Peer",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "kind": "parameter",
+              "key": "Scale",
+              "status": "changed",
+              "changedFields": [
+                "access",
+                "value"
+              ],
+              "proposalAssessment": "contradictsSuppliedReadOnly"
+            }
+          },
+          {
+            "index": 3,
+            "value": {
+              "kind": "relationship",
+              "key": "actor",
+              "status": "changed",
+              "changedFields": [
+                "metadata"
+              ],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 4,
+            "value": {
+              "kind": "relationship",
+              "key": "back",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 5,
+            "value": {
+              "kind": "relationship",
+              "key": "leading",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 6,
+            "value": {
+              "kind": "relationship",
+              "key": "missing",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          },
+          {
+            "index": 7,
+            "value": {
+              "kind": "relationship",
+              "key": "off",
+              "status": "unchanged",
+              "changedFields": [],
+              "proposalAssessment": "notAssessed"
+            }
+          }
+        ],
+        "context": [
+          {
+            "index": 0,
+            "value": {
+              "selectionAndAncestors": [
+                {
+                  "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀",
+                  "kind": "technologyObject",
+                  "name": "Axis日本😀",
+                  "parentId": "/projects/Fixture/PLC",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {
+                    "systemLibraryType": "TO_PositioningAxis",
+                    "systemLibraryVersion": "10.0"
+                  }
+                },
+                {
+                  "nodeId": "/projects/Fixture/PLC",
+                  "objectPath": "/projects/Fixture/PLC",
+                  "kind": "plc",
+                  "name": "PLC",
+                  "parentId": "/projects/Fixture",
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                },
+                {
+                  "nodeId": "/projects/Fixture",
+                  "objectPath": "/projects/Fixture",
+                  "kind": "project",
+                  "name": "Fixture",
+                  "parentId": null,
+                  "origin": "native",
+                  "plcPath": "/projects/Fixture/PLC",
+                  "metadata": {}
+                }
+              ],
+              "ancestorTraversalStopped": false,
+              "ancestorTraversalEnd": "root",
+              "directCapturedEdges": [
+                {
+                  "source": {
+                    "nodeId": "/projects/Fixture/PLC/technology/Axis日本😀",
+                    "objectPath": "/projects/Fixture/PLC/technology/Axis日本😀"
+                  },
+                  "target": {
+                    "nodeId": "/projects/Fixture/PLC/hardware/Drive",
+                    "objectPath": "/projects/Fixture/PLC/hardware/Drive"
+                  },
+                  "kind": "suppliedFixtureEdge",
+                  "evidence": {
+                    "origin": "parsedSupported",
+                    "resolution": "resolved"
+                  }
+                }
+              ],
+              "directEdgesTruncated": false
+            }
+          }
+        ],
+        "sources": [
+          {
+            "index": 0,
+            "value": {
+              "label": "é",
+              "purpose": "supplied baseline only",
+              "phase": "before",
+              "fileName": "supplied日本.xml",
+              "bytes": 66,
+              "artifact": {
+                "path": "technology-profile-reviews/8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8.source",
+                "sha256": "8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8"
+              }
+            }
+          },
+          {
+            "index": 1,
+            "value": {
+              "label": "é",
+              "purpose": "supplied baseline only",
+              "phase": "before",
+              "fileName": "supplied.bin",
+              "bytes": 6,
+              "artifact": {
+                "path": "technology-profile-reviews/192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc.source",
+                "sha256": "192345604f36cfa29999f86d1cb4805fa790075df3d053d566d3b9fb4d680cdc"
+              }
+            }
+          },
+          {
+            "index": 2,
+            "value": {
+              "label": "same bytes, another role",
+              "purpose": "declared comparison source",
+              "phase": "after",
+              "fileName": "supplied日本.xml",
+              "bytes": 66,
+              "artifact": {
+                "path": "technology-profile-reviews/8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8.source",
+                "sha256": "8ad0122652721271df29cd185feafa1e3daf6ad496704bb030137ba312b9e3a8"
+              }
+            }
+          }
+        ],
+        "consumers": [],
+        "consumerChanges": [],
+        "impactPaths": [],
+        "impactTraversal": []
+      }
+    }
+  ],
+  "shutdown": {
+    "hostExitCode": 0,
+    "forcedHostStop": false,
+    "workerExits": [],
+    "stderrEofObserved": true
+  },
+  "nativeExecuted": false
+}

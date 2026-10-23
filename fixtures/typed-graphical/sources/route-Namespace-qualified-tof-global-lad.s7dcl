@@ -1,0 +1,23 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TOF_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  "TiaMcp_UnitA.Alternate.TgpNamespace_GlobalTimer".TOF( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

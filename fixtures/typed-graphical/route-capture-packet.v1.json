@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "sourcePacket": {
+    "path": "artifacts/tgr06.inputs",
+    "sha256": "5037ccc063e8646641003f5cfa8c68d93869e218b75d1a33b03da0f5a26eee25"
+  },
+  "sourceArchive": {
+    "path": "artifacts/tgr04/changes/change-5174ee4f86a946e69ecd2b237817c7b2/before.zap21",
+    "sha256": "82cdd36a64784306bb2294c7b45fe8c614ec2489fbb01a7f2edd984433b753f9"
+  },
+  "unit": "TiaMcp_UnitA",
+  "nativeReferenceQualification": false,
+  "typedBuilderQualification": false,
+  "runtimeQualification": false,
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-advanced-callees.scl",
+      "sha256": "3c802fbab108c00563f5857577bacaff9f481c35d68edbe93838f268296ce584",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_NumericFC",
+        "TgpNamespace_NumericFB"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-storage.scl",
+      "sha256": "c3e300733d3e71db620ad8325aa6087539fded7354791fbf63943bc600aab989",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_GlobalTimer",
+        "TgpNamespace_GlobalCounter",
+        "TgpNamespace_NumericFB_DB",
+        "TgpNamespace_GlobalTemplateFB_LAD",
+        "TgpNamespace_GlobalTemplateFB_FBD",
+        "TgpNamespace_MultiTemplateFB_LAD",
+        "TgpNamespace_MultiTemplateFB_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fc-lad.s7dcl",
+      "sha256": "c9b168c70ddf888e711c0e91856669ff8a87ed351fe44416249a15fceb5aa953",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFC_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fc-fbd.s7dcl",
+      "sha256": "728bf327b72bdedadd8e2050a91279c03ada8b3d3d212e70df26b353951b61e2",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFC_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fb-lad.s7dcl",
+      "sha256": "49ec7efc9f63f2cb4913179b4445b49067270f513bc873d2629f4cefb354e78d",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fb-fbd.s7dcl",
+      "sha256": "80bed061a0678aaa7c85b06d1244c089a96ae3b46158e613ef540e57e0c94985",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFB_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fb-global-lad.s7dcl",
+      "sha256": "7aa9f80b0d81bd32d10d943acfe0e78f9f4cea0c457cf9ffcb0dce38c3c48362",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFB_Global_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-numeric-fb-global-fbd.s7dcl",
+      "sha256": "33bf50904db4a8599220df5a8b5a65f444104670ffb8e7bb86455bf23047ab2c",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_NumericFB_Global_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-eq-lad.s7dcl",
+      "sha256": "ee79e565633e5fa1f342d1e5b37681e47c63682e4a073623a8ada3a272a5e3fe",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Eq_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-eq-fbd.s7dcl",
+      "sha256": "141b4bea16a85ccc5a0a77fb07fb51e5afb4a77aa90dd25c67f37e9b26acc2a7",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Eq_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-native-ton-lad.xml",
+      "sha256": "1fc7bdc0d6b9c1e0316febbdbd5ece4c8151f14371dbea56e8826045be049c1c",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TON_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-native-ton-fbd.xml",
+      "sha256": "4ea374c51d62853febdd8d72cc6b3d17ae8fff1aebae7b88945346d38f4f21c9",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TON_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-native-ton-global-lad.xml",
+      "sha256": "a5cffad97f03ee01c68b4b20f00d456f29aec784b3c6959e0b9e36e823279bd3",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TON_Global_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-native-ton-global-fbd.xml",
+      "sha256": "b924abeca54528d04655ec6396bbbe200d6ee35609194c5e3714f8e167f362ed",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TON_Global_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-native-ton-lad.xml",
+      "sha256": "db38bdac59dc93c5a9023abf0335acaad32474f0573ce49ebb27dc447cf01ee2",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TON_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-native-ton-fbd.xml",
+      "sha256": "ceb5f424882cf4d3396e03ab6063739390f29b6b3f8c268df8ffb7711f7500ab",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TON_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-native-ton-global-lad.xml",
+      "sha256": "d76215eec299795553fca7fb69fd99370406372d196464fe5e22670003b4f237",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TON_Global_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-native-ton-global-fbd.xml",
+      "sha256": "b26ec14edf787a043fc4aafa56ab96f900b4a478ecd43b27ab329000a3a75fdb",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TON_Global_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-ne-lad.s7dcl",
+      "sha256": "90f2b39d32b7837c552dd262704b7254bc96a948fd5d7aa53b86b64ef6fa7ebd",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Ne_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-ne-fbd.s7dcl",
+      "sha256": "47d4ea5902ac527b44744163761523359bc060c0a46e9c831e6203a14fadde0b",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Ne_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-lt-lad.s7dcl",
+      "sha256": "12fcdb324bbb3543d65902027297dc13d4d52ad339cec9a351fef1e6b4145a61",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Lt_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-lt-fbd.s7dcl",
+      "sha256": "272019c97c4cf0905c1711b6d3a520b3aaed1960e9723bcebf9269cc1200e12e",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Lt_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-le-lad.s7dcl",
+      "sha256": "c08529206093a72d64a6e02f77bc617979250ff719cbe16e7b1afd7a34a8ce2a",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Le_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-le-fbd.s7dcl",
+      "sha256": "aced6ffde83f17c640da0c9de4029f6f700d8f1b7a08fcabd84b871cec8f797b",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Le_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-gt-lad.s7dcl",
+      "sha256": "3b46b72a909ce2fada2eef5d98e19214d785e7cecf6e9d86bc9b81b2a9787533",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Gt_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-gt-fbd.s7dcl",
+      "sha256": "18d0ce6f8e7dcd27bb2bb9dcd7e843870c8597641a37ef1dda1213562265e2c1",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Gt_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-ge-lad.s7dcl",
+      "sha256": "d7dd3dc9e4c53bdcc77ffef4e575de48c9b1dba42fe863553b1402f5e93fe53a",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Ge_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-qualified-ge-fbd.s7dcl",
+      "sha256": "76e257c17746b102e068a05be3df5a0674cd5004e3f69692c3ec3473f00954d6",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_Ge_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-ne-lad.s7dcl",
+      "sha256": "ee5163c3ff18daac7fef6d79e03feae72ab70bcb7c7bf1d0c06f27980a5e09d2",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Ne_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-ne-fbd.s7dcl",
+      "sha256": "b7de4eddad0c0e08c6a4e3036edc39bd5a8b59bc958574f122b9a22df8f355d0",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Ne_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-lt-lad.s7dcl",
+      "sha256": "bcbd15a3e8b80926564ea90b8d4ca1f99a7b175766d5b2c2dcce16a67e8a1c05",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Lt_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-lt-fbd.s7dcl",
+      "sha256": "fa6ce62d2230873615427af82090751ccd7e72f2abe51af9fbf1f236b298c9b5",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Lt_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-le-lad.s7dcl",
+      "sha256": "366e17fc0d0cdc8f2097646e0210e5e4c7bb9dd4c548fe14babf6414a76d0196",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Le_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-le-fbd.s7dcl",
+      "sha256": "d06a68bccf405297c03720e4c6c13727bce0513ebd63d4255dcf8c6e8e8d6548",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Le_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-gt-lad.s7dcl",
+      "sha256": "90225d9dd16ff48a4a723ffa4d71518977d83b34a2e45fe5fe9cc0146c06348a",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Gt_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-gt-fbd.s7dcl",
+      "sha256": "73dab26a8669787361150093f0fc8007796e5d8ecd1bd88e53b14d3546b9268d",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Gt_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-ge-lad.s7dcl",
+      "sha256": "1d8054e871e23dd5cb2f4a540692d020d4a10d2385c761778e4ed94b3fac99d7",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Ge_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-qualified-ge-fbd.s7dcl",
+      "sha256": "201721326dc23780171d5a924c87929136d7dddabd8ace8db20e1c115d851aed",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_Ge_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    }
+  ]
+}

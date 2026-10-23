@@ -1,0 +1,29 @@
+{
+  "artifactRoot": "D:\\TIAW",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "ownedScratch": true,
+  "creationTool": "tia_create_scratch",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "definitionSha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+  "binarySha256": "d2bd0e17b7189d4238f09d74e9d9a9f920c391841a646d7acf6f630678dc526f",
+  "apiSha256": {
+    "Base": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+    "Step7": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba",
+    "TestSuite": "03e1b656eea82492ce3852a722d02cbc261c19c6c008035807c6e6d30c3d1fdb"
+  },
+  "sourceFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleScopeEvidence\\Program.cs",
+      "sha256": "8bdf0d6cf1bdab97b721d95a26f7bffcd4c8c2b90d57589da848aa4218be5ad3"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleScopeEvidence\\TestSuiteStyleScopeEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c"
+    }
+  ],
+  "mode": "inspect-scope",
+  "outputDirectory": "D:\\TIAW\\ts01\\evidence\\inspect-scope-01"
+}

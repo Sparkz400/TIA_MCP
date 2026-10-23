@@ -1,0 +1,19 @@
+DATA_BLOCK "Tgp_ResolutionOne"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Flag : Bool := TRUE;
+ RetainedMarker : Int := 17;
+END_VAR
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "Tgp_ResolutionTwo"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Flag : Bool := FALSE;
+ RetainedMarker : Int := 29;
+END_VAR
+BEGIN
+END_DATA_BLOCK

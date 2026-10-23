@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "qualification": "authored-not-executed",
+  "cases": [
+    {"id":"tag-exact-owner","operand":{"scope":"tag","ownerRole":"tags","components":["Ready"],"dataType":"Bool"},"expect":{"outcome":"prepared","dataType":"Bool"},"prerequisites":["Ready is a unique non-safety Bool tag in the caller's standard scope."]},
+    {"id":"tag-wrong-table","operand":{"scope":"tag","ownerRole":"otherTags","components":["Ready"]},"expect":{"outcome":"rejected","code":"OperandNotFound"},"prerequisites":["otherTags is an existing same-scope table without Ready; tags contains Ready."]},
+    {"id":"tag-duplicate-name","operand":{"scope":"tag","ownerRole":"tags","components":["Ready"]},"expect":{"outcome":"rejected","code":"AmbiguousOperand"},"prerequisites":["Two tables in the same scope contain Ready. Native setup must independently establish this; do not bypass tag import collision guards."]},
+    {"id":"db-first-owner","operand":{"scope":"db","ownerRole":"dbOne","components":["Flag"],"dataType":"Bool"},"expect":{"outcome":"prepared","dataType":"Bool"},"prerequisites":["dbOne and dbTwo have distinct DB names, same Bool Flag member, and different start values."]},
+    {"id":"db-second-owner","operand":{"scope":"db","ownerRole":"dbTwo","components":["Flag"],"dataType":"Bool"},"expect":{"outcome":"prepared","dataType":"Bool"}},
+    {"id":"db-wrong-kind","operand":{"scope":"db","ownerRole":"caller","components":["InputBool"]},"expect":{"outcome":"rejected","code":"OperandOwnerMismatch"}},
+    {"id":"db-missing-member","operand":{"scope":"db","ownerRole":"dbOne","components":["MissingFlag"]},"expect":{"outcome":"rejected","code":"OperandNotFound"}},
+    {"id":"db-wrong-type","operand":{"scope":"db","ownerRole":"dbOne","components":["Flag"],"dataType":"Int"},"expect":{"outcome":"rejected","code":"OperandTypeMismatch"}},
+    {"id":"db-duplicate-name","operand":{"scope":"db","ownerRole":"ambiguousDb","components":["Flag"]},"expect":{"outcome":"rejected","code":"AmbiguousOperand"},"prerequisites":["The selected DB is non-namespaced and same-scope; a different native DB identity elsewhere in the PLC has its exact emitted name."]},
+    {"id":"db-other-scope","operand":{"scope":"db","ownerRole":"otherScopeDb","components":["Flag"]},"expect":{"outcome":"rejected","code":"UnsupportedScopeReference"}},
+    {"id":"nested-udt-namespace","callerRole":"nestedCaller","operand":{"scope":"local","components":["State","Child","Flag"],"dataType":"Bool"},"expect":{"outcome":"prepared","dataType":"Bool","typeDependencyRoles":["outerType","innerType"]},"prerequisites":["Caller namespace A declares State as B.Outer. B.Outer declares Child as fully qualified B.Inner; B.Inner.Flag is Bool and A.Inner.Flag is Int. Every declaration belongs to the exact caller software scope. Use an existing qualified Boolean route. Native source generation rejected the earlier unqualified Inner spelling; this fixture does not qualify unqualified nested namespace propagation."]},
+    {"id":"unit-tag-stays-unsupported","callerRole":"nestedCaller","operand":{"scope":"tag","ownerRole":"unitTags","components":["Ready"]},"expect":{"outcome":"rejected","code":"UnsupportedScopeReference"},"prerequisites":["nestedCaller belongs to a software unit; unitTags is observed in that scope."]}
+  ]
+}

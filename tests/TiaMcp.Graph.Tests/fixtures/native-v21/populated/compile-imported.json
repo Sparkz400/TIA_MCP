@@ -1,0 +1,52 @@
+{
+  "state": "Warning",
+  "errors": 0,
+  "warnings": 1,
+  "messages": [
+    {
+      "state": "Warning",
+      "description": "",
+      "path": "GraphPLC",
+      "messages": [
+        {
+          "state": "Warning",
+          "description": "",
+          "path": "Program blocks",
+          "messages": [
+            {
+              "state": "Warning",
+              "description": "",
+              "path": "GraphQualification (FB1)",
+              "messages": [
+                {
+                  "state": "Warning",
+                  "description": "Step Idle does not contain actions.",
+                  "path": "Sequence 1",
+                  "messages": []
+                },
+                {
+                  "state": "Success",
+                  "description": "Block was successfully compiled.",
+                  "path": null,
+                  "messages": []
+                }
+              ]
+            },
+            {
+              "state": "Success",
+              "description": "Block was successfully compiled.",
+              "path": "Main (OB1)",
+              "messages": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "state": "Warning",
+      "description": "Compiling finished (errors: 0; warnings: 1)",
+      "path": null,
+      "messages": []
+    }
+  ]
+}

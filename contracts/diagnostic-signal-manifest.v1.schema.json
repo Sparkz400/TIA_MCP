@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-signal-manifest.v1.schema.json",
+  "title": "Evidence-backed caller-proposed or bounded dependency-selected signal manifest",
+  "type": "array",
+  "maxItems": 64,
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "role",
+      "reason",
+      "hypothesisIds",
+      "storagePath",
+      "memberPath",
+      "datatype",
+      "resolution",
+      "traceability",
+      "onlineAddress",
+      "evidence"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "role": {
+        "type": "string"
+      },
+      "reason": {
+        "type": "string"
+      },
+      "hypothesisIds": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      },
+      "storagePath": {
+        "type": "string"
+      },
+      "memberPath": {
+        "$ref": "diagnostic-case.v1.schema.json#/$defs/memberPath"
+      },
+      "datatype": {
+        "type": "string"
+      },
+      "resolution": {
+        "enum": [
+          "capturedDeclaration",
+          "unavailable"
+        ]
+      },
+      "traceability": {
+        "enum": [
+          "requiresTargetValidation",
+          "unavailable"
+        ]
+      },
+      "onlineAddress": {
+        "type": "null"
+      },
+      "evidence": {
+        "type": [
+          "object",
+          "null"
+        ]
+      },
+      "inclusionOrigin": {
+        "enum": [
+          "callerProposedWithDeclarationEvidence",
+          "boundedDependencyEvidence"
+        ]
+      },
+      "selectionEvidence": {
+        "type": [
+          "array",
+          "null"
+        ]
+      }
+    }
+  }
+}

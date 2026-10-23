@@ -1,0 +1,80 @@
+{
+  "mode": "definition-import",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "startedAtUtc": "2026-10-15T07:50:00.1618613Z",
+  "beforeModified": false,
+  "servicePresence": "observed",
+  "licenseAvailability": "unknown",
+  "executionAvailability": "notAttempted",
+  "automaticReplay": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "metadata": {
+    "groups": [
+      {
+        "type": "Siemens.Engineering.TestSuite.StyleGuide.StyleGuideSystemGroup",
+        "compositions": [
+          {
+            "name": "RuleSets",
+            "creationInfos": [],
+            "definitions": [
+              {
+                "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet",
+                "name": "TiaMcp_CasingAvailability"
+              }
+            ]
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSystemGroup",
+        "compositions": [
+          {
+            "name": "ApplicationTestSets",
+            "creationInfos": [],
+            "definitions": []
+          },
+          {
+            "name": "TestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.SystemTest.SystemTestSystemGroup",
+        "compositions": [
+          {
+            "name": "SystemTestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor"
+        ]
+      }
+    ]
+  },
+  "checkpoint": {
+    "path": "D:\\TIAW\\ts01\\evidence\\application-import-01\\before-testsuite.zap21",
+    "sha256": "14af5c88f39514c6a2aa380959730dbb36d2cd375073e2235927da3e274ef7cb",
+    "bytes": 362780
+  },
+  "operationFailure": {
+    "type": "Siemens.Engineering.EngineeringTargetInvocationException",
+    "message": "Error when calling method 'LoadFromFile' of type 'Siemens.Engineering.TestSuite.ApplicationTest.TestCaseComposition'.\r\n\r\nThe TIA project does not contains the 'Scope' mentioned",
+    "inner": null,
+    "automaticReplay": false
+  },
+  "afterModified": true,
+  "finishedAtUtc": "2026-10-15T07:50:01.4504199Z",
+  "completed": true
+}

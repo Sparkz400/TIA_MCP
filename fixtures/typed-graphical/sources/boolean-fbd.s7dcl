@@ -1,0 +1,20 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_Boolean_FBD"
+VAR_INPUT
+  A : Bool;
+  B : Bool;
+  Inhibit : Bool;
+END_VAR
+VAR_OUTPUT
+  Active : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #A
+  O( in2 := #B )
+  A( in2 := NOT #Inhibit )
+  Coil( #Active )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

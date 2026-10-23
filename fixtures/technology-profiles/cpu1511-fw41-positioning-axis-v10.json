@@ -1,0 +1,10 @@
+{
+  "family": "axis",
+  "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "typeIdentifier": "TO_PositioningAxis",
+  "version": "10.0",
+  "parameters": {
+    "VirtualAxis.Mode": 1,
+    "_Properties.MotionType": 0
+  }
+}

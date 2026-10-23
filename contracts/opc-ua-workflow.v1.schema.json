@@ -1,0 +1,671 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:opcua-workflow:v1",
+  "title": "Bounded offline Host OPC UA workflow responses and tool contracts",
+  "$comment": "Row bytes are capped at 128 KiB before JSON transport duplication; oversized rows are explicit omissions pointing at the complete report. Original bytes, consumer manifests and reports are immutable; receipt hash binds the handle. All source/report hashes are rechecked on reads. Dependency and native completeness flags remain false. x-tool-contracts specifies accepted inputs and success output shapes; tool errors use $defs/error.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/recordSummary"
+    },
+    {
+      "$ref": "#/$defs/reportPage"
+    },
+    {
+      "$ref": "#/$defs/artifactPage"
+    },
+    {
+      "$ref": "#/$defs/listPage"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "recordRef": {
+      "type": "string",
+      "pattern": "^opcua:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "artifactRef": {
+      "type": "string",
+      "pattern": "^opcua:[a-f0-9]{32}:[a-f0-9]{64}:(original\\.xml|consumers\\.json|report\\.json)$"
+    },
+    "uploadRef": {
+      "type": "string",
+      "pattern": "^upload:[a-f0-9]{32}$"
+    },
+    "kind": {
+      "enum": [
+        "model",
+        "comparison",
+        "dependencies",
+        "dependency-comparison"
+      ]
+    },
+    "cursor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "reportSha256",
+        "section",
+        "offset"
+      ],
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "reportSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactRef",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "artifactRef": {
+          "$ref": "#/$defs/artifactRef"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 33554432
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "recordSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "recordSha256",
+        "kind",
+        "state",
+        "createdUtc",
+        "inputs",
+        "summary",
+        "artifacts",
+        "nativeQualified",
+        "nativeFreshnessVerified",
+        "compatibilityCertified",
+        "dependencyClosureComplete"
+      ],
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "recordSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "createdUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "inputs": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/recordRef"
+          }
+        },
+        "summary": {
+          "type": "object",
+          "required": [
+            "schemaVersion",
+            "nativeQualified",
+            "targetProbed",
+            "tiaImportAccepted",
+            "plcMappingsResolved",
+            "dependencyClosureComplete"
+          ],
+          "properties": {
+            "nativeQualified": {
+              "const": false
+            },
+            "targetProbed": {
+              "const": false
+            },
+            "tiaImportAccepted": {
+              "const": false
+            },
+            "plcMappingsResolved": {
+              "const": false
+            },
+            "dependencyClosureComplete": {
+              "const": false
+            },
+            "compatibilityCertified": {
+              "const": false
+            },
+            "requiredModelVersionsEvaluated": {
+              "const": false
+            }
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeFreshnessVerified": {
+          "const": false
+        },
+        "compatibilityCertified": {
+          "const": false
+        },
+        "dependencyClosureComplete": {
+          "const": false
+        }
+      }
+    },
+    "reportPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "reportSha256",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextCursor",
+        "completeArtifactRef",
+        "nativeQualified",
+        "compatibilityCertified",
+        "dependencyClosureComplete"
+      ],
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "reportSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 500
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/cursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completeArtifactRef": {
+          "$ref": "#/$defs/artifactRef"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "compatibilityCertified": {
+          "const": false
+        },
+        "dependencyClosureComplete": {
+          "const": false
+        }
+      }
+    },
+    "artifactPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactRef",
+        "sha256",
+        "bytes",
+        "offset",
+        "count",
+        "data",
+        "nextOffset",
+        "complete",
+        "nativeQualified"
+      ],
+      "properties": {
+        "artifactRef": {
+          "$ref": "#/$defs/artifactRef"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 33554432
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "data": {
+          "type": "string",
+          "contentEncoding": "base64",
+          "maxLength": 87384
+        },
+        "nextOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      }
+    },
+    "listRow": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordRef",
+            "state",
+            "kind",
+            "createdUtc"
+          ],
+          "properties": {
+            "recordRef": {
+              "$ref": "#/$defs/recordRef"
+            },
+            "state": {
+              "const": "complete"
+            },
+            "kind": {
+              "$ref": "#/$defs/kind"
+            },
+            "createdUtc": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordRef",
+            "publicationId",
+            "state",
+            "errorCode"
+          ],
+          "properties": {
+            "recordRef": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/recordRef"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "publicationId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "state": {
+              "enum": [
+                "incomplete",
+                "integrity-failed"
+              ]
+            },
+            "errorCode": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "listPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows",
+        "total",
+        "nextOffset",
+        "ordering",
+        "nativeQualified"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/listRow"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ordering": {
+          "type": "string"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "details": {}
+          }
+        }
+      }
+    },
+    "opcua_inspectInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeSetUploadRef"
+      ],
+      "properties": {
+        "nodeSetUploadRef": {
+          "$ref": "#/$defs/uploadRef"
+        }
+      }
+    },
+    "opcua_compareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeRef",
+        "afterRef"
+      ],
+      "properties": {
+        "beforeRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "afterRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "consumerManifestUploadRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/uploadRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "opcua_dependenciesInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelRefs"
+      ],
+      "properties": {
+        "modelRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/recordRef"
+          }
+        }
+      }
+    },
+    "opcua_dependency_compareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeSetRef",
+        "afterSetRef"
+      ],
+      "properties": {
+        "beforeSetRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "afterSetRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "consumerManifestUploadRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/uploadRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "opcua_report_pageInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "section"
+      ],
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/cursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "opcua_reopenInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef"
+      ],
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/recordRef"
+        }
+      }
+    },
+    "opcua_listInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    },
+    "opcua_artifact_readInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactRef"
+      ],
+      "properties": {
+        "artifactRef": {
+          "$ref": "#/$defs/artifactRef"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "opcua_inspect": {
+      "input": {
+        "$ref": "#/$defs/opcua_inspectInput"
+      },
+      "output": {
+        "$ref": "#/$defs/recordSummary"
+      }
+    },
+    "opcua_compare": {
+      "input": {
+        "$ref": "#/$defs/opcua_compareInput"
+      },
+      "output": {
+        "$ref": "#/$defs/recordSummary"
+      }
+    },
+    "opcua_dependencies": {
+      "input": {
+        "$ref": "#/$defs/opcua_dependenciesInput"
+      },
+      "output": {
+        "$ref": "#/$defs/recordSummary"
+      }
+    },
+    "opcua_dependency_compare": {
+      "input": {
+        "$ref": "#/$defs/opcua_dependency_compareInput"
+      },
+      "output": {
+        "$ref": "#/$defs/recordSummary"
+      }
+    },
+    "opcua_report_page": {
+      "input": {
+        "$ref": "#/$defs/opcua_report_pageInput"
+      },
+      "output": {
+        "$ref": "#/$defs/reportPage"
+      }
+    },
+    "opcua_reopen": {
+      "input": {
+        "$ref": "#/$defs/opcua_reopenInput"
+      },
+      "output": {
+        "$ref": "#/$defs/recordSummary"
+      }
+    },
+    "opcua_list": {
+      "input": {
+        "$ref": "#/$defs/opcua_listInput"
+      },
+      "output": {
+        "$ref": "#/$defs/listPage"
+      }
+    },
+    "opcua_artifact_read": {
+      "input": {
+        "$ref": "#/$defs/opcua_artifact_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/artifactPage"
+      }
+    }
+  }
+}

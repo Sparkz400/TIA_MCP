@@ -1,0 +1,7 @@
+TYPE "TiaMcpLibraryState"
+VERSION : 0.1
+STRUCT
+    Active : Bool;
+    Count : DInt;
+END_STRUCT;
+END_TYPE

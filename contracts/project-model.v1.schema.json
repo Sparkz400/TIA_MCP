@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:project-model:v1",
+  "title": "Versioned read-only project explorer snapshot",
+  "type": "object",
+  "required": ["schemaVersion", "snapshotId", "sessionGeneration", "project", "captureStartedAtUtc", "captureCompletedAtUtc", "expiresAtUtc", "metadataRevision", "limits", "usage", "coverage", "nodes", "edges", "warnings"],
+  "properties": {
+    "schemaVersion": {"const": "project-model.v1"},
+    "snapshotId": {"type": "string", "minLength": 1},
+    "sessionGeneration": {"type": "string", "minLength": 1},
+    "project": {"type": "object", "required": ["name", "projectPath", "host"], "properties": {"name": {"type": "string"}, "projectPath": {"type": "string", "minLength": 1}, "host": {"type": "string", "minLength": 1}}},
+    "captureStartedAtUtc": {"type": "string", "format": "date-time"},
+    "captureCompletedAtUtc": {"type": "string", "format": "date-time"},
+    "expiresAtUtc": {"type": "string", "format": "date-time"},
+    "metadataRevision": {"type": "object", "required": ["value", "scope", "includesContent"], "properties": {"value": {"type": "string", "minLength": 1}, "scope": {"const": "exposedMetadata"}, "includesContent": {"const": false}}},
+    "limits": {"type": "object", "properties": {"maxVisited": {"type": "integer", "minimum": 1, "maximum": 50000}, "maxDepth": {"type": "integer", "minimum": 1, "maximum": 64}, "maxBytes": {"type": "integer", "minimum": 1, "maximum": 33554432}}},
+    "usage": {"type": "object"},
+    "coverage": {"type": "array", "items": {"$ref": "#/$defs/coverage"}},
+    "nodes": {"type": "array", "maxItems": 50000, "items": {"$ref": "#/$defs/node"}},
+    "edges": {"type": "array", "maxItems": 50000, "items": {"$ref": "#/$defs/edge"}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "reference": {
+      "description": "Snapshot/session/project-copy bound reference. Canonical paths are not persistent GUIDs. Re-resolve before fresh reads; never substitute names.",
+      "type": "object", "required": ["schemaVersion", "snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath"],
+      "properties": {"schemaVersion": {"const": "project-model.v1"}, "snapshotId": {"type": "string", "minLength": 1}, "sessionGeneration": {"type": "string", "minLength": 1}, "projectPath": {"type": "string", "minLength": 1}, "nodeId": {"type": "string", "minLength": 1}, "objectPath": {"type": "string", "minLength": 1}}
+    },
+    "coverage": {
+      "type": "object", "required": ["provider", "scope", "status", "visited", "returned", "warnings", "continuationAvailable"],
+      "properties": {"provider": {"type": "string", "minLength": 1}, "scope": {"type": "string", "minLength": 1}, "status": {"enum": ["complete", "partial", "truncated", "unsupported", "unavailable", "protected", "unresolved"]}, "visited": {"type": "integer", "minimum": 0}, "returned": {"type": "integer", "minimum": 0}, "warnings": {"type": "array", "items": {"type": "string"}}, "continuationAvailable": {"type": "boolean"}, "truncationReason": {"type": ["string", "null"]}, "relationshipScope": {"$ref": "#/$defs/relationshipScope"}}
+    },
+    "relationshipScope": {
+      "description": "Completeness of a bounded traversal over retained observations only. Provider coverage and native qualification remain independent.",
+      "type": "object", "required": ["scope", "projectCompleteness"],
+      "properties": {
+        "scope": {"enum": ["retainedSnapshotEdges", "selectedGraphQuery"]},
+        "projectCompleteness": {"const": "notEstablished"},
+        "status": {"enum": ["complete", "truncated"]},
+        "retainedEdges": {"type": "integer", "minimum": 0}, "returnedEdges": {"type": "integer", "minimum": 0},
+        "direction": {"enum": ["both", "outgoing", "incoming"]}, "kinds": {"type": "array", "maxItems": 32, "items": {"type": "string"}},
+        "stopReasons": {"type": "array", "uniqueItems": true, "items": {"enum": ["depth", "nodes", "edges", "bytes", "coverageBytes", "adapterBytes"]}}
+      }
+    },
+    "node": {
+      "type": "object", "required": ["nodeId", "parentId", "kind", "name", "origin", "access", "detailAvailability", "metadata"],
+      "properties": {"nodeId": {"type": "string", "minLength": 1, "maxLength": 4096}, "parentId": {"type": ["string", "null"]}, "kind": {"type": "string", "minLength": 1}, "name": {"type": "string"}, "origin": {"enum": ["native", "virtual"]}, "objectPath": {"type": "string", "minLength": 1}, "plcPath": {"type": ["string", "null"]}, "scopePath": {"type": ["string", "null"]}, "access": {"type": "object", "required": ["state"], "properties": {"state": {"enum": ["readable", "protected", "unavailable", "unknown", "virtual"]}}}, "detailAvailability": {"type": ["object", "string", "array"]}, "metadata": {"type": "object"}},
+      "allOf": [{"if": {"properties": {"origin": {"const": "native"}}}, "then": {"required": ["objectPath"]}, "else": {"not": {"required": ["objectPath"]}}}]
+    },
+    "endpoint": {"type": ["object", "null"], "required": ["nodeId"], "properties": {"nodeId": {"type": "string", "minLength": 1}, "objectPath": {"type": ["string", "null"]}}},
+    "contentRevision": {"type": "object", "required": ["status", "scope"], "properties": {"status": {"enum": ["available", "unavailable", "partial"]}, "scope": {"type": "string", "not": {"enum": ["exposedMetadata", "metadata"]}}, "algorithm": {"const": "sha256"}, "value": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"}}, "dependentRequired": {"value": ["algorithm"]}},
+    "edge": {
+      "type": "object", "required": ["edgeId", "source", "target", "kind", "evidence", "unresolved"],
+      "properties": {"edgeId": {"type": "string", "minLength": 1}, "source": {"$ref": "#/$defs/endpoint"}, "target": {"$ref": "#/$defs/endpoint"}, "kind": {"enum": ["contains", "calls", "instanceOf", "reads", "writes", "usesType", "dependsOn", "configuredIo", "hmiBinding", "screenNavigation", "libraryVersion"]}, "evidence": {"type": "object", "required": ["origin", "resolution", "sourcePath", "location", "capturedAtUtc", "contentRevision"], "properties": {"origin": {"enum": ["nativeConfirmed", "parsedSupported", "inferred", "unresolved"]}, "resolution": {"enum": ["resolved", "partial", "unresolved"]}, "sourcePath": {"type": ["string", "null"]}, "location": {"type": ["object", "string", "null"]}, "capturedAtUtc": {"type": "string", "format": "date-time"}, "contentRevision": {"$ref": "#/$defs/contentRevision"}}}, "unresolved": {"type": ["object", "null"]}},
+      "allOf": [{"if": {"anyOf": [{"properties": {"source": {"type": "null"}}}, {"properties": {"target": {"type": "null"}}}]}, "then": {"properties": {"unresolved": {"type": "object"}}}}]
+    }
+  }
+}

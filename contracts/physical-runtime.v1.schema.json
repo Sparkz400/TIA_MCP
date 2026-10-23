@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/physical-runtime.v1.schema.json",
+  "title": "Web runtime protocol read observation; not authenticated device or program evidence",
+  "$ref": "#/$defs/readResult",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "connectionId",
+        "epoch",
+        "peerCertificateSha256"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "minLength": 9,
+          "maxLength": 4096,
+          "pattern": "^https://[^/@?#\\\\\\s]+$(?![\\s\\S])"
+        },
+        "connectionId": {
+          "$ref": "#/$defs/id"
+        },
+        "epoch": {
+          "$ref": "#/$defs/id"
+        },
+        "peerCertificateSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "symbol",
+        "representation",
+        "metadataSha256"
+      ],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!\\s*$)[^\\u0000-\\u001f\\u007f-\\u009f]+$(?![\\s\\S])"
+        },
+        "representation": {
+          "enum": [
+            "simple",
+            "raw"
+          ]
+        },
+        "metadataSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "readResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "selection",
+        "requestId",
+        "status",
+        "value",
+        "providerErrorCode",
+        "requestStartedUtc",
+        "responseReceivedUtc",
+        "elapsedMilliseconds",
+        "valueEncoding",
+        "clock",
+        "hostClockWentBackwards",
+        "sourceTimestamp",
+        "serverTimestamp",
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "deviceIdentityVerified",
+        "programMatchVerified",
+        "nativeQualified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "physical-runtime-web-read.v1"
+        },
+        "selection": {
+          "$ref": "#/$defs/selection"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "read",
+            "permissionDenied",
+            "unsupportedMethod",
+            "resourceUnavailable",
+            "addressUnavailable",
+            "invalidAddress",
+            "invalidArrayIndex",
+            "unsupportedAddress",
+            "providerError"
+          ]
+        },
+        "value": {},
+        "providerErrorCode": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "requestStartedUtc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(?:Z|\\+00:00)$"
+        },
+        "responseReceivedUtc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(?:Z|\\+00:00)$"
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "valueEncoding": {
+          "const": "siemens-web-api-json"
+        },
+        "clock": {
+          "const": "hostUtcAndMonotonicDuration"
+        },
+        "hostClockWentBackwards": {
+          "type": "boolean"
+        },
+        "sourceTimestamp": {
+          "type": "null"
+        },
+        "serverTimestamp": {
+          "type": "null"
+        },
+        "atomicAcrossSignals": {
+          "const": false
+        },
+        "scanSynchronized": {
+          "const": false
+        },
+        "deviceIdentityVerified": {
+          "const": false
+        },
+        "programMatchVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "read"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "providerErrorCode": {
+                "type": "null"
+              }
+            },
+            "if": {
+              "properties": {
+                "selection": {
+                  "properties": {
+                    "representation": {
+                      "const": "raw"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "providerErrorCode": {
+                "type": "integer"
+              },
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

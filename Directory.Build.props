@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Authors>Nico Schürmann</Authors>
+    <Copyright>Copyright 2026 Nico Schürmann</Copyright>
+    <RestorePackagesPath>$(MSBuildThisFileDirectory).packages</RestorePackagesPath>
+    <RestoreFallbackFolders Condition="Exists('$(USERPROFILE)\.nuget\packages')">$(USERPROFILE)\.nuget\packages</RestoreFallbackFolders>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <Deterministic>true</Deterministic>
+    <UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
+</Project>

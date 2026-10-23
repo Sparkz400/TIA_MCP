@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "composite-engineering-request.v2",
+  "before": {
+    "reviewId": "36319e5674ea61e24d65ddee408db5a74396726a786cb33b3144af033686e4ed",
+    "automationMlRef": "automationml:3bbdb7dc3b8f4a09b45e185d86a36186:6bffce451a5497d483bc156f83389a647f042a31f7c2c7f03b52e2121626d9ca",
+    "connections": [
+      "a57c7c48d71f570f5f5ef4160af90227154116f5e6a275599838fb398159d6e1"
+    ],
+    "drives": [
+      "e0cbca706eb68b144dcf1c309bc604fc9589f4dd53c32327efab5995b4953fef"
+    ],
+    "technology": [
+      "25f04964d2ca699aaf7f03543740d811dd99fd733302129558b4b6461d87c4f0"
+    ]
+  },
+  "after": {
+    "reviewId": "36319e5674ea61e24d65ddee408db5a74396726a786cb33b3144af033686e4ed",
+    "automationMlRef": "automationml:82913023bc094104a55f400061f2122a:442a4a56eb7c449b0b9474f264df945491feeca91e1b93ade412a2c5cd923e2c",
+    "connections": [
+      "a57c7c48d71f570f5f5ef4160af90227154116f5e6a275599838fb398159d6e1"
+    ],
+    "drives": [
+      "e0cbca706eb68b144dcf1c309bc604fc9589f4dd53c32327efab5995b4953fef"
+    ],
+    "technology": [
+      "25f04964d2ca699aaf7f03543740d811dd99fd733302129558b4b6461d87c4f0"
+    ]
+  },
+  "mappings": [
+    {
+      "id": "before-hardware",
+      "phase": "before",
+      "purpose": "hardware",
+      "reason": "Explicit supplied association: Überprüfung — 保留",
+      "source": {
+        "kind": "amlObject",
+        "phase": "before",
+        "recordRef": "automationml:3bbdb7dc3b8f4a09b45e185d86a36186:6bffce451a5497d483bc156f83389a647f042a31f7c2c7f03b52e2121626d9ca",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]"
+      },
+      "target": {
+        "kind": "model",
+        "phase": "before",
+        "reviewId": "36319e5674ea61e24d65ddee408db5a74396726a786cb33b3144af033686e4ed",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      }
+    },
+    {
+      "id": "after-hardware",
+      "phase": "after",
+      "purpose": "hardware",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlObject",
+        "phase": "after",
+        "recordRef": "automationml:82913023bc094104a55f400061f2122a:442a4a56eb7c449b0b9474f264df945491feeca91e1b93ade412a2c5cd923e2c",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]"
+      },
+      "target": {
+        "kind": "model",
+        "phase": "after",
+        "reviewId": "36319e5674ea61e24d65ddee408db5a74396726a786cb33b3144af033686e4ed",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      }
+    }
+  ],
+  "correspondences": [],
+  "allowDifferentProjectCopy": false
+}

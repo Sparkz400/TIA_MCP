@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-workflow.v1.schema.json",
+  "title": "Immutable offline translation publication receipt",
+  "description": "Receipt is published last. An intent or partial artifact set is never completion. SHA-256 provides integrity, not authentication. Native import remains disabled.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "id", "createdUtc", "metadata", "artifacts", "inputs", "recordSha256"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {"enum": ["capture", "review", "approval", "candidate", "reconciliation"]},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "createdUtc": {"type": "string", "format": "date-time"},
+    "metadata": {"type": "object"},
+    "artifacts": {
+      "type": "array", "maxItems": 10,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "bytes", "sha256"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z][a-z0-9.-]{0,63}$"},
+          "bytes": {"type": "integer", "minimum": 0, "maximum": 104857600},
+          "sha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "inputs": {
+      "type": "array", "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["recordRef", "recordSha256"],
+        "properties": {
+          "recordRef": {"$ref": "#/$defs/recordRef"},
+          "recordSha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "recordSha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "recordRef": {"type": "string", "pattern": "^translation:(capture|review|approval|candidate|reconciliation):[0-9a-f]{32}$"},
+    "artifactRef": {"type": "string", "pattern": "^translation:(capture|review|approval|candidate|reconciliation):[0-9a-f]{32}:[a-z][a-z0-9.-]{0,63}$"},
+    "reviewCursor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordRef", "recordSha256", "section", "offset"],
+      "properties": {
+        "recordRef": {"$ref": "#/$defs/recordRef"},
+        "recordSha256": {"$ref": "#/$defs/sha256"},
+        "section": {"enum": ["edits", "issues", "completeness", "rows", "proposals"]},
+        "offset": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

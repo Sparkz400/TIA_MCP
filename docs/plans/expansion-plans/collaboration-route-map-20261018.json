@@ -1,0 +1,586 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration-planning-route-map-not-runtime-contract",
+  "recordedDate": "2026-10-18",
+  "baselineCommit": "48cfa73d4ad4dcc4eca82d54c7e72c2e1a16067b",
+  "nativeExecuted": false,
+  "productionCodeChanged": false,
+  "fullGoalComplete": false,
+  "inventory": {
+    "path": "docs/plans/expansion-plans/api-coverage-inventory-20261014.json",
+    "sha256": "66c33cf070682c77e58f9000907bcab7928a79a191913c6fa5ecbb2ab7b02c23"
+  },
+  "scopeBaseline": {
+    "path": "docs/plans/offline-scope-reconciliation-20261017.json",
+    "sha256": "a4ce92e57f19f42a148a7cdfb9abf3871fc25d6fe3a64770d8f14dafb05ce046"
+  },
+  "interpretation": "Selected exact XML member IDs and planned effect classes, not verified accessibility, return types, current SDK compatibility, live service semantics or dispatch authority. Unselected members remain in the complete hash-bound inventory. Primary-source findings and unresolved queries are recorded in the linked plans.",
+  "workstreams": [
+    {
+      "id": "X05",
+      "plan": "multiuser-project-server.md",
+      "originalReleaseRequirement": {
+        "source": "releaseLedger",
+        "jsonPointer": "/obligations/31",
+        "canonicalRecordSha256": "54f6f0ca27e9784a4a2108bf9522594ac50e0525bb46b6b59f5afa66067f8e23"
+      },
+      "retainedRawMemberCount": 287,
+      "selectedRouteCount": 27,
+      "rawSelection": "Multiuser namespace plus TiaPortal.LocalSessions and TiaPortal.ProjectServers",
+      "routes": [
+        {
+          "pointer": "/modules/5/members/15221",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSession.Close",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "discardLocalChanges",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15222",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSession.CloseAndCommit(System.String)",
+          "sourceGroup": "X05",
+          "package": "MU-06",
+          "plannedEffectClass": "externalCommitAndSessionClose",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15223",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSession.IsUptoDate",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15224",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSession.Save",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "localSave",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15238",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSessionComposition.Open(System.IO.FileInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "nativeSessionOpen",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15239",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LocalSessionComposition.OpenServerProject(System.IO.FileInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "nativeSessionOpen",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15278",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LockStateProvider.GetLockOwner",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15279",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.LockStateProvider.IsProjectLocked",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15356",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.MarkingService.GetMarkStateInfo(Siemens.Engineering.IEngineeringObject)",
+          "sourceGroup": "X05",
+          "package": "MU-05",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15357",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.MarkingService.GetMarkings",
+          "sourceGroup": "X05",
+          "package": "MU-05",
+          "plannedEffectClass": "observationWithDeletedObjectsOmitted",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15358",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.MarkingService.IsMarkable(Siemens.Engineering.IEngineeringObject)",
+          "sourceGroup": "X05",
+          "package": "MU-05",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15359",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.MarkingService.MarkObjects(System.Collections.Generic.IEnumerable{Siemens.Engineering.IEngineeringObject})",
+          "sourceGroup": "X05",
+          "package": "MU-05",
+          "plannedEffectClass": "markMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15360",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.MarkingService.UnmarkObjects(System.Collections.Generic.IEnumerable{Siemens.Engineering.IEngineeringObject})",
+          "sourceGroup": "X05",
+          "package": "MU-05",
+          "plannedEffectClass": "markMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15414",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.AddProjectToServer(System.IO.FileInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "externalProjectCreation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15415",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.CreateLocalSession(Siemens.Engineering.Multiuser.ServerProjectInfo,System.String,System.IO.DirectoryInfo,Siemens.Engineering.Multiuser.SessionCreationMode)",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "localAndExternalSessionCreation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15416",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.DeleteConnection",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "configurationMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15417",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.DeleteLocalSessionFromServer(Siemens.Engineering.Multiuser.ServerProjectInfo,Siemens.Engineering.Multiuser.LocalSessionInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "externalSessionDeletion",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15418",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.GetLocalSessions(Siemens.Engineering.Multiuser.ServerProjectInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15419",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.GetLockStateProvider(Siemens.Engineering.Multiuser.ServerProjectInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "providerAcquisition",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15420",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.GetProjectServerGroups",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15421",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.GetServerProjects",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15422",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.SetHostName(System.String)",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "configurationMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15423",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.SetPort(System.Int32)",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "configurationMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15424",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServer.SetProtocol(Siemens.Engineering.Multiuser.Protocol)",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "configurationMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15438",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServerComposition.Create(System.String,Siemens.Engineering.Multiuser.Protocol,System.String,System.Int32)",
+          "sourceGroup": "X05",
+          "package": "MU-08",
+          "plannedEffectClass": "configurationMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15458",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServerGroup.AddProjectToServer(System.IO.FileInfo)",
+          "sourceGroup": "X05",
+          "package": "MU-04",
+          "plannedEffectClass": "externalProjectCreation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/5/members/15459",
+          "module": "net48/Siemens.Engineering.Base.xml",
+          "memberId": "M:Siemens.Engineering.Multiuser.ProjectServerGroup.GetServerProjects",
+          "sourceGroup": "X05",
+          "package": "MU-03",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        }
+      ],
+      "packages": [
+        {
+          "id": "MU-01",
+          "status": "planDeliveredWithOpenFeasibility"
+        },
+        {
+          "id": "MU-02",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-03",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-04",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-05",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-06",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-07",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-08",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-09",
+          "status": "notImplemented"
+        },
+        {
+          "id": "MU-10",
+          "status": "notImplemented"
+        }
+      ],
+      "fullOfflineCompletionProven": false,
+      "nativeAdapterImplemented": false
+    },
+    {
+      "id": "X09",
+      "plan": "teamcenter-gateway.md",
+      "originalReleaseRequirement": {
+        "source": "releaseLedger",
+        "jsonPointer": "/obligations/35",
+        "canonicalRecordSha256": "4a9baf31fcb3e86816202d63cfdeb515d78d1aac83b6acc1a8af3cac94afa782"
+      },
+      "retainedRawMemberCount": 280,
+      "selectedRouteCount": 17,
+      "rawSelection": "Entire TeamcenterGateway XML module, including X03 credential connection member",
+      "routes": [
+        {
+          "pointer": "/modules/12/members/155",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayLockProvider.CancelCheckoutDataset(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.DatasetType,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-06",
+          "plannedEffectClass": "externalLockMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/156",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayLockProvider.CheckinDataset(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.DatasetType,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-06",
+          "plannedEffectClass": "externalLockMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/157",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayLockProvider.CheckoutDataset(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.DatasetType,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-06",
+          "plannedEffectClass": "externalLockMutation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/176",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewaySearchAndDownloadProvider.Download(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.ItemType,Siemens.Engineering.TeamcenterGateway.LocalCacheOption)",
+          "sourceGroup": "X09",
+          "package": "TC-05",
+          "plannedEffectClass": "localCacheWrite",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/177",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewaySearchAndDownloadProvider.Search(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.ItemType,System.String,System.String,System.String,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-04",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/196",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.GetTeamcenterCustomAttributes(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-04",
+          "plannedEffectClass": "observation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/197",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.Save(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.LocalCacheOption)",
+          "sourceGroup": "X09",
+          "package": "TC-07",
+          "plannedEffectClass": "localAndExternalPublication",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/198",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveAsNewItem(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.ItemDetailsDelegate,System.Collections.Generic.IEnumerable{Siemens.Engineering.TeamcenterGateway.TeamcenterProperty})",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "localAndExternalCreation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/199",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveAsNewItemWithProxyObject(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.ItemDetailsDelegate,System.Collections.Generic.IEnumerable{Siemens.Engineering.TeamcenterGateway.TeamcenterProperty})",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "creationWithDependencies",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/200",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveAsNewRevision(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.RevisionDetailsDelegate,System.Collections.Generic.IEnumerable{Siemens.Engineering.TeamcenterGateway.TeamcenterProperty})",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "localAndExternalCreation",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/201",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveAsNewRevisionWithProxyObject(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.RevisionDetailsDelegate,System.Collections.Generic.IEnumerable{Siemens.Engineering.TeamcenterGateway.TeamcenterProperty})",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "creationWithDependencies",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/202",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveToItem(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.LocalCacheOption)",
+          "sourceGroup": "X09",
+          "package": "TC-07",
+          "plannedEffectClass": "localAndExternalPublication",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/203",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveToItemWithProxyObject(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,System.String,System.String,Siemens.Engineering.TeamcenterGateway.LocalCacheOption)",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "publicationWithDependencies",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/204",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TcGatewayWorkflowProvider.SaveWithProxyObject(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo,Siemens.Engineering.TeamcenterGateway.LocalCacheOption)",
+          "sourceGroup": "X09",
+          "package": "TC-08",
+          "plannedEffectClass": "publicationWithDependencies",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/245",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TeamcenterConnectionProvider.Connect(System.String,System.Security.SecureString,System.String,System.String,System.String,System.String)",
+          "sourceGroup": "X03",
+          "package": "TC-03",
+          "plannedEffectClass": "authenticatedConnection",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/246",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TeamcenterConnectionProvider.ConnectSSO(System.String,System.String,System.String,System.String)",
+          "sourceGroup": "X09",
+          "package": "TC-03",
+          "plannedEffectClass": "possiblyInteractiveAuthentication",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        },
+        {
+          "pointer": "/modules/12/members/247",
+          "module": "net48/Siemens.Engineering.TeamcenterGateway.xml",
+          "memberId": "M:Siemens.Engineering.TeamcenterGateway.TeamcenterConnectionProvider.Disconnect(Siemens.Engineering.TeamcenterGateway.TcGatewayConnectionInfo)",
+          "sourceGroup": "X09",
+          "package": "TC-03",
+          "plannedEffectClass": "connectionLifecycle",
+          "nativeImplemented": false,
+          "nativeQualified": false
+        }
+      ],
+      "packages": [
+        {
+          "id": "TC-01",
+          "status": "planDeliveredWithOpenFeasibility"
+        },
+        {
+          "id": "TC-02",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-03",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-04",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-05",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-06",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-07",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-08",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-09",
+          "status": "notImplemented"
+        },
+        {
+          "id": "TC-10",
+          "status": "notImplemented"
+        }
+      ],
+      "fullOfflineCompletionProven": false,
+      "nativeAdapterImplemented": false
+    }
+  ],
+  "sharedPrerequisites": [
+    "EngineeringResourceKey.ForExternal requires trusted provider canonicalization and authentication",
+    "EngineeringExternalEvidence binds bytes/context but does not authenticate native observations",
+    "Resource reservations cover one configured artifact store, not distributed server admission",
+    "AI-03 authenticated Add-In ownership and handoff remain open"
+  ],
+  "nextOfflinePackages": [
+    "MU-02",
+    "TC-02"
+  ]
+}

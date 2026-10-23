@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-style-job.v1.schema.json",
+  "title": "Persisted immutable style queue; shared operation journals own progress and reservations",
+  "type": "object", "additionalProperties": false,
+  "required": ["id", "reviewSha256", "review", "idempotencyKey", "operationIds"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "reviewSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "review": {"$ref": "engineering-operation.v1.schema.json#/$defs/artifact"},
+    "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 256},
+    "operationIds": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-f0-9]{32}$"}}
+  }
+}

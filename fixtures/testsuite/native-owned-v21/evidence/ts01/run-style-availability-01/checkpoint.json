@@ -1,0 +1,119 @@
+{
+  "mode": "run-style-availability",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "blockType": "Siemens.Engineering.SW.Blocks.FC",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "startedAtUtc": "2026-10-15T07:49:03.5709386Z",
+  "beforeModified": false,
+  "automaticReplay": false,
+  "styleExecutionInvoked": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "licenseAvailability": "unknown",
+  "executionAvailability": "notAttempted",
+  "effectiveScope": "unverified",
+  "qualification": false,
+  "nativeQualified": false,
+  "testsPassed": false,
+  "coverageClaim": false,
+  "scopeLimit": "SetScope success records requested scope only; execution availability is not exact-scope or test-coverage proof.",
+  "inventory": {
+    "rootBlocks": [
+      "Main",
+      "TiaMcp_EnableGate",
+      "TiaMcp_EnableGate_DB",
+      "TiaMcp_IsEnabled"
+    ],
+    "userBlockGroups": 0,
+    "allProjectObjectsOwned": "explicitAdmissionAndScratchCreationReceipt",
+    "coverageClaim": false
+  },
+  "ownershipReceipt": {
+    "path": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01\\ownership-receipt.json",
+    "sha256": "1da261ba60f638487fb04c31a38359652ed57bd59ba6ae691278944fb42d254a",
+    "bytes": 5924
+  },
+  "definitionBefore": {
+    "path": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01\\definition-before.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "blockBefore": {
+    "path": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01\\target-block-before.xml",
+    "sha256": "527e631e21cb9ba402bd72a0dfa7dc4a7a0cae29ad90a8297827c26dfb5c3612",
+    "bytes": 5835
+  },
+  "nativeMetadata": {
+    "attributes": [
+      {
+        "name": "Name",
+        "access": "ReadWrite",
+        "types": [
+          "System.String"
+        ]
+      }
+    ],
+    "compositions": [],
+    "invocations": [
+      {
+        "name": "CopyScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "targetRuleSet",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet"
+          }
+        ]
+      },
+      {
+        "name": "Delete",
+        "type": "System.Void",
+        "parameters": []
+      },
+      {
+        "name": "SaveToFile",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "path",
+            "type": "System.IO.FileInfo"
+          }
+        ]
+      },
+      {
+        "name": "SetScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "updateOptions",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.UpdateOptions"
+          },
+          {
+            "name": "selectedInformation",
+            "type": "System.Collections.Generic.IEnumerable`1[[Siemens.Engineering.IEngineeringObject, Siemens.Engineering.Base, Version=21.0.0.0, Culture=neutral, PublicKeyToken=29bfe5fdf4ba5d3b]]"
+          }
+        ]
+      },
+      {
+        "name": "ShowInEditor",
+        "type": "System.Void",
+        "parameters": []
+      }
+    ]
+  },
+  "scopeBefore": {
+    "exactSingleBlockVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks/TiaMcp_IsEnabled"
+  },
+  "checkpoint": {
+    "path": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01\\before-availability.zap21",
+    "sha256": "d6a322b94753b4bc204f2c7fb339a3def56b4a7d7eaf7aa5dfb63fade1b51b72",
+    "bytes": 362793
+  }
+}

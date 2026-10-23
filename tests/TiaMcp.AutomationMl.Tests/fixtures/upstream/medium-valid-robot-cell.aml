@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CAEXFile xmlns="http://www.dke.de/CAEX" ChangeMode="state" SchemaVersion="3.0" FileName="medium-valid-robot-cell.aml">
+  <SuperiorStandardVersion>AutomationML 2.1</SuperiorStandardVersion>
+  <SourceDocumentInformation OriginName="AutomationML SDK validation suite" OriginID="automationml-validation-suite" OriginVersion="0.1.0" LastWritingDateTime="2026-07-03T00:00:00+00:00"/>
+  <InstanceHierarchy ChangeMode="state" Name="PackagingCell">
+    <InternalElement ChangeMode="state" ID="cell-1" Name="RobotCell-1" RefBaseSystemUnitPath="SystemUnitClassLib/Cell">
+      <Attribute ChangeMode="state" Name="assetTag" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/AssetTag">
+        <Value>CELL-1</Value>
+      </Attribute>
+      <Attribute ChangeMode="state" Name="cycleTime" Unit="s" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/CycleTime">
+        <Value>38</Value>
+      </Attribute>
+      <ExternalInterface ChangeMode="state" ID="cell-1-data" Name="Data" RefBaseClassPath="AutomationMLInterfaceClassLib/DataPort"/>
+      <InternalElement ChangeMode="state" ID="cell-1-conveyor" Name="InfeedConveyor" RefBaseSystemUnitPath="SystemUnitClassLib/ConveyorModule">
+        <Attribute ChangeMode="state" Name="assetTag" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/AssetTag">
+          <Value>CONV-1</Value>
+        </Attribute>
+        <Attribute ChangeMode="state" Name="cycleTime" Unit="s" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/CycleTime">
+          <Value>8</Value>
+        </Attribute>
+        <ExternalInterface ChangeMode="state" ID="cell-1-conveyor-out" Name="MaterialOut" RefBaseClassPath="AutomationMLInterfaceClassLib/MaterialPort"/>
+        <ExternalInterface ChangeMode="state" ID="cell-1-conveyor-data" Name="Data" RefBaseClassPath="AutomationMLInterfaceClassLib/DataPort"/>
+        <RoleRequirements ChangeMode="state" RefBaseRoleClassPath="RoleClassLib/Conveyor"/>
+      </InternalElement>
+      <InternalElement ChangeMode="state" ID="cell-1-robot" Name="RobotArm" RefBaseSystemUnitPath="SystemUnitClassLib/RobotModule">
+        <Attribute ChangeMode="state" Name="assetTag" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/AssetTag">
+          <Value>ROBOT-1</Value>
+        </Attribute>
+        <Attribute ChangeMode="state" Name="cycleTime" Unit="s" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/CycleTime">
+          <Value>12</Value>
+        </Attribute>
+        <Attribute ChangeMode="state" Name="payload" Unit="kg" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/PayloadKg">
+          <Value>10</Value>
+        </Attribute>
+        <ExternalInterface ChangeMode="state" ID="cell-1-robot-in" Name="MaterialIn" RefBaseClassPath="AutomationMLInterfaceClassLib/MaterialPort"/>
+        <ExternalInterface ChangeMode="state" ID="cell-1-robot-data" Name="Data" RefBaseClassPath="AutomationMLInterfaceClassLib/DataPort"/>
+        <RoleRequirements ChangeMode="state" RefBaseRoleClassPath="RoleClassLib/Robot"/>
+      </InternalElement>
+      <InternalElement ChangeMode="state" ID="cell-1-quality" Name="VisionGate" RefBaseSystemUnitPath="SystemUnitClassLib/QualityGateModule">
+        <Attribute ChangeMode="state" Name="assetTag" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/AssetTag">
+          <Value>QUALITY-1</Value>
+        </Attribute>
+        <Attribute ChangeMode="state" Name="cycleTime" Unit="s" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/CycleTime">
+          <Value>6</Value>
+        </Attribute>
+        <Attribute ChangeMode="state" Name="qualityState" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/QualityState">
+          <Value>ready</Value>
+        </Attribute>
+        <ExternalInterface ChangeMode="state" ID="cell-1-quality-data" Name="Data" RefBaseClassPath="AutomationMLInterfaceClassLib/DataPort"/>
+        <RoleRequirements ChangeMode="state" RefBaseRoleClassPath="RoleClassLib/QualityGate"/>
+      </InternalElement>
+      <InternalLink ChangeMode="state" Name="MaterialToRobot" RefPartnerSideA="cell-1-conveyor-out" RefPartnerSideB="cell-1-robot-in"/>
+      <InternalLink ChangeMode="state" Name="QualityFeedback" RefPartnerSideA="cell-1-data" RefPartnerSideB="cell-1-quality-data"/>
+    </InternalElement>
+  </InstanceHierarchy>
+  <InterfaceClassLib ChangeMode="state" Name="AutomationMLInterfaceClassLib">
+    <InterfaceClass ChangeMode="state" Name="Port"/>
+    <InterfaceClass ChangeMode="state" Name="DataPort" RefBaseClassPath="AutomationMLInterfaceClassLib/Port"/>
+    <InterfaceClass ChangeMode="state" Name="MaterialPort" RefBaseClassPath="AutomationMLInterfaceClassLib/Port"/>
+  </InterfaceClassLib>
+  <RoleClassLib ChangeMode="state" Name="RoleClassLib">
+    <RoleClass ChangeMode="state" Name="Equipment"/>
+    <RoleClass ChangeMode="state" Name="Conveyor" RefBaseClassPath="RoleClassLib/Equipment"/>
+    <RoleClass ChangeMode="state" Name="Robot" RefBaseClassPath="RoleClassLib/Equipment"/>
+    <RoleClass ChangeMode="state" Name="QualityGate" RefBaseClassPath="RoleClassLib/Equipment"/>
+  </RoleClassLib>
+  <SystemUnitClassLib ChangeMode="state" Name="SystemUnitClassLib">
+    <SystemUnitClass ChangeMode="state" Name="Asset">
+      <Attribute ChangeMode="state" Name="assetTag" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/AssetTag">
+        <Value>asset</Value>
+      </Attribute>
+    </SystemUnitClass>
+    <SystemUnitClass ChangeMode="state" Name="Cell" RefBaseClassPath="SystemUnitClassLib/Asset">
+      <Attribute ChangeMode="state" Name="cycleTime" Unit="s" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/CycleTime">
+        <Value>42</Value>
+      </Attribute>
+      <ExternalInterface ChangeMode="state" ID="cell-class-data" Name="Data" RefBaseClassPath="AutomationMLInterfaceClassLib/DataPort"/>
+      <SupportedRoleClass ChangeMode="state" RefRoleClassPath="RoleClassLib/Equipment"/>
+    </SystemUnitClass>
+    <SystemUnitClass ChangeMode="state" Name="ConveyorModule" RefBaseClassPath="SystemUnitClassLib/Cell">
+      <ExternalInterface ChangeMode="state" ID="conveyor-class-material-out" Name="MaterialOut" RefBaseClassPath="AutomationMLInterfaceClassLib/MaterialPort"/>
+      <SupportedRoleClass ChangeMode="state" RefRoleClassPath="RoleClassLib/Conveyor"/>
+    </SystemUnitClass>
+    <SystemUnitClass ChangeMode="state" Name="RobotModule" RefBaseClassPath="SystemUnitClassLib/Cell">
+      <Attribute ChangeMode="state" Name="payload" Unit="kg" AttributeDataType="xs:double" RefAttributeType="LineAttributeTypes/PayloadKg">
+        <Value>12</Value>
+      </Attribute>
+      <ExternalInterface ChangeMode="state" ID="robot-class-material-in" Name="MaterialIn" RefBaseClassPath="AutomationMLInterfaceClassLib/MaterialPort"/>
+      <SupportedRoleClass ChangeMode="state" RefRoleClassPath="RoleClassLib/Robot"/>
+    </SystemUnitClass>
+    <SystemUnitClass ChangeMode="state" Name="QualityGateModule" RefBaseClassPath="SystemUnitClassLib/Cell">
+      <Attribute ChangeMode="state" Name="qualityState" AttributeDataType="xs:string" RefAttributeType="LineAttributeTypes/QualityState">
+        <Value>ready</Value>
+      </Attribute>
+      <SupportedRoleClass ChangeMode="state" RefRoleClassPath="RoleClassLib/QualityGate"/>
+    </SystemUnitClass>
+  </SystemUnitClassLib>
+  <AttributeTypeLib ChangeMode="state" Name="LineAttributeTypes">
+    <AttributeType ChangeMode="state" Name="AssetTag" AttributeDataType="xs:string"/>
+    <AttributeType ChangeMode="state" Name="CycleTime" Unit="s" AttributeDataType="xs:double"/>
+    <AttributeType ChangeMode="state" Name="PayloadKg" Unit="kg" AttributeDataType="xs:double"/>
+    <AttributeType ChangeMode="state" Name="QualityState" AttributeDataType="xs:string"/>
+  </AttributeTypeLib>
+</CAEXFile>

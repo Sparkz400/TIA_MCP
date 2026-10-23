@@ -1,0 +1,6 @@
+DATA_BLOCK "Tgp_GlobalTimer"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"IEC_TIMER"
+BEGIN
+END_DATA_BLOCK

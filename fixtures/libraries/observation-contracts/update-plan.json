@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "kind": "library_update_project",
+  "sessionGeneration": "2c33d78364a344f396cd99a3ce9c3131",
+  "resources": [
+    {
+      "libraryId": "library-b25329436a2b4a94a809444fde400028",
+      "revision": "ba817f071fc562ef0a44f3bf4cf12b5b91ef6a99ea2268aee6d8ab4783507162",
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\libraries\\l_f27cdd2aea03\\work\\TypeQualification\\TypeQualification.al21",
+      "sourcePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\libraries\\l_f27cdd2aea03\\source\\published.zal21",
+      "sourceHash": "e9815ebb7f28bd71ff85059faf59ee4a9e704a15c46473a8ba8226159372a328"
+    }
+  ],
+  "selection": [
+    {
+      "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+      "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+    }
+  ],
+  "dependencies": [
+    {
+      "rootVersionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+      "versions": [
+        {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.1.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true,
+          "requiredVersionGuids": []
+        }
+      ]
+    }
+  ],
+  "effects": [
+    {
+      "action": "updateAllSelectedTypeUses",
+      "plcPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+      "forceDefault": false,
+      "deleteUnusedVersions": false
+    },
+    {
+      "action": "library_update_project",
+      "targetLibraryId": "library-b25329436a2b4a94a809444fde400028",
+      "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\scratch\\TiaMcpScratch_20261009_052655_40272b13\\TiaMcpScratch_20261009_052655_40272b13\\TiaMcpScratch_20261009_052655_40272b13.ap21"
+    }
+  ],
+  "warnings": [],
+  "payload": {
+    "schemaVersion": 1,
+    "source": {
+      "libraryId": "library-b25329436a2b4a94a809444fde400028",
+      "revision": "ba817f071fc562ef0a44f3bf4cf12b5b91ef6a99ea2268aee6d8ab4783507162"
+    },
+    "selection": [
+      {
+        "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+        "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+      }
+    ],
+    "updateScope": "entireSelectedPlc",
+    "target": {
+      "plcPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"
+    }
+  },
+  "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\scratch\\TiaMcpScratch_20261009_052655_40272b13\\TiaMcpScratch_20261009_052655_40272b13\\TiaMcpScratch_20261009_052655_40272b13.ap21",
+  "updateImpact": {
+    "plcPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+    "affectedUses": [
+      {
+        "objectPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate",
+        "object": {
+          "engineeringType": "Siemens.Engineering.SW.Blocks.FB",
+          "Name": "TiaMcpLibraryGate",
+          "Number": 2,
+          "Namespace": ""
+        },
+        "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+        "beforeVersionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+        "beforeVersion": "1.0.0",
+        "requestedVersionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+        "requestedVersion": "1.1.0",
+        "action": "update"
+      }
+    ],
+    "usesScopeComplete": true,
+    "types": [
+      {
+        "requested": {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.1.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true
+        },
+        "affectedUseCount": 1,
+        "scope": "allNativeUsesInSelectedPlc",
+        "nativeComparisons": [
+          {
+            "beforeVersionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "requestedVersionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "properties": [
+              {
+                "description": "GUID of version object",
+                "status": "ObjectsDifferent",
+                "before": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+                "after": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+              },
+              {
+                "description": "Version Number",
+                "status": "ObjectsDifferent",
+                "before": "1.0.0",
+                "after": "1.1.0"
+              },
+              {
+                "description": "Is Default Version",
+                "status": "ObjectsIdentical",
+                "before": "True",
+                "after": "True"
+              },
+              {
+                "description": "Version author",
+                "status": "ObjectsIdentical",
+                "before": "TIA MCP qualification",
+                "after": "TIA MCP qualification"
+              },
+              {
+                "description": "Version comment",
+                "status": "ObjectsDifferent",
+                "before": "Owned fixture release 1.0.0",
+                "after": "Owned fixture release 1.1.0"
+              },
+              {
+                "description": "Modified Time",
+                "status": "ObjectsDifferent",
+                "before": "09.10.2026 07:26:14.998",
+                "after": "09.10.2026 07:26:31.218"
+              },
+              {
+                "description": "Original Library",
+                "status": "NotCompared",
+                "before": "TypeQualification",
+                "after": "TiaMcpScratch_20261009_052439_c82bed7f"
+              }
+            ]
+          }
+        ],
+        "libraryVersionsEligibleForCopy": [
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.0.0",
+            "state": "Committed",
+            "isDefault": false,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          }
+        ]
+      }
+    ],
+    "noOp": false,
+    "nativeComparisonsComplete": true,
+    "libraryScope": "Selected types and required native dependency types; native synchronization can copy their other committed library releases. It does not create new engineering instances when no uses exist.",
+    "runtimeCompatibilityVerified": false
+  },
+  "updateBaseline": {
+    "plcPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+    "objectPaths": [
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryState_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpLibraryState"
+    ],
+    "uses": [
+      {
+        "objectPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate",
+        "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+        "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5"
+      },
+      {
+        "objectPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpLibraryState",
+        "typeGuid": "1445ca96-6c54-43ae-81e9-b140c0364034",
+        "versionGuid": "ff1a89cc-5fea-462a-9a6d-4153b35963e2"
+      }
+    ],
+    "scopeComplete": true
+  },
+  "updateCleanupGuard": {
+    "policy": "Every baseline library use must have an exact native reference path from an OB, excluding outgoing references of updated objects.",
+    "requiredLibraryUses": [
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpLibraryState"
+    ],
+    "obRoots": [
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main"
+    ],
+    "reachablePaths": [
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryState_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled",
+      "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpLibraryState"
+    ],
+    "proofEdges": [
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate_DB"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryState_DB"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate_DB",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryGate"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpLibraryState_DB",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpLibraryState"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled"
+      },
+      {
+        "callerPath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB",
+        "calleePath": "/projects/TiaMcpScratch_20261009_052655_40272b13/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate"
+      }
+    ],
+    "objectsWithoutCrossReferenceService": [],
+    "proofScope": "All required baseline library uses have positive native OB-rooted reference paths; unavailable or unresolved graph edges provide no evidence.",
+    "allRequiredUsesProven": true,
+    "completeReferenceGraphClaimed": false,
+    "nativeCleanupDisabled": false,
+    "runtimeReachabilityClaimed": false
+  },
+  "compileScope": [
+    "ScratchStation"
+  ],
+  "fingerprint": "dfc1dfc34d015793e8e84cb1a0fc77cba72f0d633283ce971114cd6305cafba7"
+}

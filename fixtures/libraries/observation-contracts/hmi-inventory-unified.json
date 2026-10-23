@@ -1,0 +1,56 @@
+{
+  "target": {
+    "family": "unified",
+    "hmiPath": "/devices/Synthetic/items/HMI/hmi/Synthetic",
+    "name": "Synthetic",
+    "compileScope": "/devices/Synthetic",
+    "compileScopeKind": "owningDeviceHardwareAndSoftware"
+  },
+  "screens": [
+    {
+      "name": "Synthetic",
+      "width": 800,
+      "height": 480,
+      "faceplates": [
+        {
+          "nativeObjectType": "Synthetic",
+          "typeGuid": null,
+          "versionGuid": null,
+          "version": null,
+          "nativeLinkVerified": false,
+          "runtimeVerified": false,
+          "linkStatus": "noService",
+          "name": "Container",
+          "containedType": "",
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "interface": [],
+          "interfaceTruncated": false
+        }
+      ],
+      "screenItemsTruncated": false
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tag",
+      "dataType": "Bool",
+      "hmiDataType": "",
+      "connection": "<Interne Variable>",
+      "plcTag": "",
+      "table": "Tags"
+    }
+  ],
+  "connections": [
+    {
+      "name": "PLC",
+      "partner": null,
+      "station": "PLC_1",
+      "driver": "SIMATIC S7-1200/1500"
+    }
+  ],
+  "truncated": false,
+  "coverage": "Synthetic bounded Unified inventory; no native, runtime or completeness qualification."
+}

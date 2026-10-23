@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-review.v1.schema.json",
+  "title": "Retained offline before/after diagnostic experiment review",
+  "type": "object",
+  "required": ["schemaVersion", "beforeExperimentId", "afterExperimentId", "beforeMeasurementId", "afterMeasurementId", "request", "lineage", "beforeReportId", "afterReportId", "comparisonId", "beforeHypotheses", "afterHypotheses", "beforeQualityAssessment", "afterQualityAssessment", "beforeAcquisition", "afterAcquisition", "sourceChanged", "programIdentityChanged", "sourceAuthenticityVerified", "clockSynchronizationVerified", "causationProven", "bugFixProven", "nativeQualification", "nativeAccessAttempted", "limits"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": "diagnostic-experiment-review.v1"},
+    "beforeExperimentId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "afterExperimentId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "beforeMeasurementId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "afterMeasurementId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "request": {"$ref": "#/$defs/request"},
+    "lineage": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "previousPlanId", "currentPlanId"],
+      "properties": {
+        "kind": {"enum": ["sameDiagnosticCase", "explicitDirectReplan"]},
+        "previousPlanId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "currentPlanId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "replan": {"type": "object"}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "explicitDirectReplan"}}}, "then": {"required": ["replan"]}},
+        {"if": {"properties": {"kind": {"const": "sameDiagnosticCase"}}}, "then": {"not": {"required": ["replan"]}}}
+      ]
+    },
+    "beforeReportId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "afterReportId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "comparisonId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "beforeHypotheses": {"$ref": "diagnostic-report.v1.schema.json#/properties/hypotheses"},
+    "afterHypotheses": {"$ref": "diagnostic-report.v1.schema.json#/properties/hypotheses"},
+    "beforeQualityAssessment": {"type": "object"},
+    "afterQualityAssessment": {"type": "object"},
+    "beforeAcquisition": {"$ref": "trace-comparison.v1.schema.json#/$defs/acquisition"},
+    "afterAcquisition": {"$ref": "trace-comparison.v1.schema.json#/$defs/acquisition"},
+    "sourceChanged": {"type": "boolean"},
+    "programIdentityChanged": {"type": "boolean"},
+    "sourceAuthenticityVerified": {"const": false},
+    "clockSynchronizationVerified": {"const": false},
+    "causationProven": {"const": false},
+    "bugFixProven": {"const": false},
+    "nativeQualification": {"const": false},
+    "nativeAccessAttempted": {"const": false},
+    "limits": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["afterExperimentId", "beforeMeasurementId", "afterMeasurementId", "comparison"],
+      "properties": {
+        "afterExperimentId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "beforeMeasurementId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "afterMeasurementId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "comparison": {"$ref": "trace-comparison.v1.schema.json#/$defs/options"}
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false, "required": ["experimentId", "request"],
+      "properties": {
+        "experimentId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "request": {"$ref": "#/$defs/request"}
+      }
+    },
+    "receipt": {
+      "type": "object", "additionalProperties": false, "required": ["id", "artifact", "schemaVersion", "review"],
+      "properties": {
+        "id": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "artifact": {"$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"},
+        "schemaVersion": {"const": "diagnostic-experiment-review.v1"},
+        "review": {"$ref": "#"}
+      }
+    }
+  }
+}

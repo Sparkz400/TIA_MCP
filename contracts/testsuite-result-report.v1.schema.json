@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-result-report.v1.schema.json",
+  "title": "Offline supplied-result report with exact or explicitly unresolved saved-review joins",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviewId",
+    "inputSha256",
+    "planSha256",
+    "summary",
+    "results",
+    "scope",
+    "scopeBindings",
+    "findings",
+    "assessment"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "testsuite-result-report.v1"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inputSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "planSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suppliedRequiredCoveragePassed",
+        "savedReviewScopeBound",
+        "resultCount",
+        "findingCount",
+        "resolvedFindingCount",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "nativeExecuted",
+        "nativeQualified",
+        "nativeExecutionAuthorized",
+        "wholeProjectHealthComplete",
+        "tiaVersionOrigin",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "suppliedRequiredCoveragePassed": {
+          "type": "boolean"
+        },
+        "savedReviewScopeBound": {
+          "type": "boolean"
+        },
+        "resultCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "findingCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "resolvedFindingCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecutionAuthorized": {
+          "const": false
+        },
+        "wholeProjectHealthComplete": {
+          "const": false
+        },
+        "tiaVersionOrigin": {
+          "const": "suppliedUnverified"
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "definitionId",
+          "outcome",
+          "rawSha256",
+          "reasons",
+          "captureIndex",
+          "nativeState",
+          "nativeErrorCount",
+          "nativeWarningCount"
+        ],
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "outcome": {
+            "enum": [
+              "passed",
+              "assertionFailed",
+              "executionError",
+              "inconclusive",
+              "blocked",
+              "excluded",
+              "notRun",
+              "outcomeUnknown"
+            ]
+          },
+          "rawSha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "string",
+              "maxLength": 4000
+            }
+          },
+          "captureIndex": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 999
+          },
+          "nativeState": {
+            "enum": [
+              null,
+              "Success",
+              "Information",
+              "Warning",
+              "Error",
+              "Unknown"
+            ]
+          },
+          "nativeErrorCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "nativeWarningCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "testsuite-scope-coverage.v1.schema.json#/$defs/entry"
+      }
+    },
+    "scopeBindings": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "definitionId",
+          "reference",
+          "binding"
+        ],
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "reference": {
+            "$ref": "engineering-object-reference.v1.schema.json"
+          },
+          "binding": {
+            "enum": [
+              "exactCapturedSource",
+              "objectAbsentFromReview",
+              "differentProjectPlcOrScope",
+              "differentSourceObservation",
+              "differentObjectOrContent"
+            ]
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "finding",
+          "binding",
+          "candidateNodeId"
+        ],
+        "properties": {
+          "finding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "definitionId",
+              "state",
+              "description",
+              "nativePath",
+              "resolvedObject",
+              "errorCount",
+              "warningCount"
+            ],
+            "properties": {
+              "definitionId": {
+                "type": "string",
+                "maxLength": 256
+              },
+              "state": {
+                "enum": [
+                  "Success",
+                  "Information",
+                  "Warning",
+                  "Error",
+                  "Unknown"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 8192
+              },
+              "nativePath": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 8192
+              },
+              "resolvedObject": {
+                "anyOf": [
+                  {
+                    "$ref": "engineering-object-reference.v1.schema.json"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "errorCount": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "warningCount": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              }
+            }
+          },
+          "binding": {
+            "enum": [
+              "exactCapturedSource",
+              "objectAbsentFromReview",
+              "differentProjectPlcOrScope",
+              "differentSourceObservation",
+              "differentObjectOrContent"
+            ]
+          },
+          "candidateNodeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 8192
+          }
+        }
+      }
+    },
+    "assessment": {
+      "$ref": "testsuite-assessment.v1.schema.json"
+    }
+  }
+}

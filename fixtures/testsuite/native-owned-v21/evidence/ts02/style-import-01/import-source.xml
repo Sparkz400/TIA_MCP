@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authored import source using Siemens' published example schema; not a native export. -->
+<RuleSets>
+  <RuleSet Name="TiaMcp_CasingAvailability">
+    <Property>
+      <PropertyAttribute Name="Author" Value="TIA MCP" />
+      <PropertyAttribute Name="Version" Value="0.1" />
+      <PropertyAttribute Name="Comment" Value="Owned scratch execution availability probe" />
+    </Property>
+    <Rules>
+      <Rule Name="TiaMcp_CamelCase" Enabled="True" Type="CasingRule">
+        <RuleAttribute Name="ObjectSelector" Value="CodeBlock_FB_FC_OB" />
+        <RuleAttribute Name="Target" Value="TargetName" />
+        <RuleAttribute Name="Category" Value="Error" />
+        <RuleAttribute Name="Comment" Value="Names in the scratch intentionally violate camel casing" />
+        <RuleAttribute Name="Casing" Value="CamelCasing" />
+        <RuleAttribute Name="ViolationCondition" Value="IsNotSet" />
+      </Rule>
+    </Rules>
+  </RuleSet>
+</RuleSets>

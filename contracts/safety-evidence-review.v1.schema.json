@@ -1,0 +1,777 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/safety-evidence-review.v1.schema.json",
+  "title": "Supplied safety observations and opaque supporting artifacts; no safety approval or native qualification",
+  "$ref": "#/$defs/receipt",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "purpose",
+        "fileName",
+        "bytes",
+        "artifact"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after",
+            "context"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changeCount",
+        "issueCount",
+        "programSignatureChangeCount",
+        "blockSignatureChangeCount",
+        "otherReportedContentChanged",
+        "originalBytesEqual"
+      ],
+      "properties": {
+        "changeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "issueCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "programSignatureChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockSignatureChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "otherReportedContentChanged": {
+          "type": "boolean"
+        },
+        "originalBytesEqual": {
+          "type": "boolean"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "reportedCompleteness",
+        "warnings",
+        "reportedBlock",
+        "programSignatureCount",
+        "blockSignatureCount",
+        "runtimeGroupCount",
+        "settingCount"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "reportedCompleteness": {
+          "type": "object",
+          "required": [
+            "scopeComplete",
+            "truncated"
+          ],
+          "properties": {
+            "scopeComplete": {
+              "type": "boolean"
+            },
+            "truncated": {
+              "type": "boolean"
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        },
+        "reportedBlock": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "programSignatureCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "blockSignatureCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "runtimeGroupCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "settingCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "scope",
+        "type",
+        "valueDecimal",
+        "zero"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "programSignatures",
+            "blockSignatures"
+          ]
+        },
+        "type": {
+          "type": "string"
+        },
+        "valueDecimal": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,19})$"
+        },
+        "zero": {
+          "type": "boolean"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "code",
+        "message"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "code": {
+          "enum": [
+            "incompleteObservation",
+            "noProgramSignatures",
+            "blockSignatureServiceUnavailable",
+            "noBlockSignatures",
+            "zeroSignature"
+          ]
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "identity",
+        "status",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "section": {
+          "enum": [
+            "programSignatures",
+            "blockSignatures",
+            "runtimeGroups",
+            "settings",
+            "otherReportedContent"
+          ]
+        },
+        "identity": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "onlyBefore",
+            "onlyAfter",
+            "differentObservation"
+          ]
+        },
+        "before": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "after": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "beforeSignatureDecimal": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterSignatureDecimal": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "plcPath",
+        "projectPath",
+        "observations",
+        "signatures",
+        "changes",
+        "issues",
+        "summary",
+        "nativeExecutable",
+        "nativeExecuted",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "safetyApproval",
+        "requiredSignatureProfileVerified",
+        "wholeProgramAnalysisComplete",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "safety-evidence-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "projectPath": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "minItems": 2
+        },
+        "signatures": {
+          "type": "array",
+          "maxItems": 512,
+          "items": {
+            "$ref": "#/$defs/signature"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 16897,
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "maxItems": 520,
+          "items": {
+            "$ref": "#/$defs/issue"
+          }
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "safetyApproval": {
+          "const": false
+        },
+        "requiredSignatureProfileVerified": {
+          "const": false
+        },
+        "wholeProgramAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "plcPath",
+        "input",
+        "comparisonInput",
+        "sources",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "safety-evidence-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "$ref": "#/$defs/artifact"
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "plcPath",
+        "input",
+        "comparisonInput",
+        "reportArtifact",
+        "sources",
+        "supportingSourcePolicy",
+        "summary",
+        "nativeExecutable",
+        "nativeExecuted",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "safetyApproval",
+        "requiredSignatureProfileVerified",
+        "wholeProgramAnalysisComplete",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "supportingSourcePolicy": {
+          "type": "string"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "safetyApproval": {
+          "const": false
+        },
+        "requiredSignatureProfileVerified": {
+          "const": false
+        },
+        "wholeProgramAnalysisComplete": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "plcPath",
+        "input",
+        "comparisonInput",
+        "reportArtifact",
+        "sources",
+        "supportingSourcePolicy",
+        "summary",
+        "nativeExecutable",
+        "nativeExecuted",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "safetyApproval",
+        "requiredSignatureProfileVerified",
+        "wholeProgramAnalysisComplete",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "nextOffset",
+        "rows"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "sources": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "supportingSourcePolicy": {
+          "type": "string"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "safetyApproval": {
+          "const": false
+        },
+        "requiredSignatureProfileVerified": {
+          "const": false
+        },
+        "wholeProgramAnalysisComplete": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "signatures",
+            "issues",
+            "changes"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "type": "object"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "section": {
+                "const": "observations"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "properties": {
+                    "value": {
+                      "$ref": "#/$defs/observation"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "section": {
+                "const": "signatures"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "properties": {
+                    "value": {
+                      "$ref": "#/$defs/signature"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "section": {
+                "const": "issues"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "properties": {
+                    "value": {
+                      "$ref": "#/$defs/issue"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "section": {
+                "const": "changes"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "rows": {
+                "items": {
+                  "properties": {
+                    "value": {
+                      "$ref": "#/$defs/change"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

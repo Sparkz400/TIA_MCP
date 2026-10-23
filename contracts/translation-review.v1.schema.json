@@ -1,0 +1,471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-review.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "project",
+    "workbookSha256",
+    "profileSha256",
+    "profileKind",
+    "sourceCulture",
+    "options",
+    "edits",
+    "issues",
+    "completeness",
+    "changedCells",
+    "canWriteOfflineCandidate",
+    "sourceChangesRequireFreshExport",
+    "nativeQualified",
+    "nativeExecuted",
+    "nativeImportAllowed",
+    "reviewSha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "translation-offline-review"
+    },
+    "project": {
+      "$ref": "engineering-object-reference.v1.schema.json"
+    },
+    "workbookSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "profileSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "profileKind": {
+      "enum": [
+        "synthetic",
+        "unqualified-explicit"
+      ]
+    },
+    "sourceCulture": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "updateSourceLanguage",
+        "glossaryId",
+        "glossary"
+      ],
+      "properties": {
+        "updateSourceLanguage": {
+          "type": "boolean"
+        },
+        "glossaryId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1048576
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "glossary": {
+          "anyOf": [
+            {
+              "type": "array",
+              "maxItems": 10000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sourceTerm",
+                  "requiredTargetTerm",
+                  "targetCulture",
+                  "category",
+                  "caseSensitive"
+                ],
+                "properties": {
+                  "sourceTerm": {
+                    "type": "string",
+                    "maxLength": 1048576
+                  },
+                  "requiredTargetTerm": {
+                    "type": "string",
+                    "maxLength": 1048576
+                  },
+                  "targetCulture": {
+                    "type": "string",
+                    "maxLength": 64
+                  },
+                  "category": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 1024
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "caseSensitive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "edits": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nativeKey",
+          "culture",
+          "edit",
+          "changed"
+        ],
+        "properties": {
+          "nativeKey": {
+            "type": "string",
+            "maxLength": 1048576
+          },
+          "culture": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "edit": {
+            "$ref": "#/$defs/edit"
+          },
+          "changed": {
+            "type": "boolean"
+          },
+          "source": {
+            "$ref": "#/$defs/state"
+          },
+          "before": {
+            "$ref": "#/$defs/state"
+          },
+          "after": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1048576
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "location": {
+            "$ref": "translation-profile.v1.schema.json#/$defs/location"
+          },
+          "invalidatesTranslationReviews": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nativeKey",
+          "culture",
+          "code",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "nativeKey": {
+            "type": "string",
+            "maxLength": 1048576
+          },
+          "culture": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "severity": {
+            "const": "error"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1048576
+          }
+        }
+      }
+    },
+    "completeness": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "culture",
+          "mapped",
+          "missing",
+          "empty",
+          "nonempty",
+          "whitespaceOnly",
+          "scope"
+        ],
+        "properties": {
+          "culture": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "mapped": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "missing": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "empty": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nonempty": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "whitespaceOnly": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope": {
+            "const": "explicit-profile-rows-only"
+          }
+        }
+      }
+    },
+    "changedCells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "canWriteOfflineCandidate": {
+      "type": "boolean"
+    },
+    "sourceChangesRequireFreshExport": {
+      "type": "boolean"
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "nativeExecuted": {
+      "const": false
+    },
+    "nativeImportAllowed": {
+      "const": false
+    },
+    "reviewSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "alarmInheritance": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nativeKey",
+          "before",
+          "after"
+        ],
+        "properties": {
+          "nativeKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1048576
+          },
+          "before": {
+            "$ref": "#/$defs/alarmInheritance"
+          },
+          "after": {
+            "$ref": "#/$defs/alarmInheritance"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "edit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nativeKey",
+        "culture",
+        "kind",
+        "value",
+        "expectedSourceSha256",
+        "expectedTargetSha256",
+        "approved",
+        "reviewer",
+        "rationale"
+      ],
+      "properties": {
+        "nativeKey": {
+          "type": "string",
+          "maxLength": 1048576
+        },
+        "culture": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "kind": {
+          "enum": [
+            "keep",
+            "set",
+            "clear"
+          ]
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1048576
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedSourceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedTargetSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "reviewer": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1048576
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "text",
+        "richText"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "missing",
+            "empty",
+            "text"
+          ]
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1048576
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "richText": {
+          "type": "boolean"
+        }
+      }
+    },
+    "alarmInheritance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "mappedFields",
+        "inheritedFields",
+        "missingFields",
+        "status",
+        "scope"
+      ],
+      "properties": {
+        "policy": {
+          "const": "instance-inheritance-v1"
+        },
+        "mappedFields": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1001
+        },
+        "inheritedFields": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1001
+        },
+        "missingFields": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1001
+        },
+        "status": {
+          "enum": [
+            "literal",
+            "inherited",
+            "mixed",
+            "missingFields"
+          ]
+        },
+        "scope": {
+          "const": "explicit-profile-language-fields-only"
+        }
+      }
+    }
+  }
+}

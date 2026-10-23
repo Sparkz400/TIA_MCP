@@ -1,0 +1,12 @@
+{
+  "targets": [
+    {
+      "family": "classic",
+      "hmiPath": "/devices/Synthetic/items/HMI/hmi/Synthetic",
+      "name": "Synthetic",
+      "compileScope": "/devices/Synthetic/items/HMI/hmi/Synthetic",
+      "compileScopeKind": "hmiSoftware"
+    }
+  ],
+  "complete": true
+}

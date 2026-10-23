@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "opcua-profiles.v1",
+  "tiaVersion": 21,
+  "status": "candidateProfilesOnly",
+  "nativeQualified": false,
+  "source": "docs/plans/expansion-plans/opc-ua-engineering.md",
+  "qualificationRule": "No operation is enabled by this manifest. Public API presence, target availability, bridge implementation and native qualification are independent states.",
+  "profiles": [
+    {
+      "id": "P1500-40",
+      "product": "STEP 7 Professional",
+      "cpu": "CPU 1511-1 PN",
+      "orderNumber": "6ES7 511-1AL03-0AB0",
+      "firmware": "V4.0",
+      "fixtureState": "requiredOwnedOfflineCopy",
+      "license": "Verify engineering entitlement and target-specific OPC UA runtime license; installed DLLs are not entitlement evidence.",
+      "candidateFeatures": ["customInterfaces", "simaticInterfaces", "referenceNamespaces", "accessControl", "localCertificates"],
+      "formatProfile": null,
+      "targetAvailable": null,
+      "nativeQualified": false,
+      "blockers": ["UA-Q00 fixture export/import dialect", "nativeAdmission", "securityActivationAttributeProfile", "exactDeclarationMapping"]
+    },
+    {
+      "id": "P1500-41",
+      "product": "STEP 7 Professional",
+      "cpu": "CPU 1511-1 PN",
+      "orderNumber": "6ES7 511-1AL03-0AB0",
+      "firmware": "V4.1",
+      "fixtureState": "requiredOwnedOfflineCopy",
+      "license": "Verify CPU-specific engineering/runtime entitlement.",
+      "candidateFeatures": ["customInterfaces", "simaticInterfaces", "referenceNamespaces", "accessControl", "localCertificates", "dynamicClientCertificateServices"],
+      "formatProfile": null,
+      "targetAvailable": null,
+      "nativeQualified": false,
+      "blockers": ["UA-Q00", "dynamicClientServiceConstraints", "GDSPrerequisitesOutsideEngineering"]
+    },
+    {
+      "id": "P1200-45",
+      "product": "STEP 7",
+      "cpu": "S7-1200 exact CPU/order number to be selected",
+      "orderNumber": null,
+      "firmware": "V4.5",
+      "fixtureState": "unavailable",
+      "license": "Verify CPU-specific OPC UA license and engineering product support.",
+      "candidateFeatures": ["serverInterfaceExposure", "arraysStructuresMethodsWhereSupported"],
+      "formatProfile": null,
+      "targetAvailable": null,
+      "nativeQualified": false,
+      "blockers": ["exactTargetSelection", "publicServiceAvailability", "noUnions", "methodScaffoldVersion", "categorySupportUnknown"]
+    },
+    {
+      "id": "P-UNIFIED",
+      "product": "WinCC Unified optional installation",
+      "cpu": null,
+      "orderNumber": null,
+      "firmware": null,
+      "fixtureState": "requiresHmiOwnerHandoff",
+      "license": "Verify exact Unified runtime product and endpoint features.",
+      "candidateFeatures": ["runtimeServerSettings", "alarmTypes"],
+      "formatProfile": null,
+      "targetAvailable": null,
+      "nativeQualified": false,
+      "blockers": ["exactProductVersion", "hmiCompileRecovery", "alarmParameterSemantics", "optionalApiAvailability"]
+    }
+  ],
+  "categories": [
+    {"id": "custom", "publicType": "Siemens.Engineering.SW.OpcUa.ServerInterface", "documentedOperations": ["enumerate", "create", "import", "export", "delete", "setAuthor", "setEnabled", "editCommentItems"], "unsupportedDirectOperations": ["rename", "typedPerNodeCrud"]},
+    {"id": "simatic", "publicType": "Siemens.Engineering.SW.OpcUa.SimaticInterface", "documentedOperations": ["enumerate", "create", "export", "delete", "setAuthor", "setEnabled", "setUseStringNodeIds", "editCommentItems"], "metadataCandidateOperations": ["rename"], "unsupportedDirectOperations": ["import", "typedPerNodeCrud"], "note": "Installed writable Name accessor conflicts with older documentation; native rename remains unqualified."},
+    {"id": "referenceNamespace", "publicType": "Siemens.Engineering.SW.OpcUa.ReferenceNamespace", "documentedOperations": ["enumerate", "createWithFile", "import", "export", "delete", "rename", "setAuthor", "setEnabled", "setGenerateNodes", "setGeneratedInterfaceName", "setUseStringNodeIds"], "unsupportedDirectOperations": ["generateNodesMethod", "typedPerNodeCrud"]}
+  ],
+  "documentedAttributeCandidates": [
+    {"name": "OpcUaSecurityPolicies", "owner": "eligible CPU OPC UA submodule", "type": "Siemens.Engineering.HW.OpcUaSecurityPolicies", "writeEnabled": false, "prerequisite": "OPC UA server active; exact owner and policy meanings verified on profile; never choose a None policy to pass a fixture"},
+    {"name": "OpcUaServerCertificate", "owner": "eligible CPU OPC UA submodule", "type": "target descriptor required", "writeEnabled": false, "prerequisite": "local certificate exists, usage/key/SAN/policy acceptable, exact assignment type observed"}
+  ],
+  "unestablishedPublicRoutes": ["serverActivationAttribute", "endpointAuthenticationAttributeProfile", "generalTrustLists", "CRLManagement", "globalCertificateStoreLifecycle", "plcClientInterfaceCrud", "genericClientConnectionSession", "customInterfaceDirectRename", "simaticInterfaceImport"],
+  "offlineSchema": {
+    "path": "third-party/opcua/UANodeSet.xsd",
+    "sha256": "c7ac09ea7504d54174e1eb4c5a8123c0cc491040703dfcd6bfe085bf6c53f9f0",
+    "modelVersion": "1.05.04",
+    "tiaImportAccepted": false,
+    "mappingDialect": null
+  }
+}

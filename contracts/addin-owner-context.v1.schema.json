@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "addin-owner-context.v1.schema.json",
+  "title": "Existing worker owner context; native route remains unqualified",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workerInstanceId",
+    "workerProcessId",
+    "sessionGeneration",
+    "ownsPortalProcess",
+    "state",
+    "reason",
+    "process",
+    "osProcessIdentityVerified",
+    "nativeProcessIdMatched",
+    "producerAuthenticated",
+    "liveSelectionVerified",
+    "nativeQualified"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "addin-owner-context.v1"
+    },
+    "workerInstanceId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$"
+    },
+    "workerProcessId": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "sessionGeneration": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$"
+    },
+    "ownsPortalProcess": {
+      "type": "boolean"
+    },
+    "state": {
+      "enum": [
+        "available",
+        "unavailable"
+      ]
+    },
+    "reason": {
+      "enum": [
+        null,
+        "NotAttached",
+        "CaptureUnavailable",
+        "ProcessChanged",
+        "ProcessExited",
+        "IdentityQueryUnavailable",
+        "Disposed"
+      ]
+    },
+    "process": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "processId",
+            "startedAtUtc",
+            "executablePath",
+            "windowsSessionId"
+          ],
+          "properties": {
+            "processId": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            "startedAtUtc": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$"
+            },
+            "executablePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768
+            },
+            "windowsSessionId": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          }
+        }
+      ]
+    },
+    "osProcessIdentityVerified": {
+      "type": "boolean"
+    },
+    "nativeProcessIdMatched": {
+      "type": "boolean"
+    },
+    "producerAuthenticated": {
+      "const": false
+    },
+    "liveSelectionVerified": {
+      "const": false
+    },
+    "nativeQualified": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "available"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "type": "null"
+          },
+          "process": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "processId",
+              "startedAtUtc",
+              "executablePath",
+              "windowsSessionId"
+            ],
+            "properties": {
+              "processId": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "startedAtUtc": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$"
+              },
+              "executablePath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32768
+              },
+              "windowsSessionId": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              }
+            }
+          },
+          "osProcessIdentityVerified": {
+            "const": true
+          },
+          "nativeProcessIdMatched": {
+            "const": true
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "osProcessIdentityVerified": {
+            "const": false
+          },
+          "nativeProcessIdMatched": {
+            "const": false
+          }
+        }
+      }
+    }
+  ]
+}

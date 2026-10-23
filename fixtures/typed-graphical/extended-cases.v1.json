@@ -1,0 +1,5176 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "fixtureId": "typed-create-fc-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_FC_LAD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "createdBlockName": "TgpCreated_FC_LAD"
+    },
+    {
+      "fixtureId": "typed-create-fb-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_FB_LAD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "createdBlockName": "TgpCreated_FB_LAD"
+    },
+    {
+      "fixtureId": "typed-insert-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "insertNetwork",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "insertAfterNetworkId": "$first"
+        },
+        "instances": []
+      },
+      "engineeringOnly": true
+    },
+    {
+      "fixtureId": "typed-edit-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TemplateFC_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TemplateFC_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "editNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "edited",
+              "kind": "contact",
+              "operand": "replacement",
+              "nativeUid": "$part:Contact:0"
+            }
+          ],
+          "operands": [
+            {
+              "key": "replacement",
+              "scope": "local",
+              "components": [
+                "InOutBool"
+              ]
+            }
+          ],
+          "connections": []
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Access",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "InputBool"
+          ],
+          "toComponents": [
+            "InOutBool"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-fb-multi-lad",
+      "family": "fb-multi",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_multi_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_multi_LAD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createMulti",
+            "name": "Fresh_fb_multi_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-fb-multi-lad",
+      "family": "fb-multi",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_global_LAD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createGlobal",
+            "name": "Fresh_fb_multi_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "TiaMcp_EnableGate_DB"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ton_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ton_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ton_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_ton_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-tof-lad",
+      "family": "tof",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tof_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tof_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-tof-lad",
+      "family": "tof",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_tof_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_tof_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-tp-lad",
+      "family": "tp",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tp_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tp_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-tp-lad",
+      "family": "tp",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_tp_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_tp_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctu-lad",
+      "family": "ctu",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctu_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctu_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctu-lad",
+      "family": "ctu",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctu_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctu_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctd-lad",
+      "family": "ctd",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctd_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctd_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctd-lad",
+      "family": "ctd",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctd_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctd_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctud-lad",
+      "family": "ctud",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctud_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctud_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctud-lad",
+      "family": "ctud",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctud_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctud_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-create-fc-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_FC_FBD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "createdBlockName": "TgpCreated_FC_FBD"
+    },
+    {
+      "fixtureId": "typed-create-fb-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_FB_FBD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "createdBlockName": "TgpCreated_FB_FBD"
+    },
+    {
+      "fixtureId": "typed-insert-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Boolean_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Boolean_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "insertNetwork",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "insertAfterNetworkId": "$first"
+        },
+        "instances": []
+      },
+      "engineeringOnly": true
+    },
+    {
+      "fixtureId": "typed-edit-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TemplateFC_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TemplateFC_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "editNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "edited",
+              "kind": "assign",
+              "operand": "replacement",
+              "nativeUid": "$part:Coil:0"
+            }
+          ],
+          "operands": [
+            {
+              "key": "replacement",
+              "scope": "local",
+              "components": [
+                "InOutBool"
+              ]
+            }
+          ],
+          "connections": []
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Access",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "OutputBool"
+          ],
+          "toComponents": [
+            "InOutBool"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-fb-multi-fbd",
+      "family": "fb-multi",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_multi_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_multi_FBD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createMulti",
+            "name": "Fresh_fb_multi_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-fb-multi-fbd",
+      "family": "fb-multi",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_global_FBD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createGlobal",
+            "name": "Fresh_fb_multi_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "TiaMcp_EnableGate_DB"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ton_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ton_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ton_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_ton_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-tof-fbd",
+      "family": "tof",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tof_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tof_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-tof-fbd",
+      "family": "tof",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_tof_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_tof_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-tp-fbd",
+      "family": "tp",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tp_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tp_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-tp-fbd",
+      "family": "tp",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_tp_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTimer.xml",
+          "names": [
+            "Tgp_GlobalTimer"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalTimer"
+          ],
+          "toComponents": [
+            "Fresh_tp_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctu-fbd",
+      "family": "ctu",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctu_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctu_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctu-fbd",
+      "family": "ctu",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctu_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctu_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctd-fbd",
+      "family": "ctd",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctd_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctd_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctd-fbd",
+      "family": "ctd",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctd_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctd_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createmulti-ctud-fbd",
+      "family": "ctud",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctud_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctud_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-createglobal-ctud-fbd",
+      "family": "ctud",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createGlobal",
+            "name": "Fresh_ctud_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalCounter.xml",
+          "names": [
+            "Tgp_GlobalCounter"
+          ]
+        }
+      ],
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "Tgp_GlobalCounter"
+          ],
+          "toComponents": [
+            "Fresh_ctud_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    }
+  ]
+}

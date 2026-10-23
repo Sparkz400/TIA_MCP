@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-readback.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "tracePlanId",
+    "reviewId",
+    "nativeTraceIdentity",
+    "targetIdentity",
+    "observationMethod",
+    "programIdentity",
+    "project",
+    "target",
+    "settings",
+    "signals",
+    "evidenceArtifacts",
+    "programMatchVerified",
+    "triggerSupported",
+    "samplingTaskVerified",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-readback.v1"
+    },
+    "tracePlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "reviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "nativeTraceIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "targetIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "observationMethod": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "programIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "project": {
+      "type": "object"
+    },
+    "target": {
+      "type": "object"
+    },
+    "settings": {
+      "type": "object"
+    },
+    "signals": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "storagePath",
+          "memberPath",
+          "datatype",
+          "observable"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "storagePath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "memberPath": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/memberPath"
+          },
+          "datatype": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "observable": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "evidenceArtifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+          }
+        }
+      }
+    },
+    "programMatchVerified": {
+      "type": "boolean"
+    },
+    "triggerSupported": {
+      "type": "boolean"
+    },
+    "samplingTaskVerified": {
+      "type": "boolean"
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "maxSignals",
+        "maxSamples",
+        "minSampleEvery",
+        "maxSampleEvery",
+        "freeSlotsBefore",
+        "requiredSampleCapacity",
+        "sampleWindowSemantics"
+      ],
+      "properties": {
+        "maxSignals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minSampleEvery": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxSampleEvery": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "freeSlotsBefore": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requiredSampleCapacity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sampleWindowSemantics": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

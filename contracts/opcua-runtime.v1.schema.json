@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/opcua-runtime.v1.schema.json",
+  "title": "Owned read-only OPC UA runtime status",
+  "$ref": "#/$defs/status",
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaceUri", "identifierType", "identifier"],
+      "properties": {
+        "namespaceUri": {"type": "string", "format": "uri", "maxLength": 4096},
+        "identifierType": {"enum": ["numeric", "string", "guid", "opaque"]},
+        "identifier": {"type": "string", "minLength": 1, "maxLength": 4096}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["endpoint", "applicationUri", "certificateSha256", "authentication"],
+      "properties": {
+        "endpoint": {"type": "string", "pattern": "^opc\\.tcp://", "maxLength": 2048},
+        "applicationUri": {"type": "string", "format": "uri", "maxLength": 4096},
+        "certificateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "authentication": {"enum": ["anonymous", "username"]},
+        "user": {"type": ["string", "null"], "maxLength": 256},
+        "vaultName": {"type": ["string", "null"], "maxLength": 32},
+        "credential": {"type": ["object", "null"]}
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "attemptId", "hostId", "selection", "state", "errorCode", "peerVerified", "updatedAt",
+        "securityPolicy", "securityMode", "physicalQualified", "programIdentityVerified", "secretsReturned", "operationErrorCode"],
+      "properties": {
+        "schemaVersion": {"const": "opcua-runtime-session.v1"},
+        "attemptId": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "hostId": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "selection": {"$ref": "#/$defs/selection"},
+        "state": {"enum": ["connecting", "connected", "notConnected", "remoteSessionUnknown", "hostEndedRemoteUnknown", "closed", "abandonedRemoteUnknown"]},
+        "errorCode": {"type": ["string", "null"], "maxLength": 128},
+        "peerVerified": {"type": "boolean"},
+        "updatedAt": {"type": "string", "format": "date-time"},
+        "securityPolicy": {"const": "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"},
+        "securityMode": {"const": "SignAndEncrypt"},
+        "physicalQualified": {"const": false},
+        "programIdentityVerified": {"const": false},
+        "secretsReturned": {"const": false},
+        "operationErrorCode": {"type": ["string", "null"], "maxLength": 128}
+      }
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "outcome", "builtInType", "dataType", "valueRank", "arrayDimensions", "statusCode", "quality",
+        "sourceTimestamp", "serverTimestamp", "sourcePicoseconds", "serverPicoseconds", "encoding", "value", "errorCode"],
+      "properties": {
+        "node": {"$ref": "#/$defs/node"},
+        "outcome": {"enum": ["value", "itemError", "metadataError", "unsupported"]},
+        "builtInType": {"type": ["string", "null"]},
+        "dataType": {"oneOf": [{"$ref": "#/$defs/node"}, {"type": "null"}]},
+        "valueRank": {"type": ["integer", "null"]},
+        "arrayDimensions": {"type": ["array", "null"], "maxItems": 4096, "items": {"type": "integer", "minimum": 0, "maximum": 4294967295}},
+        "statusCode": {"type": "string", "pattern": "^0x[0-9a-f]{8}$"},
+        "quality": {"enum": ["Good", "Uncertain", "Bad"]},
+        "sourceTimestamp": {"type": ["string", "null"], "format": "date-time"},
+        "serverTimestamp": {"type": ["string", "null"], "format": "date-time"},
+        "sourcePicoseconds": {"type": "integer", "minimum": 0, "maximum": 65535},
+        "serverPicoseconds": {"type": "integer", "minimum": 0, "maximum": 65535},
+        "encoding": {"type": ["string", "null"]},
+        "value": {"type": ["string", "boolean", "null"]},
+        "errorCode": {"type": ["string", "null"]}
+      }
+    },
+    "read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attemptId", "startedAt", "completedAt", "items"],
+      "properties": {
+        "attemptId": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "startedAt": {"type": "string", "format": "date-time"},
+        "completedAt": {"type": "string", "format": "date-time"},
+        "items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/value"}}
+      }
+    }
+  }
+}

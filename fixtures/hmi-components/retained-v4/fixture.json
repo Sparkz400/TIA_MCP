@@ -1,0 +1,353 @@
+{
+  "completed": true,
+  "nativeExecuted": false,
+  "fullGoalComplete": false,
+  "producer": {
+    "baseCommit": "80d432528ca9cb30170f06a89feda8bbc646f72d",
+    "sourceManifestSha256": "c925b46da3b61511bb5aa91d66649bb4458d63f817bbf0c9181e982b1bc2a292",
+    "bundleManifestSha256": "4d3da6adfd30603aaa806159253229a301714733273e91e3ab15c92ec35de8e5",
+    "binaryHashes": {
+      "TiaMcp.Host.dll": "61294cdceae14a0894e8d7a07182e9b7482db1ff71f8948664ba8716bde05ee6",
+      "TiaMcp.Core.dll": "5019b61ffc89dc5700f1c7a984cfd3007b8c5328cb1258b57b2f4d8416b37906"
+    }
+  },
+  "records": [
+    {
+      "recordId": "23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28",
+      "schemaVersion": "hmi-component-review-record.v4",
+      "receipt": {
+        "recordId": "23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28",
+        "input": {
+          "path": "hmi-component-reviews/5e21b5fdafb86e278defe7852c36246c8459f2344fa9407ec78ffa74f728fb69.input",
+          "sha256": "5e21b5fdafb86e278defe7852c36246c8459f2344fa9407ec78ffa74f728fb69"
+        },
+        "reportArtifact": {
+          "path": "hmi-component-reviews/23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28.json",
+          "sha256": "23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28"
+        },
+        "summary": {
+          "outputCount": 1,
+          "bindingCount": 0,
+          "conflictCount": 0,
+          "gapCount": 0,
+          "componentComparisonCount": 2,
+          "changedInterfaceCount": 0,
+          "unresolvedComponentCount": 0,
+          "consumerPathCount": 5,
+          "consumerScopeCount": 3,
+          "truncatedConsumerScopes": 0,
+          "effectMatchCount": 1,
+          "effectMismatchCount": 0,
+          "effectIncompleteCount": 0,
+          "derivedEffectCount": 1
+        },
+        "operation": "update",
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "wholeProjectPreservationVerified": false,
+        "componentMemberCoverageComplete": false,
+        "consumerCoverageComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      }
+    },
+    {
+      "recordId": "d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a",
+      "schemaVersion": "hmi-component-review-record.v4",
+      "receipt": {
+        "recordId": "d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a",
+        "input": {
+          "path": "hmi-component-reviews/4992c217c447c707c0b82513f8f814638d082d0b7a766514f37c573020eafece.input",
+          "sha256": "4992c217c447c707c0b82513f8f814638d082d0b7a766514f37c573020eafece"
+        },
+        "reportArtifact": {
+          "path": "hmi-component-reviews/d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a.json",
+          "sha256": "d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a"
+        },
+        "summary": {
+          "outputCount": 1,
+          "bindingCount": 0,
+          "conflictCount": 0,
+          "gapCount": 0,
+          "componentComparisonCount": 2,
+          "changedInterfaceCount": 0,
+          "unresolvedComponentCount": 0,
+          "consumerPathCount": 5,
+          "consumerScopeCount": 3,
+          "truncatedConsumerScopes": 0,
+          "effectMatchCount": 1,
+          "effectMismatchCount": 0,
+          "effectIncompleteCount": 0,
+          "derivedEffectCount": 1
+        },
+        "operation": "update",
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "wholeProjectPreservationVerified": false,
+        "componentMemberCoverageComplete": false,
+        "consumerCoverageComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      }
+    },
+    {
+      "recordId": "7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590",
+      "schemaVersion": "hmi-component-review-record.v4",
+      "receipt": {
+        "recordId": "7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590",
+        "input": {
+          "path": "hmi-component-reviews/18962fc6601e900d827b9a44d8798b78dfd7e791cdfa738bcfc37ba825d66445.input",
+          "sha256": "18962fc6601e900d827b9a44d8798b78dfd7e791cdfa738bcfc37ba825d66445"
+        },
+        "reportArtifact": {
+          "path": "hmi-component-reviews/7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590.json",
+          "sha256": "7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590"
+        },
+        "summary": {
+          "outputCount": 1,
+          "bindingCount": 0,
+          "conflictCount": 0,
+          "gapCount": 0,
+          "componentComparisonCount": 2,
+          "changedInterfaceCount": 0,
+          "unresolvedComponentCount": 0,
+          "consumerPathCount": 5,
+          "consumerScopeCount": 3,
+          "truncatedConsumerScopes": 0,
+          "effectMatchCount": 1,
+          "effectMismatchCount": 0,
+          "effectIncompleteCount": 0,
+          "derivedEffectCount": 1
+        },
+        "operation": "update",
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "wholeProjectPreservationVerified": false,
+        "componentMemberCoverageComplete": false,
+        "consumerCoverageComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      }
+    },
+    {
+      "recordId": "d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c",
+      "schemaVersion": "hmi-component-review-record.v4",
+      "receipt": {
+        "recordId": "d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c",
+        "input": {
+          "path": "hmi-component-reviews/32122c6e348aac4f81a2b974446a307815afc7fd3190bea27ce3e6b1803b3a28.input",
+          "sha256": "32122c6e348aac4f81a2b974446a307815afc7fd3190bea27ce3e6b1803b3a28"
+        },
+        "reportArtifact": {
+          "path": "hmi-component-reviews/d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c.json",
+          "sha256": "d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c"
+        },
+        "summary": {
+          "outputCount": 1,
+          "bindingCount": 0,
+          "conflictCount": 0,
+          "gapCount": 0,
+          "componentComparisonCount": 2,
+          "changedInterfaceCount": 0,
+          "unresolvedComponentCount": 0,
+          "consumerPathCount": 5,
+          "consumerScopeCount": 3,
+          "truncatedConsumerScopes": 0,
+          "effectMatchCount": 0,
+          "effectMismatchCount": 0,
+          "effectIncompleteCount": 1,
+          "derivedEffectCount": 1
+        },
+        "operation": "update",
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "wholeProjectPreservationVerified": false,
+        "componentMemberCoverageComplete": false,
+        "consumerCoverageComplete": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "hmi-component-reviews/18962fc6601e900d827b9a44d8798b78dfd7e791cdfa738bcfc37ba825d66445.input",
+      "bytes": 4453,
+      "sha256": "18962fc6601e900d827b9a44d8798b78dfd7e791cdfa738bcfc37ba825d66445"
+    },
+    {
+      "path": "hmi-component-reviews/23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28.json",
+      "bytes": 20933,
+      "sha256": "23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28"
+    },
+    {
+      "path": "hmi-component-reviews/32122c6e348aac4f81a2b974446a307815afc7fd3190bea27ce3e6b1803b3a28.input",
+      "bytes": 4155,
+      "sha256": "32122c6e348aac4f81a2b974446a307815afc7fd3190bea27ce3e6b1803b3a28"
+    },
+    {
+      "path": "hmi-component-reviews/4992c217c447c707c0b82513f8f814638d082d0b7a766514f37c573020eafece.input",
+      "bytes": 4455,
+      "sha256": "4992c217c447c707c0b82513f8f814638d082d0b7a766514f37c573020eafece"
+    },
+    {
+      "path": "hmi-component-reviews/5e21b5fdafb86e278defe7852c36246c8459f2344fa9407ec78ffa74f728fb69.input",
+      "bytes": 4244,
+      "sha256": "5e21b5fdafb86e278defe7852c36246c8459f2344fa9407ec78ffa74f728fb69"
+    },
+    {
+      "path": "hmi-component-reviews/660df89d02113969252c69cc302d11c36225ad8218ba41967dd40c251f7a296a.source",
+      "bytes": 10,
+      "sha256": "660df89d02113969252c69cc302d11c36225ad8218ba41967dd40c251f7a296a"
+    },
+    {
+      "path": "hmi-component-reviews/73ecb0196b4232b2dff6a048f4f8089a4c6866d27ca75e7290ee80a986036579.source",
+      "bytes": 4108,
+      "sha256": "73ecb0196b4232b2dff6a048f4f8089a4c6866d27ca75e7290ee80a986036579"
+    },
+    {
+      "path": "hmi-component-reviews/7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590.json",
+      "bytes": 21207,
+      "sha256": "7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590"
+    },
+    {
+      "path": "hmi-component-reviews/ac3828fd3a392c7530e32629a427ee4eb58749a16585425fdf68bebfc97e4802.source",
+      "bytes": 4103,
+      "sha256": "ac3828fd3a392c7530e32629a427ee4eb58749a16585425fdf68bebfc97e4802"
+    },
+    {
+      "path": "hmi-component-reviews/b48e664b7aeb7171448fcfded125f2a7fc3ce99548521243e69e7e6cf4f1c2db.source",
+      "bytes": 4109,
+      "sha256": "b48e664b7aeb7171448fcfded125f2a7fc3ce99548521243e69e7e6cf4f1c2db"
+    },
+    {
+      "path": "hmi-component-reviews/ba8b4ca50e9e7723374574ee98ed48d0a35175eb1f316df444368fad54304125.source",
+      "bytes": 28,
+      "sha256": "ba8b4ca50e9e7723374574ee98ed48d0a35175eb1f316df444368fad54304125"
+    },
+    {
+      "path": "hmi-component-reviews/d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c.json",
+      "bytes": 20761,
+      "sha256": "d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c"
+    },
+    {
+      "path": "hmi-component-reviews/d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a.json",
+      "bytes": 21207,
+      "sha256": "d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a"
+    },
+    {
+      "path": "hmi-component-reviews/fab77ece7655adcad083c68aaa9b09bba131e5a90c443b9398ec7994591178c7.source",
+      "bytes": 5,
+      "sha256": "fab77ece7655adcad083c68aaa9b09bba131e5a90c443b9398ec7994591178c7"
+    },
+    {
+      "path": "hmi-component-reviews/fc633a36813029e143afd08f9c54e36147f6a60f7b44994afadf90e9ca3d2f8b.source",
+      "bytes": 28,
+      "sha256": "fc633a36813029e143afd08f9c54e36147f6a60f7b44994afadf90e9ca3d2f8b"
+    },
+    {
+      "path": "project-reviews/2bf4ca67f99bc9b01caba0e06ca15927f3b6498941e590165fcccbdea57b9827.json",
+      "bytes": 6137,
+      "sha256": "2bf4ca67f99bc9b01caba0e06ca15927f3b6498941e590165fcccbdea57b9827"
+    },
+    {
+      "path": "project-reviews/3b9ff8b28222f173abd3b35278086b8892c382f1fd36d7eed2066b94221c42ea.json",
+      "bytes": 7309,
+      "sha256": "3b9ff8b28222f173abd3b35278086b8892c382f1fd36d7eed2066b94221c42ea"
+    },
+    {
+      "path": "project-reviews/a51bf8c6b200e97e767a0df5f6bde3757acb1ce8de29503c680e6e4033e5278d.json",
+      "bytes": 4375,
+      "sha256": "a51bf8c6b200e97e767a0df5f6bde3757acb1ce8de29503c680e6e4033e5278d"
+    }
+  ],
+  "checks": [
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 components",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 outputs",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 bindings",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 consumerPaths",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 consumerCoverage",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 effectChecks",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 derivedEffects",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 expectationCoverage",
+    "Lifetime 0: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 files",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a components",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a outputs",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a bindings",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a consumerPaths",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a consumerCoverage",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a effectChecks",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a derivedEffects",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a expectationCoverage",
+    "Lifetime 0: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a files",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 components",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 outputs",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 bindings",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 consumerPaths",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 consumerCoverage",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 effectChecks",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 derivedEffects",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 expectationCoverage",
+    "Lifetime 0: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 files",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c components",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c outputs",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c bindings",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c consumerPaths",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c consumerCoverage",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c effectChecks",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c derivedEffects",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c expectationCoverage",
+    "Lifetime 0: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c files",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 components",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 outputs",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 bindings",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 consumerPaths",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 consumerCoverage",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 effectChecks",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 derivedEffects",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 expectationCoverage",
+    "Lifetime 1: original 23274aa1bf88f87573977c98135dcd6f4d9e0e8148421aee2180c12995f04f28 files",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a components",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a outputs",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a bindings",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a consumerPaths",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a consumerCoverage",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a effectChecks",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a derivedEffects",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a expectationCoverage",
+    "Lifetime 1: original d9ac8361617b2cd95d41ab59f54b970b77caa165a63e41e3f84a9430a257d88a files",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 components",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 outputs",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 bindings",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 consumerPaths",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 consumerCoverage",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 effectChecks",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 derivedEffects",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 expectationCoverage",
+    "Lifetime 1: original 7daa552a14c7ff613253c65d82765294d87a3bd729e13bcf57645b8c6b4cb590 files",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c components",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c outputs",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c bindings",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c consumerPaths",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c consumerCoverage",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c effectChecks",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c derivedEffects",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c expectationCoverage",
+    "Lifetime 1: original d6a93472084a89cad6dd7b5f6a13f7c8787730d6a0d1040dc00c41f8183e632c files"
+  ],
+  "shutdowns": [
+    {
+      "hostExitCode": 0,
+      "forcedHostStop": false,
+      "workerExits": [],
+      "stderrEofObserved": true
+    },
+    {
+      "hostExitCode": 0,
+      "forcedHostStop": false,
+      "workerExits": [],
+      "stderrEofObserved": true
+    }
+  ],
+  "scope": "Exact original v4 requests, reports, source bytes and selected saved reviews. No regeneration or schema upgrade. Prepared for future v5 compatibility checks; no v5 implementation or native acceptance claimed."
+}

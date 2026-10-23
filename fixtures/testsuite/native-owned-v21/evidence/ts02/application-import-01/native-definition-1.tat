@@ -1,0 +1,19 @@
+TEST_CASE "TiaMcp_ScratchSingleStep"
+
+PROPERTY
+AUTHOR : "TIA MCP"
+VERSION : "0.1"
+COMMENT : "Authored from installed V21 grammar; import/export qualification only"
+SCOPE : "ScratchPLC"
+PLCSIM_INSTANCE_NAME : ""
+TEST_EXECUTION_MODE : "SystemManagedPlcSimAdvInstance"
+END_PROPERTY
+
+STEP: "Enable gate output"
+RUN(Cycles:=1);
+ASSERT.Equal("TiaMcp_EnableGate_DB".Active,true);
+END_STEP
+
+
+END_TEST_CASE
+

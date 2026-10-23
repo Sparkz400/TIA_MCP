@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-report.v1.schema.json",
+  "title": "Combined revalidated diagnostic experiment report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sourceReportId",
+    "sourceSchemaVersion",
+    "sourceReport",
+    "experiments",
+    "runs",
+    "sourceEvidenceRevalidated",
+    "windowAnalysisRecomputed",
+    "sourceAuthenticityVerified",
+    "independentRunsVerified",
+    "clockSynchronizationVerified",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-experiment-report.v1"
+    },
+    "sourceReportId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "sourceSchemaVersion": {
+      "enum": [
+        "diagnostic-experiment-review.v1",
+        "diagnostic-experiment-repeat.v1"
+      ]
+    },
+    "sourceReport": {
+      "oneOf": [
+        {
+          "$ref": "diagnostic-experiment-review.v1.schema.json"
+        },
+        {
+          "$ref": "diagnostic-experiment-repeat.v1.schema.json"
+        }
+      ]
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "document"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+          },
+          "document": {
+            "$ref": "diagnostic-experiment.v1.schema.json"
+          }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "reviewId",
+          "review",
+          "beforeReport",
+          "afterReport",
+          "comparison",
+          "beforeInputArtifact",
+          "afterInputArtifact",
+          "beforeWindow",
+          "afterWindow"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewId": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+          },
+          "review": {
+            "$ref": "diagnostic-experiment-review.v1.schema.json"
+          },
+          "beforeReport": {
+            "$ref": "diagnostic-report.v1.schema.json"
+          },
+          "afterReport": {
+            "$ref": "diagnostic-report.v1.schema.json"
+          },
+          "comparison": {
+            "$ref": "trace-comparison.v1.schema.json"
+          },
+          "beforeInputArtifact": {
+            "$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"
+          },
+          "afterInputArtifact": {
+            "$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"
+          },
+          "beforeWindow": {
+            "$ref": "diagnostic-experiment-repeat.v1.schema.json#/$defs/window"
+          },
+          "afterWindow": {
+            "$ref": "diagnostic-experiment-repeat.v1.schema.json#/$defs/window"
+          }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 8
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "windowAnalysisRecomputed": {
+      "const": true
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "independentRunsVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

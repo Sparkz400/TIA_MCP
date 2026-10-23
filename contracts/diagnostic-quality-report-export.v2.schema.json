@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-quality-report-export.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-quality-report-export.v2"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifact": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/artifact"
+    },
+    "sourceReportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceSchemaVersion": {
+      "enum": [
+        "diagnostic-report.v2",
+        "trace-comparison.v2",
+        "diagnostic-experiment-review.v2",
+        "diagnostic-experiment-repeat.v2"
+      ]
+    },
+    "format": {
+      "enum": [
+        "json",
+        "markdown",
+        "html"
+      ]
+    },
+    "mediaType": {
+      "enum": [
+        "application/json",
+        "text/html; charset=utf-8",
+        "text/markdown; charset=utf-8"
+      ]
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "originalBytesIncluded": {
+      "const": true
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "artifact",
+    "sourceReportId",
+    "sourceSchemaVersion",
+    "format",
+    "mediaType",
+    "sourceEvidenceRevalidated",
+    "originalBytesIncluded",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

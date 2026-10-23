@@ -1,0 +1,55 @@
+{
+  "matchingProductionWaveProcesses": [],
+  "completed": true,
+  "testSuiteRuns": {
+    "ts02": {
+      "workerExitCode": 0,
+      "workerProcessId": 16380,
+      "nativeProcessId": 42956
+    },
+    "ts01": {
+      "workerExitCode": 0,
+      "workerProcessId": 44520,
+      "nativeProcessId": 51612
+    }
+  },
+  "exactProcessChecks": [
+    {
+      "processId": 51612,
+      "exited": true
+    },
+    {
+      "processId": 42956,
+      "exited": true
+    },
+    {
+      "processId": 44520,
+      "exited": true
+    },
+    {
+      "processId": 16380,
+      "exited": true
+    },
+    {
+      "processId": 53840,
+      "exited": true
+    },
+    {
+      "processId": 23368,
+      "exited": true
+    },
+    {
+      "processId": 38844,
+      "exited": true
+    }
+  ],
+  "nativeQueueClosed": true,
+  "checkedAtUtc": "2026-10-15T07:56:44.0670437Z",
+  "untouchedOtherInstances": [
+    10040,
+    23540,
+    21772,
+    38280
+  ],
+  "limitation": "No global TIA shutdown; only exact owned processes checked."
+}

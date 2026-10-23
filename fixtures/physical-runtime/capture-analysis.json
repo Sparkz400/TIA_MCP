@@ -1,0 +1,633 @@
+{
+  "schemaVersion": "runtime-capture-analysis.v1",
+  "snapshotRef": "capture:9e21c091c32449abbd21796360542b72:1:e91c344354b9d93d6945ebbbdfa27d245c267ec609cca2ee33f4a397a1487ce6",
+  "caseId": "0799efb0c3980f11a3b7d10fe8cfe5fbb59580894219095b088557b71e726cca",
+  "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+  "symptom": "Conveyor 2 occasionally stops although its enable command remains true.",
+  "hypotheses": [
+    {
+      "id": "writer",
+      "statement": "A separate writer changes the final output while the internal command remains true.",
+      "prediction": {
+        "when": [
+          {
+            "signalId": "final",
+            "op": "eq",
+            "value": false
+          }
+        ],
+        "expect": [
+          {
+            "signalId": "run",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "signalId": "override",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "signalId": "enable",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "verdict": "unresolved",
+      "causationProven": false,
+      "matchedCycles": 0,
+      "contradictedCycles": 0,
+      "unknownCycles": 2,
+      "examples": [
+        {
+          "cycle": 0,
+          "patternMatched": null,
+          "values": {
+            "enableSource": null,
+            "enable": true,
+            "run": null,
+            "final": null,
+            "feedback": null,
+            "permit": null,
+            "step": 65535,
+            "elapsed": null,
+            "timerDone": null,
+            "fault": null,
+            "override": null
+          },
+          "reads": {
+            "enable": {
+              "sequence": 0,
+              "cycle": 0,
+              "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+              "scheduledMilliseconds": 0,
+              "elapsedMilliseconds": 20.8317,
+              "observedUtc": "2026-10-17T22:43:35.6244238+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.6214575+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.6242564+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            },
+            "step": {
+              "sequence": 1,
+              "cycle": 0,
+              "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+              "scheduledMilliseconds": 0,
+              "elapsedMilliseconds": 42.9107,
+              "observedUtc": "2026-10-17T22:43:35.6465022+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.644111+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.6463971+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            }
+          }
+        },
+        {
+          "cycle": 1,
+          "patternMatched": null,
+          "values": {
+            "enableSource": null,
+            "enable": true,
+            "run": null,
+            "final": null,
+            "feedback": null,
+            "permit": null,
+            "step": 65535,
+            "elapsed": null,
+            "timerDone": null,
+            "fault": null,
+            "override": null
+          },
+          "reads": {
+            "enable": {
+              "sequence": 2,
+              "cycle": 1,
+              "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+              "scheduledMilliseconds": 100,
+              "elapsedMilliseconds": 120.9952,
+              "observedUtc": "2026-10-17T22:43:35.7245852+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.7221621+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.7244758+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            },
+            "step": {
+              "sequence": 3,
+              "cycle": 1,
+              "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+              "scheduledMilliseconds": 100,
+              "elapsedMilliseconds": 138.9507,
+              "observedUtc": "2026-10-17T22:43:35.7425404+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.7398472+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.7424101+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            }
+          }
+        }
+      ],
+      "reason": "Sequential polling cycles and unverified address/program identity cannot establish a passing or failing behavioral assertion. Counts describe observed patterns only."
+    },
+    {
+      "id": "captured",
+      "statement": "Captured sequential pattern <script> remains unqualified.",
+      "prediction": {
+        "when": [
+          {
+            "signalId": "enable",
+            "op": "eq",
+            "value": true
+          }
+        ],
+        "expect": [
+          {
+            "signalId": "step",
+            "op": "eq",
+            "value": 65535,
+            "unit": "count"
+          }
+        ]
+      },
+      "verdict": "unresolved",
+      "causationProven": false,
+      "matchedCycles": 2,
+      "contradictedCycles": 0,
+      "unknownCycles": 0,
+      "examples": [
+        {
+          "cycle": 0,
+          "patternMatched": true,
+          "values": {
+            "enableSource": null,
+            "enable": true,
+            "run": null,
+            "final": null,
+            "feedback": null,
+            "permit": null,
+            "step": 65535,
+            "elapsed": null,
+            "timerDone": null,
+            "fault": null,
+            "override": null
+          },
+          "reads": {
+            "enable": {
+              "sequence": 0,
+              "cycle": 0,
+              "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+              "scheduledMilliseconds": 0,
+              "elapsedMilliseconds": 20.8317,
+              "observedUtc": "2026-10-17T22:43:35.6244238+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.6214575+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.6242564+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            },
+            "step": {
+              "sequence": 1,
+              "cycle": 0,
+              "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+              "scheduledMilliseconds": 0,
+              "elapsedMilliseconds": 42.9107,
+              "observedUtc": "2026-10-17T22:43:35.6465022+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.644111+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.6463971+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            }
+          }
+        },
+        {
+          "cycle": 1,
+          "patternMatched": true,
+          "values": {
+            "enableSource": null,
+            "enable": true,
+            "run": null,
+            "final": null,
+            "feedback": null,
+            "permit": null,
+            "step": 65535,
+            "elapsed": null,
+            "timerDone": null,
+            "fault": null,
+            "override": null
+          },
+          "reads": {
+            "enable": {
+              "sequence": 2,
+              "cycle": 1,
+              "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+              "scheduledMilliseconds": 100,
+              "elapsedMilliseconds": 120.9952,
+              "observedUtc": "2026-10-17T22:43:35.7245852+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.7221621+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.7244758+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            },
+            "step": {
+              "sequence": 3,
+              "cycle": 1,
+              "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+              "scheduledMilliseconds": 100,
+              "elapsedMilliseconds": 138.9507,
+              "observedUtc": "2026-10-17T22:43:35.7425404+00:00",
+              "status": "read",
+              "requestStartedUtc": "2026-10-17T22:43:35.7398472+00:00",
+              "responseReceivedUtc": "2026-10-17T22:43:35.7424101+00:00",
+              "hostClockWentBackwards": false,
+              "providerErrorCode": null,
+              "unavailableReason": null
+            }
+          }
+        }
+      ],
+      "reason": "Sequential polling cycles and unverified address/program identity cannot establish a passing or failing behavioral assertion. Counts describe observed patterns only."
+    }
+  ],
+  "units": {
+    "enable": "1",
+    "step": "count"
+  },
+  "unitsOrigin": "callerSuppliedNoConversion",
+  "association": {
+    "caseId": "0799efb0c3980f11a3b7d10fe8cfe5fbb59580894219095b088557b71e726cca",
+    "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+    "project": {
+      "projectPath": "synthetic-fixture.ap21",
+      "host": "offline-test"
+    },
+    "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+    "selectedInstance": {
+      "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2"
+      ],
+      "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+      "plcPath": "/projects/Fixture/plc/CPU",
+      "scopePath": "/projects/Fixture/plc/CPU",
+      "namespace": "",
+      "evidence": [
+        {
+          "kind": "usesType",
+          "source": {
+            "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+            "nodeId": "DB_Line"
+          },
+          "target": {
+            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+            "nodeId": "FB_Line"
+          },
+          "evidence": {
+            "origin": "nativeConfirmed",
+            "resolution": "resolved",
+            "fixtureNote": "Synthetic edge; no native observation."
+          }
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+          "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+          "xmlLine": 1,
+          "origin": "savedNativeXml",
+          "liveVerified": false,
+          "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "instanceScope": "GlobalVariable",
+          "instanceComponents": [
+            "DB_Line"
+          ],
+          "callOrdinal": 0,
+          "callUid": null,
+          "parameterBindings": []
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+          "xmlLine": 1,
+          "origin": "savedNativeXml",
+          "liveVerified": false
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+          "xmlLine": 3,
+          "origin": "savedNativeXml",
+          "liveVerified": false
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+          "xmlLine": 1,
+          "origin": "savedNativeXml",
+          "liveVerified": false,
+          "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+          "instanceScope": "LocalVariable",
+          "instanceComponents": [
+            "Conv2"
+          ],
+          "callOrdinal": 0,
+          "callUid": null,
+          "parameterBindings": [],
+          "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "callerMemberPath": []
+        }
+      ],
+      "callSites": [
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+          "xmlLine": 1,
+          "origin": "savedNativeXml",
+          "liveVerified": false,
+          "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+          "instanceScope": "LocalVariable",
+          "instanceComponents": [
+            "Conv2"
+          ],
+          "callOrdinal": 0,
+          "callUid": null,
+          "parameterBindings": [],
+          "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "callerMemberPath": []
+        }
+      ],
+      "rootCallSites": [
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+          "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+          "xmlLine": 1,
+          "origin": "savedNativeXml",
+          "liveVerified": false,
+          "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "instanceScope": "GlobalVariable",
+          "instanceComponents": [
+            "DB_Line"
+          ],
+          "callOrdinal": 0,
+          "callUid": null,
+          "parameterBindings": []
+        }
+      ],
+      "resolution": "capturedStorageOnly",
+      "runtimeCallContextVerified": false
+    },
+    "sourceRevision": {
+      "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+      "documents": [
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+          "status": "exported",
+          "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2"
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+          "status": "exported",
+          "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed"
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+          "status": "exported",
+          "utf8Sha256": "104202185c0a224ffe6b9f1b41deb8cf4ad8108d2988f82803df740153811dfa"
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "status": "exported",
+          "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf"
+        },
+        {
+          "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+          "status": "exported",
+          "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f"
+        }
+      ],
+      "onlineVerified": false
+    },
+    "signals": [
+      {
+        "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+        "signalId": "enable",
+        "declaration": {
+          "id": "enable",
+          "role": "instance enable",
+          "reason": "Independently authored instance enable role tests the writer prediction.",
+          "hypothesisIds": [
+            "writer"
+          ],
+          "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "memberPath": [
+            "Conv2",
+            "Enable"
+          ],
+          "datatype": "Bool",
+          "symbolComponents": [
+            "DB_Line",
+            "Conv2",
+            "Enable"
+          ],
+          "namespace": "",
+          "scopePath": "/projects/Fixture/plc/CPU",
+          "resolution": "capturedDeclaration",
+          "unavailableReason": null,
+          "traceability": "requiresTargetValidation",
+          "evidence": {
+            "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+            "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+            "xmlLine": 3,
+            "origin": "savedNativeXml",
+            "liveVerified": false
+          },
+          "onlineAddress": null,
+          "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+          "selectionEvidence": null
+        }
+      },
+      {
+        "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+        "signalId": "step",
+        "declaration": {
+          "id": "step",
+          "role": "sequence state",
+          "reason": "Independently authored sequence state role tests the writer prediction.",
+          "hypothesisIds": [
+            "writer"
+          ],
+          "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "memberPath": [
+            "Conv2",
+            "Step"
+          ],
+          "datatype": "UInt",
+          "symbolComponents": [
+            "DB_Line",
+            "Conv2",
+            "Step"
+          ],
+          "namespace": "",
+          "scopePath": "/projects/Fixture/plc/CPU",
+          "resolution": "capturedDeclaration",
+          "unavailableReason": null,
+          "traceability": "requiresTargetValidation",
+          "evidence": {
+            "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+            "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+            "xmlLine": 3,
+            "origin": "savedNativeXml",
+            "liveVerified": false
+          },
+          "onlineAddress": null,
+          "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+          "selectionEvidence": null
+        }
+      }
+    ],
+    "addressMatchVerified": false,
+    "programMatchVerified": false,
+    "sourceAuthenticityVerified": false,
+    "nativeQualified": false
+  },
+  "capture": {
+    "captureId": "9e21c091c32449abbd21796360542b72",
+    "recordedProgress": {
+      "state": "ended",
+      "terminalReason": "sampleLimit",
+      "elapsedMilliseconds": 139.0644,
+      "observedUtc": "2026-10-17T22:43:35.7433813+00:00",
+      "rows": 4,
+      "readAttempts": 4,
+      "skippedPolls": 0,
+      "droppedReadResults": 0
+    },
+    "request": {
+      "attemptId": "f7698cc76c1d4fb9871f01ea3fd247a3",
+      "selectionIds": [
+        "0ab4d2e48c0d4fe195a6bfa354188868",
+        "2d55dae3ba3f47d5bc1c13e43e019c0d"
+      ],
+      "intervalMilliseconds": 100,
+      "durationSeconds": 5,
+      "maximumSamples": 4,
+      "maximumBytes": 1048576,
+      "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+      "representation": "simple",
+      "association": {
+        "caseId": "0799efb0c3980f11a3b7d10fe8cfe5fbb59580894219095b088557b71e726cca",
+        "mappings": [
+          {
+            "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+            "signalId": "enable",
+            "reason": "Explicit synthetic conveyor enable"
+          },
+          {
+            "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+            "signalId": "step",
+            "reason": "Explicit synthetic conveyor step"
+          }
+        ],
+        "assertedProgramIdentity": "Caller assertion only; synthetic loopback"
+      }
+    },
+    "signals": [
+      {
+        "selectionId": "0ab4d2e48c0d4fe195a6bfa354188868",
+        "selection": {
+          "context": {
+            "endpoint": "https://127.0.0.1:55564",
+            "connectionId": "f7698cc76c1d4fb9871f01ea3fd247a3",
+            "epoch": "0b66beb983344737ad33a8a564c18c95",
+            "peerCertificateSha256": "14e29593c9317e354b2371edb8e7a9b049a22184c896e6423b2cee581e327cb2"
+          },
+          "symbol": "\"DB_Line\".Conv2.Enable",
+          "representation": "simple",
+          "metadataSha256": "2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747"
+        },
+        "metadata": {
+          "name": "Enable",
+          "datatype": "bool"
+        }
+      },
+      {
+        "selectionId": "2d55dae3ba3f47d5bc1c13e43e019c0d",
+        "selection": {
+          "context": {
+            "endpoint": "https://127.0.0.1:55564",
+            "connectionId": "f7698cc76c1d4fb9871f01ea3fd247a3",
+            "epoch": "0b66beb983344737ad33a8a564c18c95",
+            "peerCertificateSha256": "14e29593c9317e354b2371edb8e7a9b049a22184c896e6423b2cee581e327cb2"
+          },
+          "symbol": "\"DB_Line\".Conv2.Step",
+          "representation": "simple",
+          "metadataSha256": "cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241"
+        },
+        "metadata": {
+          "name": "Step",
+          "datatype": "uint"
+        }
+      }
+    ],
+    "context": {
+      "endpoint": "https://127.0.0.1:55564",
+      "connectionId": "f7698cc76c1d4fb9871f01ea3fd247a3",
+      "epoch": "0b66beb983344737ad33a8a564c18c95",
+      "peerCertificateSha256": "14e29593c9317e354b2371edb8e7a9b049a22184c896e6423b2cee581e327cb2"
+    },
+    "uncommittedDataUnknown": false
+  },
+  "qualityAssessment": {
+    "cyclesObserved": 2,
+    "missingValues": 18,
+    "hostReadErrors": 0,
+    "providerFailures": 0,
+    "unsupportedValues": 0,
+    "unavailableReasons": {},
+    "skippedPolls": 0,
+    "droppedReadResults": 0,
+    "uncapturedSignalIds": [
+      "enableSource",
+      "run",
+      "final",
+      "feedback",
+      "permit",
+      "elapsed",
+      "timerDone",
+      "fault",
+      "override"
+    ]
+  },
+  "observedChanges": [],
+  "observedChangeCount": 0,
+  "observedChangesTruncated": false,
+  "atomicAcrossSignals": false,
+  "scanSynchronized": false,
+  "programMatchVerified": false,
+  "addressMatchVerified": false,
+  "sourceAuthenticityVerified": false,
+  "clockSynchronizationVerified": false,
+  "nativeQualification": false,
+  "causationProven": false,
+  "plcChangesBetweenPollsUnknown": true,
+  "coverageGaps": [
+    "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+    "Saved evidence is sequential and may be stale; online program identity is unknown.",
+    "Report extraction/ranking is lexical. Automatic selection uses conservative compile-unit/network dependencies and simple explicit call bindings, not full program semantics.",
+    "Relationship ranking inspects at most 100 captured adjacent edges per node and reports one matching edge per term. Missing HMI/alarm/library/I/O relationships are not inferred.",
+    "Only exact native root type edges and bounded explicit XML local calls with exact qualified type names are resolved. Cross-unit aliases, arrays, indirect access and opaque languages remain unresolved.",
+    "Signals are caller-proposed or derived from bounded dependency evidence and checked against exported declarations; every signal needs native target observability validation.",
+    "Settings, resources, firmware, licenses and sampling effects are not probed. Native trace lifecycle is unavailable."
+  ],
+  "nextCapture": "Retain exact source and independently establish address/program identity and acquisition suitability. Missing, bad, raw or nonrepresentable values stay unknown; skipped cycles are not fabricated. Observed changes compare consecutive cycles only and do not timestamp PLC transitions."
+}

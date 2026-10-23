@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-quality-report.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-quality-report.v2"
+    },
+    "sourceReportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceSchemaVersion": {
+      "enum": [
+        "diagnostic-report.v2",
+        "trace-comparison.v2",
+        "diagnostic-experiment-review.v2",
+        "diagnostic-experiment-repeat.v2"
+      ]
+    },
+    "sourceReport": {
+      "oneOf": [
+        {
+          "$ref": "https://tia-mcp.local/contracts/diagnostic-report.v2.schema.json"
+        },
+        {
+          "$ref": "https://tia-mcp.local/contracts/trace-comparison.v2.schema.json"
+        },
+        {
+          "$ref": "https://tia-mcp.local/contracts/diagnostic-experiment-review.v2.schema.json"
+        },
+        {
+          "$ref": "https://tia-mcp.local/contracts/diagnostic-experiment-repeat.v2.schema.json"
+        }
+      ]
+    },
+    "sourceReportBase64": {
+      "type": "string",
+      "contentEncoding": "base64"
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "document": {
+            "$ref": "https://tia-mcp.local/contracts/trace-import.v2.schema.json"
+          },
+          "original": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "artifact": {
+                "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/artifact"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8388608
+              },
+              "base64": {
+                "type": "string",
+                "contentEncoding": "base64"
+              }
+            },
+            "required": [
+              "artifact",
+              "sha256",
+              "bytes",
+              "base64"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "document",
+          "original"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "document": {
+            "$ref": "https://tia-mcp.local/contracts/diagnostic-experiment.v1.schema.json"
+          }
+        },
+        "required": [
+          "id",
+          "document"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 16
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "review": {
+            "$ref": "https://tia-mcp.local/contracts/diagnostic-experiment-review.v2.schema.json"
+          },
+          "beforeReport": {
+            "$ref": "https://tia-mcp.local/contracts/diagnostic-report.v2.schema.json"
+          },
+          "afterReport": {
+            "$ref": "https://tia-mcp.local/contracts/diagnostic-report.v2.schema.json"
+          },
+          "comparison": {
+            "$ref": "https://tia-mcp.local/contracts/trace-comparison.v2.schema.json"
+          }
+        },
+        "required": [
+          "id",
+          "review",
+          "beforeReport",
+          "afterReport",
+          "comparison"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 8
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "originalBytesIncluded": {
+      "const": true
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "sourceReportId",
+    "sourceSchemaVersion",
+    "sourceReport",
+    "sourceReportBase64",
+    "measurements",
+    "experiments",
+    "runs",
+    "sourceEvidenceRevalidated",
+    "originalBytesIncluded",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

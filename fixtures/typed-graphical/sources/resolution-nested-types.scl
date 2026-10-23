@@ -1,0 +1,15 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+TYPE "Tgp_ResolutionInner"
+VERSION : 0.1
+STRUCT
+ Flag : Bool;
+END_STRUCT;
+END_TYPE
+
+TYPE "Tgp_ResolutionOuter"
+VERSION : 0.1
+STRUCT
+ Child : "TiaMcp_UnitA.Alternate.Tgp_ResolutionInner";
+END_STRUCT;
+END_TYPE
+END_NAMESPACE

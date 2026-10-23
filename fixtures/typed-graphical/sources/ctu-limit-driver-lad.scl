@@ -1,0 +1,36 @@
+FUNCTION_BLOCK "Tgp_CTU_LimitDriver_LAD"
+{ S7_Optimized_Access := 'TRUE' }
+VAR_INPUT
+    Edges : Int;
+    Reset : Bool;
+END_VAR
+VAR_OUTPUT
+    Count : Int;
+    Done : Bool;
+    Rejected : Bool;
+END_VAR
+VAR
+    Counter : "Tgp_CTU_LAD";
+END_VAR
+VAR_TEMP
+    Index : Int;
+END_VAR
+BEGIN
+    #Rejected := (#Edges < 0) OR (#Edges > 512);
+    IF NOT #Rejected THEN
+        IF #Reset OR (#Edges = 0) THEN
+            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,
+                     Load := FALSE, Preset := 32767,
+                     Done => #Done, Count => #Count);
+        ELSE
+            FOR #Index := 1 TO #Edges DO
+                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,
+                         Load := FALSE, Preset := 32767,
+                         Done => #Done, Count => #Count);
+                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,
+                         Load := FALSE, Preset := 32767,
+                         Done => #Done, Count => #Count);
+            END_FOR;
+        END_IF;
+    END_IF;
+END_FUNCTION_BLOCK

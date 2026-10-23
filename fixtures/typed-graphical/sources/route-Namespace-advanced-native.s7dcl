@@ -1,0 +1,948 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Eq_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Eq( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Ne_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Ne( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Lt_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Lt( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Le_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Le( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Gt_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Gt( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Ge_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Ge( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TON_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TON_TIME;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  #Storage.TON( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TOF_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TOF_TIME;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  #Storage.TOF( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TP_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TP_TIME;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  #Storage.TP( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTU_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTU_INT;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTU( r := #Reset, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTD_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTD_INT;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTD( ld := #Load, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTUD_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTUD_INT;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTUD( cd := #Down, r := #Reset, ld := #Load, pv := #Preset, qd => #Lower, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TON_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TON( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TOF_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TOF( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TP_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TP( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTU_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTU( r := #Reset, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTD_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTD( ld := #Load, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTUD_Global_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTUD( cd := #Down, r := #Reset, ld := #Load, pv := #Preset, qd => #Lower, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFC_LAD"
+VAR_INPUT
+ Value : Int;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Result : Int;
+ Returned : Int;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+ "TgpNamespace_NumericFC"( Value := #Value, Accumulator := #Accumulator, Result => #Result, Ret_Val => #Returned )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFB_LAD"
+VAR_INPUT
+ Enable : Bool;
+ Delta : Int;
+ Reset : Bool;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Total : Int;
+END_VAR
+VAR
+ Child : "TgpNamespace_NumericFB";
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+ #Child( Enable := #Enable, Delta := #Delta, Reset := #Reset, Accumulator := #Accumulator, Total => #Total )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFB_Global_LAD"
+VAR_INPUT
+ Enable : Bool;
+ Delta : Int;
+ Reset : Bool;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Total : Int;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+ "TgpNamespace_NumericFB_DB"( Enable := #Enable, Delta := #Delta, Reset := #Reset, Accumulator := #Accumulator, Total => #Total )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Eq_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Eq( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Ne_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Ne( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Lt_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Lt( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Le_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Le( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Gt_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Gt( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_Ge_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  { S7_Templates := "SrcType := Int" }
+  Ge( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TON_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TON_TIME;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  #Storage.TON( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TOF_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TOF_TIME;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  #Storage.TOF( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TP_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TP_TIME;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  #Storage.TP( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTU_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTU_INT;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTU( r := #Reset, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTD_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTD_INT;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTD( ld := #Load, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTUD_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+VAR
+  Storage : CTUD_INT;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  #Storage.CTUD( cd := #Down, r := #Reset, ld := #Load, pv := #Preset, qd => #Lower, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TON_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TON( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TOF_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TOF( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TP_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "time_type := Time" }
+  "TgpNamespace_GlobalTimer".TP( pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTU_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTU( r := #Reset, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTD_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTD( ld := #Load, pv := #Preset, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_CTUD_Global_FBD"
+VAR_INPUT
+  Enable : Bool;
+  Down : Bool;
+  Reset : Bool;
+  Load : Bool;
+  Preset : Int;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Lower : Bool;
+  Count : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+  #Enable
+  { S7_Templates := "value_type := Int" }
+  "TgpNamespace_GlobalCounter".CTUD( cd := #Down, r := #Reset, ld := #Load, pv := #Preset, qd => #Lower, cv => #Count )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFC_FBD"
+VAR_INPUT
+ Value : Int;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Result : Int;
+ Returned : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+ "TgpNamespace_NumericFC"( Value := #Value, Accumulator := #Accumulator, Result => #Result, Ret_Val => #Returned )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFB_FBD"
+VAR_INPUT
+ Enable : Bool;
+ Delta : Int;
+ Reset : Bool;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Total : Int;
+END_VAR
+VAR
+ Child : "TgpNamespace_NumericFB";
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+ #Child( Enable := #Enable, Delta := #Delta, Reset := #Reset, Accumulator := #Accumulator, Total => #Total )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_NumericFB_Global_FBD"
+VAR_INPUT
+ Enable : Bool;
+ Delta : Int;
+ Reset : Bool;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Total : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+ "TgpNamespace_NumericFB_DB"( Enable := #Enable, Delta := #Delta, Reset := #Reset, Accumulator := #Accumulator, Total => #Total )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-replan-request.v1.schema.json",
+  "type": "object",
+  "required": [
+    "reviewId",
+    "blockPath",
+    "instance",
+    "reason",
+    "signalMappings"
+  ],
+  "properties": {
+    "reviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "blockPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "instance": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/request/properties/instance"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "signalMappings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "storagePath",
+          "memberPath",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "storagePath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "memberPath": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/memberPath"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "testSuiteFinding": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/testSuiteFindingSelector"
+    },
+    "alarmContext": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/alarmContextSelector"
+    },
+    "alarmBindings": {
+      "$ref": "diagnostic-alarm-bindings.v1.schema.json#/$defs/selectors"
+    }
+  },
+  "dependentRequired": {
+    "alarmBindings": [
+      "alarmContext"
+    ]
+  }
+}

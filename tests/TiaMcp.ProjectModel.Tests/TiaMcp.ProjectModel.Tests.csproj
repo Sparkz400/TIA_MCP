@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
+    <Compile Include="../../src/TiaMcp.Host/ProjectExplorerArtifacts.cs" Link="ProjectExplorerArtifacts.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelStore.cs" Link="ProjectModelStore.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/PlcLibraryInstanceCapture.cs" Link="PlcLibraryInstanceCapture.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs" Link="LibraryDependencyCapture.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/BridgeException.cs" Link="BridgeException.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="OpennessSession.ScanBudget.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
+    <Compile Include="../TiaMcp.Tests/ProjectModelTypedPreviewTests.cs" Link="ProjectModelTypedPreviewTests.cs" />
+    <Compile Include="../TiaMcp.Tests/ProjectModelRelationshipTests.cs" Link="ProjectModelRelationshipTests.cs" />
+    <Compile Include="../TiaMcp.Tests/ProjectModelTests.cs" Link="ProjectModelTests.cs" />
+    <None Include="../../fixtures/project-explorer/*.json" Link="fixtures/project-explorer/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

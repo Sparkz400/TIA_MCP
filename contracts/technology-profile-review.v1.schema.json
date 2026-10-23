@@ -1,0 +1,4266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/technology-profile-review.v1.schema.json",
+  "title": "Supplied technology profile review; no native execution or qualification",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plcPath",
+        "orderNumber",
+        "firmware",
+        "technologyType",
+        "technologyVersion",
+        "options",
+        "unknownReason"
+      ],
+      "properties": {
+        "plcPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "orderNumber": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firmware": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "technologyType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "technologyVersion": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "options": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+          },
+          "uniqueItems": true
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "scalar",
+                "opaque"
+              ]
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4194304
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unavailable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          }
+        }
+      ]
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "nativeType",
+        "access",
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "nativeType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "access": {
+          "enum": [
+            "readOnly",
+            "readWrite",
+            "unknown"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "sourcePath",
+        "targetPath",
+        "targetMember",
+        "state",
+        "reason",
+        "metadata"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "kind": {
+          "enum": [
+            "hardware",
+            "coupling",
+            "mapping",
+            "dependency",
+            "child",
+            "cam",
+            "interpreter"
+          ]
+        },
+        "sourcePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "targetPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetMember": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "declared",
+            "disconnected",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "declared"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "disconnected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "targetPath": {
+                "type": "null"
+              },
+              "targetMember": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "valueDomain",
+        "parametersComplete",
+        "relationshipsComplete",
+        "parameters",
+        "relationships"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "valueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "parametersComplete": {
+          "type": "boolean"
+        },
+        "relationshipsComplete": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "$ref": "#/$defs/relationship"
+          }
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "parameter"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "parameter": {
+          "$ref": "#/$defs/parameter"
+        }
+      }
+    },
+    "relationshipObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "relationship",
+        "sourceResolution",
+        "targetResolution",
+        "memberResolution",
+        "inDeclaredCycle"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "relationship": {
+          "$ref": "#/$defs/relationship"
+        },
+        "sourceResolution": {
+          "enum": [
+            "capturedObject",
+            "unresolved"
+          ]
+        },
+        "targetResolution": {
+          "enum": [
+            "capturedObject",
+            "unresolved",
+            "declaredDisconnected"
+          ]
+        },
+        "memberResolution": {
+          "enum": [
+            "notDeclared",
+            "notVerified"
+          ]
+        },
+        "inDeclaredCycle": {
+          "type": "boolean"
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "key",
+        "status",
+        "changedFields",
+        "proposalAssessment"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "parameter",
+            "relationship"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "enum": [
+              "nativeType",
+              "access",
+              "value",
+              "metadata",
+              "kind",
+              "sourcePath",
+              "targetPath",
+              "targetMember",
+              "state",
+              "reason"
+            ]
+          }
+        },
+        "proposalAssessment": {
+          "enum": [
+            "notProposal",
+            "notAssessed",
+            "contradictsSuppliedReadOnly",
+            "accessUnknown"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/summaryV1"
+        },
+        {
+          "$ref": "#/$defs/summaryV4"
+        }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selectionAndAncestors",
+        "ancestorTraversalStopped",
+        "ancestorTraversalEnd",
+        "directCapturedEdges",
+        "directEdgesTruncated"
+      ],
+      "properties": {
+        "selectionAndAncestors": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object"
+          }
+        },
+        "ancestorTraversalStopped": {
+          "type": "boolean"
+        },
+        "ancestorTraversalEnd": {
+          "enum": [
+            "root",
+            "unresolvedParent",
+            "cycleOrLimit"
+          ]
+        },
+        "directCapturedEdges": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "object"
+          }
+        },
+        "directEdgesTruncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "relationships",
+            "changes",
+            "context",
+            "sources",
+            "consumers",
+            "consumerChanges",
+            "impactPaths",
+            "impactTraversal",
+            "encoderConnections",
+            "encoderChanges",
+            "encoderCoverage"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/relationshipObservation"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      },
+                      {
+                        "$ref": "#/$defs/context"
+                      },
+                      {
+                        "$ref": "#/$defs/source"
+                      },
+                      {
+                        "$ref": "#/$defs/consumerObservation"
+                      },
+                      {
+                        "$ref": "#/$defs/consumerChange"
+                      },
+                      {
+                        "$ref": "#/$defs/impactPath"
+                      },
+                      {
+                        "$ref": "#/$defs/impactTraversal"
+                      },
+                      {
+                        "$ref": "#/$defs/encoderObservation"
+                      },
+                      {
+                        "$ref": "#/$defs/encoderChange"
+                      },
+                      {
+                        "$ref": "#/$defs/encoderCoverage"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "requestV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "afterKind",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        }
+      }
+    },
+    "reportV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "relationships",
+        "changes",
+        "context",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete",
+            "beforeRelationshipsComplete",
+            "afterRelationshipsComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            },
+            "beforeRelationshipsComplete": {
+              "type": "boolean"
+            },
+            "afterRelationshipsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 8192,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/relationshipObservation"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 10240,
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "summary": {
+          "$ref": "#/$defs/summaryV1"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "recordV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/reportV1"
+        }
+      }
+    },
+    "sourceDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "purpose",
+        "phase",
+        "fileName",
+        "uploadRef",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "phase": {
+          "enum": [
+            "before",
+            "after",
+            "context"
+          ]
+        },
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "uploadRef": {
+          "type": "string",
+          "pattern": "^upload:[a-f0-9]{32}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        }
+      }
+    },
+    "requestV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "afterKind",
+        "before",
+        "after",
+        "sources"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-request.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/sourceDeclaration"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "purpose",
+        "phase",
+        "fileName",
+        "bytes",
+        "artifact"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "phase": {
+          "enum": [
+            "before",
+            "after",
+            "context"
+          ]
+        },
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "artifact": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "reportV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "relationships",
+        "changes",
+        "context",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "limits",
+        "sources"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete",
+            "beforeRelationshipsComplete",
+            "afterRelationshipsComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            },
+            "beforeRelationshipsComplete": {
+              "type": "boolean"
+            },
+            "afterRelationshipsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 8192,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/relationshipObservation"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 10240,
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "summary": {
+          "$ref": "#/$defs/summaryV1"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "recordV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-record.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/reportV2"
+        }
+      }
+    },
+    "request": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/requestV1"
+        },
+        {
+          "$ref": "#/$defs/requestV2"
+        },
+        {
+          "$ref": "#/$defs/requestV3"
+        },
+        {
+          "$ref": "#/$defs/requestV4"
+        }
+      ]
+    },
+    "report": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/reportV1"
+        },
+        {
+          "$ref": "#/$defs/reportV2"
+        },
+        {
+          "$ref": "#/$defs/reportV3"
+        },
+        {
+          "$ref": "#/$defs/reportV4"
+        }
+      ]
+    },
+    "record": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/recordV1"
+        },
+        {
+          "$ref": "#/$defs/recordV2"
+        },
+        {
+          "$ref": "#/$defs/recordV3"
+        },
+        {
+          "$ref": "#/$defs/recordV4"
+        }
+      ]
+    },
+    "consumerDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "subjectKind",
+        "subjectKey",
+        "objectPath",
+        "nodeId",
+        "member",
+        "state",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "subjectKind": {
+          "enum": [
+            "parameter",
+            "relationship"
+          ]
+        },
+        "subjectKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "objectPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "member": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "declared",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "declared"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "objectPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              },
+              "nodeId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "objectPath": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nodeId": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "nodeId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "consumerObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "consumer",
+        "subjectResolution",
+        "objectResolution",
+        "memberResolution",
+        "nativeLinkVerified"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "consumer": {
+          "$ref": "#/$defs/consumerDeclaration"
+        },
+        "subjectResolution": {
+          "enum": [
+            "suppliedDeclaration",
+            "missingDeclaration"
+          ]
+        },
+        "objectResolution": {
+          "enum": [
+            "notDeclared",
+            "ambiguous",
+            "missing",
+            "identityMismatch",
+            "outOfScope",
+            "scopeUnknown",
+            "capturedObject"
+          ]
+        },
+        "memberResolution": {
+          "enum": [
+            "notDeclared",
+            "notVerified"
+          ]
+        },
+        "nativeLinkVerified": {
+          "const": false
+        }
+      }
+    },
+    "consumerChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "changedFields"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "onlyBefore",
+            "onlyAfter",
+            "unchanged",
+            "changed"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "subjectKind",
+              "subjectKey",
+              "objectPath",
+              "nodeId",
+              "member",
+              "state",
+              "reason"
+            ]
+          },
+          "maxItems": 7
+        }
+      }
+    },
+    "impactLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "impactDepth",
+        "maxImpactPaths",
+        "maxImpactEdgeVisits"
+      ],
+      "properties": {
+        "impactDepth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "maxImpactPaths": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "maxImpactEdgeVisits": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        }
+      }
+    },
+    "impactPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewSide",
+        "reviewId",
+        "changedPath",
+        "changedObjectPath",
+        "change",
+        "changedFields",
+        "affectedObjectPath",
+        "distance",
+        "objectPaths",
+        "edges"
+      ],
+      "properties": {
+        "reviewSide": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "changedPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "changedObjectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "change": {
+          "const": "suppliedContextRoot"
+        },
+        "changedFields": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "affectedObjectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "distance": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "objectPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192,
+            "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+          },
+          "maxItems": 6
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "maxItems": 5
+        }
+      }
+    },
+    "impactTraversal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "freshness",
+        "truncated",
+        "truncationReasons",
+        "limits",
+        "returnedPaths",
+        "visitedEdges",
+        "pathBytes",
+        "excludedEdges",
+        "supportedRelationshipKinds",
+        "policy",
+        "limitations",
+        "excludedNodeCount",
+        "rootCount",
+        "consumerPolicy"
+      ],
+      "properties": {
+        "complete": {
+          "const": false
+        },
+        "freshness": {
+          "const": "savedSnapshotsOnly"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "truncationReasons": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "impactDepth",
+              "maxImpactPaths",
+              "maxImpactEdgeVisits",
+              "maxImpactPathBytes"
+            ]
+          },
+          "maxItems": 4
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "impactDepth",
+            "maxImpactPaths",
+            "maxImpactEdgeVisits",
+            "maxImpactPathBytes"
+          ],
+          "properties": {
+            "impactDepth": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "maxImpactPaths": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "maxImpactEdgeVisits": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20000
+            },
+            "maxImpactPathBytes": {
+              "const": 1048576
+            }
+          }
+        },
+        "returnedPaths": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "visitedEdges": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20000
+        },
+        "pathBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "excludedEdges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reviewSide",
+              "counts"
+            ],
+            "properties": {
+              "reviewSide": {
+                "enum": [
+                  "before",
+                  "after"
+                ]
+              },
+              "counts": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "maxItems": 2
+        },
+        "supportedRelationshipKinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "policy": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "string"
+        },
+        "excludedNodeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rootCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 513
+        },
+        "consumerPolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "requestV3": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "afterKind",
+        "before",
+        "after",
+        "sources",
+        "consumers",
+        "impactLimits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-request.v3"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/sourceDeclaration"
+          }
+        },
+        "consumers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerDeclaration"
+              },
+              "maxItems": 256
+            },
+            "after": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerDeclaration"
+              },
+              "maxItems": 256
+            }
+          }
+        },
+        "impactLimits": {
+          "$ref": "#/$defs/impactLimits"
+        }
+      }
+    },
+    "reportV3": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "relationships",
+        "changes",
+        "context",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "limits",
+        "sources",
+        "consumers",
+        "consumerChanges",
+        "impactPaths",
+        "impactTraversal"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review.v3"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete",
+            "beforeRelationshipsComplete",
+            "afterRelationshipsComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            },
+            "beforeRelationshipsComplete": {
+              "type": "boolean"
+            },
+            "afterRelationshipsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 8192,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/relationshipObservation"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 10240,
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "summary": {
+          "$ref": "#/$defs/summaryV1"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerObservation"
+          },
+          "maxItems": 512
+        },
+        "consumerChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerChange"
+          },
+          "maxItems": 512
+        },
+        "impactPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/impactPath"
+          },
+          "maxItems": 200
+        },
+        "impactTraversal": {
+          "$ref": "#/$defs/impactTraversal"
+        }
+      }
+    },
+    "recordV3": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-record.v3"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/reportV3"
+        }
+      }
+    },
+    "summaryV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeParameterCount",
+        "afterParameterCount",
+        "beforeRelationshipCount",
+        "afterRelationshipCount",
+        "changedCount",
+        "readOnlyConflictCount",
+        "unknownAccessChangeCount",
+        "unresolvedEndpointCount",
+        "declaredCycleRecordCount"
+      ],
+      "properties": {
+        "beforeParameterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterParameterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeRelationshipCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterRelationshipCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readOnlyConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknownAccessChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedEndpointCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declaredCycleRecordCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "summaryV4": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeParameterCount",
+        "afterParameterCount",
+        "beforeRelationshipCount",
+        "afterRelationshipCount",
+        "changedCount",
+        "readOnlyConflictCount",
+        "unknownAccessChangeCount",
+        "unresolvedEndpointCount",
+        "declaredCycleRecordCount",
+        "beforeEncoderCount",
+        "afterEncoderCount",
+        "changedEncoderCount"
+      ],
+      "properties": {
+        "beforeParameterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterParameterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeRelationshipCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterRelationshipCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readOnlyConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknownAccessChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedEndpointCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declaredCycleRecordCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeEncoderCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "afterEncoderCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "changedEncoderCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        }
+      }
+    },
+    "encoderSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "objectPath"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "encoderAddress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "bit",
+            "byte",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "encoderDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provider",
+        "interfaceName",
+        "state",
+        "route",
+        "sensorIndex",
+        "connectOption",
+        "target",
+        "unknownReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "interfaceName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "state": {
+          "enum": [
+            "connected",
+            "disconnected",
+            "unknown"
+          ]
+        },
+        "route": {
+          "enum": [
+            "module",
+            "splitModules",
+            "channel",
+            "addresses",
+            "dbMember",
+            "startdriveTelegram",
+            "unknown"
+          ]
+        },
+        "sensorIndex": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "connectOption": {
+          "enum": [
+            null,
+            "Default",
+            "AllowAllModules"
+          ]
+        },
+        "target": {},
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "module"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetModule"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "splitModules"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetSplitmodules"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "channel"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetChannel"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "addresses"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetAddresses"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "dbMember"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetDbmember"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "startdriveTelegram"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/encoderTargetStartdrivetelegram"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "route": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "disconnected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "state": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "sensorIndex": {
+                    "const": null
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "connectOption": {
+                    "const": null
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "state": {
+                    "not": {
+                      "const": "disconnected"
+                    }
+                  },
+                  "target": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "channel"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "number": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "number"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "channel"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "channel"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "direction": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "direction"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "addresses"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "input": {
+                        "properties": {
+                          "value": {
+                            "const": null
+                          }
+                        },
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "input"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "addresses"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "input": {
+                        "properties": {
+                          "unit": {
+                            "const": "unknown"
+                          }
+                        },
+                        "required": [
+                          "unit"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "input"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "addresses"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "output": {
+                        "properties": {
+                          "value": {
+                            "const": null
+                          }
+                        },
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "output"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "route": {
+                    "const": "addresses"
+                  },
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "output": {
+                        "properties": {
+                          "unit": {
+                            "const": "unknown"
+                          }
+                        },
+                        "required": [
+                          "unit"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "output"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "unknownReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "encoderTargetModule": {
+      "$ref": "#/$defs/encoderSelector"
+    },
+    "encoderTargetSplitmodules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputModule",
+        "outputModule"
+      ],
+      "properties": {
+        "inputModule": {
+          "$ref": "#/$defs/encoderSelector"
+        },
+        "outputModule": {
+          "$ref": "#/$defs/encoderSelector"
+        }
+      }
+    },
+    "encoderTargetChannel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "number",
+        "type",
+        "direction"
+      ],
+      "properties": {
+        "module": {
+          "$ref": "#/$defs/encoderSelector"
+        },
+        "number": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "encoderTargetAddresses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plc",
+        "input",
+        "output"
+      ],
+      "properties": {
+        "plc": {
+          "$ref": "#/$defs/encoderSelector"
+        },
+        "input": {
+          "$ref": "#/$defs/encoderAddress"
+        },
+        "output": {
+          "$ref": "#/$defs/encoderAddress"
+        }
+      }
+    },
+    "encoderTargetDbmember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "block",
+        "member"
+      ],
+      "properties": {
+        "block": {
+          "$ref": "#/$defs/encoderSelector"
+        },
+        "member": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "encoderTargetStartdrivetelegram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "phase",
+        "telegramId"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "telegramId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "encoderTargetUnknown": {
+      "type": "null"
+    },
+    "encoderPhase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "observations"
+      ],
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/encoderDeclaration"
+          }
+        }
+      }
+    },
+    "requestV4": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "afterKind",
+        "before",
+        "after",
+        "sources",
+        "consumers",
+        "impactLimits",
+        "encoders"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-request.v4"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/sourceDeclaration"
+          }
+        },
+        "consumers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerDeclaration"
+              },
+              "maxItems": 256
+            },
+            "after": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerDeclaration"
+              },
+              "maxItems": 256
+            }
+          }
+        },
+        "impactLimits": {
+          "$ref": "#/$defs/impactLimits"
+        },
+        "encoders": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "before",
+            "after"
+          ],
+          "properties": {
+            "before": {
+              "$ref": "#/$defs/encoderPhase"
+            },
+            "after": {
+              "$ref": "#/$defs/encoderPhase"
+            }
+          }
+        }
+      }
+    },
+    "encoderDriveIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "driveId",
+        "family",
+        "orderNumber",
+        "firmware",
+        "parameterSet",
+        "unknownReason"
+      ],
+      "properties": {
+        "driveId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "orderNumber": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firmware": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameterSet": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "encoderDriveTelegramObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "sourceIndex",
+        "telegram",
+        "addresses",
+        "numberSemantics",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "sourceIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "telegram": {
+          "$ref": "#/$defs/encoderDriveTelegram"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/encoderDriveTelegramAddressObservation"
+          },
+          "maxItems": 16
+        },
+        "numberSemantics": {
+          "enum": [
+            "unknown",
+            "freelyConfigurable",
+            "declaredNumber"
+          ]
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      }
+    },
+    "encoderDriveTelegram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "number",
+        "inputBytes",
+        "outputBytes",
+        "addressesComplete",
+        "addresses",
+        "unknownReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "type": {
+          "enum": [
+            "MainTelegram",
+            "TorqueTelegram",
+            "SafetyTelegram",
+            "EdgeTelegram",
+            "SupplementaryTelegram",
+            "AdditionalTelegram",
+            null
+          ]
+        },
+        "number": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inputBytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outputBytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "addressesComplete": {
+          "type": "boolean"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/encoderDriveTelegramAddress"
+          },
+          "maxItems": 16
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "type": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "number": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "inputBytes": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "outputBytes": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "addressesComplete": {
+                    "const": false
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "unknownReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "encoderDriveTelegramAddress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "plcPath",
+        "direction",
+        "context",
+        "startAddress",
+        "addressUnit",
+        "length",
+        "lengthUnit",
+        "unknownReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "plcPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "enum": [
+            "Input",
+            "Output",
+            null
+          ]
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startAddress": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "addressUnit": {
+          "enum": [
+            "bit",
+            "byte",
+            "unknown"
+          ]
+        },
+        "length": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lengthUnit": {
+          "enum": [
+            "bit",
+            "byte",
+            "unknown"
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "plcPath": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "direction": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "context": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "startAddress": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "length": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "addressUnit": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "lengthUnit": {
+                    "const": "unknown"
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "unknownReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "encoderDriveTelegramAddressObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceIndex",
+        "address",
+        "plcResolution",
+        "startBit",
+        "lengthBits",
+        "endBitExclusive",
+        "directionalSizeComparison",
+        "nativeAddressVerified"
+      ],
+      "properties": {
+        "sourceIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "address": {
+          "$ref": "#/$defs/encoderDriveTelegramAddress"
+        },
+        "plcResolution": {
+          "enum": [
+            "notDeclared",
+            "missing",
+            "ambiguousIdentity",
+            "invalidIdentity",
+            "virtualObject",
+            "wrongKind",
+            "capturedPlc"
+          ]
+        },
+        "startBit": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 17179869176
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lengthBits": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 17179869176
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endBitExclusive": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 34359738352
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "directionalSizeComparison": {
+          "enum": [
+            "unknown",
+            "equalDeclaredSize",
+            "differentDeclaredSize"
+          ]
+        },
+        "nativeAddressVerified": {
+          "const": false
+        }
+      }
+    },
+    "encoderDriveTelegramChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "changedFields",
+        "identityEqualityVerified",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "type",
+              "number",
+              "inputBytes",
+              "outputBytes",
+              "addressesComplete",
+              "addresses",
+              "unknownReason"
+            ]
+          },
+          "maxItems": 7
+        },
+        "identityEqualityVerified": {
+          "const": false
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      }
+    },
+    "encoderTargetEvidence": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "declaredDisconnected",
+                "notCaptured"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "moduleResolution"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "moduleResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "inputModuleResolution",
+            "outputModuleResolution"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "inputModuleResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            },
+            "outputModuleResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "moduleResolution",
+            "channelResolution"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "moduleResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            },
+            "channelResolution": {
+              "const": "notVerified"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "plcResolution",
+            "inputBitAddress",
+            "outputBitAddress"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "plcResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            },
+            "inputBitAddress": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 17179869176
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "outputBitAddress": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 17179869176
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "blockResolution",
+            "memberResolution"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "blockResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            },
+            "memberResolution": {
+              "const": "notVerified"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "telegramResolution",
+            "driveHardwarePath",
+            "driveHardwareResolution",
+            "driveIdentity",
+            "driveValueDomain",
+            "telegramEvidence",
+            "telegramChange",
+            "valueDomainComparison",
+            "externalEncoderNumberCheck"
+          ],
+          "properties": {
+            "state": {
+              "const": "suppliedTarget"
+            },
+            "telegramResolution": {
+              "enum": [
+                "unsupportedVersion",
+                "missing",
+                "retainedDeclaration"
+              ]
+            },
+            "driveHardwarePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "driveHardwareResolution": {
+              "enum": [
+                "capturedObject",
+                "ambiguous",
+                "missing",
+                "identityMismatch",
+                "virtualObject",
+                "wrongKind",
+                "scopeUnknown",
+                "differentPlc"
+              ]
+            },
+            "driveIdentity": {
+              "$ref": "#/$defs/encoderDriveIdentity"
+            },
+            "driveValueDomain": {
+              "enum": [
+                "online",
+                "offline"
+              ]
+            },
+            "telegramEvidence": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/encoderDriveTelegramObservation"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "telegramChange": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/encoderDriveTelegramChange"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "valueDomainComparison": {
+              "enum": [
+                "equalDeclarations",
+                "differentDeclarations"
+              ]
+            },
+            "externalEncoderNumberCheck": {
+              "enum": [
+                "outsideDocumentedProfile",
+                "unknown",
+                "documentedNumber",
+                "differentNumber"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "encoderObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "sourceIndex",
+        "encoder",
+        "targetEvidence",
+        "contradictions",
+        "nativeConnectionVerified",
+        "targetCompatibilityVerified"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "sourceIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "encoder": {
+          "$ref": "#/$defs/encoderDeclaration"
+        },
+        "targetEvidence": {
+          "$ref": "#/$defs/encoderTargetEvidence"
+        },
+        "contradictions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "disconnectedWithSensorIndex",
+              "connectedWithZeroSensorIndex"
+            ]
+          },
+          "maxItems": 1
+        },
+        "nativeConnectionVerified": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        }
+      }
+    },
+    "encoderChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "changedFields",
+        "identityEqualityVerified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "provider",
+              "interfaceName",
+              "state",
+              "route",
+              "sensorIndex",
+              "connectOption",
+              "target",
+              "unknownReason"
+            ]
+          }
+        },
+        "identityEqualityVerified": {
+          "const": false
+        }
+      }
+    },
+    "encoderCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ownerResolution",
+        "beforeComplete",
+        "afterComplete"
+      ],
+      "properties": {
+        "ownerResolution": {
+          "enum": [
+            "capturedObject",
+            "ambiguous",
+            "missing",
+            "identityMismatch",
+            "virtualObject",
+            "wrongKind",
+            "scopeUnknown",
+            "differentPlc"
+          ]
+        },
+        "beforeComplete": {
+          "type": "boolean"
+        },
+        "afterComplete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "reportV4": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "technologyPath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "relationships",
+        "changes",
+        "context",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "nativeExecuted",
+        "targetCompatibilityVerified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeObjectAnalysisComplete",
+        "limits",
+        "sources",
+        "consumers",
+        "consumerChanges",
+        "impactPaths",
+        "impactTraversal",
+        "encoderConnections",
+        "encoderChanges",
+        "encoderCoverage",
+        "encoderPolicy"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review.v4"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "technologyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete",
+            "beforeRelationshipsComplete",
+            "afterRelationshipsComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            },
+            "beforeRelationshipsComplete": {
+              "type": "boolean"
+            },
+            "afterRelationshipsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 8192,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/relationshipObservation"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "maxItems": 10240,
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "summary": {
+          "$ref": "#/$defs/summaryV4"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "nativeExecuted": {
+          "const": false
+        },
+        "targetCompatibilityVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeObjectAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerObservation"
+          },
+          "maxItems": 512
+        },
+        "consumerChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerChange"
+          },
+          "maxItems": 512
+        },
+        "impactPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/impactPath"
+          },
+          "maxItems": 200
+        },
+        "impactTraversal": {
+          "$ref": "#/$defs/impactTraversal"
+        },
+        "encoderConnections": {
+          "type": "array",
+          "maxItems": 512,
+          "items": {
+            "$ref": "#/$defs/encoderObservation"
+          }
+        },
+        "encoderChanges": {
+          "type": "array",
+          "maxItems": 512,
+          "items": {
+            "$ref": "#/$defs/encoderChange"
+          }
+        },
+        "encoderCoverage": {
+          "$ref": "#/$defs/encoderCoverage"
+        },
+        "encoderPolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "recordV4": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "technology-profile-review-record.v4"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/reportV4"
+        }
+      }
+    }
+  }
+}

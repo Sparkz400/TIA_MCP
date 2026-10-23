@@ -1,0 +1,10 @@
+{
+  "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "plcName": "GraphPLC",
+  "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g15\\project\\GraphScratch\\GraphScratch.ap21",
+  "checkpoint": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g15\\before-import.zap21",
+    "sha256": "934ea7b3d542d656940ce19b00c1c33f4a1a760bcdac5db615d7d9c560559586",
+    "bytes": 336389
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "target": {
+    "family": "classic",
+    "hmiPath": "/devices/Synthetic/items/HMI/hmi/Synthetic",
+    "name": "Synthetic",
+    "compileScope": "/devices/Synthetic/items/HMI/hmi/Synthetic",
+    "compileScopeKind": "hmiSoftware"
+  },
+  "items": [
+    {
+      "kind": "screen",
+      "path": "/screens/Synthetic",
+      "name": "Synthetic"
+    },
+    {
+      "kind": "tagTable",
+      "path": "/tagTables/Synthetic",
+      "name": "Synthetic",
+      "tags": [
+        {
+          "name": "Tag"
+        }
+      ],
+      "tagsTruncated": false
+    }
+  ],
+  "truncated": false,
+  "connections": [],
+  "connectionsTruncated": false,
+  "coverage": "Synthetic observation matching the bounded Classic producer shape; no native qualification."
+}

@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-measurement.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-measurement.v2"
+    },
+    "tracePlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "mode": {
+      "enum": [
+        "synthetic",
+        "polling",
+        "manualNativeExport"
+      ]
+    },
+    "programIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "clocks": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/clock"
+      },
+      "minItems": 1,
+      "maxItems": 8
+    },
+    "quality": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/quality"
+    },
+    "capture": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/capture"
+    },
+    "expectedIntervals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clockId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "epoch": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "interval": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000000000000000
+          }
+        },
+        "required": [
+          "clockId",
+          "epoch",
+          "interval"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 64
+    },
+    "units": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 64,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+      }
+    },
+    "samples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000000
+          },
+          "readings": {
+            "type": "object",
+            "maxProperties": 64,
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "value": {
+                  "type": [
+                    "number",
+                    "boolean",
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "good",
+                    "bad",
+                    "uncertain",
+                    "missing"
+                  ]
+                },
+                "statusCode": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 0,
+                      "maxLength": 512
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "error": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 0,
+                      "maxLength": 2000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "timestamps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "clockId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      },
+                      "epoch": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      },
+                      "value": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": -1000000000000000000,
+                            "maximum": 1000000000000000000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "clockId",
+                      "epoch",
+                      "value"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 8
+                }
+              },
+              "required": [
+                "value",
+                "status",
+                "statusCode",
+                "error",
+                "timestamps"
+              ],
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "status": {
+                        "const": "good"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "type": [
+                          "boolean",
+                          "number",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "sequence",
+          "readings"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    },
+    "originalArtifact": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/artifact"
+    },
+    "conversion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "settingsReadbackEvidence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "tracePlanId",
+    "reviewId",
+    "mode",
+    "programIdentity",
+    "clocks",
+    "quality",
+    "capture",
+    "expectedIntervals",
+    "units",
+    "samples"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "manualNativeExport"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "originalArtifact",
+          "conversion",
+          "settingsReadbackEvidence"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "polling"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "atomicAcrossSignals": {
+                "const": false
+              },
+              "scanSynchronized": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

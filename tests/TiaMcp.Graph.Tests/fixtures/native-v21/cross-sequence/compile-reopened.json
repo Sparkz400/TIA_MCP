@@ -1,0 +1,33 @@
+{
+  "state": "Success",
+  "errors": 0,
+  "warnings": 0,
+  "messages": [
+    {
+      "state": "Information",
+      "description": "",
+      "path": "GraphPLC",
+      "messages": [
+        {
+          "state": "Information",
+          "description": "",
+          "path": "Program blocks",
+          "messages": [
+            {
+              "state": "Information",
+              "description": "No block was compiled. All blocks are up-to-date.",
+              "path": null,
+              "messages": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "state": "Success",
+      "description": "Compiling finished (errors: 0; warnings: 0)",
+      "path": null,
+      "messages": []
+    }
+  ]
+}

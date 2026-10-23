@@ -1,0 +1,33 @@
+{
+  "id": "tia-v21-project-texts-1.3-read-20261015-03-filtered-block",
+  "kind": "unqualified-explicit",
+  "sourceCulture": "de-DE",
+  "rows": [
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcKQUf2R2ZEv0KS29SG0VEoe9buPg5k5CpGlPPW0CyM/OPTvaV3hxXbl2rffUvmCQEZDp/f93IA7ZIOTISg88Bf7qx2vOjXdXosyK3EEX/rbOxyRX++mHBjdSCjfcQE0ORA==",
+      "category": "<BlockCommentCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C2"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E2"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F2"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    }
+  ],
+  "allowSharedStringToInline": false
+}

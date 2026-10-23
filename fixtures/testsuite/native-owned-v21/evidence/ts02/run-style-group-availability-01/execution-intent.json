@@ -1,0 +1,24 @@
+{
+  "atUtc": "2026-10-15T07:53:17.6879523Z",
+  "automaticReplay": false,
+  "nativeRoute": "RuleSetExecutor.Run(RuleSet)",
+  "definition": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\definition-before-execution.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "requestedScope": [
+    "ScratchPLC/Program blocks"
+  ],
+  "setScopeReturned": true,
+  "scopeObservation": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "effectiveScope": "unverified",
+  "qualification": false,
+  "executionPurpose": "Operation-specific style license and execution availability in an entirely owned isolated scratch."
+}

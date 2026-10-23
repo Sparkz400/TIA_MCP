@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-candidate.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "project",
+    "profileId",
+    "profileKind",
+    "profileSha256",
+    "inputSha256",
+    "outputSha256",
+    "reviewSha256",
+    "review",
+    "changedCells",
+    "parts",
+    "preservationVerified",
+    "preservationScope",
+    "nativeQualified",
+    "nativeExecuted",
+    "nativeImportAllowed",
+    "remainingGate",
+    "manifestSha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "translation-offline-candidate"
+    },
+    "project": {
+      "$ref": "engineering-object-reference.v1.schema.json"
+    },
+    "profileId": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "profileKind": {
+      "enum": [
+        "synthetic",
+        "unqualified-explicit"
+      ]
+    },
+    "profileSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inputSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "outputSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "review": {
+      "$ref": "translation-review.v1.schema.json"
+    },
+    "changedCells": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "parts": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "beforeSha256",
+          "afterSha256",
+          "changed"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 8192
+          },
+          "beforeSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "afterSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "preservationVerified": {
+      "const": true
+    },
+    "preservationScope": {
+      "type": "string",
+      "maxLength": 1048576
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "nativeExecuted": {
+      "const": false
+    },
+    "nativeImportAllowed": {
+      "const": false
+    },
+    "remainingGate": {
+      "type": "string",
+      "maxLength": 1048576
+    },
+    "manifestSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

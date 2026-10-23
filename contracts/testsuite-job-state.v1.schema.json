@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-job-state.v1.schema.json",
+  "title": "Pure job transition contract; no scheduler/native cancellation implementation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "state",
+    "stopRequested",
+    "dispatched",
+    "cleanupVerified",
+    "reconciliationSha256",
+    "nativeCancellationSupported",
+    "resourceReleasePermitted"
+  ],
+  "properties": {
+    "state": {
+      "enum": [
+        "prepared",
+        "queued",
+        "admitted",
+        "dispatched",
+        "collecting",
+        "verifying",
+        "passed",
+        "failed",
+        "blocked",
+        "stopped",
+        "outcomeUnknown"
+      ]
+    },
+    "stopRequested": {
+      "type": "boolean"
+    },
+    "dispatched": {
+      "type": "boolean"
+    },
+    "cleanupVerified": {
+      "type": "boolean"
+    },
+    "reconciliationSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nativeCancellationSupported": {
+      "const": false
+    },
+    "resourceReleasePermitted": {
+      "type": "boolean"
+    }
+  }
+}

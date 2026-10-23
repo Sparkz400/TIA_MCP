@@ -1,0 +1,15 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_FC_LAD"
+VAR_INPUT
+  Enable : Bool;
+END_VAR
+VAR_OUTPUT
+  Active : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  "TiaMcp_IsEnabled"( Enable := #Enable, Ret_Val => #Active )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

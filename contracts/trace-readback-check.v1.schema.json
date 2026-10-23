@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-readback-check.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "tracePlanId",
+    "readbackArtifact",
+    "matchesSuppliedReadback",
+    "differences",
+    "observation",
+    "nativeProbePerformed",
+    "nativeQualification",
+    "mutationAttempted",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-readback-check.v1"
+    },
+    "tracePlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "readbackArtifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        }
+      }
+    },
+    "matchesSuppliedReadback": {
+      "type": "boolean"
+    },
+    "differences": {
+      "type": "array"
+    },
+    "observation": {
+      "$ref": "trace-readback.v1.schema.json"
+    },
+    "nativeProbePerformed": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "mutationAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  }
+}

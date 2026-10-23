@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/watch-table-authoring.v1.schema.json",
+  "title": "Reviewed watch authoring request; native profile admission is independently required",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generationId", "generationSha256", "idempotencyKey", "mode", "destination", "steps"],
+  "properties": {
+    "generationId": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "generationSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 8192},
+    "mode": {"enum": ["create", "update"]},
+    "destination": {
+      "type": "object", "additionalProperties": false,
+      "required": ["projectPath", "plcPath", "group", "tableName"],
+      "properties": {
+        "projectPath": {"$ref": "#/$defs/path"}, "plcPath": {"$ref": "#/$defs/path"},
+        "group": {"$ref": "#/$defs/path"}, "tableName": {"$ref": "#/$defs/name"}
+      }
+    },
+    "template": {
+      "type": "object", "additionalProperties": false, "required": ["group", "tableName"],
+      "properties": {"group": {"$ref": "#/$defs/path"}, "tableName": {"$ref": "#/$defs/name"}}
+    },
+    "steps": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"oneOf": [
+      {"type": "object", "additionalProperties": false, "required": ["kind", "candidateId", "templateOrdinal"], "properties": {
+        "kind": {"const": "add"}, "candidateId": {"type": "string", "minLength": 1, "maxLength": 64},
+        "templateOrdinal": {"$ref": "#/$defs/ordinal"}, "insertAt": {"type": "integer", "minimum": 0, "maximum": 256},
+        "comments": {"$ref": "#/$defs/comments"}
+      }},
+      {"type": "object", "additionalProperties": false, "required": ["kind", "ordinal"], "properties": {
+        "kind": {"const": "remove"}, "ordinal": {"$ref": "#/$defs/ordinal"}
+      }},
+      {"type": "object", "additionalProperties": false, "required": ["kind", "order"], "properties": {
+        "kind": {"const": "reorder"}, "order": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "#/$defs/ordinal"}}
+      }},
+      {"type": "object", "additionalProperties": false, "required": ["kind", "ordinal", "comments"], "properties": {
+        "kind": {"const": "comment"}, "ordinal": {"$ref": "#/$defs/ordinal"}, "comments": {"$ref": "#/$defs/comments"}
+      }}
+    ]}}
+  },
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "maxLength": 8192},
+    "name": {"type": "string", "minLength": 1, "maxLength": 128},
+    "ordinal": {"type": "integer", "minimum": 0, "maximum": 255},
+    "comments": {"type": "object", "minProperties": 1, "maxProperties": 32,
+      "propertyNames": {"type": "string", "minLength": 1, "maxLength": 32},
+      "additionalProperties": {"type": "string", "maxLength": 65536}}
+  }
+}

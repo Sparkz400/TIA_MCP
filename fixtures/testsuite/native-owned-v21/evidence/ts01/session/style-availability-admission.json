@@ -1,0 +1,38 @@
+{
+  "artifactRoot": "D:\\TIAW",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "ownedScratch": true,
+  "creationTool": "tia_create_scratch",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "definitionSha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+  "binarySha256": "ec9c2c4fcbbd6d7125b25b5fe4d446d4a7ff513d0eb462683e13532de8ecce9b",
+  "apiSha256": {
+    "Base": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+    "Step7": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba",
+    "TestSuite": "03e1b656eea82492ce3852a722d02cbc261c19c6c008035807c6e6d30c3d1fdb"
+  },
+  "sourceFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleAvailabilityEvidence\\Program.cs",
+      "sha256": "1472d38e5e9a1106709590fb6ee39d36cb6e71c5418b3f98d8429ddd1e493495",
+      "bytes": 22168
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteStyleAvailabilityEvidence\\TestSuiteStyleAvailabilityEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c",
+      "bytes": 991
+    }
+  ],
+  "mode": "run-style-availability",
+  "outputDirectory": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01",
+  "isolatedScratch": true,
+  "allProjectObjectsOwned": true,
+  "availabilityOnlyScopeUnverifiedAccepted": true,
+  "ownershipEvidence": {
+    "path": "D:\\TIAW\\ts01\\step-scratch_create-e566b.json",
+    "sha256": "1da261ba60f638487fb04c31a38359652ed57bd59ba6ae691278944fb42d254a"
+  }
+}

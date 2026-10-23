@@ -1,0 +1,1792 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/opcua-runtime-subscription.v1.schema.json",
+  "title": "Bounded durable OPC UA subscription acquisition",
+  "$ref": "#/$defs/captureStatus",
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespaceUri",
+        "identifierType",
+        "identifier"
+      ],
+      "properties": {
+        "namespaceUri": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 4096
+        },
+        "identifierType": {
+          "enum": [
+            "numeric",
+            "string",
+            "guid",
+            "opaque"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "applicationUri",
+        "certificateSha256",
+        "authentication"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "pattern": "^opc\\.tcp://",
+          "maxLength": 2048
+        },
+        "applicationUri": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 4096
+        },
+        "certificateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authentication": {
+          "enum": [
+            "anonymous",
+            "username"
+          ]
+        },
+        "user": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "vaultName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 32
+        },
+        "credential": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "outcome",
+        "builtInType",
+        "dataType",
+        "valueRank",
+        "arrayDimensions",
+        "statusCode",
+        "quality",
+        "sourceTimestamp",
+        "serverTimestamp",
+        "sourcePicoseconds",
+        "serverPicoseconds",
+        "encoding",
+        "value",
+        "errorCode"
+      ],
+      "properties": {
+        "node": {
+          "$ref": "#/$defs/node"
+        },
+        "outcome": {
+          "enum": [
+            "value",
+            "itemError",
+            "metadataError",
+            "unsupported"
+          ]
+        },
+        "builtInType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dataType": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valueRank": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "arrayDimensions": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "maxItems": 4096,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        },
+        "statusCode": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{8}$"
+        },
+        "quality": {
+          "enum": [
+            "Good",
+            "Uncertain",
+            "Bad"
+          ]
+        },
+        "sourceTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "serverTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "sourcePicoseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "serverPicoseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "encoding": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "sessionStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "attemptId",
+        "hostId",
+        "selection",
+        "state",
+        "errorCode",
+        "peerVerified",
+        "updatedAt",
+        "securityPolicy",
+        "securityMode",
+        "physicalQualified",
+        "programIdentityVerified",
+        "secretsReturned",
+        "operationErrorCode"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-session.v1"
+        },
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "selection": {
+          "$ref": "#/$defs/selection"
+        },
+        "state": {
+          "enum": [
+            "connecting",
+            "connected",
+            "notConnected",
+            "remoteSessionUnknown",
+            "hostEndedRemoteUnknown",
+            "closed",
+            "abandonedRemoteUnknown"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "peerVerified": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "securityPolicy": {
+          "const": "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+        },
+        "securityMode": {
+          "const": "SignAndEncrypt"
+        },
+        "physicalQualified": {
+          "const": false
+        },
+        "programIdentityVerified": {
+          "const": false
+        },
+        "secretsReturned": {
+          "const": false
+        },
+        "operationErrorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "publishingIntervalMilliseconds": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 1000
+        },
+        "samplingIntervalMilliseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "queueSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "discardOldest": {
+          "type": "boolean"
+        },
+        "keepAliveCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "lifetimeCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 1000
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maximumNotifications": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "maximumBytes": {
+          "type": "integer",
+          "minimum": 1048576,
+          "maximum": 67108864
+        },
+        "maximumRepublish": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "diagnosticBindingId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional immutable diagnostic_ua_binding_plan ID selected before capture; exact session attempt and ordered nodes are revalidated."
+        }
+      },
+      "required": [
+        "attemptId",
+        "nodes"
+      ],
+      "description": "Runtime additionally requires lifetimeCount >= 3 * keepAliveCount and canonical distinct node identities."
+    },
+    "normalizedRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "publishingIntervalMilliseconds": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 1000
+        },
+        "samplingIntervalMilliseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "queueSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "discardOldest": {
+          "type": "boolean"
+        },
+        "keepAliveCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "lifetimeCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 1000
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maximumNotifications": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "maximumBytes": {
+          "type": "integer",
+          "minimum": 1048576,
+          "maximum": 67108864
+        },
+        "maximumRepublish": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "diagnosticBindingId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional immutable diagnostic_ua_binding_plan ID selected before capture; exact session attempt and ordered nodes are revalidated."
+        }
+      },
+      "required": [
+        "attemptId",
+        "nodes",
+        "publishingIntervalMilliseconds",
+        "samplingIntervalMilliseconds",
+        "queueSize",
+        "discardOldest",
+        "keepAliveCount",
+        "lifetimeCount",
+        "durationSeconds",
+        "maximumNotifications",
+        "maximumBytes",
+        "maximumRepublish"
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "createdUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "request": {
+          "$ref": "#/$defs/normalizedRequest"
+        },
+        "session": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/sessionStatus"
+            },
+            {
+              "properties": {
+                "state": {
+                  "const": "connected"
+                },
+                "peerVerified": {
+                  "const": true
+                },
+                "errorCode": {
+                  "const": null
+                },
+                "operationErrorCode": {
+                  "const": null
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "captureId",
+        "hostId",
+        "createdUtc",
+        "request",
+        "session"
+      ]
+    },
+    "monitoredItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clientHandle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "node": {
+          "$ref": "#/$defs/node"
+        },
+        "statusCode": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{8}$"
+        },
+        "monitoredItemId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "revisedSamplingInterval": {
+          "type": "number",
+          "minimum": 0
+        },
+        "revisedQueueSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "metadata": {
+          "$ref": "#/$defs/value"
+        }
+      },
+      "required": [
+        "clientHandle",
+        "node",
+        "statusCode",
+        "monitoredItemId",
+        "revisedSamplingInterval",
+        "revisedQueueSize",
+        "metadata"
+      ]
+    },
+    "created": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subscriptionId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "revisedPublishingInterval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "revisedLifetimeCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "revisedKeepAliveCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/monitoredItem"
+          },
+          "maxItems": 64,
+          "minItems": 1
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "revisedPublishingInterval",
+        "revisedLifetimeCount",
+        "revisedKeepAliveCount",
+        "items"
+      ]
+    },
+    "notification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clientHandle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "monitoredItemId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "overflow": {
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        }
+      },
+      "required": [
+        "clientHandle",
+        "monitoredItemId",
+        "overflow",
+        "value"
+      ]
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "created",
+            "publish",
+            "republish",
+            "gap",
+            "deleted",
+            "failure"
+          ]
+        },
+        "subscriptionId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "sequenceNumber": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4294967295
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "publishTime": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "keepAlive": {
+          "type": "boolean"
+        },
+        "duplicate": {
+          "type": "boolean"
+        },
+        "moreNotifications": {
+          "type": "boolean"
+        },
+        "availableSequenceNumbers": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "maxItems": 4096,
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "acknowledgedSequenceNumbers": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "maxItems": 65,
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "acknowledgementResults": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^0x[0-9a-f]{8}$"
+              },
+              "maxItems": 65,
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "notifications": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/notification"
+              },
+              "maxItems": 1,
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statusChanges": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^0x[0-9a-f]{8}$"
+              },
+              "maxItems": 4096,
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requestedSequenceNumber": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4294967295
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statusCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^0x[0-9a-f]{8}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/created"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "errorCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^Ua",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gapFrom": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4294967295
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gapTo": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4294967295
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missingCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "kind",
+        "subscriptionId",
+        "sequenceNumber",
+        "publishTime",
+        "keepAlive",
+        "duplicate",
+        "moreNotifications",
+        "availableSequenceNumbers",
+        "acknowledgedSequenceNumbers",
+        "acknowledgementResults",
+        "notifications",
+        "statusChanges",
+        "requestedSequenceNumber",
+        "statusCode",
+        "created",
+        "errorCode",
+        "gapFrom",
+        "gapTo",
+        "missingCount"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "created"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "created": {
+                "$ref": "#/$defs/created"
+              },
+              "subscriptionId": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "created": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "publish",
+                  "republish"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sequenceNumber": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "publishTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "subscriptionId": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "gap"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "gapFrom": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "gapTo": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "missingCount": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "gapFrom": {
+                "const": null
+              },
+              "gapTo": {
+                "const": null
+              },
+              "missingCount": {
+                "const": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "failure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "type": "string",
+                "pattern": "^Ua",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "errorCode": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "deleted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "statusCode": {
+                "type": "string",
+                "pattern": "^0x[0-9a-f]{8}$"
+              },
+              "subscriptionId": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "publish",
+                  "republish"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "notifications": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/notification"
+                },
+                "maxItems": 1,
+                "minItems": 0
+              },
+              "statusChanges": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-f]{8}$"
+                },
+                "maxItems": 4096,
+                "minItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "sequenceNumber": {
+                "const": null
+              },
+              "publishTime": {
+                "const": null
+              },
+              "availableSequenceNumbers": {
+                "const": null
+              },
+              "acknowledgedSequenceNumbers": {
+                "const": null
+              },
+              "acknowledgementResults": {
+                "const": null
+              },
+              "notifications": {
+                "const": null
+              },
+              "statusChanges": {
+                "const": null
+              },
+              "keepAlive": {
+                "const": false
+              },
+              "duplicate": {
+                "const": false
+              },
+              "moreNotifications": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "publish"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "availableSequenceNumbers": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4294967295
+                },
+                "maxItems": 4096,
+                "minItems": 0
+              },
+              "acknowledgedSequenceNumbers": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4294967295
+                },
+                "maxItems": 65,
+                "minItems": 0
+              },
+              "acknowledgementResults": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-f]{8}$"
+                },
+                "maxItems": 65,
+                "minItems": 0
+              },
+              "requestedSequenceNumber": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "republish"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requestedSequenceNumber": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "keepAlive": {
+                "const": false
+              },
+              "moreNotifications": {
+                "const": false
+              },
+              "availableSequenceNumbers": {
+                "const": null
+              },
+              "acknowledgedSequenceNumbers": {
+                "const": null
+              },
+              "acknowledgementResults": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "keepAlive": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "notifications": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/notification"
+                },
+                "maxItems": 0,
+                "minItems": 0
+              },
+              "statusChanges": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^0x[0-9a-f]{8}$"
+                },
+                "maxItems": 0,
+                "minItems": 0
+              },
+              "duplicate": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "created",
+                  "gap",
+                  "deleted"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requestedSequenceNumber": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "created",
+                  "publish",
+                  "republish",
+                  "gap"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "statusCode": {
+                "const": null
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "failure"
+              },
+              "errorCode": {
+                "const": "UaRepublishUnavailable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requestedSequenceNumber": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "statusCode": {
+                "const": "0x807b0000"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "failure"
+              },
+              "errorCode": {
+                "not": {
+                  "const": "UaRepublishUnavailable"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requestedSequenceNumber": {
+                "const": null
+              },
+              "statusCode": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 199999
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observedUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event": {
+          "$ref": "#/$defs/event"
+        }
+      },
+      "required": [
+        "sequence",
+        "elapsedMilliseconds",
+        "observedUtc",
+        "event"
+      ]
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "running",
+            "ended"
+          ]
+        },
+        "terminalReason": {
+          "anyOf": [
+            {
+              "enum": [
+                "durationLimit",
+                "notificationLimit",
+                "sessionUnavailable",
+                "byteLimit",
+                "valueLimit",
+                "storageFailure",
+                "stopped",
+                "hostShutdown",
+                "sequenceGapLimit",
+                "serverStatusChanged",
+                "allItemsFailed"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observedUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200000
+        },
+        "notifications": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "duplicateMessages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missingSequences": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "remoteCleanupConfirmed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "state",
+        "terminalReason",
+        "elapsedMilliseconds",
+        "observedUtc",
+        "rows",
+        "notifications",
+        "duplicateMessages",
+        "missingSequences",
+        "remoteCleanupConfirmed"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "running"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalReason": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "terminalReason": {
+                "enum": [
+                  "durationLimit",
+                  "notificationLimit",
+                  "sessionUnavailable",
+                  "byteLimit",
+                  "valueLimit",
+                  "storageFailure",
+                  "stopped",
+                  "hostShutdown",
+                  "sequenceGapLimit",
+                  "serverStatusChanged",
+                  "allItemsFailed"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "captureStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-subscription-status.v1"
+        },
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "ended",
+            "interrupted",
+            "historicalPrefix"
+          ]
+        },
+        "recordedProgress": {
+          "$ref": "#/$defs/progress"
+        },
+        "localFailure": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        },
+        "committedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uncommittedTailPresent": {
+          "type": "boolean"
+        },
+        "uncommittedDataUnknown": {
+          "type": "boolean"
+        },
+        "acquisitionMode": {
+          "const": "subscription"
+        },
+        "reconnectPolicy": {
+          "const": "none"
+        },
+        "transferPolicy": {
+          "const": "none"
+        },
+        "sourceCompletenessVerified": {
+          "const": false
+        },
+        "physicalQualified": {
+          "const": false
+        },
+        "atomicAcrossSignals": {
+          "const": false
+        },
+        "scanSynchronized": {
+          "const": false
+        },
+        "programMatchVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "captureId",
+        "snapshotRef",
+        "state",
+        "recordedProgress",
+        "localFailure",
+        "plan",
+        "committedBytes",
+        "uncommittedTailPresent",
+        "uncommittedDataUnknown",
+        "acquisitionMode",
+        "reconnectPolicy",
+        "transferPolicy",
+        "sourceCompletenessVerified",
+        "physicalQualified",
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "programMatchVerified",
+        "nativeQualified"
+      ]
+    },
+    "omittedRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "enum": [
+            "created",
+            "publish",
+            "republish",
+            "gap",
+            "deleted",
+            "failure"
+          ]
+        },
+        "omitted": {
+          "const": true
+        },
+        "reason": {
+          "const": "Row exceeds page budget; use exact capture export."
+        }
+      },
+      "required": [
+        "sequence",
+        "kind",
+        "omitted",
+        "reason"
+      ]
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-subscription-page.v1"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalRows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200000
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/row"
+              },
+              {
+                "$ref": "#/$defs/omittedRow"
+              }
+            ]
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "snapshotRef",
+        "offset",
+        "totalRows",
+        "rows",
+        "nextOffset",
+        "nativeQualified"
+      ]
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-subscription-export.v1"
+        },
+        "subscription": {
+          "$ref": "#/$defs/captureStatus"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/row"
+          },
+          "maxItems": 200000,
+          "minItems": 0
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "subscription",
+        "rows"
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "exportResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "maxItems": 2,
+          "minItems": 1
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "csvCompanionJson": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "snapshotRef",
+        "artifacts",
+        "nativeQualified",
+        "csvCompanionJson"
+      ]
+    },
+    "startInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      },
+      "required": [
+        "captureId",
+        "request"
+      ]
+    },
+    "captureInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        }
+      },
+      "required": [
+        "captureId"
+      ]
+    },
+    "pageInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "snapshotRef"
+      ]
+    },
+    "exportInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^ua-subscription:[0-9a-f]{32}:(0|[1-9][0-9]{0,5}):[0-9a-f]{64}$"
+        },
+        "format": {
+          "enum": [
+            "json",
+            "csv"
+          ]
+        }
+      },
+      "required": [
+        "snapshotRef"
+      ]
+    }
+  },
+  "x-tool-contracts": {
+    "runtime_ua_subscription_start": {
+      "input": {
+        "$ref": "#/$defs/startInput"
+      },
+      "output": {
+        "$ref": "#/$defs/captureStatus"
+      }
+    },
+    "runtime_ua_subscription_status": {
+      "input": {
+        "$ref": "#/$defs/captureInput"
+      },
+      "output": {
+        "$ref": "#/$defs/captureStatus"
+      }
+    },
+    "runtime_ua_subscription_stop": {
+      "input": {
+        "$ref": "#/$defs/captureInput"
+      },
+      "output": {
+        "$ref": "#/$defs/captureStatus"
+      }
+    },
+    "runtime_ua_subscription_page": {
+      "input": {
+        "$ref": "#/$defs/pageInput"
+      },
+      "output": {
+        "$ref": "#/$defs/page"
+      }
+    },
+    "runtime_ua_subscription_export": {
+      "input": {
+        "$ref": "#/$defs/exportInput"
+      },
+      "output": {
+        "$ref": "#/$defs/exportResult"
+      }
+    }
+  }
+}

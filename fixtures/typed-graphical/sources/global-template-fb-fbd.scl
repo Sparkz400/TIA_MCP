@@ -1,0 +1,6 @@
+DATA_BLOCK "Tgp_GlobalTemplateFB_FBD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"Tgp_TemplateFB_FBD"
+BEGIN
+END_DATA_BLOCK

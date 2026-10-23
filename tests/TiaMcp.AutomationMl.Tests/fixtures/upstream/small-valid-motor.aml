@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CAEXFile xmlns="http://www.dke.de/CAEX" ChangeMode="state" SchemaVersion="3.0" FileName="small-valid-motor.aml">
+  <SuperiorStandardVersion>AutomationML 2.1</SuperiorStandardVersion>
+  <SourceDocumentInformation OriginName="AutomationML SDK validation suite" OriginID="automationml-validation-suite" OriginVersion="0.1.0" LastWritingDateTime="2026-07-03T00:00:00+00:00"/>
+  <InstanceHierarchy ChangeMode="state" Name="Plant">
+    <InternalElement ChangeMode="state" ID="ie-motor-1" Name="Motor-1" RefBaseSystemUnitPath="ExampleSystemUnitClassLib/Motor">
+      <Attribute ChangeMode="state" Name="speed" Unit="rpm" AttributeDataType="xs:double" RefAttributeType="ExampleAttributeTypeLib/Speed">
+        <Value>1500</Value>
+      </Attribute>
+      <ExternalInterface ChangeMode="state" ID="if-motor-power" Name="Power" RefBaseClassPath="ExampleInterfaceClassLib/PowerPort"/>
+      <RoleRequirements ChangeMode="state" RefBaseRoleClassPath="ExampleRoleClassLib/Drive"/>
+    </InternalElement>
+  </InstanceHierarchy>
+  <InterfaceClassLib ChangeMode="state" Name="ExampleInterfaceClassLib">
+    <InterfaceClass ChangeMode="state" Name="Port"/>
+    <InterfaceClass ChangeMode="state" Name="PowerPort" RefBaseClassPath="ExampleInterfaceClassLib/Port"/>
+  </InterfaceClassLib>
+  <RoleClassLib ChangeMode="state" Name="ExampleRoleClassLib">
+    <RoleClass ChangeMode="state" Name="Drive"/>
+  </RoleClassLib>
+  <SystemUnitClassLib ChangeMode="state" Name="ExampleSystemUnitClassLib">
+    <SystemUnitClass ChangeMode="state" Name="Motor">
+      <Attribute ChangeMode="state" Name="speed" Unit="rpm" AttributeDataType="xs:double" RefAttributeType="ExampleAttributeTypeLib/Speed">
+        <Value>1500</Value>
+      </Attribute>
+      <ExternalInterface ChangeMode="state" ID="motor-class-power" Name="Power" RefBaseClassPath="ExampleInterfaceClassLib/PowerPort"/>
+      <SupportedRoleClass ChangeMode="state" RefRoleClassPath="ExampleRoleClassLib/Drive"/>
+    </SystemUnitClass>
+  </SystemUnitClassLib>
+  <AttributeTypeLib ChangeMode="state" Name="ExampleAttributeTypeLib">
+    <AttributeType ChangeMode="state" Name="Speed" Unit="rpm" AttributeDataType="xs:double"/>
+  </AttributeTypeLib>
+</CAEXFile>

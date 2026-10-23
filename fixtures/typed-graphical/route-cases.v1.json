@@ -1,0 +1,1911 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "fixtureId": "typed-unit-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-lad-create-fc",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Unit_FC_LAD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA",
+      "createdBlockName": "TgpCreated_Unit_FC_LAD"
+    },
+    {
+      "fixtureId": "typed-unit-lad-create-fb",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Unit_FB_LAD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA",
+      "createdBlockName": "TgpCreated_Unit_FB_LAD"
+    },
+    {
+      "fixtureId": "typed-unit-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-fbd-create-fc",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Unit_FC_FBD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA",
+      "createdBlockName": "TgpCreated_Unit_FC_FBD"
+    },
+    {
+      "fixtureId": "typed-unit-fbd-create-fb",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Unit_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Unit_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Unit_FB_FBD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA",
+      "createdBlockName": "TgpCreated_Unit_FB_FBD"
+    },
+    {
+      "fixtureId": "typed-namespace-lad",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-lad-create-fc",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Namespace_FC_LAD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "createdBlockName": "TgpCreated_Namespace_FC_LAD"
+    },
+    {
+      "fixtureId": "typed-namespace-lad-create-fb",
+      "family": "boolean",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "a",
+              "kind": "contact",
+              "operand": "A"
+            },
+            {
+              "key": "b",
+              "kind": "contact",
+              "operand": "B"
+            },
+            {
+              "key": "join",
+              "kind": "branch",
+              "inputCount": 2
+            },
+            {
+              "key": "inhibit",
+              "kind": "contact",
+              "operand": "Inhibit",
+              "negated": true
+            },
+            {
+              "key": "active",
+              "kind": "coil",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "a",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "b",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "a",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "b",
+                "port": "out"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "inhibit",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "inhibit",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Namespace_FB_LAD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "createdBlockName": "TgpCreated_Namespace_FB_LAD"
+    },
+    {
+      "fixtureId": "typed-namespace-fbd",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-fbd-create-fc",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Namespace_FC_FBD",
+            "blockType": "FC",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "createdBlockName": "TgpCreated_Namespace_FC_FBD"
+    },
+    {
+      "fixtureId": "typed-namespace-fbd-create-fb",
+      "family": "boolean",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_Namespace_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_Namespace_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "createBlock",
+          "operands": [
+            {
+              "key": "A",
+              "scope": "local",
+              "components": [
+                "A"
+              ]
+            },
+            {
+              "key": "B",
+              "scope": "local",
+              "components": [
+                "B"
+              ]
+            },
+            {
+              "key": "Inhibit",
+              "scope": "local",
+              "components": [
+                "Inhibit"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "join",
+              "kind": "or",
+              "inputCount": 2
+            },
+            {
+              "key": "invert",
+              "kind": "not"
+            },
+            {
+              "key": "gate",
+              "kind": "and",
+              "inputCount": 2
+            },
+            {
+              "key": "active",
+              "kind": "assign",
+              "operand": "Active"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$A",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$B",
+                "port": "value"
+              },
+              "to": {
+                "node": "join",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "$Inhibit",
+                "port": "value"
+              },
+              "to": {
+                "node": "invert",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "join",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "invert",
+                "port": "out"
+              },
+              "to": {
+                "node": "gate",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "gate",
+                "port": "out"
+              },
+              "to": {
+                "node": "active",
+                "port": "in"
+              }
+            }
+          ],
+          "creation": {
+            "name": "TgpCreated_Namespace_FB_FBD",
+            "blockType": "FB",
+            "interface": [
+              {
+                "name": "A",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "B",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Inhibit",
+                "section": "Input",
+                "dataType": "Bool"
+              },
+              {
+                "name": "Active",
+                "section": "Output",
+                "dataType": "Bool"
+              }
+            ]
+          }
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21",
+      "archiveSha256": "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "createdBlockName": "TgpCreated_Namespace_FB_FBD"
+    }
+  ]
+}

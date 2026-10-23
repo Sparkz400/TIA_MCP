@@ -1,0 +1,21 @@
+# Independent HMI fixtures
+
+For new prerequisite work, explicitly select `positive` in `HmiSeeder.exe qualify <fresh-output> <profile-ids> positive`. Omitting the final argument keeps the historical negative-reference mode. Positive intent does not assert compilation. Reports retain native compile results before scalar trials, after restoration, after fresh reopen and after archive retrieval. A separately emitted `derived-native-report.json`, when present, is a new candidate with source report/archive provenance; it does not replace source failures. See [the 12 October prerequisite progress](../../docs/plans/hmi-remaining-work.md).
+
+Append `textlists` for the documented [bilingual Unified text-list inputs](unified-text-list/README.md). This optional mode requires explicitly selected Unified profiles and paired input files; each native import/export/lifecycle result is independently recorded. The current input fixture and successful build do not assert native acceptance.
+
+These fixtures are authored by `scripts/native/HmiSeeder`, a separate C# application using the installed Siemens V21 public API. The adapter under test does not generate its own expected observations. No user project is opened and no project scripts or runtime are executed.
+
+`evidence-manifest.json` records the exact native report/archive/export hashes and relative paths. Large `.ap21` projects and `.zap21` archives remain under `artifacts/hmi-native-*`; they are not source-controlled or distributed with the bridge. Siemens assemblies are resolved from the installation and are not bundled. `native-classic-screen.xml` is an actual re-export of a newly created synthetic fixture, not invented preservation evidence.
+
+Fixture d independently covers Classic TP700 Comfort/17.0.0.0, WinCC RT Advanced/17.0.0.0, KTP700 Basic PN/17.0.0.0, Unified MTP700 Comfort/21.0.1.0 and Unified PC RT/21.0.1.0. RT Professional has no matching installed catalog entry and remains blocked. Every available profile contains two HMI owners and duplicate `RepeatedItem` names in two separate screen scopes. All project archives carry SHA-256 values and new-copy recovery readbacks.
+
+Fixture e extends the Comfort families with two CPU1511-1PN/V4.1 owners sharing the same PLC tag name and with native integrated HMI connections. Unified dynamics include a direct tag, an indirect tag, a deliberately missing tag and formula text. The deliberate negatives produce real native compiler/getter diagnostics. They are not clean compiling baselines. Fixture f further exercises DB/member bindings and a Classic IOField import attempt; consult its final native report rather than assuming successful authoring.
+
+The reports preserve API rejection details, compile failures, getter errors and incomplete coverage. A catalog identity, an empty list or successful archive retrieval does not certify unrelated preservation, visual rendering or an engineering operation. See [qualification](../../docs/verification/hmi-qualification.md) and [capability matrix](../../docs/reference/hmi-capability-matrix.md).
+
+Fixture g adds nonempty Unified discrete alarms and screen event/global source. Its historical PC station lacks a network interface, so connection creation and linked tags failed; this is an authoring prerequisite, not a successful mapping. Root-i captures actual rich inspection/explorer results. Supplemental `root-i-reassessment-b` qualifies the Comfort full PLC chain and both profiles' dynamic/broken/script observations, while retaining incomplete getter coverage and original failures.
+
+The f Classic ordered save/reopen/archive comparison failed only because two screens changed enumeration order. `artifacts/hmi-native-f-recovery-audit-20261008.json` verifies all eight scoped screen export comparisons match except the exporter timestamp; the original failed gates remain failed.
+
+Fresh PC-only fixture h corrects the absent network node by discovering the installed IE General catalog item and checking native CanPlugNew before adding it to the owned PC station. Both links and linked scalar/DB tags are now independently authored. `artifacts/hmi-native-combined-final-20261008.json` aggregates unaltered f Classic, g Unified Comfort and h Unified PC rows with source hashes; final bridge comparison of the corrected PC fixture remains pending.

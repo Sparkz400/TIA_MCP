@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-assessment.v1.schema.json",
+  "title": "Combined Test Suite result and exact effective scope assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["planSha256", "resultReportSha256", "scopeReportSha256", "requiredCoveragePassed", "nativeExecutionAuthorized", "releaseAccepted"],
+  "properties": {
+    "planSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "resultReportSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "scopeReportSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "requiredCoveragePassed": {"type": "boolean"},
+    "nativeExecutionAuthorized": {"const": false},
+    "releaseAccepted": {"const": false}
+  }
+}

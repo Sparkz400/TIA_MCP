@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-comparison.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "beforeMeasurementId",
+    "afterMeasurementId",
+    "beforeTracePlanId",
+    "afterTracePlanId",
+    "beforeReviewId",
+    "afterReviewId",
+    "sourceChanged",
+    "reason",
+    "alignment",
+    "signals",
+    "settingsEqual",
+    "acquisitionModesEqual",
+    "resampled",
+    "bugFixProven",
+    "nativeQualification"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-comparison.v1"
+    },
+    "beforeMeasurementId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "afterMeasurementId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "beforeTracePlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "afterTracePlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "beforeReviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "afterReviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "sourceChanged": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "alignment": {
+      "$ref": "#/$defs/options"
+    },
+    "signals": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "settingsEqual": {
+      "type": "boolean"
+    },
+    "acquisitionModesEqual": {
+      "type": "boolean"
+    },
+    "resampled": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "programIdentityChanged": {
+      "type": "boolean"
+    },
+    "beforeAcquisition": {
+      "$ref": "#/$defs/acquisition"
+    },
+    "afterAcquisition": {
+      "$ref": "#/$defs/acquisition"
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "options": {
+      "type": "object",
+      "required": [
+        "reason",
+        "beforeAnchorSeconds",
+        "afterAnchorSeconds",
+        "windowStartSeconds",
+        "windowEndSeconds"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "beforeAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "afterAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "windowStartSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "windowEndSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "allowChangedSource": {
+          "type": "boolean",
+          "description": "Explicit admission for different source review IDs or different declared measurement program identities; does not verify their authenticity."
+        },
+        "signalMap": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "required": [
+              "before",
+              "after"
+            ],
+            "properties": {
+              "before": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "after": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "acquisition": {
+      "type": "object",
+      "required": [
+        "mode",
+        "clock",
+        "timeUnit",
+        "programIdentity",
+        "identityVerified"
+      ],
+      "properties": {
+        "mode": {
+          "$ref": "trace-measurement.v1.schema.json#/properties/mode"
+        },
+        "clock": {
+          "$ref": "trace-measurement.v1.schema.json#/properties/clock"
+        },
+        "timeUnit": {
+          "$ref": "trace-measurement.v1.schema.json#/properties/timeUnit"
+        },
+        "programIdentity": {
+          "$ref": "trace-measurement.v1.schema.json#/properties/programIdentity"
+        },
+        "identityVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "dependentRequired": {
+    "programIdentityChanged": [
+      "beforeAcquisition",
+      "afterAcquisition",
+      "clockSynchronizationVerified"
+    ],
+    "beforeAcquisition": [
+      "programIdentityChanged",
+      "afterAcquisition",
+      "clockSynchronizationVerified"
+    ],
+    "afterAcquisition": [
+      "programIdentityChanged",
+      "beforeAcquisition",
+      "clockSynchronizationVerified"
+    ],
+    "clockSynchronizationVerified": [
+      "programIdentityChanged",
+      "beforeAcquisition",
+      "afterAcquisition"
+    ]
+  }
+}

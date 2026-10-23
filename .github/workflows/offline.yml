@@ -1,0 +1,193 @@
+name: Python and .NET validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Hosted runners execute only the offline allowlist. Native Siemens builds and
+# live qualification remain explicit engineering-workstation tasks.
+jobs:
+  python:
+    name: Python contracts and harnesses
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Validate contracts and Python harnesses
+        shell: pwsh
+        run: |
+          python -m pip install -r scripts/requirements-test.txt
+          ./scripts/Test-Offline.ps1 -Suite Python
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: python-validation
+          path: artifacts/offline-validation/
+          retention-days: 14
+
+  managed:
+    name: .NET managed suites
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install schema and lifecycle dependencies
+        run: python -m pip install -r scripts/requirements-test.txt
+      - name: Build and run managed suites
+        shell: pwsh
+        run: ./scripts/Test-Offline.ps1 -Suite Managed
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: managed-validation
+          path: |
+            artifacts/offline-validation/*/result.json
+            artifacts/offline-validation/*/validation.log
+            artifacts/offline-validation/*/general-managed.log
+            artifacts/offline-validation/*/project-index-store-tests.json
+            artifacts/offline-validation/*/physical-runtime-results.json
+            artifacts/offline-validation/*/runtime-session-mcp/*.json
+            artifacts/offline-validation/*/hmi-component-mcp/*.json
+            artifacts/offline-validation/*/hmi-component-mcp/host-artifacts/hmi-component-reviews/**
+            artifacts/offline-validation/*/hmi-component-mcp/host-artifacts/project-reviews/**
+            artifacts/offline-validation/*/runtime-session-mcp/store/**
+            artifacts/offline-validation/*/access/capture-handoff/**
+            artifacts/offline-validation/*/access/runtime-captures/**
+            artifacts/offline-validation/*/composite-engineering/**
+            artifacts/offline-validation/*/access/handoff/**
+            artifacts/offline-validation/*/access/handoff-workflow/**
+            artifacts/offline-validation/*/access/runtime-handoff/**
+            artifacts/offline-validation/*/access/access-reviews/**
+            artifacts/offline-validation/*/access/project-reviews/**
+            artifacts/offline-validation/*/runtime-handoff-mcp/store/runtime-handoff/**
+            artifacts/offline-validation/*/runtime-handoff-mcp/store/access-reviews/**
+            artifacts/offline-validation/*/runtime-handoff-mcp/store/project-reviews/**
+            artifacts/offline-validation/*/access/handoff-child-*.log
+            artifacts/offline-validation/*/access/verification.json
+            artifacts/offline-validation/*/drive-profiles/verification.json
+            artifacts/offline-validation/*/drive-profiles/telegrams-v2/**
+            artifacts/offline-validation/*/technology-profiles/verification.json
+            artifacts/offline-validation/*/technology-profiles/encoders-v4/**
+            artifacts/offline-validation/*/addin-owner-framework/result.json
+            artifacts/offline-validation/*/addin-handoff-lifecycle.json
+            artifacts/offline-validation/*/addin-receiver-processes.json
+            artifacts/offline-validation/*/addin-receiver-host/*.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/*.status.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/*.receiver.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/receiver-fixture.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/authority-calls.log
+            artifacts/offline-validation/*/temp/tia-handoff-*/addin-handoffs/receiver.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/addin-handoffs/*/*.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/addin-handoffs/*/selection.input
+            artifacts/offline-validation/*/temp/tia-handoff-*/project-reviews/*.json
+            artifacts/offline-validation/*/temp/tia-handoff-*/addin-selections/*
+            artifacts/offline-validation/*/*-schema.json
+            artifacts/offline-validation/*/*-mcp.json
+            artifacts/offline-validation/*/*-mcp/verification.json
+            artifacts/offline-validation/*/credentials/recovery/verification.json
+            artifacts/offline-validation/*/credentials/operations/verification.json
+            artifacts/offline-validation/*/credentials/verification.json
+            artifacts/offline-validation/*/credential-cli/verification.json
+          retention-days: 14
+
+  package:
+    name: Portable package and relocation
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Validate portable package without Siemens
+        shell: pwsh
+        run: |
+          python -m pip install -r scripts/requirements-test.txt
+          ./scripts/Test-OfflinePackage.ps1
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: portable-package-validation
+          path: |
+            artifacts/offline-package/*/result.json
+            artifacts/offline-package/*/validation.log
+            artifacts/offline-package/*/original/verification.json
+            artifacts/offline-package/*/relocated/verification.json
+            artifacts/offline-package/*/runtime-session-mcp/*.json
+            artifacts/offline-package/*/hmi-component-mcp/*.json
+            artifacts/offline-package/*/hmi-component-mcp/host-artifacts/hmi-component-reviews/**
+            artifacts/offline-package/*/hmi-component-mcp/host-artifacts/project-reviews/**
+            artifacts/offline-package/*/runtime-session-mcp/store/**
+            artifacts/offline-package/*/access/capture-handoff/**
+            artifacts/offline-package/*/access/runtime-captures/**
+            artifacts/offline-package/*/addin-receiver-host/*.json
+            artifacts/offline-package/*/composite-engineering/**
+            artifacts/offline-package/*/access/handoff/**
+            artifacts/offline-package/*/access/handoff-workflow/**
+            artifacts/offline-package/*/access/runtime-handoff/**
+            artifacts/offline-package/*/access/access-reviews/**
+            artifacts/offline-package/*/access/project-reviews/**
+            artifacts/offline-package/*/runtime-handoff-mcp/store/runtime-handoff/**
+            artifacts/offline-package/*/runtime-handoff-mcp/store/access-reviews/**
+            artifacts/offline-package/*/runtime-handoff-mcp/store/project-reviews/**
+            artifacts/offline-package/*/access/handoff-child-*.log
+            artifacts/offline-package/*/access/verification.json
+            artifacts/offline-package/*/drive-profiles/verification.json
+            artifacts/offline-package/*/drive-profiles/telegrams-v2/**
+            artifacts/offline-package/*/technology-profiles/verification.json
+            artifacts/offline-package/*/technology-profiles/encoders-v4/**
+            artifacts/offline-package/*/*-mcp/verification.json
+            artifacts/offline-package/*/credentials/recovery/verification.json
+            artifacts/offline-package/*/credentials/operations/verification.json
+            artifacts/offline-package/*/credentials/verification.json
+            artifacts/offline-package/*/credential-cli/verification.json
+            artifacts/releases/*.zip
+            artifacts/releases/*.zip.sha256
+          retention-days: 14
+
+  opcua:
+    name: OPC UA isolated parser and CLI
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Run isolated OPC UA validation
+        shell: pwsh
+        run: ./scripts/Test-OpcUaOffline.ps1
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: opcua-validation
+          path: artifacts/opcua-offline/
+          retention-days: 14

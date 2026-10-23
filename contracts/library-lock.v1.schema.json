@@ -1,0 +1,319 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-lock:v1",
+  "title": "Successful library-save observation receipt; no reopen/runtime acceptance",
+  "description": "Validates receipt identity, exact pins, selection/dependency structure and explicit qualification limits. Does not read referenced paths, prove authenticity, re-run native operations, validate every operation-specific result, or establish complete content preservation.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "manifestKind",
+    "changeId",
+    "previewHash",
+    "createdUtc",
+    "sources",
+    "selectedVersionsAndMasters",
+    "dependencies",
+    "target",
+    "projectPath",
+    "actualResult",
+    "compilation",
+    "savedLibraryIdentities",
+    "nativeSaveCompleted",
+    "freshReopenVerified",
+    "runtimeVerified",
+    "journalPath",
+    "pinScope"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "manifestKind": {
+      "const": "tia-library-lock"
+    },
+    "changeId": {
+      "type": "string",
+      "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+    },
+    "previewHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "createdUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "maxItems": 32
+    },
+    "selectedVersionsAndMasters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/selection"
+      },
+      "maxItems": 100
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "target": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Original operation-specific target observation; its native meaning is outside this receipt contract."
+    },
+    "projectPath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "actualResult": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Original operation-specific payload is retained as opaque evidence; schema validity does not certify its effect or preservation."
+    },
+    "compilation": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Original compiler evidence; this schema does not convert a summary into a complete successful compile."
+    },
+    "savedLibraryIdentities": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:tia-mcp:library-identity:v1"
+      },
+      "maxItems": 32
+    },
+    "nativeSaveCompleted": {
+      "const": true
+    },
+    "freshReopenVerified": {
+      "const": false
+    },
+    "runtimeVerified": {
+      "const": false
+    },
+    "journalPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pinScope": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": [
+        "libraryId",
+        "revision",
+        "path",
+        "sourcePath",
+        "sourceHash"
+      ],
+      "properties": {
+        "libraryId": {
+          "type": "string",
+          "pattern": "^library-[a-f0-9]{32}(?![\\s\\S])"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourcePath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceHash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "masterCopyPath"
+          ],
+          "properties": {
+            "masterCopyPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        {
+          "required": [
+            "typeGuid",
+            "versionGuid"
+          ],
+          "properties": {
+            "typeGuid": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+            },
+            "versionGuid": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+            }
+          }
+        }
+      ],
+      "description": "Retains the selected caller object, including additional supplied fields; native resolution and duplicates require separate checks."
+    },
+    "dependency": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "rootVersionGuid",
+            "scopeComplete",
+            "reason"
+          ],
+          "properties": {
+            "rootVersionGuid": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+            },
+            "scopeComplete": {
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "rootVersionGuid",
+            "versions"
+          ],
+          "properties": {
+            "rootVersionGuid": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+            },
+            "versions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dependencyVersion"
+              },
+              "maxItems": 1000
+            },
+            "masterCopy": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dependencyVersion": {
+      "type": "object",
+      "required": [
+        "kind",
+        "typeGuid",
+        "versionGuid",
+        "typeName",
+        "version",
+        "state",
+        "isDefault",
+        "engineeringType",
+        "modifiedDate",
+        "author",
+        "doNotUse",
+        "setForUpdate",
+        "requiredVersionGuids"
+      ],
+      "properties": {
+        "kind": {
+          "const": "version"
+        },
+        "typeGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "versionGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "engineeringType": {
+          "type": "string"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "doNotUse": {
+          "type": "boolean"
+        },
+        "setForUpdate": {
+          "type": "boolean"
+        },
+        "requiredVersionGuids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+          },
+          "maxItems": 1000
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

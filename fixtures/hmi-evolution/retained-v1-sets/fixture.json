@@ -1,0 +1,2132 @@
+{
+  "schemaVersion": "actual-prior-text-list-sets.v1",
+  "producer": {
+    "sourceSnapshot": "pw20w3s1",
+    "sourceManifestSha256": "697cc911596c7b3e8922288d2a080aafe2dac7e6bef0b2dd612eb4826041639b",
+    "verificationSha256": "f96013574277e4fd27a4b4bcb4fc08ac70c7ab84934fd4dad7b1b196eefaf45d",
+    "binaryHashes": {
+      "TiaMcp.Host.dll": "318fcd7acf820010853c514eabd5af618acfb2e7cb47d2df08873a304775cae6",
+      "TiaMcp.Core.dll": "129b69fac368a9cca99ea67cd9a1ab768b7cabcc745257a4c67406c764eca004"
+    }
+  },
+  "records": [
+    {
+      "recordId": "58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2",
+      "receipt": {
+        "schemaVersion": "unified-text-list-set-record.v1",
+        "input": {
+          "path": "hmi-component-reviews/f4174b6527d2e5dbb410c1ac0ad7c4c3e145127e1f92c94c754ebe4ea908631f.text-set-input",
+          "sha256": "f4174b6527d2e5dbb410c1ac0ad7c4c3e145127e1f92c94c754ebe4ea908631f"
+        },
+        "componentReviewId": "2585fe15dd95793f6b0473c8096402e9eb4a5227fdea7684b79a2646330b637a",
+        "previousRecordId": null,
+        "status": "candidatesReady",
+        "outputs": [
+          {
+            "outputId": "run",
+            "bindingId": "run-binding",
+            "profile": "unified-bool-binding-text-list.v1",
+            "authorRecordId": "06a2d733beb1f0632c173c68507fbe87aa694227cdc5b11be9eed56f909a9d96",
+            "componentContext": {
+              "reviewRecordId": "2585fe15dd95793f6b0473c8096402e9eb4a5227fdea7684b79a2646330b637a",
+              "outputId": "run",
+              "bindingId": "run-binding",
+              "afterComponent": {
+                "selection": {
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPaths": [
+                    "/P/PLC/Block"
+                  ]
+                },
+                "objects": [
+                  {
+                    "capturedObject": {
+                      "nodeId": "/P/PLC/Block",
+                      "objectPath": "/P/PLC/Block",
+                      "kind": "block",
+                      "parentId": "/P/PLC",
+                      "name": "Block",
+                      "metadata": {}
+                    },
+                    "document": {
+                      "status": "exported",
+                      "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3"
+                    }
+                  }
+                ],
+                "project": {
+                  "projectPath": "synthetic.ap21"
+                },
+                "libraryIdentityVerified": false,
+                "runtimeInstanceVerified": false,
+                "dependencyClosureVerified": false
+              },
+              "destination": {
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "hmiPath": "/P/HMI",
+                "family": "unified"
+              },
+              "binding": {
+                "id": "run-binding",
+                "selection": {
+                  "id": "run-binding",
+                  "outputId": "run",
+                  "property": "Value",
+                  "beforeMember": null,
+                  "afterMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "Run"
+                    ]
+                  },
+                  "declaredHmiType": "Bool",
+                  "reason": "Exact supplied declaration."
+                },
+                "beforeDeclaration": null,
+                "afterDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "Run"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Bool",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "change": "added",
+                "capturedProperty": null,
+                "conflicts": [],
+                "gaps": [
+                  "Destination property/faceplate port is not established by captured metadata."
+                ],
+                "nativeCompatibilityVerified": false,
+                "runtimeStorageVerified": false
+              },
+              "dependencyAssociationIndices": []
+            },
+            "intent": {
+              "schemaVersion": "unified-text-list-author-request.v1",
+              "fileBase": "Run",
+              "textLibrary": "RunTexts",
+              "languages": [
+                "en-US",
+                "de-DE"
+              ],
+              "defaultLanguage": "en-US",
+              "texts": [
+                {
+                  "id": "FalseText",
+                  "translations": {
+                    "en-US": "Stopped",
+                    "de-DE": "Gestoppt"
+                  }
+                },
+                {
+                  "id": "TrueText",
+                  "translations": {
+                    "en-US": "Run",
+                    "de-DE": "L\u00e4uft"
+                  }
+                }
+              ],
+              "lists": [
+                {
+                  "name": "RunList",
+                  "rangeType": "Bool",
+                  "entries": [
+                    {
+                      "id": "False",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "FalseText"
+                    },
+                    {
+                      "id": "True",
+                      "type": "SingleValue",
+                      "fromValue": 1,
+                      "toValue": 1,
+                      "isDefault": false,
+                      "textId": "TrueText"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dependencyCoverage": {
+              "selectedScopes": [
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                }
+              ],
+              "associations": [],
+              "contradictionCount": 0,
+              "unobservedScopes": [],
+              "allObservedSelectedIndicesMatched": false,
+              "dependencyClosureVerified": false,
+              "consumerCoverageComplete": false,
+              "sourceImpactCoverage": [
+                {
+                  "associationCount": 0,
+                  "includedAssociationCount": 0,
+                  "omittedAssociationIndices": [],
+                  "returnedBytes": 2,
+                  "maxBytes": 1048576,
+                  "truncated": false,
+                  "consumerCoverageComplete": false,
+                  "outputMappingComplete": false,
+                  "nativeImpactVerified": false
+                }
+              ],
+              "sourceConsumerCoverage": [
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "destination",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/HMI/Manual"
+                  ],
+                  "excludedOutputIds": [
+                    "run",
+                    "state"
+                  ],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                }
+              ],
+              "policy": "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure."
+            },
+            "consumerPaths": [],
+            "valueCoverage": null,
+            "stateChanges": null,
+            "conflicts": [],
+            "gaps": [
+              "Selected output: Captured inventory does not prove live name availability or native creation support; a new native identity must be observed after admitted creation.",
+              "Selected output: A complete declared proposed file set has not been supplied.",
+              "Selected binding: Destination property/faceplate port is not established by captured metadata."
+            ]
+          },
+          {
+            "outputId": "state",
+            "bindingId": "state-binding",
+            "profile": "unified-integer-state-text-list.v1",
+            "authorRecordId": "1aa162e17ae41e6fa741b3cd4d4d6727b2bf2ab8ccedc52e58aab6acc7367149",
+            "componentContext": {
+              "reviewRecordId": "2585fe15dd95793f6b0473c8096402e9eb4a5227fdea7684b79a2646330b637a",
+              "outputId": "state",
+              "bindingId": "state-binding",
+              "afterComponent": {
+                "selection": {
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPaths": [
+                    "/P/PLC/Block"
+                  ]
+                },
+                "objects": [
+                  {
+                    "capturedObject": {
+                      "nodeId": "/P/PLC/Block",
+                      "objectPath": "/P/PLC/Block",
+                      "kind": "block",
+                      "parentId": "/P/PLC",
+                      "name": "Block",
+                      "metadata": {}
+                    },
+                    "document": {
+                      "status": "exported",
+                      "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3"
+                    }
+                  }
+                ],
+                "project": {
+                  "projectPath": "synthetic.ap21"
+                },
+                "libraryIdentityVerified": false,
+                "runtimeInstanceVerified": false,
+                "dependencyClosureVerified": false
+              },
+              "destination": {
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "hmiPath": "/P/HMI",
+                "family": "unified"
+              },
+              "binding": {
+                "id": "state-binding",
+                "selection": {
+                  "id": "state-binding",
+                  "outputId": "state",
+                  "property": "Value",
+                  "beforeMember": null,
+                  "afterMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "State"
+                    ]
+                  },
+                  "declaredHmiType": "Int",
+                  "reason": "Exact supplied declaration."
+                },
+                "beforeDeclaration": null,
+                "afterDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "State"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Int",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "change": "added",
+                "capturedProperty": null,
+                "conflicts": [],
+                "gaps": [
+                  "Destination property/faceplate port is not established by captured metadata."
+                ],
+                "nativeCompatibilityVerified": false,
+                "runtimeStorageVerified": false
+              },
+              "dependencyAssociationIndices": []
+            },
+            "intent": {
+              "schemaVersion": "unified-text-list-author-request.v1",
+              "fileBase": "State",
+              "textLibrary": "StateTexts",
+              "languages": [
+                "en-US",
+                "de-DE"
+              ],
+              "defaultLanguage": "en-US",
+              "texts": [
+                {
+                  "id": "Idle",
+                  "translations": {
+                    "en-US": "Run",
+                    "de-DE": "L\u00e4uft"
+                  }
+                },
+                {
+                  "id": "Active",
+                  "translations": {
+                    "en-US": "Run",
+                    "de-DE": "L\u00e4uft"
+                  }
+                }
+              ],
+              "lists": [
+                {
+                  "name": "StateList",
+                  "rangeType": "Decimal",
+                  "entries": [
+                    {
+                      "id": "Idle",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "Idle"
+                    },
+                    {
+                      "id": "Active",
+                      "type": "Range",
+                      "fromValue": 1,
+                      "toValue": 10,
+                      "isDefault": false,
+                      "textId": "Active"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dependencyCoverage": {
+              "selectedScopes": [
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                }
+              ],
+              "associations": [],
+              "contradictionCount": 0,
+              "unobservedScopes": [],
+              "allObservedSelectedIndicesMatched": false,
+              "dependencyClosureVerified": false,
+              "consumerCoverageComplete": false,
+              "sourceImpactCoverage": [
+                {
+                  "associationCount": 0,
+                  "includedAssociationCount": 0,
+                  "omittedAssociationIndices": [],
+                  "returnedBytes": 2,
+                  "maxBytes": 1048576,
+                  "truncated": false,
+                  "consumerCoverageComplete": false,
+                  "outputMappingComplete": false,
+                  "nativeImpactVerified": false
+                }
+              ],
+              "sourceConsumerCoverage": [
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "destination",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/HMI/Manual"
+                  ],
+                  "excludedOutputIds": [
+                    "run",
+                    "state"
+                  ],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                }
+              ],
+              "policy": "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure."
+            },
+            "consumerPaths": [],
+            "valueCoverage": {
+              "dataType": "Int",
+              "minimum": -32768,
+              "maximum": 32767,
+              "stateCount": 2,
+              "unlistedIntervals": [
+                {
+                  "fromValue": -32768,
+                  "toValue": -1
+                },
+                {
+                  "fromValue": 11,
+                  "toValue": 32767
+                }
+              ],
+              "allTypeValuesListed": false,
+              "requireFullTypeCoverage": false,
+              "defaultCoversUnlistedValuesVerified": false,
+              "nativeNumericSemanticsVerified": false
+            },
+            "stateChanges": [
+              {
+                "id": "Active",
+                "change": "added",
+                "before": null,
+                "after": {
+                  "entries": [
+                    {
+                      "id": "Active",
+                      "type": "Range",
+                      "fromValue": 1,
+                      "toValue": 10,
+                      "isDefault": false,
+                      "textId": "Active"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "consumerCompatibilityVerified": false
+              },
+              {
+                "id": "Idle",
+                "change": "added",
+                "before": null,
+                "after": {
+                  "entries": [
+                    {
+                      "id": "Idle",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "Idle"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "consumerCompatibilityVerified": false
+              }
+            ],
+            "conflicts": [],
+            "gaps": [
+              "Selected output: Captured inventory does not prove live name availability or native creation support; a new native identity must be observed after admitted creation.",
+              "Selected output: A complete declared proposed file set has not been supplied.",
+              "Selected binding: Destination property/faceplate port is not established by captured metadata.",
+              "Explicit state intervals do not cover the entire selected integer type; a default entry does not prove native handling of unlisted values.",
+              "Selected component/dependency observations are unavailable or have unmatched indices; complete dependency closure is not established."
+            ]
+          }
+        ],
+        "files": [
+          {
+            "fileName": "Run.hmi.yml",
+            "bytes": 534,
+            "artifact": {
+              "path": "hmi-component-reviews/c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf.candidate",
+              "sha256": "c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf"
+            },
+            "outputId": "run"
+          },
+          {
+            "fileName": "Run.TextLibrary.hmi.yml",
+            "bytes": 296,
+            "artifact": {
+              "path": "hmi-component-reviews/0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de.candidate",
+              "sha256": "0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de"
+            },
+            "outputId": "run"
+          },
+          {
+            "fileName": "State.hmi.yml",
+            "bytes": 532,
+            "artifact": {
+              "path": "hmi-component-reviews/a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57.candidate",
+              "sha256": "a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57"
+            },
+            "outputId": "state"
+          },
+          {
+            "fileName": "State.TextLibrary.hmi.yml",
+            "bytes": 285,
+            "artifact": {
+              "path": "hmi-component-reviews/6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96.candidate",
+              "sha256": "6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96"
+            },
+            "outputId": "state"
+          }
+        ],
+        "preservedFiles": [
+          {
+            "outputId": "manual",
+            "fileName": "manual.js",
+            "bytes": 5,
+            "artifact": {
+              "path": "hmi-component-reviews/dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f.source",
+              "sha256": "dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f"
+            }
+          }
+        ],
+        "conflicts": [],
+        "gaps": [
+          "run: Selected output: Captured inventory does not prove live name availability or native creation support; a new native identity must be observed after admitted creation.",
+          "run: Selected output: A complete declared proposed file set has not been supplied.",
+          "run: Selected binding: Destination property/faceplate port is not established by captured metadata.",
+          "run: Selected dependency indices are unavailable or unmatched; complete closure remains unverified.",
+          "state: Selected output: Captured inventory does not prove live name availability or native creation support; a new native identity must be observed after admitted creation.",
+          "state: Selected output: A complete declared proposed file set has not been supplied.",
+          "state: Selected binding: Destination property/faceplate port is not established by captured metadata.",
+          "state: Explicit state intervals do not cover the entire selected integer type; a default entry does not prove native handling of unlisted values.",
+          "state: Selected component/dependency observations are unavailable or have unmatched indices; complete dependency closure is not established.",
+          "state: Selected dependency indices are unavailable or unmatched; complete closure remains unverified.",
+          "Captured unselected member declarations remain outside the generated mapping.",
+          "Declared output/binding coverage is bounded to this supplied review. Unobserved project content and omitted/truncated consumer or dependency evidence remain unqualified."
+        ],
+        "coverage": {
+          "declaredOutputIds": [
+            "run",
+            "state",
+            "manual"
+          ],
+          "declaredBindingIds": [
+            "run-binding",
+            "state-binding"
+          ],
+          "uncoveredOutputIds": [],
+          "uncoveredBindingIds": [],
+          "allDeclaredOutputsCovered": true,
+          "allDeclaredBindingsCovered": true,
+          "members": {
+            "observations": [
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Run"
+                ],
+                "dataType": "Bool",
+                "bindingIds": [
+                  "run-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "State"
+                ],
+                "dataType": "Int",
+                "bindingIds": [
+                  "state-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Unselected"
+                ],
+                "dataType": "Real",
+                "bindingIds": [],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              }
+            ],
+            "unavailableObjects": [],
+            "truncated": false,
+            "maximumObservations": 4096,
+            "maximumDepth": 16,
+            "componentMemberCoverageComplete": false
+          },
+          "sourceConsumerCoverage": [
+            {
+              "scope": "afterComponent",
+              "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+              "roots": [
+                "/P/PLC/Block"
+              ],
+              "excludedOutputIds": [],
+              "traversal": {
+                "complete": false,
+                "freshness": "savedSnapshotsOnly",
+                "truncated": false,
+                "truncationReasons": [],
+                "limits": {
+                  "impactDepth": 2,
+                  "maxImpactPaths": 100,
+                  "maxImpactEdgeVisits": 1000,
+                  "maxImpactPathBytes": 1048576
+                },
+                "returnedPaths": 0,
+                "visitedEdges": 0,
+                "pathBytes": 2,
+                "excludedEdges": {},
+                "supportedRelationshipKinds": [
+                  "calls",
+                  "dependsOn",
+                  "hmiBinding",
+                  "instanceOf",
+                  "libraryVersion",
+                  "reads",
+                  "usesType",
+                  "writes"
+                ],
+                "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+              }
+            },
+            {
+              "scope": "destination",
+              "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+              "roots": [
+                "/P/HMI/Manual"
+              ],
+              "excludedOutputIds": [
+                "run",
+                "state"
+              ],
+              "traversal": {
+                "complete": false,
+                "freshness": "savedSnapshotsOnly",
+                "truncated": false,
+                "truncationReasons": [],
+                "limits": {
+                  "impactDepth": 2,
+                  "maxImpactPaths": 100,
+                  "maxImpactEdgeVisits": 1000,
+                  "maxImpactPathBytes": 1048576
+                },
+                "returnedPaths": 0,
+                "visitedEdges": 0,
+                "pathBytes": 2,
+                "excludedEdges": {},
+                "supportedRelationshipKinds": [
+                  "calls",
+                  "dependsOn",
+                  "hmiBinding",
+                  "instanceOf",
+                  "libraryVersion",
+                  "reads",
+                  "usesType",
+                  "writes"
+                ],
+                "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+              }
+            }
+          ],
+          "sourceDependencyImpactCoverage": [
+            {
+              "associationCount": 0,
+              "includedAssociationCount": 0,
+              "omittedAssociationIndices": [],
+              "returnedBytes": 2,
+              "maxBytes": 1048576,
+              "truncated": false,
+              "consumerCoverageComplete": false,
+              "outputMappingComplete": false,
+              "nativeImpactVerified": false
+            }
+          ],
+          "consumerCoverageComplete": false,
+          "dependencyClosureVerified": false,
+          "componentMemberCoverageComplete": false
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "preservationVerified": false,
+        "ownershipVerified": false,
+        "policy": "Coordinated offline candidates for 2..16 explicit paired Bool/integer lists, one supplied v7 review, fixed output/binding/profile/file/list/library identities during regeneration. Every declared output and binding must be accounted for. Any relevant conflict suppresses all candidates and child records. Selected retained peer bytes remain exact. Completion is the final immutable set record; interrupted publication may leave unreferenced immutable artifacts. No native import, merge, rename, removal, project completeness, authenticated source, native dependency closure or preservation qualification.",
+        "recordId": "58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2",
+        "recordArtifact": {
+          "path": "hmi-component-reviews/58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2.text-set.json",
+          "sha256": "58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2"
+        }
+      },
+      "label": "mixed initial generation"
+    },
+    {
+      "recordId": "bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0",
+      "receipt": {
+        "schemaVersion": "unified-text-list-set-record.v1",
+        "input": {
+          "path": "hmi-component-reviews/4b63bb4283bb316999f18b7a33373e59aca2c4863dd653bc644cbb99755c6c0d.text-set-input",
+          "sha256": "4b63bb4283bb316999f18b7a33373e59aca2c4863dd653bc644cbb99755c6c0d"
+        },
+        "componentReviewId": "15ae6e6a2b5f18ef7101a5a36405fd2ade7ef5262817e79f5591d047571ac1d5",
+        "previousRecordId": "58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2",
+        "status": "candidatesReady",
+        "outputs": [
+          {
+            "outputId": "run",
+            "bindingId": "run-binding",
+            "profile": "unified-bool-binding-text-list.v1",
+            "authorRecordId": "d3fdc7978048ec825fcfcae75a8f6e3b18b33fd89463068b8db5794ae5f17503",
+            "componentContext": {
+              "reviewRecordId": "15ae6e6a2b5f18ef7101a5a36405fd2ade7ef5262817e79f5591d047571ac1d5",
+              "outputId": "run",
+              "bindingId": "run-binding",
+              "afterComponent": {
+                "selection": {
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPaths": [
+                    "/P/PLC/Block"
+                  ]
+                },
+                "objects": [
+                  {
+                    "capturedObject": {
+                      "nodeId": "/P/PLC/Block",
+                      "objectPath": "/P/PLC/Block",
+                      "kind": "block",
+                      "parentId": "/P/PLC",
+                      "name": "Block",
+                      "metadata": {}
+                    },
+                    "document": {
+                      "status": "exported",
+                      "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3"
+                    }
+                  }
+                ],
+                "project": {
+                  "projectPath": "synthetic.ap21"
+                },
+                "libraryIdentityVerified": false,
+                "runtimeInstanceVerified": false,
+                "dependencyClosureVerified": false
+              },
+              "destination": {
+                "reviewId": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec",
+                "hmiPath": "/P/HMI",
+                "family": "unified"
+              },
+              "binding": {
+                "id": "run-binding",
+                "selection": {
+                  "id": "run-binding",
+                  "outputId": "run",
+                  "property": "Value",
+                  "beforeMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "Run"
+                    ]
+                  },
+                  "afterMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "Run"
+                    ]
+                  },
+                  "declaredHmiType": "Bool",
+                  "reason": "Exact supplied declaration."
+                },
+                "beforeDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "Run"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Bool",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "afterDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "Run"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Bool",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "change": "sameSelectedMember",
+                "capturedProperty": "Run",
+                "conflicts": [],
+                "gaps": [],
+                "nativeCompatibilityVerified": false,
+                "runtimeStorageVerified": false
+              },
+              "dependencyAssociationIndices": []
+            },
+            "intent": {
+              "schemaVersion": "unified-text-list-author-request.v1",
+              "fileBase": "Run",
+              "textLibrary": "RunTexts",
+              "languages": [
+                "de-DE",
+                "en-US"
+              ],
+              "defaultLanguage": "de-DE",
+              "texts": [
+                {
+                  "id": "FalseText",
+                  "translations": {
+                    "en-US": "Stopped",
+                    "de-DE": "Gestoppt"
+                  }
+                },
+                {
+                  "id": "TrueText",
+                  "translations": {
+                    "en-US": "Running \ud83d\ude00\nExplicit supplied output",
+                    "de-DE": "L\u00e4uft"
+                  }
+                }
+              ],
+              "lists": [
+                {
+                  "name": "RunList",
+                  "rangeType": "Bool",
+                  "entries": [
+                    {
+                      "id": "False",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "FalseText"
+                    },
+                    {
+                      "id": "True",
+                      "type": "SingleValue",
+                      "fromValue": 1,
+                      "toValue": 1,
+                      "isDefault": false,
+                      "textId": "TrueText"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dependencyCoverage": {
+              "selectedScopes": [
+                {
+                  "scope": "beforeComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                },
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                }
+              ],
+              "associations": [],
+              "contradictionCount": 0,
+              "unobservedScopes": [],
+              "allObservedSelectedIndicesMatched": false,
+              "dependencyClosureVerified": false,
+              "consumerCoverageComplete": false,
+              "sourceImpactCoverage": [
+                {
+                  "associationCount": 0,
+                  "includedAssociationCount": 0,
+                  "omittedAssociationIndices": [],
+                  "returnedBytes": 2,
+                  "maxBytes": 1048576,
+                  "truncated": false,
+                  "consumerCoverageComplete": false,
+                  "outputMappingComplete": false,
+                  "nativeImpactVerified": false
+                }
+              ],
+              "sourceConsumerCoverage": [
+                {
+                  "scope": "beforeComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "destination",
+                  "reviewId": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec",
+                  "roots": [
+                    "/P/HMI/Manual",
+                    "/P/HMI/RunList",
+                    "/P/HMI/StateList"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                }
+              ],
+              "policy": "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure."
+            },
+            "consumerPaths": [],
+            "valueCoverage": null,
+            "stateChanges": null,
+            "conflicts": [],
+            "gaps": [
+              "Selected output: A complete declared proposed file set has not been supplied."
+            ]
+          },
+          {
+            "outputId": "state",
+            "bindingId": "state-binding",
+            "profile": "unified-integer-state-text-list.v1",
+            "authorRecordId": "4754dec592707de467dea7e89b6bafae70513285e42afec70a474482c804ae13",
+            "componentContext": {
+              "reviewRecordId": "15ae6e6a2b5f18ef7101a5a36405fd2ade7ef5262817e79f5591d047571ac1d5",
+              "outputId": "state",
+              "bindingId": "state-binding",
+              "afterComponent": {
+                "selection": {
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPaths": [
+                    "/P/PLC/Block"
+                  ]
+                },
+                "objects": [
+                  {
+                    "capturedObject": {
+                      "nodeId": "/P/PLC/Block",
+                      "objectPath": "/P/PLC/Block",
+                      "kind": "block",
+                      "parentId": "/P/PLC",
+                      "name": "Block",
+                      "metadata": {}
+                    },
+                    "document": {
+                      "status": "exported",
+                      "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3"
+                    }
+                  }
+                ],
+                "project": {
+                  "projectPath": "synthetic.ap21"
+                },
+                "libraryIdentityVerified": false,
+                "runtimeInstanceVerified": false,
+                "dependencyClosureVerified": false
+              },
+              "destination": {
+                "reviewId": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec",
+                "hmiPath": "/P/HMI",
+                "family": "unified"
+              },
+              "binding": {
+                "id": "state-binding",
+                "selection": {
+                  "id": "state-binding",
+                  "outputId": "state",
+                  "property": "Value",
+                  "beforeMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "State"
+                    ]
+                  },
+                  "afterMember": {
+                    "objectPath": "/P/PLC/Block",
+                    "memberPath": [
+                      "State"
+                    ]
+                  },
+                  "declaredHmiType": "Int",
+                  "reason": "Exact supplied declaration."
+                },
+                "beforeDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "State"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Int",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "afterDeclaration": {
+                  "objectPath": "/P/PLC/Block",
+                  "memberPath": [
+                    "State"
+                  ],
+                  "status": "capturedDeclaration",
+                  "dataType": "Int",
+                  "evidence": {
+                    "objectPath": "/P/PLC/Block",
+                    "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "nativeCompatibilityVerified": false
+                },
+                "change": "sameSelectedMember",
+                "capturedProperty": "Run",
+                "conflicts": [],
+                "gaps": [],
+                "nativeCompatibilityVerified": false,
+                "runtimeStorageVerified": false
+              },
+              "dependencyAssociationIndices": []
+            },
+            "intent": {
+              "schemaVersion": "unified-text-list-author-request.v1",
+              "fileBase": "State",
+              "textLibrary": "StateTexts",
+              "languages": [
+                "de-DE",
+                "en-US"
+              ],
+              "defaultLanguage": "de-DE",
+              "texts": [
+                {
+                  "id": "Idle",
+                  "translations": {
+                    "en-US": "Run",
+                    "de-DE": "L\u00e4uft"
+                  }
+                },
+                {
+                  "id": "Active",
+                  "translations": {
+                    "en-US": "Run",
+                    "de-DE": "L\u00e4uft"
+                  }
+                }
+              ],
+              "lists": [
+                {
+                  "name": "StateList",
+                  "rangeType": "Decimal",
+                  "entries": [
+                    {
+                      "id": "Idle",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "Idle"
+                    },
+                    {
+                      "id": "Active",
+                      "type": "Range",
+                      "fromValue": 1,
+                      "toValue": 20,
+                      "isDefault": false,
+                      "textId": "Active"
+                    }
+                  ]
+                }
+              ]
+            },
+            "dependencyCoverage": {
+              "selectedScopes": [
+                {
+                  "scope": "beforeComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                },
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "objectPath": "/P/PLC/Block",
+                  "dependencyStatus": "unavailable",
+                  "reason": "ownerIdentityUnavailable",
+                  "requiredCount": null,
+                  "selectedIndices": [],
+                  "unassociatedIndices": [],
+                  "repeatedVersionGuids": [],
+                  "selfReferenceIndices": [],
+                  "allObservedIndicesMatched": false,
+                  "dependencyClosureVerified": false
+                }
+              ],
+              "associations": [],
+              "contradictionCount": 0,
+              "unobservedScopes": [],
+              "allObservedSelectedIndicesMatched": false,
+              "dependencyClosureVerified": false,
+              "consumerCoverageComplete": false,
+              "sourceImpactCoverage": [
+                {
+                  "associationCount": 0,
+                  "includedAssociationCount": 0,
+                  "omittedAssociationIndices": [],
+                  "returnedBytes": 2,
+                  "maxBytes": 1048576,
+                  "truncated": false,
+                  "consumerCoverageComplete": false,
+                  "outputMappingComplete": false,
+                  "nativeImpactVerified": false
+                }
+              ],
+              "sourceConsumerCoverage": [
+                {
+                  "scope": "beforeComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "afterComponent",
+                  "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                  "roots": [
+                    "/P/PLC/Block"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                },
+                {
+                  "scope": "destination",
+                  "reviewId": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec",
+                  "roots": [
+                    "/P/HMI/Manual",
+                    "/P/HMI/RunList",
+                    "/P/HMI/StateList"
+                  ],
+                  "excludedOutputIds": [],
+                  "traversal": {
+                    "complete": false,
+                    "freshness": "savedSnapshotsOnly",
+                    "truncated": false,
+                    "truncationReasons": [],
+                    "limits": {
+                      "impactDepth": 2,
+                      "maxImpactPaths": 100,
+                      "maxImpactEdgeVisits": 1000,
+                      "maxImpactPathBytes": 1048576
+                    },
+                    "returnedPaths": 0,
+                    "visitedEdges": 0,
+                    "pathBytes": 2,
+                    "excludedEdges": {},
+                    "supportedRelationshipKinds": [
+                      "calls",
+                      "dependsOn",
+                      "hmiBinding",
+                      "instanceOf",
+                      "libraryVersion",
+                      "reads",
+                      "usesType",
+                      "writes"
+                    ],
+                    "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                    "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+                  }
+                }
+              ],
+              "policy": "All original associations touching exact selected members or nodes on their bounded same-scope saved consumer paths. Missing dependency observations for those nodes stay explicit; no transitive graph completion, foreign-snapshot join or native closure."
+            },
+            "consumerPaths": [],
+            "valueCoverage": {
+              "dataType": "Int",
+              "minimum": -32768,
+              "maximum": 32767,
+              "stateCount": 2,
+              "unlistedIntervals": [
+                {
+                  "fromValue": -32768,
+                  "toValue": -1
+                },
+                {
+                  "fromValue": 21,
+                  "toValue": 32767
+                }
+              ],
+              "allTypeValuesListed": false,
+              "requireFullTypeCoverage": false,
+              "defaultCoversUnlistedValuesVerified": false,
+              "nativeNumericSemanticsVerified": false
+            },
+            "stateChanges": [
+              {
+                "id": "Active",
+                "change": "changed",
+                "before": {
+                  "entries": [
+                    {
+                      "id": "Active",
+                      "type": "Range",
+                      "fromValue": 1,
+                      "toValue": 10,
+                      "isDefault": false,
+                      "textId": "Active"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "after": {
+                  "entries": [
+                    {
+                      "id": "Active",
+                      "type": "Range",
+                      "fromValue": 1,
+                      "toValue": 20,
+                      "isDefault": false,
+                      "textId": "Active"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "consumerCompatibilityVerified": false
+              },
+              {
+                "id": "Idle",
+                "change": "unchanged",
+                "before": {
+                  "entries": [
+                    {
+                      "id": "Idle",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "Idle"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "after": {
+                  "entries": [
+                    {
+                      "id": "Idle",
+                      "type": "SingleValue",
+                      "fromValue": 0,
+                      "toValue": 0,
+                      "isDefault": false,
+                      "textId": "Idle"
+                    }
+                  ],
+                  "translations": [
+                    {
+                      "en-US": "Run",
+                      "de-DE": "L\u00e4uft"
+                    }
+                  ]
+                },
+                "consumerCompatibilityVerified": false
+              }
+            ],
+            "conflicts": [],
+            "gaps": [
+              "Selected output: A complete declared proposed file set has not been supplied.",
+              "Explicit state intervals do not cover the entire selected integer type; a default entry does not prove native handling of unlisted values.",
+              "Selected component/dependency observations are unavailable or have unmatched indices; complete dependency closure is not established."
+            ]
+          }
+        ],
+        "files": [
+          {
+            "fileName": "Run.hmi.yml",
+            "bytes": 534,
+            "artifact": {
+              "path": "hmi-component-reviews/c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf.candidate",
+              "sha256": "c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf"
+            },
+            "outputId": "run"
+          },
+          {
+            "fileName": "Run.TextLibrary.hmi.yml",
+            "bytes": 335,
+            "artifact": {
+              "path": "hmi-component-reviews/91fc7a232fb7ffb9b0fb8e7f621cde64b9343aa6f23d1b491b5d87f29469c26b.candidate",
+              "sha256": "91fc7a232fb7ffb9b0fb8e7f621cde64b9343aa6f23d1b491b5d87f29469c26b"
+            },
+            "outputId": "run"
+          },
+          {
+            "fileName": "State.hmi.yml",
+            "bytes": 532,
+            "artifact": {
+              "path": "hmi-component-reviews/8f9f54959faf00f1af2ac518e92ceb11212f58d7319881e5f3a945be6f66012e.candidate",
+              "sha256": "8f9f54959faf00f1af2ac518e92ceb11212f58d7319881e5f3a945be6f66012e"
+            },
+            "outputId": "state"
+          },
+          {
+            "fileName": "State.TextLibrary.hmi.yml",
+            "bytes": 285,
+            "artifact": {
+              "path": "hmi-component-reviews/3139d63b6a37b7bdd37d5ba82be3c3a7b824774f3b7b6c981ae60d0bf76acba0.candidate",
+              "sha256": "3139d63b6a37b7bdd37d5ba82be3c3a7b824774f3b7b6c981ae60d0bf76acba0"
+            },
+            "outputId": "state"
+          }
+        ],
+        "preservedFiles": [
+          {
+            "outputId": "manual",
+            "fileName": "manual.js",
+            "bytes": 5,
+            "artifact": {
+              "path": "hmi-component-reviews/dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f.source",
+              "sha256": "dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f"
+            }
+          }
+        ],
+        "conflicts": [],
+        "gaps": [
+          "run: Selected output: A complete declared proposed file set has not been supplied.",
+          "run: Selected dependency indices are unavailable or unmatched; complete closure remains unverified.",
+          "state: Selected output: A complete declared proposed file set has not been supplied.",
+          "state: Explicit state intervals do not cover the entire selected integer type; a default entry does not prove native handling of unlisted values.",
+          "state: Selected component/dependency observations are unavailable or have unmatched indices; complete dependency closure is not established.",
+          "state: Selected dependency indices are unavailable or unmatched; complete closure remains unverified.",
+          "Captured unselected member declarations remain outside the generated mapping.",
+          "Declared output/binding coverage is bounded to this supplied review. Unobserved project content and omitted/truncated consumer or dependency evidence remain unqualified."
+        ],
+        "coverage": {
+          "declaredOutputIds": [
+            "run",
+            "state",
+            "manual"
+          ],
+          "declaredBindingIds": [
+            "run-binding",
+            "state-binding"
+          ],
+          "uncoveredOutputIds": [],
+          "uncoveredBindingIds": [],
+          "allDeclaredOutputsCovered": true,
+          "allDeclaredBindingsCovered": true,
+          "members": {
+            "observations": [
+              {
+                "scope": "beforeComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Run"
+                ],
+                "dataType": "Bool",
+                "bindingIds": [
+                  "run-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "beforeComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "State"
+                ],
+                "dataType": "Int",
+                "bindingIds": [
+                  "state-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "beforeComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Unselected"
+                ],
+                "dataType": "Real",
+                "bindingIds": [],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Run"
+                ],
+                "dataType": "Bool",
+                "bindingIds": [
+                  "run-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "State"
+                ],
+                "dataType": "Int",
+                "bindingIds": [
+                  "state-binding"
+                ],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              },
+              {
+                "scope": "afterComponent",
+                "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+                "objectPath": "/P/PLC/Block",
+                "memberPath": [
+                  "Unselected"
+                ],
+                "dataType": "Real",
+                "bindingIds": [],
+                "evidence": {
+                  "objectPath": "/P/PLC/Block",
+                  "utf8Sha256": "159483e12d013e3de573f1b44c78cd5f38e4931eddf355c8bbeac69fe8b7bcf3",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                }
+              }
+            ],
+            "unavailableObjects": [],
+            "truncated": false,
+            "maximumObservations": 4096,
+            "maximumDepth": 16,
+            "componentMemberCoverageComplete": false
+          },
+          "sourceConsumerCoverage": [
+            {
+              "scope": "beforeComponent",
+              "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+              "roots": [
+                "/P/PLC/Block"
+              ],
+              "excludedOutputIds": [],
+              "traversal": {
+                "complete": false,
+                "freshness": "savedSnapshotsOnly",
+                "truncated": false,
+                "truncationReasons": [],
+                "limits": {
+                  "impactDepth": 2,
+                  "maxImpactPaths": 100,
+                  "maxImpactEdgeVisits": 1000,
+                  "maxImpactPathBytes": 1048576
+                },
+                "returnedPaths": 0,
+                "visitedEdges": 0,
+                "pathBytes": 2,
+                "excludedEdges": {},
+                "supportedRelationshipKinds": [
+                  "calls",
+                  "dependsOn",
+                  "hmiBinding",
+                  "instanceOf",
+                  "libraryVersion",
+                  "reads",
+                  "usesType",
+                  "writes"
+                ],
+                "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+              }
+            },
+            {
+              "scope": "afterComponent",
+              "reviewId": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309",
+              "roots": [
+                "/P/PLC/Block"
+              ],
+              "excludedOutputIds": [],
+              "traversal": {
+                "complete": false,
+                "freshness": "savedSnapshotsOnly",
+                "truncated": false,
+                "truncationReasons": [],
+                "limits": {
+                  "impactDepth": 2,
+                  "maxImpactPaths": 100,
+                  "maxImpactEdgeVisits": 1000,
+                  "maxImpactPathBytes": 1048576
+                },
+                "returnedPaths": 0,
+                "visitedEdges": 0,
+                "pathBytes": 2,
+                "excludedEdges": {},
+                "supportedRelationshipKinds": [
+                  "calls",
+                  "dependsOn",
+                  "hmiBinding",
+                  "instanceOf",
+                  "libraryVersion",
+                  "reads",
+                  "usesType",
+                  "writes"
+                ],
+                "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+              }
+            },
+            {
+              "scope": "destination",
+              "reviewId": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec",
+              "roots": [
+                "/P/HMI/Manual",
+                "/P/HMI/RunList",
+                "/P/HMI/StateList"
+              ],
+              "excludedOutputIds": [],
+              "traversal": {
+                "complete": false,
+                "freshness": "savedSnapshotsOnly",
+                "truncated": false,
+                "truncationReasons": [],
+                "limits": {
+                  "impactDepth": 2,
+                  "maxImpactPaths": 100,
+                  "maxImpactEdgeVisits": 1000,
+                  "maxImpactPathBytes": 1048576
+                },
+                "returnedPaths": 0,
+                "visitedEdges": 0,
+                "pathBytes": 2,
+                "excludedEdges": {},
+                "supportedRelationshipKinds": [
+                  "calls",
+                  "dependsOn",
+                  "hmiBinding",
+                  "instanceOf",
+                  "libraryVersion",
+                  "reads",
+                  "usesType",
+                  "writes"
+                ],
+                "policy": "Incoming saved dependency context for selected roots in this exact review only. No component-version or destination edges are joined. Supplied bindings and proposed outputs never create graph edges. Paths do not establish regeneration effects, member compatibility, live identity or complete consumers.",
+                "limitations": "Static dependency review candidates, not runtime effects or a compile verdict. Both captures have incomplete relationship coverage; excluded edges and bounds can hide further paths. Absence from captured scope is not deletion; no paths does not establish no impact."
+              }
+            }
+          ],
+          "sourceDependencyImpactCoverage": [
+            {
+              "associationCount": 0,
+              "includedAssociationCount": 0,
+              "omittedAssociationIndices": [],
+              "returnedBytes": 2,
+              "maxBytes": 1048576,
+              "truncated": false,
+              "consumerCoverageComplete": false,
+              "outputMappingComplete": false,
+              "nativeImpactVerified": false
+            }
+          ],
+          "consumerCoverageComplete": false,
+          "dependencyClosureVerified": false,
+          "componentMemberCoverageComplete": false
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "preservationVerified": false,
+        "ownershipVerified": false,
+        "policy": "Coordinated offline candidates for 2..16 explicit paired Bool/integer lists, one supplied v7 review, fixed output/binding/profile/file/list/library identities during regeneration. Every declared output and binding must be accounted for. Any relevant conflict suppresses all candidates and child records. Selected retained peer bytes remain exact. Completion is the final immutable set record; interrupted publication may leave unreferenced immutable artifacts. No native import, merge, rename, removal, project completeness, authenticated source, native dependency closure or preservation qualification.",
+        "recordId": "bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0",
+        "recordArtifact": {
+          "path": "hmi-component-reviews/bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0.text-set.json",
+          "sha256": "bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0"
+        }
+      },
+      "label": "coordinated regeneration with state and translated Bool changes"
+    }
+  ],
+  "files": [
+    {
+      "path": "hmi-component-reviews/06a2d733beb1f0632c173c68507fbe87aa694227cdc5b11be9eed56f909a9d96.author.json",
+      "bytes": 3978,
+      "sha256": "06a2d733beb1f0632c173c68507fbe87aa694227cdc5b11be9eed56f909a9d96"
+    },
+    {
+      "path": "hmi-component-reviews/0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de.candidate",
+      "bytes": 296,
+      "sha256": "0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de"
+    },
+    {
+      "path": "hmi-component-reviews/0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de.source",
+      "bytes": 296,
+      "sha256": "0d0dbaf533aaa95957d5a8d1d78188dea2f36f0f1e2631edd112ea0b15fd12de"
+    },
+    {
+      "path": "hmi-component-reviews/15ae6e6a2b5f18ef7101a5a36405fd2ade7ef5262817e79f5591d047571ac1d5.json",
+      "bytes": 21507,
+      "sha256": "15ae6e6a2b5f18ef7101a5a36405fd2ade7ef5262817e79f5591d047571ac1d5"
+    },
+    {
+      "path": "hmi-component-reviews/1aa162e17ae41e6fa741b3cd4d4d6727b2bf2ab8ccedc52e58aab6acc7367149.author.json",
+      "bytes": 8876,
+      "sha256": "1aa162e17ae41e6fa741b3cd4d4d6727b2bf2ab8ccedc52e58aab6acc7367149"
+    },
+    {
+      "path": "hmi-component-reviews/2585fe15dd95793f6b0473c8096402e9eb4a5227fdea7684b79a2646330b637a.json",
+      "bytes": 15694,
+      "sha256": "2585fe15dd95793f6b0473c8096402e9eb4a5227fdea7684b79a2646330b637a"
+    },
+    {
+      "path": "hmi-component-reviews/3139d63b6a37b7bdd37d5ba82be3c3a7b824774f3b7b6c981ae60d0bf76acba0.candidate",
+      "bytes": 285,
+      "sha256": "3139d63b6a37b7bdd37d5ba82be3c3a7b824774f3b7b6c981ae60d0bf76acba0"
+    },
+    {
+      "path": "hmi-component-reviews/3c8b7649dd881dca01371f78cd1f7176cbfc6bd85524e5b04d291132320f0c31.author-input",
+      "bytes": 777,
+      "sha256": "3c8b7649dd881dca01371f78cd1f7176cbfc6bd85524e5b04d291132320f0c31"
+    },
+    {
+      "path": "hmi-component-reviews/3d7d7e1f29d27523825034dda41cdf7a85c7468aa91064a4f41f681594f96395.input",
+      "bytes": 2125,
+      "sha256": "3d7d7e1f29d27523825034dda41cdf7a85c7468aa91064a4f41f681594f96395"
+    },
+    {
+      "path": "hmi-component-reviews/4754dec592707de467dea7e89b6bafae70513285e42afec70a474482c804ae13.author.json",
+      "bytes": 10852,
+      "sha256": "4754dec592707de467dea7e89b6bafae70513285e42afec70a474482c804ae13"
+    },
+    {
+      "path": "hmi-component-reviews/4b63bb4283bb316999f18b7a33373e59aca2c4863dd653bc644cbb99755c6c0d.text-set-input",
+      "bytes": 1236,
+      "sha256": "4b63bb4283bb316999f18b7a33373e59aca2c4863dd653bc644cbb99755c6c0d"
+    },
+    {
+      "path": "hmi-component-reviews/58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2.text-set.json",
+      "bytes": 21870,
+      "sha256": "58d307d212b3b603f6b2a4c080874f07e7aef6c3f672b6e98cb1faa1bac685c2"
+    },
+    {
+      "path": "hmi-component-reviews/6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96.candidate",
+      "bytes": 285,
+      "sha256": "6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96"
+    },
+    {
+      "path": "hmi-component-reviews/6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96.source",
+      "bytes": 285,
+      "sha256": "6a8a4e5f3fb3a66873e44b43ba2273c673ba1e1365371a204d8f4798f30e9a96"
+    },
+    {
+      "path": "hmi-component-reviews/71bcfa309332ca55fd3fc93f6943a0c93a441013fe095233e8d5d291d0b9c7d1.input",
+      "bytes": 3288,
+      "sha256": "71bcfa309332ca55fd3fc93f6943a0c93a441013fe095233e8d5d291d0b9c7d1"
+    },
+    {
+      "path": "hmi-component-reviews/81ab07c92899be7351cbaa681101bab192f7bcc342e7b17d7de70a95bc43a9d4.author-input",
+      "bytes": 591,
+      "sha256": "81ab07c92899be7351cbaa681101bab192f7bcc342e7b17d7de70a95bc43a9d4"
+    },
+    {
+      "path": "hmi-component-reviews/82c1da871a175ab7d3d7849132b2b2ccd4f097070f6ae91f4b7330a4f2d21529.author-input",
+      "bytes": 715,
+      "sha256": "82c1da871a175ab7d3d7849132b2b2ccd4f097070f6ae91f4b7330a4f2d21529"
+    },
+    {
+      "path": "hmi-component-reviews/8f9f54959faf00f1af2ac518e92ceb11212f58d7319881e5f3a945be6f66012e.candidate",
+      "bytes": 532,
+      "sha256": "8f9f54959faf00f1af2ac518e92ceb11212f58d7319881e5f3a945be6f66012e"
+    },
+    {
+      "path": "hmi-component-reviews/91fc7a232fb7ffb9b0fb8e7f621cde64b9343aa6f23d1b491b5d87f29469c26b.candidate",
+      "bytes": 335,
+      "sha256": "91fc7a232fb7ffb9b0fb8e7f621cde64b9343aa6f23d1b491b5d87f29469c26b"
+    },
+    {
+      "path": "hmi-component-reviews/a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57.candidate",
+      "bytes": 532,
+      "sha256": "a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57"
+    },
+    {
+      "path": "hmi-component-reviews/a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57.source",
+      "bytes": 532,
+      "sha256": "a6dc12e3ab80945ef97fa06dfa2b68d672f677f57ccbdf2c5243cf6f22136e57"
+    },
+    {
+      "path": "hmi-component-reviews/b19c8d27cf45e91ae1e35aa84e15b8650f601d366d9d6f8fb9f405e95baffd01.author-input",
+      "bytes": 486,
+      "sha256": "b19c8d27cf45e91ae1e35aa84e15b8650f601d366d9d6f8fb9f405e95baffd01"
+    },
+    {
+      "path": "hmi-component-reviews/bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0.text-set.json",
+      "bytes": 27240,
+      "sha256": "bb17338f288a0841460726a15ff9b24081a3ed0a76cfef43bf39fd6c5bcd3db0"
+    },
+    {
+      "path": "hmi-component-reviews/c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf.candidate",
+      "bytes": 534,
+      "sha256": "c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf"
+    },
+    {
+      "path": "hmi-component-reviews/c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf.source",
+      "bytes": 534,
+      "sha256": "c57f6720eb427b94da12022ae3874bdabd45a67b4776b6cfa85c951dd5eb34cf"
+    },
+    {
+      "path": "hmi-component-reviews/d3fdc7978048ec825fcfcae75a8f6e3b18b33fd89463068b8db5794ae5f17503.author.json",
+      "bytes": 4111,
+      "sha256": "d3fdc7978048ec825fcfcae75a8f6e3b18b33fd89463068b8db5794ae5f17503"
+    },
+    {
+      "path": "hmi-component-reviews/dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f.source",
+      "bytes": 5,
+      "sha256": "dfc1b87dee0af742257bb7b74993e765afa61c5d6ede25e12bc54e72cf0d298f"
+    },
+    {
+      "path": "hmi-component-reviews/f4174b6527d2e5dbb410c1ac0ad7c4c3e145127e1f92c94c754ebe4ea908631f.text-set-input",
+      "bytes": 1131,
+      "sha256": "f4174b6527d2e5dbb410c1ac0ad7c4c3e145127e1f92c94c754ebe4ea908631f"
+    },
+    {
+      "path": "project-reviews/e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309.json",
+      "bytes": 1944,
+      "sha256": "e72ef563fb11156250c43ca397c359f31122be77e193e9ee416bfe2004257309"
+    },
+    {
+      "path": "project-reviews/fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec.json",
+      "bytes": 2374,
+      "sha256": "fda667cb72079a43483384357688cbb00f901943f9db286cd2c5b896d40065ec"
+    }
+  ]
+}

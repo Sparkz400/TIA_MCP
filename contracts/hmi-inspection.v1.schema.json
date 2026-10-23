@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/hmi-inspection.v1.schema.json",
+  "title": "Bounded HMI inspection request",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "section": {"enum": ["devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources"]},
+    "projectName": {"type": "string"},
+    "projectPath": {"type": "string"},
+    "family": {"enum": ["classic", "unified"]},
+    "hmiPath": {"type": "string"},
+    "objectPath": {"type": "string"},
+    "screenPath": {"type": "string"},
+    "includeSource": {"type": "boolean", "default": false},
+    "includeScreenOwner": {"type": "boolean", "default": false, "description": "For an exact items request, include its native screen row and on-demand behavior metadata alongside item rows. Ordinary item enumeration excludes the screen owner."},
+    "expectedMetadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "target": {"$ref": "#/$defs/selector"},
+    "identity": {"$ref": "hmi-identity.v2.schema.json"},
+    "artifactDirectory": {"type": "string"},
+    "limit": {"type": "integer", "minimum": 1, "maximum": 200},
+    "offset": {"type": "integer", "minimum": 0, "maximum": 50000},
+    "maxVisited": {"type": "integer", "minimum": 1, "maximum": 50000},
+    "maxBytes": {"type": "integer", "minimum": 4096, "maximum": 1048576}
+  },
+  "$defs": {
+    "selector": {
+      "type": "object", "required": ["hmiPath"],
+      "properties": {"schemaVersion": {"const": 2}, "hmiPath": {"type": "string", "minLength": 1}, "family": {"enum": ["classic", "unified", "unknown"]}, "objectPath": {"type": "string"}, "kind": {"type": "string", "pattern": "^hmi"}, "screenPath": {"type": "string"}, "projectPath": {"type": "string"}, "projectCopyId": {"type": "string"}, "sessionGeneration": {"type": "string"}, "devicePath": {"type": "string"}, "exportSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "targetProfile": {"type": "string"}},
+      "not": {"required": ["plcPath"]}
+    },
+    "response": {
+      "type": "object", "required": ["schemaVersion", "projectPath", "projectCopyId", "sessionGeneration", "section", "target", "items", "coverage", "metadataRevision", "diagnostics", "scriptsExecuted"],
+      "properties": {
+        "schemaVersion": {"const": 1}, "projectPath": {"type": ["string", "null"]}, "projectCopyId": {"type": "string"}, "sessionGeneration": {"type": "string"}, "section": {"enum": ["devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources"]},
+        "target": {"type": ["object", "null"]}, "items": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/row"}},
+        "coverage": {"type": "object", "required": ["status", "complete", "truncated", "visited"], "properties": {"status": {"enum": ["complete", "truncated", "unsupported", "unavailable", "failed"]}, "complete": {"type": "boolean"}, "truncated": {"type": "boolean"}, "visited": {"type": "integer", "minimum": 0}, "screenScopes": {"type": "array", "maxItems": 6, "items": {"$ref": "#/$defs/classicScreenScope"}}}},
+        "metadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "offset": {"type": "integer", "minimum": 0}, "nextOffset": {"type": ["integer", "null"]},
+        "diagnostics": {"type": "array", "items": {"type": "object"}}, "artifacts": {"type": "array", "items": {"type": "object"}}, "scriptsExecuted": {"const": false}, "runtimeVerified": {"const": false}
+      }
+    },
+    "row": {"type": "object", "required": ["identity", "kind", "name", "parentPath", "source"], "properties": {"identity": {"$ref": "hmi-identity.v2.schema.json"}, "kind": {"enum": ["hmiDevice", "hmiConnection", "hmiTagTable", "hmiTag", "hmiScreen", "hmiScreenItem", "hmiScreenLayer", "hmiAlarm", "hmiScript", "hmiResource"]}, "name": {"type": ["string", "null"]}, "parentPath": {"type": "string"}, "screenRole": {"enum":["regular","template","popup","slideIn","globalElements","overview"]}, "nativeType": {"type": ["string", "null"]}, "properties": {"type": "object"}, "source": {"type": "object"}, "nativeSources": {"type": "array", "maxItems": 32}, "nativeSourceCoverage": {"$ref": "#/$defs/sourceCoverage"}}},
+    "classicScreenScope": {"type":"object","additionalProperties":false,"required":["role","property","path","status","observed"],"properties":{"role":{"enum":["regular","template","popup","slideIn","globalElements","overview"]},"property":{"enum":["ScreenFolder","ScreenTemplateFolder","ScreenPopupFolder","ScreenSlideinFolder","ScreenGlobalElements","ScreenOverview"]},"path":{"type":"string","minLength":1},"status":{"enum":["complete","absent","unavailable","truncated"]},"observed":{"type":"integer","minimum":0,"maximum":50000}}},
+    "sourceCoverage": {
+      "type": "object",
+      "required": ["status", "complete", "scope", "selectedObjectOnly", "requestedObjectPath", "exportOwnerPath", "omissions"],
+      "properties": {"status": {"const": "partial"}, "complete": {"const": false}, "scope": {"enum": ["selectedObject", "nativeComposition"]}, "selectedObjectOnly": {"type": "boolean"}, "requestedObjectPath": {"type": "string"}, "exportOwnerPath": {"type": "string"}, "nativeComposition": {"type": ["string", "null"]}, "omissions": {"type": "array", "items": {"type": "string"}}, "retainedFileCount": {"type": "integer", "minimum": 0, "maximum": 32}},
+      "allOf": [{"if": {"properties": {"scope": {"const": "nativeComposition"}}, "required": ["scope"]}, "then": {"properties": {"selectedObjectOnly": {"const": false}}}}]
+    }
+  },
+  "description": "Non-device sections require exact HMI selection in target, identity, or top-level hmiPath. Full returned identities add project/session stale guards; target selectors may contain only hmiPath. Limit/offset are bounded live observations, not immutable snapshot cursors; use project_model for cached pages. Classic screen inventory includes regular/template/popup/slide-in/global/overview roles with per-scope coverage. Additional Classic roles expose metadata, not qualified item parsers. Items require screenPath. includeSource requires exact objectPath and retained native artifact output. Scripts are only read as data. Coverage and metadata revision do not imply complete native content."
+}
+

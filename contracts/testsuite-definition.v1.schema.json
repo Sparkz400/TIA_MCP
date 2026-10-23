@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-definition.v1.schema.json",
+  "title": "Captured Test Suite definition; original bytes retained separately; no invented vendor grammar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "family",
+    "name",
+    "extension",
+    "reference",
+    "originalSha256",
+    "originalBytes",
+    "profileId",
+    "requiredScope",
+    "dependencies",
+    "scopeComplete",
+    "effectsReviewed",
+    "unresolvedSyntax"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "family": {
+      "enum": [
+        "style",
+        "application",
+        "system",
+        "applicationSet"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "extension": {
+      "enum": [
+        ".xml",
+        ".tat",
+        ".tst",
+        ".ttst",
+        ".TTST"
+      ]
+    },
+    "reference": {
+      "$ref": "engineering-object-reference.v1.schema.json"
+    },
+    "originalSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "originalBytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 16777216
+    },
+    "profileId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "requiredScope": {
+      "type": "array",
+      "items": {
+        "$ref": "engineering-object-reference.v1.schema.json"
+      },
+      "maxItems": 10000,
+      "minItems": 1
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "maxItems": 1000,
+      "minItems": 0
+    },
+    "scopeComplete": {
+      "type": "boolean"
+    },
+    "effectsReviewed": {
+      "type": "boolean"
+    },
+    "unresolvedSyntax": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "maxItems": 1000,
+      "minItems": 0
+    }
+  }
+}

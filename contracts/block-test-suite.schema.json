@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:block-test-suite:v1",
+  "title": "Reusable isolated block test suite",
+  "type": "object",
+  "required": [
+    "fixtureId",
+    "cases"
+  ],
+  "properties": {
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_.-]*$"
+    },
+    "timingMode": {
+      "enum": [
+        "application_call_controlled",
+        "scan_controlled",
+        "timed_polling"
+      ]
+    },
+    "requireScanSynchronization": {
+      "type": "boolean"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "$defs": {
+    "value": {
+      "type": [
+        "boolean",
+        "number",
+        "string"
+      ]
+    },
+    "values": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/value"
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "steps"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "initial": {
+          "$ref": "#/$defs/values"
+        },
+        "repeat": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "maxDurationMs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600000
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "set": {
+          "$ref": "#/$defs/values"
+        },
+        "calls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1024
+        },
+        "waitMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60000
+        },
+        "pulse": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "high": {
+              "$ref": "#/$defs/value"
+            },
+            "low": {
+              "$ref": "#/$defs/value"
+            },
+            "highCalls": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1024
+            },
+            "lowCalls": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1024
+            }
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assertion"
+          }
+        }
+      }
+    },
+    "assertion": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "expected"
+          ],
+          "properties": {
+            "kind": {
+              "const": "exact"
+            },
+            "path": {
+              "type": "string"
+            },
+            "expected": {
+              "$ref": "#/$defs/value"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "expected"
+          ],
+          "anyOf": [
+            {
+              "required": [
+                "absoluteTolerance"
+              ]
+            },
+            {
+              "required": [
+                "relativeTolerance"
+              ]
+            }
+          ],
+          "properties": {
+            "kind": {
+              "const": "approx"
+            },
+            "path": {
+              "type": "string"
+            },
+            "expected": {
+              "type": "number"
+            },
+            "absoluteTolerance": {
+              "type": "number",
+              "minimum": 0
+            },
+            "relativeTolerance": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "from",
+            "to"
+          ],
+          "properties": {
+            "kind": {
+              "const": "transition"
+            },
+            "path": {
+              "type": "string"
+            },
+            "from": {
+              "$ref": "#/$defs/value"
+            },
+            "to": {
+              "$ref": "#/$defs/value"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "expected",
+            "maxMs"
+          ],
+          "properties": {
+            "kind": {
+              "const": "window"
+            },
+            "path": {
+              "type": "string"
+            },
+            "expected": {
+              "$ref": "#/$defs/value"
+            },
+            "minMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 60000
+            },
+            "maxMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60000
+            },
+            "pollMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5000
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "sinceStep",
+            "capMs",
+            "resolutionMs",
+            "maxUncertaintyMs"
+          ],
+          "properties": {
+            "kind": {
+              "const": "elapsed"
+            },
+            "path": {
+              "type": "string"
+            },
+            "sinceStep": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60000
+            },
+            "resolutionMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "maxUncertaintyMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60000
+            }
+          }
+        }
+      ]
+    }
+  }
+}

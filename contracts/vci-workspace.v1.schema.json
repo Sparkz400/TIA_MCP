@@ -1,0 +1,1264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:vci-workspace:v1",
+  "title": "Offline local Git document workflow",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/summary"
+    },
+    {
+      "$ref": "#/$defs/export"
+    },
+    {
+      "$ref": "#/$defs/history"
+    },
+    {
+      "$ref": "#/$defs/chunk"
+    },
+    {
+      "$ref": "#/$defs/list"
+    },
+    {
+      "$ref": "#/$defs/error"
+    },
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/comparison"
+    },
+    {
+      "$ref": "#/$defs/branches"
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "ref": {
+      "type": "string",
+      "pattern": "^vci:(preview|revision|export|manifest|comparison):[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "email": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 254
+        }
+      },
+      "required": [
+        "name",
+        "email"
+      ],
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "enum": [
+            "diff.txt",
+            "files.json",
+            "revision.zip",
+            "mapping.json",
+            "manifest.json",
+            "inputs.json",
+            "comparison.json",
+            "fork-journal/intent.json",
+            "fork-journal/0001.json",
+            "fork-journal/0002.json"
+          ]
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "name",
+        "sha256",
+        "bytes"
+      ],
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "kind": {
+          "enum": [
+            "preview",
+            "revision"
+          ]
+        },
+        "previewRef": {
+          "$ref": "#/$defs/previewRef"
+        },
+        "revisionRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revisionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "prepared",
+            "committed",
+            "outcomeUnknown"
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "parentRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revisionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "planSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "author": {
+          "$ref": "#/$defs/author"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "changeCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "commit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tree": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "maxItems": 5
+        },
+        "diffCoverage": {
+          "type": "string"
+        },
+        "commitJournal": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "count",
+                "sha256",
+                "phase",
+                "operationId",
+                "candidateCommit",
+                "candidateTree"
+              ],
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "sha256": {
+                  "$ref": "#/$defs/hash"
+                },
+                "phase": {
+                  "enum": [
+                    "dispatchPrepared",
+                    "candidateRecorded",
+                    "publicationPrepared",
+                    "verified",
+                    "outcomeUnknown"
+                  ]
+                },
+                "operationId": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                "candidateCommit": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "candidateTree": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "executableSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "gitVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "headReference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^refs/heads/"
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "previewRef",
+        "revisionRef",
+        "state",
+        "nativeQualified",
+        "parentRef",
+        "planSha256",
+        "author",
+        "message",
+        "fileCount",
+        "changeCount",
+        "commit",
+        "tree",
+        "artifacts",
+        "diffCoverage",
+        "commitJournal",
+        "receiptName",
+        "executableSha256",
+        "gitVersion",
+        "headReference"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "kind": {
+          "const": "export"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "maxItems": 2
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "nativeQualified",
+        "revisionRef",
+        "commit",
+        "fileCount",
+        "artifacts",
+        "receiptName"
+      ],
+      "additionalProperties": false
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "maximumCommits": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "history": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "format": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionRef",
+        "nativeQualified",
+        "maximumCommits",
+        "history",
+        "format"
+      ],
+      "additionalProperties": false
+    },
+    "chunk": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "data": {
+          "type": "string",
+          "maxLength": 87384
+        },
+        "encoding": {
+          "const": "base64"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "sha256",
+        "bytes",
+        "offset",
+        "count",
+        "data",
+        "encoding",
+        "nextOffset",
+        "complete",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "recordRef": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/ref"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "state": {
+                "enum": [
+                  "incomplete",
+                  "integrity-failed",
+                  "prepared",
+                  "complete",
+                  "outcomeUnknown"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "recordRef",
+              "state"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 50
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ordering": {
+          "type": "string"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "rows",
+        "total",
+        "nextOffset",
+        "ordering",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "fileInput": {
+      "type": "object",
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "uploadRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^upload:[a-f0-9]{32}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "delete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "relativePath"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "delete": {
+                "const": true
+              }
+            },
+            "required": [
+              "delete"
+            ]
+          },
+          "then": {
+            "properties": {
+              "uploadRef": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "vci_prepareInput": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/fileInput"
+          }
+        },
+        "author": {
+          "$ref": "#/$defs/author"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16384
+        },
+        "parentRevisionRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revisionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branchName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 180,
+          "description": "New initial branch, or new unused branch at the exact parent commit. Omission inherits the parent branch."
+        }
+      },
+      "required": [
+        "files",
+        "author",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "vci_commitInput": {
+      "type": "object",
+      "properties": {
+        "previewRef": {
+          "$ref": "#/$defs/previewRef"
+        },
+        "reviewedPlanSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "previewRef",
+        "reviewedPlanSha256"
+      ],
+      "additionalProperties": false
+    },
+    "vci_reopenInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        }
+      },
+      "required": [
+        "recordRef"
+      ],
+      "additionalProperties": false
+    },
+    "vci_historyInput": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [
+        "revisionRef"
+      ],
+      "additionalProperties": false
+    },
+    "vci_materializeInput": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        }
+      },
+      "required": [
+        "revisionRef"
+      ],
+      "additionalProperties": false
+    },
+    "vci_listInput": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "vci_artifact_readInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "name": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "recordRef",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "vci_file_readInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/previewRef"
+            },
+            {
+              "$ref": "#/$defs/revisionRef"
+            }
+          ]
+        },
+        "relativePath": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "recordRef",
+        "relativePath"
+      ],
+      "additionalProperties": false
+    },
+    "vci_reconcileInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previewRef",
+        "expectedCallbackSha256"
+      ],
+      "properties": {
+        "previewRef": {
+          "$ref": "#/$defs/previewRef"
+        },
+        "expectedCallbackSha256": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "previewRef": {
+      "type": "string",
+      "pattern": "^vci:preview:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "revisionRef": {
+      "type": "string",
+      "pattern": "^vci:revision:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "exportRef": {
+      "type": "string",
+      "pattern": "^vci:export:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "manifestRef": {
+      "type": "string",
+      "pattern": "^vci:manifest:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "comparisonRef": {
+      "type": "string",
+      "pattern": "^vci:comparison:[a-f0-9]{32}:[a-f0-9]{64}$"
+    },
+    "expectedHashes": {
+      "type": "object",
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/hash"
+        },
+        "project": {
+          "$ref": "#/$defs/hash"
+        },
+        "workspace": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "required": [
+        "baseline",
+        "project",
+        "workspace"
+      ],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "kind": {
+          "const": "manifest"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "targetProbed": {
+          "const": false
+        },
+        "sourceRecordRef": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/previewRef"
+            },
+            {
+              "$ref": "#/$defs/revisionRef"
+            }
+          ]
+        },
+        "manifestSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "enumerationComplete": {
+          "type": "boolean"
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "packageCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "incompletePackageCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "unmanagedFileCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "nativeQualified",
+        "receiptName",
+        "artifacts",
+        "targetProbed",
+        "sourceRecordRef",
+        "manifestSha256",
+        "workspaceId",
+        "enumerationComplete",
+        "fileCount",
+        "packageCount",
+        "incompletePackageCount",
+        "unmanagedFileCount"
+      ],
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/comparisonRef"
+        },
+        "kind": {
+          "const": "comparison"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "canSynchronize": {
+          "const": false
+        },
+        "resolutionApplied": {
+          "const": false
+        },
+        "baselineRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "projectRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "workspaceRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "reportSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "rowCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "conflictCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 2
+        },
+        "stateCounts": {
+          "type": "object",
+          "maxProperties": 20,
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3000
+          }
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "nativeQualified",
+        "receiptName",
+        "artifacts",
+        "canSynchronize",
+        "resolutionApplied",
+        "baselineRef",
+        "projectRef",
+        "workspaceRef",
+        "reportSha256",
+        "rowCount",
+        "conflictCount",
+        "issues",
+        "stateCounts"
+      ],
+      "additionalProperties": false
+    },
+    "vci_package_captureInput": {
+      "type": "object",
+      "properties": {
+        "sourceRecordRef": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/previewRef"
+            },
+            {
+              "$ref": "#/$defs/revisionRef"
+            }
+          ]
+        },
+        "mappingUploadRef": {
+          "type": "string",
+          "pattern": "^upload:[a-f0-9]{32}$"
+        }
+      },
+      "required": [
+        "sourceRecordRef",
+        "mappingUploadRef"
+      ],
+      "additionalProperties": false
+    },
+    "vci_package_compareInput": {
+      "type": "object",
+      "properties": {
+        "baselineRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "projectRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "workspaceRef": {
+          "$ref": "#/$defs/manifestRef"
+        },
+        "expectedHashes": {
+          "$ref": "#/$defs/expectedHashes"
+        }
+      },
+      "required": [
+        "baselineRef",
+        "projectRef",
+        "workspaceRef",
+        "expectedHashes"
+      ],
+      "additionalProperties": false
+    },
+    "branches": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "inventorySha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "properties": {
+              "reference": {
+                "type": "string",
+                "pattern": "^refs/heads/"
+              },
+              "commit": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{40}$"
+              }
+            },
+            "required": [
+              "reference",
+              "commit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "scope": {
+          "const": "Fresh local refs in this exact revision repository; pin inventorySha256 across pages."
+        }
+      },
+      "required": [
+        "revisionRef",
+        "inventorySha256",
+        "offset",
+        "rows",
+        "total",
+        "nextOffset",
+        "nativeQualified",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "vci_branchesInput": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "expectedInventorySha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "revisionRef"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "offset": {
+                "minimum": 1
+              }
+            },
+            "required": [
+              "offset"
+            ]
+          },
+          "then": {
+            "required": [
+              "expectedInventorySha256"
+            ],
+            "properties": {
+              "expectedInventorySha256": {
+                "$ref": "#/$defs/hash"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "x-tool-contracts": {
+    "vci_prepare": {
+      "input": {
+        "$ref": "#/$defs/vci_prepareInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "vci_commit": {
+      "input": {
+        "$ref": "#/$defs/vci_commitInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "vci_reopen": {
+      "input": {
+        "$ref": "#/$defs/vci_reopenInput"
+      },
+      "output": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/summary"
+          },
+          {
+            "$ref": "#/$defs/export"
+          },
+          {
+            "$ref": "#/$defs/manifest"
+          },
+          {
+            "$ref": "#/$defs/comparison"
+          }
+        ]
+      }
+    },
+    "vci_history": {
+      "input": {
+        "$ref": "#/$defs/vci_historyInput"
+      },
+      "output": {
+        "$ref": "#/$defs/history"
+      }
+    },
+    "vci_materialize": {
+      "input": {
+        "$ref": "#/$defs/vci_materializeInput"
+      },
+      "output": {
+        "$ref": "#/$defs/export"
+      }
+    },
+    "vci_list": {
+      "input": {
+        "$ref": "#/$defs/vci_listInput"
+      },
+      "output": {
+        "$ref": "#/$defs/list"
+      }
+    },
+    "vci_artifact_read": {
+      "input": {
+        "$ref": "#/$defs/vci_artifact_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/chunk"
+      }
+    },
+    "vci_file_read": {
+      "input": {
+        "$ref": "#/$defs/vci_file_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/chunk"
+      }
+    },
+    "vci_reconcile": {
+      "input": {
+        "$ref": "#/$defs/vci_reconcileInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "vci_package_capture": {
+      "input": {
+        "$ref": "#/$defs/vci_package_captureInput"
+      },
+      "output": {
+        "$ref": "#/$defs/manifest"
+      }
+    },
+    "vci_package_compare": {
+      "input": {
+        "$ref": "#/$defs/vci_package_compareInput"
+      },
+      "output": {
+        "$ref": "#/$defs/comparison"
+      }
+    },
+    "vci_branches": {
+      "input": {
+        "$ref": "#/$defs/vci_branchesInput"
+      },
+      "output": {
+        "$ref": "#/$defs/branches"
+      }
+    }
+  }
+}

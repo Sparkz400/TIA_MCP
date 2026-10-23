@@ -1,0 +1,17 @@
+TEST_CASE "SingleStep"
+PROPERTY
+AUTHOR : "Harish"
+VERSION : "0.1"
+COMMENT : "This testcase contains single step"
+SCOPE : "PLC1"
+END_PROPERTY
+VAR
+"a" : "Data_block_1".varBool:=1;
+"b" : "Data_block_1".varInt:=1;
+END_VAR
+STEP: "Step name"
+RUN(Cycles:=1);
+ASSERT.Equal("a",1);
+ASSERT.Equal("Data_block_1".varInt,1);
+END_STEP
+END_TEST_CASE

@@ -1,0 +1,26 @@
+{
+  "scope": "Retained failed native05 graphical_prepared preview and proposed XML; no typed apply/native installation success",
+  "sourceReport": "artifacts\\p17n\\component-native-05\\result.json",
+  "sourceReportSha256": "894d0cc324c919b468607edc62b0c20bd68b03693b5e067f002abc6a6d72ea9a",
+  "selectedPreviewFields": [
+    "kind",
+    "effects",
+    "typed",
+    "payload"
+  ],
+  "files": [
+    {
+      "name": "native05-requested-fbd.xml",
+      "sha256": "5e4c979556c48fe7aed8de2dd8b27112e4c3d4e13d7f1010860740ea4bee590e"
+    },
+    {
+      "name": "native05-typed-preview.json",
+      "sha256": "760e713194601a717c506aefa8074fb6b1dad7c94c31597b67a07611dd88fa67"
+    }
+  ],
+  "instanceFixture": {
+    "path": "native05-requested-instance.xml",
+    "bytes": 3612,
+    "sha256": "48db5984b2a4e78015f5cd85a746f783ad0830bec6d91d90536a9f2381c9bf0d"
+  }
+}

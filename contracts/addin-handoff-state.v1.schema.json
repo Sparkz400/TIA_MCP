@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/addin-handoff-state.v1.schema.json",
+  "title": "Internal Add-In handoff lifecycle evidence; transport and native enrollment remain unavailable",
+  "$ref": "#/$defs/status",
+  "$defs": {
+    "peer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processId",
+        "startedAtUtc",
+        "executablePath",
+        "windowsSessionId"
+      ],
+      "properties": {
+        "processId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "startedAtUtc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}Z$"
+        },
+        "executablePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "windowsSessionId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workerProcessId",
+        "workerInstanceId",
+        "sessionGeneration",
+        "tiaProcess",
+        "projectHost",
+        "projectPath",
+        "snapshotId",
+        "assemblySha256",
+        "configurationSha256",
+        "authorityEvidenceSha256",
+        "syntheticAuthority"
+      ],
+      "properties": {
+        "workerProcessId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "workerInstanceId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "sessionGeneration": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "tiaProcess": {
+          "$ref": "#/$defs/peer"
+        },
+        "projectHost": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "projectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "assemblySha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "configurationSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "authorityEvidenceSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "syntheticAuthority": {
+          "type": "boolean"
+        }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "receiverInstanceId",
+        "challenge",
+        "lifetimeMilliseconds",
+        "selectionSha256",
+        "syntheticAuthority",
+        "producerAuthenticated",
+        "liveSelectionVerified",
+        "nativeQualified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "addin-handoff-challenge.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "receiverInstanceId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "challenge": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "lifetimeMilliseconds": {
+          "const": 30000
+        },
+        "selectionSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "syntheticAuthority": {
+          "type": "boolean"
+        },
+        "producerAuthenticated": {
+          "const": false
+        },
+        "liveSelectionVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "state",
+        "receiverInstanceId",
+        "hostProcessId",
+        "reviewId",
+        "selectionSha256",
+        "binding",
+        "selection",
+        "automaticReplay",
+        "producerAuthenticated",
+        "liveSelectionVerified",
+        "nativeQualified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "addin-handoff-status.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "state": {
+          "enum": [
+            "awaitingResponse",
+            "expiredOrUnavailable",
+            "interrupted",
+            "cancelled",
+            "consumedNoReceipt",
+            "receiptUncommitted",
+            "completed"
+          ]
+        },
+        "receiverInstanceId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "hostProcessId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "selectionSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "binding": {
+          "$ref": "#/$defs/binding"
+        },
+        "selection": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "addin-selection.v1.schema.json#/$defs/receipt"
+            }
+          ]
+        },
+        "automaticReplay": {
+          "const": false
+        },
+        "producerAuthenticated": {
+          "const": false
+        },
+        "liveSelectionVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "selection": {
+                "type": "object"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "selection": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

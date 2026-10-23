@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../TiaMcp.Openness.V21/HmiPreservationRules.cs" Link="HmiComponents/HmiPreservationRules.cs" />
+    <Compile Include="../TiaMcp.Openness.V21/HmiRecipeRules.cs" Link="HmiComponents/HmiRecipeRules.cs" />
+    <ProjectReference Include="../TiaMcp.Graph/TiaMcp.Graph.csproj" />
+    <EmbeddedResource Include="../../third-party/automationml/*.xsd" LogicalName="TiaMcp.AutomationMl.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../contracts/feature-catalog.v1.json" LogicalName="TiaMcp.FeatureCatalog.v1.json" />
+    <EmbeddedResource Include="../../fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml" LogicalName="TiaMcp.WatchTable.OwnedV21.xml" />
+  </ItemGroup>
+</Project>

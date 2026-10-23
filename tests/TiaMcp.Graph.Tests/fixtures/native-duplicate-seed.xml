@@ -1,0 +1,302 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Document>
+  <Engineering version="V21" />
+  <SW.Blocks.FB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <Interface>
+        <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+          <Section Name="Input">
+            <Member Name="ACK_EF" Datatype="Bool" />
+            <Member Name="StartCommand" Datatype="Bool" />
+            <Member Name="ResetCommand" Datatype="Bool" />
+            <Member Name="GuardClosed" Datatype="Bool" />
+            <Member Name="SupervisionTrip" Datatype="Bool" />
+          </Section>
+          <Section Name="Output">
+            <Member Name="MotorA" Datatype="Bool" />
+            <Member Name="MotorB" Datatype="Bool" />
+          </Section>
+          <Section Name="InOut" />
+          <Section Name="Static" />
+          <Section Name="Temp" />
+          <Section Name="Constant" />
+        </Sections>
+      </Interface>
+      <Name>GraphQualification</Name>
+      <Namespace />
+      <ProgrammingLanguage>GRAPH</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <SW.Blocks.CompileUnit ID="1" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource>
+            <Graph xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/Graph/v6">
+              <PreOperations />
+              <Sequence>
+                <Title>
+                  <MultiLanguageText Lang="en-US">Parallel cycle</MultiLanguageText>
+                  <MultiLanguageText Lang="de-DE">Paralleler Ablauf</MultiLanguageText>
+                </Title>
+                <Steps>
+                  <Step Number="1" Name="Idle" Init="true">
+                    <StepName>
+                      <MultiLanguageText Lang="de-DE">Warten</MultiLanguageText>
+                    </StepName>
+                    <Actions />
+                    <Supervisions>
+                      <Supervision ProgrammingLanguage="LAD">
+                        <FlgNet>
+                          <Parts>
+                            <Access Scope="LocalVariable" UId="10">
+                              <Symbol>
+                                <Component Name="SupervisionTrip" />
+                              </Symbol>
+                            </Access>
+                            <Part Name="Contact" UId="11" />
+                            <Part Name="SvCoil" UId="12" />
+                          </Parts>
+                          <Wires>
+                            <Wire UId="13">
+                              <Powerrail />
+                              <NameCon UId="11" Name="in" />
+                            </Wire>
+                            <Wire UId="14">
+                              <IdentCon UId="10" />
+                              <NameCon UId="11" Name="operand" />
+                            </Wire>
+                            <Wire UId="15">
+                              <NameCon UId="11" Name="out" />
+                              <NameCon UId="12" Name="in" />
+                            </Wire>
+                          </Wires>
+                        </FlgNet>
+                      </Supervision>
+                    </Supervisions>
+                    <Interlocks>
+                      <Interlock ProgrammingLanguage="LAD">
+                        <FlgNet>
+                          <Parts>
+                            <Access Scope="LocalVariable" UId="20">
+                              <Symbol>
+                                <Component Name="GuardClosed" />
+                              </Symbol>
+                            </Access>
+                            <Part Name="Contact" UId="21" />
+                            <Part Name="IlCoil" UId="22" />
+                          </Parts>
+                          <Wires>
+                            <Wire UId="23">
+                              <Powerrail />
+                              <NameCon UId="21" Name="in" />
+                            </Wire>
+                            <Wire UId="24">
+                              <IdentCon UId="20" />
+                              <NameCon UId="21" Name="operand" />
+                            </Wire>
+                            <Wire UId="25">
+                              <NameCon UId="21" Name="out" />
+                              <NameCon UId="22" Name="in" />
+                            </Wire>
+                          </Wires>
+                        </FlgNet>
+                      </Interlock>
+                    </Interlocks>
+                  </Step>
+                </Steps>
+                <Transitions>
+                  <Transition Number="1" Name="Start" ProgrammingLanguage="LAD">
+                    <FlgNet>
+                      <Parts>
+                        <Access Scope="LocalVariable" UId="70">
+                          <Symbol>
+                            <Component Name="StartCommand" />
+                          </Symbol>
+                        </Access>
+                        <Part Name="Contact" UId="71" />
+                        <Part Name="TrCoil" UId="72" />
+                      </Parts>
+                      <Wires>
+                        <Wire UId="73">
+                          <Powerrail />
+                          <NameCon UId="71" Name="in" />
+                        </Wire>
+                        <Wire UId="74">
+                          <IdentCon UId="70" />
+                          <NameCon UId="71" Name="operand" />
+                        </Wire>
+                        <Wire UId="75">
+                          <NameCon UId="71" Name="out" />
+                          <NameCon UId="72" Name="in" />
+                        </Wire>
+                      </Wires>
+                    </FlgNet>
+                  </Transition>
+                </Transitions>
+                <Branches />
+                <Connections>
+                  <Connection>
+                    <NodeFrom>
+                      <StepRef Number="1" />
+                    </NodeFrom>
+                    <NodeTo>
+                      <TransitionRef Number="1" />
+                    </NodeTo>
+                    <LinkType>Direct</LinkType>
+                  </Connection>
+                  <Connection>
+                    <NodeFrom>
+                      <TransitionRef Number="1" />
+                    </NodeFrom>
+                    <NodeTo>
+                      <StepRef Number="1" />
+                    </NodeTo>
+                    <LinkType>Jump</LinkType>
+                  </Connection>
+                </Connections>
+              </Sequence>
+              <Sequence>
+                <Title>
+                  <MultiLanguageText Lang="en-US">Parallel cycle</MultiLanguageText>
+                  <MultiLanguageText Lang="de-DE">Paralleler Ablauf</MultiLanguageText>
+                </Title>
+                <Steps>
+                  <Step Number="1" Name="OtherIdle" Init="true">
+                    <StepName>
+                      <MultiLanguageText Lang="de-DE">Warten</MultiLanguageText>
+                    </StepName>
+                    <Actions />
+                    <Supervisions>
+                      <Supervision ProgrammingLanguage="LAD">
+                        <FlgNet>
+                          <Parts>
+                            <Access Scope="LocalVariable" UId="10">
+                              <Symbol>
+                                <Component Name="SupervisionTrip" />
+                              </Symbol>
+                            </Access>
+                            <Part Name="Contact" UId="11" />
+                            <Part Name="SvCoil" UId="12" />
+                          </Parts>
+                          <Wires>
+                            <Wire UId="13">
+                              <Powerrail />
+                              <NameCon UId="11" Name="in" />
+                            </Wire>
+                            <Wire UId="14">
+                              <IdentCon UId="10" />
+                              <NameCon UId="11" Name="operand" />
+                            </Wire>
+                            <Wire UId="15">
+                              <NameCon UId="11" Name="out" />
+                              <NameCon UId="12" Name="in" />
+                            </Wire>
+                          </Wires>
+                        </FlgNet>
+                      </Supervision>
+                    </Supervisions>
+                    <Interlocks>
+                      <Interlock ProgrammingLanguage="LAD">
+                        <FlgNet>
+                          <Parts>
+                            <Access Scope="LocalVariable" UId="20">
+                              <Symbol>
+                                <Component Name="GuardClosed" />
+                              </Symbol>
+                            </Access>
+                            <Part Name="Contact" UId="21" />
+                            <Part Name="IlCoil" UId="22" />
+                          </Parts>
+                          <Wires>
+                            <Wire UId="23">
+                              <Powerrail />
+                              <NameCon UId="21" Name="in" />
+                            </Wire>
+                            <Wire UId="24">
+                              <IdentCon UId="20" />
+                              <NameCon UId="21" Name="operand" />
+                            </Wire>
+                            <Wire UId="25">
+                              <NameCon UId="21" Name="out" />
+                              <NameCon UId="22" Name="in" />
+                            </Wire>
+                          </Wires>
+                        </FlgNet>
+                      </Interlock>
+                    </Interlocks>
+                  </Step>
+                </Steps>
+                <Transitions>
+                  <Transition Number="1" Name="OtherStart" ProgrammingLanguage="LAD">
+                    <FlgNet>
+                      <Parts>
+                        <Access Scope="LocalVariable" UId="70">
+                          <Symbol>
+                            <Component Name="StartCommand" />
+                          </Symbol>
+                        </Access>
+                        <Part Name="Contact" UId="71" />
+                        <Part Name="TrCoil" UId="72" />
+                      </Parts>
+                      <Wires>
+                        <Wire UId="73">
+                          <Powerrail />
+                          <NameCon UId="71" Name="in" />
+                        </Wire>
+                        <Wire UId="74">
+                          <IdentCon UId="70" />
+                          <NameCon UId="71" Name="operand" />
+                        </Wire>
+                        <Wire UId="75">
+                          <NameCon UId="71" Name="out" />
+                          <NameCon UId="72" Name="in" />
+                        </Wire>
+                      </Wires>
+                    </FlgNet>
+                  </Transition>
+                </Transitions>
+                <Branches />
+                <Connections>
+                  <Connection>
+                    <NodeFrom>
+                      <StepRef Number="1" />
+                    </NodeFrom>
+                    <NodeTo>
+                      <TransitionRef Number="1" />
+                    </NodeTo>
+                    <LinkType>Direct</LinkType>
+                  </Connection>
+                  <Connection>
+                    <NodeFrom>
+                      <TransitionRef Number="1" />
+                    </NodeFrom>
+                    <NodeTo>
+                      <StepRef Number="1" />
+                    </NodeTo>
+                    <LinkType>Jump</LinkType>
+                  </Connection>
+                </Connections>
+              </Sequence>
+              <PostOperations />
+              <AlarmsSettings>
+                <AlarmSupervisionCategories>
+                  <AlarmSupervisionCategory Id="1" DisplayClass="1" />
+                </AlarmSupervisionCategories>
+                <AlarmInterlockCategory Id="1" />
+                <AlarmSubcategory1Interlock Id="0" />
+                <AlarmSubcategory2Interlock Id="0" />
+                <AlarmCategorySupervision Id="1" />
+                <AlarmSubcategory1Supervision Id="0" />
+                <AlarmSubcategory2Supervision Id="0" />
+                <AlarmWarningCategory Id="1" />
+                <AlarmSubcategory1Warning Id="0" />
+                <AlarmSubcategory2Warning Id="0" />
+              </AlarmsSettings>
+            </Graph>
+          </NetworkSource>
+          <ProgrammingLanguage>GRAPH</ProgrammingLanguage>
+        </AttributeList>
+      </SW.Blocks.CompileUnit>
+    </ObjectList>
+  </SW.Blocks.FB>
+</Document>

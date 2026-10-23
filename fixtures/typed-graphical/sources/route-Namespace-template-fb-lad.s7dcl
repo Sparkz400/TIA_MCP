@@ -1,0 +1,107 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "TgpNamespace_TemplateFB_LAD"
+VAR_INPUT
+  InputBool : Bool;
+  InputSInt : SInt;
+  InputInt : Int;
+  InputDInt : DInt;
+  InputLInt : LInt;
+  InputUSInt : USInt;
+  InputUInt : UInt;
+  InputUDInt : UDInt;
+  InputULInt : ULInt;
+  InputReal : Real;
+  InputLReal : LReal;
+  InputByte : Byte;
+  InputWord : Word;
+  InputDWord : DWord;
+  InputLWord : LWord;
+  InputTime : Time;
+  InputLTime : LTime;
+END_VAR
+VAR_OUTPUT
+  OutputBool : Bool;
+  OutputSInt : SInt;
+  OutputInt : Int;
+  OutputDInt : DInt;
+  OutputLInt : LInt;
+  OutputUSInt : USInt;
+  OutputUInt : UInt;
+  OutputUDInt : UDInt;
+  OutputULInt : ULInt;
+  OutputReal : Real;
+  OutputLReal : LReal;
+  OutputByte : Byte;
+  OutputWord : Word;
+  OutputDWord : DWord;
+  OutputLWord : LWord;
+  OutputTime : Time;
+  OutputLTime : LTime;
+END_VAR
+VAR_IN_OUT
+  InOutBool : Bool;
+  InOutSInt : SInt;
+  InOutInt : Int;
+  InOutDInt : DInt;
+  InOutLInt : LInt;
+  InOutUSInt : USInt;
+  InOutUInt : UInt;
+  InOutUDInt : UDInt;
+  InOutULInt : ULInt;
+  InOutReal : Real;
+  InOutLReal : LReal;
+  InOutByte : Byte;
+  InOutWord : Word;
+  InOutDWord : DWord;
+  InOutLWord : LWord;
+  InOutTime : Time;
+  InOutLTime : LTime;
+END_VAR
+VAR_TEMP
+  TempBool : Bool;
+  TempSInt : SInt;
+  TempInt : Int;
+  TempDInt : DInt;
+  TempLInt : LInt;
+  TempUSInt : USInt;
+  TempUInt : UInt;
+  TempUDInt : UDInt;
+  TempULInt : ULInt;
+  TempReal : Real;
+  TempLReal : LReal;
+  TempByte : Byte;
+  TempWord : Word;
+  TempDWord : DWord;
+  TempLWord : LWord;
+  TempTime : Time;
+  TempLTime : LTime;
+END_VAR
+VAR
+  StaticBool : Bool;
+  StaticSInt : SInt;
+  StaticInt : Int;
+  StaticDInt : DInt;
+  StaticLInt : LInt;
+  StaticUSInt : USInt;
+  StaticUInt : UInt;
+  StaticUDInt : UDInt;
+  StaticULInt : ULInt;
+  StaticReal : Real;
+  StaticLReal : LReal;
+  StaticByte : Byte;
+  StaticWord : Word;
+  StaticDWord : DWord;
+  StaticLWord : LWord;
+  StaticTime : Time;
+  StaticLTime : LTime;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+ Contact( #InputBool )
+ Coil( #OutputBool )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK
+END_NAMESPACE

@@ -1,0 +1,1180 @@
+{
+  "schemaVersion": "runtime-capture-export.v1",
+  "capture": {
+    "schemaVersion": "runtime-capture-status.v1",
+    "captureId": "2a56651524ee425580648dd6b5a87991",
+    "snapshotRef": "capture:2a56651524ee425580648dd6b5a87991:1:a9eaf3a329084a029c2aea9a99acc586f0ca9d32d41ce82c78c5a0ea64ab1aa0",
+    "state": "ended",
+    "recordedProgress": {
+      "state": "ended",
+      "terminalReason": "stopped",
+      "elapsedMilliseconds": 2,
+      "observedUtc": "2026-10-18T20:41:36.7096588+00:00",
+      "rows": 1,
+      "readAttempts": 1,
+      "skippedPolls": 0,
+      "droppedReadResults": 0
+    },
+    "localFailure": null,
+    "plan": {
+      "captureId": "2a56651524ee425580648dd6b5a87991",
+      "hostId": "c06591bef9914b8d8907ea9eba75380d",
+      "createdUtc": "2026-10-18T20:41:36.626539+00:00",
+      "request": {
+        "attemptId": "44ec639359174403970863154fdac7e7",
+        "selectionIds": [
+          "10b6e67a46844f2dacd13b86a689f10c"
+        ],
+        "intervalMilliseconds": 100,
+        "durationSeconds": 1,
+        "maximumSamples": 10,
+        "maximumBytes": 1048576,
+        "reviewId": "89c075796eb78934580d64cae7c6f63992bcf3d448f80d36114b45800c682ca8",
+        "representation": "simple",
+        "association": {
+          "caseId": "6ba5ebd54b35b622b4eb3f545f7f72cc3b1e750b94e9f0fe0b38a0e7ebda7f0d",
+          "mappings": [
+            {
+              "selectionId": "10b6e67a46844f2dacd13b86a689f10c",
+              "signalId": "enable",
+              "reason": "Explicit saved alarm operand"
+            }
+          ],
+          "assertedProgramIdentity": null
+        }
+      },
+      "signals": [
+        {
+          "selectionId": "10b6e67a46844f2dacd13b86a689f10c",
+          "selection": {
+            "context": {
+              "endpoint": "https://plc.example",
+              "connectionId": "44ec639359174403970863154fdac7e7",
+              "epoch": "066f651aff2f4f729290ccd5c0a1a9c4",
+              "peerCertificateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "symbol": "\"DB_Line\".Conv2.Enable",
+            "representation": "simple",
+            "metadataSha256": "2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747"
+          },
+          "metadata": {
+            "name": "Enable",
+            "datatype": "bool"
+          }
+        }
+      ],
+      "association": {
+        "caseId": "6ba5ebd54b35b622b4eb3f545f7f72cc3b1e750b94e9f0fe0b38a0e7ebda7f0d",
+        "reviewId": "89c075796eb78934580d64cae7c6f63992bcf3d448f80d36114b45800c682ca8",
+        "project": {
+          "projectPath": "synthetic-fixture.ap21",
+          "host": "offline-test"
+        },
+        "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+        "selectedInstance": {
+          "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "memberPath": [
+            "Conv2"
+          ],
+          "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+          "plcPath": "/projects/Fixture/plc/CPU",
+          "scopePath": "/projects/Fixture/plc/CPU",
+          "namespace": "",
+          "evidence": [
+            {
+              "kind": "usesType",
+              "source": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "nodeId": "DB_Line"
+              },
+              "target": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                "nodeId": "FB_Line"
+              },
+              "evidence": {
+                "origin": "nativeConfirmed",
+                "resolution": "resolved",
+                "fixtureNote": "Synthetic edge; no native observation."
+              }
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "instanceScope": "GlobalVariable",
+              "instanceComponents": [
+                "DB_Line"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": []
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+              "xmlLine": 3,
+              "origin": "savedNativeXml",
+              "liveVerified": false
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "instanceScope": "LocalVariable",
+              "instanceComponents": [
+                "Conv2"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": [
+                {
+                  "parameter": "Enable",
+                  "direction": "Input",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "resolution": "simpleSymbol",
+                  "actual": {
+                    "scope": "GlobalVariable",
+                    "components": [
+                      "DB_IO",
+                      "Enable2"
+                    ]
+                  },
+                  "operandEvidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  }
+                },
+                {
+                  "parameter": "RunCmd",
+                  "direction": "Output",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "resolution": "simpleSymbol",
+                  "actual": {
+                    "scope": "GlobalVariable",
+                    "components": [
+                      "DB_IO",
+                      "Final2"
+                    ]
+                  },
+                  "operandEvidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  }
+                }
+              ],
+              "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "callerMemberPath": []
+            }
+          ],
+          "callSites": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "instanceScope": "LocalVariable",
+              "instanceComponents": [
+                "Conv2"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": [
+                {
+                  "parameter": "Enable",
+                  "direction": "Input",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "resolution": "simpleSymbol",
+                  "actual": {
+                    "scope": "GlobalVariable",
+                    "components": [
+                      "DB_IO",
+                      "Enable2"
+                    ]
+                  },
+                  "operandEvidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  }
+                },
+                {
+                  "parameter": "RunCmd",
+                  "direction": "Output",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "resolution": "simpleSymbol",
+                  "actual": {
+                    "scope": "GlobalVariable",
+                    "components": [
+                      "DB_IO",
+                      "Final2"
+                    ]
+                  },
+                  "operandEvidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                    "xmlLine": 1,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  }
+                }
+              ],
+              "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "callerMemberPath": []
+            }
+          ],
+          "rootCallSites": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "instanceScope": "GlobalVariable",
+              "instanceComponents": [
+                "DB_Line"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": []
+            }
+          ],
+          "resolution": "capturedStorageOnly",
+          "runtimeCallContextVerified": false
+        },
+        "sourceRevision": {
+          "reviewId": "89c075796eb78934580d64cae7c6f63992bcf3d448f80d36114b45800c682ca8",
+          "documents": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "status": "exported",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "status": "exported",
+              "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "status": "exported",
+              "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "status": "exported",
+              "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+              "status": "exported",
+              "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f"
+            }
+          ],
+          "onlineVerified": false
+        },
+        "signals": [
+          {
+            "selectionId": "10b6e67a46844f2dacd13b86a689f10c",
+            "signalId": "enable",
+            "declaration": {
+              "id": "enable",
+              "role": "instance enable",
+              "reason": "Independently authored instance enable role tests the writer prediction.",
+              "hypothesisIds": [
+                "writer"
+              ],
+              "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "memberPath": [
+                "Conv2",
+                "Enable"
+              ],
+              "datatype": "Bool",
+              "symbolComponents": [
+                "DB_Line",
+                "Conv2",
+                "Enable"
+              ],
+              "namespace": "",
+              "scopePath": "/projects/Fixture/plc/CPU",
+              "resolution": "capturedDeclaration",
+              "unavailableReason": null,
+              "traceability": "requiresTargetValidation",
+              "evidence": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                "xmlLine": 3,
+                "origin": "savedNativeXml",
+                "liveVerified": false
+              },
+              "onlineAddress": null,
+              "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+              "selectionEvidence": null
+            }
+          }
+        ],
+        "addressMatchVerified": false,
+        "programMatchVerified": false,
+        "sourceAuthenticityVerified": false,
+        "nativeQualified": false,
+        "alarmBindings": {
+          "schemaVersion": "diagnostic-alarm-bindings.v1",
+          "reviewId": "89c075796eb78934580d64cae7c6f63992bcf3d448f80d36114b45800c682ca8",
+          "alarmSelector": {
+            "reviewId": "89c075796eb78934580d64cae7c6f63992bcf3d448f80d36114b45800c682ca8",
+            "nodeId": "alarm-42",
+            "objectPath": "/projects/Fixture/plc/CPU/units/LineA/alarms/42"
+          },
+          "selectors": [
+            {
+              "id": "condition",
+              "signalId": "enable",
+              "operand": {
+                "nodeId": "condition",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/condition"
+              },
+              "edgeIndices": [
+                1,
+                4
+              ]
+            },
+            {
+              "id": "condition-actual",
+              "signalId": "enableSource",
+              "operand": {
+                "nodeId": "condition",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/condition"
+              },
+              "edgeIndices": [
+                1,
+                4
+              ]
+            },
+            {
+              "id": "parameter",
+              "signalId": "final",
+              "operand": {
+                "nodeId": "parameter",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/parameter"
+              },
+              "edgeIndices": [
+                1,
+                5
+              ]
+            }
+          ],
+          "bindings": [
+            {
+              "id": "condition",
+              "signalId": "enable",
+              "operand": {
+                "nodeId": "condition",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/condition",
+                "kind": "member",
+                "plcPath": "/projects/Fixture/plc/CPU",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "metadata": {
+                  "syntheticFixture": true,
+                  "rawLabel": "Überlast / overload",
+                  "alarmOperand": {
+                    "schemaVersion": "alarm-operand.v1",
+                    "role": "condition",
+                    "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                    "instance": {
+                      "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "memberPath": [
+                        "Conv2"
+                      ]
+                    },
+                    "memberPath": [
+                      "Enable"
+                    ],
+                    "datatype": "Bool"
+                  }
+                }
+              },
+              "relationships": [
+                {
+                  "index": 1,
+                  "edge": {
+                    "kind": "dependsOn",
+                    "source": {
+                      "nodeId": "alarm-42",
+                      "objectPath": "/projects/Fixture/plc/CPU/units/LineA/alarms/42"
+                    },
+                    "target": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "independently authored fixture only"
+                    }
+                  }
+                },
+                {
+                  "index": 4,
+                  "edge": {
+                    "kind": "reads",
+                    "source": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "target": {
+                      "nodeId": "condition",
+                      "objectPath": "/projects/Fixture/plc/CPU/operands/condition"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "Normalized supplied test observation only"
+                    }
+                  }
+                }
+              ],
+              "signal": {
+                "id": "enable",
+                "role": "instance enable",
+                "reason": "Independently authored instance enable role tests the writer prediction.",
+                "hypothesisIds": [
+                  "writer"
+                ],
+                "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "memberPath": [
+                  "Conv2",
+                  "Enable"
+                ],
+                "datatype": "Bool",
+                "symbolComponents": [
+                  "DB_Line",
+                  "Conv2",
+                  "Enable"
+                ],
+                "namespace": "",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "resolution": "capturedDeclaration",
+                "unavailableReason": null,
+                "traceability": "requiresTargetValidation",
+                "evidence": {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                  "xmlLine": 3,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                },
+                "onlineAddress": null,
+                "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+                "selectionEvidence": null
+              },
+              "status": "capturedDeclarationMatch",
+              "declaration": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                "xmlLine": 1,
+                "origin": "savedNativeXml",
+                "liveVerified": false,
+                "datatype": "Bool"
+              },
+              "storage": {
+                "candidates": [
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "memberPath": [
+                      "Conv2",
+                      "Enable"
+                    ],
+                    "bindingEvidence": [
+                      {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                        "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    ],
+                    "origin": "selectedMemberOrAlias"
+                  },
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                    "memberPath": [
+                      "Enable2"
+                    ],
+                    "bindingEvidence": [],
+                    "origin": "actualParameter",
+                    "callSite": {
+                      "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                      "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                      "xmlLine": 1,
+                      "origin": "savedNativeXml",
+                      "liveVerified": false,
+                      "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                      "instanceScope": "LocalVariable",
+                      "instanceComponents": [
+                        "Conv2"
+                      ],
+                      "callOrdinal": 0,
+                      "callUid": null,
+                      "parameterBindings": [
+                        {
+                          "parameter": "Enable",
+                          "direction": "Input",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Enable2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        },
+                        {
+                          "parameter": "RunCmd",
+                          "direction": "Output",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Final2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        }
+                      ],
+                      "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "callerMemberPath": []
+                    },
+                    "parameterBinding": {
+                      "parameter": "Enable",
+                      "direction": "Input",
+                      "evidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      },
+                      "resolution": "simpleSymbol",
+                      "actual": {
+                        "scope": "GlobalVariable",
+                        "components": [
+                          "DB_IO",
+                          "Enable2"
+                        ]
+                      },
+                      "operandEvidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    }
+                  }
+                ],
+                "gaps": [],
+                "truncated": false,
+                "maxCandidates": 64,
+                "maxCallSites": 64,
+                "maxParameterBindings": 256,
+                "maxResolutionVisits": 1000,
+                "runtimeCallContextVerified": false
+              }
+            },
+            {
+              "id": "condition-actual",
+              "signalId": "enableSource",
+              "operand": {
+                "nodeId": "condition",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/condition",
+                "kind": "member",
+                "plcPath": "/projects/Fixture/plc/CPU",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "metadata": {
+                  "syntheticFixture": true,
+                  "rawLabel": "Überlast / overload",
+                  "alarmOperand": {
+                    "schemaVersion": "alarm-operand.v1",
+                    "role": "condition",
+                    "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                    "instance": {
+                      "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "memberPath": [
+                        "Conv2"
+                      ]
+                    },
+                    "memberPath": [
+                      "Enable"
+                    ],
+                    "datatype": "Bool"
+                  }
+                }
+              },
+              "relationships": [
+                {
+                  "index": 1,
+                  "edge": {
+                    "kind": "dependsOn",
+                    "source": {
+                      "nodeId": "alarm-42",
+                      "objectPath": "/projects/Fixture/plc/CPU/units/LineA/alarms/42"
+                    },
+                    "target": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "independently authored fixture only"
+                    }
+                  }
+                },
+                {
+                  "index": 4,
+                  "edge": {
+                    "kind": "reads",
+                    "source": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "target": {
+                      "nodeId": "condition",
+                      "objectPath": "/projects/Fixture/plc/CPU/operands/condition"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "Normalized supplied test observation only"
+                    }
+                  }
+                }
+              ],
+              "signal": {
+                "id": "enableSource",
+                "role": "enable source",
+                "reason": "Independently authored enable source role tests the writer prediction.",
+                "hypothesisIds": [
+                  "writer"
+                ],
+                "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                "memberPath": [
+                  "Enable2"
+                ],
+                "datatype": "Bool",
+                "symbolComponents": [
+                  "DB_IO",
+                  "Enable2"
+                ],
+                "namespace": "",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "resolution": "capturedDeclaration",
+                "unavailableReason": null,
+                "traceability": "requiresTargetValidation",
+                "evidence": {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                  "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                },
+                "onlineAddress": null,
+                "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+                "selectionEvidence": null
+              },
+              "status": "capturedDeclarationMatch",
+              "declaration": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                "xmlLine": 1,
+                "origin": "savedNativeXml",
+                "liveVerified": false,
+                "datatype": "Bool"
+              },
+              "storage": {
+                "candidates": [
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "memberPath": [
+                      "Conv2",
+                      "Enable"
+                    ],
+                    "bindingEvidence": [
+                      {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                        "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    ],
+                    "origin": "selectedMemberOrAlias"
+                  },
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                    "memberPath": [
+                      "Enable2"
+                    ],
+                    "bindingEvidence": [],
+                    "origin": "actualParameter",
+                    "callSite": {
+                      "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                      "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                      "xmlLine": 1,
+                      "origin": "savedNativeXml",
+                      "liveVerified": false,
+                      "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                      "instanceScope": "LocalVariable",
+                      "instanceComponents": [
+                        "Conv2"
+                      ],
+                      "callOrdinal": 0,
+                      "callUid": null,
+                      "parameterBindings": [
+                        {
+                          "parameter": "Enable",
+                          "direction": "Input",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Enable2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        },
+                        {
+                          "parameter": "RunCmd",
+                          "direction": "Output",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Final2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        }
+                      ],
+                      "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "callerMemberPath": []
+                    },
+                    "parameterBinding": {
+                      "parameter": "Enable",
+                      "direction": "Input",
+                      "evidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      },
+                      "resolution": "simpleSymbol",
+                      "actual": {
+                        "scope": "GlobalVariable",
+                        "components": [
+                          "DB_IO",
+                          "Enable2"
+                        ]
+                      },
+                      "operandEvidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    }
+                  }
+                ],
+                "gaps": [],
+                "truncated": false,
+                "maxCandidates": 64,
+                "maxCallSites": 64,
+                "maxParameterBindings": 256,
+                "maxResolutionVisits": 1000,
+                "runtimeCallContextVerified": false
+              }
+            },
+            {
+              "id": "parameter",
+              "signalId": "final",
+              "operand": {
+                "nodeId": "parameter",
+                "objectPath": "/projects/Fixture/plc/CPU/operands/parameter",
+                "kind": "member",
+                "plcPath": "/projects/Fixture/plc/CPU",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "metadata": {
+                  "syntheticFixture": true,
+                  "rawLabel": "Überlast / overload",
+                  "alarmOperand": {
+                    "schemaVersion": "alarm-operand.v1",
+                    "role": "parameter",
+                    "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                    "instance": {
+                      "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "memberPath": [
+                        "Conv2"
+                      ]
+                    },
+                    "memberPath": [
+                      "RunCmd"
+                    ],
+                    "datatype": "Bool"
+                  }
+                }
+              },
+              "relationships": [
+                {
+                  "index": 1,
+                  "edge": {
+                    "kind": "dependsOn",
+                    "source": {
+                      "nodeId": "alarm-42",
+                      "objectPath": "/projects/Fixture/plc/CPU/units/LineA/alarms/42"
+                    },
+                    "target": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "independently authored fixture only"
+                    }
+                  }
+                },
+                {
+                  "index": 5,
+                  "edge": {
+                    "kind": "reads",
+                    "source": {
+                      "nodeId": "supervision",
+                      "objectPath": "/projects/Fixture/plc/CPU/supervisions/17"
+                    },
+                    "target": {
+                      "nodeId": "parameter",
+                      "objectPath": "/projects/Fixture/plc/CPU/operands/parameter"
+                    },
+                    "evidence": {
+                      "origin": "parsedSupported",
+                      "resolution": "resolved",
+                      "location": "Normalized supplied test observation only"
+                    }
+                  }
+                }
+              ],
+              "signal": {
+                "id": "final",
+                "role": "final output",
+                "reason": "Independently authored final output role tests the writer prediction.",
+                "hypothesisIds": [
+                  "writer"
+                ],
+                "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                "memberPath": [
+                  "Final2"
+                ],
+                "datatype": "Bool",
+                "symbolComponents": [
+                  "DB_IO",
+                  "Final2"
+                ],
+                "namespace": "",
+                "scopePath": "/projects/Fixture/plc/CPU",
+                "resolution": "capturedDeclaration",
+                "unavailableReason": null,
+                "traceability": "requiresTargetValidation",
+                "evidence": {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                  "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                },
+                "onlineAddress": null,
+                "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+                "selectionEvidence": null
+              },
+              "status": "capturedDeclarationMatch",
+              "declaration": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                "xmlLine": 1,
+                "origin": "savedNativeXml",
+                "liveVerified": false,
+                "datatype": "Bool"
+              },
+              "storage": {
+                "candidates": [
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "memberPath": [
+                      "Conv2",
+                      "RunCmd"
+                    ],
+                    "bindingEvidence": [
+                      {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                        "utf8Sha256": "572345a324546aa1801569d6e9a548fa6a2ae7d20ccc9a3ae2766bb006722c02",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    ],
+                    "origin": "selectedMemberOrAlias"
+                  },
+                  {
+                    "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                    "memberPath": [
+                      "Final2"
+                    ],
+                    "bindingEvidence": [],
+                    "origin": "actualParameter",
+                    "callSite": {
+                      "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                      "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                      "xmlLine": 1,
+                      "origin": "savedNativeXml",
+                      "liveVerified": false,
+                      "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                      "instanceScope": "LocalVariable",
+                      "instanceComponents": [
+                        "Conv2"
+                      ],
+                      "callOrdinal": 0,
+                      "callUid": null,
+                      "parameterBindings": [
+                        {
+                          "parameter": "Enable",
+                          "direction": "Input",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Enable2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        },
+                        {
+                          "parameter": "RunCmd",
+                          "direction": "Output",
+                          "evidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          },
+                          "resolution": "simpleSymbol",
+                          "actual": {
+                            "scope": "GlobalVariable",
+                            "components": [
+                              "DB_IO",
+                              "Final2"
+                            ]
+                          },
+                          "operandEvidence": {
+                            "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                            "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                            "xmlLine": 1,
+                            "origin": "savedNativeXml",
+                            "liveVerified": false
+                          }
+                        }
+                      ],
+                      "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                      "callerMemberPath": []
+                    },
+                    "parameterBinding": {
+                      "parameter": "RunCmd",
+                      "direction": "Output",
+                      "evidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      },
+                      "resolution": "simpleSymbol",
+                      "actual": {
+                        "scope": "GlobalVariable",
+                        "components": [
+                          "DB_IO",
+                          "Final2"
+                        ]
+                      },
+                      "operandEvidence": {
+                        "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                        "utf8Sha256": "01a53465af0d51f2e845970ba13e6141b007991f4a8d0526e5cee1b182447956",
+                        "xmlLine": 1,
+                        "origin": "savedNativeXml",
+                        "liveVerified": false
+                      }
+                    }
+                  }
+                ],
+                "gaps": [],
+                "truncated": false,
+                "maxCandidates": 64,
+                "maxCallSites": 64,
+                "maxParameterBindings": 256,
+                "maxResolutionVisits": 1000,
+                "runtimeCallContextVerified": false
+              }
+            }
+          ],
+          "allSelectedMatched": true,
+          "sourceAuthenticityVerified": false,
+          "nativeQualified": false,
+          "runtimeAlarmAssociationVerified": false,
+          "coverageComplete": false,
+          "maxBytes": 524288,
+          "policy": "Normalized supplied alarm operands and declared relationship paths, independently checked against saved executable source. Matching declarations do not prove alarm generation, runtime invocation, causality or complete consumers."
+        }
+      }
+    },
+    "committedBytes": 25547,
+    "uncommittedTailPresent": false,
+    "uncommittedDataUnknown": false,
+    "plcChangesBetweenPollsUnknown": true,
+    "acquisitionMode": "polling",
+    "atomicAcrossSignals": false,
+    "scanSynchronized": false,
+    "programMatchVerified": false,
+    "nativeQualified": false
+  },
+  "rows": [
+    {
+      "sequence": 0,
+      "kind": "read",
+      "selectionId": "10b6e67a46844f2dacd13b86a689f10c",
+      "cycle": 0,
+      "scheduledMilliseconds": 0,
+      "elapsedMilliseconds": 1,
+      "observedUtc": "2026-10-18T20:41:36.626539+00:00",
+      "readResultJson": null,
+      "errorCode": "RuntimeTimeout",
+      "skippedPolls": 0
+    }
+  ]
+}

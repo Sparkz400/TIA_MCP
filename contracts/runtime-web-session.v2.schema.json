@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/runtime-web-session.v2.schema.json",
+  "title": "Owned Web API session observation; physical identity remains unverified",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "attemptId",
+    "hostId",
+    "context",
+    "login",
+    "state",
+    "errorCode",
+    "peerVerified",
+    "methods",
+    "readAvailability",
+    "trust",
+    "deviceIdentityVerified",
+    "programMatchVerified",
+    "nativeQualified",
+    "secretReturned"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "runtime-web-session.v2"
+    },
+    "attemptId": {
+      "$ref": "https://tia-mcp.local/contracts/physical-runtime.v1.schema.json#/$defs/id"
+    },
+    "hostId": {
+      "$ref": "https://tia-mcp.local/contracts/physical-runtime.v1.schema.json#/$defs/id"
+    },
+    "context": {
+      "$ref": "https://tia-mcp.local/contracts/physical-runtime.v1.schema.json#/$defs/context"
+    },
+    "login": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "peerCertificateSha256",
+        "user",
+        "mode",
+        "vaultName",
+        "credential"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "peerCertificateSha256": {
+          "$ref": "https://tia-mcp.local/contracts/physical-runtime.v1.schema.json#/$defs/sha256"
+        },
+        "user": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "mode": {
+          "enum": [
+            "local",
+            "static",
+            "disabled",
+            "umc"
+          ]
+        },
+        "vaultName": {
+          "type": "string"
+        },
+        "credential": {
+          "$ref": "https://tia-mcp.local/contracts/protected-credential.v1.schema.json#/$defs/reference"
+        }
+      }
+    },
+    "state": {
+      "enum": [
+        "connecting",
+        "connected",
+        "disconnecting",
+        "closed",
+        "notConnected",
+        "remoteSessionUnknown",
+        "hostEndedRemoteUnknown",
+        "abandonedRemoteUnknown"
+      ]
+    },
+    "errorCode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "peerVerified": {
+      "type": "boolean"
+    },
+    "methods": {
+      "type": "array",
+      "maxItems": 2048,
+      "items": {
+        "type": "string",
+        "maxLength": 128
+      }
+    },
+    "readAvailability": {
+      "enum": [
+        "unsupported",
+        "permissionUnknown",
+        "permissionDenied",
+        "permittedAtObservation"
+      ]
+    },
+    "trust": {
+      "const": "explicitLeafPinAndHostnameAndValidity"
+    },
+    "deviceIdentityVerified": {
+      "const": false
+    },
+    "programMatchVerified": {
+      "const": false
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "secretReturned": {
+      "const": false
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "apiVersion",
+        "quantityProfile",
+        "maximumRequestBytes",
+        "maximumParallelRequests",
+        "maximumUserSessions",
+        "authenticationModes",
+        "sessionInfoObserved",
+        "sessionUser",
+        "sessionAuthenticationMode",
+        "runtimeTimeout",
+        "passwordExpiresUtc",
+        "passwordExpirationWarning",
+        "hasNoPermissions"
+      ],
+      "properties": {
+        "apiVersion": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "quantityProfile": {
+          "enum": [
+            "unavailable",
+            "siemens-v21-table-max"
+          ]
+        },
+        "maximumRequestBytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "maximumParallelRequests": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "maximumUserSessions": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "authenticationModes": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "local",
+              "static",
+              "disabled",
+              "umc",
+              "umc_sso"
+            ]
+          }
+        },
+        "sessionInfoObserved": {
+          "type": "boolean"
+        },
+        "sessionUser": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 1024
+        },
+        "sessionAuthenticationMode": {
+          "enum": [
+            null,
+            "local",
+            "static",
+            "disabled",
+            "umc"
+          ]
+        },
+        "runtimeTimeout": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "passwordExpiresUtc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "passwordExpirationWarning": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "hasNoPermissions": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

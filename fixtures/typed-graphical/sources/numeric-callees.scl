@@ -1,0 +1,44 @@
+FUNCTION "Tgp_NumericFC" : Int
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Value : Int;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Result : Int;
+END_VAR
+BEGIN
+ #Accumulator := #Accumulator + #Value;
+ #Result := #Accumulator * 2;
+ #Tgp_NumericFC := #Accumulator + 1;
+END_FUNCTION
+
+FUNCTION_BLOCK "Tgp_NumericFB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+ Delta : Int;
+ Reset : Bool;
+END_VAR
+VAR_IN_OUT
+ Accumulator : Int;
+END_VAR
+VAR_OUTPUT
+ Total : Int;
+END_VAR
+VAR
+ State : Int;
+END_VAR
+BEGIN
+ IF #Reset THEN
+  #State := 0;
+ ELSIF #Enable THEN
+  #State := #State + #Delta;
+  #Accumulator := #Accumulator + #Delta;
+ END_IF;
+ #Total := #State + #Accumulator;
+END_FUNCTION_BLOCK

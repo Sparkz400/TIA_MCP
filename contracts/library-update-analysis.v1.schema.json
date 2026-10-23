@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-update-analysis:v1",
+  "title": "Recorded project-update impact, baseline and cleanup proof",
+  "description": "Local consistency of a retained preview only. OB identities and native references remain reported observations; arbitrary content preservation and runtime reachability are not proven.",
+  "type": "object",
+  "properties": {
+    "updateImpact": {
+      "$ref": "#/$defs/impact"
+    },
+    "updateBaseline": {
+      "$ref": "#/$defs/baseline"
+    },
+    "updateCleanupGuard": {
+      "$ref": "#/$defs/guard"
+    }
+  },
+  "required": [
+    "updateImpact",
+    "updateBaseline",
+    "updateCleanupGuard"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 4096,
+      "pattern": "^/[^\\x00-\\x1f\\x7f-\\x9f\\\\]+(?![\\s\\S])"
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      },
+      "maxItems": 50000,
+      "uniqueItems": true
+    },
+    "use": {
+      "type": "object",
+      "properties": {
+        "objectPath": {
+          "$ref": "#/$defs/path"
+        },
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "versionGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        }
+      },
+      "required": [
+        "objectPath",
+        "typeGuid",
+        "versionGuid"
+      ],
+      "additionalProperties": false
+    },
+    "baseline": {
+      "type": "object",
+      "properties": {
+        "plcPath": {
+          "$ref": "#/$defs/path"
+        },
+        "objectPaths": {
+          "$ref": "#/$defs/paths"
+        },
+        "uses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/use"
+          },
+          "maxItems": 1000
+        },
+        "scopeComplete": {
+          "const": true
+        }
+      },
+      "required": [
+        "plcPath",
+        "objectPaths",
+        "uses",
+        "scopeComplete"
+      ],
+      "additionalProperties": false
+    },
+    "affected": {
+      "type": "object",
+      "properties": {
+        "objectPath": {
+          "$ref": "#/$defs/path"
+        },
+        "object": {
+          "type": "object"
+        },
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "beforeVersionGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "beforeVersion": {
+          "type": "string"
+        },
+        "requestedVersionGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "requestedVersion": {
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "update",
+            "keepExactVersion"
+          ]
+        }
+      },
+      "required": [
+        "objectPath",
+        "object",
+        "typeGuid",
+        "beforeVersionGuid",
+        "beforeVersion",
+        "requestedVersionGuid",
+        "requestedVersion",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "comparison": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "beforeVersionGuid": {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            "requestedVersionGuid": {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "before": {
+                    "type": "string"
+                  },
+                  "after": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "status",
+                  "before",
+                  "after"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 200
+            }
+          },
+          "required": [
+            "beforeVersionGuid",
+            "requestedVersionGuid",
+            "properties"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "beforeVersionGuid": {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            "comparisonAvailable": {
+              "const": false
+            },
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "beforeVersionGuid",
+            "comparisonAvailable",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "type": {
+      "type": "object",
+      "properties": {
+        "requested": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+        },
+        "affectedUseCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "scope": {
+          "enum": [
+            "allNativeUsesInSelectedPlc",
+            "librarySynchronizationOnly_NoNewEngineeringInstance"
+          ]
+        },
+        "nativeComparisons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/comparison"
+          },
+          "maxItems": 1000
+        },
+        "libraryVersionsEligibleForCopy": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+          }
+        }
+      },
+      "required": [
+        "requested",
+        "affectedUseCount",
+        "scope",
+        "nativeComparisons",
+        "libraryVersionsEligibleForCopy"
+      ],
+      "additionalProperties": false
+    },
+    "impact": {
+      "type": "object",
+      "properties": {
+        "plcPath": {
+          "$ref": "#/$defs/path"
+        },
+        "affectedUses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/affected"
+          },
+          "maxItems": 1000
+        },
+        "usesScopeComplete": {
+          "const": true
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/type"
+          },
+          "maxItems": 1000,
+          "minItems": 1
+        },
+        "noOp": {
+          "type": "boolean"
+        },
+        "nativeComparisonsComplete": {
+          "type": "boolean"
+        },
+        "libraryScope": {
+          "const": "Selected types and required native dependency types; native synchronization can copy their other committed library releases. It does not create new engineering instances when no uses exist."
+        },
+        "runtimeCompatibilityVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "plcPath",
+        "affectedUses",
+        "usesScopeComplete",
+        "types",
+        "noOp",
+        "nativeComparisonsComplete",
+        "libraryScope",
+        "runtimeCompatibilityVerified"
+      ],
+      "additionalProperties": false
+    },
+    "guard": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "const": "Every baseline library use must have an exact native reference path from an OB, excluding outgoing references of updated objects."
+        },
+        "requiredLibraryUses": {
+          "$ref": "#/$defs/paths"
+        },
+        "obRoots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "maxItems": 50000,
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "reachablePaths": {
+          "$ref": "#/$defs/paths"
+        },
+        "proofEdges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "callerPath": {
+                "$ref": "#/$defs/path"
+              },
+              "calleePath": {
+                "$ref": "#/$defs/path"
+              }
+            },
+            "required": [
+              "callerPath",
+              "calleePath"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200000
+        },
+        "objectsWithoutCrossReferenceService": {
+          "$ref": "#/$defs/paths"
+        },
+        "proofScope": {
+          "const": "All required baseline library uses have positive native OB-rooted reference paths; unavailable or unresolved graph edges provide no evidence."
+        },
+        "allRequiredUsesProven": {
+          "const": true
+        },
+        "completeReferenceGraphClaimed": {
+          "const": false
+        },
+        "nativeCleanupDisabled": {
+          "const": false
+        },
+        "runtimeReachabilityClaimed": {
+          "const": false
+        }
+      },
+      "required": [
+        "policy",
+        "requiredLibraryUses",
+        "obRoots",
+        "reachablePaths",
+        "proofEdges",
+        "objectsWithoutCrossReferenceService",
+        "proofScope",
+        "allRequiredUsesProven",
+        "completeReferenceGraphClaimed",
+        "nativeCleanupDisabled",
+        "runtimeReachabilityClaimed"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

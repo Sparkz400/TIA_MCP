@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-comparison.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-comparison.v2"
+    },
+    "beforeMeasurementId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterMeasurementId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "beforeTracePlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterTracePlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "beforeReviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterReviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "alignment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/alignment"
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "beforeSignalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "afterSignalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "beforeIdentity": {
+            "type": "object",
+            "required": [
+              "id",
+              "storagePath",
+              "memberPath",
+              "datatype"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "storagePath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "memberPath": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "minItems": 1,
+                "maxItems": 16
+              },
+              "datatype": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            }
+          },
+          "afterIdentity": {
+            "type": "object",
+            "required": [
+              "id",
+              "storagePath",
+              "memberPath",
+              "datatype"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "storagePath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "memberPath": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "minItems": 1,
+                "maxItems": 16
+              },
+              "datatype": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            }
+          },
+          "sameStorage": {
+            "type": "boolean"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "before": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/series"
+          },
+          "after": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/series"
+          }
+        },
+        "required": [
+          "beforeSignalId",
+          "afterSignalId",
+          "beforeIdentity",
+          "afterIdentity",
+          "sameStorage",
+          "unit",
+          "before",
+          "after"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "sourceChanged": {
+      "type": "boolean"
+    },
+    "programIdentityChanged": {
+      "type": "boolean"
+    },
+    "beforeAcquisition": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/context"
+    },
+    "afterAcquisition": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/context"
+    },
+    "beforeAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    },
+    "afterAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    },
+    "beforeWindow": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+    },
+    "afterWindow": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+    },
+    "settingsEqual": {
+      "type": "boolean"
+    },
+    "resampled": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "beforeMeasurementId",
+    "afterMeasurementId",
+    "beforeTracePlanId",
+    "afterTracePlanId",
+    "beforeReviewId",
+    "afterReviewId",
+    "reason",
+    "alignment",
+    "signals",
+    "sourceChanged",
+    "programIdentityChanged",
+    "beforeAcquisition",
+    "afterAcquisition",
+    "beforeAssessment",
+    "afterAssessment",
+    "beforeWindow",
+    "afterWindow",
+    "settingsEqual",
+    "resampled",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "atUtc": "2026-10-15T07:53:17.5222484Z",
+  "automaticReplay": false,
+  "nativeRoute": "RuleSet.SetScope(UpdateOptions.Override,IEnumerable<IEngineeringObject>)",
+  "requestedScope": [
+    "ScratchPLC/Program blocks"
+  ],
+  "definition": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\definition-before-binding.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "effectiveScope": "unverified",
+  "qualification": false
+}

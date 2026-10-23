@@ -1,0 +1,509 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/runtime-capture-analysis.v1.schema.json",
+  "title": "Unqualified sequential polling cycle observations",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/report"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ],
+  "$defs": {
+    "read": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cycle": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectionId": {
+          "$ref": "physical-runtime.v1.schema.json#/$defs/id"
+        },
+        "scheduledMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observedUtc": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unavailableReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requestStartedUtc": {
+          "type": "string",
+          "minLength": 1
+        },
+        "responseReceivedUtc": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hostClockWentBackwards": {
+          "type": "boolean"
+        },
+        "providerErrorCode": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "sequence",
+        "cycle",
+        "selectionId",
+        "scheduledMilliseconds",
+        "elapsedMilliseconds",
+        "observedUtc",
+        "unavailableReason"
+      ],
+      "additionalProperties": false
+    },
+    "report": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-capture-analysis.v1"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^capture:[a-f0-9]{32}:[0-9]{1,6}:[a-f0-9]{64}$"
+        },
+        "caseId": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "reviewId": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "symptom": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "hypotheses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "prediction": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "when",
+                      "expect"
+                    ],
+                    "properties": {
+                      "when": {
+                        "$ref": "diagnostic-case.v1.schema.json#/$defs/conditions"
+                      },
+                      "expect": {
+                        "$ref": "diagnostic-case.v1.schema.json#/$defs/conditions"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "verdict": {
+                "const": "unresolved"
+              },
+              "causationProven": {
+                "const": false
+              },
+              "matchedCycles": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "contradictedCycles": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "unknownCycles": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "examples": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cycle": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "patternMatched": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "values": {
+                      "type": "object",
+                      "maxProperties": 64,
+                      "additionalProperties": {
+                        "type": [
+                          "boolean",
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "reads": {
+                      "type": "object",
+                      "maxProperties": 64,
+                      "additionalProperties": {
+                        "$ref": "#/$defs/read"
+                      }
+                    }
+                  },
+                  "required": [
+                    "cycle",
+                    "patternMatched",
+                    "values",
+                    "reads"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 20
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "statement",
+              "prediction",
+              "verdict",
+              "causationProven",
+              "matchedCycles",
+              "contradictedCycles",
+              "unknownCycles",
+              "examples",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 12,
+          "minItems": 1
+        },
+        "units": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 64,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "unitsOrigin": {
+          "const": "callerSuppliedNoConversion"
+        },
+        "association": {
+          "$ref": "runtime-capture.v1.schema.json#/$defs/association"
+        },
+        "capture": {
+          "type": "object",
+          "properties": {
+            "captureId": {
+              "$ref": "physical-runtime.v1.schema.json#/$defs/id"
+            },
+            "recordedProgress": {
+              "$ref": "runtime-capture.v1.schema.json#/$defs/progress"
+            },
+            "request": {
+              "$ref": "runtime-capture.v1.schema.json#/$defs/request"
+            },
+            "signals": {
+              "$ref": "runtime-capture.v1.schema.json#/$defs/plan/properties/signals"
+            },
+            "context": {
+              "$ref": "physical-runtime.v1.schema.json#/$defs/context"
+            },
+            "uncommittedDataUnknown": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "captureId",
+            "recordedProgress",
+            "request",
+            "signals",
+            "context",
+            "uncommittedDataUnknown"
+          ],
+          "additionalProperties": false
+        },
+        "qualityAssessment": {
+          "type": "object",
+          "properties": {
+            "cyclesObserved": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "missingValues": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "hostReadErrors": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "providerFailures": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unsupportedValues": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unavailableReasons": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "skippedPolls": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "droppedReadResults": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uncapturedSignalIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "maxItems": 64,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "cyclesObserved",
+            "missingValues",
+            "hostReadErrors",
+            "providerFailures",
+            "unsupportedValues",
+            "unavailableReasons",
+            "skippedPolls",
+            "droppedReadResults",
+            "uncapturedSignalIds"
+          ],
+          "additionalProperties": false
+        },
+        "observedChanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signalId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "before": {
+                "type": [
+                  "boolean",
+                  "number",
+                  "null"
+                ]
+              },
+              "after": {
+                "type": [
+                  "boolean",
+                  "number",
+                  "null"
+                ]
+              },
+              "beforeRead": {
+                "$ref": "#/$defs/read"
+              },
+              "afterRead": {
+                "$ref": "#/$defs/read"
+              }
+            },
+            "required": [
+              "signalId",
+              "before",
+              "after",
+              "beforeRead",
+              "afterRead"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200
+        },
+        "observedChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observedChangesTruncated": {
+          "type": "boolean"
+        },
+        "atomicAcrossSignals": {
+          "const": false
+        },
+        "scanSynchronized": {
+          "const": false
+        },
+        "programMatchVerified": {
+          "const": false
+        },
+        "addressMatchVerified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "clockSynchronizationVerified": {
+          "const": false
+        },
+        "nativeQualification": {
+          "const": false
+        },
+        "causationProven": {
+          "const": false
+        },
+        "plcChangesBetweenPollsUnknown": {
+          "const": true
+        },
+        "coverageGaps": {
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "nextCapture": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handoff": {
+          "$ref": "runtime-capture.v1.schema.json#/$defs/handoff"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "snapshotRef",
+        "caseId",
+        "reviewId",
+        "symptom",
+        "hypotheses",
+        "units",
+        "unitsOrigin",
+        "association",
+        "capture",
+        "qualityAssessment",
+        "observedChanges",
+        "observedChangeCount",
+        "observedChangesTruncated",
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "programMatchVerified",
+        "addressMatchVerified",
+        "sourceAuthenticityVerified",
+        "clockSynchronizationVerified",
+        "nativeQualification",
+        "causationProven",
+        "plcChangesBetweenPollsUnknown",
+        "coverageGaps",
+        "nextCapture"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "capture": {
+                "properties": {
+                  "request": {
+                    "required": [
+                      "handoffRef"
+                    ]
+                  }
+                },
+                "required": [
+                  "request"
+                ]
+              }
+            },
+            "required": [
+              "capture"
+            ]
+          },
+          "then": {
+            "required": [
+              "handoff"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "handoff"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-capture-analysis.v1"
+        },
+        "id": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "artifact": {
+          "$ref": "diagnostic-report-export.v1.schema.json#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "id",
+        "artifact",
+        "report"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

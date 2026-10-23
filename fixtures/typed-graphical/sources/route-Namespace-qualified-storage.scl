@@ -1,0 +1,55 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+DATA_BLOCK "TgpNamespace_GlobalTimer"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"IEC_TIMER"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpNamespace_GlobalCounter"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"IEC_COUNTER"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpNamespace_NumericFB_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.Alternate.TgpNamespace_NumericFB"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpNamespace_GlobalTemplateFB_LAD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.Alternate.TgpNamespace_TemplateFB_LAD"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpNamespace_GlobalTemplateFB_FBD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.Alternate.TgpNamespace_TemplateFB_FBD"
+BEGIN
+END_DATA_BLOCK
+
+FUNCTION_BLOCK "TgpNamespace_MultiTemplateFB_LAD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Child : "TiaMcp_UnitA.Alternate.TgpNamespace_TemplateFB_LAD";
+END_VAR
+BEGIN
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK "TgpNamespace_MultiTemplateFB_FBD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Child : "TiaMcp_UnitA.Alternate.TgpNamespace_TemplateFB_FBD";
+END_VAR
+BEGIN
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>TiaMcp.OptionalStartup.WrongVersionFixture</AssemblyName>
+    <FixtureVersion Condition="'$(FixtureVersion)' == ''">20.0.0.0</FixtureVersion>
+    <AssemblyVersion>$(FixtureVersion)</AssemblyVersion>
+    <FileVersion>$(FixtureVersion)</FileVersion>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+  </PropertyGroup>
+</Project>

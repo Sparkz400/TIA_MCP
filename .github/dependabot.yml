@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Discover active projects explicitly; retained fixture/evidence sources are immutable.
+  - package-ecosystem: nuget
+    directories:
+      - /src/*
+      - /tests/*
+      - /tests/*/Native
+      - /scripts/native/*
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      nuget-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+  - package-ecosystem: npm
+    directories:
+      - /
+      - /ui/project-explorer
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+  - package-ecosystem: pip
+    directory: /scripts
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      python-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      actions-minor-patch:
+        patterns: ['*']
+        update-types: [minor, patch]

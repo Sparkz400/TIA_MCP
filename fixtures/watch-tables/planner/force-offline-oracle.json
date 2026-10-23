@@ -1,0 +1,65 @@
+{
+  "profile": "owned-peripheral-direct-bool-force-v1",
+  "reviewStatus": "requiresFreshMetadataAndIndependentReview",
+  "projectPath": "synthetic-offline-project.ap21",
+  "plcName": "ScratchPLC",
+  "forceTableName": "Force table",
+  "activeLanguages": [],
+  "rows": [
+    {
+      "kind": "signal",
+      "name": "",
+      "address": "%I0.0:P",
+      "displayFormat": "Bool",
+      "forceValue": "FALSE",
+      "forceIntention": false,
+      "monitorTrigger": "Permanent",
+      "comments": {
+        "de-DE": "Nur Offline-Erfassung Eingang {0}"
+      }
+    },
+    {
+      "kind": "comment",
+      "comments": {
+        "de-DE": "Nur Offline-Erfassung; keine Aktivierung"
+      }
+    },
+    {
+      "kind": "signal",
+      "name": "",
+      "address": "%Q0.0:P",
+      "displayFormat": "Bool",
+      "forceValue": "TRUE",
+      "forceIntention": false,
+      "monitorTrigger": "Permanent",
+      "comments": {
+        "de-DE": "Nur Offline-Erfassung Ausgang {0}"
+      }
+    }
+  ],
+  "signals": [
+    {
+      "forceOrdinal": 0,
+      "forceName": "",
+      "forceAddress": "%I0.0:P",
+      "hardwarePath": "ScratchStation/ExplorerConfiguredIoFixture/ExplorerConfiguredIoFixture",
+      "ioType": "Input",
+      "rangeStartAddress": 0,
+      "rangeLengthBits": 256,
+      "byteOffset": 0,
+      "bitOffset": 0
+    },
+    {
+      "forceOrdinal": 2,
+      "forceName": "",
+      "forceAddress": "%Q0.0:P",
+      "hardwarePath": "ScratchStation/ExplorerConfiguredIoFixture/ExplorerConfiguredIoFixture",
+      "ioType": "Output",
+      "rangeStartAddress": 0,
+      "rangeLengthBits": 192,
+      "byteOffset": 0,
+      "bitOffset": 0
+    }
+  ],
+  "reviewNotes": "Synthetic regression input only. No native admission or qualification."
+}

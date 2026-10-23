@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "teamcenter-observations.v1",
+  "before": {
+    "captureId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "capturedAtUtc": "2026-10-18T00:00:00.0000000+00:00",
+    "producer": "Synthetic supplied fixture",
+    "connection": {
+      "serverUrl": "https://teamcenter.invalid/service",
+      "instance": "training",
+      "principal": "user",
+      "group": "Engineering",
+      "role": "Reviewer",
+      "connectionId": "connection-a",
+      "epoch": "epoch-a"
+    },
+    "items": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "name": "Über Project",
+          "properties": [
+            {
+              "name": "Comment",
+              "value": "Public\ncomment"
+            }
+          ]
+        }
+      ]
+    },
+    "revisions": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "revisionId": "A",
+          "properties": []
+        }
+      ]
+    },
+    "datasets": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "revisionId": "A",
+          "datasetType": "T4TiaProjectDataset",
+          "name": "Über Project",
+          "version": "1",
+          "lock": {
+            "state": "checkedOut",
+            "owner": "peer"
+          },
+          "properties": []
+        }
+      ]
+    },
+    "localCopies": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "dataset": {
+            "itemType": "project",
+            "itemId": "000495",
+            "revisionId": "A",
+            "datasetType": "T4TiaProjectDataset",
+            "name": "Über Project"
+          },
+          "purpose": "cache",
+          "path": "D:/declared-cache/project",
+          "cacheVersion": "1",
+          "serverVersion": "2",
+          "manifest": {
+            "uploadRef": "upload:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "sha256": "e200e36b1ea6e440751adca82bf9fab8ed23e3cc7c2ffb3ce7b6eca6ea132229"
+          }
+        }
+      ]
+    }
+  },
+  "after": {
+    "captureId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "capturedAtUtc": "2026-10-18T00:01:00.0000000+00:00",
+    "producer": "Synthetic supplied fixture",
+    "connection": {
+      "serverUrl": "https://teamcenter.invalid/service",
+      "instance": "training",
+      "principal": "user",
+      "group": "Engineering",
+      "role": "Reviewer",
+      "connectionId": "connection-a",
+      "epoch": "epoch-b"
+    },
+    "items": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "name": "Über Project",
+          "properties": [
+            {
+              "name": "Comment",
+              "value": "Public\ncomment"
+            }
+          ]
+        }
+      ]
+    },
+    "revisions": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "revisionId": "A",
+          "properties": []
+        }
+      ]
+    },
+    "datasets": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "itemType": "project",
+          "itemId": "000495",
+          "revisionId": "A",
+          "datasetType": "T4TiaProjectDataset",
+          "name": "Über Project",
+          "version": "2",
+          "lock": {
+            "state": "unknown",
+            "owner": null
+          },
+          "properties": []
+        }
+      ]
+    },
+    "localCopies": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "dataset": {
+            "itemType": "project",
+            "itemId": "000495",
+            "revisionId": "A",
+            "datasetType": "T4TiaProjectDataset",
+            "name": "Über Project"
+          },
+          "purpose": "cache",
+          "path": "D:/declared-cache/project",
+          "cacheVersion": "1",
+          "serverVersion": "2",
+          "manifest": {
+            "uploadRef": "upload:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "sha256": "e200e36b1ea6e440751adca82bf9fab8ed23e3cc7c2ffb3ce7b6eca6ea132229"
+          }
+        }
+      ]
+    }
+  }
+}

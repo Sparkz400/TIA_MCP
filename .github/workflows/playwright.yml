@@ -1,0 +1,38 @@
+name: Explorer validation
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  explorer:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: '24'
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Chromium
+      run: npx playwright install --with-deps chromium
+    - name: Validate explorer model and client
+      run: npm run test:explorer
+    - name: Validate the actual offline and MCP explorer
+      run: npm run test:explorer:browser
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: explorer-evidence
+        path: |
+          artifacts/project-explorer/runs/
+          output/playwright/project-explorer/
+        retention-days: 30

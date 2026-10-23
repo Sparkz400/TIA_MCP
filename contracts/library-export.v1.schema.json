@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-export:v1",
+  "title": "Native library document export observation",
+  "description": "Serialized export metadata only. Does not read files, recompute directory hashes, interpret transfer success or grant native qualification.",
+  "type": "object",
+  "required": ["schemaVersion", "libraryId", "revision", "documentDirectory", "directory", "documentName", "sha256", "manifest", "transferState", "files", "filesTruncated"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "libraryId": {"$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"},
+    "revision": {"$ref": "#/$defs/hash"},
+    "documentDirectory": {"type": "string", "minLength": 1},
+    "directory": {"type": "string", "minLength": 1},
+    "documentName": {"const": "component"},
+    "sha256": {"$ref": "#/$defs/hash"},
+    "manifest": {"$ref": "#/$defs/manifestFile"},
+    "transferState": {"type": "string", "minLength": 1},
+    "files": {"type": "array", "items": {"$ref": "#/$defs/documentFile"}, "maxItems": 200},
+    "filesTruncated": {"type": "boolean"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}(?![\\s\\S])"},
+    "file": {
+      "type": "object",
+      "required": ["path", "bytes", "sha256", "mediaType"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0, "maximum": 9223372036854775807},
+        "sha256": {"$ref": "#/$defs/hash"},
+        "mediaType": {"type": "string"}
+      }
+    },
+    "manifestFile": {
+      "allOf": [{"$ref": "#/$defs/file"}],
+      "properties": {"mediaType": {"const": "application/json"}},
+      "unevaluatedProperties": false
+    },
+    "documentFile": {
+      "allOf": [{"$ref": "#/$defs/file"}],
+      "required": ["relativePath"],
+      "properties": {
+        "relativePath": {"type": "string", "minLength": 1},
+        "mediaType": {"enum": ["application/xml", "application/octet-stream"]}
+      },
+      "unevaluatedProperties": false
+    }
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/addin-handoff-wire.v1.schema.json",
+  "title": "Bounded Add-In pipe protocol; production enrollment remains unavailable",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "request": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "action"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "action": {
+              "const": "status"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "action",
+            "requestId"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "action": {
+              "const": "read"
+            },
+            "requestId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$(?![\\s\\S])"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "action",
+            "requestId",
+            "reviewId",
+            "selectionBase64"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "action": {
+              "const": "begin"
+            },
+            "requestId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$(?![\\s\\S])"
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$(?![\\s\\S])"
+            },
+            "selectionBase64": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 1398104,
+              "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$(?![\\s\\S])"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "action",
+            "requestId",
+            "challenge"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "action": {
+              "const": "complete"
+            },
+            "requestId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$(?![\\s\\S])"
+            },
+            "challenge": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$(?![\\s\\S])"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "action",
+            "requestId",
+            "challenge"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "action": {
+              "const": "cancel"
+            },
+            "requestId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$(?![\\s\\S])"
+            },
+            "challenge": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$(?![\\s\\S])"
+            }
+          }
+        }
+      ]
+    },
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "protocolVersion",
+        "state",
+        "receiverInstanceId",
+        "pipeName",
+        "host",
+        "userSid",
+        "authorityConfigured",
+        "maximumConnections",
+        "requestBytes",
+        "responseBytes",
+        "connectionLifetimeMilliseconds",
+        "producerAuthenticated",
+        "liveSelectionVerified",
+        "nativeQualified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "addin-handoff-discovery.v1"
+        },
+        "protocolVersion": {
+          "const": 1
+        },
+        "state": {
+          "enum": [
+            "listening",
+            "stopped"
+          ]
+        },
+        "receiverInstanceId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$(?![\\s\\S])"
+        },
+        "pipeName": {
+          "type": "string",
+          "pattern": "^TiaMcp-AddIn-[a-f0-9]{32}$(?![\\s\\S])"
+        },
+        "host": {
+          "$ref": "https://tia-mcp.local/contracts/addin-handoff-state.v1.schema.json#/$defs/peer"
+        },
+        "userSid": {
+          "type": "string",
+          "pattern": "^S-1-5-[0-9-]+$(?![\\s\\S])"
+        },
+        "authorityConfigured": {
+          "type": "boolean"
+        },
+        "maximumConnections": {
+          "const": 4
+        },
+        "requestBytes": {
+          "const": 1402200
+        },
+        "responseBytes": {
+          "const": 2097152
+        },
+        "connectionLifetimeMilliseconds": {
+          "const": 20000
+        },
+        "producerAuthenticated": {
+          "const": false
+        },
+        "liveSelectionVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      }
+    },
+    "response": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "success",
+            "error"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "success": {
+              "const": false
+            },
+            "error": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "success",
+            "result"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 1
+            },
+            "success": {
+              "const": true
+            },
+            "result": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/discovery"
+                },
+                {
+                  "$ref": "https://tia-mcp.local/contracts/addin-handoff-state.v1.schema.json#/$defs/challenge"
+                },
+                {
+                  "$ref": "https://tia-mcp.local/contracts/addin-handoff-state.v1.schema.json#/$defs/status"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

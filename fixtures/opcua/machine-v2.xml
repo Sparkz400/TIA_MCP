@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris><Uri>urn:example:machine:2</Uri></NamespaceUris>
+  <Models><Model ModelUri="urn:example:machine:2" Version="2.0.0" PublicationDate="2026-10-16T00:00:00Z"><RequiredModel ModelUri="http://opcfoundation.org/UA/" Version="1.05.04" PublicationDate="2024-12-01T00:00:00Z" /></Model></Models>
+  <Aliases><Alias Alias="Double">i=11</Alias><Alias Alias="HasComponent">i=47</Alias></Aliases>
+  <UAObject NodeId="ns=1;s=Machine" BrowseName="1:Machine"><DisplayName>Machine</DisplayName><References><Reference ReferenceType="HasComponent">ns=1;s=Machine.Axis.Speed</Reference><Reference ReferenceType="HasComponent">ns=1;s=Machine.Reset</Reference></References></UAObject>
+  <UAVariable NodeId="ns=1;s=Machine.Axis.Speed" BrowseName="1:AxisSpeed" DataType="Double" AccessLevel="1"><DisplayName>Axis speed</DisplayName><References><Reference ReferenceType="HasComponent" IsForward="false">ns=1;s=Machine</Reference></References></UAVariable>
+  <UAMethod NodeId="ns=1;s=Machine.Reset" BrowseName="1:Reset" ParentNodeId="ns=1;s=Machine"><DisplayName>Reset</DisplayName></UAMethod>
+</UANodeSet>

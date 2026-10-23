@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/hmi-library-handoff.v1.schema.json",
+  "title": "Library-owned type lifecycle to HMI destination handoff",
+  "type": "object",
+  "required": ["schemaVersion", "source", "destination", "dependencyClosure", "bindings", "preservation"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "source": {
+      "type": "object", "required": ["family", "typeGuid", "versionGuid", "libraryRevision"],
+      "properties": {"family": {"enum": ["classic", "unified"]}, "typeGuid": {"type": "string"}, "versionGuid": {"type": "string"}, "libraryRevision": {"type": "string"}}
+    },
+    "destination": {"$ref": "hmi-identity.v2.schema.json"},
+    "dependencyClosure": {"type": "object", "required": ["complete", "revision"], "properties": {"complete": {"const": true}, "revision": {"type": "string"}}},
+    "bindings": {"type": "array", "maxItems": 200, "items": {"type": "object", "required": ["interface", "target", "dataType"], "properties": {"interface": {"type": "string"}, "target": {"$ref": "hmi-identity.v2.schema.json"}, "dataType": {"type": "string"}}}},
+    "placement": {"type": "object", "required": ["left", "top", "width", "height"], "properties": {"left": {"type": "integer", "minimum": 0}, "top": {"type": "integer", "minimum": 0}, "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}}},
+    "preservation": {"type": "object", "required": ["profile", "contentFingerprint", "qualificationEvidence"], "properties": {"profile": {"type": "string"}, "contentFingerprint": {"type": "string"}, "qualificationEvidence": {"type": "string"}}}
+  },
+  "description": "A handoff is a prerequisite, never permission or a qualification bypass. Library subsystem owns release, transfer, publication and update. HMI resolves destination, rectangle and exact interface/tag bindings; both execute within the existing prepared change. Unsupported preservation remains unavailable even if the payload asserts evidence."
+}

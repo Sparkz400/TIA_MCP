@@ -1,0 +1,13 @@
+{
+  "atUtc": "2026-10-15T07:53:17.604068Z",
+  "setScopeReturned": true,
+  "scopeObservation": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "effectiveScope": "unverified",
+  "qualification": false
+}

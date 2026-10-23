@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-measurement.v1.schema.json",
+  "title": "Explicitly normalized measurement; not a Siemens exchange format",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "tracePlanId",
+    "reviewId",
+    "mode",
+    "timeUnit",
+    "clock",
+    "programIdentity",
+    "quality",
+    "units",
+    "samples"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-measurement.v1"
+    },
+    "tracePlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "reviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "mode": {
+      "enum": [
+        "synthetic",
+        "polling",
+        "manualNativeExport"
+      ]
+    },
+    "timeUnit": {
+      "enum": [
+        "s",
+        "ms",
+        "us",
+        "ns"
+      ]
+    },
+    "clock": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "programIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "quality": {
+      "type": "object",
+      "required": [
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "dropoutsKnown",
+        "reportedDroppedSamples",
+        "programMatchVerified"
+      ],
+      "properties": {
+        "atomicAcrossSignals": {
+          "type": "boolean"
+        },
+        "scanSynchronized": {
+          "type": "boolean"
+        },
+        "dropoutsKnown": {
+          "type": "boolean"
+        },
+        "reportedDroppedSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "programMatchVerified": {
+          "type": "boolean"
+        },
+        "expectedInterval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "units": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 64,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64
+      }
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "required": [
+          "time",
+          "values"
+        ],
+        "properties": {
+          "time": {
+            "type": "number",
+            "minimum": -1000000000000000000,
+            "maximum": 1000000000000000000
+          },
+          "values": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 64,
+            "additionalProperties": {
+              "type": [
+                "boolean",
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "originalArtifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        }
+      }
+    },
+    "conversion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "settingsReadbackEvidence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "manualNativeExport"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "originalArtifact",
+          "conversion",
+          "settingsReadbackEvidence"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "polling"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "atomicAcrossSignals": {
+                "const": false
+              },
+              "scanSynchronized": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

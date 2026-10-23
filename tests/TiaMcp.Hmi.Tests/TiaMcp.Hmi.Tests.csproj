@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>disable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiInspectionRules.cs" Link="HmiInspectionRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiClassicScreenInventory.cs" Link="HmiClassicScreenInventory.cs" />
+    <Compile Include="../../scripts/native/HmiSeeder/HmiCompilerDiagnostics.cs" Link="HmiCompilerDiagnostics.cs" />
+  </ItemGroup>
+</Project>

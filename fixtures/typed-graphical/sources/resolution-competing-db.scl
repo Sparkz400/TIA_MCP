@@ -1,0 +1,11 @@
+NAMESPACE TiaMcp_UnitB
+DATA_BLOCK "Tgp_ResolutionOne"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Flag : Bool := FALSE;
+ RetainedMarker : Int := 91;
+END_VAR
+BEGIN
+END_DATA_BLOCK
+END_NAMESPACE

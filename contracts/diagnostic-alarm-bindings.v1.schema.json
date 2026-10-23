@@ -1,0 +1,423 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-alarm-bindings.v1.schema.json",
+  "title": "Supplied normalized alarm operands and independent executable-source associations",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-alarm-bindings.v1"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "alarmSelector": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/alarmContextSelector"
+    },
+    "selectors": {
+      "$ref": "#/$defs/selectors"
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+          },
+          "signalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+          },
+          "operand": {
+            "type": "object"
+          },
+          "relationships": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 49999
+                },
+                "edge": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "index",
+                "edge"
+              ]
+            }
+          },
+          "signal": {
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "observationUnavailable",
+              "invalidObservation",
+              "relationshipUnresolved",
+              "ownerMismatch",
+              "memberUnavailable",
+              "datatypeMismatch",
+              "callEvidenceUnavailable",
+              "signalUnavailable",
+              "storageMismatch",
+              "resolutionIncomplete",
+              "capturedDeclarationMatch"
+            ]
+          },
+          "declaration": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "objectPath": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+                  },
+                  "utf8Sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "xmlLine": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "origin": {
+                    "const": "savedNativeXml"
+                  },
+                  "liveVerified": {
+                    "const": false
+                  },
+                  "datatype": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "objectPath",
+                  "utf8Sha256",
+                  "xmlLine",
+                  "origin",
+                  "liveVerified",
+                  "datatype"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "storage": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "candidates": {
+                    "type": "array",
+                    "minItems": 0,
+                    "maxItems": 64,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "storagePath": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096,
+                          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+                        },
+                        "memberPath": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 16,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+                          }
+                        },
+                        "bindingEvidence": {
+                          "type": "array",
+                          "minItems": 0,
+                          "maxItems": 1000,
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "origin": {
+                          "enum": [
+                            "selectedMemberOrAlias",
+                            "actualParameter"
+                          ]
+                        },
+                        "callSite": {
+                          "type": "object"
+                        },
+                        "parameterBinding": {
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "storagePath",
+                        "memberPath",
+                        "bindingEvidence",
+                        "origin"
+                      ]
+                    }
+                  },
+                  "gaps": {
+                    "type": "array",
+                    "minItems": 0,
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "truncated": {
+                    "type": "boolean"
+                  },
+                  "maxCandidates": {
+                    "const": 64
+                  },
+                  "maxCallSites": {
+                    "const": 64
+                  },
+                  "maxParameterBindings": {
+                    "const": 256
+                  },
+                  "maxResolutionVisits": {
+                    "const": 1000
+                  },
+                  "runtimeCallContextVerified": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "candidates",
+                  "gaps",
+                  "truncated",
+                  "maxCandidates",
+                  "maxCallSites",
+                  "maxParameterBindings",
+                  "maxResolutionVisits",
+                  "runtimeCallContextVerified"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "signalId",
+          "operand",
+          "relationships",
+          "signal",
+          "status",
+          "declaration",
+          "storage"
+        ]
+      }
+    },
+    "allSelectedMatched": {
+      "type": "boolean"
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "runtimeAlarmAssociationVerified": {
+      "const": false
+    },
+    "coverageComplete": {
+      "const": false
+    },
+    "maxBytes": {
+      "const": 524288
+    },
+    "policy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "reviewId",
+    "alarmSelector",
+    "selectors",
+    "bindings",
+    "allSelectedMatched",
+    "sourceAuthenticityVerified",
+    "nativeQualified",
+    "runtimeAlarmAssociationVerified",
+    "coverageComplete",
+    "maxBytes",
+    "policy"
+  ],
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "alarm-operand.v1"
+        },
+        "role": {
+          "enum": [
+            "condition",
+            "delay",
+            "parameter",
+            "status"
+          ]
+        },
+        "blockPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+        },
+        "instance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dbPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+            },
+            "memberPath": {
+              "type": "array",
+              "minItems": 0,
+              "maxItems": 8,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+              }
+            }
+          },
+          "required": [
+            "dbPath",
+            "memberPath"
+          ]
+        },
+        "memberPath": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+          }
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "role",
+        "blockPath",
+        "instance",
+        "memberPath",
+        "datatype"
+      ]
+    },
+    "selectors": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+          },
+          "signalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+          },
+          "operand": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "nodeId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+              },
+              "objectPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+              }
+            },
+            "required": [
+              "nodeId",
+              "objectPath"
+            ]
+          },
+          "edgeIndices": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 49999
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "signalId",
+          "operand",
+          "edgeIndices"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "translation-api-review-handoff",
+  "domain": "D03",
+  "nativeExecuted": false,
+  "qualification": "not_run",
+  "availability": "unobserved",
+  "publicReference": "C:/Program Files/Siemens/Automation/Portal V21/PublicAPI/V21/net48/Siemens.Engineering.Base.xml",
+  "operations": [
+    {"id": "TR.export.bilingual", "symbols": ["M:Siemens.Engineering.ProjectBase.ExportProjectTexts(System.IO.FileInfo,System.Globalization.CultureInfo,System.Globalization.CultureInfo)"], "remaining": "native XLSX and target qualification"},
+    {"id": "TR.export.filtered", "symbols": ["M:Siemens.Engineering.ProjectBase.ExportProjectTexts(System.IO.FileInfo,Siemens.Engineering.Language,System.Collections.Generic.IEnumerable{Siemens.Engineering.Language},System.Collections.Generic.IEnumerable{Siemens.Engineering.TextCategory},System.Collections.Generic.IEnumerable{Siemens.Engineering.IEngineeringObject})", "P:Siemens.Engineering.ProjectBase.TextCategories", "P:Siemens.Engineering.TextCategory.Identifier", "M:Siemens.Engineering.TextCategoryComposition.Find(System.String)"], "remaining": "category/product/selection/null/empty behavior; parameter IEngineeringObject does not make this infrastructure"},
+    {"id": "TR.import", "symbols": ["M:Siemens.Engineering.ProjectBase.ImportProjectTexts(System.IO.FileInfo,System.Boolean)", "P:Siemens.Engineering.ProjectTextResult.Path", "P:Siemens.Engineering.ProjectTextResult.State"], "remaining": "native grammar, partial results, source vs translation, preservation/reopen/recovery"},
+    {"id": "TR.language.lifecycle", "symbols": ["P:Siemens.Engineering.ProjectBase.LanguageSettings", "P:Siemens.Engineering.LanguageSettings.ActiveLanguages", "P:Siemens.Engineering.LanguageSettings.EditingLanguage", "P:Siemens.Engineering.LanguageSettings.ReferenceLanguage", "M:Siemens.Engineering.LanguageAssociation.Add(Siemens.Engineering.Language)", "M:Siemens.Engineering.LanguageAssociation.Remove(Siemens.Engineering.Language)"], "remaining": "native activation/deactivation dependent effects and text retention"}
+  ],
+  "manualOnlyResiduals": [
+    {"owner": "D12 with D03", "route": "CPU.GetAttribute(AdvancedWebserverLanguageContainer) -> TableData.Rows -> LoadToPlc / Active / display-language booleans", "qualification": "not_run"},
+    {"owner": "D03 with HMI/D11/X02", "route": "Native category/product matrix and exact XLSX opaque key/language/format metadata", "qualification": "not_run"}
+  ]
+}

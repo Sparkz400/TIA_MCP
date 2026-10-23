@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/project-health-testsuite.v1.schema.json",
+  "title": "Explicitly selected supplied Test Suite evidence; never whole-project health or native qualification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviewId",
+    "reports",
+    "selectionCount",
+    "resultCount",
+    "findingCount",
+    "resolvedFindingCount",
+    "unresolvedFindingCount",
+    "allSelectedSuppliedEvidencePassed",
+    "wholeProjectHealthComplete",
+    "nativeQualified",
+    "sourceAuthenticityVerified",
+    "liveFreshnessVerified",
+    "coveragePolicy"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "project-health-testsuite.v1"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reports": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reviewId",
+          "receipt",
+          "input",
+          "report",
+          "junit",
+          "summary",
+          "outcomeCounts"
+        ],
+        "properties": {
+          "reviewId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "receipt": {
+            "$ref": "#/$defs/artifact"
+          },
+          "input": {
+            "$ref": "#/$defs/artifact"
+          },
+          "report": {
+            "$ref": "#/$defs/artifact"
+          },
+          "junit": {
+            "$ref": "#/$defs/artifact"
+          },
+          "summary": {
+            "$ref": "testsuite-result-report.v1.schema.json#/properties/summary"
+          },
+          "outcomeCounts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "passed",
+              "assertionFailed",
+              "executionError",
+              "inconclusive",
+              "blocked",
+              "excluded",
+              "notRun",
+              "outcomeUnknown"
+            ],
+            "properties": {
+              "passed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "assertionFailed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "executionError": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "inconclusive": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "blocked": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "excluded": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "notRun": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "outcomeUnknown": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              }
+            }
+          }
+        }
+      }
+    },
+    "selectionCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 32
+    },
+    "resultCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 32000
+    },
+    "findingCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3200000
+    },
+    "resolvedFindingCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3200000
+    },
+    "unresolvedFindingCount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3200000
+    },
+    "allSelectedSuppliedEvidencePassed": {
+      "type": "boolean"
+    },
+    "wholeProjectHealthComplete": {
+      "const": false
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "liveFreshnessVerified": {
+      "const": false
+    },
+    "coveragePolicy": {
+      "type": "string",
+      "maxLength": 1000
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "selectionCount": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "allSelectedSuppliedEvidencePassed": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "sha256"
+      ],
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "selection": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    }
+  }
+}

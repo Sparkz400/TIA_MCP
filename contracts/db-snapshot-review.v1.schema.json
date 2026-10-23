@@ -1,0 +1,556 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/db-snapshot-review.v1.schema.json",
+  "title": "Supplied snapshot XML review; no live identity or freshness certification",
+  "$ref": "#/$defs/receipt",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "type",
+        "text"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "snapshotDate",
+        "structureModified",
+        "values",
+        "valueCount",
+        "formatProfile",
+        "valueDomain",
+        "xsdValidated",
+        "metadataPolicy"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "snapshotDate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "structureModified": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/value"
+          },
+          "maxItems": 20000
+        },
+        "valueCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "formatProfile": {
+          "const": "documented-interface-snapshot-shape"
+        },
+        "valueDomain": {
+          "const": "suppliedSnapshotValues"
+        },
+        "xsdValidated": {
+          "const": false
+        },
+        "metadataPolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "status",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "onlyBefore",
+            "onlyAfter",
+            "differentTextOrType"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeCount",
+        "afterCount",
+        "changedPathCount",
+        "comparisonRequested",
+        "originalBytesEqual",
+        "structureTimestampComparison"
+      ],
+      "properties": {
+        "beforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "changedPathCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "comparisonRequested": {
+          "type": "boolean"
+        },
+        "originalBytesEqual": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "structureTimestampComparison": {
+          "enum": [
+            "notCompared",
+            "unknown",
+            "sameReportedText",
+            "differentReportedText"
+          ]
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "objectPath",
+        "plcPath",
+        "association",
+        "before",
+        "after",
+        "changes",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "programIdentityVerified",
+        "structureCompatibilityVerified",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "db-snapshot-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "objectPath": {
+          "type": "string"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "association": {
+          "const": "userSelectedCapturedDB"
+        },
+        "before": {
+          "$ref": "#/$defs/document"
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/document"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "programIdentityVerified": {
+          "const": false
+        },
+        "structureCompatibilityVerified": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "objectPath",
+        "input",
+        "comparisonInput",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "db-snapshot-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "objectPath": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "comparisonInput",
+        "objectPath",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "programIdentityVerified",
+        "structureCompatibilityVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objectPath": {
+          "type": "string"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "programIdentityVerified": {
+          "const": false
+        },
+        "structureCompatibilityVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "comparisonInput",
+        "objectPath",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "programIdentityVerified",
+        "structureCompatibilityVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "comparisonInput": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objectPath": {
+          "type": "string"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "programIdentityVerified": {
+          "const": false
+        },
+        "structureCompatibilityVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "beforeValues",
+            "afterValues",
+            "changes"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/value"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

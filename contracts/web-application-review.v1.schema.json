@@ -1,0 +1,1119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.invalid/contracts/web-application-review.v1.schema.json",
+  "title": "Supplied web application review",
+  "$defs": {
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      },
+      "required": [
+        "nodeId",
+        "objectPath"
+      ]
+    },
+    "property": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ],
+          "maxLength": 8192
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ]
+    },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "applicationType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isDefault": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/property"
+          },
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "applicationId",
+        "name",
+        "applicationType",
+        "isDefault",
+        "properties"
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "webEnabled": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "systemPagesEnabled": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "applicationInventoryComplete": {
+          "type": "boolean"
+        },
+        "applications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/application"
+          },
+          "maxItems": 512
+        },
+        "generationProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/property"
+          },
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "webEnabled",
+        "systemPagesEnabled",
+        "applicationInventoryComplete",
+        "applications",
+        "generationProperties"
+      ]
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uploadRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rootRelative": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultPage": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "purpose": {
+          "enum": [
+            "webApplicationArchive",
+            "userDefinedPageSource"
+          ]
+        },
+        "unavailableReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "uploadRef",
+        "sha256",
+        "rootRelative",
+        "defaultPage",
+        "purpose",
+        "unavailableReason"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "uploadRef": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sha256": {
+                "type": "null"
+              },
+              "rootRelative": {
+                "type": "null"
+              },
+              "defaultPage": {
+                "type": "null"
+              },
+              "unavailableReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8192
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "rootRelative": {
+                "type": "string",
+                "maxLength": 1024
+              },
+              "defaultPage": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "unavailableReason": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "configuration": {
+          "$ref": "#/$defs/configuration"
+        },
+        "archive": {
+          "$ref": "#/$defs/archive"
+        }
+      },
+      "required": [
+        "configuration",
+        "archive"
+      ]
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "web-application-review-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "selectedApplicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/phase"
+        },
+        "after": {
+          "$ref": "#/$defs/phase"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "owner",
+        "selectedApplicationId",
+        "afterKind",
+        "before",
+        "after"
+      ]
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "relativePath",
+        "bytes",
+        "sha256"
+      ]
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "archiveSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "archiveBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file"
+          },
+          "maxItems": 4096
+        },
+        "selectedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "defaultPageSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "topLevelArchiveFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excludedTopLevelFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nestedExtractedFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "archiveSha256",
+        "archiveBytes",
+        "files",
+        "selectedBytes",
+        "defaultPageSha256",
+        "topLevelArchiveFiles",
+        "excludedTopLevelFiles",
+        "nestedExtractedFiles",
+        "manifestSha256"
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "configuration": {
+          "$ref": "#/$defs/configuration"
+        },
+        "archive": {
+          "$ref": "#/$defs/archive"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/content"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "applicationInventoryIncomplete",
+              "selectedApplicationNotObserved",
+              "multipleDeclaredDefaultApplications",
+              "defaultApplicationStateUnknown",
+              "webSettingsUnknown",
+              "enabledPagesWithWebDisabled"
+            ]
+          },
+          "maxItems": 6
+        }
+      },
+      "required": [
+        "phase",
+        "configuration",
+        "archive",
+        "content",
+        "findings"
+      ]
+    },
+    "configurationChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "webEnabled",
+            "systemPagesEnabled",
+            "applicationInventoryComplete",
+            "generationProperties"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/property"
+              },
+              "maxItems": 128
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/property"
+              },
+              "maxItems": 128
+            }
+          ]
+        }
+      },
+      "required": [
+        "field",
+        "before",
+        "after"
+      ]
+    },
+    "applicationChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "status": {
+          "enum": [
+            "notObservedBefore",
+            "notObservedAfter",
+            "changed",
+            "unchanged"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/application"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/application"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "applicationId",
+        "status",
+        "before",
+        "after"
+      ]
+    },
+    "fileChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "status": {
+          "enum": [
+            "added",
+            "removed",
+            "changed",
+            "unchanged"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/file"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/file"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "relativePath",
+        "status",
+        "before",
+        "after"
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "filesComparable": {
+          "type": "boolean"
+        },
+        "fileComparisonState": {
+          "enum": [
+            "comparedSuppliedRoots",
+            "contentUnavailable",
+            "purposeChanged"
+          ]
+        },
+        "changedFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedApplications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "configurationChanges": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unavailableArchives": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "findings": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "filesComparable",
+        "fileComparisonState",
+        "changedFiles",
+        "changedApplications",
+        "configurationChanges",
+        "unavailableArchives",
+        "findings"
+      ]
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "web-application-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "selectedApplicationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "configurationChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/configurationChange"
+          },
+          "maxItems": 4
+        },
+        "applicationChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/applicationChange"
+          },
+          "maxItems": 1024
+        },
+        "fileChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fileChange"
+          },
+          "maxItems": 8192
+        },
+        "archiveChanges": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "sha256",
+              "rootRelative",
+              "defaultPage",
+              "purpose",
+              "unavailableReason"
+            ]
+          },
+          "maxItems": 6
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "associationVerified": {
+          "const": false
+        },
+        "siemensCompatibilityVerified": {
+          "const": false
+        },
+        "generatedBlocksVerified": {
+          "const": false
+        },
+        "deploymentVerified": {
+          "const": false
+        },
+        "endpointVerified": {
+          "const": false
+        },
+        "limits": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "owner",
+        "selectedApplicationId",
+        "afterKind",
+        "observations",
+        "configurationChanges",
+        "applicationChanges",
+        "fileChanges",
+        "archiveChanges",
+        "summary",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "associationVerified",
+        "siemensCompatibilityVerified",
+        "generatedBlocksVerified",
+        "deploymentVerified",
+        "endpointVerified",
+        "limits"
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "archives": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "$ref": "#/$defs/artifact"
+        },
+        "after": {
+          "$ref": "#/$defs/artifact"
+        }
+      },
+      "required": []
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "web-application-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "archives": {
+          "$ref": "#/$defs/archives"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "archives",
+        "report"
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "archiveChanges": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "sha256",
+              "rootRelative",
+              "defaultPage",
+              "purpose",
+              "unavailableReason"
+            ]
+          },
+          "maxItems": 6
+        },
+        "archives": {
+          "$ref": "#/$defs/archives"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "associationVerified": {
+          "const": false
+        },
+        "siemensCompatibilityVerified": {
+          "const": false
+        },
+        "generatedBlocksVerified": {
+          "const": false
+        },
+        "deploymentVerified": {
+          "const": false
+        },
+        "endpointVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      },
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "archiveChanges",
+        "archives",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "associationVerified",
+        "siemensCompatibilityVerified",
+        "generatedBlocksVerified",
+        "deploymentVerified",
+        "endpointVerified",
+        "sourceEvidencePolicy"
+      ]
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "archiveChanges": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "sha256",
+              "rootRelative",
+              "defaultPage",
+              "purpose",
+              "unavailableReason"
+            ]
+          },
+          "maxItems": 6
+        },
+        "archives": {
+          "$ref": "#/$defs/archives"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "associationVerified": {
+          "const": false
+        },
+        "siemensCompatibilityVerified": {
+          "const": false
+        },
+        "generatedBlocksVerified": {
+          "const": false
+        },
+        "deploymentVerified": {
+          "const": false
+        },
+        "endpointVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "configurationChanges",
+            "applicationChanges",
+            "fileChanges"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/configurationChange"
+                      },
+                      {
+                        "$ref": "#/$defs/applicationChange"
+                      },
+                      {
+                        "$ref": "#/$defs/fileChange"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "index",
+                  "value"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  }
+                },
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ]
+              }
+            ]
+          },
+          "maxItems": 200
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "archiveChanges",
+        "archives",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "associationVerified",
+        "siemensCompatibilityVerified",
+        "generatedBlocksVerified",
+        "deploymentVerified",
+        "endpointVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/report"
+    },
+    {
+      "$ref": "#/$defs/record"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/page"
+    }
+  ]
+}

@@ -1,0 +1,708 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:composite-engineering-workflow:v1",
+  "title": "Retained supplied C02 workflow; no native or whole-impact qualification",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/summary"
+    },
+    {
+      "$ref": "#/$defs/page"
+    },
+    {
+      "$ref": "#/$defs/chunk"
+    },
+    {
+      "$ref": "#/$defs/list"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "requestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "beforeReviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "afterReviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceBytesChanged": {
+          "type": "boolean"
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "selections": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "mappings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "correspondences": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "impacts": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "coverageGaps": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "consumerContexts": {
+              "const": 2
+            }
+          },
+          "required": [
+            "selections",
+            "mappings",
+            "correspondences",
+            "impacts",
+            "coverageGaps"
+          ],
+          "additionalProperties": false
+        },
+        "artifacts": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "const": "request.json"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4194304
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "name",
+                "bytes",
+                "sha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "const": "report.json"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 33554432
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "name",
+                "bytes",
+                "sha256"
+              ],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeImpactAnalysisComplete": {
+          "const": false
+        }
+      },
+      "required": [
+        "recordRef",
+        "state",
+        "requestSha256",
+        "reportSha256",
+        "beforeReviewId",
+        "afterReviewId",
+        "sourceBytesChanged",
+        "counts",
+        "artifacts",
+        "receiptName",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeImpactAnalysisComplete"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "artifacts": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "const": "request.json"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4194304
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "name",
+                "bytes",
+                "sha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "const": "report.json"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 33554432
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "name",
+                "bytes",
+                "sha256"
+              ],
+              "additionalProperties": false
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "id",
+        "artifacts"
+      ],
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "section": {
+          "enum": [
+            "selections",
+            "mappings",
+            "correspondences",
+            "impacts",
+            "coverageGaps",
+            "beforeComponents",
+            "afterComponents",
+            "amlChanges",
+            "beforeAmlImpacts",
+            "afterAmlImpacts",
+            "consumerContexts",
+            "consumerCoverage",
+            "beforeConsumerRoots",
+            "beforeConsumerAssociations",
+            "beforeConsumerSavedLinks",
+            "beforeConsumerCandidates",
+            "afterConsumerRoots",
+            "afterConsumerAssociations",
+            "afterConsumerSavedLinks",
+            "afterConsumerCandidates"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {}
+                },
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "maxItems": 200
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "wholeImpactAnalysisComplete": {
+          "const": false
+        }
+      },
+      "required": [
+        "recordRef",
+        "reportSha256",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset",
+        "nativeQualified",
+        "wholeImpactAnalysisComplete"
+      ],
+      "additionalProperties": false
+    },
+    "chunk": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "name": {
+          "enum": [
+            "request.json",
+            "report.json",
+            "receipt.json"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 33554432
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "nextOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "encoding": {
+          "const": "base64"
+        },
+        "data": {
+          "type": "string",
+          "maxLength": 87384,
+          "contentEncoding": "base64"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "recordRef",
+        "name",
+        "sha256",
+        "bytes",
+        "offset",
+        "count",
+        "nextOffset",
+        "complete",
+        "encoding",
+        "data",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "recordRef": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "state": {
+                "enum": [
+                  "complete",
+                  "incomplete",
+                  "verificationFailed"
+                ]
+              },
+              "errorCode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "recordRef",
+              "state",
+              "errorCode"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 20
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ordering": {
+          "const": "record-id; relist after additions"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "rows",
+        "total",
+        "nextOffset",
+        "ordering",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "nativeAccessAttempted": {
+              "const": false
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "nativeAccessAttempted"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "composite_engineering_reviewInput": {
+      "type": "object",
+      "properties": {
+        "uploadRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "uploadRef"
+      ],
+      "additionalProperties": false
+    },
+    "composite_engineering_reopenInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "recordRef"
+      ],
+      "additionalProperties": false
+    },
+    "composite_engineering_pageInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "section": {
+          "enum": [
+            "selections",
+            "mappings",
+            "correspondences",
+            "impacts",
+            "coverageGaps",
+            "beforeComponents",
+            "afterComponents",
+            "amlChanges",
+            "beforeAmlImpacts",
+            "afterAmlImpacts",
+            "consumerContexts",
+            "consumerCoverage",
+            "beforeConsumerRoots",
+            "beforeConsumerAssociations",
+            "beforeConsumerSavedLinks",
+            "beforeConsumerCandidates",
+            "afterConsumerRoots",
+            "afterConsumerAssociations",
+            "afterConsumerSavedLinks",
+            "afterConsumerCandidates"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "recordRef"
+      ],
+      "additionalProperties": false
+    },
+    "composite_engineering_artifact_readInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^composite-engineering:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "name": {
+          "enum": [
+            "request.json",
+            "report.json",
+            "receipt.json"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "recordRef",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "composite_engineering_listInput": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  "x-tool-contracts": {
+    "composite_engineering_review": {
+      "input": {
+        "$ref": "#/$defs/composite_engineering_reviewInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "composite_engineering_reopen": {
+      "input": {
+        "$ref": "#/$defs/composite_engineering_reopenInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "composite_engineering_page": {
+      "input": {
+        "$ref": "#/$defs/composite_engineering_pageInput"
+      },
+      "output": {
+        "$ref": "#/$defs/page"
+      }
+    },
+    "composite_engineering_artifact_read": {
+      "input": {
+        "$ref": "#/$defs/composite_engineering_artifact_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/chunk"
+      }
+    },
+    "composite_engineering_list": {
+      "input": {
+        "$ref": "#/$defs/composite_engineering_listInput"
+      },
+      "output": {
+        "$ref": "#/$defs/list"
+      }
+    }
+  }
+}

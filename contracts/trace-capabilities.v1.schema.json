@@ -1,0 +1,9 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://tia-mcp.local/contracts/trace-capabilities.v1.schema.json",
+  "type":"object","required":["schemaVersion","targetProbed","nativeQualification","routes","targetLimits","measurementFormats"],
+  "properties":{
+    "schemaVersion":{"const":"trace-capabilities.v1"},"targetProbed":{"const":false},"nativeQualification":{"const":false},"targetLimits":{"type":"null"},
+    "routes":{"type":"array","items":{"type":"object","required":["backend","family","documentedRoute","implementation","qualification","targetAvailability","limitations"],"properties":{"qualification":{"const":"unqualified"},"targetAvailability":{"const":"unknown"}}}}
+  }
+}

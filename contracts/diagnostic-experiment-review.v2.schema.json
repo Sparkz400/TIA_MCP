@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-review.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-experiment-review.v2"
+    },
+    "beforeExperimentId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterExperimentId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "beforeMeasurementId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterMeasurementId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "request": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/reviewRequest"
+    },
+    "lineage": {
+      "type": "object"
+    },
+    "beforeReportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterReportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "comparisonId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "beforeHypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/hypothesis"
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "afterHypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/hypothesis"
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "beforeWindow": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+    },
+    "afterWindow": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+    },
+    "beforeQualityAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    },
+    "afterQualityAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    },
+    "beforeAcquisition": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/context"
+    },
+    "afterAcquisition": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/context"
+    },
+    "sourceChanged": {
+      "type": "boolean"
+    },
+    "programIdentityChanged": {
+      "type": "boolean"
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "beforeExperimentId",
+    "afterExperimentId",
+    "beforeMeasurementId",
+    "afterMeasurementId",
+    "request",
+    "lineage",
+    "beforeReportId",
+    "afterReportId",
+    "comparisonId",
+    "beforeHypotheses",
+    "afterHypotheses",
+    "beforeWindow",
+    "afterWindow",
+    "beforeQualityAssessment",
+    "afterQualityAssessment",
+    "beforeAcquisition",
+    "afterAcquisition",
+    "sourceChanged",
+    "programIdentityChanged",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

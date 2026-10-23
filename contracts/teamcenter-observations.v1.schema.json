@@ -1,0 +1,2068 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "teamcenter-observations.v1.schema.json",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "itemsRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemType",
+        "itemId",
+        "name",
+        "properties"
+      ],
+      "properties": {
+        "itemType": {
+          "enum": [
+            "project",
+            "globalLibrary"
+          ]
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f]*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "maxItems": 64
+        }
+      }
+    },
+    "revisionsRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemType",
+        "itemId",
+        "revisionId",
+        "properties"
+      ],
+      "properties": {
+        "itemType": {
+          "enum": [
+            "project",
+            "globalLibrary"
+          ]
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "revisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f]*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "maxItems": 64
+        }
+      }
+    },
+    "datasetsRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemType",
+        "itemId",
+        "revisionId",
+        "datasetType",
+        "name",
+        "version",
+        "lock",
+        "properties"
+      ],
+      "properties": {
+        "itemType": {
+          "enum": [
+            "project",
+            "globalLibrary"
+          ]
+        },
+        "itemId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "revisionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "datasetType": {
+          "enum": [
+            "T4TiaProjectDataset",
+            "T4TiaLibraryDataset"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "owner"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "checkedOut",
+                "checkedIn",
+                "unknown"
+              ]
+            },
+            "owner": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "state": {
+                    "const": "checkedOut"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "owner": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "owner": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "pattern": "^[^\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f]*$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "maxItems": 64
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "itemType": {
+                "const": "project"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datasetType": {
+                "const": "T4TiaProjectDataset"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "datasetType": {
+                "const": "T4TiaLibraryDataset"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "localCopiesRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset",
+        "purpose",
+        "path",
+        "cacheVersion",
+        "serverVersion",
+        "manifest"
+      ],
+      "properties": {
+        "dataset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "itemType",
+            "itemId",
+            "revisionId",
+            "datasetType",
+            "name"
+          ],
+          "properties": {
+            "itemType": {
+              "enum": [
+                "project",
+                "globalLibrary"
+              ]
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "revisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "datasetType": {
+              "enum": [
+                "T4TiaProjectDataset",
+                "T4TiaLibraryDataset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "itemType": {
+                    "const": "project"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "datasetType": {
+                    "const": "T4TiaProjectDataset"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "datasetType": {
+                    "const": "T4TiaLibraryDataset"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "purpose": {
+          "enum": [
+            "source",
+            "cache"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "cacheVersion": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "serverVersion": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "uploadRef",
+            "sha256"
+          ],
+          "properties": {
+            "uploadRef": {
+              "type": "string",
+              "minLength": 39,
+              "maxLength": 39,
+              "pattern": "^upload:[a-f0-9]{32}$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureId",
+        "capturedAtUtc",
+        "producer",
+        "connection",
+        "items",
+        "revisions",
+        "datasets",
+        "localCopies"
+      ],
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "capturedAtUtc": {
+          "type": "string",
+          "minLength": 33,
+          "maxLength": 33,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}\\+00:00$"
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "connection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "serverUrl",
+            "instance",
+            "principal",
+            "group",
+            "role",
+            "connectionId",
+            "epoch"
+          ],
+          "properties": {
+            "serverUrl": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "^https?://[^@?#\\\\\\s]+$"
+            },
+            "instance": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "principal": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "group": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "role": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "connectionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "epoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            }
+          }
+        },
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic",
+            "rows"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/itemsRow"
+              },
+              "maxItems": 256
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "enum": [
+                      "unknown",
+                      "denied",
+                      "failed",
+                      "unavailable"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "rows": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "not": {
+                      "const": "complete"
+                    }
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "revisions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic",
+            "rows"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/revisionsRow"
+              },
+              "maxItems": 512
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "enum": [
+                      "unknown",
+                      "denied",
+                      "failed",
+                      "unavailable"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "rows": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "not": {
+                      "const": "complete"
+                    }
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "datasets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic",
+            "rows"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/datasetsRow"
+              },
+              "maxItems": 1024
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "enum": [
+                      "unknown",
+                      "denied",
+                      "failed",
+                      "unavailable"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "rows": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "not": {
+                      "const": "complete"
+                    }
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "localCopies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic",
+            "rows"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/localCopiesRow"
+              },
+              "maxItems": 128
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "enum": [
+                      "unknown",
+                      "denied",
+                      "failed",
+                      "unavailable"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "rows": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "coverage": {
+                    "not": {
+                      "const": "complete"
+                    }
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "captureId",
+        "capturedAtUtc",
+        "producer",
+        "connection",
+        "items",
+        "revisions",
+        "datasets",
+        "localCopies"
+      ],
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "capturedAtUtc": {
+          "type": "string",
+          "minLength": 33,
+          "maxLength": 33,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{7}\\+00:00$"
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "connection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "serverUrl",
+            "instance",
+            "principal",
+            "group",
+            "role",
+            "connectionId",
+            "epoch"
+          ],
+          "properties": {
+            "serverUrl": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "^https?://[^@?#\\\\\\s]+$"
+            },
+            "instance": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "principal": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "group": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "role": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "connectionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            "epoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            }
+          }
+        },
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "revisions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "datasets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "localCopies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "coverage",
+            "diagnostic"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "complete",
+                "partial",
+                "unknown",
+                "denied",
+                "failed",
+                "unavailable"
+              ]
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "teamcenter-observations.v1"
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "rootPath",
+        "coverage",
+        "diagnostic",
+        "files"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "teamcenter-local-manifest.v1"
+        },
+        "rootPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+        },
+        "coverage": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "denied",
+            "failed",
+            "unavailable"
+          ]
+        },
+        "diagnostic": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "bytes",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "sha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          },
+          "maxItems": 4096
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "enum": [
+                  "unknown",
+                  "denied",
+                  "failed",
+                  "unavailable"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "files": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "not": {
+                  "const": "complete"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostic": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^(?![\\s\\S]*[\\u0000-\\u001f\\u007f-\\u009f])(?=[\\s\\S]*\\S)[\\s\\S]+$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "manifestEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uploadRef",
+        "sha256",
+        "manifest",
+        "manifestBytesVerified",
+        "fileBytesVerified",
+        "nativeCacheVerified"
+      ],
+      "properties": {
+        "uploadRef": {
+          "type": "string",
+          "minLength": 39,
+          "maxLength": 39,
+          "pattern": "^upload:[a-f0-9]{32}$"
+        },
+        "sha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "manifest": {
+          "$ref": "#/$defs/manifest"
+        },
+        "manifestBytesVerified": {
+          "const": true
+        },
+        "fileBytesVerified": {
+          "const": false
+        },
+        "nativeCacheVerified": {
+          "const": false
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "section",
+        "identity",
+        "value"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "section": {
+          "enum": [
+            "items",
+            "revisions",
+            "datasets",
+            "localCopies",
+            "metadata"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200000
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/itemsRow"
+            },
+            {
+              "$ref": "#/$defs/revisionsRow"
+            },
+            {
+              "$ref": "#/$defs/datasetsRow"
+            },
+            {
+              "$ref": "#/$defs/localCopiesRow"
+            },
+            {
+              "$ref": "#/$defs/metadata"
+            }
+          ]
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "identity",
+        "status",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "section": {
+          "enum": [
+            "items",
+            "revisions",
+            "datasets",
+            "localCopies",
+            "metadata"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200000
+        },
+        "status": {
+          "enum": [
+            "onlyBefore",
+            "onlyAfter",
+            "differentObservation"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/itemsRow"
+                },
+                {
+                  "$ref": "#/$defs/revisionsRow"
+                },
+                {
+                  "$ref": "#/$defs/datasetsRow"
+                },
+                {
+                  "$ref": "#/$defs/localCopiesRow"
+                },
+                {
+                  "$ref": "#/$defs/metadata"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/itemsRow"
+                },
+                {
+                  "$ref": "#/$defs/revisionsRow"
+                },
+                {
+                  "$ref": "#/$defs/datasetsRow"
+                },
+                {
+                  "$ref": "#/$defs/localCopiesRow"
+                },
+                {
+                  "$ref": "#/$defs/metadata"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "section",
+        "identity",
+        "code"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "section": {
+          "enum": [
+            "items",
+            "revisions",
+            "datasets",
+            "localCopies",
+            "metadata"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200000
+        },
+        "code": {
+          "enum": [
+            "itemNotSupplied",
+            "unknownDatasetVersion",
+            "revisionNotSupplied",
+            "reportedCheckout",
+            "unknownLock",
+            "datasetNotSupplied",
+            "unknownVersionComparison",
+            "reportedVersionMismatch",
+            "incompleteManifest",
+            "partial",
+            "unknown",
+            "denied",
+            "failed",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "observations",
+        "changes",
+        "issues",
+        "manifests",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "checkoutOwnershipVerified",
+        "fileBytesVerified",
+        "nativeCacheVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "teamcenter-report.v1"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 4000
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          },
+          "maxItems": 4000
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "maxItems": 10000
+        },
+        "manifests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/manifestEvidence"
+          },
+          "maxItems": 16
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "observationCount",
+            "changeCount",
+            "issueCount",
+            "manifestCount",
+            "scope"
+          ],
+          "properties": {
+            "observationCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "changeCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "issueCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "manifestCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scope": {
+              "const": "suppliedDeclarationsOnly"
+            }
+          }
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "checkoutOwnershipVerified": {
+          "const": false
+        },
+        "fileBytesVerified": {
+          "const": false
+        },
+        "nativeCacheVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "input",
+        "manifests",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "teamcenter-review-record.v1"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "manifests": {
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 39,
+            "maxLength": 39,
+            "pattern": "^upload:[a-f0-9]{32}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+              },
+              "sha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "input",
+        "manifestArtifacts",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "checkoutOwnershipVerified",
+        "fileBytesVerified",
+        "nativeCacheVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "manifestArtifacts": {
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 39,
+            "maxLength": 39,
+            "pattern": "^upload:[a-f0-9]{32}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+              },
+              "sha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "reportArtifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "observationCount",
+            "changeCount",
+            "issueCount",
+            "manifestCount",
+            "scope"
+          ],
+          "properties": {
+            "observationCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "changeCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "issueCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "manifestCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scope": {
+              "const": "suppliedDeclarationsOnly"
+            }
+          }
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "checkoutOwnershipVerified": {
+          "const": false
+        },
+        "fileBytesVerified": {
+          "const": false
+        },
+        "nativeCacheVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "input",
+        "manifestArtifacts",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "checkoutOwnershipVerified",
+        "fileBytesVerified",
+        "nativeCacheVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "manifestArtifacts": {
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 39,
+            "maxLength": 39,
+            "pattern": "^upload:[a-f0-9]{32}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+              },
+              "sha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "reportArtifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^teamcenter-reviews/[a-f0-9]{64}\\.(input|json|manifest)$"
+            },
+            "sha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "observationCount",
+            "changeCount",
+            "issueCount",
+            "manifestCount",
+            "scope"
+          ],
+          "properties": {
+            "observationCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "changeCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "issueCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "manifestCount": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scope": {
+              "const": "suppliedDeclarationsOnly"
+            }
+          }
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "checkoutOwnershipVerified": {
+          "const": false
+        },
+        "fileBytesVerified": {
+          "const": false
+        },
+        "nativeCacheVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "changes",
+            "issues",
+            "manifests"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      },
+                      {
+                        "$ref": "#/$defs/issue"
+                      },
+                      {
+                        "$ref": "#/$defs/manifestEvidence"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "maxItems": 200
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

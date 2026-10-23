@@ -1,0 +1,16 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION "TiaMcpComponentCaller" : Void
+VAR_INPUT
+    PreserveInput : Bool;
+END_VAR
+VAR_OUTPUT
+    PreserveOutput : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG
+    #PreserveInput
+    Coil( #PreserveOutput )
+END_RUNG
+END_NETWORK
+END_FUNCTION

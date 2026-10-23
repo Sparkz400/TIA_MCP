@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris><Uri>urn:example:device</Uri><Uri>urn:example:types</Uri></NamespaceUris>
+  <Models><Model ModelUri="urn:example:device" Version="1.0"><RequiredModel ModelUri="urn:example:types" Version="1.0" /></Model></Models>
+  <Aliases><Alias Alias="Telemetry">ns=2;i=1001</Alias></Aliases>
+  <UAVariable NodeId="ns=1;s=Sensor" BrowseName="1:Sensor" DataType="Telemetry" />
+  <UAObject NodeId="ns=1;s=Unrelated" BrowseName="1:Unrelated" />
+</UANodeSet>

@@ -1,0 +1,60 @@
+{
+  "sourceReceipt": {
+    "path": "artifacts/expansion-foundation-20261015/native/translations-03/result.json",
+    "sha256": "81618d3a2c18dde658fcbabe902d2a1e53a6cc03e62fdd3b2f928e9ab6c484d0",
+    "bytes": 5358
+  },
+  "nativeExportObserved": true,
+  "nativeImportExecuted": false,
+  "nativeWriteQualified": false,
+  "profiles": [
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+        "sha256": "3d0674a3c6c539e87d34f1d225edb9aea6c59d22b8d390b65bf24c18b828deae",
+        "bytes": 8342
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-03/legacy.xlsx",
+        "sha256": "1dfc65a91e5aa3efd36cfa0c0e599c307737ca4a5dca75b4191409de2875eaa1",
+        "bytes": 5577
+      }
+    },
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+        "sha256": "acdc3914cfef85729108541c9475cd2cd0506a6bb00ac9ae770526d1f40a7427",
+        "bytes": 4821
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-03/filtered-plc.xlsx",
+        "sha256": "2b745b22f2877cf53610a05abaf1ae8c45d72bbdf648885c92332627ad2d5bbf",
+        "bytes": 5073
+      }
+    },
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-block.profile.json",
+        "sha256": "9e4537134be01419405f2e4635efbff0bfa7ff1ed79bf9a05309baa1b5f872d0",
+        "bytes": 1064
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-03/filtered-block.xlsx",
+        "sha256": "fb605fdecf9a81e69576553de5ce27d41c4d5e73ecefc807ba502d16212c6999",
+        "bytes": 4404
+      }
+    },
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+        "sha256": "e6528dae03da0e7633bf11851ccf7fbe216a06162adf74a346c41c82848bd913",
+        "bytes": 4826
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-03/filtered-category.xlsx",
+        "sha256": "f967df557b86c5f163f228b705c9a65de1c9c512278586a2bca1f54790b3e413",
+        "bytes": 5071
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:block-test-result:v1",
+  "title": "Block sequence executor evidence",
+  "type": "object",
+  "required": ["schemaVersion", "fixtureId", "status", "programRevision", "suiteSha256", "cases", "runtimeQualified", "scanQualified", "limitations"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "fixtureId": {"type": "string"},
+    "status": {"enum": ["passed", "failed", "blocked"]},
+    "programRevision": {"type": ["object", "string"]},
+    "suiteSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "runtimeQualified": {"type": "boolean"}, "scanQualified": {"type": "boolean"},
+    "qualificationScope": {"type": "string"}, "limitations": {"type": "array", "items": {"type": "string"}},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "repetition", "status", "programRevision", "observations", "steps", "failures", "cleanup"],
+        "properties": {
+          "id": {"type": "string"}, "repetition": {"type": "integer", "minimum": 1},
+          "status": {"enum": ["passed", "failed", "blocked"]},
+          "programRevision": {"type": ["object", "string"]},
+          "observations": {"type": "array", "items": {"type": "object", "required": ["values", "quality", "hostIntervalMs", "observedAtUtc"]}},
+          "steps": {"type": "array"}, "cleanup": {"type": "object"},
+          "failures": {"type": "array", "items": {"type": "object", "required": ["inputs", "outcome", "snapshot", "timestampUtc", "programRevision"]}}
+        }
+      }
+    }
+  }
+}

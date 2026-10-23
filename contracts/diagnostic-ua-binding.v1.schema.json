@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-ua-binding.v1.schema.json",
+  "title": "Explicit pre-acquisition UA diagnostic observation intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "experimentId",
+    "attemptId",
+    "request",
+    "experiment",
+    "mappings",
+    "associationKind",
+    "programMatchVerified",
+    "addressMatchVerified",
+    "datatypeMatchVerified",
+    "sourceAuthenticityVerified",
+    "physicalQualified",
+    "clockSynchronizationVerified",
+    "assertionsAdmitted",
+    "nativeAccessAttempted",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-ua-binding.v1"
+    },
+    "experimentId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+    },
+    "attemptId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}(?![\\s\\S])"
+    },
+    "request": {
+      "$ref": "#/$defs/request"
+    },
+    "experiment": {
+      "$ref": "diagnostic-experiment.v1.schema.json"
+    },
+    "mappings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signalId",
+          "node",
+          "unit",
+          "reason",
+          "declaration"
+        ],
+        "properties": {
+          "signalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "node": {
+            "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "declaration": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "associationKind": {
+      "const": "callerSelectedObservationIntent"
+    },
+    "programMatchVerified": {
+      "const": false
+    },
+    "addressMatchVerified": {
+      "const": false
+    },
+    "datatypeMatchVerified": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "physicalQualified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "assertionsAdmitted": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signalId",
+        "node",
+        "unit",
+        "reason"
+      ],
+      "properties": {
+        "signalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "node": {
+          "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attemptId",
+        "reason",
+        "mappings"
+      ],
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}(?![\\s\\S])"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "mappings": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/mapping"
+          }
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experimentId",
+        "request"
+      ],
+      "properties": {
+        "experimentId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "schemaVersion",
+        "artifact",
+        "binding"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "schemaVersion": {
+          "const": "diagnostic-ua-binding.v1"
+        },
+        "artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8388608
+            }
+          }
+        },
+        "binding": {
+          "$ref": "#"
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "diagnostic_ua_binding_plan": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#/$defs/receipt"
+      }
+    }
+  }
+}

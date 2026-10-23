@@ -1,0 +1,26 @@
+{
+  "scope": "Retained exact native02 GUID read-only xp01 full/base exports; no native replay",
+  "report": "artifacts/p15/xp01/result.json",
+  "files": [
+    {
+      "path": "installed-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options1.xml",
+      "source": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\xp01\\native\\installed-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options1.xml",
+      "sha256": "4695c02bd6a51025e9cd54ff23bfa7de2d30a9024bb7f3686843295a9f3459a5"
+    },
+    {
+      "path": "installed-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options3.xml",
+      "source": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\xp01\\native\\installed-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options3.xml",
+      "sha256": "daa92ae727d217fe644d053f8cc7a8746d59707ef42aaff445707abdc7d6aac5"
+    },
+    {
+      "path": "source-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options1.xml",
+      "source": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\xp01\\native\\source-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options1.xml",
+      "sha256": "878c05c2c41a9b402f4647a16875ffa68e600745eae493d162598a6be0448341"
+    },
+    {
+      "path": "source-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options3.xml",
+      "source": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\xp01\\native\\source-43b5c338-b589-4ab5-8c82-cae3e08e9d06-options3.xml",
+      "sha256": "822b2ee97d370198282594bf39256f0e692c145360d2be85c9204aa38923761e"
+    }
+  ]
+}

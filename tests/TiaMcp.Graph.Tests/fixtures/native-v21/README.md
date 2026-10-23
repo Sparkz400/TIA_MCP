@@ -1,0 +1,24 @@
+# Native GRAPH qualification evidence
+
+These are genuine, unmodified XML exports from **TIA Portal V21 Update 2**, GRAPH block version **6.0**, GRAPH XML namespace **v6**, and CPU **1511-1 PN / 6ES7 511-1AL03-0AB0 / V4.1**. Capture date: 2026-10-16. They were produced from independently authored import seeds in dedicated, task-owned scratch projects. They are not production-machine exports or manually authored editor projects.
+
+The native runner creates its own TIA processes directly, without attaching to a discovered or shared session. Subsequent fixture runs may retrieve its own hash-verified pre-import archive into a new directory. Native project/archive/build files remain under `../../Native/bin`; the small XML exports and JSON receipts here are reviewable regression evidence. [manifest.json](manifest.json) records SHA-256 for each included artifact. The public API assembly hashes, source seed hash, executable hash, process IDs and project ownership are in each profile's receipts.
+
+A completed profile includes seed import; software compile/save/export; import of that **unchanged native export**; compile/save/export; close and reopen in a newly created TIA process; and archive retrieval into a new directory in another newly created process. Tests compare the complete XML document after removing only `DocumentInfo/Created`, as well as the GRAPH subtree and the library's categorized comparison. Source bytes and their different export timestamps remain retained in full.
+
+| Profile | Independent expected content | Native result |
+| --- | --- | --- |
+| `populated` | Step 1 `Idle`, initial; Transition 1 `Start`; direct edge and jump back to Step 1; StartCommand transition, GuardClosed interlock, SupervisionTrip supervision; English/German title | Completed roundtrip, fresh reopen and recovery; zero compiler errors. Initial/roundtrip compilation warns about the intentionally actionless Idle step. |
+| `cross-sequence` | Two sequences, Step/Transition numbers 1 and 11; reciprocal jumps to the other sequence; populated conditions | Completed roundtrip, fresh reopen and recovery; zero compiler errors. Initial/roundtrip compilation warns about two intentionally actionless steps. |
+| `parallel` | Three steps, two transitions, SimBegin/SimEnd branches, eight connections and a return jump; Step 2 event S1 / qualifier N / interlock true / #MotorA, Step 3 N / #MotorB; populated LAD conditions and bilingual title | Completed roundtrip, fresh reopen and recovery; zero compiler errors. Initial/roundtrip compilation warns only about actionless Idle. |
+| `alternative` | Four steps, five transitions, AltBegin/AltEnd branches, twelve connections and a return jump; same two actions and populated conditions | Completed roundtrip, fresh reopen and recovery; zero compiler errors. Initial/roundtrip compilation warns about actionless Idle and Join. |
+| `empty-condition` | Step 1 `Idle`, Transition 1 `Next`, direct edge and return jump; empty interlock/supervision | Seed compiles and exports, with two expected empty-content warnings. **Unchanged native export is rejected on re-import** because empty Supervision/Interlock modules omit schema-required FlgNet. |
+| `duplicate-number` | Two authored sequences reuse Transition 1, with different transition names | Native import rejects the duplicated transition number. This is rejection evidence; there is no native export for this profile. |
+
+Native action operands in the qualified profiles are `Token` text such as `#MotorA`, without a semicolon. The library preserves that XML rather than translating it into LAD/SCL or an execution model.
+
+The reader's `EmptyNativeCondition` warning makes the observed V21 export/import mismatch explicit. It does not insert a body or relabel a modified candidate as a no-op roundtrip. The original bytes remain the preservation authority.
+
+Step and transition identities are chart-wide, not sequence-local. This is supported by the captured duplicate rejection and reciprocal cross-sequence jumps, and agrees with Siemens' documentation on [renumbering](https://docs.tia.siemens.cloud/r/en-us/v20/creating-graph-programs-s7-300-s7-400-s7-1500/programming-the-structure-of-a-sequencer-s7-300-s7-400-s7-1500/using-steps-and-transitions-s7-300-s7-400-s7-1500/renumbering-steps-and-transitions-s7-300-s7-400-s7-1500) and [ending sequencers with jumps](https://docs.tia.siemens.cloud/r/en-us/v21/creating-graph-programs-s7-300-s7-400-s7-1500/programming-the-structure-of-a-sequencer-s7-300-s7-400-s7-1500/ending-sequencers-s7-300-s7-400-s7-1500).
+
+Qualification is limited to these exact profiles. It does not certify arbitrary XML, other TIA/CPU versions, native editing of unsupported extensions, localized step-name import, or runtime/timing behavior. No CPU was connected, downloaded, started, or controlled. Embedded logic remains retained XML; native compilation does not turn the document library into a LAD/FBD interpreter.

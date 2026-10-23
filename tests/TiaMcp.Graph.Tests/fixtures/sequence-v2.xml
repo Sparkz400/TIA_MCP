@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hand-authored schema fixture, not a native TIA export. -->
+<Graph>
+  <PreOperations><PermanentOperation ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></PermanentOperation></PreOperations>
+  <Sequence>
+    <Title><MultiLanguageText Lang="en-US">Parallel cycle</MultiLanguageText><MultiLanguageText Lang="de-DE">Paralleler Ablauf</MultiLanguageText></Title>
+    <Steps>
+      <Step Number="1" Name="Idle" Init="true">
+        <StepName><MultiLanguageText Lang="de-DE">Warten</MultiLanguageText></StepName>
+        <Actions />
+        <Supervisions><Supervision ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Supervision></Supervisions>
+        <Interlocks><Interlock ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Interlock></Interlocks>
+      </Step>
+      <Step Number="2" Name="Run A" MaximumStepTime="T#12s" WarningTime="T#8s">
+        <Actions><Action Event="S1" Qualifier="S" Interlock="true"><Access Scope="GlobalVariable"><Symbol><Component Name="MotorA" /></Symbol></Access><Token Text=":=" /><Token Text="TRUE" /></Action></Actions>
+        <Supervisions><Supervision ProgrammingLanguage="FBD"><AlarmText><MultiLanguageText Lang="en-US">Travel timeout</MultiLanguageText></AlarmText><FlgNet><Parts><Part Name="Contact" UId="21" /></Parts></FlgNet></Supervision></Supervisions>
+        <Interlocks><Interlock ProgrammingLanguage="LAD"><FlgNet><Parts><Access Scope="GlobalVariable" UId="22"><Symbol><Component Name="GuardClosed" /></Symbol></Access></Parts></FlgNet></Interlock></Interlocks>
+      </Step>
+      <Step Number="3" Name="Run B" Init="0">
+        <Actions><Action Qualifier="S"><Token Text="MotorB" /></Action><Action Qualifier="D"><Token Text="T#2s" /></Action></Actions>
+        <Supervisions><Supervision ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Supervision></Supervisions>
+        <Interlocks><Interlock ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Interlock></Interlocks>
+      </Step>
+    </Steps>
+    <Transitions>
+      <Transition Number="1" Name="Start" ProgrammingLanguage="LAD"><FlgNet><Parts><Access Scope="GlobalVariable" UId="10"><Symbol><Component Name="StartPermitted" /></Symbol></Access><Part Name="Contact" UId="11" /></Parts><Wires><Wire UId="12"><IdentCon UId="10" /><NameCon UId="11" Name="operand" /></Wire></Wires></FlgNet></Transition>
+      <Transition Number="2" Name="Reset" ProgrammingLanguage="FBD"><FlgNet><Parts><Part Name="Contact" UId="10" /></Parts></FlgNet></Transition>
+    </Transitions>
+    <Branches><Branch Number="1" Type="SimBegin" Cardinality="2" /><Branch Number="2" Type="SimEnd" Cardinality="2" /></Branches>
+    <Connections>
+      <Connection><NodeFrom><StepRef Number="1" /></NodeFrom><NodeTo><TransitionRef Number="1" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><TransitionRef Number="1" /></NodeFrom><NodeTo><BranchRef Number="1" In="0" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><BranchRef Number="1" Out="0" /></NodeFrom><NodeTo><StepRef Number="2" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><BranchRef Number="1" Out="1" /></NodeFrom><NodeTo><StepRef Number="3" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><StepRef Number="2" /></NodeFrom><NodeTo><BranchRef Number="2" In="0" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><StepRef Number="3" /></NodeFrom><NodeTo><BranchRef Number="2" In="1" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><BranchRef Number="2" Out="0" /></NodeFrom><NodeTo><TransitionRef Number="2" /></NodeTo><LinkType>Direct</LinkType></Connection>
+      <Connection><NodeFrom><TransitionRef Number="2" /></NodeFrom><NodeTo><EndConnection /></NodeTo><LinkType>Direct</LinkType></Connection>
+    </Connections>
+  </Sequence>
+  <PostOperations />
+  <AlarmsSettings>
+    <AlarmSupervisionCategories><AlarmSupervisionCategory Id="1" DisplayClass="1" /></AlarmSupervisionCategories>
+    <AlarmInterlockCategory Id="1" /><AlarmSubcategory1Interlock Id="0" /><AlarmSubcategory2Interlock Id="0" />
+    <AlarmCategorySupervision Id="1" /><AlarmSubcategory1Supervision Id="0" /><AlarmSubcategory2Supervision Id="0" />
+    <AlarmWarningCategory Id="1" /><AlarmSubcategory1Warning Id="0" /><AlarmSubcategory2Warning Id="0" />
+  </AlarmsSettings>
+</Graph>

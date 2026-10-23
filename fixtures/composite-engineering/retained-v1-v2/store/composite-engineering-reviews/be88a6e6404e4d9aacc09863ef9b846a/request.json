@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "composite-engineering-request.v1",
+  "before": {
+    "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+    "automationMlRef": "automationml:4067fde9e6794adda53fcac740bb5afb:a0613980a6c837f191e1a1438df30ef71f3935f2a7683a571cb195ceb584a362",
+    "connections": [
+      "8485f35352ade320490d890baa94f7f90281cfdbb93d6bf8f3da8cef41c737f8"
+    ],
+    "drives": [
+      "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35"
+    ],
+    "technology": [
+      "6cde997bcdd6fbcbaddde4ba7248f7509d7ecf7de6e952b842c470666c11d91c"
+    ]
+  },
+  "after": {
+    "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+    "automationMlRef": "automationml:89d6ab243c9d4d869fb738e2ccc0449d:9b51685a37c5603e5bb53029f59be5e193db8e0975c0d56b03e7d66e53d0a395",
+    "connections": [
+      "8485f35352ade320490d890baa94f7f90281cfdbb93d6bf8f3da8cef41c737f8"
+    ],
+    "drives": [
+      "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35"
+    ],
+    "technology": [
+      "6cde997bcdd6fbcbaddde4ba7248f7509d7ecf7de6e952b842c470666c11d91c"
+    ]
+  },
+  "mappings": [
+    {
+      "id": "before-hardware",
+      "phase": "before",
+      "purpose": "hardware",
+      "reason": "Explicit supplied association: Überprüfung — 保留",
+      "source": {
+        "kind": "amlObject",
+        "phase": "before",
+        "recordRef": "automationml:4067fde9e6794adda53fcac740bb5afb:a0613980a6c837f191e1a1438df30ef71f3935f2a7683a571cb195ceb584a362",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]"
+      },
+      "target": {
+        "kind": "model",
+        "phase": "before",
+        "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      }
+    },
+    {
+      "id": "before-parameter",
+      "phase": "before",
+      "purpose": "parameter",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlAttribute",
+        "phase": "before",
+        "recordRef": "automationml:4067fde9e6794adda53fcac740bb5afb:a0613980a6c837f191e1a1438df30ef71f3935f2a7683a571cb195ceb584a362",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]/Attribute[1]"
+      },
+      "target": {
+        "kind": "driveParameter",
+        "phase": "before",
+        "recordRef": "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35",
+        "name": "p1",
+        "number": 1,
+        "arrayIndex": -1
+      }
+    },
+    {
+      "id": "before-dependent",
+      "phase": "before",
+      "purpose": "dependent",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "model",
+        "phase": "before",
+        "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      },
+      "target": {
+        "kind": "technologyRelationship",
+        "phase": "before",
+        "recordRef": "6cde997bcdd6fbcbaddde4ba7248f7509d7ecf7de6e952b842c470666c11d91c",
+        "id": "actor"
+      }
+    },
+    {
+      "id": "before-communication",
+      "phase": "before",
+      "purpose": "communication",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlLink",
+        "phase": "before",
+        "recordRef": "automationml:4067fde9e6794adda53fcac740bb5afb:a0613980a6c837f191e1a1438df30ef71f3935f2a7683a571cb195ceb584a362",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalLink[1]"
+      },
+      "target": {
+        "kind": "connectionEndpoint",
+        "phase": "before",
+        "recordRef": "8485f35352ade320490d890baa94f7f90281cfdbb93d6bf8f3da8cef41c737f8",
+        "id": "c",
+        "endpoint": "local"
+      }
+    },
+    {
+      "id": "after-hardware",
+      "phase": "after",
+      "purpose": "hardware",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlObject",
+        "phase": "after",
+        "recordRef": "automationml:89d6ab243c9d4d869fb738e2ccc0449d:9b51685a37c5603e5bb53029f59be5e193db8e0975c0d56b03e7d66e53d0a395",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]"
+      },
+      "target": {
+        "kind": "model",
+        "phase": "after",
+        "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      }
+    },
+    {
+      "id": "after-parameter",
+      "phase": "after",
+      "purpose": "parameter",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlAttribute",
+        "phase": "after",
+        "recordRef": "automationml:89d6ab243c9d4d869fb738e2ccc0449d:9b51685a37c5603e5bb53029f59be5e193db8e0975c0d56b03e7d66e53d0a395",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalElement[1]/Attribute[1]"
+      },
+      "target": {
+        "kind": "driveParameter",
+        "phase": "after",
+        "recordRef": "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35",
+        "name": "p1",
+        "number": 1,
+        "arrayIndex": -1
+      }
+    },
+    {
+      "id": "after-dependent",
+      "phase": "after",
+      "purpose": "dependent",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "model",
+        "phase": "after",
+        "reviewId": "c26d05c4cd16b91f658b9c7e82aae67b7ddbb81df297bb9057325d2d412a1b10",
+        "nodeId": "/projects/Fixture/PLC/Hardware",
+        "objectPath": "/projects/Fixture/PLC/Hardware"
+      },
+      "target": {
+        "kind": "technologyRelationship",
+        "phase": "after",
+        "recordRef": "6cde997bcdd6fbcbaddde4ba7248f7509d7ecf7de6e952b842c470666c11d91c",
+        "id": "actor"
+      }
+    },
+    {
+      "id": "after-communication",
+      "phase": "after",
+      "purpose": "communication",
+      "reason": "Explicit fixture association",
+      "source": {
+        "kind": "amlLink",
+        "phase": "after",
+        "recordRef": "automationml:89d6ab243c9d4d869fb738e2ccc0449d:9b51685a37c5603e5bb53029f59be5e193db8e0975c0d56b03e7d66e53d0a395",
+        "path": "/CAEXFile[1]/InstanceHierarchy[1]/InternalLink[1]"
+      },
+      "target": {
+        "kind": "connectionEndpoint",
+        "phase": "after",
+        "recordRef": "8485f35352ade320490d890baa94f7f90281cfdbb93d6bf8f3da8cef41c737f8",
+        "id": "c",
+        "endpoint": "local"
+      }
+    }
+  ],
+  "correspondences": [
+    {
+      "id": "parameter-continuity",
+      "kind": "continuity",
+      "reason": "Supplied claim",
+      "before": {
+        "kind": "driveParameter",
+        "phase": "before",
+        "recordRef": "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35",
+        "name": "p1",
+        "number": 1,
+        "arrayIndex": -1
+      },
+      "after": {
+        "kind": "driveParameter",
+        "phase": "after",
+        "recordRef": "c7535ff29aae6919ddc914f263004ad53bf4114c0f15834cdc99a136172adf35",
+        "name": "p1",
+        "number": 1,
+        "arrayIndex": -1
+      }
+    }
+  ],
+  "allowDifferentProjectCopy": false
+}

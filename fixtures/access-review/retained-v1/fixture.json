@@ -1,0 +1,804 @@
+{
+  "producer": {
+    "correspondingImplementationCommit": "987885cab5b63ac4c75d801f473d8b12d28428a0",
+    "bundleManifestSha256": "6be96c07df0a4ecd21dc162502f928dd8e381599d518a422a858dd6aa9730b3c",
+    "binaryHashes": {
+      "TiaMcp.Core.dll": "b436e7a6bf1821edf22888f90bd8aaedcede546b485e039916fb0d2307778d7c",
+      "TiaMcp.Host.dll": "dfddc536ef451aecb49056b0912eea40ff75949b5de950b2b4b937dd475b850f"
+    }
+  },
+  "records": [
+    {
+      "recordId": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68",
+      "summary": {
+        "recordId": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68",
+        "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+        "input": {
+          "path": "access-reviews/dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970.input",
+          "sha256": "dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970"
+        },
+        "reportArtifact": {
+          "path": "access-reviews/4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68.json",
+          "sha256": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68"
+        },
+        "summary": {
+          "beforeCount": 4,
+          "afterCount": 4,
+          "changedCount": 1,
+          "beforeUnexpectedCount": 1,
+          "afterUnexpectedCount": 0,
+          "beforeRequiredNotObservedCount": 0,
+          "afterRequiredNotObservedCount": 0
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "effectiveRightsVerified": false,
+        "minimumRightsVerified": false,
+        "lockoutSafetyVerified": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "pages": {
+        "observations": {
+          "recordId": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970.input",
+            "sha256": "dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68.json",
+            "sha256": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "observations",
+          "offset": 0,
+          "total": 8,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "user:Überwachung",
+                  "kind": "user",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "group:operators"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "group:operators",
+                  "kind": "group",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "role:monitor"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "role:monitor",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "ReadTag",
+                      "scope": "cpu:A"
+                    },
+                    {
+                      "id": "ModifyTag",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 3,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "role:unrelated",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "WriteFirmware",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 4,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "user:Überwachung",
+                  "kind": "user",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "group:operators"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 5,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "group:operators",
+                  "kind": "group",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "role:monitor"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 6,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "role:monitor",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "ReadTag",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 7,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "role:unrelated",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "WriteFirmware",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            }
+          ],
+          "nextOffset": null
+        },
+        "assessments": {
+          "recordId": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970.input",
+            "sha256": "dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68.json",
+            "sha256": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "assessments",
+          "offset": 0,
+          "total": 2,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "phase": "before",
+                "subjectId": "user:Überwachung",
+                "visitedIds": [
+                  "user:Überwachung",
+                  "group:operators",
+                  "role:monitor"
+                ],
+                "suppliedClosureComplete": true,
+                "gaps": [],
+                "potentialRights": [
+                  {
+                    "id": "ModifyTag",
+                    "scope": "cpu:A"
+                  },
+                  {
+                    "id": "ReadTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "outsideAllowedRights": [
+                  {
+                    "id": "ModifyTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "requiredNotObserved": [],
+                "effectiveRightsVerified": false,
+                "minimumRightsVerified": false
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "phase": "after",
+                "subjectId": "user:Überwachung",
+                "visitedIds": [
+                  "user:Überwachung",
+                  "group:operators",
+                  "role:monitor"
+                ],
+                "suppliedClosureComplete": true,
+                "gaps": [],
+                "potentialRights": [
+                  {
+                    "id": "ReadTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "outsideAllowedRights": [],
+                "requiredNotObserved": [],
+                "effectiveRightsVerified": false,
+                "minimumRightsVerified": false
+              }
+            }
+          ],
+          "nextOffset": null
+        },
+        "changes": {
+          "recordId": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970.input",
+            "sha256": "dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68.json",
+            "sha256": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "changes",
+          "offset": 0,
+          "total": 4,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "id": "group:operators",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "id": "role:monitor",
+                "status": "changed",
+                "changedFields": [
+                  "rights"
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "value": {
+                "id": "role:unrelated",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            },
+            {
+              "index": 3,
+              "value": {
+                "id": "user:Überwachung",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            }
+          ],
+          "nextOffset": null
+        }
+      }
+    },
+    {
+      "recordId": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10",
+      "summary": {
+        "recordId": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10",
+        "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+        "input": {
+          "path": "access-reviews/c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8.input",
+          "sha256": "c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8"
+        },
+        "reportArtifact": {
+          "path": "access-reviews/7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10.json",
+          "sha256": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10"
+        },
+        "summary": {
+          "beforeCount": 4,
+          "afterCount": 4,
+          "changedCount": 1,
+          "beforeUnexpectedCount": 1,
+          "afterUnexpectedCount": 0,
+          "beforeRequiredNotObservedCount": 0,
+          "afterRequiredNotObservedCount": 0
+        },
+        "nativeExecutable": false,
+        "nativeQualified": false,
+        "sourceAuthenticityVerified": false,
+        "liveFreshnessVerified": false,
+        "effectiveRightsVerified": false,
+        "minimumRightsVerified": false,
+        "lockoutSafetyVerified": false,
+        "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review."
+      },
+      "pages": {
+        "observations": {
+          "recordId": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8.input",
+            "sha256": "c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10.json",
+            "sha256": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "observations",
+          "offset": 0,
+          "total": 8,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "user:Überwachung",
+                  "kind": "user",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "group:operators"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "group:operators",
+                  "kind": "group",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "role:monitor"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "role:monitor",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "ReadTag",
+                      "scope": "cpu:A"
+                    },
+                    {
+                      "id": "ModifyTag",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 3,
+              "value": {
+                "phase": "before",
+                "entity": {
+                  "id": "role:unrelated",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "WriteFirmware",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 4,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "user:Überwachung",
+                  "kind": "user",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "group:operators"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 5,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "group:operators",
+                  "kind": "group",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [],
+                  "inherits": [
+                    "role:monitor"
+                  ]
+                }
+              }
+            },
+            {
+              "index": 6,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "role:monitor",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "ReadTag",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            },
+            {
+              "index": 7,
+              "value": {
+                "phase": "after",
+                "entity": {
+                  "id": "role:unrelated",
+                  "kind": "role",
+                  "enabled": true,
+                  "rightsComplete": true,
+                  "assignmentsComplete": true,
+                  "rights": [
+                    {
+                      "id": "WriteFirmware",
+                      "scope": "cpu:A"
+                    }
+                  ],
+                  "inherits": []
+                }
+              }
+            }
+          ],
+          "nextOffset": null
+        },
+        "assessments": {
+          "recordId": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8.input",
+            "sha256": "c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10.json",
+            "sha256": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "assessments",
+          "offset": 0,
+          "total": 2,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "phase": "before",
+                "subjectId": "user:Überwachung",
+                "visitedIds": [
+                  "user:Überwachung",
+                  "group:operators",
+                  "role:monitor"
+                ],
+                "suppliedClosureComplete": true,
+                "gaps": [],
+                "potentialRights": [
+                  {
+                    "id": "ModifyTag",
+                    "scope": "cpu:A"
+                  },
+                  {
+                    "id": "ReadTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "outsideAllowedRights": [
+                  {
+                    "id": "ModifyTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "requiredNotObserved": [],
+                "effectiveRightsVerified": false,
+                "minimumRightsVerified": false
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "phase": "after",
+                "subjectId": "user:Überwachung",
+                "visitedIds": [
+                  "user:Überwachung",
+                  "group:operators",
+                  "role:monitor"
+                ],
+                "suppliedClosureComplete": true,
+                "gaps": [],
+                "potentialRights": [
+                  {
+                    "id": "ReadTag",
+                    "scope": "cpu:A"
+                  }
+                ],
+                "outsideAllowedRights": [],
+                "requiredNotObserved": [],
+                "effectiveRightsVerified": false,
+                "minimumRightsVerified": false
+              }
+            }
+          ],
+          "nextOffset": null
+        },
+        "changes": {
+          "recordId": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10",
+          "reviewId": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7",
+          "input": {
+            "path": "access-reviews/c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8.input",
+            "sha256": "c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8"
+          },
+          "reportArtifact": {
+            "path": "access-reviews/7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10.json",
+            "sha256": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10"
+          },
+          "summary": {
+            "beforeCount": 4,
+            "afterCount": 4,
+            "changedCount": 1,
+            "beforeUnexpectedCount": 1,
+            "afterUnexpectedCount": 0,
+            "beforeRequiredNotObservedCount": 0,
+            "afterRequiredNotObservedCount": 0
+          },
+          "nativeExecutable": false,
+          "nativeQualified": false,
+          "sourceAuthenticityVerified": false,
+          "liveFreshnessVerified": false,
+          "effectiveRightsVerified": false,
+          "minimumRightsVerified": false,
+          "lockoutSafetyVerified": false,
+          "sourceEvidencePolicy": "Saved source observations are supplied evidence; authenticity, live state and native qualification are not verified by offline review.",
+          "section": "changes",
+          "offset": 0,
+          "total": 4,
+          "rows": [
+            {
+              "index": 0,
+              "value": {
+                "id": "group:operators",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            },
+            {
+              "index": 1,
+              "value": {
+                "id": "role:monitor",
+                "status": "changed",
+                "changedFields": [
+                  "rights"
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "value": {
+                "id": "role:unrelated",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            },
+            {
+              "index": 3,
+              "value": {
+                "id": "user:Überwachung",
+                "status": "unchanged",
+                "changedFields": []
+              }
+            }
+          ],
+          "nextOffset": null
+        }
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "access-reviews/4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68.json",
+      "bytes": 4166,
+      "sha256": "4dc3546600e2736c21efaddac451ee140aab14b44ee3654ea223ccb4f84b4f68"
+    },
+    {
+      "path": "access-reviews/7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10.json",
+      "bytes": 4169,
+      "sha256": "7cb42d30a64695942af0a9273708cddfed4524773aa0ef6c1c00f08388b2cc10"
+    },
+    {
+      "path": "access-reviews/c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8.input",
+      "bytes": 2333,
+      "sha256": "c7b0e7cb41afc3afca1b96baa49ad0dc2e778cf2ba85a77d6591986450ece0c8"
+    },
+    {
+      "path": "access-reviews/dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970.input",
+      "bytes": 2319,
+      "sha256": "dc1cda4d8fb0c98a55471daab4a1ee137726bffcb111c0ff78bb2cf7649a0970"
+    },
+    {
+      "path": "project-reviews/2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7.json",
+      "bytes": 672,
+      "sha256": "2b997c17dc058323a592f8dd63ec15410fa1a318728b3daf07e51a22cef7ccc7"
+    }
+  ],
+  "nativeExecuted": false
+}

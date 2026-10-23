@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-change-journal:v1",
+  "title": "Durable native library change journal",
+  "type": "object",
+  "required": ["schemaVersion", "changeId", "kind", "sessionGeneration", "previewHash", "preview", "state", "checkpoints", "outputs", "events", "automaticRetryAllowed"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "changeId": {"type": "string", "pattern": "^lib-[a-f0-9]{32}$"},
+    "kind": {"type": "string", "pattern": "^library_[a-z_]+$"},
+    "sessionGeneration": {"type": "string", "minLength": 1},
+    "previewHash": {"$ref": "#/$defs/sha256"},
+    "preview": {"type": "object"},
+    "state": {"type": "string", "minLength": 1},
+    "automaticRetryAllowed": {"const": false},
+    "runtimeVerified": {"const": false},
+    "persistenceVerified": {"type": "boolean"},
+    "checkpoints": {"type": "array", "items": {"type": "object", "required": ["kind", "originalPath", "archivePath", "sha256"], "properties": {
+      "kind": {"enum": ["project", "library"]}, "originalPath": {"type": ["string", "null"]}, "archivePath": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}
+    }}},
+    "outputs": {"type": "array", "items": {"type": "object"}},
+    "events": {"type": "array", "items": {"type": "object", "required": ["stage", "state", "utc"], "properties": {
+      "stage": {"type": "string"}, "state": {"type": "string"}, "utc": {"type": "string", "format": "date-time"}
+    }}}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

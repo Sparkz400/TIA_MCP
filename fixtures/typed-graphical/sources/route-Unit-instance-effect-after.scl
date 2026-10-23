@@ -1,0 +1,19 @@
+NAMESPACE TiaMcp_UnitA
+FUNCTION_BLOCK "TgpUnit_InstanceEffect"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+ Child : "TiaMcp_UnitA.TgpUnit_TemplateFB_LAD";
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+END_NAMESPACE

@@ -1,0 +1,142 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "artifact",
+    "reportId",
+    "format",
+    "mediaType",
+    "sourceEvidenceRevalidated",
+    "limits",
+    "atomicAcrossSignals",
+    "scanSynchronized",
+    "programMatchVerified",
+    "addressMatchVerified",
+    "datatypeMatchVerified",
+    "sourceAuthenticityVerified",
+    "physicalQualified",
+    "clockSynchronizationVerified",
+    "assertionsAdmitted",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "sourceCompletenessVerified"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-ua-observation-export.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "artifact": {
+      "$ref": "diagnostic-report-export.v1.schema.json#/$defs/artifact"
+    },
+    "reportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "format": {
+      "enum": [
+        "json",
+        "markdown",
+        "html"
+      ]
+    },
+    "mediaType": {
+      "enum": [
+        "application/json",
+        "text/markdown",
+        "text/html"
+      ]
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "limits": {
+      "type": "string"
+    },
+    "atomicAcrossSignals": {
+      "const": false
+    },
+    "scanSynchronized": {
+      "const": false
+    },
+    "programMatchVerified": {
+      "const": false
+    },
+    "addressMatchVerified": {
+      "const": false
+    },
+    "datatypeMatchVerified": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "physicalQualified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "assertionsAdmitted": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "sourceCompletenessVerified": {
+      "const": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-ua-observation-export.v1.schema.json",
+  "title": "Revalidated exact or readable retained UA observation export",
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reportId",
+        "format"
+      ],
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "format": {
+          "enum": [
+            "json",
+            "markdown",
+            "html"
+          ]
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "diagnostic_ua_report_export": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#"
+      }
+    }
+  }
+}

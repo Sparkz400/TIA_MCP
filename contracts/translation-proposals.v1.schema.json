@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-proposals.v1.schema.json",
+  "title": "Unapproved Host translation proposal batch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["edits"],
+  "properties": {
+    "edits": {
+      "type": "array", "maxItems": 10000,
+      "items": {
+        "allOf": [
+          {"$ref": "translation-review.v1.schema.json#/$defs/edit"},
+          {"properties": {"approved": {"const": false}, "reviewer": {"type": "null"}}}
+        ]
+      }
+    },
+    "options": {
+      "anyOf": [
+        {"type": "null"},
+        {"$ref": "translation-review.v1.schema.json#/properties/options"}
+      ]
+    }
+  }
+}

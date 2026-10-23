@@ -1,0 +1,8 @@
+NAMESPACE TiaMcp_UnitA
+TYPE "Tgp_ResolutionInner"
+VERSION : 0.1
+STRUCT
+ Flag : Int;
+END_STRUCT;
+END_TYPE
+END_NAMESPACE

@@ -1,0 +1,79 @@
+{
+  "mode": "inspect",
+  "processId": 42956,
+  "projectPath": "D:\\TIAW\\ts02\\s\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4.ap21",
+  "startedAtUtc": "2026-10-15T07:54:06.843577Z",
+  "beforeModified": false,
+  "servicePresence": "observed",
+  "licenseAvailability": "unknown",
+  "executionAvailability": "notAttempted",
+  "automaticReplay": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "metadata": {
+    "groups": [
+      {
+        "type": "Siemens.Engineering.TestSuite.StyleGuide.StyleGuideSystemGroup",
+        "compositions": [
+          {
+            "name": "RuleSets",
+            "creationInfos": [],
+            "definitions": [
+              {
+                "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet",
+                "name": "TiaMcp_CasingAvailability"
+              }
+            ]
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSystemGroup",
+        "compositions": [
+          {
+            "name": "ApplicationTestSets",
+            "creationInfos": [],
+            "definitions": []
+          },
+          {
+            "name": "TestCases",
+            "creationInfos": [],
+            "definitions": [
+              {
+                "type": "Siemens.Engineering.TestSuite.ApplicationTest.TestCase",
+                "name": "TiaMcp_ScratchSingleStep"
+              }
+            ]
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.SystemTest.SystemTestSystemGroup",
+        "compositions": [
+          {
+            "name": "SystemTestCases",
+            "creationInfos": [],
+            "definitions": [
+              {
+                "type": "Siemens.Engineering.TestSuite.SystemTest.SystemTestCase",
+                "name": "SingleStep"
+              }
+            ]
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor"
+        ]
+      }
+    ]
+  },
+  "afterModified": false,
+  "finishedAtUtc": "2026-10-15T07:54:06.9022553Z",
+  "completed": true
+}

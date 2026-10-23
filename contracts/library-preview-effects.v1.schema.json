@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-preview-effects:v1",
+  "title": "Library preview effects and retained selector observations",
+  "description": "Recorded operation effects, source identity and recovery/content descriptors. No live selector resolution or referenced-file verification.",
+  "type": "object",
+  "properties": {
+    "effects": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "enum": [
+                  "library_create",
+                  "library_upgrade",
+                  "library_copy_elements",
+                  "library_instantiate",
+                  "library_update_project",
+                  "library_integrate",
+                  "library_create_type",
+                  "library_create_master_copy",
+                  "library_edit_version",
+                  "library_release_version",
+                  "library_discard_version",
+                  "library_set_default",
+                  "library_type_policy",
+                  "library_organize",
+                  "library_delete",
+                  "library_publish",
+                  "library_save",
+                  "library_archive"
+                ]
+              },
+              "targetLibraryId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "projectPath": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "action",
+              "targetLibraryId",
+              "projectPath"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "const": "copyTypeAllVersions"
+              },
+              "versions": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                },
+                "minItems": 1,
+                "maxItems": 1000
+              },
+              "defaultPolicy": {
+                "const": "Promote source default only when newer; exact per-type effects are in typeSynchronization."
+              }
+            },
+            "required": [
+              "action",
+              "versions",
+              "defaultPolicy"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "const": "updateAllSelectedTypeUses"
+              },
+              "plcPath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "forceDefault": {
+                "const": false
+              },
+              "deleteUnusedVersions": {
+                "const": false
+              }
+            },
+            "required": [
+              "action",
+              "plcPath",
+              "forceDefault",
+              "deleteUnusedVersions"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "const": "planPlcComponent"
+              },
+              "nativeMutation": {
+                "const": false
+              },
+              "proposedSteps": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "required": [
+              "action",
+              "nativeMutation",
+              "proposedSteps"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "action": {
+                "const": "persistCurrentPartialNativeState"
+              },
+              "recoveryChangeId": {
+                "type": "string",
+                "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+              },
+              "scope": {
+                "const": "All current unsaved content in the owned working copy. The prior failed operation's checkpoint remains the recovery baseline."
+              }
+            },
+            "required": [
+              "action",
+              "recoveryChangeId",
+              "scope"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 102
+    },
+    "sourceObject": {
+      "type": "object",
+      "properties": {
+        "projectPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plcPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scopePath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "project",
+            "plc",
+            "block",
+            "type",
+            "tagTable",
+            "hardware",
+            "technology",
+            "softwareUnit",
+            "safetyUnit"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectPath",
+        "plcPath",
+        "scopePath",
+        "objectPath",
+        "kind",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "existingRecoveryCheckpoint": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "library"
+        },
+        "originalPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "archivePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        }
+      },
+      "required": [
+        "kind",
+        "originalPath",
+        "archivePath",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "componentContentPins": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:tia-mcp:library-component-preview:v1#/properties/integrationPlan/properties/versions/items"
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    }
+  },
+  "required": [
+    "effects"
+  ],
+  "additionalProperties": false
+}

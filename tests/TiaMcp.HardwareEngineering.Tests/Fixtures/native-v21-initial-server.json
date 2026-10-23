@@ -1,0 +1,713 @@
+{
+  "provenance": {
+    "sourceReport": "artifacts/p16n/native-02.json",
+    "sourceReportSha256": "149a0c038c72bfaf6121a25a43008ff1d0dea5cccb8ac8b5ad9f128693177529",
+    "normalization": "Project name and author replaced consistently; native fields and values otherwise unchanged.",
+    "beforeSha256": "9efaaefc7dbaefe206fbf9dd5a0833a8baf93a9a9fe34a64bb7909ae989bb6ed",
+    "afterSha256": "d7fce7cc836ccc349d321b48f445aa33ba3e35bd251de834c130d5afb806db74"
+  },
+  "kind": "network_io_assign",
+  "payload": {
+    "addressControllerOwnerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+    "connectorIndex": 0,
+    "controllerHardwarePath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+    "controllerIndex": 0,
+    "createIoSystemName": "RemoteIoProofSystem",
+    "hardwarePath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+    "expectedServerModule": {
+      "name": "Servermodul_1",
+      "typeIdentifier": "OrderNumber:6ES7 193-6PA00-0AA0/V1.2",
+      "positionNumber": 1,
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "Servermodul_1",
+        "PlantDesignation": ""
+      },
+      "containerHardwarePath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0"
+    }
+  },
+  "before": [
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/Profilschiene_0",
+      "name": "Profilschiene_0",
+      "typeIdentifier": "OrderNumber:6ES7 590-1***0-0AA0",
+      "positionNumber": 0,
+      "containerPath": null,
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Profilschiene_0"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "name": "ScratchPLC",
+      "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/Profilschiene_0",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "ScratchPLC",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1",
+      "name": "CPU-Display_1",
+      "typeIdentifier": null,
+      "positionNumber": 3,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "CPU-Display_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1",
+      "name": "Kartenleser/-schreiber_1",
+      "typeIdentifier": null,
+      "positionNumber": 4,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "Kartenleser/-schreiber_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+      "name": "OPC UA_1",
+      "typeIdentifier": null,
+      "positionNumber": 254,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "OPC UA_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "name": "PROFINET-Schnittstelle_1",
+      "typeIdentifier": null,
+      "positionNumber": 32768,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "PROFINET-Schnittstelle_1"
+      },
+      "channels": [],
+      "addresses": [],
+      "network": {
+        "nodes": [
+          {
+            "name": "X1",
+            "type": "Ethernet",
+            "subnet": "RemoteIoProofSubnet",
+            "attributes": {
+              "Address": "192.0.2.10",
+              "IpProtocolSelection": "Project",
+              "PnDeviceName": "scratchplc.profinet-schnittstelle_1",
+              "PnDeviceNameAutoGeneration": true,
+              "PnDeviceNameSetDirectly": false,
+              "SubnetMask": "255.255.255.0",
+              "UseIpProtocol": true,
+              "UseRouter": false
+            }
+          }
+        ],
+        "controllers": [
+          {
+            "index": 0,
+            "system": {
+              "state": "notAssigned"
+            }
+          }
+        ],
+        "connectors": []
+      }
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1",
+      "name": "Port_1",
+      "typeIdentifier": null,
+      "positionNumber": 32769,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Port_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2",
+      "name": "Port_2",
+      "typeIdentifier": null,
+      "positionNumber": 32770,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Port_2"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45",
+      "name": "BA 2xRJ45",
+      "typeIdentifier": "OrderNumber:6ES7 193-6AR00-0AA0/V0.0",
+      "positionNumber": 127,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "BA 2xRJ45",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45/items/Port_1",
+      "name": "Port_1",
+      "typeIdentifier": null,
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "Comment": "",
+        "Name": "Port_1"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45/items/Port_2",
+      "name": "Port_2",
+      "typeIdentifier": null,
+      "positionNumber": 2,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "Comment": "",
+        "Name": "Port_2"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0",
+      "name": "Baugruppenträger_0",
+      "typeIdentifier": "System:Rack.ET200SP",
+      "positionNumber": 0,
+      "containerPath": null,
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Baugruppenträger_0"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "name": "TiaMcpRemoteHead",
+      "typeIdentifier": "OrderNumber:6ES7 155-6AU02-0BN0/V6.4",
+      "positionNumber": 0,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "TiaMcpRemoteHead",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "name": "PROFINET-Schnittstelle",
+      "typeIdentifier": null,
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "attributes": {
+        "Comment": "",
+        "Name": "PROFINET-Schnittstelle"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ],
+      "network": {
+        "nodes": [
+          {
+            "name": "IE1",
+            "type": "Ethernet",
+            "subnet": "RemoteIoProofSubnet",
+            "attributes": {
+              "Address": "192.0.2.11",
+              "IpProtocolSelection": "Project",
+              "PnDeviceName": "tiamcpremotehead",
+              "PnDeviceNameAutoGeneration": true,
+              "SubnetMask": "255.255.255.0",
+              "UseIpProtocol": true,
+              "UseRouter": false
+            }
+          }
+        ],
+        "controllers": [],
+        "connectors": [
+          {
+            "index": 0,
+            "system": {
+              "state": "notAssigned"
+            }
+          },
+          {
+            "index": 1,
+            "system": {
+              "state": "notAssigned"
+            }
+          },
+          {
+            "index": 2,
+            "system": {
+              "state": "notAssigned"
+            }
+          },
+          {
+            "index": 3,
+            "system": {
+              "state": "notAssigned"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/TiaMcpRemoteHead",
+      "name": "TiaMcpRemoteHead",
+      "typeIdentifier": null,
+      "positionNumber": 0,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "attributes": {
+        "Name": "TiaMcpRemoteHead"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/Profilschiene_0",
+      "name": "Profilschiene_0",
+      "typeIdentifier": "OrderNumber:6ES7 590-1***0-0AA0",
+      "positionNumber": 0,
+      "containerPath": null,
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Profilschiene_0"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "name": "ScratchPLC",
+      "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/Profilschiene_0",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "ScratchPLC",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/CPU-Display_1",
+      "name": "CPU-Display_1",
+      "typeIdentifier": null,
+      "positionNumber": 3,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "CPU-Display_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/Kartenleser%2F-schreiber_1",
+      "name": "Kartenleser/-schreiber_1",
+      "typeIdentifier": null,
+      "positionNumber": 4,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "Kartenleser/-schreiber_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+      "name": "OPC UA_1",
+      "typeIdentifier": null,
+      "positionNumber": 254,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Name": "OPC UA_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "name": "PROFINET-Schnittstelle_1",
+      "typeIdentifier": null,
+      "positionNumber": 32768,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "PROFINET-Schnittstelle_1"
+      },
+      "channels": [],
+      "addresses": [],
+      "network": {
+        "nodes": [
+          {
+            "name": "X1",
+            "type": "Ethernet",
+            "subnet": "RemoteIoProofSubnet",
+            "attributes": {
+              "Address": "192.0.2.10",
+              "IpProtocolSelection": "Project",
+              "PnDeviceName": "scratchplc.profinet-schnittstelle_1",
+              "PnDeviceNameAutoGeneration": true,
+              "PnDeviceNameSetDirectly": false,
+              "SubnetMask": "255.255.255.0",
+              "UseIpProtocol": true,
+              "UseRouter": false
+            }
+          }
+        ],
+        "controllers": [
+          {
+            "index": 0,
+            "system": {
+              "state": "assigned",
+              "name": "RemoteIoProofSystem",
+              "number": 100,
+              "ownerHardwarePath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+              "controllerIndex": 0,
+              "subnet": {
+                "state": "connected",
+                "name": "RemoteIoProofSubnet",
+                "path": "/projects/CapturedRemoteIo/subnets/RemoteIoProofSubnet",
+                "resolution": "resolved",
+                "reason": null
+              }
+            }
+          }
+        ],
+        "connectors": []
+      }
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_1",
+      "name": "Port_1",
+      "typeIdentifier": null,
+      "positionNumber": 32769,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Port_1"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1/items/Port_2",
+      "name": "Port_2",
+      "typeIdentifier": null,
+      "positionNumber": 32770,
+      "containerPath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Port_2"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45",
+      "name": "BA 2xRJ45",
+      "typeIdentifier": "OrderNumber:6ES7 193-6AR00-0AA0/V0.0",
+      "positionNumber": 127,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "BA 2xRJ45",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45/items/Port_1",
+      "name": "Port_1",
+      "typeIdentifier": null,
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "Comment": "",
+        "Name": "Port_1"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/BA%202xRJ45/items/Port_2",
+      "name": "Port_2",
+      "typeIdentifier": null,
+      "positionNumber": 2,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "attributes": {
+        "Comment": "",
+        "Name": "Port_2"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0",
+      "name": "Baugruppenträger_0",
+      "typeIdentifier": "System:Rack.ET200SP",
+      "positionNumber": 0,
+      "containerPath": null,
+      "attributes": {
+        "Author": "fixture-author",
+        "Comment": "",
+        "Name": "Baugruppenträger_0"
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Servermodul_1",
+      "name": "Servermodul_1",
+      "typeIdentifier": "OrderNumber:6ES7 193-6PA00-0AA0/V1.2",
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "Servermodul_1",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Servermodul_1/items/Servermodul_1",
+      "name": "Servermodul_1",
+      "typeIdentifier": null,
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Servermodul_1",
+      "attributes": {
+        "Comment": "",
+        "Name": "Servermodul_1"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "name": "TiaMcpRemoteHead",
+      "typeIdentifier": "OrderNumber:6ES7 155-6AU02-0BN0/V6.4",
+      "positionNumber": 0,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/Baugruppentr%C3%A4ger_0",
+      "attributes": {
+        "AdditionalInformation": "",
+        "Author": "fixture-author",
+        "Comment": "",
+        "LocationIdentifier": "",
+        "Name": "TiaMcpRemoteHead",
+        "PlantDesignation": ""
+      },
+      "channels": [],
+      "addresses": []
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/PROFINET-Schnittstelle",
+      "name": "PROFINET-Schnittstelle",
+      "typeIdentifier": null,
+      "positionNumber": 1,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "attributes": {
+        "Comment": "",
+        "Name": "PROFINET-Schnittstelle"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ],
+      "network": {
+        "nodes": [
+          {
+            "name": "IE1",
+            "type": "Ethernet",
+            "subnet": "RemoteIoProofSubnet",
+            "attributes": {
+              "Address": "192.0.2.11",
+              "IpProtocolSelection": "Project",
+              "PnDeviceName": "tiamcpremotehead",
+              "PnDeviceNameAutoGeneration": true,
+              "SubnetMask": "255.255.255.0",
+              "UseIpProtocol": true,
+              "UseRouter": false
+            }
+          }
+        ],
+        "controllers": [],
+        "connectors": [
+          {
+            "index": 0,
+            "system": {
+              "state": "assigned",
+              "name": "RemoteIoProofSystem",
+              "number": 100,
+              "ownerHardwarePath": "/projects/CapturedRemoteIo/devices/ScratchStation/items/ScratchPLC/items/PROFINET-Schnittstelle_1",
+              "controllerIndex": 0,
+              "subnet": {
+                "state": "connected",
+                "name": "RemoteIoProofSubnet",
+                "path": "/projects/CapturedRemoteIo/subnets/RemoteIoProofSubnet",
+                "resolution": "resolved",
+                "reason": null
+              }
+            }
+          },
+          {
+            "index": 1,
+            "system": {
+              "state": "notAssigned"
+            }
+          },
+          {
+            "index": 2,
+            "system": {
+              "state": "notAssigned"
+            }
+          },
+          {
+            "index": 3,
+            "system": {
+              "state": "notAssigned"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead/items/TiaMcpRemoteHead",
+      "name": "TiaMcpRemoteHead",
+      "typeIdentifier": null,
+      "positionNumber": 0,
+      "containerPath": "/projects/CapturedRemoteIo/devices/TiaMcpRemoteIo/items/TiaMcpRemoteHead",
+      "attributes": {
+        "Name": "TiaMcpRemoteHead"
+      },
+      "channels": [],
+      "addresses": [
+        {
+          "ioType": "Diagnosis",
+          "startAddress": -1,
+          "lengthBits": 0,
+          "owners": []
+        }
+      ]
+    }
+  ]
+}

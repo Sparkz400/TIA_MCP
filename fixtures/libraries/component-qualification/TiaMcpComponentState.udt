@@ -1,0 +1,6 @@
+TYPE "TiaMcpComponentState"
+VERSION : 0.1
+STRUCT
+    Active : Bool;
+END_STRUCT;
+END_TYPE

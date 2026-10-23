@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "changeId": "lib-fdbeb1d33b2f4295b0729fbd14ec94ad",
+  "previewHash": "622390ec46b61a19915d7dd245ed13729691e37b68823aad7ac42c42c1303c9f",
+  "state": "applied",
+  "preview": {
+    "schemaVersion": 1,
+    "kind": "library_publish",
+    "sessionGeneration": "ea806ac2f7b2409b87e9ab0d88c3fb9f",
+    "resources": [
+      {
+        "libraryId": "library-16adb6032edb47659f980fe856ba1a6c",
+        "revision": "652f111044461adf5b251a4ab5d7b40bf4af1a74c897f3e720dcfc5fc804fa69",
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\scratch\\TiaMcpScratch_20261009_052439_c82bed7f\\TiaMcpScratch_20261009_052439_c82bed7f\\TiaMcpScratch_20261009_052439_c82bed7f.ap21",
+        "sourcePath": null,
+        "sourceHash": null
+      },
+      {
+        "libraryId": "library-e897c8d6ae904d21a294589b23ff0a2d",
+        "revision": "684fd29702fb1c1d64f52db3426e396e7ee051ca3acc6ee98d38393d352eb787",
+        "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-48898bca5adf4c2fb6d044f02a675777\\created\\TypeQualification\\TypeQualification.al21",
+        "sourcePath": null,
+        "sourceHash": null
+      }
+    ],
+    "selection": [
+      {
+        "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+        "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+      }
+    ],
+    "dependencies": [
+      {
+        "rootVersionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+        "versions": [
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.0.0",
+            "state": "Committed",
+            "isDefault": false,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true,
+            "requiredVersionGuids": []
+          }
+        ]
+      },
+      {
+        "rootVersionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+        "versions": [
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true,
+            "requiredVersionGuids": []
+          }
+        ]
+      }
+    ],
+    "effects": [
+      {
+        "action": "copyTypeAllVersions",
+        "versions": [
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.0.0",
+            "state": "Committed",
+            "isDefault": false,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          }
+        ],
+        "defaultPolicy": "Promote source default only when newer; exact per-type effects are in typeSynchronization."
+      },
+      {
+        "action": "library_publish",
+        "targetLibraryId": "library-e897c8d6ae904d21a294589b23ff0a2d",
+        "projectPath": null
+      }
+    ],
+    "warnings": [],
+    "payload": {
+      "schemaVersion": 1,
+      "source": {
+        "libraryId": "library-16adb6032edb47659f980fe856ba1a6c",
+        "revision": "652f111044461adf5b251a4ab5d7b40bf4af1a74c897f3e720dcfc5fc804fa69"
+      },
+      "selection": [
+        {
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+        }
+      ],
+      "destinationLibraryId": "library-e897c8d6ae904d21a294589b23ff0a2d"
+    },
+    "typeSynchronization": [
+      {
+        "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+        "typeName": "TiaMcpLibraryGate",
+        "nativeForceUpdateMode": "SetOnlyHigherUpdatedVersionAsDefault",
+        "forceUpdate": false,
+        "beforeDefault": {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.0.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true
+        },
+        "sourceDefault": {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.1.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true
+        },
+        "expectedDefault": {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.1.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true
+        },
+        "defaultChange": true,
+        "defaultEffect": "promoteNewerSourceDefault",
+        "expectedVersions": [
+          {
+            "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "versionNumber": "1.0.0"
+          },
+          {
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "versionNumber": "1.1.0"
+          }
+        ],
+        "deleteVersions": false
+      }
+    ],
+    "fingerprint": "4c9e3949dc1625bde84f9f7f955454f4bf3119d7482a4600db8e729e9090b717"
+  },
+  "journal": {
+    "schemaVersion": 1,
+    "changeId": "lib-fdbeb1d33b2f4295b0729fbd14ec94ad",
+    "kind": "library_publish",
+    "sessionGeneration": "ea806ac2f7b2409b87e9ab0d88c3fb9f",
+    "previewHash": "622390ec46b61a19915d7dd245ed13729691e37b68823aad7ac42c42c1303c9f",
+    "preview": {
+      "schemaVersion": 1,
+      "kind": "library_publish",
+      "sessionGeneration": "ea806ac2f7b2409b87e9ab0d88c3fb9f",
+      "resources": [
+        {
+          "libraryId": "library-16adb6032edb47659f980fe856ba1a6c",
+          "revision": "652f111044461adf5b251a4ab5d7b40bf4af1a74c897f3e720dcfc5fc804fa69",
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\scratch\\TiaMcpScratch_20261009_052439_c82bed7f\\TiaMcpScratch_20261009_052439_c82bed7f\\TiaMcpScratch_20261009_052439_c82bed7f.ap21",
+          "sourcePath": null,
+          "sourceHash": null
+        },
+        {
+          "libraryId": "library-e897c8d6ae904d21a294589b23ff0a2d",
+          "revision": "684fd29702fb1c1d64f52db3426e396e7ee051ca3acc6ee98d38393d352eb787",
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-48898bca5adf4c2fb6d044f02a675777\\created\\TypeQualification\\TypeQualification.al21",
+          "sourcePath": null,
+          "sourceHash": null
+        }
+      ],
+      "selection": [
+        {
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+        }
+      ],
+      "dependencies": [
+        {
+          "rootVersionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+          "versions": [
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.0.0",
+              "state": "Committed",
+              "isDefault": false,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true,
+              "requiredVersionGuids": []
+            }
+          ]
+        },
+        {
+          "rootVersionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "versions": [
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.1.0",
+              "state": "Committed",
+              "isDefault": true,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true,
+              "requiredVersionGuids": []
+            }
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "action": "copyTypeAllVersions",
+          "versions": [
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.0.0",
+              "state": "Committed",
+              "isDefault": false,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true
+            },
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.1.0",
+              "state": "Committed",
+              "isDefault": true,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true
+            }
+          ],
+          "defaultPolicy": "Promote source default only when newer; exact per-type effects are in typeSynchronization."
+        },
+        {
+          "action": "library_publish",
+          "targetLibraryId": "library-e897c8d6ae904d21a294589b23ff0a2d",
+          "projectPath": null
+        }
+      ],
+      "warnings": [],
+      "payload": {
+        "schemaVersion": 1,
+        "source": {
+          "libraryId": "library-16adb6032edb47659f980fe856ba1a6c",
+          "revision": "652f111044461adf5b251a4ab5d7b40bf4af1a74c897f3e720dcfc5fc804fa69"
+        },
+        "selection": [
+          {
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663"
+          }
+        ],
+        "destinationLibraryId": "library-e897c8d6ae904d21a294589b23ff0a2d"
+      },
+      "typeSynchronization": [
+        {
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "typeName": "TiaMcpLibraryGate",
+          "nativeForceUpdateMode": "SetOnlyHigherUpdatedVersionAsDefault",
+          "forceUpdate": false,
+          "beforeDefault": {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.0.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          "sourceDefault": {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          "expectedDefault": {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          "defaultChange": true,
+          "defaultEffect": "promoteNewerSourceDefault",
+          "expectedVersions": [
+            {
+              "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+              "versionNumber": "1.0.0"
+            },
+            {
+              "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+              "versionNumber": "1.1.0"
+            }
+          ],
+          "deleteVersions": false
+        }
+      ],
+      "fingerprint": "4c9e3949dc1625bde84f9f7f955454f4bf3119d7482a4600db8e729e9090b717"
+    },
+    "checkpoints": [
+      {
+        "kind": "library",
+        "originalPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-48898bca5adf4c2fb6d044f02a675777\\created\\TypeQualification\\TypeQualification.al21",
+        "archivePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-fdbeb1d33b2f4295b0729fbd14ec94ad\\before-0.zal21",
+        "sha256": "428354087ae32923d4d58d42de3a8617d4e6e2681a45b9c7c2fc280955ee94c9"
+      }
+    ],
+    "outputs": [],
+    "events": [
+      {
+        "stage": "prepared",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:37.5715157Z"
+      },
+      {
+        "stage": "claim",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:37.8370371Z"
+      },
+      {
+        "stage": "checkpoint_save_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "dispatching",
+        "utc": "2026-10-09T05:26:37.8624228Z"
+      },
+      {
+        "stage": "checkpoint_save_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:37.9112477Z"
+      },
+      {
+        "stage": "checkpoint_archive_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "dispatching",
+        "utc": "2026-10-09T05:26:37.9444576Z"
+      },
+      {
+        "stage": "checkpoint_archive_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:38.8517516Z"
+      },
+      {
+        "stage": "native_mutation",
+        "state": "dispatching",
+        "utc": "2026-10-09T05:26:38.8669898Z"
+      },
+      {
+        "stage": "copy_type_242f7bb1-3562-4b41-a536-151a48546a72",
+        "state": "dispatching",
+        "utc": "2026-10-09T05:26:38.9158389Z"
+      },
+      {
+        "stage": "copy_type_242f7bb1-3562-4b41-a536-151a48546a72",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:39.29763Z"
+      },
+      {
+        "stage": "native_mutation",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:39.378174Z"
+      },
+      {
+        "stage": "save_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "dispatching",
+        "utc": "2026-10-09T05:26:39.3932458Z"
+      },
+      {
+        "stage": "save_library-e897c8d6ae904d21a294589b23ff0a2d",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:39.5549252Z"
+      },
+      {
+        "stage": "transaction",
+        "state": "completed",
+        "utc": "2026-10-09T05:26:39.6884775Z"
+      }
+    ],
+    "automaticRetryAllowed": false,
+    "state": "applied",
+    "updatedUtc": "2026-10-09T05:26:39.6884775Z",
+    "idempotencyKeyHash": "c89940e349016eab5bb0d2ba860b63db4a109718c7cdea960909469511ced835",
+    "result": {
+      "objects": [
+        {
+          "kind": "version",
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+          "typeName": "TiaMcpLibraryGate",
+          "version": "1.1.0",
+          "state": "Committed",
+          "isDefault": true,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "setForUpdate": true
+        }
+      ],
+      "typeSynchronization": [
+        {
+          "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+          "defaultVersion": {
+            "kind": "version",
+            "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+            "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+            "typeName": "TiaMcpLibraryGate",
+            "version": "1.1.0",
+            "state": "Committed",
+            "isDefault": true,
+            "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+            "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+            "author": "TIA MCP qualification",
+            "doNotUse": false,
+            "setForUpdate": true
+          },
+          "versions": [
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "cbb424bb-76a3-4f61-adb6-96133da5cdd5",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.0.0",
+              "state": "Committed",
+              "isDefault": false,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:14.9985515Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true
+            },
+            {
+              "kind": "version",
+              "typeGuid": "242f7bb1-3562-4b41-a536-151a48546a72",
+              "versionGuid": "d39d9eb2-ad63-4d62-b33b-4cc5ddc40663",
+              "typeName": "TiaMcpLibraryGate",
+              "version": "1.1.0",
+              "state": "Committed",
+              "isDefault": true,
+              "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+              "modifiedDate": "2026-10-09T05:26:31.2188849Z",
+              "author": "TIA MCP qualification",
+              "doNotUse": false,
+              "setForUpdate": true
+            }
+          ],
+          "exactVersionsAndDefaultVerified": true
+        }
+      ]
+    },
+    "lockManifest": {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-fdbeb1d33b2f4295b0729fbd14ec94ad\\library-lock.v1.json",
+      "bytes": 6974,
+      "sha256": "9b46b9a4ead8c34b7c49ffe20e9188b6ec7ab57c0fbd44bf14adf7b0d1e6d487",
+      "mediaType": "application/json"
+    },
+    "engineeringVerified": false,
+    "persistenceVerified": false,
+    "runtimeVerified": false
+  },
+  "journalPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\l09\\nt_69d941cf\\changes\\change-lib-fdbeb1d33b2f4295b0729fbd14ec94ad\\journal.json",
+  "automaticRetryAllowed": false
+}

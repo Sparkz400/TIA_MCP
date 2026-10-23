@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:test-result:v1",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "fixtureId", "status", "environment", "steps", "evidence", "limitations"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "runId": {"type": "string", "minLength": 1},
+    "fixtureId": {"type": "string", "minLength": 1},
+    "status": {"enum": ["passed", "failed", "blocked", "skipped"]},
+    "environment": {"type": "object"},
+    "steps": {"type": "array", "items": {"type": "object"}},
+    "evidence": {"type": "array"},
+    "limitations": {"type": "array"}
+  }
+}

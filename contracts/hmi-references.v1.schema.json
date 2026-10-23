@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/hmi-references.v1.schema.json",
+  "title": "Bounded HMI relationship response",
+  "type": "object",
+  "required": ["schemaVersion", "target", "relationships", "offset", "nextOffset", "metadataRevision", "coverage", "diagnostics", "scriptsExecuted", "runtimeVerified"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "target": {"type": "object", "required": ["identity", "family", "hmiPath"], "properties": {"identity": {"$ref": "hmi-identity.v2.schema.json"}}},
+    "relationships": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/edge"}},
+    "offset": {"type": "integer", "minimum": 0, "maximum": 50000},
+    "nextOffset": {"type": ["integer", "null"], "minimum": 0},
+    "metadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "observedAtUtc": {"type": "string", "format": "date-time"},
+    "diagnostics": {"type": "array", "items": {"type": "object"}},
+    "artifacts": {"type": "array", "items": {"type": "object"}},
+    "coverage": {"$ref": "#/$defs/coverage"},
+    "scriptsExecuted": {"const": false},
+    "runtimeVerified": {"const": false}
+  },
+  "$defs": {
+    "edge": {
+      "type": "object", "required": ["sourcePath", "relation", "target", "targetCandidates", "resolution", "evidence", "sourceProperty", "automaticRewiringAllowed"],
+      "properties": {
+        "sourcePath": {"type": ["string", "null"]}, "source": {"type": ["object", "null"]},
+        "relation": {"enum": ["hmiTagConnection", "hmiPlcDeclaration", "hmiConnectionPlc", "hmiScreenItemTag", "hmiNativePayload", "hmiFaceplateTypeVersion", "hmiFaceplatePort", "hmiAlarmTag", "hmiNativeCrossReference", "hmiScriptBehavior"]},
+        "target": {"type": ["object", "null"]}, "targetCandidates": {"type": "array", "items": {"type": "object"}},
+        "candidateScopeComplete": {"type": "boolean"},
+        "resolution": {"enum": ["resolved", "unresolved", "ambiguous", "dynamic", "resolvedLibraryReference"]},
+        "evidence": {"enum": ["nativeConfirmed", "parsedSupported", "inferred", "unresolved"]},
+        "sourceProperty": {"type": "string"}, "sourceArtifact": {"type": ["object", "null"]}, "nativeSpelling": {"type": ["string", "null"]},
+        "nativeStation": {"type": ["string", "object", "null"]}, "nativeNode": {"type": ["string", "object", "null"]},
+        "rawProperties": {"type": "object"}, "libraryReference": {"type": "object"}, "locations": {"type": "array", "items": {"type": "object"}},
+        "automaticRewiringAllowed": {"const": false}
+      },
+      "allOf": [{"if": {"properties": {"resolution": {"const": "resolved"}}, "required": ["resolution"]}, "then": {"properties": {"target": {"type": "object"}, "evidence": {"enum": ["nativeConfirmed", "parsedSupported"]}, "candidateScopeComplete": {"const": true}}}}]
+    },
+    "coverage": {"type": "object", "required": ["status", "complete", "scopeComplete", "truncated", "reasons"], "properties": {"status": {"enum": ["complete", "truncated", "unsupported", "unavailable", "failed"]}, "complete": {"const": false}, "scopeComplete": {"type": "boolean"}, "truncated": {"type": "boolean"}, "reasons": {"type": "array", "items": {"type": "string"}}}},
+    "request": {
+      "type": "object", "properties": {
+        "schemaVersion": {"const": 1}, "projectName": {"type": "string"}, "projectPath": {"type": "string"},
+        "target": {"$ref": "hmi-inspection.v1.schema.json#/$defs/selector"}, "identity": {"$ref": "hmi-identity.v2.schema.json"},
+        "hmiPath": {"type": "string"}, "family": {"enum": ["classic", "unified"]}, "screenPath": {"type": "string"}, "includeAlarms": {"type": "boolean"}, "artifactDirectory": {"type": "string"},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 200}, "offset": {"type": "integer", "minimum": 0, "maximum": 50000},
+        "maxVisited": {"type": "integer", "minimum": 1, "maximum": 50000}, "maxNativeQueries": {"type": "integer", "minimum": 1, "maximum": 16},
+        "maxBytes": {"type": "integer", "minimum": 4096, "maximum": 1048576}, "expectedMetadataRevision": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  },
+  "description": "Only explicit native foreign keys in completely observed scopes, native UnderlyingObject equality, or configured symbolic declarations anchored by exact native CommunicationManagement endpoints may produce resolved endpoints. Native names-only PLC endpoints, dynamic expressions and incomplete DB/UDT member paths remain unresolved. Edges never grant mutation permission. Library version references remain owned by the library subsystem."
+}

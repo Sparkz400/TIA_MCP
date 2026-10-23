@@ -1,0 +1,9 @@
+{
+  "fixtureOrigin": "independently authored pure expected-entry oracle; not native evidence",
+  "selectedStorage": "/plc/PLC_A/blocks/MotorA",
+  "rowIds": ["enable", "running", "fault", "starts"],
+  "types": ["Bool", "Bool", "Bool", "DInt"],
+  "members": [["Enable"], ["Running"], ["Fault"], ["Starts"]],
+  "gapIds": ["temp"],
+  "forbiddenStorage": "/plc/PLC_A/blocks/MotorB"
+}

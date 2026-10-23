@@ -1,0 +1,79 @@
+# TS-03 production Host integration
+
+**Offline supplied-result review:** Two separate [result intake/review tools](testsuite-result-review.md) now retain supplied packets, page exact findings and export JUnit without invoking this native execution queue. The ten style tools below retain their original gating.
+
+**16 October owning-worker continuation:** [Gated worker integration and scope-editor evidence](../verification/testsuite-worker-integration-20261016.md) now connect the existing Host adapter to the owning-worker protocol and optional library. The earlier “not loaded or registered” statement below describes the initial TS-03 handoff and is superseded. An owned GUI scratch supplied independent selected-scope screenshots and exact normal cleanup receipts; the historical observation is not a repeatable worker-bound scope provider. Native effective-scope, current execution-license and complete lifecycle providers remain unqualified; execution is still disabled and TS-Q01 execution has not run.
+
+Implemented on 16 October 2026. The managed baseline was independently rerun at **233 checks** before changes. That initial expanded suite passed **354 checks**, including **121 new queue/adapter/recovery checks**. These are authored fake observations and retained-file tests, not Siemens execution or native qualification.
+
+**Offline identity-text repair:** The [current verification record](../verification/testsuite-identity-text-20261016.md) covers exact Unicode identities, refusal before serialization/hashing, retained review validation and four actual MCP Host lifetimes. The targeted managed suite passes 549 checks; the Host harness passes 46. JSON controls remain permitted in raw diagnostic text, but are refused in bounded identity selectors. Malformed escaped UTF-16 in transport arguments is rejected by the installed MCP SDK before tool dispatch with a generic RPC error; Core retained-artifact parsing returns `InvalidTestSuiteArtifact`. Neither refusal opens a native worker.
+
+`TiaTools` exposes ten local tools through [TestSuiteTools.cs](../../src/TiaMcp.Host/TestSuiteTools.cs). Registration uses the existing partial type; no native worker starts to prepare, review, query, retrieve results, stop or mark an interruption. All current production execution/recovery profiles are disabled in code. There is no Host flag, JSON Boolean or caller-authored qualification receipt that enables them.
+
+| Tool | Bounded operation |
+| --- | --- |
+| `testsuite_style_plan_prepare` | Select exact captured definitions and scope into one to 32 ordered runs; retain complete plans, original definition bundles, project effect/checkpoint obligations and profile. |
+| `testsuite_style_plan_review` | Reopen the complete review and restore every immutable bundle; no truncated membership preview. |
+| `testsuite_style_job_prepare` | Bind the reviewed digest and idempotency key to all shared durable operation IDs. Preparation has no native effects or reservation. |
+| `testsuite_style_job_status` | Reopen operation revisions, progress, pending reconciliation and persistent stop state. |
+| `testsuite_style_job_execute_next` | Explicitly execute exactly the next unattempted run, once, through an admitted adapter; currently refuses with `TestSuiteProfileUnqualified`. |
+| `testsuite_style_job_results` | Return raw/result/scope/assessment artifact references and operation evidence, rechecking retained hashes and recomputing reports. |
+| `testsuite_style_job_stop_request` | Persist stop before stopping remaining prepared operations; stop remains effective after Host restart or an interrupted stop response. |
+| `testsuite_style_job_mark_interrupted` | Explicitly mark checkpoint/dispatch/recovery ambiguity unknown, retaining reservations. Refuses while that job's execution lock is held. |
+| `testsuite_style_job_recover` | Reserve exact new recovery destinations before a single restore; currently qualification-gated. |
+| `testsuite_style_job_reconcile` | Obtain independent original/destination observations through an adapter before shared-store reconciliation; currently qualification-gated. |
+
+The plan request contains `target` (`NativeTargetObservation`), `executionProfile`, `definitions:[{manifest,originalArtifact:{relativePath,sha256}}]`, and `runs:[{selectedDefinitionIds,excludedDefinitionIds}]`. Originals must already exist under the configured Host artifact root. Up to 1,000 definitions and 32 MiB of originals are admitted for one review; each retained artifact is bounded to 64 MiB. Existing planner/bundle limits still apply. Application/system definitions, mixed resources, unresolved syntax, excluded required coverage and incomplete review scopes cannot become style operations. Caller-authored observations can describe a review but cannot establish native admission.
+
+Each review returns its complete content and an artifact reference. Review its SHA-256, then supply it as `reviewedSha256` to job preparation and mutations. Execution additionally requires the exact `operationId` and current `expectedRevision`. There is no automatic runner, restart resumption, timeout takeover, retry, import or scope mutation. Repeated preparation is idempotent; repeated execution of an attempted operation is refused, including when the original successful response was lost.
+
+## Persistence and adapter contract
+
+[TestSuiteStyleJobs](../../src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs) retains content-addressed blobs and immutable job membership under `testsuite-jobs/`. All native progress, checkpoint/dispatch/recovery intents and resource reservations remain authoritative in the existing `EngineeringOperationStore`. Its canonical project resource key also conflicts with other engineering domains and legacy mutation admissions. All cooperating Hosts must use the same artifact root.
+
+One process-independent execution lock covers a job attempt. A separate short control lock orders stop requests against checkpoint/dispatch admission, allowing stops and status during a blocking native call. A stop before intent prevents it; a stop after dispatch intent leaves that invocation in flight and prevents the next run. A stop after checkpoint cannot release project ownership without reconciliation. A native list call, if a future profile qualifies it, stays one dispatch; it is never advertised as cancellable or split after it starts.
+
+[ITestSuiteStyleAdapter](../../src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs) is a trusted code boundary, not an MCP-supplied object. Qualification must succeed before native lease acquisition. Its session owns native exclusive access across reobservation, flushed intent and invocation. The orchestrator restores the original bundle and checks:
+
+- Exact project, source/content, session epoch, adapter/profile, hardware and native identities at both checkpoint and dispatch boundaries.
+- Current observed product/license/style-service/scope probes with retained receipts bound to that exact installation/profile/project/session.
+- Every reacquired original definition byte against the retained bundle.
+- Independent scope observations and their exact run-bound receipt, including missing, ignored and unexpected objects. Only actual readback or a separately qualified exhaustive proof profile can qualify; SetScope returns and diagnostic mentions cannot.
+
+The adapter must provide genuine checkpoint/preservation material and independent compile, preservation, fresh reopen and cleanup gates. Fresh reopen must compare the frozen preservation expectation in a different native session epoch; it cannot reuse the old operation for execution in that epoch. Managed artifact validation proves retention and binding, not the truth of those native observations. No synthetic production probe or passing verification implementation is supplied.
+
+Native raw response bytes are flushed before parsing, result normalization or verification. `dispatch.rawResults` is committed while ownership is held. Unknown fields, duplicate JSON fields and malformed captures cannot disappear through normalization. Successful reports bind raw, normalized result, independent requested/effective scope and assessment hashes. Reopened result classification is independently recomputed; a forged passing label is refused. Assertion failure, execution failure and incomplete evidence retain a `recoveryRequired` operation. A missing response retains `outcomeUnknown`. Resource reconciliation does not mean tests passed and cannot manufacture a missing result. A cleanup failure cannot release a successful-looking result or reconciliation. Use the existing bounded `artifact_read` tool with a returned `relativePath` to transfer original raw/report bytes.
+
+Recovery reuses `ReserveRecovery`, `RecordRecoveryEvidence` and `Reconcile`. The retained archive hash is checked before destination admission; originals and destinations cannot overlap. A returned restore stays reserved pending independent evidence. A lost restore response is not retried. Every admitted destination needs `verifiedRestored`, `verifiedAbsent` or `retainedPartial` evidence, and every original resource needs its own disposition.
+
+## Native boundary and remaining prerequisites
+
+[TiaMcp.TestSuite.V21](../../src/TiaMcp.TestSuite.V21/) is an optional **library**, compiled against the installed public V21 Base/TestSuite assemblies. It contains the evidenced single-rule `RuleSets.Find`, `RuleSet.SaveToFile`, `GetService<RuleSetExecutor>` and `RuleSetExecutor.Run(RuleSet)` routes, a one-invocation guard, immediate flushed return receipt and bounded recursive raw result serialization. It starts/attaches no TIA instance, imports nothing and never calls SetScope. It makes no assertion classification from diagnostic text. Missing effective-scope proof stays false.
+
+The native-side gate, as well as the Host-side gate, currently refuses every profile. The optional library is **not loaded or registered into the owning worker yet**: the missing current product/license observation provider, complete effective-scope provider and qualified checkpoint/preservation/fresh-reopen/recovery session must be supplied and qualified together before connecting it. This is deliberate fail-closed behavior, not an enabled production execution profile. The full durable workflow is exercised through the same managed adapter interface using fakes; no native call was made in this lane.
+
+Smallest proposed **TS-Q01** packet, to be scheduled solely by the native queue owner after WT-05:
+
+1. Freeze the exact Host/Core/optional-adapter source and binary hashes, public API/product identities, owned scratch project and original definitions, independent expected findings, complete inventory/preservation baseline and exact process/session ownership. Use one existing rule per run and no simulator or endpoint.
+2. Resolve and review a complete scope route **first**: independently readable scope, or a separately reviewed exhaustive owned-container proof profile covering every applicable object, silent clean objects, ignored objects and out-of-scope controls. A successful SetScope or the retained three diagnostics cannot satisfy this step. If unavailable, retain refusal and stop before checkpoint/Run.
+3. Observe fresh product, execution-license and service prerequisites without treating service/DLL presence or the old availability return as license proof. Test missing product/license, stale definition/session and incomplete scope refusals before effects.
+4. Run one independently authored clean and one deliberately violating fixture as two separately reviewed single dispatches. Retain genuine archives/manifests, flushed intent/return/raw trees, exact object findings, independent scope, compile, unchanged peers, save and fresh reopen. Stop after the first run and verify the second remains uninvoked.
+5. In a separately admitted failure window, interrupt after dispatch intent/return, reopen the Host, prove replay refusal and retained project contention, then perform explicit archive restoration to a new reserved location. Independently reconcile original and recovered copies and verify actual cleanup. Only those exact demonstrated profiles may be proposed for enablement.
+
+Application/system execution, scope authoring/import, native list/group profiles and CI provisioning remain outside this increment.
+
+## Verification and integration handoff
+
+Evidence is isolated under [artifacts/ts03-production-20261016](../../artifacts/ts03-production-20261016/). The [handoff](../../artifacts/ts03-production-20261016/handoff.json) records final commands, results, changed-file ownership and source hashes. [Shared catalog handoff](../../artifacts/ts03-production-20261016/shared-catalog-handoff.json) records the pre/post hashes of append-only TS entries; unrelated current records were preserved. No shared Host startup, worker dispatch, project references, solution, WatchTable files, native reservations, frozen binaries or historical receipts were changed by this lane.
+
+The [review](../../contracts/testsuite-style-review.v1.schema.json) and [job](../../contracts/testsuite-style-job.v1.schema.json) schemas add structural contracts. Runtime reconstruction and the shared journal still enforce hashes, revisions, idempotency, complete evidence and state transitions. The actual MCP registration/restart harness uses deliberately nonexistent engineering and simulator workers.
+
+```powershell
+dotnet run --project tests/TiaMcp.TestSuite.Tests/TiaMcp.TestSuite.Tests.csproj --artifacts-path artifacts/your-ts03-build -- artifacts/your-ts03-results
+dotnet build src/TiaMcp.Host/TiaMcp.Host.csproj --artifacts-path artifacts/your-ts03-host
+dotnet build src/TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj --artifacts-path artifacts/your-ts03-native-compile
+python scripts/test_testsuite_production_host.py --host <isolated-host.exe> --fixture artifacts/your-ts03-results-production/host-fixture.json --report <fresh-report.json>
+python scripts/test_testsuite_style_contracts.py --fixture artifacts/your-ts03-results-production/host-fixture.json --report <fresh-contract-report.json>
+```
+
+The schema check requires `jsonschema` and `referencing`. This lane used the existing retained schema-tool installation with `python -B` to avoid writing to historical artifacts; no dependency download was needed.

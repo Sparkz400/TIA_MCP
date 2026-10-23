@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/api-coverage-registry.v1.schema.json",
+  "title": "Reviewed semantic seed, first AC-01 slice; no qualification promotion",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "scopePolicy", "domains", "operations", "featureObligations", "manualResiduals", "limitations"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "kind": {"const": "api-coverage-reviewed-seed"},
+    "scopePolicy": {"type": "string", "minLength": 1},
+    "domains": {"type": "array", "minItems": 30, "maxItems": 30, "items": {"type": "object", "required": ["id", "title", "releaseObligation", "releaseAccepted", "scope", "dependencies", "review"], "properties": {"id": {"type": "string", "pattern": "^[DX][0-9]{2}$"}, "releaseObligation": {"const": true}, "releaseAccepted": {"const": false}}}},
+    "operations": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "domain", "title", "symbols", "sources", "api", "implementation", "qualification", "availability", "releaseObligation", "releaseAccepted", "review"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1}, "domain": {"type": "string", "pattern": "^[DX][0-9]{2}$"},
+        "title": {"type": "string", "minLength": 1},
+        "symbols": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[TMPFE]:.+"}},
+        "sources": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "api": {"const": "documented_installed_xml"}, "implementation": {"const": "not_implemented"},
+        "qualification": {"const": "not_run"}, "availability": {"const": "unobserved"},
+        "releaseObligation": {"const": true}, "releaseAccepted": {"const": false}, "review": {"type": "string"}
+      }
+    }},
+    "featureObligations": {"type": "array", "items": {"type": "object", "required": ["featureId", "obligations"]}},
+    "manualResiduals": {"type": "array", "minItems": 30, "items": {"type": "object", "required": ["domain", "state", "nextAction"]}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

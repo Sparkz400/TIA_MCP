@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/project-review-import.v1.schema.json",
+  "title": "Saved project review upload intake; no native qualification",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "artifact": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 67108864
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "nodeCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50000
+        },
+        "documentCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "nativeAccessAttempted": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "wholeProjectContentComplete": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "reviewId",
+        "artifact",
+        "nodeCount",
+        "documentCount",
+        "nativeAccessAttempted",
+        "sourceAuthenticityVerified",
+        "nativeQualified",
+        "wholeProjectContentComplete",
+        "sourceEvidencePolicy"
+      ],
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "uploadRef": {
+          "type": "string",
+          "pattern": "^upload:[a-f0-9]{32}$"
+        }
+      },
+      "required": [
+        "uploadRef"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "x-tool-contracts": {
+    "project_snapshot_import": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#/$defs/receipt"
+      }
+    }
+  }
+}

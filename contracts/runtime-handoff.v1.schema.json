@@ -1,0 +1,1749 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/runtime-handoff.v1.schema.json",
+  "title": "Supplied security/runtime handoff review; no live authority",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "connectionId",
+        "epoch",
+        "peerCertificateSha256"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^https://[^\\s/?#\\\\]+$"
+        },
+        "connectionId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "epoch": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "peerCertificateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "identity": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scheme",
+            "value"
+          ],
+          "properties": {
+            "scheme": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "credential": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "vaultId",
+            "credentialId",
+            "bindingSha256",
+            "cipherSha256"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": "protected-credential-reference.v1"
+            },
+            "vaultId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            },
+            "credentialId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$"
+            },
+            "bindingSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "cipherSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "objectPath"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hostId",
+        "context",
+        "targetIdentity",
+        "programIdentity",
+        "subjectId",
+        "clientId",
+        "credential",
+        "securityDomain",
+        "securityMode"
+      ],
+      "properties": {
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "targetIdentity": {
+          "$ref": "#/$defs/identity"
+        },
+        "programIdentity": {
+          "$ref": "#/$defs/identity"
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "clientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "credential": {
+          "$ref": "#/$defs/credential"
+        },
+        "securityDomain": {
+          "enum": [
+            "cpuRuntime",
+            "legacyWeb"
+          ]
+        },
+        "securityMode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "requiredOutcome"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "requiredOutcome": {
+          "enum": [
+            "allowed",
+            "denied"
+          ]
+        }
+      }
+    },
+    "permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "outcome"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "outcome": {
+          "enum": [
+            "allowed",
+            "denied",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "program",
+        "session"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/reference"
+        },
+        "program": {
+          "$ref": "#/$defs/reference"
+        },
+        "session": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceKind",
+        "hostId",
+        "context",
+        "sequence",
+        "freshness",
+        "identity"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-target.v1"
+        },
+        "sourceKind": {
+          "enum": [
+            "supplied",
+            "synthetic"
+          ]
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "expired",
+            "unknown"
+          ]
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        }
+      }
+    },
+    "program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceKind",
+        "hostId",
+        "context",
+        "sequence",
+        "freshness",
+        "identity"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-program.v1"
+        },
+        "sourceKind": {
+          "enum": [
+            "supplied",
+            "synthetic"
+          ]
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "expired",
+            "unknown"
+          ]
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        }
+      }
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceKind",
+        "hostId",
+        "context",
+        "sequence",
+        "freshness",
+        "subjectId",
+        "clientId",
+        "credential",
+        "securityDomain",
+        "securityMode",
+        "peerVerified",
+        "authenticated",
+        "state",
+        "permissionsComplete",
+        "permissions"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-session.v1"
+        },
+        "sourceKind": {
+          "enum": [
+            "supplied",
+            "synthetic"
+          ]
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "expired",
+            "unknown"
+          ]
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "clientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "credential": {
+          "$ref": "#/$defs/credential"
+        },
+        "securityDomain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "securityMode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "peerVerified": {
+          "type": "boolean"
+        },
+        "authenticated": {
+          "type": "boolean"
+        },
+        "state": {
+          "enum": [
+            "connected",
+            "closed",
+            "expired",
+            "unknown"
+          ]
+        },
+        "permissionsComplete": {
+          "type": "boolean"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission"
+          },
+          "minItems": 0,
+          "maxItems": 256
+        }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "program",
+        "session"
+      ],
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "program": {
+          "$ref": "#/$defs/program"
+        },
+        "session": {
+          "$ref": "#/$defs/session"
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "accessRecordId",
+        "accessPhase",
+        "owner",
+        "expected",
+        "operations",
+        "baseline",
+        "current"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessRecordId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessPhase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "expected": {
+          "$ref": "#/$defs/expected"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operation"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "baseline": {
+          "$ref": "#/$defs/references"
+        },
+        "current": {
+          "$ref": "#/$defs/references"
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "kind",
+        "state"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "baseline",
+            "current",
+            "transition"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "state": {
+          "enum": [
+            "unknown",
+            "equalDeclarations",
+            "mismatch",
+            "declaredCurrent",
+            "expired",
+            "declaredConnected",
+            "unavailable",
+            "declaredTrue",
+            "regressed",
+            "nondecreasingDeclaration"
+          ]
+        }
+      }
+    },
+    "permissionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "baselineOutcome",
+        "currentOutcome",
+        "state",
+        "publicGrantDeclared",
+        "operationAdmitted"
+      ],
+      "properties": {
+        "operation": {
+          "$ref": "#/$defs/operation"
+        },
+        "baselineOutcome": {
+          "enum": [
+            "allowed",
+            "denied",
+            "unknown"
+          ]
+        },
+        "currentOutcome": {
+          "enum": [
+            "allowed",
+            "denied",
+            "unknown"
+          ]
+        },
+        "state": {
+          "enum": [
+            "unknown",
+            "matchesDeclaredExpectation",
+            "mismatch"
+          ]
+        },
+        "publicGrantDeclared": {
+          "type": "boolean"
+        },
+        "operationAdmitted": {
+          "const": false
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "accessRecordId",
+        "accessPhase",
+        "owner",
+        "expected",
+        "evidence",
+        "observations",
+        "constraints",
+        "permissions",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "deviceIdentityVerified",
+        "programMatchVerified",
+        "effectiveRightsVerified",
+        "operationAdmitted",
+        "assertionsAdmitted",
+        "admission",
+        "mutationRecovery",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessRecordId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessPhase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "expected": {
+          "$ref": "#/$defs/expected"
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "baseline",
+            "current"
+          ],
+          "properties": {
+            "baseline": {
+              "$ref": "#/$defs/references"
+            },
+            "current": {
+              "$ref": "#/$defs/references"
+            }
+          }
+        },
+        "observations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "baseline",
+            "current"
+          ],
+          "properties": {
+            "baseline": {
+              "$ref": "#/$defs/observations"
+            },
+            "current": {
+              "$ref": "#/$defs/observations"
+            }
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permissionResult"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "requiresFreshEvidence",
+            "constraintCount",
+            "operationCount",
+            "publicAccessPhaseKind",
+            "publicClosureComplete",
+            "referencedBytes"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "requiresFreshEvidence",
+                "consistentDeclarations"
+              ]
+            },
+            "requiresFreshEvidence": {
+              "type": "boolean"
+            },
+            "constraintCount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 128
+            },
+            "operationCount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "publicAccessPhaseKind": {
+              "enum": [
+                "observation",
+                "proposal"
+              ]
+            },
+            "publicClosureComplete": {
+              "type": "boolean"
+            },
+            "referencedBytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 67108864
+            }
+          }
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "deviceIdentityVerified": {
+          "const": false
+        },
+        "programMatchVerified": {
+          "const": false
+        },
+        "effectiveRightsVerified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        },
+        "admission": {
+          "const": "unavailableWithoutQualifiedNativeEvidence"
+        },
+        "mutationRecovery": {
+          "const": "unknownOutcomeRequiresIndependentReconciliationNoAutomaticReplay"
+        },
+        "limits": {
+          "type": "string",
+          "maxLength": 4096
+        }
+      }
+    },
+    "retainedArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "request.json",
+            "report.json",
+            "baseline.target.json",
+            "baseline.program.json",
+            "baseline.session.json",
+            "current.target.json",
+            "current.program.json",
+            "current.session.json"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2097152
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "observationReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "artifact",
+        "bytes",
+        "sourceKind",
+        "nativeQualified",
+        "operationAdmitted",
+        "assertionsAdmitted",
+        "nativeExecutable",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-observation-receipt.v1"
+        },
+        "role": {
+          "enum": [
+            "target",
+            "program",
+            "session"
+          ]
+        },
+        "artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^runtime-handoff/observations/[0-9a-f]{64}\\.json$"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 262144
+        },
+        "sourceKind": {
+          "enum": [
+            "supplied",
+            "synthetic"
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        }
+      }
+    },
+    "handoffReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "recordRef",
+        "state",
+        "requestSha256",
+        "reportSha256",
+        "reviewId",
+        "accessRecordId",
+        "accessPhase",
+        "summary",
+        "artifacts",
+        "receiptName",
+        "admission",
+        "nativeQualified",
+        "operationAdmitted",
+        "assertionsAdmitted",
+        "nativeExecutable",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "runtime-handoff-receipt.v1"
+        },
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "requestSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessRecordId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "accessPhase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "summary": {
+          "$ref": "#/$defs/report/properties/summary"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/retainedArtifact"
+          },
+          "maxItems": 8,
+          "minItems": 8,
+          "prefixItems": [
+            {
+              "properties": {
+                "name": {
+                  "const": "request.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "report.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.target.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.program.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.session.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.target.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.program.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.session.json"
+                }
+              }
+            }
+          ]
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "admission": {
+          "const": "unavailableWithoutQualifiedNativeEvidence"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        }
+      }
+    },
+    "recordManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "artifacts"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/retainedArtifact"
+          },
+          "maxItems": 8,
+          "minItems": 8,
+          "prefixItems": [
+            {
+              "properties": {
+                "name": {
+                  "const": "request.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "report.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.target.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.program.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "baseline.session.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.target.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.program.json"
+                }
+              }
+            },
+            {
+              "properties": {
+                "name": {
+                  "const": "current.session.json"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "observationRow": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "observation"
+          ],
+          "properties": {
+            "role": {
+              "const": "target"
+            },
+            "observation": {
+              "$ref": "#/$defs/target"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "observation"
+          ],
+          "properties": {
+            "role": {
+              "const": "program"
+            },
+            "observation": {
+              "$ref": "#/$defs/program"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "observation"
+          ],
+          "properties": {
+            "role": {
+              "const": "session"
+            },
+            "observation": {
+              "$ref": "#/$defs/session"
+            }
+          }
+        }
+      ]
+    },
+    "handoffPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "reportSha256",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset",
+        "nativeQualified",
+        "operationAdmitted",
+        "assertionsAdmitted"
+      ],
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "section": {
+          "enum": [
+            "constraints",
+            "permissions",
+            "baselineObservations",
+            "currentObservations"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/constraint"
+                      },
+                      {
+                        "$ref": "#/$defs/permissionResult"
+                      },
+                      {
+                        "$ref": "#/$defs/observationRow"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 256
+                  }
+                }
+              }
+            ]
+          },
+          "maxItems": 200
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        }
+      }
+    },
+    "handoffChunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "name",
+        "sha256",
+        "bytes",
+        "offset",
+        "count",
+        "nextOffset",
+        "complete",
+        "encoding",
+        "data",
+        "nativeQualified",
+        "operationAdmitted",
+        "assertionsAdmitted"
+      ],
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "name": {
+          "enum": [
+            "request.json",
+            "report.json",
+            "baseline.target.json",
+            "baseline.program.json",
+            "baseline.session.json",
+            "current.target.json",
+            "current.program.json",
+            "current.session.json",
+            "receipt.json"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2097152
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "nextOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "encoding": {
+          "const": "base64"
+        },
+        "data": {
+          "type": "string",
+          "maxLength": 87384
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        }
+      }
+    },
+    "handoffList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows",
+        "total",
+        "nextOffset",
+        "retainedObservationFiles",
+        "incompleteObservationFiles",
+        "ordering",
+        "nativeQualified",
+        "operationAdmitted",
+        "assertionsAdmitted"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "recordRef",
+              "state",
+              "errorCode"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "recordRef": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "state": {
+                "enum": [
+                  "complete",
+                  "incomplete",
+                  "verificationFailed"
+                ]
+              },
+              "errorCode": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "maxItems": 20
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retainedObservationFiles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2048
+        },
+        "incompleteObservationFiles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2048
+        },
+        "ordering": {
+          "const": "record-id; relist after additions"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "operationAdmitted": {
+          "const": false
+        },
+        "assertionsAdmitted": {
+          "const": false
+        }
+      }
+    },
+    "handoffError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "message",
+            "nativeAccessAttempted"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "message": {
+              "type": "string"
+            },
+            "nativeAccessAttempted": {
+              "const": false
+            }
+          }
+        }
+      }
+    },
+    "runtime_handoff_observationInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "uploadRef"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "target",
+            "program",
+            "session"
+          ]
+        },
+        "uploadRef": {
+          "type": "string",
+          "pattern": "^upload:[0-9a-f]{32}$"
+        }
+      }
+    },
+    "runtime_handoff_reviewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uploadRef"
+      ],
+      "properties": {
+        "uploadRef": {
+          "type": "string",
+          "pattern": "^upload:[0-9a-f]{32}$"
+        }
+      }
+    },
+    "runtime_handoff_reopenInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef"
+      ],
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "runtime_handoff_pageInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef"
+      ],
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "section": {
+          "enum": [
+            "constraints",
+            "permissions",
+            "baselineObservations",
+            "currentObservations"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      }
+    },
+    "runtime_handoff_artifact_readInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordRef",
+        "name"
+      ],
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "name": {
+          "enum": [
+            "request.json",
+            "report.json",
+            "baseline.target.json",
+            "baseline.program.json",
+            "baseline.session.json",
+            "current.target.json",
+            "current.program.json",
+            "current.session.json",
+            "receipt.json"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      }
+    },
+    "runtime_handoff_listInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "runtime_handoff_observation": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_observationInput"
+      },
+      "output": {
+        "$ref": "#/$defs/observationReceipt"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    },
+    "runtime_handoff_review": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_reviewInput"
+      },
+      "output": {
+        "$ref": "#/$defs/handoffReceipt"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    },
+    "runtime_handoff_reopen": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_reopenInput"
+      },
+      "output": {
+        "$ref": "#/$defs/handoffReceipt"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    },
+    "runtime_handoff_page": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_pageInput"
+      },
+      "output": {
+        "$ref": "#/$defs/handoffPage"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    },
+    "runtime_handoff_artifact_read": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_artifact_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/handoffChunk"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    },
+    "runtime_handoff_list": {
+      "input": {
+        "$ref": "#/$defs/runtime_handoff_listInput"
+      },
+      "output": {
+        "$ref": "#/$defs/handoffList"
+      },
+      "error": {
+        "$ref": "#/$defs/handoffError"
+      }
+    }
+  }
+}

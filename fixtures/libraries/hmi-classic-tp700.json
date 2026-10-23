@@ -1,0 +1,6 @@
+{
+  "family": "classic",
+  "typeIdentifier": "OrderNumber:6AV2 124-0GC01-0AX0/17.0.0.0",
+  "screenXml": "fixtures/libraries/classic-blank-screen.xml",
+  "purpose": "Classic native screen master-copy fixture. Identifier observed in installed V21 catalog; no faceplate/runtime qualification is implied."
+}

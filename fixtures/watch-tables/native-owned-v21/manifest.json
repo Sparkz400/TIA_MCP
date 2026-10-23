@@ -1,0 +1,105 @@
+{
+  "kind": "owned-native-watch-fixtures",
+  "sourceRun": "wt04",
+  "operationId": "72fbb25f3f634368a2b0a39530f3669b",
+  "recordedAtUtc": "2026-10-15T07:39:54.287117+00:00",
+  "nativeVersion": "TIA Portal V21 Update 2",
+  "hardware": "CPU 1511-1 PN, 6ES7 511-1AL03-0AB0/V4.1",
+  "sourceOwnedScratch": true,
+  "exportBytesUnmodified": true,
+  "files": [
+    {
+      "path": "MilestoneWatch.before.xml",
+      "role": "target-before",
+      "sourceRelativePath": "watch-observations/w_4665f88f48b8/watch-0.xml",
+      "sha256": "d710c6b85dd5c94cc27d7eb7edc24f5ac188ec5bdbaccdae5998acf5b697c09d",
+      "bytes": 3697,
+      "literal": "FALSE"
+    },
+    {
+      "path": "MilestoneWatch.applied.xml",
+      "role": "target-applied",
+      "sourceRelativePath": "watch-observations/w_96f5ca12ced3/watch-1.xml",
+      "sha256": "9af352047225e4c2e9de34605809690f17488c951291f1bc85347b09b63692a6",
+      "bytes": 3695,
+      "literal": "TRUE"
+    },
+    {
+      "path": "MilestoneWatch.reopened.xml",
+      "role": "target-reopened",
+      "sourceRelativePath": "watch-observations/w_5eace18a213b/watch-1.xml",
+      "sha256": "f07d0bd26ca65c4912b8da2708e3c93019bda7d64d50339addddf9f88571f721",
+      "bytes": 3696,
+      "literal": "TRUE"
+    },
+    {
+      "path": "MilestoneWatch.restored.xml",
+      "role": "target-restored",
+      "sourceRelativePath": "watch-observations/w_377dc6346b5b/watch-0.xml",
+      "sha256": "2010a24077b2092584fd17ba9c128c6691d075c735b593446798e98498077095",
+      "bytes": 3697,
+      "literal": "FALSE"
+    },
+    {
+      "path": "MilestoneWatch.original.xml",
+      "role": "target-original",
+      "sourceRelativePath": "watch-observations/w_1d8e91cb9a16/watch-1.xml",
+      "sha256": "cce9bf83bafff5ce4d37d60d2b270566d8c39058a4d7bc879d8696179363ed01",
+      "bytes": 3696,
+      "literal": "TRUE"
+    },
+    {
+      "path": "UnchangedPeer.xml",
+      "role": "unchanged-watch-peer",
+      "sourceRelativePath": "watch-observations/w_4665f88f48b8/watch-1.xml",
+      "sha256": "c7deb582a0bbfcb0e0c53144cbec25350f8b9af85bc78dcd345ea13c6279c0d4",
+      "bytes": 3697,
+      "rows": 1
+    },
+    {
+      "path": "ForceTable.xml",
+      "role": "unchanged-force-peer",
+      "sourceRelativePath": "watch-observations/w_4665f88f48b8/force-2.xml",
+      "sha256": "9a916175c4385a7f62a93d9d2f885c1a462b50579266eb0bcf5eb2ce96dc702d",
+      "bytes": 2219,
+      "rows": 0
+    }
+  ],
+  "strictNativeComparisons": [
+    {
+      "stage": "applied",
+      "targetBytesEqualExceptCreatedAndApprovedLiteral": true,
+      "peerExportsEqualExceptCreated": 7,
+      "whitespaceNormalized": false
+    },
+    {
+      "stage": "reopened",
+      "targetBytesEqualExceptCreatedAndApprovedLiteral": true,
+      "peerExportsEqualExceptCreated": 7,
+      "whitespaceNormalized": false
+    },
+    {
+      "stage": "retrieved",
+      "targetBytesEqualExceptCreatedAndApprovedLiteral": true,
+      "peerExportsEqualExceptCreated": 7,
+      "whitespaceNormalized": false
+    },
+    {
+      "stage": "restored",
+      "targetBytesEqualExceptCreatedAndApprovedLiteral": true,
+      "peerExportsEqualExceptCreated": 7,
+      "whitespaceNormalized": false
+    },
+    {
+      "stage": "original",
+      "targetBytesEqualExceptCreatedAndApprovedLiteral": true,
+      "peerExportsEqualExceptCreated": 7,
+      "whitespaceNormalized": false
+    }
+  ],
+  "localVerification": {
+    "path": "artifacts/production-watch-20261015/document-review/wt04-workflow-verification-02.json",
+    "sha256": "f51a1983e1f986a1b95496cba477530a2b9e4e3d271252e37403d39ffa657e7e",
+    "completed": true
+  }
+}

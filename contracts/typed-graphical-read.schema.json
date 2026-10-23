@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:typed-graphical-read:v1",
+  "title": "Read-only partial typed network view with native preservation envelope",
+  "description": "Network instruction keys and ports are distinct from project explorer relationship nodes. Native XML remains authoritative for opaque content. A supported node does not establish complete network coverage or runtime qualification.",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "blockPath", "sourceSha256", "nativeXml", "networks"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "blockPath": {"type": "string"},
+    "sourceSha256": {"$ref": "#/$defs/hash"}, "nativeXml": {"type": "string"},
+    "networks": {"type": "array", "items": {"$ref": "#/$defs/network"}}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "network": {
+      "type": "object", "additionalProperties": false,
+      "required": ["networkId", "language", "semantics", "coverage", "nativeXml", "sourceSha256", "nodes", "connections", "diagnostics"],
+      "properties": {
+        "networkId": {"type": "string"}, "language": {"type": "string"},
+        "semantics": {"type": "string"}, "coverage": {"enum": ["complete", "partial", "opaque"]},
+        "nativeXml": {"type": "string"}, "sourceSha256": {"$ref": "#/$defs/hash"},
+        "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}},
+        "connections": {"type": "array", "items": {"$ref": "#/$defs/connection"}},
+        "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}}
+      }
+    },
+    "node": {
+      "type": "object", "additionalProperties": false,
+      "required": ["key", "nativeUid", "kind", "nativeName", "supported", "nativeXml", "sourceSha256"],
+      "properties": {
+        "key": {"type": "string"}, "nativeUid": {"type": ["string", "null"]},
+        "kind": {"type": "string"}, "nativeName": {"type": ["string", "null"]}, "supported": {"type": "boolean"},
+        "profileId": {"type": ["string", "null"]}, "pins": {"type": "array", "items": {"$ref": "#/$defs/pin"}},
+        "negatedPins": {"type": "array", "items": {"type": "string"}},
+        "nativeXml": {"type": "string"}, "sourceSha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "pin": {"type": "object", "additionalProperties": false, "required": ["name", "direction", "dataType", "required"], "properties": {"name": {"type": "string"}, "direction": {"enum": ["input", "output", "inout"]}, "dataType": {"type": "string"}, "required": {"type": "boolean"}}},
+    "endpoint": {
+      "type": "object", "additionalProperties": false, "required": ["node", "port"],
+      "properties": {"node": {"type": ["string", "null"]}, "port": {"type": ["string", "null"]}}
+    },
+    "connection": {
+      "type": "object", "additionalProperties": false, "required": ["nativeUid", "endpoints", "resolved", "nativeXml"],
+      "properties": {"nativeUid": {"type": ["string", "null"]},
+        "endpoints": {"type": "array", "items": {"$ref": "#/$defs/endpoint"}},
+        "resolved": {"type": "boolean"}, "nativeXml": {"type": "string"}}
+    },
+    "diagnostic": {
+      "type": "object", "additionalProperties": false, "required": ["code", "message", "severity"],
+      "properties": {"code": {"type": "string"}, "message": {"type": "string"},
+        "node": {"type": ["string", "null"]}, "severity": {"enum": ["information", "warning", "error"]}}
+    }
+  }
+}

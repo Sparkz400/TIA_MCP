@@ -1,0 +1,3 @@
+watch-table-absent.v1
+root
+WT05_BoolCreation

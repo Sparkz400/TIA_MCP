@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-plan.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "diagnosticPlanId",
+    "reviewId",
+    "backend",
+    "family",
+    "target",
+    "signals",
+    "requestedSettings",
+    "effectiveSettings",
+    "pendingValidation",
+    "manualSteps",
+    "nativeExecutable",
+    "mutationAttempted"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-plan.v1"
+    },
+    "diagnosticPlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "reviewId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "backend": {
+      "const": "manual"
+    },
+    "family": {
+      "const": "ordinaryPlc"
+    },
+    "fulfillment": {
+      "const": "partialManualHandoff"
+    },
+    "signals": {
+      "$ref": "diagnostic-signal-manifest.v1.schema.json"
+    },
+    "target": {
+      "type": "object"
+    },
+    "requestedSettings": {
+      "$ref": "#/$defs/settings"
+    },
+    "effectiveSettings": {
+      "type": "null"
+    },
+    "nativeExecutable": {
+      "const": false
+    },
+    "mutationAttempted": {
+      "const": false
+    },
+    "pendingValidation": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "manualSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "alarmBindings": {
+      "$ref": "diagnostic-alarm-bindings.v1.schema.json"
+    }
+  },
+  "$defs": {
+    "settings": {
+      "type": "object",
+      "required": [
+        "task",
+        "rationale",
+        "sampleEvery",
+        "preSamples",
+        "postSamples",
+        "trigger"
+      ],
+      "properties": {
+        "task": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "sampleEvery": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "preSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "postSamples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000000
+        },
+        "trigger": {
+          "type": "object",
+          "required": [
+            "signalId",
+            "kind"
+          ],
+          "properties": {
+            "signalId": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "risingEdge",
+                "fallingEdge",
+                "above",
+                "below"
+              ]
+            },
+            "threshold": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "backend",
+        "family",
+        "reviewId",
+        "settings"
+      ],
+      "properties": {
+        "backend": {
+          "const": "manual"
+        },
+        "family": {
+          "const": "ordinaryPlc"
+        },
+        "reviewId": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "settings": {
+          "$ref": "#/$defs/settings"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

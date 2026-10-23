@@ -1,0 +1,26 @@
+NAMESPACE TiaMcp_UnitA.Alternate
+FUNCTION_BLOCK "TgpNamespace_InstanceEffect"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+DATA_BLOCK "TgpNamespace_InstanceEffect_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.Alternate.TgpNamespace_InstanceEffect"
+BEGIN
+ RetainedMarker := 42;
+END_DATA_BLOCK
+
+END_NAMESPACE

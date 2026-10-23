@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-result.v1.schema.json",
+  "title": "Lossless captured result normalization; CI summary does not grant release acceptance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "planSha256",
+    "results",
+    "requiredDefinitionIds",
+    "requiredCoveragePassed",
+    "nativeExecutedByNormalizer",
+    "releaseAccepted"
+  ],
+  "properties": {
+    "planSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "definitionId",
+          "outcome",
+          "rawJson",
+          "rawSha256",
+          "reasons"
+        ],
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "outcome": {
+            "enum": [
+              "passed",
+              "assertionFailed",
+              "executionError",
+              "inconclusive",
+              "blocked",
+              "excluded",
+              "notRun",
+              "outcomeUnknown"
+            ]
+          },
+          "rawJson": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 67108864
+          },
+          "rawSha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4000
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        }
+      },
+      "maxItems": 1000,
+      "minItems": 1
+    },
+    "requiredDefinitionIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "maxItems": 1000,
+      "minItems": 1
+    },
+    "requiredCoveragePassed": {
+      "type": "boolean"
+    },
+    "nativeExecutedByNormalizer": {
+      "const": false
+    },
+    "releaseAccepted": {
+      "const": false
+    }
+  }
+}

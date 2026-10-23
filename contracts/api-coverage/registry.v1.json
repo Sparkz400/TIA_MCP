@@ -1,0 +1,3061 @@
+{
+  "schemaVersion": 1,
+  "kind": "api-coverage-reviewed-seed",
+  "scopePolicy": "Every feasible capability is required before 1.0; unresolved feasibility remains open.",
+  "domains": [
+    {
+      "id": "D01",
+      "title": "VCI and external Git",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Workspace/mapping/group lifecycle, formats and companions, directed synchronization, two-sided conflicts, external Git provenance and isolated revision restore.",
+      "dependencies": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D02",
+      "title": "Watch and force table engineering",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Table/group lifecycle, ordered entries/comments/formats, diagnostic generation and access rules; separately establish feasibility and acceptance of live monitoring/force operations.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D03",
+      "title": "Project translations",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Filtered keyed XLSX export/reimport, language lifecycle, source/translation distinctions, placeholders, glossary, stale keys, partial import and unrelated-language preservation.",
+      "dependencies": [
+        "F01",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D04",
+      "title": "OPC UA engineering",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Integrate existing module; native discovery/export, exact PLC mappings, category lifecycle/generation, roles/certificates, preserve/reopen/recover, failure/scale/profile breadth and runtime handoff.",
+      "dependencies": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D05",
+      "title": "AutomationML and CAx",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "AML inspect/export/diff/import, exact device/topology/catalog profiles, companion/library references, full transfer diagnostics, wider merge effects and recovery.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D06",
+      "title": "Native Siemens Test Suite",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Style/application/system definitions and results, bounded jobs, actual cancel/interruption semantics, license absence and endpoint behavior.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D07",
+      "title": "Software unit lifecycle",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Create/copy/rename/delete, relations/publication/namespaces, dependency/visibility/cycle rules, unit-library templates and identity-preserving move feasibility.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D08",
+      "title": "Communication connection engineering",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Supported S7/TCP/UDP/ISO/FDL/PtP/HMI connection operations, resources/partners/TSAPs, both-device preservation/compile and separate runtime communication evidence.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D09",
+      "title": "Online comparison DB snapshots and station upload",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Authenticated target/program identity, fingerprints, actual/snapshot/start values, upload to a new project; separately qualify feasible writes/download/control.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D12"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D10",
+      "title": "Startdrive",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Drive/component/parameter lifecycle, types/units/ranges, BICO/telegrams/DRIVE-CLiQ where feasible; separately qualified online reads/transfers/activation and drive trace.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D08"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D11",
+      "title": "PLC alarms and ProDiag",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Classes/text lists/supervision lifecycle, stable alarm IDs, translations and generated dependencies, broken-member impact, separately tested runtime acknowledgment/text substitution.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D12",
+      "title": "PLC web applications access and security",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Web apps/default pages, CPU users/roles/access/certificates and external effects; separately qualified asset deployment and supported online actions.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D13",
+      "title": "Motion and technology objects",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Version/type profiles, drive/telegram/axis/encoder links, cams/measuring inputs/kinematics/PID/counting/Ident/interpreter mappings; separate runtime and commissioning evidence.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D08"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D14",
+      "title": "Safety and F IO validation tooling",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Signatures/admin/reports, activation definitions and execution, reviewed F-I/O profiles, feasible F-logic/runtime-group changes, protection and interruption/recovery. Bridge tests do not establish functional-safety approval.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D08"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D15",
+      "title": "SiVArc HMI generation",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Rule/template/expression/layout lifecycle, initial generation and preserving regeneration, exact PLC/library/HMI bindings, manual edits, native visual/runtime and interrupted generation.",
+      "dependencies": [
+        "X02",
+        "X07",
+        "X08",
+        "D03",
+        "D07",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D16",
+      "title": "Physical PLC runtime",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Exact endpoint/program/session/permissions, reads/browse/subscriptions/capture, timing/quality/dropouts/reconnect; assess and independently qualify every feasible write/control/download capability.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D12"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "D17",
+      "title": "Bug driven native trace diagnostics",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Native instance/call/binding oracle, language/storage fidelity, supported trace backend, full settings readback, preserved lifecycle, actual fault capture and real measurement dialects; long-term/project/drive/safety families separately.",
+      "dependencies": [
+        "F01",
+        "F02"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X01",
+      "title": "Platform project lifecycle and metadata",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "All feasible project copy/upgrade/properties/languages/settings/read-only/compare/custom identity operations, exact metadata coverage, failure/reconnect/scale.",
+      "dependencies": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X02",
+      "title": "Library lifecycle and engineering documents",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Exact version/default/release/edit/discard/copy/publish/delete/cleanup, dependency closure/collisions/cycles, PLC/UDT/unit/HMI formats, vendor/upgrade/scale, actual interruption and multi-resource recovery.",
+      "dependencies": [
+        "F00"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X03",
+      "title": "UMAC UMC certificates and operational settings",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Roles/groups/function rights, passwords policies, UMC consistency, certificate lifecycle, confidential settings, syslog/time/access and externally consistent recovery.",
+      "dependencies": [
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X04",
+      "title": "Native TIA Add In companion",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Packaged public Add-In, exact selection handoff, VCI/CAx/safety hooks where feasible, permissions/lifetime/stale context and real interactive acceptance.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D01"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X05",
+      "title": "Multiuser and Project Server",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Server/project/session inventory, lock/freshness/marking, local session create/commit and response-loss reconciliation with immutable local backups.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D01"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X06",
+      "title": "GRAPH CFC DCC and interpreter documents",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Independent chart/document/libraries/pins/run-order/protection models, export/no-op import before edits, compile/preservation/recovery and behavioral timing.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D07"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X07",
+      "title": "Classic HMI full supported breadth",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Comfort/Basic/Advanced/Professional feasible profiles; screens/templates/popups/global/slide-in, faceplates/scripts/resources/recipes/reports/logs/security/schedulers/themes; preserving engineering/visual/runtime.",
+      "dependencies": [
+        "F00"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X08",
+      "title": "Unified HMI full supported breadth",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Clean security/transfer prerequisites, screens/events/dynamics/scripts/types/faceplates, resources/logging/audit/runtime/OPC alarms/CPM, native preserving writes and visual/runtime acceptance.",
+      "dependencies": [
+        "F00"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X09",
+      "title": "Teamcenter Gateway",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "SSO/connect/search/download and supported checkout/checkin/cancel/item/revision/publication with exact external commit reconciliation.",
+      "dependencies": [
+        "F02",
+        "F03",
+        "D01"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X10",
+      "title": "Hardware network and remote IO breadth",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Reviewed writable channel, replacement/copy/catalog/HSP/GSD, topology/shared devices/redundancy/IO-Link/couplers/telecontrol/resources/energy profiles and partial failures; physical effects separately.",
+      "dependencies": [
+        "F00"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X11",
+      "title": "PLC objects languages and document breadth",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Explicit move/copy/interface/namespace/number/protection/OB metadata/document-format/loadable/NVT/system-type and mixed-language operation cells, transitive storage and behavior.",
+      "dependencies": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X12",
+      "title": "Other feasible TIA version adapters",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Public API/SDK inventory per major/update, feasibility resolution, separate workers/build/loaders and exact conversion/refusal/upgrade/qualification matrix for feasible versions.",
+      "dependencies": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "review": "operation_decomposition_incomplete"
+    },
+    {
+      "id": "X13",
+      "title": "Other supported Siemens interfaces",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "scope": "Feasibility rows for each public SDK and useful workflow; implement and qualify every feasible row. Private API workarounds and directory presence are not proof.",
+      "dependencies": [
+        "F01"
+      ],
+      "review": "operation_decomposition_incomplete"
+    }
+  ],
+  "operations": [
+    {
+      "id": "D01.workspace.create",
+      "domain": "D01",
+      "title": "Create VCI workspace with explicit directory and culture",
+      "symbols": [
+        "M:Siemens.Engineering.VersionControl.WorkspaceComposition.Create(System.String)",
+        "M:Siemens.Engineering.VersionControl.WorkspaceComposition.Create(System.String,System.IO.DirectoryInfo)",
+        "M:Siemens.Engineering.VersionControl.WorkspaceComposition.Create(System.String,System.IO.DirectoryInfo,System.Globalization.CultureInfo)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/vci-and-git.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D01.mapping.connect",
+      "domain": "D01",
+      "title": "Connect exact engineering object to workspace",
+      "symbols": [
+        "M:Siemens.Engineering.VersionControl.Workspace.ConnectObject(Siemens.Engineering.IEngineeringObject,System.IO.DirectoryInfo,System.String,System.String)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/vci-and-git.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D01.object.export",
+      "domain": "D01",
+      "title": "Export exact object and format companion package",
+      "symbols": [
+        "M:Siemens.Engineering.VersionControl.Workspace.ExportObject(Siemens.Engineering.IEngineeringObject,System.IO.DirectoryInfo,System.String,System.String)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/vci-and-git.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D01.formats.discover",
+      "domain": "D01",
+      "title": "Inspect supported formats for exact engineering object",
+      "symbols": [
+        "M:Siemens.Engineering.VersionControl.Workspace.GetSupportedFileFormats(Siemens.Engineering.IEngineeringObject)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/vci-and-git.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D02.watch.create",
+      "domain": "D02",
+      "title": "Create native watch table",
+      "symbols": [
+        "M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition.Create(System.String)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D02.watch.import",
+      "domain": "D02",
+      "title": "Import reviewed native watch-table document",
+      "symbols": [
+        "M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition.Import(System.IO.FileInfo,Siemens.Engineering.ImportOptions)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D02.force.import",
+      "domain": "D02",
+      "title": "Import offline force-table document",
+      "symbols": [
+        "M:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTableComposition.Import(System.IO.FileInfo,Siemens.Engineering.ImportOptions)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D03.texts.export",
+      "domain": "D03",
+      "title": "Export project texts including categories and selected objects",
+      "symbols": [
+        "M:Siemens.Engineering.ProjectBase.ExportProjectTexts(System.IO.FileInfo,Siemens.Engineering.Language,System.Collections.Generic.IEnumerable{Siemens.Engineering.Language},System.Collections.Generic.IEnumerable{Siemens.Engineering.TextCategory},System.Collections.Generic.IEnumerable{Siemens.Engineering.IEngineeringObject})",
+        "M:Siemens.Engineering.ProjectBase.ExportProjectTexts(System.IO.FileInfo,System.Globalization.CultureInfo,System.Globalization.CultureInfo)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/project-translations.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D03.texts.import",
+      "domain": "D03",
+      "title": "Import reviewed project-text workbook",
+      "symbols": [
+        "M:Siemens.Engineering.ProjectBase.ImportProjectTexts(System.IO.FileInfo,System.Boolean)"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/project-translations.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D06.style.scope",
+      "domain": "D06",
+      "title": "Set exact style-guide object scope",
+      "symbols": [
+        "M:Siemens.Engineering.TestSuite.StyleGuide.RuleSet.SetScope(Siemens.Engineering.TestSuite.StyleGuide.UpdateOptions,System.Collections.Generic.IEnumerable{Siemens.Engineering.IEngineeringObject})"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/native-test-suite.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D06.style.run",
+      "domain": "D06",
+      "title": "Run native style-guide checks",
+      "symbols": [
+        "M:Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor.Run(Siemens.Engineering.TestSuite.StyleGuide.RuleSet)",
+        "M:Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor.Run(Siemens.Engineering.TestSuite.StyleGuide.StyleGuideSystemGroup)",
+        "M:Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor.Run(System.Collections.Generic.IEnumerable{Siemens.Engineering.TestSuite.StyleGuide.RuleSet})"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/native-test-suite.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D06.application.run",
+      "domain": "D06",
+      "title": "Run application cases or sets with exclusive simulator ownership",
+      "symbols": [
+        "M:Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor.Run(Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSet)",
+        "M:Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor.Run(Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSystemGroup)",
+        "M:Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor.Run(Siemens.Engineering.TestSuite.ApplicationTest.TestCase)",
+        "M:Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor.Run(System.Collections.Generic.IEnumerable{Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSet})",
+        "M:Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor.Run(System.Collections.Generic.IEnumerable{Siemens.Engineering.TestSuite.ApplicationTest.TestCase})"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/native-test-suite.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    },
+    {
+      "id": "D06.system.run",
+      "domain": "D06",
+      "title": "Run system tests against an explicitly bound endpoint",
+      "symbols": [
+        "M:Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor.Run(Siemens.Engineering.TestSuite.SystemTest.SystemTestCase)",
+        "M:Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor.Run(Siemens.Engineering.TestSuite.SystemTest.SystemTestSystemGroup)",
+        "M:Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor.Run(System.Collections.Generic.IEnumerable{Siemens.Engineering.TestSuite.SystemTest.SystemTestCase})"
+      ],
+      "sources": [
+        "docs/plans/expansion-plans/native-test-suite.md"
+      ],
+      "api": "documented_installed_xml",
+      "implementation": "not_implemented",
+      "qualification": "not_run",
+      "availability": "unobserved",
+      "releaseObligation": true,
+      "releaseAccepted": false,
+      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+    }
+  ],
+  "featureObligations": [
+    {
+      "featureId": "tia_discover",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_capabilities",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_attach",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_session_status",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_start",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_detach",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "tia_create_scratch",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_open",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_retrieve",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_inventory",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "software_inspect",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "block_read",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "block_interface",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "type_read",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "tag_table_read",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "hardware_inspect",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "technology_read",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "safety_inspect",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "xref_query",
+      "obligations": [
+        "L04"
+      ]
+    },
+    {
+      "featureId": "call_graph",
+      "obligations": [
+        "L04"
+      ]
+    },
+    {
+      "featureId": "symbol_trace",
+      "obligations": [
+        "L04"
+      ]
+    },
+    {
+      "featureId": "change_impact",
+      "obligations": [
+        "L04"
+      ]
+    },
+    {
+      "featureId": "engineering_read",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "hardware_catalog_search",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "fixture_sources",
+      "obligations": [
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change_prepare",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "change_apply",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "change_status",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "change_restore",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "simulation_download",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "simulation_provision_scratch_credential",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_status",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_create",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_select",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_state",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_tags",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_read",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_write",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_test",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_release",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "artifact_read",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "feature_catalog",
+      "obligations": [
+        "F01",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "target_capabilities",
+      "obligations": [
+        "F01",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "object_resolve",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.source_upsert",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.type_source_upsert",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_import_xml",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.plc_type_import_xml",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_import_xml",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_rename",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_delete",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.graphical_operand_set",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.hardware_add",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_plug",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_delete",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_attributes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.network_configure",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.to_create",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.to_parameters",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.to_delete",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.safety_import_xml",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "change.project_simulation_enable",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "block.graphical.networks",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "block.move",
+      "obligations": [
+        "D07",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "block.software_unit.create",
+      "obligations": [
+        "D07",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "type.rename_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "tag.member.crud",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "library.types",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "hardware.catalog_profiles",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "hardware.distributed_io",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "technology.motion_connections",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "technology.version_profiles",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "safety.logic_changes",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "safety.hardware",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "hmi.engineering",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "drives.engineering",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "project.index_paging",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "deployment.vm_qualification",
+      "obligations": [
+        "L05",
+        "L06"
+      ]
+    },
+    {
+      "featureId": "runtime.physical_plc",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "tia.multiversion",
+      "obligations": [
+        "X12"
+      ]
+    },
+    {
+      "featureId": "change.graphical_network_patch",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.graphical_network_insert",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.call_parameter_set",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.call_connection_set",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.type_rename",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.type_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.constant_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.constant_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.group_create",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.group_rename",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.group_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.hardware_address_set",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "project_index",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "library_open",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_list",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_query",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_compare",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_close",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_capabilities",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_begin",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_chunk",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_status",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_commit",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_abort",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "artifact_upload_release",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_package_stage",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_package_inspect",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_package_status",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library_package_release",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_create",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_upgrade",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_copy_elements",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_instantiate",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_update_project",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_integrate",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_create_type",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_create_master_copy",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_edit_version",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_release_version",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_discard_version",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_set_default",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_type_policy",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_organize",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_delete",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_publish",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_save",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_archive",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "project_model",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_capture",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_children",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_search",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_details",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_relationships",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_verify",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_release",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_model_export",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "library_export",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "hmi_inspect",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "hmi_references",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "hmi_capabilities",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "change.hmi_engineering",
+      "obligations": [
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "change.graphical_typed_edit",
+      "obligations": [
+        "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "sim_creation_status",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "project_snapshot_capture",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_snapshot_compare",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_snapshot_search",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "project_health_report",
+      "obligations": [
+        "L04",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.hardware_move",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_channel_attributes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.network_io_assign",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "diagnostic_plan",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_capabilities",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_prepare",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_read",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_analyze",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_compare",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "diagnostic_replan",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "trace_check_readback",
+      "obligations": [
+        "D17"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_plan_review",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_status",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_stop_request",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_execute_next",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_results",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_mark_interrupted",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_recover",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_style_job_reconcile",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "device_inventory",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "device_online_browse",
+      "obligations": [
+        "X10",
+        "X13"
+      ]
+    },
+    {
+      "featureId": "device_identify",
+      "obligations": [
+        "X10",
+        "X13"
+      ]
+    },
+    {
+      "featureId": "device_inventory_export",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "watch_table_read",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_apply",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_verify_reopen",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_recover",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_reconcile_recovery",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_reconcile_interrupted",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "engineering_operation_status",
+      "obligations": [
+        "F03"
+      ]
+    },
+    {
+      "featureId": "qualification_watch_fixture_seed",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "qualification_watch_compete",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "qualification_component_window",
+      "obligations": [
+        "L04",
+        "F03"
+      ]
+    },
+    {
+      "featureId": "watch_table_generate",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_authoring",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "translation_capture",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_inspect",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_prepare",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_review_page",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_approve",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_candidate",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_reconcile",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_reopen",
+      "obligations": [
+        "D03",
+        "D11",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "translation_list",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_artifact_read",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_testsuite_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "qualification_testsuite_execute",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "qualification_testsuite_recover",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "qualification_testsuite_reconcile",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "qualification_testsuite_scope_probe",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_fixture",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_categories",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_capture",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_prepare",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_apply",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_recover",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_reconcile",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_status",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_reconcile_before_checkpoint",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "qualification_translation_resume_closed_fixture",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "opcua_inspect",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_compare",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_dependencies",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_dependency_compare",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_report_page",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_reopen",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_list",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_artifact_read",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "qualification_watch_authoring_source_negative",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "qualification_watch_authoring_source_reconcile",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "translation_native_capture",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_native_prepare",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_native_apply",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_native_status",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_native_recover",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "translation_native_reconcile",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "vci_prepare",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_commit",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_reopen",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_history",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_materialize",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_list",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_artifact_read",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_file_read",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_reconcile",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_package_capture",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_package_compare",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "graph_inspect",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "graph_compare",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "graph_reopen",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "graph_report_page",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "graph_artifact_read",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "graph_list",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "vci_branches",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "project_snapshot_import",
+      "obligations": [
+        "L04",
+        "X11",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_watch_plan",
+      "obligations": [
+        "D02",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "automationml_inspect",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "automationml_compare",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "automationml_reopen",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "automationml_report_page",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "automationml_artifact_read",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "automationml_list",
+      "obligations": [
+        "D05",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "testsuite_result_import",
+      "obligations": [
+        "D06",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "testsuite_result_review",
+      "obligations": [
+        "D06",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "software_unit_review",
+      "obligations": [
+        "D07",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "software_unit_review_page",
+      "obligations": [
+        "D07",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "connection_review",
+      "obligations": [
+        "D08",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "connection_review_page",
+      "obligations": [
+        "D08",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "db_snapshot_review",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "db_snapshot_review_page",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "drive_profile_review",
+      "obligations": [
+        "D10",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "drive_profile_review_page",
+      "obligations": [
+        "D10",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "access_review",
+      "obligations": [
+        "D12",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "access_review_page",
+      "obligations": [
+        "D12",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "public_certificate_review",
+      "obligations": [
+        "D12",
+        "X03",
+        "D04",
+        "D16",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "public_certificate_review_page",
+      "obligations": [
+        "D12",
+        "X03",
+        "D04",
+        "D16",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "web_application_review",
+      "obligations": [
+        "D12",
+        "X03",
+        "X02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "web_application_review_page",
+      "obligations": [
+        "D12",
+        "X03",
+        "X02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "technology_profile_review",
+      "obligations": [
+        "D13",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "technology_profile_report",
+      "obligations": [
+        "D13",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "safety_evidence_review",
+      "obligations": [
+        "D14",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "safety_evidence_report",
+      "obligations": [
+        "D14",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change.plc_compile",
+      "obligations": [
+        "D13",
+        "D14",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "diagnostic_report_export",
+      "obligations": [
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "hmi_component_review",
+      "obligations": [
+        "C01",
+        "L02",
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "hmi_component_review_page",
+      "obligations": [
+        "C01",
+        "L02",
+        "X07",
+        "X08"
+      ]
+    },
+    {
+      "featureId": "runtime_web_credential_binding",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_connect",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_browse",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_read",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_status",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_web_disconnect",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_start",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_status",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_stop",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_page",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_export",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_capture_analyze",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
+      "featureId": "addin_selection_review",
+      "obligations": [
+        "X04",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "addin_selection_page",
+      "obligations": [
+        "X04",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "multiuser_observation_review",
+      "obligations": [
+        "X05",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "multiuser_observation_page",
+      "obligations": [
+        "X05",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "teamcenter_observation_review",
+      "obligations": [
+        "X09",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "teamcenter_observation_page",
+      "obligations": [
+        "X09",
+        "F02"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_review",
+      "obligations": [
+        "C02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_reopen",
+      "obligations": [
+        "C02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_page",
+      "obligations": [
+        "C02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_artifact_read",
+      "obligations": [
+        "C02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_list",
+      "obligations": [
+        "C02",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_observation",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_review",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_reopen",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_page",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_artifact_read",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "runtime_handoff_list",
+      "obligations": [
+        "C03",
+        "D12",
+        "D16",
+        "X03",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "hmi_text_list_author",
+      "obligations": [
+        "D15",
+        "X08",
+        "C01"
+      ]
+    },
+    {
+      "featureId": "diagnostic_experiment_plan",
+      "obligations": [
+        "D02",
+        "D11",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_experiment_review",
+      "obligations": [
+        "D02",
+        "D11",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_experiment_compare_runs",
+      "obligations": [
+        "D02",
+        "D11",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_experiment_report_export",
+      "obligations": [
+        "D02",
+        "D11",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "hmi_text_list_generate_set",
+      "obligations": [
+        "D15",
+        "X08",
+        "C01"
+      ]
+    },
+    {
+      "featureId": "diagnostic_experiment_acquire_runtime",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_runtime_acquisition_export",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_client_identity",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_credential_binding",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_connect",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_browse",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_read",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_status",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_disconnect",
+      "obligations": [
+        "D16",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_capture_start",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_capture_status",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_capture_stop",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_capture_page",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_capture_export",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_subscription_start",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_subscription_status",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_subscription_stop",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_subscription_page",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_subscription_export",
+      "obligations": [
+        "D16",
+        "C03",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_ua_binding_plan",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_ua_observe",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_ua_report_export",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    }
+  ],
+  "manualResiduals": [
+    {
+      "domain": "D01",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D02",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D03",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D04",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D05",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D06",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D07",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D08",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D09",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D10",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D11",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D12",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D13",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D14",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D15",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D16",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "D17",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X01",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X02",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X03",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X04",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X05",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X06",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X07",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X08",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X09",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X10",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X11",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X12",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    },
+    {
+      "domain": "X13",
+      "state": "not_fully_enumerated",
+      "nextAction": "Enumerate and review official manual leaves, dynamic services and attribute routes; link exact evidence."
+    }
+  ],
+  "limitations": [
+    "This is the first AC-01 implementation slice, not full semantic coverage.",
+    "No implementation or qualification promotion is permitted from this seed."
+  ]
+}

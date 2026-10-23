@@ -1,0 +1,88 @@
+{
+  "errorCount": 0,
+  "warningCount": 1,
+  "targets": [
+    {
+      "target": "ScratchStation",
+      "state": "Warning",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "description": "",
+          "path": "ScratchPLC",
+          "state": "Warning",
+          "depth": 0
+        },
+        {
+          "description": "",
+          "path": "Hardware configuration",
+          "state": "Warning",
+          "depth": 1
+        },
+        {
+          "description": " ",
+          "path": "ScratchStation",
+          "state": "Warning",
+          "depth": 2
+        },
+        {
+          "description": " ",
+          "path": "Profilschiene_0",
+          "state": "Warning",
+          "depth": 3
+        },
+        {
+          "description": " ",
+          "path": "ScratchPLC",
+          "state": "Warning",
+          "depth": 4
+        },
+        {
+          "description": " ",
+          "path": "CPU-Display_1",
+          "state": "Warning",
+          "depth": 5
+        },
+        {
+          "description": "The S7-1500 CPU display does not contain any password protection.",
+          "path": "",
+          "state": "Warning",
+          "depth": 6
+        },
+        {
+          "description": "",
+          "path": "PLC data types",
+          "state": "Success",
+          "depth": 1
+        },
+        {
+          "description": "The data type was successfully updated.",
+          "path": "TiaMcpLibraryState (UDT)",
+          "state": "Success",
+          "depth": 2
+        },
+        {
+          "description": "",
+          "path": "Program blocks",
+          "state": "Information",
+          "depth": 1
+        },
+        {
+          "description": "No block was compiled. All blocks are up-to-date.",
+          "path": null,
+          "state": "Information",
+          "depth": 2
+        },
+        {
+          "description": "Compiling finished (errors: 0; warnings: 1)",
+          "path": null,
+          "state": "Warning",
+          "depth": 0
+        }
+      ],
+      "messagesTruncated": false
+    }
+  ],
+  "scope": "All devices of the explicitly selected affected project."
+}

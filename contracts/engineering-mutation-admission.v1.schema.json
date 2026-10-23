@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/engineering-mutation-admission.v1.schema.json",
+  "title": "Shared native dispatch admission; returned is not engineering qualification",
+  "type": "object", "additionalProperties": false,
+  "required": ["id", "revision", "state", "scope", "requestSha256", "resourceKeys", "previousSha256", "recordedAt", "response", "reconciliation"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-f0-9]{32}$", "minLength": 32, "maxLength": 32},
+    "revision": {"type": "integer", "minimum": 0, "maximum": 15},
+    "state": {"enum": ["dispatchIntent", "returned", "outcomeUnknown", "reconciled"]},
+    "requestSha256": {"$ref": "#/$defs/digest"},
+    "previousSha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/digest"}]},
+    "recordedAt": {"type": "string", "format": "date-time"},
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["operation", "requestSha256", "scopeSha256", "sessionEpoch", "adapterSha256", "processId", "observationSha256", "resources"],
+      "properties": {
+        "operation": {"enum": ["change_apply", "change_restore", "simulation_download", "simulation_provision_scratch_credential", "library_open", "scratch_create", "project_retrieve", "watch_fixture_seed", "watch_authoring_source_negative"]},
+        "requestSha256": {"$ref": "#/$defs/digest"}, "scopeSha256": {"$ref": "#/$defs/digest"},
+        "sessionEpoch": {"type": "string", "minLength": 1, "maxLength": 128},
+        "adapterSha256": {"$ref": "#/$defs/digest"}, "observationSha256": {"$ref": "#/$defs/digest"},
+        "processId": {"type": "integer", "minimum": 1},
+        "resources": {
+          "type": "array", "minItems": 1, "maxItems": 64,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["kind", "path", "effect"],
+            "properties": {"kind": {"enum": ["project", "library", "workspace"]}, "path": {"$ref": "#/$defs/text"}, "effect": {"type": "string", "minLength": 1, "maxLength": 256}}
+          }
+        }
+      }
+    },
+    "resourceKeys": {"type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+    "response": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/artifact"}]},
+    "reconciliation": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["resourceKey", "disposition", "recoveryLocation", "evidence"],
+        "properties": {"resourceKey": {"$ref": "#/$defs/text"}, "disposition": {"enum": ["unchanged", "verifiedApplied"]}, "recoveryLocation": {"type": "null"}, "evidence": {"$ref": "#/$defs/artifact"}}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$", "minLength": 64, "maxLength": 64},
+    "text": {"type": "string", "minLength": 1, "maxLength": 8192},
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["relativePath", "sha256"],
+      "properties": {"relativePath": {"$ref": "#/$defs/text"}, "sha256": {"$ref": "#/$defs/digest"}}
+    }
+  }
+}

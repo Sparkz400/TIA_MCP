@@ -1,0 +1,79 @@
+[
+  {
+    "path": "License.txt",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/License.txt",
+    "bytes": 1084,
+    "sha256": "5e7dcaed9c919e408039d268a1835dc6758545bd9f96269112917864712f69c0",
+    "localPath": "third-party/automationml/License.txt"
+  },
+  {
+    "path": "UnitTests/AML/CAEX_ClassModel_V2.15.xsd",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/CAEX_ClassModel_V2.15.xsd",
+    "bytes": 27455,
+    "sha256": "b36bf0d97c65d818aa98edcaf924a9e8115cbd9172354bbf5495368c3c9962a7",
+    "localPath": "third-party/automationml/CAEX_ClassModel_V2.15.xsd"
+  },
+  {
+    "path": "UnitTests/AML/CAEX_ClassModel_V.3.0.xsd",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/CAEX_ClassModel_V.3.0.xsd",
+    "bytes": 33863,
+    "sha256": "1fbcf5e6bbb2c8fbc09d935438b6f369a5e0d71cd99665e84fbc375b77762108",
+    "localPath": "third-party/automationml/CAEX_ClassModel_V.3.0.xsd"
+  },
+  {
+    "path": "UnitTests/AML/0_EmptyFile_V2.0.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/0_EmptyFile_V2.0.aml",
+    "bytes": 248,
+    "sha256": "2d982cdf866727a451b943dd68add8557ff8be59ec4aef39cf3d1f288f32be7a",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/0_EmptyFile_V2.0.aml"
+  },
+  {
+    "path": "UnitTests/AML/0_EmptyFile_V2.1.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/0_EmptyFile_V2.1.aml",
+    "bytes": 615,
+    "sha256": "8f460b5a3061a6fabaf6d04ca2c7d597f0d2747639f568c81bc0b79db8523c85",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/0_EmptyFile_V2.1.aml"
+  },
+  {
+    "path": "UnitTests/AML/9_ExtInt_IntLink.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/9_ExtInt_IntLink.aml",
+    "bytes": 4368,
+    "sha256": "0e1324918627f900232dd56b7e0c68f9e33ef6e181501ff20496737396895d3f",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/9_ExtInt_IntLink.aml"
+  },
+  {
+    "path": "UnitTests/AML/3_IE_Attribute.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/3_IE_Attribute.aml",
+    "bytes": 673,
+    "sha256": "17b41019aa09ad0eac68229da1aef6d7859901db3806662c342253babf1a94a2",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/3_IE_Attribute.aml"
+  },
+  {
+    "path": "UnitTests/AML/5_SUC.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/AML-UA-XSLT/2e6ad1c76e0fb11c306a34f014be3ce7fbea6f97/UnitTests/AML/5_SUC.aml",
+    "bytes": 2627,
+    "sha256": "428536154454de695476d03fc9b1169836422d5892b650e62ad0a7d98a897418",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/5_SUC.aml"
+  },
+  {
+    "path": "examples/validation-suite/xml/medium-valid-robot-cell.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/automationml-python/424ebbc93057cd432d70583c1eac29ba10b702a8/examples/validation-suite/xml/medium-valid-robot-cell.aml",
+    "bytes": 8006,
+    "sha256": "c5b313ec8115fa5af5f79c52cbf6a4bddb929783b5f620b1f2ceb9022374af65",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/medium-valid-robot-cell.aml"
+  },
+  {
+    "path": "examples/validation-suite/xml/small-valid-motor.aml",
+    "url": "https://raw.githubusercontent.com/AutomationML/automationml-python/424ebbc93057cd432d70583c1eac29ba10b702a8/examples/validation-suite/xml/small-valid-motor.aml",
+    "bytes": 2263,
+    "sha256": "c2ad395d0dd2d671b83fc92dacef2cf55d28ee4ed953476b293c15bc6e072dba",
+    "localPath": "tests/TiaMcp.AutomationMl.Tests/fixtures/upstream/small-valid-motor.aml"
+  },
+  {
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/AutomationML/automationml-python/424ebbc93057cd432d70583c1eac29ba10b702a8/LICENSE",
+    "bytes": 1089,
+    "sha256": "6c70b52ad53188e209ea9f6653be4188191c1679be2d7e8d5e3c680d8e340cca",
+    "localPath": "third-party/automationml/automationml-python.LICENSE"
+  }
+]

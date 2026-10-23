@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/composite-engineering-request.v2.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "composite-engineering-request.v2"
+    },
+    "before": {
+      "$ref": "#/$defs/context"
+    },
+    "after": {
+      "$ref": "#/$defs/context"
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mapping"
+      },
+      "maxItems": 4096
+    },
+    "correspondences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/correspondence"
+      },
+      "maxItems": 4096
+    },
+    "allowDifferentProjectCopy": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "before",
+    "after",
+    "mappings",
+    "correspondences",
+    "allowDifferentProjectCopy"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "selector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "amlObject"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "amlAttribute"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "amlLink"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "model"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "objectPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "reviewId",
+            "nodeId",
+            "objectPath"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "connectionEndpoint"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "endpoint": {
+              "enum": [
+                "local",
+                "partner"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "id",
+            "endpoint"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "driveParameter"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "arrayIndex": {
+              "type": "integer",
+              "minimum": -1,
+              "maximum": 32767
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "name",
+            "number",
+            "arrayIndex"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "technologyRelationship"
+            },
+            "phase": {
+              "enum": [
+                "before",
+                "after"
+              ]
+            },
+            "recordRef": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "phase",
+            "recordRef",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "automationMlRef": {
+          "type": "string",
+          "pattern": "^automationml:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "maxItems": 64
+        },
+        "drives": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "maxItems": 64
+        },
+        "technology": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "reviewId",
+        "automationMlRef",
+        "connections",
+        "drives",
+        "technology"
+      ],
+      "additionalProperties": false
+    },
+    "mapping": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "purpose": {
+          "enum": [
+            "hardware",
+            "communication",
+            "parameter",
+            "dependent",
+            "telegram",
+            "encoder"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "source": {
+          "$ref": "#/$defs/selector"
+        },
+        "target": {
+          "$ref": "#/$defs/selector"
+        }
+      },
+      "required": [
+        "id",
+        "phase",
+        "purpose",
+        "reason",
+        "source",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "correspondence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "kind": {
+          "enum": [
+            "continuity",
+            "replacement"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "before": {
+          "$ref": "#/$defs/selector"
+        },
+        "after": {
+          "$ref": "#/$defs/selector"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "reason",
+        "before",
+        "after"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

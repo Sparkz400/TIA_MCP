@@ -1,0 +1,690 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "snapshotRef",
+    "acquisitionMode",
+    "bindingId",
+    "experimentId",
+    "binding",
+    "bindingArtifact",
+    "captureSource",
+    "signals",
+    "hypotheses",
+    "unselectedSignalIds",
+    "events",
+    "completeCommittedPrefixRetained",
+    "sourceEvidenceRevalidated",
+    "limits",
+    "atomicAcrossSignals",
+    "scanSynchronized",
+    "programMatchVerified",
+    "addressMatchVerified",
+    "datatypeMatchVerified",
+    "sourceAuthenticityVerified",
+    "physicalQualified",
+    "clockSynchronizationVerified",
+    "assertionsAdmitted",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "sourceCompletenessVerified"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-ua-observation.v1"
+    },
+    "snapshotRef": {
+      "type": "string",
+      "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "acquisitionMode": {
+      "enum": [
+        "polling",
+        "subscription"
+      ]
+    },
+    "bindingId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "experimentId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "binding": {
+      "$ref": "diagnostic-ua-binding.v1.schema.json"
+    },
+    "bindingArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes",
+        "base64"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8388608
+        },
+        "base64": {
+          "type": "string",
+          "contentEncoding": "base64"
+        }
+      }
+    },
+    "captureSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotRef",
+        "acquisitionMode",
+        "originalFiles",
+        "originalByteCount",
+        "plan",
+        "recordedProgress",
+        "rows",
+        "rowsTruncated",
+        "chainSha256",
+        "planSha256",
+        "segmentCount",
+        "currentHeadConsulted",
+        "uncommittedDataUnknown"
+      ],
+      "properties": {
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "acquisitionMode": {
+          "enum": [
+            "polling",
+            "subscription"
+          ]
+        },
+        "originalFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sha256",
+              "bytes",
+              "base64",
+              "relativePath"
+            ],
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "base64": {
+                "type": "string",
+                "contentEncoding": "base64"
+              },
+              "relativePath": {
+                "type": "string"
+              }
+            }
+          },
+          "maxItems": 10002
+        },
+        "originalByteCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3145728
+        },
+        "plan": {
+          "type": "object"
+        },
+        "recordedProgress": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "maxItems": 10000
+        },
+        "rowsTruncated": {
+          "const": false
+        },
+        "chainSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "planSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "segmentCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10001
+        },
+        "currentHeadConsulted": {
+          "const": false
+        },
+        "uncommittedDataUnknown": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "acquisitionMode": {
+                "const": "polling"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "plan": {
+                "$ref": "opcua-runtime-capture.v1.schema.json#/$defs/plan"
+              },
+              "recordedProgress": {
+                "$ref": "opcua-runtime-capture.v1.schema.json#/$defs/progress"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "$ref": "opcua-runtime-capture.v1.schema.json#/$defs/row"
+                },
+                "maxItems": 10000
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "acquisitionMode": {
+                "const": "subscription"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "plan": {
+                "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/plan"
+              },
+              "recordedProgress": {
+                "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/progress"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/row"
+                },
+                "maxItems": 10000
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signalId",
+          "node",
+          "unit",
+          "savedDatatype",
+          "monitoredItem",
+          "observationCount",
+          "hostReadErrors",
+          "goodValues",
+          "uncertain",
+          "bad",
+          "unsupported",
+          "metadataErrors",
+          "nullValues",
+          "missingSourceTimestamps",
+          "missingServerTimestamps",
+          "observedBuiltInTypes",
+          "firstObservation",
+          "lastObservation",
+          "coverage"
+        ],
+        "properties": {
+          "signalId": {
+            "type": "string"
+          },
+          "node": {
+            "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "savedDatatype": {
+            "type": "string"
+          },
+          "monitoredItem": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/monitoredItem"
+              }
+            ]
+          },
+          "observationCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "hostReadErrors": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "goodValues": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uncertain": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bad": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unsupported": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "metadataErrors": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "nullValues": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "missingSourceTimestamps": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "missingServerTimestamps": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observedBuiltInTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64
+          },
+          "firstObservation": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rowSequence",
+                  "elapsedMilliseconds",
+                  "observedUtc",
+                  "readStartedAt",
+                  "readCompletedAt",
+                  "value"
+                ],
+                "properties": {
+                  "rowSequence": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "elapsedMilliseconds": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "observedUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "readStartedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "readCompletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "value": {
+                    "$ref": "opcua-runtime.v1.schema.json#/$defs/value"
+                  },
+                  "messageSequenceNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  },
+                  "publishTime": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "eventKind": {
+                    "enum": [
+                      "publish",
+                      "republish",
+                      "gap"
+                    ]
+                  },
+                  "overflow": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
+          },
+          "lastObservation": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rowSequence",
+                  "elapsedMilliseconds",
+                  "observedUtc",
+                  "readStartedAt",
+                  "readCompletedAt",
+                  "value"
+                ],
+                "properties": {
+                  "rowSequence": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "elapsedMilliseconds": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "observedUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "readStartedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "readCompletedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "value": {
+                    "$ref": "opcua-runtime.v1.schema.json#/$defs/value"
+                  },
+                  "messageSequenceNumber": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  },
+                  "publishTime": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "eventKind": {
+                    "enum": [
+                      "publish",
+                      "republish",
+                      "gap"
+                    ]
+                  },
+                  "overflow": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
+          },
+          "coverage": {
+            "enum": [
+              "noSelectedObservations",
+              "recordedObservationsOnly"
+            ]
+          }
+        }
+      },
+      "maxItems": 64
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "statement",
+          "verdict",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "verdict": {
+            "const": "unresolved"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "maxItems": 64
+    },
+    "unselectedSignalIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gapRows",
+        "duplicateMessages",
+        "keepalives",
+        "failureEvents",
+        "overflowNotifications"
+      ],
+      "properties": {
+        "gapRows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicateMessages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "keepalives": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failureEvents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overflowNotifications": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "completeCommittedPrefixRetained": {
+      "const": true
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "limits": {
+      "type": "string"
+    },
+    "atomicAcrossSignals": {
+      "const": false
+    },
+    "scanSynchronized": {
+      "const": false
+    },
+    "programMatchVerified": {
+      "const": false
+    },
+    "addressMatchVerified": {
+      "const": false
+    },
+    "datatypeMatchVerified": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "physicalQualified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "assertionsAdmitted": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "sourceCompletenessVerified": {
+      "const": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-ua-observation.v1.schema.json",
+  "title": "Retained prebound UA observations without online association authority",
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "artifact",
+        "schemaVersion",
+        "snapshotRef",
+        "acquisitionMode",
+        "bindingId",
+        "experimentId",
+        "sourceEvidenceRevalidated",
+        "limits"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "artifact": {
+          "$ref": "diagnostic-report-export.v1.schema.json#/$defs/artifact"
+        },
+        "schemaVersion": {
+          "const": "diagnostic-ua-observation.v1"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "acquisitionMode": {
+          "enum": [
+            "polling",
+            "subscription"
+          ]
+        },
+        "bindingId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "experimentId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "sourceEvidenceRevalidated": {
+          "const": true
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshotRef"
+      ],
+      "properties": {
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "diagnostic_ua_observe": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#/$defs/receipt"
+      }
+    }
+  }
+}

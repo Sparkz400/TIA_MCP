@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "project-model-provider.v1",
+  "provider": "typedLadFbd",
+  "reference": {
+    "schemaVersion": "project-model.v1",
+    "snapshotId": "recorded-explorer-20261008",
+    "sessionGeneration": "recorded-session",
+    "projectPath": "D:\\fixtures\\Explorer\\Explorer.ap21",
+    "nodeId": "start-a",
+    "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+  },
+  "facet": "typedPreview",
+  "status": "unsupported",
+  "reason": "Typed preview provider unavailable.",
+  "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+  "contentRevision": {
+    "status": "unavailable",
+    "scope": "graphicalNetwork"
+  },
+  "coverage": [
+    {
+      "provider": "typedLadFbd",
+      "scope": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+      "status": "unsupported",
+      "visited": 0,
+      "returned": 0,
+      "warnings": [
+        "Provider unavailable."
+      ],
+      "continuationAvailable": false
+    }
+  ],
+  "attachments": [],
+  "engineeringVerified": false,
+  "runtimeVerified": false
+}

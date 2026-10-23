@@ -1,0 +1,417 @@
+{
+  "schemaVersion": "runtime-capture-export.v1",
+  "capture": {
+    "schemaVersion": "runtime-capture-status.v1",
+    "captureId": "7a020ab336214440ad5cc5dff94dfad4",
+    "snapshotRef": "capture:7a020ab336214440ad5cc5dff94dfad4:1:51b26cb709f4e71cfb2129b33614a68d3478c53ed2288ee1c87b6718771c8c93",
+    "state": "ended",
+    "recordedProgress": {
+      "state": "ended",
+      "terminalReason": "sampleLimit",
+      "elapsedMilliseconds": 139.7378,
+      "observedUtc": "2026-10-17T22:08:14.0374345+00:00",
+      "rows": 4,
+      "readAttempts": 4,
+      "skippedPolls": 0,
+      "droppedReadResults": 0
+    },
+    "localFailure": null,
+    "plan": {
+      "captureId": "7a020ab336214440ad5cc5dff94dfad4",
+      "hostId": "27002a283f49446b90c18ecbf69f7edd",
+      "createdUtc": "2026-10-17T22:08:13.8815109+00:00",
+      "request": {
+        "attemptId": "a14cb92d32054dbda74c0ed1220f6bf3",
+        "selectionIds": [
+          "98c57e4daaaf4bfb82e9f1e5319839f9",
+          "42ba8bbe14c34624bb1a14e8d1de9507"
+        ],
+        "intervalMilliseconds": 100,
+        "durationSeconds": 5,
+        "maximumSamples": 4,
+        "maximumBytes": 1048576,
+        "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+        "representation": "simple",
+        "association": {
+          "caseId": "6097516d21ad31bde837cb25241a91dc7a07b5db123c371ee12adbbb51d06165",
+          "mappings": [
+            {
+              "selectionId": "98c57e4daaaf4bfb82e9f1e5319839f9",
+              "signalId": "enable",
+              "reason": "Explicit synthetic conveyor enable"
+            },
+            {
+              "selectionId": "42ba8bbe14c34624bb1a14e8d1de9507",
+              "signalId": "step",
+              "reason": "Explicit synthetic conveyor step"
+            }
+          ],
+          "assertedProgramIdentity": "Caller assertion only; synthetic loopback"
+        },
+        "handoffRef": "runtime-handoff:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "signals": [
+        {
+          "selectionId": "98c57e4daaaf4bfb82e9f1e5319839f9",
+          "selection": {
+            "context": {
+              "endpoint": "https://127.0.0.1:51482",
+              "connectionId": "a14cb92d32054dbda74c0ed1220f6bf3",
+              "epoch": "dba24c8e6a314e8e990d6eaf03175a2e",
+              "peerCertificateSha256": "6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da"
+            },
+            "symbol": "\"DB_Line\".Conv2.Enable",
+            "representation": "simple",
+            "metadataSha256": "2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747"
+          },
+          "metadata": {
+            "name": "Enable",
+            "datatype": "bool"
+          }
+        },
+        {
+          "selectionId": "42ba8bbe14c34624bb1a14e8d1de9507",
+          "selection": {
+            "context": {
+              "endpoint": "https://127.0.0.1:51482",
+              "connectionId": "a14cb92d32054dbda74c0ed1220f6bf3",
+              "epoch": "dba24c8e6a314e8e990d6eaf03175a2e",
+              "peerCertificateSha256": "6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da"
+            },
+            "symbol": "\"DB_Line\".Conv2.Step",
+            "representation": "simple",
+            "metadataSha256": "cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241"
+          },
+          "metadata": {
+            "name": "Step",
+            "datatype": "uint"
+          }
+        }
+      ],
+      "association": {
+        "caseId": "6097516d21ad31bde837cb25241a91dc7a07b5db123c371ee12adbbb51d06165",
+        "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+        "project": {
+          "projectPath": "synthetic-fixture.ap21",
+          "host": "offline-test"
+        },
+        "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+        "selectedInstance": {
+          "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+          "memberPath": [
+            "Conv2"
+          ],
+          "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+          "plcPath": "/projects/Fixture/plc/CPU",
+          "scopePath": "/projects/Fixture/plc/CPU",
+          "namespace": "",
+          "evidence": [
+            {
+              "kind": "usesType",
+              "source": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "nodeId": "DB_Line"
+              },
+              "target": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                "nodeId": "FB_Line"
+              },
+              "evidence": {
+                "origin": "nativeConfirmed",
+                "resolution": "resolved",
+                "fixtureNote": "Synthetic edge; no native observation."
+              }
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "instanceScope": "GlobalVariable",
+              "instanceComponents": [
+                "DB_Line"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": []
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+              "xmlLine": 3,
+              "origin": "savedNativeXml",
+              "liveVerified": false
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "instanceScope": "LocalVariable",
+              "instanceComponents": [
+                "Conv2"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": [],
+              "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "callerMemberPath": []
+            }
+          ],
+          "callSites": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "instanceScope": "LocalVariable",
+              "instanceComponents": [
+                "Conv2"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": [],
+              "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "callerMemberPath": []
+            }
+          ],
+          "rootCallSites": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+              "xmlLine": 1,
+              "origin": "savedNativeXml",
+              "liveVerified": false,
+              "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "instanceScope": "GlobalVariable",
+              "instanceComponents": [
+                "DB_Line"
+              ],
+              "callOrdinal": 0,
+              "callUid": null,
+              "parameterBindings": []
+            }
+          ],
+          "resolution": "capturedStorageOnly",
+          "runtimeCallContextVerified": false
+        },
+        "sourceRevision": {
+          "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+          "documents": [
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+              "status": "exported",
+              "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+              "status": "exported",
+              "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "status": "exported",
+              "utf8Sha256": "104202185c0a224ffe6b9f1b41deb8cf4ad8108d2988f82803df740153811dfa"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "status": "exported",
+              "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf"
+            },
+            {
+              "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+              "status": "exported",
+              "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f"
+            }
+          ],
+          "onlineVerified": false
+        },
+        "signals": [
+          {
+            "selectionId": "98c57e4daaaf4bfb82e9f1e5319839f9",
+            "signalId": "enable",
+            "declaration": {
+              "id": "enable",
+              "role": "instance enable",
+              "reason": "Independently authored instance enable role tests the writer prediction.",
+              "hypothesisIds": [
+                "writer"
+              ],
+              "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "memberPath": [
+                "Conv2",
+                "Enable"
+              ],
+              "datatype": "Bool",
+              "symbolComponents": [
+                "DB_Line",
+                "Conv2",
+                "Enable"
+              ],
+              "namespace": "",
+              "scopePath": "/projects/Fixture/plc/CPU",
+              "resolution": "capturedDeclaration",
+              "unavailableReason": null,
+              "traceability": "requiresTargetValidation",
+              "evidence": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                "xmlLine": 3,
+                "origin": "savedNativeXml",
+                "liveVerified": false
+              },
+              "onlineAddress": null,
+              "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+              "selectionEvidence": null
+            }
+          },
+          {
+            "selectionId": "42ba8bbe14c34624bb1a14e8d1de9507",
+            "signalId": "step",
+            "declaration": {
+              "id": "step",
+              "role": "sequence state",
+              "reason": "Independently authored sequence state role tests the writer prediction.",
+              "hypothesisIds": [
+                "writer"
+              ],
+              "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "memberPath": [
+                "Conv2",
+                "Step"
+              ],
+              "datatype": "UInt",
+              "symbolComponents": [
+                "DB_Line",
+                "Conv2",
+                "Step"
+              ],
+              "namespace": "",
+              "scopePath": "/projects/Fixture/plc/CPU",
+              "resolution": "capturedDeclaration",
+              "unavailableReason": null,
+              "traceability": "requiresTargetValidation",
+              "evidence": {
+                "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                "xmlLine": 3,
+                "origin": "savedNativeXml",
+                "liveVerified": false
+              },
+              "onlineAddress": null,
+              "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+              "selectionEvidence": null
+            }
+          }
+        ],
+        "addressMatchVerified": false,
+        "programMatchVerified": false,
+        "sourceAuthenticityVerified": false,
+        "nativeQualified": false
+      },
+      "handoff": {
+        "schemaVersion": "runtime-capture-handoff.v1",
+        "recordRef": "runtime-handoff:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+        "session": {
+          "hostId": "dddddddddddddddddddddddddddddddd",
+          "context": {
+            "endpoint": "https://127.0.0.1:51482",
+            "connectionId": "a14cb92d32054dbda74c0ed1220f6bf3",
+            "epoch": "dba24c8e6a314e8e990d6eaf03175a2e",
+            "peerCertificateSha256": "6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da"
+          },
+          "subjectId": "synthetic-reader",
+          "securityMode": "local",
+          "credential": {
+            "schemaVersion": "protected-credential-reference.v1",
+            "vaultId": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "credentialId": "ffffffffffffffffffffffffffffffff",
+            "bindingSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cipherSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "peerVerified": true
+        },
+        "declarationState": "consistentDeclarations",
+        "deviceIdentityVerified": false,
+        "programMatchVerified": false,
+        "effectiveRightsVerified": false,
+        "sourceAuthenticityVerified": false,
+        "operationAdmitted": false,
+        "assertionsAdmitted": false
+      }
+    },
+    "committedBytes": 14612,
+    "uncommittedTailPresent": false,
+    "uncommittedDataUnknown": false,
+    "plcChangesBetweenPollsUnknown": true,
+    "acquisitionMode": "polling",
+    "atomicAcrossSignals": false,
+    "scanSynchronized": false,
+    "programMatchVerified": false,
+    "nativeQualified": false
+  },
+  "rows": [
+    {
+      "sequence": 0,
+      "kind": "read",
+      "selectionId": "98c57e4daaaf4bfb82e9f1e5319839f9",
+      "cycle": 0,
+      "scheduledMilliseconds": 0,
+      "elapsedMilliseconds": 20.1273,
+      "observedUtc": "2026-10-17T22:08:13.9169907+00:00",
+      "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:51482\",\"connectionId\":\"a14cb92d32054dbda74c0ed1220f6bf3\",\"epoch\":\"dba24c8e6a314e8e990d6eaf03175a2e\",\"peerCertificateSha256\":\"6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Enable\",\"representation\":\"simple\",\"metadataSha256\":\"2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747\"},\"requestId\":\"a66e964c0488435f874ae6262b23599d\",\"status\":\"read\",\"value\":true,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-17T22:08:13.9143793+00:00\",\"responseReceivedUtc\":\"2026-10-17T22:08:13.9167824+00:00\",\"elapsedMilliseconds\":2.4034,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+      "errorCode": null,
+      "skippedPolls": 0
+    },
+    {
+      "sequence": 1,
+      "kind": "read",
+      "selectionId": "42ba8bbe14c34624bb1a14e8d1de9507",
+      "cycle": 0,
+      "scheduledMilliseconds": 0,
+      "elapsedMilliseconds": 42.5551,
+      "observedUtc": "2026-10-17T22:08:13.939418+00:00",
+      "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:51482\",\"connectionId\":\"a14cb92d32054dbda74c0ed1220f6bf3\",\"epoch\":\"dba24c8e6a314e8e990d6eaf03175a2e\",\"peerCertificateSha256\":\"6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Step\",\"representation\":\"simple\",\"metadataSha256\":\"cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241\"},\"requestId\":\"21c4b0545edb474295e894115fc9a0d3\",\"status\":\"read\",\"value\":65535,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-17T22:08:13.9369661+00:00\",\"responseReceivedUtc\":\"2026-10-17T22:08:13.9393043+00:00\",\"elapsedMilliseconds\":2.3383,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+      "errorCode": null,
+      "skippedPolls": 0
+    },
+    {
+      "sequence": 2,
+      "kind": "read",
+      "selectionId": "98c57e4daaaf4bfb82e9f1e5319839f9",
+      "cycle": 1,
+      "scheduledMilliseconds": 100,
+      "elapsedMilliseconds": 120.1888,
+      "observedUtc": "2026-10-17T22:08:14.01705+00:00",
+      "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:51482\",\"connectionId\":\"a14cb92d32054dbda74c0ed1220f6bf3\",\"epoch\":\"dba24c8e6a314e8e990d6eaf03175a2e\",\"peerCertificateSha256\":\"6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Enable\",\"representation\":\"simple\",\"metadataSha256\":\"2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747\"},\"requestId\":\"7824d7a58b34452b867de143cba401fd\",\"status\":\"read\",\"value\":true,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-17T22:08:14.0145106+00:00\",\"responseReceivedUtc\":\"2026-10-17T22:08:14.0169319+00:00\",\"elapsedMilliseconds\":2.4216,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+      "errorCode": null,
+      "skippedPolls": 0
+    },
+    {
+      "sequence": 3,
+      "kind": "read",
+      "selectionId": "42ba8bbe14c34624bb1a14e8d1de9507",
+      "cycle": 1,
+      "scheduledMilliseconds": 100,
+      "elapsedMilliseconds": 139.6142,
+      "observedUtc": "2026-10-17T22:08:14.036475+00:00",
+      "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:51482\",\"connectionId\":\"a14cb92d32054dbda74c0ed1220f6bf3\",\"epoch\":\"dba24c8e6a314e8e990d6eaf03175a2e\",\"peerCertificateSha256\":\"6234ef1c6194ded349111ee89dc9d0de4629325e24ecc25d0bfbbe6e374193da\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Step\",\"representation\":\"simple\",\"metadataSha256\":\"cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241\"},\"requestId\":\"f720586e64314b7f842d4162838ca3d4\",\"status\":\"read\",\"value\":65535,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-17T22:08:14.0340508+00:00\",\"responseReceivedUtc\":\"2026-10-17T22:08:14.0363597+00:00\",\"elapsedMilliseconds\":2.3091,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+      "errorCode": null,
+      "skippedPolls": 0
+    }
+  ]
+}

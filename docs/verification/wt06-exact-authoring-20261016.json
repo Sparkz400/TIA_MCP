@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-16",
+  "profile": "watch.create-owned-v21-1511-v41-de-active-bool.v1",
+  "deliveryStatus": "nativeQualificationPassed_productionAdmissionPending",
+  "productionApplyEnabled": false,
+  "genericProfilesEnabled": false,
+  "nativeQualification": {
+    "completed": true,
+    "root": "D:/TIAW/we1602",
+    "package": "artifacts/watch-exact-20261016/package-03",
+    "workerSha256": "f465aa19436d10ef42bf43c8314d4ee62d37c1d50b9d24057e63359fcc056157",
+    "sourceManifestSha256": "cf6ddbf03e92cc0a1694f521bbbd0d48e96da04e4295af928c23561e4545a666",
+    "packetSha256": "50e44ec59a77b377af423c442477d4af1afb120796f34ab732f0f2de86ccc459",
+    "verificationSha256": "bb946d506cb67a1a434f31873edaed813f69b488431c484445f6201a2c03b362",
+    "independentRerunSha256": "01973dd08d72b61d8a731a611b6da95c801dbff6e7157abb7ba298a45c97b864",
+    "terminalAuditSha256": "acc6812c2f608d648360f569d9f6ceb8b85c3c4017e7d4aa2fc2eed4fc8006ee",
+    "sourceNegativeReceiptSha256": "6d2e621790981ef45b0adfbe87cb4ce133fe3baf511ad9ab2141ca2c208fa912",
+    "cases": [
+      "savedHeaderAuthorDriftRefusedByNativeStaleSourceGuard",
+      "finallyRestorationAndFreshSourceCapture",
+      "exactProfileMatched",
+      "exactNameCollision",
+      "caseFoldedNameCollision",
+      "forceTableNameCollision",
+      "lateStaleEpochStoppedBeforeCheckpoint",
+      "oneReviewedBoolCreation",
+      "sixPreservedPeerExports",
+      "savedFreshReopen",
+      "distinctCheckpointRecoveryToAbsence",
+      "freshRecoveredReopen",
+      "originalReconciliation"
+    ],
+    "exactTerminalLifetimes": { "host": 1, "worker": 1, "native": 6, "allExitCodes": 0 },
+    "pendingOwnedResources": 0,
+    "foreignStoresChecked": 49,
+    "allStoreHandlesClosed": true
+  },
+  "retainedFailure": {
+    "root": "D:/TIAW/we1601",
+    "qualificationPassed": false,
+    "cause": "Dynamic FB Author attribute unsupported; failure before archive, marker or source write",
+    "rawMcpReplyAvailable": false,
+    "hostStderrExceptionRetained": true,
+    "separateReadOnlyReconciliationCompleted": true,
+    "reconciliationAuditSha256": "94ea8078935c4f5d4c5084163860c9d42f172c34316d8814668dfc8be62fe6ed",
+    "pendingOwnedResources": 0
+  },
+  "portableValidation": {
+    "frozenBuildsZeroWarningsErrors": 4,
+    "exactScopeChecks": 39,
+    "sourceNegativeRecoveryChecks": 15,
+    "managedAuthoringChecks": 57,
+    "workerBoundaryChecks": 31,
+    "actualHostBoundaryCases": 5,
+    "nativeNegativeOracleCases": 8,
+    "negativeControllerCases": 7,
+    "priorAuthoringPythonCases": 23,
+    "creationLossControllerOracleCases": 8
+  },
+  "proposedCreationLoss": {
+    "controller": "scripts/qualify_watch_authoring_loss.py",
+    "verifier": "scripts/verify_watch_authoring_loss.py",
+    "packet": "artifacts/watch-exact-20261016/native-packet-03.json",
+    "packetSha256": "0d607de54582d22e3c32b9b6449e0372eb05b0799de89d9634c82d258fb09e71",
+    "nativeDispatched": false,
+    "rootCreated": false
+  },
+  "remaining": [
+    "creationSpecificUnknownOutcomeNativeTrial",
+    "exactProductionPredicateAndWorkerAdmissionDecision",
+    "normalHostCreationNegativesReopenRecoveryProof",
+    "actualHostPreparationAgainstConcurrentSourceChange",
+    "broaderAuthoringProfiles"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-inspection-page.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "workbookSha256", "profileSha256", "projectSha256", "offset", "totalMappedTargets", "scope", "rows", "nextCursor", "nativeQualified", "nativeExecuted", "nativeImportAllowed", "pageSha256"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {"const": "translation-inspection-page"},
+    "workbookSha256": {"$ref": "#/$defs/sha256"},
+    "profileSha256": {"$ref": "#/$defs/sha256"},
+    "projectSha256": {"$ref": "#/$defs/sha256"},
+    "offset": {"type": "integer", "minimum": 0, "maximum": 1000000},
+    "totalMappedTargets": {"type": "integer", "minimum": 0, "maximum": 1000000},
+    "scope": {"const": "explicit-profile-rows-only"},
+    "rows": {
+      "type": "array", "maxItems": 1000,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["nativeKey", "culture", "category", "location", "source", "target", "sourceSha256", "targetSha256", "findings"],
+        "properties": {
+          "nativeKey": {"type": "string", "minLength": 1, "maxLength": 1048576},
+          "culture": {"type": "string", "minLength": 1, "maxLength": 64},
+          "category": {"type": "string", "minLength": 1, "maxLength": 1024},
+          "location": {"$ref": "translation-profile.v1.schema.json#/$defs/location"},
+          "source": {"$ref": "translation-review.v1.schema.json#/$defs/state"},
+          "target": {"$ref": "translation-review.v1.schema.json#/$defs/state"},
+          "sourceSha256": {"$ref": "#/$defs/sha256"},
+          "targetSha256": {"$ref": "#/$defs/sha256"},
+          "alarmInheritance": {"$ref": "translation-review.v1.schema.json#/$defs/alarmInheritance"},
+          "findings": {
+            "type": "array", "maxItems": 7, "uniqueItems": true,
+            "items": {"enum": ["missing", "empty", "whitespace-only", "same-as-source", "rich-text-edit-unsupported", "placeholder-grammar-unqualified", "length-limit-exceeded"]}
+          }
+        }
+      }
+    },
+    "nextCursor": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/cursor"}]},
+    "nativeQualified": {"const": false},
+    "nativeExecuted": {"const": false},
+    "nativeImportAllowed": {"const": false},
+    "pageSha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "cursor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workbookSha256", "profileSha256", "projectSha256", "offset"],
+      "properties": {
+        "workbookSha256": {"$ref": "#/$defs/sha256"},
+        "profileSha256": {"$ref": "#/$defs/sha256"},
+        "projectSha256": {"$ref": "#/$defs/sha256"},
+        "offset": {"type": "integer", "minimum": 0, "maximum": 1000000}
+      }
+    }
+  }
+}

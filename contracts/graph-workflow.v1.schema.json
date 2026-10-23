@@ -1,0 +1,579 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:graph-workflow:v1",
+  "title": "Offline retained GRAPH workflow; native qualification always false",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/summary"
+    },
+    {
+      "$ref": "#/$defs/page"
+    },
+    {
+      "$ref": "#/$defs/chunk"
+    },
+    {
+      "$ref": "#/$defs/list"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "kind": {
+          "enum": [
+            "document",
+            "comparison"
+          ]
+        },
+        "state": {
+          "const": "complete"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+          },
+          "maxItems": 2
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "behavioralEquivalenceCertified": {
+          "const": false
+        },
+        "fullSchemaValidated": {
+          "const": false
+        },
+        "sourceSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "beforeSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hasErrors": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "hasUnsupportedContent": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "matchingReliable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "sourceBytesChanged": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "enum": [
+                  "original.xml",
+                  "report.json",
+                  "viewer.html"
+                ]
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100663296
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "name",
+              "bytes",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "inputs",
+        "nativeQualified",
+        "behavioralEquivalenceCertified",
+        "fullSchemaValidated",
+        "sourceSha256",
+        "beforeSha256",
+        "afterSha256",
+        "hasErrors",
+        "hasUnsupportedContent",
+        "matchingReliable",
+        "sourceBytesChanged",
+        "counts",
+        "artifacts",
+        "receiptName"
+      ],
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "reportSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "section": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {}
+                },
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "recordRef",
+        "reportSha256",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "chunk": {
+      "type": "object",
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "encoding": {
+          "const": "base64"
+        },
+        "data": {
+          "type": "string"
+        },
+        "nextOffset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "sha256",
+        "bytes",
+        "offset",
+        "count",
+        "encoding",
+        "data",
+        "nextOffset",
+        "complete",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "rows": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              },
+              "recordRef": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "state": {
+                "enum": [
+                  "complete",
+                  "incomplete",
+                  "integrity-failed"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "recordRef",
+              "state"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nextOffset": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ordering": {
+          "const": "record-id; relist after additions"
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "rows",
+        "total",
+        "nextOffset",
+        "ordering",
+        "nativeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "graph_inspectInput": {
+      "type": "object",
+      "properties": {
+        "xmlUploadRef": {
+          "type": "string",
+          "pattern": "^upload:[a-f0-9]{32}$"
+        }
+      },
+      "required": [
+        "xmlUploadRef"
+      ],
+      "additionalProperties": false
+    },
+    "graph_compareInput": {
+      "type": "object",
+      "properties": {
+        "beforeRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "afterRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "beforeRef",
+        "afterRef"
+      ],
+      "additionalProperties": false
+    },
+    "graph_reopenInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "recordRef"
+      ],
+      "additionalProperties": false
+    },
+    "graph_report_pageInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^/"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "recordRef",
+        "section"
+      ],
+      "additionalProperties": false
+    },
+    "graph_artifact_readInput": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "type": "string",
+          "pattern": "^graph:[a-f0-9]{32}:[a-f0-9]{64}$"
+        },
+        "name": {
+          "enum": [
+            "original.xml",
+            "report.json",
+            "viewer.html",
+            "receipt.json"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "recordRef",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "graph_listInput": {
+      "type": "object",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  },
+  "x-tool-contracts": {
+    "graph_inspect": {
+      "input": {
+        "$ref": "#/$defs/graph_inspectInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "graph_compare": {
+      "input": {
+        "$ref": "#/$defs/graph_compareInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "graph_reopen": {
+      "input": {
+        "$ref": "#/$defs/graph_reopenInput"
+      },
+      "output": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "graph_report_page": {
+      "input": {
+        "$ref": "#/$defs/graph_report_pageInput"
+      },
+      "output": {
+        "$ref": "#/$defs/page"
+      }
+    },
+    "graph_artifact_read": {
+      "input": {
+        "$ref": "#/$defs/graph_artifact_readInput"
+      },
+      "output": {
+        "$ref": "#/$defs/chunk"
+      }
+    },
+    "graph_list": {
+      "input": {
+        "$ref": "#/$defs/graph_listInput"
+      },
+      "output": {
+        "$ref": "#/$defs/list"
+      }
+    }
+  }
+}

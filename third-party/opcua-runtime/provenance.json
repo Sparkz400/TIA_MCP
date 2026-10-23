@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "observedAtUtc": "2026-10-20T13:37:05.950420+00:00",
+  "packages": [
+    {
+      "id": "BitFaster.Caching",
+      "version": "2.6.0",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/BitFaster.Caching/2.6.0",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/bitfaster.caching/2.6.0/bitfaster.caching.2.6.0.nupkg",
+      "packageSha256": "705dd20ca6e8a5d58f899ed6af1e5487b3d7c68854a153c05429268de0703cfc",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/bitfaster/BitFaster.Caching",
+        "commit": "43a8822785038dd90f8376b202243ad28c53f845"
+      },
+      "retainedFiles": [
+        {
+          "path": "bitfaster.caching.nuspec",
+          "sha256": "7f44b621c2743eb9fc8dc6337748632638a2cfb5a7e5a262c535d9147793df34"
+        },
+        {
+          "path": "BitFaster.Caching.LICENSE",
+          "sha256": "f3bf474c62109fbe7b81345419eff56bfd6e5b539accc877a9b840e2e7a5176b"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "Newtonsoft.Json",
+      "version": "13.0.4",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/Newtonsoft.Json/13.0.4",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg",
+      "packageSha256": "f09081d457405baf35a973fa0c50d6bf272ed683f2568c5a620a49da952f6529",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/JamesNK/Newtonsoft.Json",
+        "commit": "4e13299d4b0ec96bd4df9954ef646bd2d1b5bf2a"
+      },
+      "retainedFiles": [
+        {
+          "path": "newtonsoft.json.nuspec",
+          "sha256": "f4bc224d57a21fb481f1dc655c3fde6f2e5b8ce80a9448e74a5721a51932adf3"
+        },
+        {
+          "path": "Newtonsoft.Json.LICENSE.md",
+          "sha256": "b98a397897ff55f76cddc380041507a95a896b2946e0188703bf0496793d6516"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Client",
+      "version": "1.5.378.182",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Client/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.client/1.5.378.182/opcfoundation.netstandard.opc.ua.client.1.5.378.182.nupkg",
+      "packageSha256": "fd40f76db642e1f0cd52f479a4fd76371b2716bcc049dc61a36236903a8d66ac",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.client.nuspec",
+          "sha256": "ae8ccefaee3f5a1d6dac2d0138f69e49b63d342190276389c6259ae18c554adc"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Configuration",
+      "version": "1.5.378.182",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Configuration/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.configuration/1.5.378.182/opcfoundation.netstandard.opc.ua.configuration.1.5.378.182.nupkg",
+      "packageSha256": "4fbd4a4c7a2d8b8ab8869870fd2185565f058a9384fcc4955c39d3588cfe79ee",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.configuration.nuspec",
+          "sha256": "e5f576bec0da09b1448d6c8ec2ae6a6e25765dae8cf7ddb102c8f091c61b936f"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Core",
+      "version": "1.5.378.182",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Core/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.core/1.5.378.182/opcfoundation.netstandard.opc.ua.core.1.5.378.182.nupkg",
+      "packageSha256": "53193b8fbb7ae5d7b3deb6ce8936108f91658d3ec3c4ba94b3ba70b45e27d69c",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.core.nuspec",
+          "sha256": "4e5c5280248ada42d35aac98cffa04d3d84edfef5c29c42344b5fd7fae033c54"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Security.Certificates",
+      "version": "1.5.378.182",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Security.Certificates/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.security.certificates/1.5.378.182/opcfoundation.netstandard.opc.ua.security.certificates.1.5.378.182.nupkg",
+      "packageSha256": "f12080f69fd6a75c7784fdf041b022da3723f9f09c063959eadb0b3512d43527",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.security.certificates.nuspec",
+          "sha256": "a9662718bcc3a11fc813a7fed281c7985a32d459e1fd902919946cf957fe98a8"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Server",
+      "version": "1.5.378.182",
+      "scope": "test server only",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Server/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.server/1.5.378.182/opcfoundation.netstandard.opc.ua.server.1.5.378.182.nupkg",
+      "packageSha256": "c22693f171f345a5a81f8f3b7f8ba5268319078add0680323b18e508baece594",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.server.nuspec",
+          "sha256": "988b1babcc64caa1e5475b331b140bc7c3845ba56ed7231a40e4f25fb7b2104f"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    },
+    {
+      "id": "OPCFoundation.NetStandard.Opc.Ua.Types",
+      "version": "1.5.378.182",
+      "scope": "Host runtime",
+      "nugetPage": "https://www.nuget.org/packages/OPCFoundation.NetStandard.Opc.Ua.Types/1.5.378.182",
+      "packageUrl": "https://api.nuget.org/v3-flatcontainer/opcfoundation.netstandard.opc.ua.types/1.5.378.182/opcfoundation.netstandard.opc.ua.types.1.5.378.182.nupkg",
+      "packageSha256": "ddfd78919e8d7df0172d3fad72949f1d6d0a788787a74c0665d06182c5b62040",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/OPCFoundation/UA-.NETStandard",
+        "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b"
+      },
+      "retainedFiles": [
+        {
+          "path": "opcfoundation.netstandard.opc.ua.types.nuspec",
+          "sha256": "778b0c9038b122f95bc106fdbe75b26654c46731bf1419d94197997ca3c648d1"
+        },
+        {
+          "path": "OPCFoundation.LICENSE.txt",
+          "sha256": "3927c73bc0abbd9327364bcfdcbb7d8a7be50c05c2948fcfb49a45b165bda737"
+        }
+      ],
+      "noticeBytesMatchOfficialPackage": true
+    }
+  ],
+  "upstreamMaintenance": {
+    "sourceUrl": "https://raw.githubusercontent.com/OPCFoundation/UA-.NETStandard/master/README.md",
+    "capturedSha256": "a11a580b1738829536133036d7395725065523905fb69ebd88e7adf2689e1a77",
+    "decision": "Pin the supported 1.5.378 maintenance line; upstream also offers 2.x. This pin does not claim the newest major version."
+  },
+  "sdkSourceReview": {
+    "commit": "6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b",
+    "files": [
+      {
+        "path": "Libraries/Opc.Ua.Client/Session/Session.cs",
+        "sha256": "12ba012b68ea4659777650f8cd7c4841c0272d457083afd85760fe9c86b384b0",
+        "gitBlobSha1": "50ef1eb9d5fec77b27f2b3d30e1494c3fa9aead1",
+        "sourceUrl": "https://github.com/OPCFoundation/UA-.NETStandard/blob/6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b/Libraries/Opc.Ua.Client/Session/Session.cs"
+      },
+      {
+        "path": "Libraries/Opc.Ua.Client/Session/DefaultSessionFactory.cs",
+        "sha256": "69d94dfc359267b46d639c7c46a1c05bfb484b2ec471a5734fcc2237ab9a6eb6",
+        "gitBlobSha1": "fb2057f10b72f039a08cee3cf46749547d3dafce",
+        "sourceUrl": "https://github.com/OPCFoundation/UA-.NETStandard/blob/6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b/Libraries/Opc.Ua.Client/Session/DefaultSessionFactory.cs"
+      },
+      {
+        "path": "Stack/Opc.Ua.Core/Security/Certificates/CertificateValidator.cs",
+        "sha256": "c2fd0ca813d14fe5fd34b3b524b2479a59ad311fd86809f741f692936c5598c4",
+        "gitBlobSha1": "4c5b14df41f0a7c63d803207b197f079a0797283",
+        "sourceUrl": "https://github.com/OPCFoundation/UA-.NETStandard/blob/6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b/Stack/Opc.Ua.Core/Security/Certificates/CertificateValidator.cs"
+      },
+      {
+        "path": "Stack/Opc.Ua.Core/Stack/Client/DiscoveryClient.cs",
+        "sha256": "80ac67506cd5222b28e4195ab68b68c08c84d81f4c037e9004a17b8f8f457d63",
+        "gitBlobSha1": "75ee1935afdf29a3cc94d5def4956607b43dee56",
+        "sourceUrl": "https://github.com/OPCFoundation/UA-.NETStandard/blob/6cca32dd6d79c8b57d2e00e4d2071b991d2cf71b/Stack/Opc.Ua.Core/Stack/Client/DiscoveryClient.cs"
+      }
+    ]
+  },
+  "advisoryObservation": {
+    "feed": "https://api.nuget.org/v3/vulnerabilities/index.json",
+    "indexSha256": "500b5bdbfc7844de8b1798d9a4ca174998255aaa1f71bfd226f830d9f0c26f29",
+    "observedAtUtc": "2026-10-20T13:36:00.0903085Z",
+    "exactPackagesChecked": 12,
+    "matchingReportedVulnerabilities": 0,
+    "scope": "11 Host runtime dependencies and separate test server; point-in-time feed result, not security certification"
+  }
+}

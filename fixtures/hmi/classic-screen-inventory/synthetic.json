@@ -1,0 +1,181 @@
+{
+  "authority": "synthetic",
+  "rows": [
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "regular",
+      "parentPath": "/hmi/screens",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screens/Repeated",
+        "name": "Repeated"
+      }
+    },
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "template",
+      "parentPath": "/hmi/screenTemplates",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screenTemplates/Repeated",
+        "name": "Repeated"
+      }
+    },
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "popup",
+      "parentPath": "/hmi/screenPopups",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screenPopups/Repeated",
+        "name": "Repeated"
+      }
+    },
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "slideIn",
+      "parentPath": "/hmi/screenSlideins",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screenSlideins/Repeated",
+        "name": "Repeated"
+      }
+    },
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "globalElements",
+      "parentPath": "/hmi",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screenGlobalElements",
+        "name": "Repeated"
+      }
+    },
+    {
+      "kind": "hmiScreen",
+      "name": "Repeated",
+      "screenRole": "overview",
+      "parentPath": "/hmi",
+      "source": {
+        "kind": "synthetic",
+        "scriptsExecuted": false
+      },
+      "identity": {
+        "schemaVersion": 2,
+        "projectPath": "C:\\fixture\\HMI.ap21",
+        "projectCopyId": "fixture",
+        "sessionGeneration": "fixture",
+        "family": "classic",
+        "devicePath": "/device",
+        "hmiPath": "/hmi",
+        "kind": "hmiScreen",
+        "objectPath": "/hmi/screenOverview",
+        "name": "Repeated"
+      }
+    }
+  ],
+  "screenScopes": [
+    {
+      "role": "regular",
+      "property": "ScreenFolder",
+      "path": "/hmi/screens",
+      "status": "complete",
+      "observed": 1
+    },
+    {
+      "role": "template",
+      "property": "ScreenTemplateFolder",
+      "path": "/hmi/screenTemplates",
+      "status": "complete",
+      "observed": 1
+    },
+    {
+      "role": "popup",
+      "property": "ScreenPopupFolder",
+      "path": "/hmi/screenPopups",
+      "status": "complete",
+      "observed": 1
+    },
+    {
+      "role": "slideIn",
+      "property": "ScreenSlideinFolder",
+      "path": "/hmi/screenSlideins",
+      "status": "complete",
+      "observed": 1
+    },
+    {
+      "role": "globalElements",
+      "property": "ScreenGlobalElements",
+      "path": "/hmi/screenGlobalElements",
+      "status": "complete",
+      "observed": 1
+    },
+    {
+      "role": "overview",
+      "property": "ScreenOverview",
+      "path": "/hmi/screenOverview",
+      "status": "complete",
+      "observed": 1
+    }
+  ]
+}

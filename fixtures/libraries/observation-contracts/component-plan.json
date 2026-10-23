@@ -1,0 +1,545 @@
+{
+  "applyError": "PlcIntegrationNotQualified",
+  "applySupported": false,
+  "compileScope": [
+    "ScratchStation"
+  ],
+  "compileTarget": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+  "dependencies": [
+    {
+      "rootVersionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9",
+      "versions": [
+        {
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+          "isDefault": true,
+          "kind": "version",
+          "modifiedDate": "2026-10-12T07:51:37.2966703Z",
+          "requiredVersionGuids": [
+            "eee41dd4-5137-48bb-a42b-d7fc64637eec"
+          ],
+          "setForUpdate": true,
+          "state": "Committed",
+          "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+          "typeName": "TiaMcpComponentGate",
+          "version": "1.0.0",
+          "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+        },
+        {
+          "author": "TIA MCP qualification",
+          "doNotUse": false,
+          "engineeringType": "Siemens.Engineering.SW.Types.PlcTypeLibraryTypeVersion",
+          "isDefault": true,
+          "kind": "version",
+          "modifiedDate": "2026-10-12T07:51:27.5337475Z",
+          "requiredVersionGuids": [],
+          "setForUpdate": true,
+          "state": "Committed",
+          "typeGuid": "35c9be87-892c-4ce6-a724-545ab1d41683",
+          "typeName": "TiaMcpComponentState",
+          "version": "1.0.0",
+          "versionGuid": "eee41dd4-5137-48bb-a42b-d7fc64637eec"
+        }
+      ]
+    }
+  ],
+  "effects": [
+    {
+      "action": "planPlcComponent",
+      "nativeMutation": false,
+      "proposedSteps": [
+        {
+          "kind": "library_instantiate",
+          "order": 1,
+          "prepareArguments": {
+            "kind": "library_instantiate",
+            "payload": {
+              "schemaVersion": 1,
+              "selection": [
+                {
+                  "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+                  "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+                }
+              ],
+              "source": {
+                "libraryId": "library-25fbe9c7bcea447e9d096e72a5e188d4",
+                "revision": "1d15d38ed25f7f4f9ec15f8efa7df90e125f4b7cdd87673f7292087f771ba9b6"
+              },
+              "target": {
+                "plcPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+                "projectName": "TiaMcpScratch_20261013_043831_58a4ae2c"
+              }
+            }
+          },
+          "requiresFreshPreparation": true
+        },
+        {
+          "kind": "graphical_typed_edit",
+          "mustWaitFor": "Exact imported FB/dependency identity and content readback; new native project fingerprint.",
+          "order": 2,
+          "prepareArguments": {
+            "kind": "graphical_typed_edit",
+            "payload": {
+              "groupPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks",
+              "instances": [
+                {
+                  "key": "instance",
+                  "kind": "createGlobal",
+                  "name": "TiaMcpComponentGate_1"
+                }
+              ],
+              "model": {
+                "connections": [
+                  {
+                    "from": {
+                      "node": "$p0",
+                      "port": "value"
+                    },
+                    "to": {
+                      "node": "call",
+                      "port": "Enable"
+                    }
+                  },
+                  {
+                    "from": {
+                      "node": "call",
+                      "port": "Active"
+                    },
+                    "to": {
+                      "node": "$p1",
+                      "port": "value"
+                    }
+                  },
+                  {
+                    "from": {
+                      "node": "$enable",
+                      "port": "value"
+                    },
+                    "to": {
+                      "node": "call",
+                      "port": "en"
+                    }
+                  }
+                ],
+                "creation": {
+                  "blockType": "FC",
+                  "interface": [],
+                  "name": "TiaMcpComponentCaller"
+                },
+                "language": "FBD",
+                "nodes": [
+                  {
+                    "calleePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+                    "instance": "instance",
+                    "key": "call",
+                    "kind": "call"
+                  }
+                ],
+                "operands": [
+                  {
+                    "components": [
+                      "ComponentEnable"
+                    ],
+                    "dataType": "Bool",
+                    "key": "p0",
+                    "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+                    "scope": "tag"
+                  },
+                  {
+                    "components": [
+                      "ComponentActive"
+                    ],
+                    "dataType": "Bool",
+                    "key": "p1",
+                    "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+                    "scope": "tag"
+                  },
+                  {
+                    "dataType": "Bool",
+                    "key": "enable",
+                    "scope": "constant",
+                    "value": "true"
+                  }
+                ],
+                "operation": "createBlock",
+                "schemaVersion": 1
+              },
+              "namespace": "",
+              "scopePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"
+            },
+            "plcPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+            "projectName": "TiaMcpScratch_20261013_043831_58a4ae2c"
+          },
+          "requiresFreshPreparation": true
+        }
+      ]
+    },
+    {
+      "action": "library_integrate",
+      "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\scratch\\TiaMcpScratch_20261013_043831_58a4ae2c\\TiaMcpScratch_20261013_043831_58a4ae2c\\TiaMcpScratch_20261013_043831_58a4ae2c.ap21",
+      "targetLibraryId": "library-25fbe9c7bcea447e9d096e72a5e188d4"
+    }
+  ],
+  "fingerprint": "bf3316d2e40428320e2d6cda5609d145403652d817e84d40b55a168683e98e97",
+  "integrationPlan": {
+    "applyError": "PlcIntegrationNotQualified",
+    "applySupported": false,
+    "blockers": [],
+    "caller": {
+      "blockPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentCaller",
+      "initiallyAbsent": true,
+      "language": "FBD",
+      "mode": "createStandaloneFc",
+      "obCallAdded": false
+    },
+    "coordinator": {
+      "automaticReplayAllowed": false,
+      "implementation": "internal_staged_coordinator_with_existing_native_adapters",
+      "initialRecoveryAnchor": "First library_instantiate complete-project checkpoint; never the subsequent typed-edit checkpoint.",
+      "nativeQualificationExecuted": false,
+      "publicEntryPointAvailable": false,
+      "qualificationEntryPoint": "Explicit --component-qualification launch; library_component_qualification preparation and per-step change_apply, owned scratch only.",
+      "remainingBoundary": "Qualification-only dispatch exists; independent native qualification is still required. Production combined apply remains unavailable.",
+      "stepReviewRequired": true
+    },
+    "instanceDb": {
+      "name": "TiaMcpComponentGate_1",
+      "numberMustBeRecheckedAfterInstantiation": true,
+      "numberPolicy": "firstAvailable",
+      "path": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate_1",
+      "provisionalNumber": 2
+    },
+    "interface": [
+      {
+        "dataType": "Bool",
+        "direction": "Input",
+        "name": "Enable"
+      },
+      {
+        "dataType": "Bool",
+        "direction": "Output",
+        "name": "Active"
+      }
+    ],
+    "inventorySha256": "c1cdfc3806cfc2c3243c50171674a9bc1fbaccfd51c889a0da05644abb16fb8b",
+    "mappings": [
+      {
+        "dataType": "Bool",
+        "direction": "Input",
+        "nativeTag": {
+          "dataType": "Bool",
+          "isSafety": false,
+          "logicalAddress": "%M120.0",
+          "name": "ComponentEnable",
+          "path": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentEnable",
+          "tablePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals"
+        },
+        "parameter": "Enable",
+        "tagPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentEnable"
+      },
+      {
+        "dataType": "Bool",
+        "direction": "Output",
+        "nativeTag": {
+          "dataType": "Bool",
+          "isSafety": false,
+          "logicalAddress": "%M120.1",
+          "name": "ComponentActive",
+          "path": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentActive",
+          "tablePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals"
+        },
+        "parameter": "Active",
+        "tagPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentActive"
+      }
+    ],
+    "nativeMutationDispatched": false,
+    "qualification": "offline_planner_only_native_qualification_required",
+    "qualificationGates": [
+      "Exact native root and dependency version/content readback after import",
+      "Fresh typed preparation: scope, protection, tag types/addresses, insertion preservation and DB collision checks",
+      "Caller and DB native readback, exact call parameter bindings and compile diagnostics",
+      "Unrelated native content comparison; save and fresh-session reopen",
+      "Initial-checkpoint recovery and interruption/no-replay cases",
+      "Independent simulator input/output and state assertions"
+    ],
+    "recoveryPlan": {
+      "affectedResource": "The complete selected project, including its project library, caller, and new FB/dependencies/instance DB.",
+      "automaticRetryAllowed": false,
+      "requiredBeforeFirstMutation": "Persist an initial project checkpoint and hashes for all affected and unrelated native exports. No checkpoint is created by this plan.",
+      "separateStepsAreAtomic": false,
+      "sourceLibraryPolicy": "Read-only source; no library publication, default changes or update operation.",
+      "uncertainOutcome": "Read change_status for the dispatched step; never replay. Preserve both step journals and recover the initial project checkpoint into a new owned location, then compare after fresh reopen."
+    },
+    "schemaVersion": 1,
+    "status": "planned_only",
+    "steps": [
+      {
+        "kind": "library_instantiate",
+        "order": 1,
+        "prepareArguments": {
+          "kind": "library_instantiate",
+          "payload": {
+            "schemaVersion": 1,
+            "selection": [
+              {
+                "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+                "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+              }
+            ],
+            "source": {
+              "libraryId": "library-25fbe9c7bcea447e9d096e72a5e188d4",
+              "revision": "1d15d38ed25f7f4f9ec15f8efa7df90e125f4b7cdd87673f7292087f771ba9b6"
+            },
+            "target": {
+              "plcPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+              "projectName": "TiaMcpScratch_20261013_043831_58a4ae2c"
+            }
+          }
+        },
+        "requiresFreshPreparation": true
+      },
+      {
+        "kind": "graphical_typed_edit",
+        "mustWaitFor": "Exact imported FB/dependency identity and content readback; new native project fingerprint.",
+        "order": 2,
+        "prepareArguments": {
+          "kind": "graphical_typed_edit",
+          "payload": {
+            "groupPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks",
+            "instances": [
+              {
+                "key": "instance",
+                "kind": "createGlobal",
+                "name": "TiaMcpComponentGate_1"
+              }
+            ],
+            "model": {
+              "connections": [
+                {
+                  "from": {
+                    "node": "$p0",
+                    "port": "value"
+                  },
+                  "to": {
+                    "node": "call",
+                    "port": "Enable"
+                  }
+                },
+                {
+                  "from": {
+                    "node": "call",
+                    "port": "Active"
+                  },
+                  "to": {
+                    "node": "$p1",
+                    "port": "value"
+                  }
+                },
+                {
+                  "from": {
+                    "node": "$enable",
+                    "port": "value"
+                  },
+                  "to": {
+                    "node": "call",
+                    "port": "en"
+                  }
+                }
+              ],
+              "creation": {
+                "blockType": "FC",
+                "interface": [],
+                "name": "TiaMcpComponentCaller"
+              },
+              "language": "FBD",
+              "nodes": [
+                {
+                  "calleePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+                  "instance": "instance",
+                  "key": "call",
+                  "kind": "call"
+                }
+              ],
+              "operands": [
+                {
+                  "components": [
+                    "ComponentEnable"
+                  ],
+                  "dataType": "Bool",
+                  "key": "p0",
+                  "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+                  "scope": "tag"
+                },
+                {
+                  "components": [
+                    "ComponentActive"
+                  ],
+                  "dataType": "Bool",
+                  "key": "p1",
+                  "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+                  "scope": "tag"
+                },
+                {
+                  "dataType": "Bool",
+                  "key": "enable",
+                  "scope": "constant",
+                  "value": "true"
+                }
+              ],
+              "operation": "createBlock",
+              "schemaVersion": 1
+            },
+            "namespace": "",
+            "scopePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"
+          },
+          "plcPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+          "projectName": "TiaMcpScratch_20261013_043831_58a4ae2c"
+        },
+        "requiresFreshPreparation": true
+      }
+    ],
+    "versions": [
+      {
+        "artifact": {
+          "bytes": 7607,
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\changes\\change-lib-d2f3563a0f6e4c49bc0483673af6bb6a\\integration-version-e129ccee1eaa456bb2f71581fcc3b6b9.xml",
+          "sha256": "878c05c2c41a9b402f4647a16875ffa68e600745eae493d162598a6be0448341"
+        },
+        "author": "TIA MCP qualification",
+        "contentPolicy": {
+          "creationDateRule": "Only direct content FB CreationDate is provenance: explicit UTC exported leaves retained independently. Native getter ticks/Kind are observations; no unspecified/local timezone inference or chronology acceptance.",
+          "documentInfoOptions": "None",
+          "policyId": "v21-fb-explicit-source-oracle-three-properties-v1",
+          "properties": {
+            "AutoNumber": "true",
+            "IsIECCheckEnabled": "false",
+            "MemoryLayout": "Optimized"
+          },
+          "qualification": "Explicit observed profile; production combined apply remains disabled.",
+          "remainingContentRule": "Full base and full oracle trees preserve every other node, attribute, ID, comment, instruction and significant text. Only exact version OriginalLibrary and direct FB CreationDate are contextual in the oracle; no generic metadata removal.",
+          "sourceBaseExportOptions": "WithDefaults",
+          "sourceLibraryName": "ComponentQualification",
+          "sourceOracleArtifact": {
+            "bytes": 11196,
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\changes\\change-lib-d2f3563a0f6e4c49bc0483673af6bb6a\\integration-oracle-e129ccee1eaa456bb2f71581fcc3b6b9.xml",
+            "sha256": "5359b7d155e6e65334db70c046386dad22fafb9beb33aa188f3a5b4ad48a08ca"
+          },
+          "sourceOracleExportOptions": "WithDefaults, WithReadOnly",
+          "sourceOracleSha256": "5359b7d155e6e65334db70c046386dad22fafb9beb33aa188f3a5b4ad48a08ca",
+          "sourceOriginalLibrary": "TiaMcpScratch_20261012_075008_cba0eb9b"
+        },
+        "contentSha256": "878c05c2c41a9b402f4647a16875ffa68e600745eae493d162598a6be0448341",
+        "doNotUse": false,
+        "engineeringType": "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+        "isDefault": true,
+        "kind": "version",
+        "modifiedDate": "2026-10-12T07:51:37.2966703Z",
+        "requiredVersionGuids": [
+          "eee41dd4-5137-48bb-a42b-d7fc64637eec"
+        ],
+        "setForUpdate": true,
+        "state": "Committed",
+        "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+        "typeName": "TiaMcpComponentGate",
+        "version": "1.0.0",
+        "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+      },
+      {
+        "artifact": {
+          "bytes": 2680,
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\changes\\change-lib-d2f3563a0f6e4c49bc0483673af6bb6a\\integration-version-eee41dd4513748bba42bd7fc64637eec.xml",
+          "sha256": "66b63292b16bec84210eb264de616bb264a519c3e28f3275364d46324869cb6a"
+        },
+        "author": "TIA MCP qualification",
+        "contentSha256": "66b63292b16bec84210eb264de616bb264a519c3e28f3275364d46324869cb6a",
+        "doNotUse": false,
+        "engineeringType": "Siemens.Engineering.SW.Types.PlcTypeLibraryTypeVersion",
+        "isDefault": true,
+        "kind": "version",
+        "modifiedDate": "2026-10-12T07:51:27.5337475Z",
+        "requiredVersionGuids": [],
+        "setForUpdate": true,
+        "state": "Committed",
+        "typeGuid": "35c9be87-892c-4ce6-a724-545ab1d41683",
+        "typeName": "TiaMcpComponentState",
+        "version": "1.0.0",
+        "versionGuid": "eee41dd4-5137-48bb-a42b-d7fc64637eec"
+      }
+    ]
+  },
+  "kind": "library_integrate",
+  "payload": {
+    "action": "plc_component_plan",
+    "integration": {
+      "caller": {
+        "language": "FBD",
+        "mode": "createStandaloneFc",
+        "name": "TiaMcpComponentCaller",
+        "numberPolicy": "firstAvailable"
+      },
+      "dependencyPins": [
+        {
+          "typeGuid": "35c9be87-892c-4ce6-a724-545ab1d41683",
+          "versionGuid": "eee41dd4-5137-48bb-a42b-d7fc64637eec"
+        }
+      ],
+      "instanceDb": {
+        "name": "TiaMcpComponentGate_1",
+        "numberPolicy": "firstAvailable"
+      },
+      "mappings": [
+        {
+          "dataType": "Bool",
+          "direction": "Input",
+          "parameter": "Enable",
+          "tagPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentEnable"
+        },
+        {
+          "dataType": "Bool",
+          "direction": "Output",
+          "parameter": "Active",
+          "tagPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals/tags/ComponentActive"
+        }
+      ]
+    },
+    "planOnly": true,
+    "schemaVersion": 1,
+    "selection": [
+      {
+        "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+        "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+      }
+    ],
+    "source": {
+      "libraryId": "library-25fbe9c7bcea447e9d096e72a5e188d4",
+      "revision": "1d15d38ed25f7f4f9ec15f8efa7df90e125f4b7cdd87673f7292087f771ba9b6"
+    },
+    "target": {
+      "plcPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+      "projectName": "TiaMcpScratch_20261013_043831_58a4ae2c"
+    }
+  },
+  "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\scratch\\TiaMcpScratch_20261013_043831_58a4ae2c\\TiaMcpScratch_20261013_043831_58a4ae2c\\TiaMcpScratch_20261013_043831_58a4ae2c.ap21",
+  "resources": [
+    {
+      "libraryId": "library-25fbe9c7bcea447e9d096e72a5e188d4",
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\libraries\\l_54b706d21eb9\\work\\ComponentQualification\\ComponentQualification.al21",
+      "revision": "1d15d38ed25f7f4f9ec15f8efa7df90e125f4b7cdd87673f7292087f771ba9b6",
+      "sourceHash": "9d691a31d60863e7384928df09eb37345eb20bd791f18d919cf7960fbfc750cc",
+      "sourcePath": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\libraries\\l_54b706d21eb9\\source\\published.zal21"
+    }
+  ],
+  "schemaVersion": 1,
+  "selection": [
+    {
+      "typeGuid": "f566f7e9-d5bc-415e-b552-4828e3b1027c",
+      "versionGuid": "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9"
+    }
+  ],
+  "sessionGeneration": "7d06095bd77c4aacad489f775d5eb2ce",
+  "targetScope": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+  "warnings": [
+    "Planning only. No checkpoint or mutation is dispatched. Separate prepared steps require fresh native validation and are not an atomic combined installation."
+  ]
+}

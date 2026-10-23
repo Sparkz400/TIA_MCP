@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-import.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "trace-import.v2"
+    },
+    "tracePlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "inputArtifact": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/artifact"
+    },
+    "measurement": {
+      "$ref": "https://tia-mcp.local/contracts/trace-measurement.v2.schema.json"
+    },
+    "qualityAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "tracePlanId",
+    "inputArtifact",
+    "measurement",
+    "qualityAssessment"
+  ]
+}

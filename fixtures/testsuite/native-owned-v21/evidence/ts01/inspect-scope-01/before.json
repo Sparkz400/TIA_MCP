@@ -1,0 +1,91 @@
+{
+  "mode": "inspect-scope",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "blockType": "Siemens.Engineering.SW.Blocks.FC",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "startedAtUtc": "2026-10-15T07:48:27.4448138Z",
+  "beforeModified": false,
+  "automaticReplay": false,
+  "styleExecutionInvoked": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "licenseAvailability": "unknown",
+  "definitionBefore": {
+    "path": "D:\\TIAW\\ts01\\evidence\\inspect-scope-01\\definition-before.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "blockBefore": {
+    "path": "D:\\TIAW\\ts01\\evidence\\inspect-scope-01\\target-block-before.xml",
+    "sha256": "d789bd1a0c602634f598da960d7f31e1856e9fc26c5c0a9668e412fffed1ba65",
+    "bytes": 5835
+  },
+  "nativeMetadata": {
+    "attributes": [
+      {
+        "name": "Name",
+        "access": "ReadWrite",
+        "types": [
+          "System.String"
+        ]
+      }
+    ],
+    "compositions": [],
+    "invocations": [
+      {
+        "name": "CopyScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "targetRuleSet",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet"
+          }
+        ]
+      },
+      {
+        "name": "Delete",
+        "type": "System.Void",
+        "parameters": []
+      },
+      {
+        "name": "SaveToFile",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "path",
+            "type": "System.IO.FileInfo"
+          }
+        ]
+      },
+      {
+        "name": "SetScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "updateOptions",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.UpdateOptions"
+          },
+          {
+            "name": "selectedInformation",
+            "type": "System.Collections.Generic.IEnumerable`1[[Siemens.Engineering.IEngineeringObject, Siemens.Engineering.Base, Version=21.0.0.0, Culture=neutral, PublicKeyToken=29bfe5fdf4ba5d3b]]"
+          }
+        ]
+      },
+      {
+        "name": "ShowInEditor",
+        "type": "System.Void",
+        "parameters": []
+      }
+    ]
+  },
+  "scopeBefore": {
+    "exactSingleBlockVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks/TiaMcp_IsEnabled"
+  }
+}

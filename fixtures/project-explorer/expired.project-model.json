@@ -1,0 +1,681 @@
+{
+  "schemaVersion": "project-model.v1",
+  "snapshotId": "expired-fixture",
+  "sessionGeneration": "recorded-session",
+  "project": {
+    "name": "Explorer",
+    "projectPath": "D:\\fixtures\\Explorer\\Explorer.ap21",
+    "host": "recorded-fixture"
+  },
+  "captureStartedAtUtc": "2026-10-08T10:00:00.0000000Z",
+  "captureCompletedAtUtc": "2026-10-08T10:00:01.0000000Z",
+  "expiresAtUtc": "2020-01-01T00:00:00Z",
+  "metadataRevision": {
+    "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "scope": "exposedMetadata",
+    "includesContent": false
+  },
+  "limits": {
+    "maxVisited": 50000,
+    "maxDepth": 64,
+    "maxBytes": 33554432
+  },
+  "usage": {
+    "visited": 28,
+    "returnedNodes": 28,
+    "returnedEdges": 6
+  },
+  "coverage": [
+    {
+      "provider": "plc",
+      "scope": "/projects/Explorer",
+      "status": "complete",
+      "visited": 25,
+      "returned": 25,
+      "warnings": [],
+      "continuationAvailable": false
+    },
+    {
+      "provider": "hardware",
+      "scope": "/projects/Explorer",
+      "status": "partial",
+      "visited": 3,
+      "returned": 3,
+      "warnings": [
+        "Configured inventory only; physical rack/port topology unavailable."
+      ],
+      "continuationAvailable": true
+    },
+    {
+      "provider": "hmi",
+      "scope": "/projects/Explorer/devices/Operator%20panel",
+      "status": "unsupported",
+      "visited": 0,
+      "returned": 0,
+      "warnings": [
+        "Family adapter unavailable."
+      ],
+      "continuationAvailable": false
+    },
+    {
+      "provider": "typedLadFbd",
+      "scope": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "status": "unsupported",
+      "visited": 0,
+      "returned": 0,
+      "warnings": [
+        "Typed preview adapter unavailable."
+      ],
+      "continuationAvailable": false
+    }
+  ],
+  "nodes": [
+    {
+      "nodeId": "project",
+      "parentId": null,
+      "kind": "project",
+      "name": "Explorer",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "projectFile": "D:\\fixtures\\Explorer\\Explorer.ap21"
+      },
+      "objectPath": "/projects/Explorer"
+    },
+    {
+      "nodeId": "devices",
+      "parentId": "project",
+      "kind": "displayFolder",
+      "name": "Devices",
+      "origin": "virtual",
+      "access": {
+        "state": "virtual"
+      },
+      "detailAvailability": "unsupported",
+      "metadata": {}
+    },
+    {
+      "nodeId": "line-a",
+      "parentId": "devices",
+      "kind": "device",
+      "name": "Line A",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A"
+    },
+    {
+      "nodeId": "cpu-a",
+      "parentId": "line-a",
+      "kind": "hardware",
+      "name": "CPU",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "physicalTopology": "unsupported",
+        "typeIdentifier": "OrderNumber:6ES7 Fixture"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU"
+    },
+    {
+      "nodeId": "plc-a",
+      "parentId": "cpu-a",
+      "kind": "plc",
+      "name": "PLC",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "blocks-a",
+      "parentId": "plc-a",
+      "kind": "blockGroup",
+      "name": "Program blocks",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "empty-a",
+      "parentId": "blocks-a",
+      "kind": "blockGroup",
+      "name": "Empty folder",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Empty",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "nested-a",
+      "parentId": "blocks-a",
+      "kind": "blockGroup",
+      "name": "Motion",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "start-a",
+      "parentId": "nested-a",
+      "kind": "block",
+      "name": "Start",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "programmingLanguage": "LAD",
+        "blockType": "FC",
+        "number": 10
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "protected",
+      "parentId": "blocks-a",
+      "kind": "block",
+      "name": "Protected sequence",
+      "origin": "native",
+      "access": {
+        "state": "protected"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "protection": "knowHowProtected"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/Protected",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "malicious",
+      "parentId": "blocks-a",
+      "kind": "block",
+      "name": "<img src=x onerror=alert(1)> & \"外部\"",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "description": "</script><script>alert(1)</script>"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/%3Cimg%3E",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "tags-a",
+      "parentId": "plc-a",
+      "kind": "tagTable",
+      "name": "Signals",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "tag-run",
+      "parentId": "tags-a",
+      "kind": "tag",
+      "name": "Run",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "dataType": "Bool",
+        "address": "%I0.0",
+        "valueKind": "offlineDeclaration"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Run",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "tag-done",
+      "parentId": "tags-a",
+      "kind": "tag",
+      "name": "Done",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "dataType": "Bool",
+        "address": "%Q0.0",
+        "valueKind": "offlineDeclaration"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Done",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "units-a",
+      "parentId": "plc-a",
+      "kind": "displayFolder",
+      "name": "Software units",
+      "origin": "virtual",
+      "access": {
+        "state": "virtual"
+      },
+      "detailAvailability": "unsupported",
+      "metadata": {}
+    },
+    {
+      "nodeId": "unit-control",
+      "parentId": "units-a",
+      "kind": "softwareUnit",
+      "name": "Control",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control"
+    },
+    {
+      "nodeId": "unit-blocks",
+      "parentId": "unit-control",
+      "kind": "blockGroup",
+      "name": "Program blocks",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control"
+    },
+    {
+      "nodeId": "unit-start",
+      "parentId": "unit-blocks",
+      "kind": "block",
+      "name": "Start",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "programmingLanguage": "FBD"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/Start",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control"
+    },
+    {
+      "nodeId": "namespaced-start",
+      "parentId": "unit-blocks",
+      "kind": "block",
+      "name": "Start",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "namespace": "Company.Area"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/namespaces/Company.Area/Start",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control"
+    },
+    {
+      "nodeId": "line-b",
+      "parentId": "devices",
+      "kind": "device",
+      "name": "Line B",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20B"
+    },
+    {
+      "nodeId": "cpu-b",
+      "parentId": "line-b",
+      "kind": "hardware",
+      "name": "CPU",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "physicalTopology": "unsupported"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20B/items/CPU"
+    },
+    {
+      "nodeId": "plc-b",
+      "parentId": "cpu-b",
+      "kind": "plc",
+      "name": "PLC",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC",
+      "plcPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "blocks-b",
+      "parentId": "plc-b",
+      "kind": "blockGroup",
+      "name": "Program blocks",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC/blocks",
+      "plcPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "start-b",
+      "parentId": "blocks-b",
+      "kind": "block",
+      "name": "Start",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "programmingLanguage": "SCL"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC/blocks/Start",
+      "plcPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "empty-b",
+      "parentId": "blocks-b",
+      "kind": "blockGroup",
+      "name": "Empty folder",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {},
+      "objectPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC/blocks/groups/Empty",
+      "plcPath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "hmi",
+      "parentId": "devices",
+      "kind": "hmi",
+      "name": "Operator panel",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "hmiFamily": "unknown",
+        "contentStatus": "unsupported",
+        "runtimeVerified": false
+      },
+      "objectPath": "/projects/Explorer/devices/Operator%20panel"
+    },
+    {
+      "nodeId": "to",
+      "parentId": "plc-a",
+      "kind": "technologyObject",
+      "name": "Axis_1",
+      "origin": "native",
+      "access": {
+        "state": "unavailable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "serviceStatus": "unavailable"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/technology/Axis_1",
+      "plcPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC",
+      "scopePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC"
+    },
+    {
+      "nodeId": "io",
+      "parentId": "line-a",
+      "kind": "hardware",
+      "name": "Digital input 16",
+      "origin": "native",
+      "access": {
+        "state": "readable"
+      },
+      "detailAvailability": "metadata",
+      "metadata": {
+        "addressStart": 0,
+        "addressLength": 2,
+        "area": "Input",
+        "physicalTopology": "unsupported"
+      },
+      "objectPath": "/projects/Explorer/devices/Line%20A/items/DI"
+    }
+  ],
+  "edges": [
+    {
+      "edgeId": "call-1",
+      "source": {
+        "nodeId": "start-a",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+      },
+      "target": {
+        "nodeId": "unit-start",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/Start"
+      },
+      "kind": "calls",
+      "evidence": {
+        "origin": "nativeConfirmed",
+        "resolution": "resolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+        "location": {
+          "nativeAccess": "calls"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "edgeId": "call-2",
+      "source": {
+        "nodeId": "unit-start",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/Start"
+      },
+      "target": {
+        "nodeId": "start-a",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+      },
+      "kind": "calls",
+      "evidence": {
+        "origin": "nativeConfirmed",
+        "resolution": "resolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/Start",
+        "location": {
+          "nativeAccess": "calls"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "edgeId": "read-1",
+      "source": {
+        "nodeId": "start-a",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+      },
+      "target": {
+        "nodeId": "tag-run",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Run"
+      },
+      "kind": "reads",
+      "evidence": {
+        "origin": "nativeConfirmed",
+        "resolution": "resolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+        "location": {
+          "nativeAccess": "reads"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "edgeId": "write-1",
+      "source": {
+        "nodeId": "start-a",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+      },
+      "target": {
+        "nodeId": "tag-done",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Done"
+      },
+      "kind": "writes",
+      "evidence": {
+        "origin": "nativeConfirmed",
+        "resolution": "resolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+        "location": {
+          "nativeAccess": "writes"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": null
+    },
+    {
+      "edgeId": "unknown-1",
+      "source": {
+        "nodeId": "start-a",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start"
+      },
+      "target": null,
+      "kind": "calls",
+      "evidence": {
+        "origin": "unresolved",
+        "resolution": "unresolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+        "location": {
+          "nativeAccess": "calls"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": {
+        "targetName": "Start",
+        "reason": "Two possible controller owners; same-name resolution prohibited",
+        "candidates": [
+          "start-b",
+          "unit-start"
+        ]
+      }
+    },
+    {
+      "edgeId": "io-1",
+      "source": {
+        "nodeId": "tag-run",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Run"
+      },
+      "target": {
+        "nodeId": "io",
+        "objectPath": "/projects/Explorer/devices/Line%20A/items/DI"
+      },
+      "kind": "configuredIo",
+      "evidence": {
+        "origin": "parsedSupported",
+        "resolution": "resolved",
+        "sourcePath": "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/tags/Signals/tags/Run",
+        "location": {
+          "nativeAccess": "configuredIo"
+        },
+        "capturedAtUtc": "2026-10-08T10:00:00.0000000Z",
+        "contentRevision": {
+          "status": "unavailable",
+          "scope": "nativeCrossReferences"
+        }
+      },
+      "unresolved": null
+    }
+  ],
+  "warnings": [
+    "Recorded deterministic fixture, not native acceptance evidence.",
+    "Metadata does not certify logic or HMI content.",
+    "Configured I/O association fixture is illustrative; no physical cable or rack topology is inferred."
+  ]
+}

@@ -1,0 +1,832 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/drive-profile-review.v1.schema.json",
+  "title": "Supplied drive parameter review; no native constraints or write authority",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "driveId",
+        "family",
+        "orderNumber",
+        "firmware",
+        "parameterSet",
+        "unknownReason"
+      ],
+      "properties": {
+        "driveId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "orderNumber": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firmware": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameterSet": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scalar"
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4194304
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "driveId",
+            "parameterName",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "reference"
+            },
+            "driveId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "parameterName": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unavailable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          }
+        }
+      ]
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "number",
+        "arrayIndex",
+        "parentName",
+        "unit",
+        "access",
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "arrayIndex": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 32767
+        },
+        "parentName": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "access": {
+          "enum": [
+            "readOnly",
+            "readWrite",
+            "unknown"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "valueDomain",
+        "parametersComplete",
+        "parameters"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "valueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "parametersComplete": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          },
+          "maxItems": 4096
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "hardwarePath",
+        "afterKind",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hardwarePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "parameter",
+        "referenceResolution",
+        "parentResolution"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "parameter": {
+          "$ref": "#/$defs/parameter"
+        },
+        "referenceResolution": {
+          "enum": [
+            "notReference",
+            "outsideSuppliedDrive",
+            "suppliedParameter",
+            "unresolved"
+          ]
+        },
+        "parentResolution": {
+          "enum": [
+            "notDeclared",
+            "suppliedParentChain",
+            "unresolved"
+          ]
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "status",
+        "changedFields",
+        "proposalAssessment"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter",
+            "selectorConflict"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "number",
+              "arrayIndex",
+              "parentName",
+              "unit",
+              "access",
+              "value",
+              "metadata"
+            ]
+          }
+        },
+        "proposalAssessment": {
+          "enum": [
+            "notProposal",
+            "notAssessed",
+            "contradictsSuppliedReadOnly",
+            "accessUnknown"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeCount",
+        "afterCount",
+        "changedCount",
+        "selectorConflictCount",
+        "readOnlyConflictCount",
+        "unknownAccessChangeCount",
+        "unresolvedReferenceCount",
+        "unresolvedParentCount"
+      ],
+      "properties": {
+        "beforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectorConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readOnlyConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknownAccessChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedReferenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedParentCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "hardwarePath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "changes",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hardwarePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 8192
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          },
+          "maxItems": 8192
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "changes"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

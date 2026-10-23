@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/unified-text-list-author.v1.schema.json",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-request.v1"
+        },
+        "fileBase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "textLibrary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 35,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "translations": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 32,
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 35,
+                  "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                },
+                "additionalProperties": {
+                  "type": "string",
+                  "maxLength": 16384
+                }
+              }
+            },
+            "required": [
+              "id",
+              "translations"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 4096
+        },
+        "lists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "rangeType": {
+                "enum": [
+                  "Decimal",
+                  "BitNumber",
+                  "Bool"
+                ]
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    },
+                    "type": {
+                      "enum": [
+                        "SingleValue",
+                        "Range",
+                        "From",
+                        "To"
+                      ]
+                    },
+                    "fromValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "toValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    },
+                    "textId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "fromValue",
+                    "toValue",
+                    "isDefault",
+                    "textId"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 4096
+              }
+            },
+            "required": [
+              "name",
+              "rangeType",
+              "entries"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "fileBase",
+        "textLibrary",
+        "languages",
+        "defaultLanguage",
+        "texts",
+        "lists"
+      ],
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-record.v1"
+        },
+        "input": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "listCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "textCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "languageCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "files",
+        "listCount",
+        "textCount",
+        "languageCount",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "consumerCoverageComplete",
+        "policy"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-record.v1"
+        },
+        "input": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "listCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "textCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "languageCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "recordId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recordArtifact": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "files",
+        "listCount",
+        "textCount",
+        "languageCount",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "consumerCoverageComplete",
+        "policy",
+        "recordId",
+        "recordArtifact"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/record"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ]
+}

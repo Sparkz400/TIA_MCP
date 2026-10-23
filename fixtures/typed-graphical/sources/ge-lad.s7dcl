@@ -1,0 +1,18 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_Ge_LAD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Bool;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := Int" }
+  Ge( in1 := #Left, in2 := #Right )
+  Coil( #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

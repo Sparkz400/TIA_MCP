@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "opcua-consumers.v2",
+  "modelSetSha256": "e31505e555cf19eb03633bf49edead44e7cd15f5933b9fcfe6bfcc8b7f12fe44",
+  "consumers": [
+    {"id": "SensorClient", "nodeKeys": ["nsu=urn%3Aexample%3Adevice;s=Sensor"]},
+    {"id": "TypeClient", "nodeKeys": ["nsu=urn%3Aexample%3Atypes;i=1002"]},
+    {"id": "UnrelatedClient", "nodeKeys": ["nsu=urn%3Aexample%3Adevice;s=Unrelated"]}
+  ]
+}

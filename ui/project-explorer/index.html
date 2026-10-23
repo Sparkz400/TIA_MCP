@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src blob: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>TIA · Project explorer</title>
+  <style>[hidden]{display:none!important}
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:16px}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th{text-align:left;background:var(--panel2);color:var(--muted);font-weight:500}.data-table td,.data-table th{padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}.data-table tr:last-child td{border-bottom:0}
+:root{color-scheme:light;--bg:#f4f6f8;--panel:#fff;--panel2:#f8fafc;--ink:#182c40;--muted:#627487;--border:#dce3e9;--accent:#126c58;--accent-bg:#e3f2ec;--warn:#805207;--warn-bg:#fff5db;--danger:#a12f40;--danger-bg:#ffedf0;--shadow:0 8px 30px #142d4410;font-family:Inter,"Segoe UI",sans-serif;font-size:13px}
+:root[data-theme=dark]{color-scheme:dark;--bg:#111a23;--panel:#182532;--panel2:#1c2c3b;--ink:#e0eaf2;--muted:#9cb0c2;--border:#334658;--accent:#7ae1bd;--accent-bg:#173e37;--warn:#f3ca74;--warn-bg:#41371f;--danger:#ffa5b3;--danger-bg:#432735;--shadow:0 8px 30px #0002}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}button,input,select{font:inherit}button,select{cursor:pointer}button{border:1px solid var(--border);border-radius:7px;background:var(--panel);color:var(--ink);padding:8px 12px;white-space:nowrap}button:hover{border-color:var(--accent);background:var(--accent-bg)}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);color:var(--panel);border-color:var(--accent);font-weight:600}button.quiet{border-color:transparent;background:transparent}button.small{padding:5px 8px;font-size:12px}button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}input,select{border:1px solid var(--border);border-radius:7px;padding:8px 9px;background:var(--panel);color:var(--ink);min-width:0}input[type=search]{width:100%;padding-left:32px}h1,h2,h3,p{margin:0}h1{font-size:20px;letter-spacing:-.5px}h2{font-size:20px;letter-spacing:-.3px}h3{font-size:13px;font-weight:650}.app{height:100vh;min-height:500px;display:flex;flex-direction:column}.topbar{height:70px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;gap:15px;padding:0 25px}.brand{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--panel);display:grid;place-items:center;font-weight:800;letter-spacing:-1px}.brandmark{width:19px;height:19px;display:grid;grid-template-columns:repeat(2,1fr);gap:3px}.brandmark i{border:1.8px solid currentColor;border-radius:2px}.titleline{display:flex;align-items:center;gap:12px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}.badge{font-size:10px;font-weight:600;border-radius:5px;padding:3px 7px;background:var(--panel2);border:1px solid var(--border);color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.badge.ok{background:var(--accent-bg);border-color:transparent;color:var(--accent)}.badge.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}.badge.danger{background:var(--danger-bg);border-color:transparent;color:var(--danger)}.dot{height:6px;width:6px;border-radius:50%;background:currentColor;display:inline-block}.projectbar{padding:13px 25px;display:flex;align-items:center;gap:20px;background:var(--panel2);border-bottom:1px solid var(--border);min-height:59px}.projectbar .project-name{font-size:15px;font-weight:650}.projectbar .project-path{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;max-width:480px;white-space:nowrap;margin-top:3px}.projectbar .meta{margin-left:auto;display:flex;gap:23px;font-size:11px;color:var(--muted)}.projectbar .meta strong{display:block;font-size:12px;color:var(--ink);font-weight:500;margin-top:3px}.notice{padding:9px 25px;background:var(--warn-bg);color:var(--warn);border-bottom:1px solid var(--border);font-size:12px;display:flex;align-items:center;gap:10px}.notice.hidden{display:none}.notice .quiet{margin-left:auto;color:inherit;padding:2px 5px}.workspace{display:grid;grid-template-columns:320px minmax(0,1fr);flex:1;min-height:0;padding:18px;gap:18px}.sidebar{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}.sidebar-head{padding:17px 15px 11px;border-bottom:1px solid var(--border)}.sidebar-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.search-box{position:relative}.search-box .search-icon{position:absolute;left:11px;top:9px;color:var(--muted)}.filters{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.filters select{font-size:11px;padding:7px 5px}.tree-count{font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;padding:10px 15px 5px}.tree{flex:1;min-height:80px;overflow:auto;position:relative;outline:none}.tree-space{position:relative;min-width:100%}.tree-row{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-left:3px solid transparent;cursor:pointer;overflow:hidden;font-size:12px;white-space:nowrap}.tree-row:hover{background:var(--panel2)}.tree-row.selected{background:var(--accent-bg);color:var(--accent);border-left-color:var(--accent);font-weight:600}.tree-row .toggle{border:0;padding:0;width:16px;height:23px;font-size:12px;background:transparent;color:var(--muted);flex-shrink:0}.tree-row .glyph{font-size:10px;width:19px;height:19px;border:1px solid var(--border);border-radius:4px;display:grid;place-items:center;flex-shrink:0;color:var(--muted);background:var(--panel2)}.tree-row .name{overflow:hidden;text-overflow:ellipsis}.tree-row .origin{margin-left:auto;font-size:9px;color:var(--muted);padding:2px 4px;border:1px dashed var(--border);border-radius:3px}.tree-row .lock{font-size:11px;color:var(--warn);margin-left:auto}.tree-row.search-row{height:52px}.tree-row .result-name{display:block;overflow:hidden;text-overflow:ellipsis}.tree-row .result-path{display:block;font-size:9px;font-weight:400;color:var(--muted);max-width:230px;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.tree-footer{padding:9px 13px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}.main-panel{min-width:0;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}.breadcrumbs{display:flex;gap:5px;align-items:center;flex-wrap:wrap;padding:11px 20px;background:var(--panel2);border-bottom:1px solid var(--border);min-height:39px;font-size:11px;color:var(--muted)}.breadcrumbs button{font-size:11px;padding:2px 4px;border:0;background:transparent;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis}.breadcrumbs .current{color:var(--ink)}.selection-head{padding:21px 23px 17px;display:flex;gap:15px;align-items:flex-start}.object-icon{border-radius:10px;width:43px;height:43px;display:grid;place-items:center;color:var(--accent);background:var(--accent-bg);font-weight:600;font-size:13px;flex-shrink:0}.selection-title{min-width:0;flex:1}.selection-title h2{overflow-wrap:anywhere;line-height:1.25}.selection-sub{margin-top:7px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:11px}.selection-actions{display:flex;gap:6px}.tabs{display:flex;gap:20px;padding:0 23px;border-bottom:1px solid var(--border);overflow:auto}.tabs button{border:0;background:transparent;border-radius:0;padding:12px 0;font-size:12px;border-bottom:2px solid transparent;color:var(--muted)}.tabs button[aria-selected=true]{border-bottom-color:var(--accent);color:var(--accent);font-weight:650}.detail-body{overflow:auto;flex:1;min-height:0;padding:22px 23px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}.subtle{color:var(--muted);font-size:12px;line-height:1.7}.hint{color:var(--muted);font-size:11px;line-height:1.6}.callout{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:17px}.callout.warning{background:var(--warn-bg);color:var(--warn);border-color:transparent}.callout.danger{background:var(--danger-bg);color:var(--danger);border-color:transparent}.property-grid{display:grid;grid-template-columns:150px minmax(0,1fr);border-top:1px solid var(--border);margin-bottom:22px}.property-grid dt,.property-grid dd{padding:11px 0;margin:0;border-bottom:1px solid var(--border);font-size:12px;line-height:1.5;overflow-wrap:anywhere}.property-grid dt{color:var(--muted)}.property-grid dd{padding-left:15px}.mono{font-family:"Cascadia Code",Consolas,monospace;font-size:11px!important;word-break:break-word}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:21px}.card{border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--panel2)}.card .metric{font-size:22px;font-weight:600;letter-spacing:-.8px;margin-bottom:6px}.card .metric-label{font-size:11px;color:var(--muted)}.empty{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:260px;text-align:center;gap:13px;padding:30px}.empty .empty-icon{font-size:26px;color:var(--accent);background:var(--accent-bg);border-radius:17px;padding:19px}.empty p{max-width:460px;line-height:1.7;color:var(--muted);font-size:12px}.welcome{flex:1;display:flex;align-items:center;justify-content:center;padding:32px}.welcome-box{width:min(640px,100%);padding:44px;background:var(--panel);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow)}.welcome-box h2{font-size:29px;margin:15px 0}.welcome-box p{margin:10px 0 20px;color:var(--muted);line-height:1.8}.welcome-box .footer-note{margin-top:25px;border-top:1px solid var(--border);padding-top:19px;font-size:11px}.coverage-list{display:flex;flex-direction:column;gap:10px}.coverage-item{padding:13px 15px;border:1px solid var(--border);border-radius:8px}.coverage-top{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:5px}.coverage-scope{font-size:10px;color:var(--muted);word-break:break-all;margin-bottom:8px}.relationship-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}.relationship-controls label{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}.relationship-controls select{font-size:11px;padding:6px}.graph-wrap{height:310px;overflow:auto;border:1px solid var(--border);border-radius:9px;background:#fff;margin-bottom:15px}.graph-wrap svg{display:block;max-width:none}.graph-summary{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:11px}.evidence-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:10px}.edge-row{display:grid;grid-template-columns:minmax(0,1fr) 98px minmax(0,1fr) 84px;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border);font-size:11px;align-items:center}.edge-row:last-child{border-bottom:0}.edge-row .endpoint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.edge-row .edge-kind{color:var(--accent);font-size:10px}.evidence-detail{border:1px solid var(--accent);border-radius:8px;padding:14px;margin:12px 0;background:var(--panel2)}.evidence-detail pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto}.statusbar{padding:7px 22px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;gap:15px;justify-content:space-between;background:var(--panel)}.toast{position:fixed;bottom:45px;left:50%;transform:translateX(-50%);max-width:80%;padding:12px 17px;background:var(--ink);color:var(--panel);border-radius:8px;box-shadow:var(--shadow);z-index:20;font-size:12px}.toast[hidden]{display:none}.loading{animation:pulse 1.3s infinite}.loading-bar{height:3px;background:var(--accent);animation:pulse 1.3s infinite;position:absolute;top:0;left:0;right:0}.preview-frame{border:1px solid var(--border);border-radius:9px;padding:15px;margin-top:12px}.preview-nodes{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}.preview-node{border:1px solid var(--border);border-radius:7px;padding:10px 15px;background:var(--panel2);font-size:12px}.file-input{position:absolute;left:-10000px}details{margin-top:10px}summary{cursor:pointer;color:var(--muted);font-size:11px}pre.data{padding:14px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;line-height:1.5;max-height:360px;overflow:auto}.close-snapshot{font-size:10px;color:var(--muted)}@keyframes pulse{50%{opacity:.35}}@media(max-width:1100px){.workspace{grid-template-columns:280px minmax(0,1fr);padding:12px;gap:12px}.topbar{padding:0 18px}.projectbar{padding:11px 18px}.projectbar .project-path{max-width:350px}.selection-head{padding:18px 17px;flex-wrap:wrap}.selection-actions{margin-left:58px}.detail-body{padding:18px 17px}.tabs{padding:0 17px;gap:16px}.top-actions button{padding:7px 9px}.projectbar .meta{gap:14px}.property-grid{grid-template-columns:130px minmax(0,1fr)}}@media(max-width:760px){.app{height:auto;min-height:100vh}.topbar{height:auto;min-height:68px;padding:12px;flex-wrap:wrap;gap:10px}.titleline h1{font-size:17px}.top-actions{gap:5px}.top-actions .optional{display:none}.projectbar{flex-wrap:wrap;gap:10px;padding:12px}.projectbar .project-path{max-width:calc(100vw - 30px)}.projectbar .meta{margin-left:0;width:100%;justify-content:space-between}.workspace{grid-template-columns:1fr;padding:10px;gap:12px}.sidebar{height:360px}.main-panel{min-height:540px}.detail-body{max-height:800px}.notice{padding:10px 12px}.statusbar{padding:8px 12px;gap:8px;flex-wrap:wrap}.cards{gap:8px}.card{padding:10px}.welcome{padding:16px}.welcome-box{padding:25px}.selection-actions{margin-left:0}.edge-row{grid-template-columns:minmax(0,1fr) 65px minmax(0,1fr) 70px;gap:5px;padding:9px}.property-grid{grid-template-columns:110px minmax(0,1fr)}}
+
+.graph-item-buttons{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.graph-preview select{max-width:100%}.graph-preview details{margin:12px 0}
+
+.runtime-panel{overflow:auto;padding:24px;min-height:0;flex:1}.runtime-heading,.runtime-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.runtime-heading h2{margin:4px 0 12px}.runtime-warning{padding:14px;border:1px solid var(--border);border-left:4px solid #bd8430;border-radius:6px;line-height:1.5}.runtime-controls{margin:18px 0}.runtime-filter{max-width:420px}.runtime-table{overflow:auto}.runtime-table table{border-collapse:collapse;width:100%}.runtime-table th,.runtime-table td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--border);overflow-wrap:anywhere}.runtime-table pre{white-space:pre-wrap;max-width:800px;max-height:300px;overflow:auto;font-size:12px}.runtime-table summary{cursor:pointer;margin-top:8px}.runtime-table th{white-space:nowrap}
+.runtime-panel pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;max-height:360px;overflow:auto;font-size:12px;line-height:1.5}.runtime-panel>p{line-height:1.6;overflow-wrap:anywhere}.runtime-panel summary{line-height:1.6}.runtime-panel .ua-signal{border:1px solid var(--border);border-radius:8px;padding:12px}
+</style>
+</head>
+<body>
+  <main id="explorer" aria-label="TIA project explorer"></main>
+  <script id="project-model" type="application/json">null</script>
+  <script>/* Plain-data project-model.v1 reader. No native proxies or engineering transport. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.ProjectExplorerModel = api;
+})(typeof globalThis === 'object' ? globalThis : this, function () {
+  'use strict';
+  const SCHEMA = 'project-model.v1';
+  const LIMITS = Object.freeze({ nodes: 50000, snapshotEdges: 50000, depth: 64, page: 200, graphNodes: 500, graphEdges: 1000, graphDepth: 5, graphBytes: 524288, bytes: 33554432 });
+  const escape = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const bytes = value => new TextEncoder().encode(JSON.stringify(value)).length;
+  const clamp = (value, min, max, fallback) => Number.isFinite(Number(value)) ? Math.max(min, Math.min(max, Math.floor(Number(value)))) : fallback;
+  function fail(code, message) { const error = new Error(message); error.code = code; throw error; }
+  function validateSnapshot(input) {
+    const doc = input && (input.snapshot || input);
+    if (!doc || doc.schemaVersion !== SCHEMA) fail('unsupported_schema', 'Expected a project-model.v1 snapshot.');
+    if (!doc.snapshotId || doc.sessionGeneration == null || !doc.project || !doc.project.projectPath) fail('invalid_snapshot', 'Missing snapshot, session or project-copy identity.');
+    if (!Array.isArray(doc.nodes) || doc.nodes.length > LIMITS.nodes) fail('invalid_snapshot', 'Snapshot nodes must be an array of at most 50,000 objects.');
+    if (!Array.isArray(doc.edges) || doc.edges.length > LIMITS.snapshotEdges) fail('invalid_snapshot', 'Snapshot edges must be an array of at most 50,000 relationships.');
+    if (doc.metadataRevision && (doc.metadataRevision.includesContent !== false || doc.metadataRevision.scope !== 'exposedMetadata')) fail('invalid_revision', 'Metadata revision must explicitly exclude content.');
+    const map = new Map();
+    for (const node of doc.nodes) {
+      if (!node.nodeId || map.has(node.nodeId) || typeof node.name !== 'string' || !node.kind) fail('invalid_node', 'Missing or duplicate node identity.');
+      if (!['native', 'virtual'].includes(node.origin)) fail('invalid_origin', 'Node origin must distinguish native objects from virtual folders.');
+      if (node.origin === 'native' && !node.objectPath) fail('invalid_reference', 'Native object is missing its canonical path.');
+      if (node.origin === 'virtual' && node.objectPath) fail('invalid_reference', 'Virtual folders cannot carry engineering object paths.');
+      map.set(node.nodeId, node);
+    }
+    const depth = new Map();
+    for (const node of doc.nodes) {
+      const visited = new Set(); let current = node; const chain = [];
+      while (current && !depth.has(current.nodeId)) {
+        if (visited.has(current.nodeId)) fail('invalid_hierarchy', 'Snapshot hierarchy contains a cycle.');
+        visited.add(current.nodeId); chain.push(current);
+        if (current.parentId && !map.has(current.parentId)) fail('invalid_hierarchy', 'Snapshot hierarchy contains an absent parent.');
+        current = current.parentId ? map.get(current.parentId) : null;
+      }
+      let d = current ? depth.get(current.nodeId) : -1;
+      for (let i = chain.length - 1; i >= 0; i--) { if (++d > LIMITS.depth) fail('invalid_hierarchy', 'Snapshot exceeds the depth limit.'); depth.set(chain[i].nodeId, d); }
+    }
+    const edgeIds = new Set();
+    for (const edge of doc.edges) {
+      if (!edge || typeof edge.edgeId !== 'string' || !edge.edgeId || edgeIds.has(edge.edgeId) || !edge.kind || !edge.evidence || typeof edge.evidence !== 'object' || Array.isArray(edge.evidence)) fail('invalid_edge', 'Relationships require unique edge IDs, a kind and evidence.');
+      edgeIds.add(edge.edgeId);
+      for (const endpoint of [edge.source, edge.target]) {
+        if (endpoint == null) { if (!edge.unresolved || typeof edge.unresolved !== 'object' || Array.isArray(edge.unresolved)) fail('invalid_edge', 'Missing endpoints require explicit unresolved evidence.'); }
+        else if (!map.has(endpoint.nodeId) || (endpoint.objectPath ?? null) !== (map.get(endpoint.nodeId).objectPath ?? null)) fail('invalid_edge', 'Relationship endpoint must match its exact captured node and path.');
+      }
+    }
+    if (bytes(doc) > LIMITS.bytes) fail('snapshot_too_large', 'Snapshot exceeds the 32 MiB reader limit.');
+    return doc;
+  }
+  function reference(snapshot, node) {
+    if (!node || node.origin !== 'native' || !node.objectPath) fail('virtual_selection', 'Display folders are not engineering objects.');
+    return { schemaVersion: SCHEMA, snapshotId: snapshot.snapshotId, sessionGeneration: snapshot.sessionGeneration, projectPath: snapshot.project.projectPath, nodeId: node.nodeId, objectPath: node.objectPath };
+  }
+  function exactNode(snapshot, map, ref) {
+    if (!ref || ref.schemaVersion !== SCHEMA || ref.snapshotId !== snapshot.snapshotId || ref.sessionGeneration !== snapshot.sessionGeneration || ref.projectPath !== snapshot.project.projectPath) fail('stale_selection', 'Selection belongs to another snapshot, session or project copy. Select the object again.');
+    const node = map.get(ref.nodeId);
+    if (!node || node.origin !== 'native' || node.objectPath !== ref.objectPath) fail('stale_selection', 'The exact selected object is absent or changed. Same-named objects are never substituted.');
+    return node;
+  }
+  class SnapshotIndex {
+    constructor(input) {
+      this.snapshot = validateSnapshot(input); this.nodes = new Map(); this.children = new Map(); this.searchRows = [];
+      for (const node of this.snapshot.nodes) {
+        this.nodes.set(node.nodeId, node);
+        const key = node.parentId || ''; if (!this.children.has(key)) this.children.set(key, []); this.children.get(key).push(node);
+        this.searchRows.push([node, [node.name, node.kind, node.objectPath, node.plcPath, node.scopePath].filter(Boolean).join('\n').toLocaleLowerCase()]);
+      }
+      const compare = (a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : a.nodeId < b.nodeId ? -1 : 1;
+      for (const list of this.children.values()) list.sort(compare);
+      this.adjacent = new Map();
+      for (const edge of this.snapshot.edges || []) {
+        const source=edge.source?.nodeId, target=edge.target?.nodeId;
+        if(source) { let list=this.adjacent.get(source); if(!list)this.adjacent.set(source,list=[]); list.push(edge); }
+        if(target && target!==source) { let list=this.adjacent.get(target); if(!list)this.adjacent.set(target,list=[]); list.push(edge); }
+      }
+      for (const edges of this.adjacent.values()) if(edges.length>1)edges.sort((a,b) => a.edgeId < b.edgeId ? -1 : a.edgeId > b.edgeId ? 1 : 0);
+    }
+    ancestors(nodeId) { const result = []; let node = this.nodes.get(nodeId); for (let i = 0; node && i <= LIMITS.depth; i++) { result.unshift(node); node = this.nodes.get(node.parentId); } return result; }
+    childPage(parentId, offset = 0, pageSize = 200) { const list = this.children.get(parentId || '') || []; const size = clamp(pageSize, 1, LIMITS.page, 200); return { nodes: list.slice(offset, offset + size), totalMatches: list.length, nextOffset: offset + size < list.length ? offset + size : null }; }
+    search({ text = '', kinds = [], scopePath = '', offset = 0, pageSize = 200 } = {}) {
+      const query = text.toLocaleLowerCase(), hits = [], kindSet = new Set(kinds); let count = 0; const size = clamp(pageSize, 1, LIMITS.page, 200);
+      for (const [node, searchable] of this.searchRows) {
+        if ((query && !searchable.includes(query)) || (kindSet.size && !kindSet.has(node.kind)) || (scopePath && node.scopePath !== scopePath && node.plcPath !== scopePath)) continue;
+        if (count >= offset && hits.length < size) hits.push(node); count++;
+      }
+      return { nodes: hits, totalMatches: count, nextOffset: offset + size < count ? offset + size : null, ancestors: hits.map(n => this.ancestors(n.nodeId).slice(0, -1)) };
+    }
+    flatten(expanded = new Set()) { const result = []; const stack = (this.children.get('') || []).slice().reverse().map(node => ({ node, depth: 0 })); while (stack.length) { const item = stack.pop(); result.push(item); if (expanded.has(item.node.nodeId)) for (const node of (this.children.get(item.node.nodeId) || []).slice().reverse()) stack.push({ node, depth: item.depth + 1 }); } return result; }
+    relationships(nodeId, { kinds = [], direction = 'both', depth = 1, maxNodes = 100, maxEdges = 200, maxBytes = LIMITS.graphBytes } = {}) {
+      if (!this.nodes.has(nodeId)) fail('selection_not_found', 'Graph seed is absent from this snapshot.');
+      direction = ({ out: 'outgoing', in: 'incoming' })[direction] || direction;
+      if (!['both','outgoing','incoming'].includes(direction)) fail('invalid_request', 'Unknown relationship direction.');
+      if (!Array.isArray(kinds) || kinds.length > 32 || kinds.some(k => typeof k !== 'string' || k.length > 80)) fail('invalid_request', 'Invalid relationship kind filter.');
+      const dmax = clamp(depth, 1, LIMITS.graphDepth, 1), nmax = clamp(maxNodes, 1, LIMITS.graphNodes, 100), emax = clamp(maxEdges, 1, LIMITS.graphEdges, 200), bmax = clamp(maxBytes, 1024, LIMITS.graphBytes, LIMITS.graphBytes);
+      const found = new Set([nodeId]), edgeIds = new Set(), queue = [[nodeId,0]], allowed = new Set(kinds), reasons = new Set();
+      const identity = id => { const {details,metadata,previews,...value} = this.nodes.get(id); return value; };
+      const matches = (edge,id) => (!allowed.size || allowed.has(edge.kind)) && (direction === 'both' || direction === 'outgoing' && edge.source?.nodeId === id || direction === 'incoming' && edge.target?.nodeId === id);
+      const result = { seedNodeId:nodeId, nodes:[identity(nodeId)], edges:[], unresolved:[], truncated:false, continuationAvailable:false,
+        limits:{depth:dmax,maxNodes:nmax,maxEdges:emax,maxBytes:bmax}, coverage:this.snapshot.coverage || [], capturedAtUtc:this.snapshot.captureCompletedAtUtc, metadataOmitted:true,
+        relationshipScope:{scope:'retainedSnapshotEdges', status:'complete', projectCompleteness:'notEstablished', retainedEdges:this.snapshot.edges.length, returnedEdges:0, direction, kinds:[...kinds], stopReasons:[]}, payloadBytes:0 };
+      // Reserve final stop reasons and explanation before admitting evidence. Never drop the seed or rewrite source edges.
+      const reserve = 512;
+      let accounted = bytes(result) + reserve;
+      if (accounted > bmax) { result.coverage=[]; reasons.add('coverageBytes'); accounted=bytes(result)+reserve; }
+      if (accounted > bmax) fail('graph_capacity', 'Graph seed and scope exceed the byte budget; increase maxBytes.');
+      for (let i=0; i<queue.length; i++) {
+        const [id,distance] = queue[i];
+        for (const edge of this.adjacent.get(id) || []) {
+          if (!matches(edge,id) || edgeIds.has(edge.edgeId)) continue;
+          if (distance >= dmax) { reasons.add('depth'); continue; }
+          const extra = [...new Set([edge.source?.nodeId,edge.target?.nodeId].filter(n => n && !found.has(n)))];
+          const unresolved=!!edge.unresolved, cost=bytes(edge)*(unresolved?2:1)+extra.reduce((total,n)=>total+bytes(identity(n))+1,0)+4;
+          if (result.edges.length >= emax) { reasons.add('edges'); continue; }
+          if (found.size+extra.length > nmax) { reasons.add('nodes'); continue; }
+          if (accounted+cost > bmax) { reasons.add('bytes'); continue; }
+          result.edges.push(edge); edgeIds.add(edge.edgeId); if(unresolved)result.unresolved.push(edge); accounted+=cost;
+          for(const other of extra) { found.add(other); result.nodes.push(identity(other)); queue.push([other,distance+1]); }
+        }
+      }
+      // A frontier edge may have been included later from another node at a shallower depth.
+      reasons.delete('depth');
+      if(queue.some(([id,distance])=>distance===dmax && (this.adjacent.get(id)||[]).some(edge=>matches(edge,id)&&!edgeIds.has(edge.edgeId))))reasons.add('depth');
+      result.truncated=reasons.size>0; result.continuationAvailable=result.truncated;
+      result.relationshipScope.status=result.truncated?'truncated':'complete'; result.relationshipScope.returnedEdges=result.edges.length; result.relationshipScope.stopReasons=[...reasons].sort();
+      if(result.truncated)result.narrowScopeSuggestion='Select an adjacent node and expand, narrow relationship kinds, or increase the indicated budget within its ceiling.';
+      while(result.payloadBytes!==bytes(result))result.payloadBytes=bytes(result);
+      if(result.payloadBytes>bmax)fail('graph_capacity','Graph response exceeds its serialized byte budget.');
+      return result;
+    }
+  }
+  function exportManifest(snapshot, filters, selected) { return { schemaVersion: SCHEMA, exportedAtUtc: new Date().toISOString(), snapshotId: snapshot.snapshotId, sessionGeneration: snapshot.sessionGeneration, project: snapshot.project, captureStartedAtUtc: snapshot.captureStartedAtUtc, captureCompletedAtUtc: snapshot.captureCompletedAtUtc, metadataRevision: snapshot.metadataRevision, contentFreshness: 'Only individual evidence/content revisions apply; metadata is not a content revision.', filters, selection: selected || null, coverage: snapshot.coverage, warnings: snapshot.warnings || [] }; }
+  function graphSvg(graph, manifest, selectedId) {
+    const nodes = (graph.nodes || []).slice(0, LIMITS.graphNodes), edges = (graph.edges || []).slice(0, LIMITS.graphEdges);
+    const columns = Math.max(1, Math.ceil(Math.sqrt(nodes.length || 1))), width = Math.max(720, columns * 228 + 50), height = Math.max(260, Math.ceil(nodes.length / columns) * 104 + 140);
+    const positions = new Map(nodes.map((n, i) => [n.nodeId, { x: 28 + i % columns * 228, y: 110 + Math.floor(i / columns) * 104 }]));
+    const links = edges.map(edge => {
+      const a = positions.get(edge.source?.nodeId), b = positions.get(edge.target?.nodeId); if (!a || !b) return '';
+      const dx = b.x - a.x, dy = b.y - a.y, ratio = Math.max(Math.abs(dx) / 95, Math.abs(dy) / 30);
+      const d = ratio ? `M${a.x + 95 + dx / ratio},${a.y + 30 + dy / ratio} L${b.x + 95 - dx / ratio * 1.08},${b.y + 30 - dy / ratio * 1.08}` : `M${a.x + 150},${a.y} C${a.x + 220},${a.y - 42} ${a.x - 30},${a.y - 42} ${a.x + 35},${a.y - 2}`;
+      return `<path d="${d}" stroke="${edge.evidence?.resolution === 'unresolved' ? '#ca8a04' : '#8298ac'}" stroke-width="1.4" fill="none" marker-end="url(#arrow)"><title>${escape(edge.kind)} · ${escape(edge.evidence?.sourcePath || 'Evidence unavailable')}</title></path>`;
+    }).join('');
+    const boxes = nodes.map(n => { const p = positions.get(n.nodeId); return `<g data-node-id="${escape(n.nodeId)}" tabindex="0" role="button" aria-label="${escape(n.name)}"><rect x="${p.x}" y="${p.y}" width="190" height="60" rx="9" fill="${n.nodeId === selectedId ? '#d6f5e9' : '#f6f9fc'}" stroke="${n.nodeId === selectedId ? '#16745f' : '#bfccd9'}"/><text x="${p.x + 12}" y="${p.y + 23}" font-size="13" fill="#153349">${escape(n.name.slice(0, 23))}</text><text x="${p.x + 12}" y="${p.y + 43}" font-size="11" fill="#53687b">${escape(n.kind)}</text><title>${escape(n.objectPath || n.name)}</title></g>`; }).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Bounded relationship graph"><metadata>${escape(JSON.stringify(manifest))}</metadata><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8298ac"/></marker></defs><rect width="100%" height="100%" fill="#ffffff"/><text x="28" y="34" font-family="Segoe UI,sans-serif" font-size="18" fill="#153349">${escape(manifest.project?.name || 'Project')} · Relationships</text><text x="28" y="59" font-family="Segoe UI,sans-serif" font-size="11" fill="#53687b">${escape(manifest.captureCompletedAtUtc || '')} · ${nodes.length} nodes / ${edges.length} edges${graph.truncated ? ' · bounded / truncated' : ''}</text><g font-family="Segoe UI,sans-serif">${links}${boxes}</g></svg>`;
+  }
+  function pngManifest(pngBytes, manifest) {
+    // Add an uncompressed UTF-8 iTXt chunk before IEND; retains a single portable PNG.
+    const input = new Uint8Array(pngBytes), payload = new TextEncoder().encode('project-model-manifest\0\0\0\0\0' + JSON.stringify(manifest));
+    const type = new TextEncoder().encode('iTXt'), chunk = new Uint8Array(payload.length + 12), view = new DataView(chunk.buffer); view.setUint32(0, payload.length); chunk.set(type, 4); chunk.set(payload, 8);
+    let crc = 0xffffffff; for (let i = 4; i < chunk.length - 4; i++) { crc ^= chunk[i]; for (let j = 0; j < 8; j++) crc = crc >>> 1 ^ (crc & 1 ? 0xedb88320 : 0); } view.setUint32(chunk.length - 4, (crc ^ 0xffffffff) >>> 0);
+    if (input.length < 20 || input[0] !== 137 || String.fromCharCode(...input.slice(-8, -4)) !== 'IEND') fail('invalid_png', 'PNG export is missing its terminal chunk.');
+    const output = new Uint8Array(input.length + chunk.length); output.set(input.slice(0, -12)); output.set(chunk, input.length - 12); output.set(input.slice(-12), input.length - 12 + chunk.length); return output;
+  }
+  function networkSvg(content) {
+    const nodes=(content.nodes||[]).slice(0,500),connections=(content.connections||[]).slice(0,1000),columns=Math.max(1,Math.min(5,Math.ceil(Math.sqrt(nodes.length)))),width=Math.max(650,columns*205+40),height=Math.max(230,Math.ceil(nodes.length/columns)*110+65);
+    const positions=new Map(nodes.map((n,i)=>[n.key||n.id||String(i),{x:25+i%columns*205,y:60+Math.floor(i/columns)*110}]));
+    const wires=connections.map(c=>{const endpoints=(c.endpoints||[c.from,c.to]).filter(Boolean).map(e=>({endpoint:e,position:positions.get(e.node||e.key)})).filter(e=>e.position);if(endpoints.length<2)return'';const x=endpoints.reduce((a,e)=>a+e.position.x+85,0)/endpoints.length,y=endpoints.reduce((a,e)=>a+e.position.y+35,0)/endpoints.length;return endpoints.map(e=>`<path d="M${x},${y} L${e.position.x+85},${e.position.y+35}" fill="none" stroke="${c.resolved===false?'#b98012':'#639689'}"${c.resolved===false?' stroke-dasharray="5 3"':''}/><title>${escape(c.nativeUid||'Connection')} · ${escape(e.endpoint.node)}.${escape(e.endpoint.port||'unresolved port')}</title>`).join('');}).join('');
+    const symbols={contact:'─| |─',coil:'─( )─',assign:'=',powerrail:'│',operand:'◇'};
+    const boxes=nodes.map((n,i)=>{const p=positions.get(n.key||n.id||String(i));return `<g><rect x="${p.x}" y="${p.y}" width="170" height="74" rx="8" fill="${n.supported===false?'#fff5db':'#f0f8f5'}" stroke="${n.supported===false?'#b98012':'#83ab9e'}"/><text x="${p.x+10}" y="${p.y+21}" font-size="12" fill="#153349">${escape((n.nativeName||n.name||n.kind||n.key||'Instruction').slice(0,22))}</text><text x="${p.x+10}" y="${p.y+43}" font-size="18" fill="#176c58">${escape(symbols[n.kind]||'□')}</text><text x="${p.x+10}" y="${p.y+61}" font-size="9" fill="#53687b">${escape(n.key||n.id||'')} · ${n.supported===false?'opaque':'reader supported'}</text><title>${escape(JSON.stringify(n))}</title></g>`;}).join('').replace(/height="74"/g,'height="74"');
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Schematic ${escape(content.language||'graphical')} network"><rect width="100%" height="100%" fill="#ffffff"/><text x="25" y="28" fill="#53687b" font-family="Segoe UI,sans-serif" font-size="11">Schematic ${content.language==='GRAPH'?'document':'native'} connections · no inferred execution order or native coordinates</text><g font-family="Segoe UI,sans-serif">${wires}${boxes}</g></svg>`;
+  }
+  async function verifyGraphReport(report) {
+    if (!report || report.format !== 'tia-graph-inspection.v1' || report.profile !== 'graph-v6-structure.v2' || report.nativeQualified !== false || report.fullSchemaValidated !== false ||
+        !Array.isArray(report.graphs) || !Array.isArray(report.diagnostics) || !Array.isArray(report.unsupported) || typeof report.hasErrors !== 'boolean' || typeof report.hasUnsupportedContent !== 'boolean' ||
+        !/^[a-f0-9]{64}$/.test(report.sourceSha256 || '') || !Number.isSafeInteger(report.sourceBytes) || report.sourceBytes < 1 || report.sourceBytes > 8 * 1024 * 1024 ||
+        typeof report.originalSourceBase64 !== 'string' || report.originalSourceBase64.length > 11184812 || bytes(report) > 12 * 1024 * 1024)
+      fail('invalid_graph_report', 'Use a bounded offline GRAPH v6 inspection report with retained source and false qualification flags.');
+    let rows = report.graphs.length + report.diagnostics.length + report.unsupported.length, sequences = 0;
+    for (const graph of report.graphs) {
+      if (!graph || !Array.isArray(graph.sequences)) fail('invalid_graph_report', 'Missing sequence inventory.');
+      sequences += graph.sequences.length;
+      for (const sequence of graph.sequences) {
+        if (!sequence || typeof sequence.path !== 'string') fail('invalid_graph_report', 'Missing exact sequence path.');
+        for (const key of ['steps','transitions','branches','connections']) {
+          if (!Array.isArray(sequence[key]) || sequence[key].some(row => !row || typeof row !== 'object' || Array.isArray(row))) fail('invalid_graph_report', 'Invalid sequence row inventory.');
+          rows += sequence[key].length;
+        }
+      }
+    }
+    if (rows > 100000 || sequences > 2000) fail('graph_capacity', 'Report exceeds Explorer navigation limits; use the standalone HTML or paged Host report.');
+    let binary; try { binary = atob(report.originalSourceBase64); } catch { fail('invalid_graph_report', 'Retained source is not valid base64.'); }
+    if (binary.length !== report.sourceBytes) fail('graph_source_changed', 'Retained source length differs from its report.');
+    const source = Uint8Array.from(binary, c => c.charCodeAt(0));
+    if (!globalThis.crypto?.subtle) fail('hash_unavailable', 'SHA-256 verification is required for imported GRAPH reports.');
+    const hash = [...new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256', source))].map(n => n.toString(16).padStart(2,'0')).join('');
+    if (hash !== report.sourceSha256) fail('graph_source_changed', 'Retained source SHA-256 differs from its report.');
+    return source;
+  }
+  function graphSequenceNetwork(sequence, chartSequences = [sequence]) {
+    const all = ['steps','transitions','branches'].flatMap((key,i) => sequence[key].map((row,index) => ({ row, key, index, kind:['Step','Transition','Branch'][i] })));
+    const frequencies = new Map();
+    for (const s of chartSequences) for (const [collection,kind] of [['steps','Step'],['transitions','Transition'],['branches','Branch']]) {
+      if (kind==='Branch' && s!==sequence) continue;
+      for (const row of s[collection]) { const key=kind+':'+row.number; frequencies.set(key,(frequencies.get(key)||0)+1); }
+    }
+    const nodes = all.slice(0,500).map(n => ({ ...n, collection:n.key, key:n.kind+':'+n.index, nativeName:n.kind+' '+(n.row.number ?? '?')+' '+String(n.row.name ?? ''),
+      supported:Number.isSafeInteger(n.row.number)&&n.row.isMissing!==true&&frequencies.get(n.kind+':'+n.row.number)===1 }));
+    const known = new Map(nodes.filter(n=>n.supported).map(n=>[n.kind+':'+n.row.number,n.key]));
+    const connections = sequence.connections.slice(0,1000).map(c => {
+      const resolved=known.has(c.from?.kind+':'+c.from?.number)&&known.has(c.to?.kind+':'+c.to?.number);
+      return { nativeUid:String(c.ordinal), resolved, endpoints:resolved?[c.from,c.to].map(e=>({node:known.get(e.kind+':'+e.number),port:e.in ?? e.out ?? '?'})):[] };
+    });
+    return {language:'GRAPH',nodes,connections,totalNodes:all.length,totalConnections:sequence.connections.length};
+  }
+  function withGraphAttachments(snapshot, attachments) {
+    const copy = structuredClone(snapshot), map = new Map(copy.nodes.map(n=>[n.nodeId,n]));
+    for (const attachment of attachments) {
+      const node = exactNode(copy,map,attachment.source);
+      node.previews = [...(node.previews || []).filter(a=>a.kind!=='graphSequence'||a.reportFileSha256!==attachment.reportFileSha256), structuredClone(attachment)];
+    }
+    validateSnapshot(copy); return copy;
+  }
+  async function verifyUaObservation(doc) {
+    const bad = () => fail('invalid_ua_observation', 'Invalid UA observation report, original chain, binding or derived summary.');
+    const same = (a,b,depth=0) => {
+      if(a===b)return true;
+      if(depth>48 || !a || !b || typeof a!=='object' || typeof b!=='object' || Array.isArray(a)!==Array.isArray(b))return false;
+      const keys=Object.keys(a);return keys.length===Object.keys(b).length && keys.every(k=>Object.hasOwn(b,k)&&same(a[k],b[k],depth+1));
+    };
+    const flags=['atomicAcrossSignals','scanSynchronized','programMatchVerified','addressMatchVerified','datatypeMatchVerified','sourceAuthenticityVerified','physicalQualified','clockSynchronizationVerified','assertionsAdmitted','causationProven','bugFixProven','nativeQualification','nativeAccessAttempted','sourceCompletenessVerified'];
+    const checkClaims=(value,depth=0)=>{
+      if(depth>64)bad();
+      if(!value||typeof value!=='object')return;
+      for(const [key,child] of Object.entries(value)){
+        if((flags.includes(key)||key==='nativeExecutable'||key==='onlineVerified'||key==='liveVerified')&&child!==false)bad();
+        checkClaims(child,depth+1);
+      }
+    };
+    const hash=async data=>Array.from(new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',data)),b=>b.toString(16).padStart(2,'0')).join('');
+    if(!globalThis.crypto?.subtle)fail('hash_unavailable','SHA-256 verification is required for UA reports.');
+    if(bytes(doc)>8*1024*1024 || doc?.schemaVersion!=='diagnostic-ua-observation.v1' || !flags.every(k=>doc[k]===false) || doc.completeCommittedPrefixRetained!==true || doc.sourceEvidenceRevalidated!==true || typeof doc.limits!=='string')bad();
+    checkClaims(doc);
+    const source=doc.captureSource,binding=doc.binding,mode=doc.acquisitionMode;
+    if(!['polling','subscription'].includes(mode)||source?.acquisitionMode!==mode||source.snapshotRef!==doc.snapshotRef||source.rowsTruncated!==false||source.currentHeadConsulted!==false||!Array.isArray(source.rows)||source.rows.length>10000||!Array.isArray(source.originalFiles))bad();
+    const ref=doc.snapshotRef.match(/^(capture|ua-subscription):([a-f0-9]{32}):(0|[1-9][0-9]*):([a-f0-9]{64})$/);
+    if(!ref || ref[1] !== (mode==='polling'?'capture':'ua-subscription') || Number(ref[3])!==source.segmentCount || source.segmentCount>10001 || source.originalFiles.length!==source.segmentCount+1)bad();
+    async function original(file,maximum) {
+      if(!file || typeof file.base64!=='string' || file.base64.length>Math.ceil(maximum/3)*4 || !Number.isSafeInteger(file.bytes)||file.bytes<1||file.bytes>maximum||!/^[a-f0-9]{64}$/.test(file.sha256))bad();
+      let binary;try{binary=atob(file.base64);}catch{bad();}
+      if(binary.length!==file.bytes || btoa(binary)!==file.base64)bad();
+      const raw=Uint8Array.from(binary,c=>c.charCodeAt(0));
+      if(await hash(raw)!==file.sha256)bad();
+      try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(raw));}catch{bad();}
+    }
+    const directory=mode==='polling'?'runtime-ua-acquisition/runtime-captures':'runtime-ua-subscriptions';
+    let previous=null,total=0;const rawRows=[];let lastProgress;
+    for(let i=0;i<source.originalFiles.length;i++){
+      const file=source.originalFiles[i];total+=file.bytes;
+      if(total>3*1024*1024||file.relativePath!==`${directory}/${ref[2]}/${i===0?'plan.json':String(i).padStart(6,'0')+'.segment'}`)bad();
+      const value=await original(file,i===0?128*1024:1024*1024);
+      if(i===0){if(!same(value,source.plan)||source.planSha256!==file.sha256)bad();}
+      else {if(value.index!==i||value.previousSha256!==previous||!Array.isArray(value.rows))bad();rawRows.push(...value.rows);lastProgress=value.progress;if(rawRows.length>10000)bad();}
+      previous=file.sha256;
+    }
+    if(previous!==ref[4]||source.chainSha256!==ref[4]||source.originalByteCount!==total||!same(rawRows,source.rows)||source.recordedProgress?.rows!==rawRows.length||source.segmentCount>0&&!same(lastProgress,source.recordedProgress))bad();
+    if(source.segmentCount===0){
+      const initial={state:'running',terminalReason:null,elapsedMilliseconds:0,observedUtc:source.plan.createdUtc,rows:0,
+        ...(mode==='polling'?{readAttempts:0,skippedPolls:0,droppedReadResults:0}:{notifications:0,duplicateMessages:0,missingSequences:0,remoteCleanupConfirmed:false})};
+      if(!same(initial,source.recordedProgress))bad();
+    }
+    if(!['running','ended'].includes(source.recordedProgress.state)||source.uncommittedDataUnknown!==(source.recordedProgress.state==='running'))bad();
+    const request=mode==='polling'?source.plan.uaContext?.request:source.plan.request;
+    if(!request||request.diagnosticBindingId!==doc.bindingId||binding?.schemaVersion!=='diagnostic-ua-binding.v1'||binding.experimentId!==doc.experimentId||binding.attemptId!==request.attemptId||binding.request?.attemptId!==request.attemptId||binding.associationKind!=='callerSelectedObservationIntent')bad();
+    if(!['programMatchVerified','addressMatchVerified','datatypeMatchVerified','sourceAuthenticityVerified','physicalQualified','clockSynchronizationVerified','assertionsAdmitted','nativeAccessAttempted'].every(k=>binding[k]===false)||!same(await original(doc.bindingArtifact,8*1024*1024),binding)||doc.bindingArtifact.sha256!==doc.bindingId)bad();
+    const mappings=binding.mappings,nodes=request.nodes;
+    if(!Array.isArray(mappings)||mappings.length<1||mappings.length>64||!Array.isArray(nodes)||nodes.length!==mappings.length||!Array.isArray(binding.request.mappings)||binding.request.mappings.length!==mappings.length||!Array.isArray(doc.signals)||doc.signals.length!==mappings.length)bad();
+    if(new Set(mappings.map(m=>m.signalId)).size!==mappings.length||new Set(nodes.map(n=>JSON.stringify([n.namespaceUri,n.identifierType,n.identifier]))).size!==nodes.length)bad();
+    const declarations=binding.experiment?.diagnosticCase?.signals;
+    if(!['nativeExecutable','nativeAccessAttempted','sourceAuthenticityVerified'].every(k=>binding.experiment?.[k]===false)||binding.experiment?.diagnosticCase?.sourceRevision?.onlineVerified!==false)bad();
+    if(!Array.isArray(declarations)||!Array.isArray(binding.experiment.diagnosticCase.hypotheses))bad();
+    for(let i=0;i<mappings.length;i++){
+      const m=mappings[i],r=binding.request.mappings[i],d=declarations.filter(d=>d.id===m.signalId);
+      if(!same(m.node,nodes[i])||!same(r.node,nodes[i])||m.signalId!==r.signalId||m.unit!==r.unit||m.reason!==r.reason||typeof m.unit!=='string'||!m.unit.trim()||d.length!==1||!same(d[0],m.declaration)||m.declaration.resolution!=='capturedDeclaration'||m.declaration.evidence?.liveVerified!==false)bad();
+    }
+    const observations=nodes.map(()=>[]),errors=nodes.map(()=>0);
+    const events={gapRows:0,duplicateMessages:0,keepalives:0,failureEvents:0,overflowNotifications:0};
+    const creation=mode==='subscription'?rawRows.find(r=>r.event?.kind==='created')?.event.created:null;
+    const item=(r,v,started=null,completed=null)=>({rowSequence:r.sequence,elapsedMilliseconds:r.elapsedMilliseconds,observedUtc:r.observedUtc,readStartedAt:started,readCompletedAt:completed,value:v});
+    for(let i=0;i<rawRows.length;i++){
+      const r=rawRows[i];if(r.sequence!==i||!Number.isFinite(r.elapsedMilliseconds)||r.elapsedMilliseconds<0||i>0&&r.elapsedMilliseconds<rawRows[i-1].elapsedMilliseconds)bad();
+      if(mode==='polling'){
+        if(r.kind==='gap'){events.gapRows++;continue;}
+        const index=source.plan.request.selectionIds.indexOf(r.selectionId);
+        if(index<0||index>=nodes.length||r.kind!=='read')bad();
+        if(r.errorCode!==null){if(typeof r.errorCode!=='string'||r.readResultJson!==null)bad();errors[index]++;continue;}
+        const read=JSON.parse(r.readResultJson);
+        checkClaims(read);
+        if(!Array.isArray(read.items)||read.items.length!==1||read.attemptId!==request.attemptId||!same(read.items[0].node,nodes[index]))bad();
+        observations[index].push(item(r,read.items[0],read.startedAt,read.completedAt));
+      }else{
+        const e=r.event;if(!e||!['created','publish','republish','gap','deleted','failure'].includes(e.kind)||typeof e.duplicate!=='boolean'||typeof e.keepAlive!=='boolean')bad();
+        if(e.kind==='gap')events.gapRows++;
+        if(e.kind==='failure')events.failureEvents++;
+        if(e.duplicate){events.duplicateMessages++;continue;}
+        if(e.keepAlive){events.keepalives++;continue;}
+        for(const n of e.notifications||[]){
+          const index=n.clientHandle-1;
+          if(!Number.isInteger(index)||index<0||index>=nodes.length||!same(n.value?.node,nodes[index])||typeof n.overflow!=='boolean')bad();
+          if(n.overflow)events.overflowNotifications++;
+          observations[index].push({...item(r,n.value),messageSequenceNumber:e.sequenceNumber,publishTime:e.publishTime,eventKind:e.kind,overflow:n.overflow});
+        }
+      }
+    }
+    for(let i=0;i<nodes.length;i++){
+      const list=observations[i],count=f=>list.filter(x=>f(x.value)).length;
+      for(const {value:v} of list){
+        if(!/^0x[0-9a-f]{8}$/.test(v.statusCode)||!['value','itemError','metadataError','unsupported'].includes(v.outcome))bad();
+        const status=parseInt(v.statusCode.slice(2),16),quality=(status&0x80000000)?'Bad':(status&0x40000000)?'Uncertain':'Good';
+        if(quality!==v.quality||quality==='Bad'&&(v.outcome!=='itemError'||v.value!==null)||v.outcome!=='value'&&(v.value!==null||v.encoding!==null))bad();
+        if(v.encoding==='null'&&v.value!==null)bad();
+        if(v.outcome==='value'&&v.encoding!=='null'&&['Int64','UInt64'].includes(v.builtInType)){
+          if(v.encoding!=='decimalInteger'||typeof v.value!=='string'||! /^-?(0|[1-9][0-9]*)$/.test(v.value)||v.value==='-0')bad();
+          const n=BigInt(v.value);if(n<(v.builtInType==='UInt64'?0n:-9223372036854775808n)||n>(v.builtInType==='UInt64'?18446744073709551615n:9223372036854775807n))bad();
+        }
+      }
+      const expected={signalId:mappings[i].signalId,node:nodes[i],unit:mappings[i].unit,savedDatatype:mappings[i].declaration.datatype,
+        monitoredItem:creation?.items?.[i]||null,observationCount:list.length,hostReadErrors:errors[i],
+        goodValues:count(v=>v.quality==='Good'&&v.outcome==='value'&&v.encoding!=='null'),uncertain:count(v=>v.quality==='Uncertain'),bad:count(v=>v.quality==='Bad'),
+        unsupported:count(v=>v.outcome==='unsupported'),metadataErrors:count(v=>v.outcome==='metadataError'),nullValues:count(v=>v.encoding==='null'),
+        missingSourceTimestamps:count(v=>v.sourceTimestamp===null),missingServerTimestamps:count(v=>v.serverTimestamp===null),
+        observedBuiltInTypes:[...new Set(list.map(x=>x.value.builtInType).filter(t=>typeof t==='string'&&t.length))].sort(),
+        firstObservation:list[0]||null,lastObservation:list.at(-1)||null,coverage:list.length?'recordedObservationsOnly':'noSelectedObservations'};
+      if(!same(expected,doc.signals[i]))bad();
+    }
+    const expectedHypotheses=binding.experiment.diagnosticCase.hypotheses;
+    if(!same(events,doc.events)||!same(declarations.map(s=>s.id).filter(id=>!mappings.some(m=>m.signalId===id)),doc.unselectedSignalIds)||!Array.isArray(doc.hypotheses)||doc.hypotheses.length!==expectedHypotheses.length||doc.hypotheses.some((h,i)=>h.verdict!=='unresolved'||h.id!==expectedHypotheses[i].id||h.statement!==expectedHypotheses[i].statement))bad();
+    return doc;
+  }
+  return { SCHEMA, LIMITS, escape, bytes, clamp, fail, validateSnapshot, reference, exactNode, SnapshotIndex, exportManifest, graphSvg, pngManifest, networkSvg, verifyUaObservation,
+    verifyGraphReport, graphSequenceNetwork, withGraphAttachments };
+});
+
+(function (root, factory) {
+  const api = factory(typeof module === 'object' && module.exports ? require('./model.js') : root.ProjectExplorerModel);
+  if (typeof module === 'object' && module.exports) module.exports = api; else root.ProjectExplorerClient = api;
+})(typeof globalThis === 'object' ? globalThis : this, function (M) {
+  'use strict';
+  const ACTIONS = new Set(['capture', 'status', 'children', 'search', 'details', 'relationships', 'verify', 'release', 'export']);
+  function unwrap(result) {
+    if (result?.isError) M.fail('tool_error', result.content?.find(c => c.type === 'text')?.text || 'Project model request failed.');
+    let value = result?.structuredContent || result;
+    if (result?.content && !result.structuredContent) { const text = result.content.find(c => c.type === 'text')?.text; if (text) { try { value = JSON.parse(text); } catch { M.fail('invalid_response', text); } } }
+    if (value?.error && !value.status) M.fail(value.error.code || 'model_error', value.error.message || String(value.error));
+    return value?.result || value;
+  }
+  class ReadOnlyClient {
+    constructor(transport) { if (!transport || typeof transport.invoke !== 'function') throw new TypeError('A transport invoke(action,args) function is required.'); this.transport = transport; this.state = transport.offline ? 'offline' : 'connected'; }
+    async invoke(action, args = {}) {
+      if (!ACTIONS.has(action)) M.fail('read_only', 'The explorer allows project-model read operations only.');
+      try { const result = unwrap(await this.transport.invoke(action, args)); return result; }
+      catch (error) { if (/session|disconnect|worker|transport|timeout/i.test(error.code + ' ' + error.message)) this.state = 'disconnected'; throw error; }
+    }
+    async sendSelection(ref) {
+      if (!this.transport.sendSelection) M.fail('host_unavailable', 'No verified chat host is connected. Copy the exact reference instead.');
+      const verification = await this.invoke('verify', { snapshotId: ref.snapshotId, reference: ref });
+      if (verification.valid === false || verification.stale || verification.matchesCurrentMetadata === false || verification.freshness === 'stale' || ['stale', 'expired', 'invalid', 'released', 'sessionLost', 'unavailable'].includes(verification.status)) M.fail('stale_selection', 'Selection verification failed. Recapture and select the exact object again.');
+      if (verification.valid !== true && verification.status !== 'valid' && verification.status !== 'current') M.fail('unverified_selection', 'The host did not confirm this exact reference.');
+      await this.transport.sendSelection(ref); return verification;
+    }
+    async readArtifact(manifest, onProgress) {
+      if (!this.transport.readArtifact) M.fail('host_unavailable', 'This transport cannot transfer host artifacts.');
+      return this.transport.readArtifact(manifest, onProgress);
+    }
+  }
+  async function readArtifactChunks(manifest, read, onProgress = () => {}) {
+    if (!manifest || typeof manifest.path !== 'string' || !/^[a-f0-9]{64}$/i.test(manifest.sha256 || '') || !Number.isSafeInteger(manifest.bytes) || manifest.bytes < 0 || manifest.bytes > M.LIMITS.bytes) M.fail('invalid_artifact', 'Artifact must have an exact host path, SHA-256 and size within 32 MiB.');
+    if (!globalThis.crypto?.subtle) M.fail('hash_unavailable', 'This browser cannot verify SHA-256. Use the artifact transfer tools.');
+    const expectedHash=manifest.sha256.toLowerCase(), data=new Uint8Array(manifest.bytes); let offset=0, relativePath;
+    do {
+      const piece=unwrap(await read({path:manifest.path,offset,count:65536}));
+      if(piece.bytes!==manifest.bytes||String(piece.sha256).toLowerCase()!==expectedHash||piece.offset!==offset||piece.encoding!=='base64'||typeof piece.data!=='string'||piece.data.length>87384) M.fail('artifact_changed','Artifact identity, size, hash or chunk boundary changed during transfer.');
+      if(relativePath!==undefined && piece.relativePath!==relativePath)M.fail('artifact_changed','Artifact path changed during transfer.'); relativePath=piece.relativePath;
+      let binary; try{binary=atob(piece.data);}catch{M.fail('invalid_artifact','Artifact chunk contains invalid base64.');}
+      if(binary.length>65536||piece.count!==binary.length||piece.nextOffset!==offset+binary.length||piece.nextOffset>data.length||piece.complete!==(piece.nextOffset===data.length)||(!binary.length&&!piece.complete)) M.fail('invalid_artifact','Artifact chunk has invalid paging or progress.');
+      for(let i=0;i<binary.length;i++)data[offset+i]=binary.charCodeAt(i); offset=piece.nextOffset;onProgress(offset,data.length);
+      if(piece.complete)break;
+    } while(offset<data.length);
+    const actual=[...new Uint8Array(await globalThis.crypto.subtle.digest('SHA-256',data))].map(v=>v.toString(16).padStart(2,'0')).join('');
+    if(actual!==expectedHash)M.fail('artifact_hash_mismatch','Transferred artifact failed its SHA-256 integrity check.');
+    return data;
+  }
+  class OfflineTransport {
+    constructor(snapshot) { this.index = new M.SnapshotIndex(snapshot); this.snapshot = this.index.snapshot; this.offline = true; this.released = false; this.cursors = new Map(); this.sequence = 0; }
+    page(page, identity) {
+      const result = { ...page, schemaVersion: M.SCHEMA, snapshotId: this.snapshot.snapshotId, coverage: this.snapshot.coverage, cached: true, offline: true }; delete result.nextOffset;
+      if (page.nextOffset != null) { const token = `local:${++this.sequence}:${this.snapshot.snapshotId}`; this.cursors.set(token, { identity, offset: page.nextOffset }); result.nextCursor = token; } else result.nextCursor = null;
+      return result;
+    }
+    offset(cursor, identity) { if (!cursor) return 0; const entry = this.cursors.get(cursor); if (!entry || entry.identity !== identity) M.fail('invalid_cursor', 'Cursor does not belong to this snapshot and query.'); return entry.offset; }
+    async invoke(action, args = {}) {
+      if (!ACTIONS.has(action)) M.fail('read_only', 'Unsupported read-only action.');
+      if (this.released && action !== 'release') M.fail('released', 'Snapshot was released. Open another snapshot.');
+      if (args.snapshotId && args.snapshotId !== this.snapshot.snapshotId) M.fail('stale_snapshot', 'Snapshot ID is stale.');
+      const ref = args.reference;
+      if (ref) M.exactNode(this.snapshot, this.index.nodes, ref);
+      switch (action) {
+        case 'capture': M.fail('offline_capture', 'An offline artifact cannot recapture TIA. Open a newly exported snapshot.'); break;
+        case 'status': return { ...this.snapshot, roots: this.index.childPage(null).nodes, offline: true };
+        case 'children': { const parentId = args.parentId || ref?.nodeId || null, key = JSON.stringify(['children', parentId, args.pageSize || 200]); return this.page(this.index.childPage(parentId, this.offset(args.cursor, key), args.pageSize), key); }
+        case 'search': { const query = { text: args.text || '', kinds: args.kinds || [], scopePath: args.scopePath || '', pageSize: args.pageSize || 200 }; const key = JSON.stringify(query); return this.page(this.index.search({ ...query, offset: this.offset(args.cursor, key) }), key); }
+        case 'details': { const node = ref ? M.exactNode(this.snapshot, this.index.nodes, ref) : this.index.nodes.get(args.nodeId); if (!node) M.fail('missing_node', 'Exact object is absent.'); const observed = node.details || {}; return { schemaVersion: M.SCHEMA, reference: node.origin === 'native' ? M.reference(this.snapshot, node) : null, node, status: observed.status || (node.access?.state === 'protected' ? 'protected' : 'cached'), capturedAtUtc: observed.capturedAtUtc || this.snapshot.captureCompletedAtUtc, metadataRevision: this.snapshot.metadataRevision, contentRevision: observed.contentRevision || null, contentFreshness: 'historicalObservationOnly', facets: node.metadata || {}, details: observed.details, previews: observed.previews || node.previews || node.metadata?.previews || [], warnings: [...(observed.warnings || []), 'Offline historical observations; not live PLC values or current content verification.'] }; }
+        case 'relationships': return this.index.relationships(ref?.nodeId || args.nodeId, args);
+        case 'verify': return { valid: false, status: 'unavailable', reason: 'Offline snapshots cannot verify the current TIA object or session.', metadataRevision: this.snapshot.metadataRevision };
+        case 'release': this.released = true; this.cursors.clear(); return { released: true, snapshotId: this.snapshot.snapshotId };
+        case 'export': return { snapshot: this.snapshot, manifest: M.exportManifest(this.snapshot, args.filters || {}, ref) };
+      }
+    }
+  }
+  function hostRequest(action, args) {
+    const request = { ...args, action };
+    if (request.pageSize != null) { request.maxItems = request.pageSize; delete request.pageSize; }
+    if (action === 'search' && request.kinds) { request.kind = request.kinds[0] || null; delete request.kinds; }
+    if (action === 'search' && request.scopePath?.startsWith('plc:')) { request.plcPath = request.scopePath; delete request.scopePath; }
+    if (action === 'relationships') { request.direction = ({ outgoing: 'out', incoming: 'in' })[request.direction] || request.direction; }
+    if (action === 'capture' && request.limits) { Object.assign(request, request.limits); delete request.limits; }
+    return { request };
+  }
+  // An initialized official SDK may also be injected by an embedding application.
+  // No raw engineering endpoint or arbitrary tool-name input is accepted.
+  function mcpAppTransport(app) {
+    const capabilities = app?.getHostCapabilities?.();
+    if (!capabilities?.serverTools || typeof app.callServerTool !== 'function') M.fail('host_unsupported', 'MCP Apps serverTools support was not negotiated. Use the portable artifact.');
+    return {
+      offline: false,
+      invoke(action, args) { if (!ACTIONS.has(action)) M.fail('read_only', 'Action is not allowed.'); return app.callServerTool({ name: 'project_model', arguments: hostRequest(action, args) }); },
+      readArtifact(manifest,onProgress){return readArtifactChunks(manifest,args=>app.callServerTool({name:'artifact_read',arguments:args}),onProgress);},
+      sendSelection: typeof app.sendMessage === 'function' ? async ref => { const result = await app.sendMessage({ role: 'user', content: [{ type: 'text', text: 'Inspect this exact project object. Re-resolve the reference before a fresh read or prepared change.\n' + JSON.stringify(ref) }] }); if (result?.isError) M.fail('host_rejected', 'The host did not accept the selected reference.'); } : undefined
+    };
+  }
+  async function connectMcpHost({ onResult = () => {}, onContext = () => {}, onDisconnect = () => {}, windowObject = globalThis, timeoutMs = 10000 } = {}) {
+    const win = windowObject, parent = win.parent;
+    if (!parent || parent === win) M.fail('host_unsupported', 'MCP Apps requires an embedding host.');
+    let sequence = 0, origin = null, initialized = false, closed = false; const pending = new Map(), notifications = [];
+    const prefix = 'tia-explorer-' + Math.random().toString(36).slice(2) + '-';
+    const send = message => parent.postMessage(message, origin && origin !== 'null' ? origin : '*');
+    function close(reason) { if (closed) return; closed = true; win.removeEventListener('message', listener); for (const entry of pending.values()) { clearTimeout(entry.timer); entry.reject(Object.assign(new Error(reason), { code: 'session_lost' })); } pending.clear(); onDisconnect(reason); }
+    function request(method, params, timeout = 120000) {
+      if (closed) return Promise.reject(Object.assign(new Error('MCP host session ended.'), { code: 'session_lost' }));
+      if (!['ui/initialize', 'tools/call', 'ui/message'].includes(method)) M.fail('read_only', 'Protocol operation is not allowed.');
+      const id = prefix + ++sequence;
+      return new Promise((resolve, reject) => { const timer = setTimeout(() => { pending.delete(id); const error = Object.assign(new Error('Host request timed out; native outcome is unknown. Do not automatically replay.'), { code: 'transport_timeout' }); reject(error); if (method !== 'ui/initialize') close(error.message); }, timeout); pending.set(id, { resolve, reject, timer, method }); send({ jsonrpc: '2.0', id, method, params }); });
+    }
+    function listener(event) {
+      // The immediate parent may be the host's sandbox proxy. Never accept sibling windows.
+      if (event.source !== parent || origin !== null && event.origin !== origin) return;
+      const message = event.data; if (!message || typeof message !== 'object' || message.jsonrpc !== '2.0') return;
+      if (message.id != null && !message.method) {
+        const entry = pending.get(message.id); if (!entry) return;
+        if (origin === null && entry.method !== 'ui/initialize') return;
+        if (origin === null) origin = event.origin;
+        clearTimeout(entry.timer); pending.delete(message.id);
+        if (message.error) entry.reject(Object.assign(new Error(message.error.message || 'Host rejected request.'), { code: 'host_error' })); else entry.resolve(message.result);
+        return;
+      }
+      if (!initialized) return;
+      if (message.method === 'ui/notifications/tool-result') { if (!transportReady) notifications.push(message.params); else Promise.resolve(onResult(message.params)).catch(onDisconnect); }
+      else if (message.method === 'ui/notifications/host-context-changed') onContext(message.params || {});
+      else if (message.method === 'ui/notifications/tool-cancelled') onDisconnect(message.params?.reason || 'Host cancelled the current request.');
+      else if (message.method === 'ui/resource-teardown') { send({ jsonrpc: '2.0', id: message.id, result: {} }); close('MCP host session ended.'); }
+      else if (message.method === 'ping' && message.id != null) send({ jsonrpc: '2.0', id: message.id, result: {} });
+      else if (message.id != null) send({ jsonrpc: '2.0', id: message.id, error: { code: -32601, message: 'The explorer exposes no engineering or mutation methods.' } });
+    }
+    let transportReady = false;
+    win.addEventListener('message', listener);
+    try {
+      const result = await request('ui/initialize', { protocolVersion: '2026-01-26', appInfo: { name: 'tia-project-explorer', version: '1.0.0' }, appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] } }, timeoutMs);
+      if (result?.protocolVersion !== '2026-01-26' || !result.hostCapabilities?.serverTools) M.fail('host_unsupported', 'Host did not negotiate supported MCP Apps serverTools.');
+      initialized = true; onContext(result.hostContext || {});
+      const transport = { offline: false, hostInfo: result.hostInfo, close,
+        invoke(action, args) { if (!ACTIONS.has(action)) M.fail('read_only', 'Action is not allowed.'); return request('tools/call', { name: 'project_model', arguments: hostRequest(action, args) }); },
+        readArtifact(manifest,onProgress){return readArtifactChunks(manifest,args=>request('tools/call',{name:'artifact_read',arguments:args}),onProgress);},
+        async sendSelection(ref) { const response = await request('ui/message', { role: 'user', content: [{ type: 'text', text: 'Inspect this exact project object. Re-resolve before a fresh read or prepared change.\n' + JSON.stringify(ref) }] }); if (response?.isError) M.fail('host_rejected', 'Host rejected selection.'); }
+      };
+      send({ jsonrpc: '2.0', method: 'ui/notifications/initialized', params: {} });
+      // Return before processing tool results so the caller can bind its transport.
+      setTimeout(() => { transportReady = true; for (const notification of notifications.splice(0)) Promise.resolve(onResult(notification)).catch(onDisconnect); }, 0);
+      return transport;
+    } catch (e) { close(e.message); throw e; }
+  }
+  return { ACTIONS, ReadOnlyClient, OfflineTransport, mcpAppTransport, connectMcpHost, hostRequest, readArtifactChunks, unwrap };
+});
+
+/* UI consumes exactly the same project-model references as the agent tools. */
+(function (root) {
+  'use strict';
+  const M = root.ProjectExplorerModel, C = root.ProjectExplorerClient, esc = M.escape;
+  const icons = { project: 'P', device: 'D', deviceItem: 'HW', plc: 'CPU', plcSoftware: 'CPU', block: 'BLK', blockGroup: '▱', group: '▱', softwareUnit: 'U', tag: 'T', tagTable: 'TT', dataType: 'DT', technologyObject: 'TO', hmi: 'HMI', virtualFolder: '▱' };
+  const icon = node => node.kind === 'block' ? ({ FB: 'FB', FC: 'FC', OB: 'OB', DB: 'DB', GlobalDB: 'DB', InstanceDB: 'DB', ArrayDB: 'DB' })[node.metadata?.kind || node.metadata?.blockType] || 'BLK' : icons[node.kind] || (node.origin === 'virtual' ? '▱' : '•');
+  const pretty = value => String(value || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
+  const time = value => { if (!value) return 'Not recorded'; const d = new Date(value); return Number.isNaN(+d) ? String(value) : d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); };
+  const str = value => typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value ?? 'Not exposed');
+  const badge = (label, tone = '') => `<span class="badge ${tone}">${esc(label)}</span>`;
+  const statusTone = state => /unsupported|unavailable|partial|truncat|protected|unresolved|stale|expir/i.test(state) ? 'warn' : /fail|disconnect|invalid/i.test(state) ? 'danger' : /complete|available|connected|valid/i.test(state) ? 'ok' : '';
+  const rows = values => '<dl class="property-grid">' + values.filter(([, v]) => v !== undefined).map(([k, v, mono]) => `<dt>${esc(k)}</dt><dd${mono ? ' class="mono"' : ''}>${esc(str(v))}</dd>`).join('') + '</dl>';
+  class Explorer {
+    constructor(element) {
+      this.element = element; this.snapshot = null; this.client = null; this.nodes = new Map(); this.children = new Map(); this.childState = new Map(); this.expanded = new Set(); this.visible = []; this.selected = null; this.tab = 'details'; this.searchToken = 0; this.detailToken = 0; this.query = ''; this.kind = ''; this.scope = ''; this.searchResults = []; this.searchCursor = null; this.graph = null; this.graphDepth = 1; this.relationKind = ''; this.direction = 'both'; this.graphZoom = 1; this.graphAttachments = []; this.graphPanels = []; this.pending = 0; this.generation = 0; this.theme = root.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; this.renderShell(); this.applyTheme();
+    }
+    $(selector) { return this.element.querySelector(selector); }
+    renderShell() {
+      this.element.innerHTML = `<div class="app"><header class="topbar"><div class="brand" aria-hidden="true"><span class="brandmark"><i></i><i></i><i></i><i></i></span></div><div><div class="eyebrow">TIA engineering workspace</div><div class="titleline"><h1>Project explorer</h1>${badge('READ ONLY')}</div></div><div class="top-actions"><button data-action="capture-open">Open capture</button><button data-action="open" class="optional">Open snapshot</button><button data-action="export" disabled>Export JSON</button><button data-action="refresh" disabled>↻ Refresh</button><button data-action="theme" aria-label="Toggle color theme" title="Toggle color theme">◐</button></div></header><section class="projectbar" hidden></section><div class="notice hidden" role="status"></div><section class="runtime-panel" aria-label="Runtime capture" hidden></section><div class="welcome"><div class="welcome-box"><div class="eyebrow">Software · Hardware · Relationships</div><h2>Your project, in context.</h2><p>Browse a captured TIA project, follow engineering references, and share an exact object selection with your agent.</p><button class="primary" data-action="open">Open project snapshot</button><p class="footer-note">Choose a <span class="mono">project-model.v1</span> JSON export. All browsing stays on this computer. A connected MCP host can provide fresh captures and exact verification.</p></div></div><div class="workspace" hidden><aside class="sidebar" aria-label="Project navigation"><div class="sidebar-head"><div class="sidebar-title"><h3>Project tree</h3><button class="quiet small" data-action="collapse" title="Collapse all">Collapse all</button></div><div class="search-box"><span class="search-icon" aria-hidden="true">⌕</span><input type="search" id="search" placeholder="Search names or exact paths" aria-label="Search project" autocomplete="off"></div><div class="filters"><select id="kind-filter" aria-label="Filter object kind"><option value="">All object types</option></select><select id="scope-filter" aria-label="Filter software scope"><option value="">All software scopes</option></select></div></div><div class="tree-count"><span id="tree-count">0 objects</span><span id="tree-mode">Hierarchy</span></div><div class="tree" id="tree" role="tree" aria-label="Project objects" tabindex="0"><div class="tree-space"></div></div><div class="tree-footer"><span>↑ ↓ navigate · → expand · Enter select</span><button class="small quiet" data-action="more" hidden>Load more</button></div></aside><section class="main-panel" aria-label="Selected object"><nav class="breadcrumbs" aria-label="Breadcrumb"></nav><div class="selection-head"></div><div class="tabs" role="tablist" aria-label="Object views"></div><div class="detail-body" role="tabpanel"></div></section></div><footer class="statusbar"><span id="connection-state">Portable viewer · no network connection</span><span id="freshness">Metadata and content freshness are separate</span><button data-action="release" class="quiet close-snapshot" hidden>Release snapshot</button></footer></div><input class="capture-input" hidden type="file" accept=".json,application/json" aria-label="Open runtime capture file"><input class="file-input" type="file" accept=".json,application/json" aria-label="Open snapshot file"><div class="toast" role="status" hidden></div>`;
+      this.element.addEventListener('click', event => { const action = event.target.closest('[data-action]'); if (action) this.action(action.dataset.action, action); });
+      this.$('.capture-input').addEventListener('change', async event => { const file=event.target.files[0]; if(!file)return; try { if(file.size>64*1024*1024+128*1024)throw new Error('Capture exceeds the 64 MiB plus metadata limit.'); await this.loadRuntimeCapture(await file.text()); } catch(e){this.error(e);} event.target.value=''; });
+      this.$('.file-input').addEventListener('change', async event => { const file = event.target.files[0]; if (!file) return; try { if (file.size > M.LIMITS.bytes) M.fail('snapshot_too_large', 'Snapshot exceeds the 32 MiB reader limit.'); const doc = JSON.parse(await file.text()); await this.load(doc, new C.OfflineTransport(doc)); } catch (e) { this.error(e); } event.target.value = ''; });
+      this.$('#search').addEventListener('input', () => { clearTimeout(this.searchDelay); this.query = this.$('#search').value; this.searchDelay = setTimeout(() => this.runSearch(), 100); });
+      this.$('#kind-filter').addEventListener('change', () => { this.kind = this.$('#kind-filter').value; this.runSearch(); });
+      this.$('#scope-filter').addEventListener('change', () => { this.scope = this.$('#scope-filter').value; this.runSearch(); });
+      this.$('#tree').addEventListener('scroll', () => this.renderTree());
+      this.$('#tree').addEventListener('keydown', event => this.treeKey(event));
+      this.$('#tree').addEventListener('click', event => { const row = event.target.closest('[data-node]'); if (!row) return; if (event.target.closest('.toggle')) this.toggle(row.dataset.node); else this.select(row.dataset.node); });
+      root.addEventListener('resize', () => this.renderTree());
+      root.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'f' && this.snapshot) { event.preventDefault(); this.$('#search').focus(); } if (event.key === 'Escape') { this.query = ''; this.$('#search').value = ''; this.runSearch(); } });
+    }
+    applyTheme() { document.documentElement.dataset.theme = this.theme; }
+    async load(input, transport) {
+      const data = C.unwrap(input), snapshot = data.snapshot || data;
+      if (snapshot.schemaVersion !== M.SCHEMA || !snapshot.snapshotId || !snapshot.project?.projectPath) M.fail('invalid_snapshot', 'Missing project-model.v1 snapshot identity.');
+      if (snapshot.metadataRevision?.includesContent !== false || snapshot.metadataRevision?.scope !== 'exposedMetadata') M.fail('invalid_revision', 'Metadata must not be presented as complete content freshness.');
+      this.$('.runtime-panel').hidden=true; this.runtimeCapture=null;
+      this.graphAttachments = []; this.graphPanels = []; this.generation++; this.searchToken++; this.detailToken++; this.snapshot = snapshot; this.client = new C.ReadOnlyClient(transport); this.nodes.clear(); this.children.clear(); this.childState.clear(); this.expanded.clear(); this.selected = null; this.graph = null; this.details = null; this.query = ''; this.kind = ''; this.scope = ''; this.searchResults = []; this.tab = 'details'; this.$('#search').value = '';
+      if (transport.offline) {
+        this.index = transport.index; for (const n of snapshot.nodes) this.nodes.set(n.nodeId, n);
+        for (const [id, values] of this.index.children) { this.children.set(id, values.map(n => n.nodeId)); this.childState.set(id, { loaded: true, cursor: null }); }
+      } else { this.index = null; this.addNodes(snapshot.nodes || data.roots || snapshot.roots || []); }
+      this.$('.welcome').hidden = true; this.$('.workspace').hidden = false; this.$('.projectbar').hidden = false; this.$('[data-action=release]').hidden = false; this.$('[data-action=export]').disabled = false; this.$('[data-action=refresh]').disabled = false;
+      if (!this.children.has('')) await this.loadChildren(null);
+      for (const id of this.children.get('') || []) this.expanded.add(id);
+      if (!transport.offline) for (const id of this.children.get('') || []) await this.loadChildren(id);
+      this.updateFilters(); this.renderProject(); this.rebuild(); this.renderSelection(); this.notice();
+    }
+    loadRuntimeCapture(text) {
+      this.uaImportToken=(this.uaImportToken||0)+1;
+      if(typeof text!=='string' || new TextEncoder().encode(text).length>64*1024*1024+128*1024)throw new Error('Capture exceeds the reader limit.');
+      const doc=JSON.parse(text), c=doc.capture, p=c?.plan;
+      if(doc.schemaVersion==='diagnostic-ua-observation.v1')return this.loadUaObservation(doc,text);
+      const invalid=()=>{throw new Error('Invalid runtime capture export or unsupported evidence claims.');};
+      if(doc.schemaVersion!=='runtime-capture-export.v1' || c?.schemaVersion!=='runtime-capture-status.v1' || !p?.request || !Array.isArray(p.signals) || p.signals.length<1 || p.signals.length>64 || !Array.isArray(doc.rows) || doc.rows.length>200000 || doc.rows.length!==c.recordedProgress?.rows || !['running','ended','interrupted','historicalPrefix'].includes(c.state) || c.acquisitionMode!=='polling' || c.plcChangesBetweenPollsUnknown!==true || !['nativeQualified','programMatchVerified','atomicAcrossSignals','scanSynchronized'].every(k=>c[k]===false))invalid();
+      const ids=new Set(p.signals.map(s=>s.selectionId));
+      if(ids.size!==p.signals.length || p.signals.some(s=>typeof s.selectionId!=='string' || typeof s.selection?.symbol!=='string' || typeof s.selection?.context?.endpoint!=='string'))invalid();
+      if(p.handoff!==undefined || p.request.handoffRef!==undefined){
+        const h=p.handoff,s=h?.session,x=s?.context,k=s?.credential;
+        const hex=(value,length)=>typeof value==='string' && value.length===length && /^[a-f0-9]+$/.test(value);
+        const exact=(value,keys)=>value && typeof value==='object' && !Array.isArray(value) && Object.keys(value).length===keys.length && keys.every(key=>Object.hasOwn(value,key));
+        const flags=['deviceIdentityVerified','programMatchVerified','effectiveRightsVerified','sourceAuthenticityVerified','operationAdmitted','assertionsAdmitted'];
+        if(!exact(h,['schemaVersion','recordRef','reviewId','session','declarationState',...flags]) || h.schemaVersion!=='runtime-capture-handoff.v1' || h.declarationState!=='consistentDeclarations' || !flags.every(key=>h[key]===false) || typeof h.recordRef!=='string' || h.recordRef.length!==113 || !/^runtime-handoff:[a-f0-9]{32}:[a-f0-9]{64}$/.test(h.recordRef) || h.recordRef!==p.request.handoffRef || !hex(h.reviewId,64) || h.reviewId!==p.request.reviewId)invalid();
+        if(!exact(s,['hostId','context','subjectId','securityMode','credential','peerVerified']) || !hex(s.hostId,32) || s.peerVerified!==true || typeof s.subjectId!=='string' || !s.subjectId.trim() || s.subjectId.length>512 || !s.subjectId.isWellFormed() || /[\u0000-\u001f\u007f-\u009f]/.test(s.subjectId) || !['local','static','disabled','umc'].includes(s.securityMode))invalid();
+        if(!exact(x,['endpoint','connectionId','epoch','peerCertificateSha256']) || typeof x.endpoint!=='string' || x.endpoint.length>4096 || !/^https:\/\/[^/@?#\\\s]+$/.test(x.endpoint) || !hex(x.connectionId,32) || !hex(x.epoch,32) || !hex(x.peerCertificateSha256,64) || x.connectionId!==p.request.attemptId || p.signals.some(signal=>Object.keys(x).some(key=>signal.selection.context[key]!==x[key])))invalid();
+        if(!exact(k,['schemaVersion','vaultId','credentialId','bindingSha256','cipherSha256']) || k.schemaVersion!=='protected-credential-reference.v1' || !hex(k.vaultId,32) || !hex(k.credentialId,32) || !hex(k.bindingSha256,64) || !hex(k.cipherSha256,64))invalid();
+      }
+      if(p.association || p.request.association){
+        const a=p.association, request=p.request.association;
+        if(!a || !request || !/^[a-f0-9]{64}$/.test(a.caseId) || !/^[a-f0-9]{64}$/.test(a.reviewId) || !a.project || typeof a.project!=='object' || Array.isArray(a.project) || typeof a.blockPath!=='string' || !a.selectedInstance || typeof a.selectedInstance.dbPath!=='string' || !Array.isArray(a.selectedInstance.memberPath) || a.selectedInstance.memberPath.some(x=>typeof x!=='string'))invalid();
+        if(!a || !request || a.caseId!==request.caseId || a.reviewId!==p.request.reviewId || !['addressMatchVerified','programMatchVerified','sourceAuthenticityVerified','nativeQualified'].every(k=>a[k]===false) || !Array.isArray(a.signals) || !Array.isArray(request.mappings) || a.signals.length!==p.signals.length || request.mappings.length!==p.signals.length || new Set(request.mappings.map(m=>m.signalId)).size!==p.signals.length || a.sourceRevision?.reviewId!==a.reviewId || a.sourceRevision.onlineVerified!==false)invalid();
+        for(let i=0;i<a.signals.length;i++){
+          const row=a.signals[i], d=row.declaration, m=request.mappings[i];
+          if(row.selectionId!==p.signals[i].selectionId || row.selectionId!==m.selectionId || row.signalId!==m.signalId || d?.id!==m.signalId || typeof m.reason!=='string' || d.resolution!=='capturedDeclaration' || d.traceability!=='requiresTargetValidation' || d.evidence?.liveVerified!==false || typeof d.datatype!=='string' || d.datatype.toLowerCase()!==p.signals[i].metadata?.datatype?.toLowerCase())invalid();
+        }
+        if(Object.hasOwn(a,'alarmBindings')){
+          const alarm=a.alarmBindings, same=(x,y,depth=0)=>{
+            if(x===y)return true;
+            if(depth>48 || !x || !y || typeof x!=='object' || typeof y!=='object' || Array.isArray(x)!==Array.isArray(y))return false;
+            const keys=Object.keys(x);return keys.length===Object.keys(y).length && keys.every(k=>Object.hasOwn(y,k) && same(x[k],y[k],depth+1));
+          };
+          if(alarm?.schemaVersion!=='diagnostic-alarm-bindings.v1' || alarm.reviewId!==a.reviewId || alarm.alarmSelector?.reviewId!==a.reviewId || alarm.allSelectedMatched!==true || !['sourceAuthenticityVerified','nativeQualified','runtimeAlarmAssociationVerified','coverageComplete'].every(k=>alarm[k]===false) || !Array.isArray(alarm.bindings) || alarm.bindings.length<1 || alarm.bindings.length>16 || !Array.isArray(alarm.selectors) || alarm.selectors.length!==alarm.bindings.length)invalid();
+          const bindingIds=new Set();
+          alarm.bindings.forEach((b,i)=>{
+            if(typeof b?.id!=='string' || !b.id.trim() || b.id.length>64 || bindingIds.has(b.id) || typeof b.signalId!=='string' || !b.signalId.trim() || b.signalId.length>64 || alarm.selectors[i]?.id!==b.id || alarm.selectors[i]?.signalId!==b.signalId || b.status!=='capturedDeclarationMatch' || b.signal?.id!==b.signalId || b.signal.resolution!=='capturedDeclaration' || b.signal.evidence?.liveVerified!==false || b.declaration?.objectPath!==a.blockPath || b.declaration.liveVerified!==false || b.storage?.truncated!==false || b.storage.runtimeCallContextVerified!==false || !Array.isArray(b.storage.gaps) || b.storage.gaps.length)invalid();
+            bindingIds.add(b.id);const mapped=a.signals.find(s=>s.signalId===b.signalId);
+            if(mapped && !['storagePath','memberPath','datatype','symbolComponents','namespace','scopePath','resolution','unavailableReason','traceability','evidence'].every(k=>same(b.signal[k],mapped.declaration[k])))invalid();
+          });
+        }
+      }
+      for(let i=0;i<doc.rows.length;i++){
+        const row=doc.rows[i];
+        if(row.sequence!==i || !Number.isFinite(row.elapsedMilliseconds) || row.elapsedMilliseconds<0 || !['read','gap'].includes(row.kind))invalid();
+        if(row.kind==='gap'){if(!Number.isSafeInteger(row.skippedPolls) || row.skippedPolls<1 || row.readResultJson!==null || row.errorCode!==null)invalid();continue;}
+        if(!ids.has(row.selectionId) || (row.readResultJson===null)===(row.errorCode===null))invalid();
+        if(row.readResultJson!==null){
+          if(typeof row.readResultJson!=='string' || row.readResultJson.length>1024*1024)invalid();
+          const read=JSON.parse(row.readResultJson);
+          if(read.schemaVersion!=='physical-runtime-web-read.v1' || typeof read.status!=='string' || !['nativeQualified','programMatchVerified','atomicAcrossSignals','scanSynchronized','deviceIdentityVerified'].every(k=>read[k]===false))invalid();
+        }else if(typeof row.errorCode!=='string')invalid();
+      }
+      this.runtimeCapture={doc,text,filter:'',page:0}; this.$('.welcome').hidden=true;this.$('.workspace').hidden=true;this.$('.projectbar').hidden=true;this.$('.notice').classList.add('hidden');
+      for(const action of ['export','refresh'])this.$('[data-action='+action+']').disabled=true;
+      this.$('[data-action=release]').hidden=true;this.$('.runtime-panel').hidden=false;this.renderRuntimeCapture();
+    }
+    renderRuntimeCapture() {
+      if(this.runtimeCapture?.doc.schemaVersion==='diagnostic-ua-observation.v1'){this.renderUaObservation();return;}
+      const view=this.runtimeCapture,{capture:c,rows:data}=view.doc, signals=c.plan.signals, selected=data.filter(r=>!view.filter || r.selectionId===view.filter || r.kind==='gap'), start=view.page*100;
+      const labels=new Map(signals.map(s=>[s.selectionId,s.selection.symbol]));
+      const a=c.plan.association, associationView=a?`<details class="runtime-association"><summary>Declared engineering mappings (${a.signals.length})</summary><p>Caller-selected links to saved declarations. Online address equivalence, source authenticity and running-program identity are unverified. These links do not qualify diagnostic assertions.</p>${rows([['Diagnostic case',a.caseId,true],['Source project',a.project],['Source block',a.blockPath,true],['Selected instance DB',a.selectedInstance.dbPath,true],['Instance members',a.selectedInstance.memberPath],['Asserted program identity',c.plan.request.association.assertedProgramIdentity||'None (caller assertion only)']])}${a.signals.map((s,i)=>`<details><summary>${esc(labels.get(s.selectionId))} → ${esc(s.signalId)}</summary>${rows([['Mapping reason',c.plan.request.association.mappings[i].reason],['Storage path',s.declaration.storagePath,true],['Member path',s.declaration.memberPath],['Captured datatype',s.declaration.datatype],['Declaration evidence',s.declaration.evidence],['Source symbol components',s.declaration.symbolComponents]])}</details>`).join('')}</details>`:'';
+      this.$('.runtime-panel').innerHTML=`<div class="runtime-heading"><div><div class="eyebrow">Retained Web API polling</div><h2>Runtime capture</h2></div><div><button data-action="capture-download">Download capture JSON</button> <button data-action="capture-close">Back to project</button></div></div><p class="runtime-warning">Unverified program match · Changes between polls are unknown · Signals are sequential, not scan synchronized. This file is supplied evidence; opening it does not authenticate its source.</p>${rows([['Capture state',c.state],['Recorded termination',c.recordedProgress.terminalReason||'Not recorded'],['Endpoint',signals[0].selection.context.endpoint,true],['Read attempts retained',c.recordedProgress.readAttempts],['Scheduled polls skipped',c.recordedProgress.skippedPolls],['Read results dropped',c.recordedProgress.droppedReadResults],['Uncommitted data unknown',c.uncommittedDataUnknown],['Declared review association',c.plan.request.reviewId||'None'],['Pinned capture reference',c.snapshotRef,true]])}${associationView}<div class="runtime-controls"><label>Signal <select class="runtime-filter" aria-label="Filter capture signal"><option value="">All signals</option>${signals.map(s=>`<option value="${esc(s.selectionId)}"${view.filter===s.selectionId?' selected':''}>${esc(s.selection.symbol)}</option>`).join('')}</select></label><span>${selected.length?start+1:0}–${Math.min(start+100,selected.length)} of ${selected.length} records</span><button data-action="capture-prev" ${start===0?'disabled':''}>Previous</button><button data-action="capture-next" ${start+100>=selected.length?'disabled':''}>Next</button></div><div class="runtime-table"><table><thead><tr><th>Record</th><th>Elapsed ms</th><th>Signal</th><th>Observation</th></tr></thead><tbody>${selected.slice(start,start+100).map(r=>`<tr><td>${r.sequence}</td><td>${esc(r.elapsedMilliseconds.toFixed(3))}</td><td>${esc(labels.get(r.selectionId)||'Polling gap')}</td><td>${r.kind==='gap'?`Skipped ${r.skippedPolls} scheduled polls`:r.readResultJson===null?`${esc(r.errorCode)} · value unknown`:`${badge(JSON.parse(r.readResultJson).status)}<details><summary>Exact read JSON</summary><pre>${esc(r.readResultJson)}</pre></details>`}</td></tr>`).join('')}</tbody></table></div><p class="footer-note">Exact JSON preserves integer text, raw bytes, provider errors and host timing. Failed reads and gaps are never filled with zero.</p>`;
+      this.$('.runtime-filter').addEventListener('change',event=>{view.filter=event.target.value;view.page=0;this.renderRuntimeCapture();});
+      const alarm=a?.alarmBindings;
+      if(alarm)this.$('.runtime-controls').insertAdjacentHTML('beforebegin',`<details class="runtime-alarm"><summary>Saved alarm operand bindings (${alarm.bindings.length})</summary><p>Original supplied bindings to saved executable source. Selection for capture does not prove a successful observation, active alarm, runtime invocation or running-program match.</p>${alarm.bindings.map(b=>`<details><summary>${esc(b.id)} → ${esc(b.signalId)} · ${a.signals.some(s=>s.signalId===b.signalId)?'Selected for capture':'Not selected in this capture'}</summary>${rows([['Original operand',b.operand],['Original relationships',b.relationships],['Saved declaration',b.declaration],['Storage and call evidence',b.storage]])}</details>`).join('')}</details>`);
+      const handoff=c.plan.handoff;
+      if(handoff)this.$('.runtime-controls').insertAdjacentHTML('beforebegin',`<details class="runtime-handoff"><summary>Retained security handoff</summary><p>Historical declarations tied to this session. Device and program identity, effective rights and source authenticity remain unverified. No operation or diagnostic assertion is admitted. Opening this file does not refresh the evidence.</p>${rows([['Handoff reference',handoff.recordRef,true],['Review',handoff.reviewId,true],['Session owner',handoff.session.hostId,true],['Capture owner',c.plan.hostId,true],['Subject',handoff.session.subjectId],['Security mode',handoff.session.securityMode],['Connection context',handoff.session.context]])}</details>`);
+      this.$('#connection-state').textContent='Offline runtime evidence · no target connection';this.$('#freshness').textContent='Polling capture · no native qualification';
+    }
+    addNodes(nodes) { for (const node of nodes) { if (this.nodes.has(node.nodeId)) continue; if (this.nodes.size >= M.LIMITS.nodes) M.fail('node_limit', 'Viewer node budget reached. Narrow the capture scope.'); if (node.origin === 'virtual' && node.objectPath) M.fail('invalid_reference', 'Virtual node cannot be an engineering reference.'); this.nodes.set(node.nodeId, node); const p = node.parentId || ''; if (!this.children.has(p)) this.children.set(p, []); this.children.get(p).push(node.nodeId); } }
+    async request(action, args = {}) { this.pending++; this.updateStatus(); try { return await this.client.invoke(action, { snapshotId: this.snapshot.snapshotId, ...args }); } finally { this.pending--; this.updateStatus(); } }
+    async loadChildren(parentId, more = false) {
+      const key = parentId || '', state = this.childState.get(key); if (state?.loading || state?.loaded && !more) return;
+      const generation = this.generation; this.childState.set(key, { ...state, loading: true });
+      try { const page = await this.request('children', { parentId, cursor: more ? state?.cursor : null, pageSize: 200 }); if (generation !== this.generation) return; this.addNodes(page.nodes || []); this.childState.set(key, { loaded: true, cursor: page.nextCursor, total: page.totalMatches }); this.updateFilters(); } catch (e) { if (generation === this.generation) { this.childState.set(key, { ...state, loading: false }); this.error(e); } }
+    }
+    updateFilters() {
+      const kinds = [...new Set([...this.nodes.values()].map(n => n.kind))].sort(), scopes = [...new Set([...this.nodes.values()].map(n => n.scopePath || n.plcPath).filter(Boolean))].sort();
+      this.$('#kind-filter').innerHTML = '<option value="">All object types</option>' + kinds.map(k => `<option value="${esc(k)}">${esc(pretty(k))}</option>`).join(''); this.$('#kind-filter').value = this.kind;
+      this.$('#scope-filter').innerHTML = '<option value="">All software scopes</option>' + scopes.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join(''); this.$('#scope-filter').value = this.scope;
+    }
+    renderProject() {
+      const s = this.snapshot; this.$('.projectbar').innerHTML = `<div><div class="project-name">${esc(s.project.name || 'TIA project')}</div><div class="project-path" title="${esc(s.project.projectPath)}">${esc(s.project.projectPath)}</div></div><div class="meta"><div>CONNECTION HOST<strong>${esc(s.project.host || 'Not recorded')}</strong></div><div>CAPTURE COMPLETED<strong>${esc(time(s.captureCompletedAtUtc))}</strong></div><div>CAPTURE SCOPE<strong>${(s.coverage || []).filter(c => c.status === 'complete').length} / ${(s.coverage || []).length} providers complete</strong></div></div>`;
+      this.updateStatus();
+    }
+    updateStatus() { if (!this.snapshot) return; const state = this.client.state; this.$('#connection-state').textContent = `${state === 'offline' ? 'Offline snapshot' : state === 'connected' ? 'Connected through MCP host' : 'Disconnected · session unavailable'}${this.pending ? ' · Loading…' : ''} · ${this.nodes.size.toLocaleString()} cached objects`; this.$('#freshness').textContent = `Snapshot ${this.snapshot.snapshotId.slice(0, 12)} · Metadata only`; }
+    notice(message, tone) {
+      const box = this.$('.notice'); if (!this.snapshot && !message) { box.classList.add('hidden'); return; }
+      const expired = this.snapshot?.expiresAtUtc && new Date(this.snapshot.expiresAtUtc) <= new Date();
+      let text = message || (expired ? 'Snapshot expired for live operations. Historical browsing remains available; recapture before using an exact selection.' : this.client?.state === 'offline' ? 'Offline capture. Values describe engineering declarations; they are not live PLC values.' : 'Snapshot metadata is cached. Content and relationships carry their own evidence timestamps.');
+      const partial = this.snapshot?.coverage?.some(c => !['complete', 'available'].includes(c.status)); if (!message && partial) text += ' Some provider coverage is partial or unavailable.';
+      box.classList.remove('hidden'); box.innerHTML = `<span aria-hidden="true">${tone === 'error' ? '!' : 'ⓘ'}</span><span>${esc(text)}</span><button class="quiet" data-action="coverage">View coverage →</button>`;
+    }
+    filtering() { return !!(this.query || this.kind || this.scope); }
+    async runSearch(more = false) {
+      if (!this.snapshot) return; const token = ++this.searchToken, generation = this.generation;
+      if (!this.filtering()) { this.searchResults = []; this.searchCursor = null; this.rebuild(); return; }
+      this.$('#tree-mode').textContent = 'Searching…';
+      try { const result = await this.request('search', { text: this.query, kinds: this.kind ? [this.kind] : [], scopePath: this.scope || null, cursor: more ? this.searchCursor : null, pageSize: 200 }); if (token !== this.searchToken || generation !== this.generation) return; this.addNodes(result.nodes || []); this.searchResults = more ? [...this.searchResults, ...(result.nodes || [])] : result.nodes || []; this.searchCursor = result.nextCursor; this.searchTotal = result.totalMatches; this.rebuild(); } catch (e) { if (token === this.searchToken) this.error(e); }
+    }
+    rebuild() {
+      if (this.filtering()) this.visible = this.searchResults.map(node => ({ node, depth: 0 }));
+      else { const stack = (this.children.get('') || []).slice().reverse().map(id => ({ node: this.nodes.get(id), depth: 0 })); this.visible = []; const seen = new Set(); while (stack.length) { const item = stack.pop(); if (!item.node || seen.has(item.node.nodeId) || item.depth > 64) continue; seen.add(item.node.nodeId); this.visible.push(item); if (this.expanded.has(item.node.nodeId)) for (const id of (this.children.get(item.node.nodeId) || []).slice().reverse()) stack.push({ node: this.nodes.get(id), depth: item.depth + 1 }); } }
+      this.$('#tree-count').textContent = this.filtering() ? `${this.searchTotal ?? this.visible.length} matches` : `${this.nodes.size.toLocaleString()} cached objects`;
+      this.$('#tree-mode').textContent = this.filtering() ? 'Search results' : 'Hierarchy';
+      this.$('[data-action=more]').hidden = !this.searchCursor && ![...this.expanded].some(id => this.childState.get(id)?.cursor); this.renderTree();
+    }
+    hasChildren(node) { return !!this.children.get(node.nodeId)?.length || !this.client.transport.offline && node.detailAvailability?.children !== false && /project|device|plc|group|folder|unit|table|software|technologyObject/i.test(node.kind); }
+    renderTree() {
+      if (!this.snapshot) return; const tree = this.$('#tree'), space = this.$('.tree-space'), height = this.filtering() ? 52 : 34;
+      space.style.height = this.visible.length * height + 'px'; const start = Math.max(0, Math.floor(tree.scrollTop / height) - 5), end = Math.min(this.visible.length, start + Math.ceil((tree.clientHeight || 400) / height) + 10);
+      space.innerHTML = this.visible.slice(start, end).map((item, j) => {
+        const n = item.node, index = start + j, expanded = this.expanded.has(n.nodeId), hasChildren = this.hasChildren(n), selected = n.nodeId === this.selected;
+        return `<div class="tree-row${selected ? ' selected' : ''}${this.filtering() ? ' search-row' : ''}" data-node="${esc(n.nodeId)}" id="tree-row-${index}" role="treeitem" aria-level="${item.depth + 1}" aria-selected="${selected}"${hasChildren ? ` aria-expanded="${expanded}"` : ''} aria-posinset="${index + 1}" aria-setsize="${this.visible.length}" style="top:${index * height}px;padding-left:${9 + item.depth * 17}px" title="${esc(n.objectPath || n.name)}"><button class="toggle" tabindex="-1" aria-label="${expanded ? 'Collapse' : 'Expand'} ${esc(n.name)}"${!hasChildren ? ' disabled' : ''}>${hasChildren ? expanded ? '▾' : '▸' : ''}</button><span class="glyph" aria-hidden="true">${esc(icon(n))}</span><span class="name"><span class="result-name">${esc(n.name)}</span>${this.filtering() ? `<span class="result-path">${esc(n.scopePath || n.plcPath || n.objectPath || 'Display folder')}</span>` : ''}</span>${n.origin === 'virtual' ? '<span class="origin">virtual</span>' : n.access?.state === 'protected' ? '<span class="lock" title="Protected object">▣</span>' : ''}</div>`;
+      }).join('');
+      const selectedIndex = this.visible.findIndex(i => i.node.nodeId === this.selected); if (selectedIndex >= start && selectedIndex < end) tree.setAttribute('aria-activedescendant', `tree-row-${selectedIndex}`); else tree.removeAttribute('aria-activedescendant');
+      if (!this.visible.length) space.innerHTML = '<div class="empty" style="min-height:120px"><p>No objects in this view. Empty and unavailable coverage remain distinct in the coverage tab.</p></div>';
+    }
+    async toggle(id) { if (this.expanded.has(id)) this.expanded.delete(id); else { this.expanded.add(id); await this.loadChildren(id); } this.rebuild(); }
+    async treeKey(event) {
+      let index = this.visible.findIndex(i => i.node.nodeId === this.selected); const node = this.nodes.get(this.selected); const keys = ['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Home', 'End', 'Enter', ' ']; if (!keys.includes(event.key)) return; event.preventDefault();
+      if (event.key === 'ArrowDown') index = Math.min(this.visible.length - 1, index + 1); else if (event.key === 'ArrowUp') index = Math.max(0, index - 1); else if (event.key === 'Home') index = 0; else if (event.key === 'End') index = this.visible.length - 1; else if (event.key === 'ArrowRight' && node) { if (!this.expanded.has(node.nodeId)) await this.toggle(node.nodeId); else index = Math.min(this.visible.length - 1, index + 1); } else if (event.key === 'ArrowLeft' && node) { if (this.expanded.has(node.nodeId)) { await this.toggle(node.nodeId); return; } index = this.visible.findIndex(i => i.node.nodeId === node.parentId); } else if ((event.key === 'Enter' || event.key === ' ') && node) { this.select(node.nodeId); return; }
+      if (index >= 0 && this.visible[index]) { await this.select(this.visible[index].node.nodeId); const height = this.filtering() ? 52 : 34, tree = this.$('#tree'); if (index * height < tree.scrollTop) tree.scrollTop = index * height; else if ((index + 1) * height > tree.scrollTop + tree.clientHeight) tree.scrollTop = (index + 1) * height - tree.clientHeight; this.renderTree(); }
+    }
+    ancestry(node) { if (Array.isArray(node.ancestors)) return [...node.ancestors, node]; const out = []; let current = node; const seen = new Set(); while (current && !seen.has(current.nodeId) && out.length <= 64) { seen.add(current.nodeId); out.unshift(current); current = this.nodes.get(current.parentId); } return out; }
+    async select(id) { const node = this.nodes.get(id); if (!node) return; this.selected = id; this.details = null; this.graph = null; this.graphDepth = 1; this.detailToken++; if (!this.filtering()) { for (const ancestor of this.ancestry(node).slice(0,-1)) this.expanded.add(ancestor.nodeId); this.rebuild(); const index=this.visible.findIndex(item=>item.node.nodeId===id); if(index>=0){const tree=this.$('#tree'); if(index*34<tree.scrollTop||(index+1)*34>tree.scrollTop+tree.clientHeight)tree.scrollTop=Math.max(0,index*34-100);} } this.renderTree(); this.renderSelection(); await this.loadTab(); }
+    renderSelection() {
+      const node = this.nodes.get(this.selected); this.$('.tabs').innerHTML = ['details', 'relationships', 'hardware', 'previews', 'coverage'].map(tab => `<button role="tab" id="tab-${tab}" aria-controls="object-panel" aria-selected="${tab === this.tab}" data-action="tab" data-tab="${tab}">${tab[0].toUpperCase() + tab.slice(1)}</button>`).join(''); this.$('.detail-body').id = 'object-panel'; this.$('.detail-body').setAttribute('aria-labelledby', `tab-${this.tab}`);
+      if (!node) { this.$('.breadcrumbs').innerHTML = esc(this.snapshot?.project.name || 'Project'); this.$('.selection-head').innerHTML = `<div class="object-icon">P</div><div class="selection-title"><h2>${esc(this.snapshot?.project.name || 'Project overview')}</h2><div class="selection-sub">Captured project overview</div></div>`; this.renderOverview(); return; }
+      this.$('.breadcrumbs').innerHTML = this.ancestry(node).map((n, i, a) => `${i ? '<span>›</span>' : ''}<button data-action="breadcrumb" data-id="${esc(n.nodeId)}" class="${i === a.length - 1 ? 'current' : ''}">${esc(n.name)}</button>`).join('');
+      this.$('.selection-head').innerHTML = `<div class="object-icon">${esc(icon(node))}</div><div class="selection-title"><h2>${esc(node.name)}</h2><div class="selection-sub">${badge(pretty(node.kind))}${badge(node.origin === 'native' ? 'Native object' : 'Virtual display folder', node.origin === 'native' ? 'ok' : '')}${node.access?.state && node.access.state !== 'available' ? badge(pretty(node.access.state), statusTone(node.access.state)) : ''}</div></div><div class="selection-actions"><button class="small" data-action="copy"${node.origin !== 'native' ? ' disabled' : ''}>Copy reference</button><button class="small primary" data-action="send"${node.origin !== 'native' || !this.client.transport.sendSelection ? ' disabled' : ''} title="Verify the exact reference, then send it to the connected agent">Send selection ↗</button></div>`;
+      this.renderTab();
+    }
+    renderOverview() {
+      if (this.tab === 'coverage') { this.renderCoverage(); return; }
+      const nodes = [...this.nodes.values()], native = nodes.filter(n => n.origin === 'native').length, complete = (this.snapshot.coverage || []).filter(c => c.status === 'complete').length;
+      this.$('.detail-body').innerHTML = `<div class="cards"><div class="card"><div class="metric">${native.toLocaleString()}</div><div class="metric-label">Native objects cached</div></div><div class="card"><div class="metric">${(nodes.length - native).toLocaleString()}</div><div class="metric-label">Virtual display folders</div></div><div class="card"><div class="metric">${complete} / ${(this.snapshot.coverage || []).length}</div><div class="metric-label">Providers complete</div></div></div><div class="section-title"><h3>Explore the captured project</h3>${badge('Bounded capture', 'ok')}</div><p class="subtle">Select an object in the tree to inspect declarations, follow evidence-backed relationships, or share its exact reference. Search includes canonical paths, so repeated names remain distinguishable across PLCs and software units.</p><div class="callout" style="margin-top:19px">Hardware is shown as the exposed engineering hierarchy. A device tree does not establish physical rack positions, network wiring, or cable topology.</div>${rows([['Project copy', this.snapshot.project.projectPath, true], ['Capture interval', `${time(this.snapshot.captureStartedAtUtc)} → ${time(this.snapshot.captureCompletedAtUtc)}`], ['Session generation', this.snapshot.sessionGeneration, true], ['Metadata revision', this.snapshot.metadataRevision?.value, true], ['Revision coverage', 'Exposed metadata only. PLC logic, screens and detailed settings need their own content evidence.']])}<button data-action="coverage">Review provider coverage →</button>`;
+    }
+    async loadTab() {
+      const node = this.nodes.get(this.selected); if (!node) { this.renderOverview(); return; } if (this.tab === 'coverage') { this.renderCoverage(); return; }
+      const token = ++this.detailToken, id = this.selected, generation = this.generation;
+      if (this.tab === 'relationships') { await this.loadGraph(token); return; }
+      if (node.origin === 'virtual') { this.details = { status: 'virtual', node, facets: node.metadata || {}, warnings: [] }; this.renderTab(); return; }
+      this.$('.detail-body').innerHTML = '<div class="empty loading"><p>Loading exact object details…</p><span class="hint">Native reads can take time. Closing this view does not cancel a Siemens call.</span></div>';
+      try { const details = await this.request('details', { reference: M.reference(this.snapshot, node), facets: this.tab === 'previews' ? ['metadata', 'previews'] : this.tab === 'hardware' ? ['metadata', 'hardware'] : ['metadata'] }); if (token !== this.detailToken || id !== this.selected || generation !== this.generation) return; this.details = details; this.renderTab(); } catch (e) { if (token === this.detailToken) { this.error(e); this.$('.detail-body').innerHTML = `<div class="callout danger">${esc(e.message)}</div><p class="subtle">The exact selection has been retained. Recapture and select again if its identity or session changed.</p>`; } }
+    }
+    renderTab() {
+      if (this.tab === 'coverage') return this.renderCoverage(); const node = this.nodes.get(this.selected); if (!node) return this.renderOverview();
+      if (this.tab === 'relationships') return this.renderGraph(); if (this.tab === 'previews') return this.renderPreviews(); if (this.tab === 'hardware') return this.renderHardware();
+      const details = this.details, metadata = details?.facets || details?.metadata || node.metadata || {};
+      this.$('.detail-body').innerHTML = `${node.origin === 'virtual' ? '<div class="callout warning">This is a virtual display folder. It has no engineering object path and cannot be sent as a mutation target.</div>' : ''}${node.access?.state === 'protected' ? '<div class="callout warning">Protected object. Only exposed metadata is shown; inaccessible content is not an empty object.</div>' : ''}<div class="section-title"><h3>Identity & scope</h3>${badge(details?.status || 'Snapshot metadata', statusTone(details?.status || ''))}</div>${rows([['Canonical object path', node.objectPath || 'Not applicable to a virtual folder', true], ['Owning PLC', node.plcPath, true], ['Software scope', node.scopePath, true], ['Snapshot node ID', node.nodeId, true], ['Access', node.access?.state || 'Not reported'], ['Details captured', time(details?.capturedAtUtc || this.snapshot.captureCompletedAtUtc)], ['Content revision', details?.contentRevision ? str(details.contentRevision) : 'Not verified; metadata hash excludes content', true]])}${this.nativeDetails(details?.details)}<div class="section-title"><h3>Exposed properties</h3><span class="hint">Engineering declarations · offline values</span></div>${Object.keys(metadata).length ? rows(Object.entries(metadata).filter(([k]) => !['previews', 'attachments'].includes(k)).map(([k, v]) => [pretty(k), v])) : '<div class="callout">No additional properties were returned for this object. See provider coverage for availability.</div>'}${(details?.warnings || []).map(w => `<div class="callout warning">${esc(str(w))}</div>`).join('')}<details><summary>Inspect structured detail response</summary><pre class="data">${esc(JSON.stringify(details || node, null, 2))}</pre></details>`;
+    }
+    nativeDetails(data) {
+      if (!data || typeof data !== 'object') return '';
+      const members=[]; for(const section of data.sections||[]) for(const member of section.members||[]) if(members.length<200) members.push({...member,section:member.section||section.name});
+      const table=members.length?`<div class="section-title"><h3>Native declarations</h3><span class="hint">${members.length} captured members · declared values</span></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Section</th><th>Type</th><th>Declared start value</th></tr></thead><tbody>${members.map(m=>`<tr><td class="mono">${esc(m.name)}</td><td>${esc(m.section)}</td><td>${esc(m.dataType||m.declaredType||'Unresolved')}</td><td>${esc(m.startValue??m.defaultValue??'Not declared')}</td></tr>`).join('')}</tbody></table></div>`:'';
+      return `${table}${data.artifact?`<details style="margin-bottom:18px"><summary>Source artifact · ${esc(data.artifact.mediaType||'native export')} · ${Number(data.artifact.bytes||0).toLocaleString()} bytes</summary>${rows([['Host-owned path',data.artifact.path,true],['SHA-256',data.artifact.sha256,true],['Transfer','Use artifact_read on the engineering host. This browser does not open host filesystem paths.']])}</details>`:''}${data.completeness?.scope?`<p class="hint" style="margin:0 0 18px">${esc(data.completeness.scope)}${data.completeness.truncated?' · Truncated':''}</p>`:''}`;
+    }
+    renderCoverage() {
+      const coverage = this.snapshot.coverage || []; this.$('.detail-body').innerHTML = `<div class="section-title"><h3>Provider coverage</h3>${badge(`${coverage.length} scopes`)}</div><p class="subtle" style="margin-bottom:16px">Coverage applies to each captured provider and scope. An empty collection is meaningful only when its traversal completed.</p><div class="coverage-list">${coverage.map(c => `<article class="coverage-item"><div class="coverage-top"><h3>${esc(pretty(c.provider))}</h3>${badge(pretty(c.status), statusTone(c.status))}</div><div class="coverage-scope">${esc(c.scope || 'Project')}</div><div class="hint">${Number(c.visited || 0).toLocaleString()} visited · ${Number(c.returned || 0).toLocaleString()} returned${c.continuationAvailable ? ' · more available: narrow scope or recapture' : ''}</div>${c.reason || c.truncationReason ? `<p class="hint">${esc(c.reason || c.truncationReason)}</p>` : ''}${(c.warnings || []).map(w => `<p class="hint">${esc(str(w))}</p>`).join('')}</article>`).join('')}</div><div class="callout" style="margin-top:18px">Metadata revision scope: <strong>${esc(this.snapshot.metadataRevision?.scope || 'Not reported')}</strong>. Includes content: <strong>false</strong>. Cross-provider data may have different capture times; inspect relationship evidence and preview content revisions.</div>${rows([['Capture started', time(this.snapshot.captureStartedAtUtc)], ['Capture completed', time(this.snapshot.captureCompletedAtUtc)], ['Snapshot expires', time(this.snapshot.expiresAtUtc)], ['Requested limits', this.snapshot.limits], ['Measured usage', this.snapshot.usage]])}${(this.snapshot.warnings || []).map(w => `<div class="callout warning">${esc(str(w))}</div>`).join('')}`;
+    }
+    renderHardware() {
+      const node = this.nodes.get(this.selected), metadata = {...(this.details?.facets || this.details?.metadata || node.metadata || {}),...(this.details?.details||{})};
+      this.$('.detail-body').innerHTML = `<div class="callout warning">Configured engineering hierarchy only. Physical positions, cable routes and port connectivity are unverified unless an explicit provider supplies evidence.</div><div class="section-title"><h3>Exposed hardware & address data</h3>${badge('No inferred topology')}</div>${rows(Object.entries(metadata).filter(([k]) => /address|channel|hardware|interface|port|rack|slot|position|type|order|firmware|device/i.test(k)).map(([k, v]) => [pretty(k), v])) || ''}<p class="subtle">${/device|hardware|module|channel|interface|port/i.test(node.kind) ? 'Properties above are those returned by the installed inspection service. Missing physical topology is unsupported, not an inferred connection.' : 'This object is not a hardware module. Its configured I/O associations, when available, appear as evidence-backed relationships.'}</p><div class="section-title" style="margin-top:24px"><h3>Contained objects</h3></div>${(this.children.get(node.nodeId) || []).length ? `<div class="coverage-list">${(this.children.get(node.nodeId) || []).slice(0, 200).map(id => { const child = this.nodes.get(id); return `<button data-action="breadcrumb" data-id="${esc(id)}" style="text-align:left">${esc(child.name)} <span class="hint">· ${esc(pretty(child.kind))}</span></button>`; }).join('')}</div>` : '<div class="callout">No contained objects are cached for this selection. Expand it in the tree to query available children.</div>'}<button style="margin-top:17px" data-action="io">Show configured I/O evidence →</button>`;
+      const items = this.details?.details?.items || [];
+      if (items.length) this.$('.detail-body').insertAdjacentHTML('afterbegin',items.slice(0,200).map(item=>`<section class="preview-frame" style="margin:0 0 16px"><div class="section-title"><h3>${esc(item.name||'Configured module')}</h3>${badge('Native exposed properties','ok')}</div>${rows([['Canonical hardware path',item.path,true],['Configured position number',item.positionNumber],['Classification',item.classification],['Built in / plugged',`${item.isBuiltIn??'Not exposed'} / ${item.isPlugged??'Not exposed'}`]])}<h3>Configured address ranges</h3>${(item.addresses||[]).length?`<div class="table-wrap" style="margin-top:10px"><table class="data-table"><thead><tr><th>I/O type</th><th>Start address</th><th>Length</th><th>Units</th><th>Byte span</th></tr></thead><tbody>${item.addresses.slice(0,200).map(a=>`<tr><td>${esc(a.ioType)}</td><td>${esc(a.startAddress)}</td><td>${esc(a.length)}</td><td>${esc(a.lengthUnit)}</td><td>${esc(a.byteSpan)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">No address rows returned. Check inspection coverage.</p>'}<h3>Exposed channels</h3>${(item.channels||[]).length?`<div class="table-wrap" style="margin-top:10px"><table class="data-table"><thead><tr><th>Number</th><th>I/O type</th><th>Channel type</th><th>Exposed attributes</th></tr></thead><tbody>${item.channels.slice(0,200).map(c=>`<tr><td>${esc(c.number)}</td><td>${esc(c.ioType)}</td><td>${esc(c.type)}</td><td>${esc(str(c.attributes||{}))}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">No channel rows returned; no per-channel offsets are inferred.</p>'}${item.network?`<details><summary>Configured network interface attributes</summary><pre class="data">${esc(JSON.stringify(item.network,null,2))}</pre></details>`:''}</section>`).join(''));
+    }
+    async renderPreviews() {
+      const node = this.nodes.get(this.selected), details = this.details || {}, providers = details.providers || details.previews || details.previewProviders || [];
+      const list = Array.isArray(providers) ? providers : Object.values(providers); const direct = details.attachments || node.previews || node.metadata?.previews || [];
+      const attachments = [...direct, ...list.flatMap(p => p.attachments || [])];
+      const generation=this.generation, selection=this.selected, token=this.detailToken, previewToken=this.previewToken=(this.previewToken||0)+1;
+      const supplied=this.graphAttachments.filter(a=>a.source.nodeId===selection);
+      this.graphPanels=[];
+      const rendered=[];
+      for (const attachment of [...attachments,...supplied]) {
+        if (attachment.kind!=='graphSequence') { rendered.push(this.previewAttachment(attachment)); continue; }
+        try {
+          M.exactNode(this.snapshot,this.nodes,attachment.source);
+          if(attachment.source.nodeId!==selection)M.fail('stale_selection','GRAPH report belongs to another exact selection.');
+          await M.verifyGraphReport(attachment.content);
+          if(generation!==this.generation||selection!==this.selected||token!==this.detailToken||previewToken!==this.previewToken||this.tab!=='previews')return;
+          const index=this.graphPanels.length;this.graphPanels.push(attachment);rendered.push(this.graphPanel(index,0));
+        } catch(error) { rendered.push(`<div class="callout danger">${esc(error.message)}</div>`); }
+      }
+      if(generation!==this.generation||selection!==this.selected||token!==this.detailToken||previewToken!==this.previewToken||this.tab!=='previews')return;
+      this.$('.detail-body').innerHTML = `<div class="section-title"><h3>Content previews</h3>${badge('Provider contracts')}</div><p class="subtle">HMI, LAD/FBD and GRAPH previews retain their source and coverage. Project scripts are never executed.</p>${node.origin==='native'&&node.kind==='block'?'<button data-action="graph-import">Attach supplied GRAPH report</button><p class="hint">Associate a report with this exact selection. This does not verify that its XML belongs to the native object.</p>':''}${list.map(p=>`<div class="callout ${p.status!=='available'?'warning':''}"><strong>${esc(pretty(p.provider||p.kind))}</strong> · ${esc(p.status||'available')}<br>${esc(p.reason||'')}<div class="hint">${esc(time(p.capturedAtUtc))} · content revision: ${esc(str(p.contentRevision))}</div></div>`).join('')}${rendered.length?rendered.join(''):'<div class="empty"><h3>No preview supplied</h3><p>No provider has returned content for this exact object. Native integration remains pending where unavailable.</p></div>'}`;
+      this.bindGraphSelectors();
+    }
+    graphPanel(index, sequenceIndex) {
+      const a=this.graphPanels[index], report=a.content, sequences=report.graphs.flatMap(g=>g.sequences.map(s=>({graph:g,sequence:s}))), selected=sequences[sequenceIndex];
+      const network=selected?M.graphSequenceNetwork(selected.sequence,selected.graph.sequences):null;
+      return `<article class="preview-frame graph-preview" data-graph-panel="${index}"><div class="section-title"><h3>GRAPH sequence review</h3>${badge('Supplied historical report','warn')}</div><p class="hint">Source bytes verified against the report hash. Report interpretation and object association are supplied, not revalidated against TIA. No native rendering or runtime qualification.</p><p class="mono hint">${esc(a.source.objectPath)} · ${esc(report.sourceSha256)}</p>${report.hasErrors?'<div class="callout danger">Structural errors were reported. Review diagnostics; this view does not authorize import.</div>':''}<label>Sequence <select class="graph-sequence" data-graph-index="${index}" aria-label="GRAPH sequence">${sequences.map((s,i)=>`<option value="${i}"${i===sequenceIndex?' selected':''}>Graph ${esc(s.graph.ordinal)} · Sequence ${esc(s.sequence.ordinal)} ${esc(s.sequence.title||'')}</option>`).join('')}</select></label><div class="graph-summary"><span>${sequences.length} sequences</span><span>${report.diagnostics.length} diagnostics</span><span>${report.unsupported.length} opaque elements</span></div>${network?`<p class="hint">Schematic document connections; no inferred execution order or native coordinates. Unresolved and cross-sequence endpoints remain in the connection records.</p>${network.totalNodes>500||network.totalConnections>1000?'<div class="callout warning">Diagram limited to 500 nodes and 1,000 connections. Complete records remain in the report download.</div>':''}<div class="graph-wrap">${M.networkSvg(network)}</div><div class="graph-item-buttons">${network.nodes.map(n=>`<button class="small" data-action="graph-item" data-panel="${index}" data-sequence="${sequenceIndex}" data-collection="${n.collection}" data-index="${n.index}">${esc(n.nativeName)}</button>`).join('')}</div><div class="graph-item-detail" aria-live="polite"></div><details><summary>Selected sequence connections and source</summary><pre class="data">${esc(JSON.stringify(selected.sequence,null,2))}</pre></details><details><summary>Chart pre/post operations and alarms</summary><pre class="data">${esc(JSON.stringify({preOperations:selected.graph.preOperations,postOperations:selected.graph.postOperations,alarmSettings:selected.graph.alarmSettings},null,2))}</pre></details>`:'<p>No supported sequence found; original XML and diagnostics remain available.</p>'}<details><summary>Diagnostics and opaque content</summary><pre class="data">${esc(JSON.stringify({diagnostics:report.diagnostics,unsupported:report.unsupported},null,2))}</pre></details><button data-action="graph-report" data-panel="${index}">Download GRAPH report</button> <button data-action="graph-source" data-panel="${index}">Download original XML</button></article>`;
+    }
+    bindGraphSelectors() {
+      this.element.querySelectorAll('.graph-sequence').forEach(select=>{select.onchange=()=>{const index=Number(select.dataset.graphIndex),sequence=Number(select.value);const panel=select.closest('.graph-preview');panel.outerHTML=this.graphPanel(index,sequence);this.bindGraphSelectors();};});
+    }
+    importGraphReport() {
+      if(this.nodes.get(this.selected)?.kind!=='block')M.fail('invalid_selection','Select an exact block before associating a GRAPH report.');
+      const reference=M.reference(this.snapshot,this.nodes.get(this.selected)), generation=this.generation;
+      const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.setAttribute('aria-label','Supplied GRAPH report');input.className='graph-file-input';input.hidden=true;input.oncancel=()=>input.remove();this.element.append(input);
+      input.onchange=async()=>{try{
+        const file=input.files[0];if(!file)return;if(file.size>12*1024*1024)M.fail('graph_capacity','Explorer accepts GRAPH reports up to 12 MiB; use the standalone HTML or Host pages for larger reports.');
+        const bytes=new Uint8Array(await file.arrayBuffer()), report=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));await M.verifyGraphReport(report);
+        if(generation!==this.generation||this.selected!==reference.nodeId)M.fail('stale_selection','Selection changed while importing; choose the exact object and import again.');
+        M.exactNode(this.snapshot,this.nodes,reference);
+        const hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');
+        const attachment={kind:'graphSequence',title:'Supplied GRAPH report',source:reference,reportFileSha256:hash,association:'callerSuppliedHistorical',nativeRenderingVerified:false,content:report};
+        const next=[...this.graphAttachments.filter(a=>a.source.nodeId!==reference.nodeId||a.reportFileSha256!==hash),attachment];
+        if(generation!==this.generation||this.selected!==reference.nodeId)M.fail('stale_selection','Selection changed while hashing; select and import again.');
+        M.withGraphAttachments({...this.snapshot,nodes:[...this.nodes.values()],edges:this.snapshot.edges||[]},next);this.graphAttachments=next;await this.renderPreviews();this.toast('Supplied GRAPH report attached locally. Export JSON to retain this association.');
+      }catch(error){this.error(error);}finally{input.remove();}};input.click();
+    }
+
+    previewAttachment(a) {
+      if (!['hmiScreen', 'ladFbdNetwork'].includes(a.kind)) return `<div class="callout warning">Unsupported preview kind: ${esc(a.kind)}</div>`;
+      const content = a.content || {}, nodes = content.nodes || content.instructions || content.items || [];
+      const sourceMismatch=a.source?.objectPath&&a.source.objectPath!==this.nodes.get(this.selected)?.objectPath;if(sourceMismatch)return'<div class="callout danger">Preview source does not match the exact selected object. Select and inspect again.</div>';
+      return `<article class="preview-frame"><div class="section-title"><h3>${esc(a.title || (a.kind === 'ladFbdNetwork' ? 'LAD/FBD network' : 'HMI screen'))} · ${esc(content.language || content.name || 'Structured preview')}</h3>${badge(content.nativeRenderingVerified ? 'Native rendering verified' : 'Approximate structured view', content.nativeRenderingVerified ? 'ok' : 'warn')}</div><p class="hint mono">${esc(a.source?.objectPath || '')}</p><div class="graph-summary" style="margin-top:12px"><span>${nodes.length} native nodes</span><span>${nodes.filter(n=>n.supported===false).length} opaque</span><span>${(content.connections||[]).filter(c=>c.resolved===false).length} unresolved connections</span><span>Coverage: ${esc(a.coverage?.status||content.coverage||'Not supplied')}</span></div>${a.kind==='ladFbdNetwork'&&nodes.length?`<div class="graph-wrap">${M.networkSvg(content)}</div>`:''}<div class="preview-nodes">${nodes.slice(0, 500).map(n => `<div class="preview-node"><strong>${esc(n.nativeName || n.name || n.kind || n.key || n.id)}</strong><div class="hint">${esc(n.key||n.nativeUid||'')} ${n.supported===false?'· opaque':''}</div><div class="hint">${esc(n.operand || n.type || n.text || '')}</div>${(n.pins||[]).length?`<div class="hint">${esc(n.pins.map(p=>`${p.name}: ${p.dataType||'?'} (${p.direction||'unknown'})`).join(' · '))}</div>`:''}</div>`).join('')}</div><p class="hint">Connections: ${(content.connections || content.wires || []).length}. Partial and opaque elements remain in the provider data below.</p>${(content.connections||[]).length?`<details><summary>Native connections and ports</summary><div class="table-wrap"><table class="data-table"><thead><tr><th>Wire UId</th><th>Native endpoints</th><th>Resolution</th></tr></thead><tbody>${content.connections.slice(0,1000).map(c=>`<tr><td>${esc(c.nativeUid||'')}</td><td>${esc((c.endpoints||[]).map(e=>`${e.node}.${e.port||'?'}`).join(' ↔ '))}</td><td>${c.resolved===false?'Unresolved':'Reader resolved'}</td></tr>`).join('')}</tbody></table></div></details>`:''}<details><summary>Source, content revision, coverage and typed content</summary><pre class="data">${esc(JSON.stringify(a, null, 2))}</pre></details></article>`;
+    }
+    async loadGraph(token = ++this.detailToken) {
+      const node = this.nodes.get(this.selected); if (!node) return; if (node.origin !== 'native') { this.graph = { nodes: [], edges: [], unavailable: 'Virtual folders are presentation-only. Select a native object for engineering relationships.' }; this.renderGraph(); return; }
+      const generation = this.generation; this.$('.detail-body').innerHTML = '<div class="empty loading"><p>Reading bounded relationships and source evidence…</p></div>';
+      try { const graph = await this.request('relationships', { reference: M.reference(this.snapshot, node), kinds: this.relationKind ? [this.relationKind] : [], direction: this.direction, depth: this.graphDepth, maxNodes: this.graphDepth > 1 ? 500 : 100, maxEdges: this.graphDepth > 1 ? 1000 : 200 }); if (token !== this.detailToken || generation !== this.generation) return; this.graph = graph; this.renderGraph(); } catch (e) { if (token === this.detailToken) { this.graph = { nodes: [], edges: [], unavailable: e.message }; this.renderGraph(); this.error(e); } }
+    }
+    async loadUaObservation(doc,text) {
+      const token=this.uaImportToken,generation=this.generation;
+      await M.verifyUaObservation(doc);
+      if(token!==this.uaImportToken || generation!==this.generation)return;
+      this.runtimeCapture={doc,text,filter:'',page:0};this.$('.welcome').hidden=true;this.$('.workspace').hidden=true;this.$('.projectbar').hidden=true;this.notice();
+      for(const action of ['export','refresh'])this.$('[data-action='+action+']').disabled=true;
+      this.$('[data-action=release]').hidden=true;this.$('.runtime-panel').hidden=false;this.renderUaObservation();
+    }
+    renderUaObservation() {
+      const view=this.runtimeCapture,d=view.doc,s=d.captureSource,data=s.rows,start=view.page*100;
+      this.$('.runtime-panel').innerHTML=`<div class="runtime-heading"><div><div class="eyebrow">Retained UA ${esc(d.acquisitionMode)}</div><h2>Diagnostic observations</h2></div><div><button data-action="capture-download">Download capture JSON</button> <button data-action="capture-close">Back to project</button></div></div><p class="runtime-warning">Original bytes and derived counts checked locally. Supplied evidence does not authenticate the source or verify online program/address identity. Hypotheses remain unresolved.</p><p>${esc(d.limits)}</p>${rows([['Experiment',d.experimentId,true],['Binding',d.bindingId,true],['Capture prefix',d.snapshotRef,true],['Recorded state',s.recordedProgress.state],['Termination',s.recordedProgress.terminalReason||'Not recorded'],['Uncommitted data unknown',s.uncommittedDataUnknown],['Unselected signals',d.unselectedSignalIds]])}<h3>Selected signals and observed quality</h3><p>Quality, outcome and missing timestamp counts overlap. First and last values are recorded observations, not continuous state.</p>${d.signals.map(signal=>`<details class="ua-signal"><summary>${esc(signal.signalId)} · ${signal.observationCount} observations · ${signal.goodValues} good · ${signal.uncertain} uncertain · ${signal.bad} bad</summary>${rows([['Exact node',signal.node],['Saved datatype',signal.savedDatatype],['Observed built-in types',signal.observedBuiltInTypes],['Caller unit',signal.unit],['Read errors',signal.hostReadErrors],['Unsupported values',signal.unsupported],['Null values',signal.nullValues],['Missing source timestamps',signal.missingSourceTimestamps],['Missing server timestamps',signal.missingServerTimestamps]])}<pre tabindex="0">${esc(JSON.stringify(signal,null,2))}</pre></details>`).join('')}<details><summary>Requested settings and retained server revisions</summary><pre tabindex="0">${esc(JSON.stringify(s.plan,null,2))}</pre>${data.filter(r=>r.event?.kind==='created').map(r=>`<pre tabindex="0">${esc(JSON.stringify(r.event,null,2))}</pre>`).join('')}</details><details><summary>Timing, gaps and cleanup</summary><pre tabindex="0">${esc(JSON.stringify(s.recordedProgress,null,2))}</pre><pre tabindex="0">${esc(JSON.stringify(d.events,null,2))}</pre></details><details><summary>Unresolved hypotheses and original bindings</summary><pre tabindex="0">${esc(JSON.stringify(d.hypotheses,null,2))}</pre><pre tabindex="0">${esc(JSON.stringify(d.binding,null,2))}</pre></details><div class="runtime-controls"><span>${data.length?start+1:0}–${Math.min(start+100,data.length)} of ${data.length} original rows</span><button data-action="capture-prev" ${start===0?'disabled':''}>Previous</button><button data-action="capture-next" ${start+100>=data.length?'disabled':''}>Next</button></div><div class="runtime-table"><table><thead><tr><th>Row</th><th>Elapsed ms</th><th>Kind</th><th>Original evidence</th></tr></thead><tbody>${data.slice(start,start+100).map(r=>`<tr><td>${r.sequence}</td><td>${esc(r.elapsedMilliseconds)}</td><td>${esc(r.kind||r.event.kind)}</td><td><details><summary>Exact row JSON</summary><pre tabindex="0">${esc(JSON.stringify(r,null,2))}</pre></details></td></tr>`).join('')}</tbody></table></div>`;
+      this.$('#connection-state').textContent='Portable UA observation report · no network connection';this.$('#freshness').textContent='Exact retained prefix · online association unverified';
+    }
+    filters() { return { text: this.query, kind: this.kind, scopePath: this.scope, relationshipKind: this.relationKind, direction: this.direction, depth: this.graphDepth, tab: this.tab }; }
+    manifest() { const node = this.nodes.get(this.selected); return M.exportManifest(this.snapshot, this.filters(), node?.origin === 'native' ? M.reference(this.snapshot, node) : null); }
+    relationshipCoverage(graph) {
+      const scope=graph.relationshipScope, coverage=Array.isArray(graph.coverage)?graph.coverage:[], native=graph.nativeCoverage;
+      return `<section class="relationship-coverage" aria-label="Relationship coverage"><p class="hint">${scope ? `Traversal ${esc(scope.status)} within captured edges · ${Number(scope.returnedEdges||0)} returned / ${Number(scope.retainedEdges||0)} retained.` : 'Traversal coverage was not supplied by this provider.'} Whole-project relationship completeness is not established.</p>${scope?.stopReasons?.length?`<p class="hint">Stopped by: ${esc(scope.stopReasons.join(', '))}. Expand from an adjacent object or adjust the indicated budget.</p>`:''}<details><summary>Provider scopes and capture limits (${coverage.length})</summary><p class="hint">Provider status applies only to its recorded scope. Hierarchy coverage does not certify relationships. Saved observations may come from separate reads.</p>${coverage.length?`<div class="table-wrap"><table class="data-table"><thead><tr><th>Provider</th><th>Scope</th><th>Status</th></tr></thead><tbody>${coverage.map(c=>`<tr><td>${esc(c.provider)}</td><td>${esc(c.scope)}</td><td>${esc(c.status)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">No provider coverage was recorded.</p>'}<pre class="data">${esc(JSON.stringify({traversal:scope||null,providers:coverage,nativeCoverage:native||null},null,2))}</pre></details></section>`;
+    }
+    renderGraph() {
+      const graph = this.graph || { nodes: [], edges: [] }, edges = graph.edges || [], unresolved = graph.unresolved || edges.filter(e => !e.target || !e.source || e.unresolved);
+      this.$('.detail-body').innerHTML = `<div class="relationship-controls"><label>Relation <select id="relation-kind">${[['', 'All relationships'], ['calls', 'Calls'], ['instanceOf', 'Instances'], ['reads', 'Reads'], ['writes', 'Writes'], ['usesType', 'Type dependencies'], ['dependsOn', 'Dependencies'], ['configuredIo', 'Configured I/O'], ['hmiBinding', 'HMI bindings'], ['screenNavigation', 'Screen navigation'], ['libraryVersion', 'Library versions'], ['contains', 'Containment']].map(([v, t]) => `<option value="${v}"${v === this.relationKind ? ' selected' : ''}>${t}</option>`).join('')}</select></label><label>Direction <select id="relation-direction">${['both', 'outgoing', 'incoming'].map(d => `<option${d === this.direction ? ' selected' : ''}>${d}</option>`).join('')}</select></label><button class="small" data-action="expand-graph"${this.graphDepth >= 5 || !this.selected ? ' disabled' : ''}>Expand one step (${this.graphDepth}/5)</button><button class="small" data-action="svg"${!edges.length ? ' disabled' : ''}>SVG</button><button class="small" data-action="png"${!edges.length ? ' disabled' : ''}>PNG</button></div><div class="graph-summary"><span>${(graph.nodes || []).length} nodes</span><span>${edges.length} edges</span><span>${unresolved.length} unresolved</span><span>Depth ${this.graphDepth} · maximum ${graph.limits?.maxNodes||500} nodes / ${graph.limits?.maxEdges||1000} edges</span></div>${this.relationshipCoverage(graph)}${graph.truncated ? `<div class="callout warning">Relationship budget reached. ${esc(graph.narrowScopeSuggestion || 'Narrow the relation filter or select a closer starting object.')}</div>` : ''}${graph.unavailable ? `<div class="callout warning">${esc(graph.unavailable)}</div>` : ''}${edges.length ? `<div class="graph-wrap">${M.graphSvg(graph, this.manifest(), this.selected)}</div><div class="section-title"><h3>Relationship evidence</h3><span class="hint">Select evidence to inspect provenance</span></div><div class="evidence-list">${edges.slice(0, 1000).map((edge, i) => `<div class="edge-row"><span class="endpoint" title="${esc(edge.source?.objectPath)}">${esc(this.endpointName(edge.source, graph))}</span><span class="edge-kind">${esc(pretty(edge.kind))} →</span><span class="endpoint" title="${esc(edge.target?.objectPath)}">${esc(this.endpointName(edge.target, graph, edge.unresolved))}</span><button class="small" data-action="evidence" data-index="${i}">Evidence</button></div>`).join('')}</div><div id="edge-evidence" aria-live="polite"></div>` : '<div class="empty"><div class="empty-icon">⌘</div><h3>No captured relationships in this view</h3><p>This does not establish absence from the whole project. Check analysis coverage, protection, unsupported providers and unresolved references.</p></div>'}`;
+      this.$('#relation-kind').addEventListener('change', () => { this.relationKind = this.$('#relation-kind').value; this.loadGraph(); }); this.$('#relation-direction').addEventListener('change', () => { this.direction = this.$('#relation-direction').value; this.loadGraph(); });
+      const graphElement = this.$('.graph-wrap'); if (graphElement) { const svg = graphElement.querySelector('svg'); svg.style.width = Math.max(graphElement.clientWidth, Number(svg.getAttribute('width'))) + 'px'; graphElement.addEventListener('click', e => { const g = e.target.closest('[data-node-id]'); if (g) this.selectGraphNode(g.dataset.nodeId); }); graphElement.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const g = e.target.closest('[data-node-id]'); if (g) { e.preventDefault(); this.selectGraphNode(g.dataset.nodeId); } } }); }
+    }
+    endpointName(endpoint, graph, unresolved) { if (!endpoint) return unresolved?.name || unresolved?.text || unresolved?.symbol || 'Unresolved endpoint'; return this.nodes.get(endpoint.nodeId)?.name || graph.nodes?.find(n => n.nodeId === endpoint.nodeId)?.name || endpoint.objectPath || endpoint.nodeId; }
+    selectGraphNode(id) { const node = this.graph?.nodes?.find(n => n.nodeId === id); if (!this.nodes.has(id) && node) this.addNodes([node]); if (this.nodes.has(id)) this.select(id); }
+    showEvidence(index) { const edge = this.graph?.edges?.[index]; if (!edge) return; const panel = this.$('#edge-evidence'); panel.innerHTML = `<section class="evidence-detail"><div class="section-title"><h3>${esc(pretty(edge.kind))} · evidence</h3>${badge(edge.evidence?.resolution || 'unresolved', statusTone(edge.evidence?.resolution || 'unresolved'))}</div>${rows([['Evidence origin', edge.evidence?.origin || 'Not supplied'], ['Source object / artifact', edge.evidence?.sourcePath || 'Unavailable', true], ['Location', edge.evidence?.location], ['Captured', time(edge.evidence?.capturedAtUtc)], ['Content revision', edge.evidence?.contentRevision || 'Not provided; metadata revision cannot substitute'], ['Unresolved endpoint', edge.unresolved]])}${edge.source?.nodeId && this.nodes.has(edge.source.nodeId) ? `<button class="small" data-action="breadcrumb" data-id="${esc(edge.source.nodeId)}">Select exact source object →</button>` : ''}<details open><summary>Structured evidence record</summary><pre class="data">${esc(JSON.stringify(edge, null, 2))}</pre></details></section>`; panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    async action(action, element) {
+      try {
+        if (action === 'graph-import') { this.importGraphReport(); return; }
+        if (action === 'graph-item') { const a=this.graphPanels[Number(element.dataset.panel)], sequences=a.content.graphs.flatMap(g=>g.sequences), row=sequences[Number(element.dataset.sequence)][element.dataset.collection][Number(element.dataset.index)]; element.closest('.graph-preview').querySelector('.graph-item-detail').innerHTML=`<h4>Selected ${esc(element.dataset.collection)} record</h4><pre class="data">${esc(JSON.stringify(row,null,2))}</pre>`; return; }
+        if (action === 'graph-report') { this.download(JSON.stringify(this.graphPanels[Number(element.dataset.panel)].content,null,2),'graph-report.json','application/json'); return; }
+        if (action === 'graph-source') { const bytes=await M.verifyGraphReport(this.graphPanels[Number(element.dataset.panel)].content);this.download(new Blob([bytes],{type:'application/xml'}),'graph-original.xml','application/xml');return; }
+        if(action==='capture-open'){this.$('.capture-input').click();return;}
+        if(action==='capture-download' && this.runtimeCapture){this.download(this.runtimeCapture.text,'runtime-capture.json','application/json');return;}
+        if(action==='capture-prev' || action==='capture-next'){if(this.runtimeCapture){this.runtimeCapture.page+=action==='capture-next'?1:-1;this.renderRuntimeCapture();}return;}
+        if(action==='capture-close'){this.runtimeCapture=null;this.$('.runtime-panel').hidden=true;this.$('.welcome').hidden=!!this.snapshot;this.$('.workspace').hidden=!this.snapshot;this.$('.projectbar').hidden=!this.snapshot;this.$('[data-action=release]').hidden=!this.snapshot;for(const a of ['export','refresh'])this.$('[data-action='+a+']').disabled=!this.snapshot;this.notice();if(this.snapshot)this.updateStatus();else{this.$('#connection-state').textContent='Portable viewer · no network connection';this.$('#freshness').textContent='Metadata and content freshness are separate';}return;}
+        if (action === 'open') { this.$('.file-input').click(); return; }
+        if (action === 'theme') { this.theme = this.theme === 'dark' ? 'light' : 'dark'; this.applyTheme(); return; }
+        if (!this.snapshot) return;
+        if (action === 'tab' || action === 'coverage') { this.tab = action === 'coverage' ? 'coverage' : element.dataset.tab; this.renderSelection(); await this.loadTab(); }
+        if (action === 'breadcrumb') await this.select(element.dataset.id);
+        if (action === 'collapse') { this.expanded.clear(); this.rebuild(); }
+        if (action === 'more') { if (this.filtering()) await this.runSearch(true); else for (const id of this.expanded) if (this.childState.get(id)?.cursor) { await this.loadChildren(id, true); break; } this.rebuild(); }
+        if (action === 'copy') { const ref = M.reference(this.snapshot, this.nodes.get(this.selected)); const text = JSON.stringify(ref, null, 2); try { await navigator.clipboard.writeText(text); this.toast('Exact reference copied. The agent must verify it before a fresh read.'); } catch { this.download(text, 'selected-object-reference.json', 'application/json'); this.toast('Clipboard unavailable; exact reference downloaded.'); } }
+        if (action === 'send') { await this.client.sendSelection(M.reference(this.snapshot, this.nodes.get(this.selected))); this.toast('Verified exact object selection sent to the agent.'); }
+        if (action === 'refresh') { if (this.client.transport.offline) { this.notice('Offline snapshots cannot refresh from TIA. Open a new capture to refresh; the current snapshot remains viewable.'); this.$('.file-input').click(); } else { const old = this.snapshot, generation = this.generation, transport = this.client.transport; this.notice('Capturing exposed metadata on the TIA host. A Siemens call may continue even if this view is closed.'); const result = await this.request('capture', { projectName: old.project.name, projectPath: old.project.projectPath, limits: old.limits }); if (generation === this.generation) { await this.load(result, transport); this.notice('Fresh snapshot loaded. Select the exact object again; previous selections are not remapped by name.'); } } }
+        if (action === 'export') { const manifest=this.manifest(),client=this.client; const result = await this.request('export', { format: 'json', filters: this.filters() }); let snapshot = result.snapshot || (client.transport.offline ? this.snapshot : null); if(!snapshot?.nodes&&result.artifact){const bytes=await client.readArtifact(result.artifact,(count,total)=>this.notice(`Transferring verified snapshot artifact: ${count.toLocaleString()} / ${total.toLocaleString()} bytes.`));snapshot=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));M.validateSnapshot(snapshot);if(snapshot.snapshotId!==manifest.snapshotId)M.fail('artifact_changed','Exported snapshot does not match the requested snapshot.');}if(!snapshot?.nodes)M.fail('invalid_artifact','The host did not return a transferable project snapshot.'); snapshot=M.withGraphAttachments(snapshot,this.graphAttachments);this.download(JSON.stringify({ ...snapshot, exportManifest: manifest }, null, 2), 'project-snapshot.json', 'application/json');this.notice();this.toast('Snapshot JSON exported with verified source bytes and capture provenance.'); }
+        if (action === 'release') { await this.request('release'); this.generation++; this.snapshot = null; this.selected = null; this.nodes.clear(); this.renderShell(); this.toast('Snapshot released.'); }
+        if (action === 'expand-graph') { this.graphDepth = Math.min(5, this.graphDepth + 1); await this.loadGraph(); }
+        if (action === 'io') { this.tab = 'relationships'; this.relationKind = 'configuredIo'; this.renderSelection(); await this.loadTab(); }
+        if (action === 'evidence') this.showEvidence(Number(element.dataset.index));
+        if (action === 'svg' || action === 'png') await this.exportGraph(action);
+      } catch (e) { this.error(e); }
+    }
+    download(data, filename, type) { const blob = data instanceof Blob ? data : new Blob([data], { type }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 10000); }
+    async exportGraph(format) {
+      const manifest = { ...this.manifest(), graphLimits: this.graph.limits, truncated: !!this.graph.truncated, relationshipScope: this.graph.relationshipScope, providerCoverage: this.graph.coverage, nativeCoverage: this.graph.nativeCoverage, evidence: this.graph.edges }, svg = M.graphSvg(this.graph, manifest, this.selected);
+      if (format === 'svg') this.download(svg, 'project-relationships.svg', 'image/svg+xml');
+      else { const image = new Image(), url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })); try { await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = url; }); const scale = Math.min(1, 4096 / Math.max(image.width, image.height)); const canvas = document.createElement('canvas'); canvas.width = Math.ceil(image.width * scale); canvas.height = Math.ceil(image.height * scale); canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height); const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('PNG export failed.'); this.download(new Blob([M.pngManifest(await blob.arrayBuffer(), manifest)], { type: 'image/png' }), 'project-relationships.png', 'image/png'); } finally { URL.revokeObjectURL(url); } }
+      this.toast(`${format.toUpperCase()} exported with an embedded timestamp, filters, coverage and evidence manifest.`);
+    }
+    error(error) { this.notice(`${error.code ? pretty(error.code) + ': ' : ''}${error.message || String(error)}`, 'error'); this.updateStatus(); this.toast(error.message || String(error)); }
+    toast(message) { const box = this.$('.toast'); box.textContent = message; box.hidden = false; clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => box.hidden = true, 6500); }
+  }
+  root.ProjectExplorer = { Explorer, mount: async (element, snapshot, transport) => { const app = new Explorer(element); if (snapshot) await app.load(snapshot, transport || new C.OfflineTransport(snapshot)); return app; } };
+  async function boot() {
+    const el = document.getElementById('explorer'); if (!el) return;
+    const app = new Explorer(el); root.projectExplorer = app;
+    try { const embedded = JSON.parse(document.getElementById('project-model')?.textContent || 'null'); if (embedded) await app.load(embedded, new C.OfflineTransport(embedded)); }
+    catch (e) { app.error(e); }
+    if (root !== root.parent && C.connectMcpHost) { try { const transport = await C.connectMcpHost({ onResult: async result => { const data = C.unwrap(result); if (data?.snapshotId || data?.snapshot?.snapshotId) await app.load(data, transport); }, onContext: context => { if (['light', 'dark'].includes(context.theme)) { app.theme = context.theme; app.applyTheme(); } }, onDisconnect: () => { if (app.client && !app.client.transport.offline) { app.client.state = 'disconnected'; app.notice('MCP host session ended. Old selections cannot be verified; reconnect and recapture.'); app.updateStatus(); } } }); app.hostTransport = transport; } catch (e) { if (!app.snapshot) app.notice('This host has not negotiated a supported MCP App connection. Open a portable project snapshot to continue.'); } }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})(globalThis);
+</script>
+</body>
+</html>

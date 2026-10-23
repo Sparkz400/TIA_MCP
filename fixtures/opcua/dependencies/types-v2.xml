@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris><Uri>urn:example:types</Uri></NamespaceUris>
+  <Models><Model ModelUri="urn:example:types" Version="2.0" /></Models>
+  <UADataType NodeId="ns=1;i=1001" BrowseName="1:Telemetry">
+    <Definition Name="1:Telemetry"><Field Name="Reading" DataType="ns=1;i=1002" /></Definition>
+  </UADataType>
+  <UADataType NodeId="ns=1;i=1002" BrowseName="1:ReadingV2" />
+</UANodeSet>

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-export-manifest:v1",
+  "title": "Native library document export manifest observation",
+  "description": "Documents hash describes the export before its manifest was added; it is distinct from the export response directory hash. File bytes and native transfer/preservation are not verified by this contract.",
+  "type": "object",
+  "required": ["schemaVersion", "version", "format", "documentsSha256", "files"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "version": {"$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"},
+    "format": {"type": "string", "minLength": 1},
+    "documentsSha256": {"$ref": "urn:tia-mcp:library-export:v1#/$defs/hash"},
+    "files": {"type": "array", "items": {"$ref": "urn:tia-mcp:library-export:v1#/$defs/documentFile"}}
+  },
+  "additionalProperties": false
+}

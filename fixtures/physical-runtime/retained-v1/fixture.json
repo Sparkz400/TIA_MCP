@@ -1,0 +1,802 @@
+{
+  "schemaVersion": 1,
+  "nativeExecuted": false,
+  "producer": {
+    "baseCommit": "821bedc942ea3d8d814408ef58a7df22fd998801",
+    "sourceManifestSha256": "a27420fcbb54e3334e472a46a7c640807dee453d20b40a82e0f71a556a8edb99",
+    "binaryHashes": {
+      "TiaMcp.Host.dll": "a4e71a3ca8170635408196e1642a29fa3f5cdc3a6747557bc823cf568076d635",
+      "TiaMcp.Core.dll": "5ffd7fa9f44a3a78bf02a82b5050a3a081663918acacd964a4ec0b104e6388d0"
+    },
+    "origin": "Original loopback TLS capture records from the prior frozen aggregate; not regenerated."
+  },
+  "files": [
+    {
+      "path": "runtime-captures/30ce4728afb749f3b97c896dd4261d13/000001.segment",
+      "bytes": 1982,
+      "sha256": "0871a27b398c18b5d88637f649535df4ff7c403931d77583c6fe72d5215090e9"
+    },
+    {
+      "path": "runtime-captures/30ce4728afb749f3b97c896dd4261d13/cccb4fda73f74f169362d6bf0c72bdb8.json",
+      "bytes": 3404,
+      "sha256": "deee4a469be4667d2792e6dd142b45a708186038f22021dc928f212cb5f10bdd"
+    },
+    {
+      "path": "runtime-captures/30ce4728afb749f3b97c896dd4261d13/ce47182c6c6a4ddb95e7b6b33d36ec1d.json",
+      "bytes": 3404,
+      "sha256": "deee4a469be4667d2792e6dd142b45a708186038f22021dc928f212cb5f10bdd"
+    },
+    {
+      "path": "runtime-captures/30ce4728afb749f3b97c896dd4261d13/head.json",
+      "bytes": 109,
+      "sha256": "f9b7e14e499effacbc5726e3f2e5251cc290119466fe6dbf9b6a8566f8af0166"
+    },
+    {
+      "path": "runtime-captures/30ce4728afb749f3b97c896dd4261d13/plan.json",
+      "bytes": 950,
+      "sha256": "0bddb60ce63a6945ba70ad497549a39178b5439141bf4d25569fff308ff26dae"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/000001.segment",
+      "bytes": 18633,
+      "sha256": "562ec9313dce2c8d57fce838667ad81ace730eb67b812e0be9736754de328940"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/000002.segment",
+      "bytes": 30,
+      "sha256": "e8d1f4d8fbb4fcd54c66a70b87eb2ecd73afbb93adb3a1f11e61940c80527144"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/270830be5827473e87d5a609c6bc6ac2.tmp",
+      "bytes": 17003,
+      "sha256": "8d070483268ca568b97c8caedf81710e386548aa3129fc5db5494a4575cdebfe"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/2c4285d7ebda42cda678b218cfdc2bdc.json",
+      "bytes": 20000,
+      "sha256": "ff0f736b06cbe700abd80d4d5b57110f8c65596e45532225c89f607a6bf67e12"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/7d21e71a32cb4ddcbc99d855584714fe.tmp",
+      "bytes": 17013,
+      "sha256": "c6f1a90deaf67bceb706d20977a44bf99f5d0722de954d3d9b371f868f09e320"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/b72d61d43e9a4d1ea771c10276b515ba.json",
+      "bytes": 20000,
+      "sha256": "ff0f736b06cbe700abd80d4d5b57110f8c65596e45532225c89f607a6bf67e12"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/head.json",
+      "bytes": 109,
+      "sha256": "6e8daff3779a3f502ac2f3b20e129f3d4004a0e7e8886dfc7c01bf16cb050307"
+    },
+    {
+      "path": "runtime-captures/dd5dc68c2daa4c9cadb03c4e173d93e3/plan.json",
+      "bytes": 890,
+      "sha256": "b4bcc12b04d1c3472a0bbc65d4e1703cbabc38444d3ab4eacb0095dfa31fb225"
+    },
+    {
+      "path": "runtime-captures/f3ed9700b2ea438bb6a1d11fa8b51949/000001.segment",
+      "bytes": 6940,
+      "sha256": "9050ef7e9ff7f5db7e8d46e065db1b3506916a457f0eefb870f316c34758828c"
+    },
+    {
+      "path": "runtime-captures/f3ed9700b2ea438bb6a1d11fa8b51949/cb5e475c968547afab89f43aa525345f.json",
+      "bytes": 15086,
+      "sha256": "b6dd620c470fd65d3202d6355870317c3133b3597d3777aaacd64c80e6b95047"
+    },
+    {
+      "path": "runtime-captures/f3ed9700b2ea438bb6a1d11fa8b51949/f5311afa50a64f42b77c25507fb1a126.json",
+      "bytes": 15086,
+      "sha256": "b6dd620c470fd65d3202d6355870317c3133b3597d3777aaacd64c80e6b95047"
+    },
+    {
+      "path": "runtime-captures/f3ed9700b2ea438bb6a1d11fa8b51949/head.json",
+      "bytes": 109,
+      "sha256": "5deb9f7809034c32a205b2d818462ff3ac7ddd397cb95e70503c853c8e18cdbf"
+    },
+    {
+      "path": "runtime-captures/f3ed9700b2ea438bb6a1d11fa8b51949/plan.json",
+      "bytes": 7673,
+      "sha256": "0e2a7758f3d3dbfc00d876c2ed19e215abdf05ea2104c1610ecf5826269b99a4"
+    }
+  ],
+  "records": [
+    {
+      "captureId": "f3ed9700b2ea438bb6a1d11fa8b51949",
+      "snapshotRef": "capture:f3ed9700b2ea438bb6a1d11fa8b51949:1:9050ef7e9ff7f5db7e8d46e065db1b3506916a457f0eefb870f316c34758828c",
+      "status": {
+        "schemaVersion": "runtime-capture-status.v1",
+        "captureId": "f3ed9700b2ea438bb6a1d11fa8b51949",
+        "snapshotRef": "capture:f3ed9700b2ea438bb6a1d11fa8b51949:1:9050ef7e9ff7f5db7e8d46e065db1b3506916a457f0eefb870f316c34758828c",
+        "state": "ended",
+        "recordedProgress": {
+          "state": "ended",
+          "terminalReason": "sampleLimit",
+          "elapsedMilliseconds": 160.0482,
+          "observedUtc": "2026-10-18T09:49:47.1462028+00:00",
+          "rows": 4,
+          "readAttempts": 4,
+          "skippedPolls": 0,
+          "droppedReadResults": 0
+        },
+        "localFailure": null,
+        "plan": {
+          "captureId": "f3ed9700b2ea438bb6a1d11fa8b51949",
+          "hostId": "9d39d251ce6c49e5b92824d2e2f50529",
+          "createdUtc": "2026-10-18T09:49:46.9646242+00:00",
+          "request": {
+            "attemptId": "0a4c88298a7f42aea6ccafad5f190e3a",
+            "selectionIds": [
+              "7a191395a83e4a2b9619781863338fdd",
+              "0f04c829c3a04df387a6b2a6b505373c"
+            ],
+            "intervalMilliseconds": 100,
+            "durationSeconds": 5,
+            "maximumSamples": 4,
+            "maximumBytes": 1048576,
+            "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+            "representation": "simple",
+            "association": {
+              "caseId": "0799efb0c3980f11a3b7d10fe8cfe5fbb59580894219095b088557b71e726cca",
+              "mappings": [
+                {
+                  "selectionId": "7a191395a83e4a2b9619781863338fdd",
+                  "signalId": "enable",
+                  "reason": "Explicit synthetic conveyor enable"
+                },
+                {
+                  "selectionId": "0f04c829c3a04df387a6b2a6b505373c",
+                  "signalId": "step",
+                  "reason": "Explicit synthetic conveyor step"
+                }
+              ],
+              "assertedProgramIdentity": "Caller assertion only; synthetic loopback"
+            }
+          },
+          "signals": [
+            {
+              "selectionId": "7a191395a83e4a2b9619781863338fdd",
+              "selection": {
+                "context": {
+                  "endpoint": "https://127.0.0.1:60382",
+                  "connectionId": "0a4c88298a7f42aea6ccafad5f190e3a",
+                  "epoch": "390309c5c79e430fa2afe0cbc6dad51f",
+                  "peerCertificateSha256": "44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120"
+                },
+                "symbol": "\"DB_Line\".Conv2.Enable",
+                "representation": "simple",
+                "metadataSha256": "2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747"
+              },
+              "metadata": {
+                "name": "Enable",
+                "datatype": "bool"
+              }
+            },
+            {
+              "selectionId": "0f04c829c3a04df387a6b2a6b505373c",
+              "selection": {
+                "context": {
+                  "endpoint": "https://127.0.0.1:60382",
+                  "connectionId": "0a4c88298a7f42aea6ccafad5f190e3a",
+                  "epoch": "390309c5c79e430fa2afe0cbc6dad51f",
+                  "peerCertificateSha256": "44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120"
+                },
+                "symbol": "\"DB_Line\".Conv2.Step",
+                "representation": "simple",
+                "metadataSha256": "cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241"
+              },
+              "metadata": {
+                "name": "Step",
+                "datatype": "uint"
+              }
+            }
+          ],
+          "association": {
+            "caseId": "0799efb0c3980f11a3b7d10fe8cfe5fbb59580894219095b088557b71e726cca",
+            "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+            "project": {
+              "projectPath": "synthetic-fixture.ap21",
+              "host": "offline-test"
+            },
+            "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+            "selectedInstance": {
+              "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+              "memberPath": [
+                "Conv2"
+              ],
+              "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+              "plcPath": "/projects/Fixture/plc/CPU",
+              "scopePath": "/projects/Fixture/plc/CPU",
+              "namespace": "",
+              "evidence": [
+                {
+                  "kind": "usesType",
+                  "source": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "nodeId": "DB_Line"
+                  },
+                  "target": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                    "nodeId": "FB_Line"
+                  },
+                  "evidence": {
+                    "origin": "nativeConfirmed",
+                    "resolution": "resolved",
+                    "fixtureNote": "Synthetic edge; no native observation."
+                  }
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+                  "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false,
+                  "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "instanceScope": "GlobalVariable",
+                  "instanceComponents": [
+                    "DB_Line"
+                  ],
+                  "callOrdinal": 0,
+                  "callUid": null,
+                  "parameterBindings": []
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                  "xmlLine": 3,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false,
+                  "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                  "instanceScope": "LocalVariable",
+                  "instanceComponents": [
+                    "Conv2"
+                  ],
+                  "callOrdinal": 0,
+                  "callUid": null,
+                  "parameterBindings": [],
+                  "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "callerMemberPath": []
+                }
+              ],
+              "callSites": [
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false,
+                  "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                  "instanceScope": "LocalVariable",
+                  "instanceComponents": [
+                    "Conv2"
+                  ],
+                  "callOrdinal": 0,
+                  "callUid": null,
+                  "parameterBindings": [],
+                  "callerDbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "callerMemberPath": []
+                }
+              ],
+              "rootCallSites": [
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+                  "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2",
+                  "xmlLine": 1,
+                  "origin": "savedNativeXml",
+                  "liveVerified": false,
+                  "calleePath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "instanceScope": "GlobalVariable",
+                  "instanceComponents": [
+                    "DB_Line"
+                  ],
+                  "callOrdinal": 0,
+                  "callUid": null,
+                  "parameterBindings": []
+                }
+              ],
+              "resolution": "capturedStorageOnly",
+              "runtimeCallContextVerified": false
+            },
+            "sourceRevision": {
+              "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+              "documents": [
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/Main",
+                  "status": "exported",
+                  "utf8Sha256": "35d46090ae6f78236a0f9ee6dafba0524116a1a1d8ac2a6e3a771b6458fb5fa2"
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Line",
+                  "status": "exported",
+                  "utf8Sha256": "48f3b420d789b0b66246cab430aebba3415b44810c8dde2e04c88bfbe608c2ed"
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+                  "status": "exported",
+                  "utf8Sha256": "104202185c0a224ffe6b9f1b41deb8cf4ad8108d2988f82803df740153811dfa"
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "status": "exported",
+                  "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf"
+                },
+                {
+                  "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+                  "status": "exported",
+                  "utf8Sha256": "e49609b185c75d773771ed21849611eac3eb26ba20df17060af7a0dd2bf03f7f"
+                }
+              ],
+              "onlineVerified": false
+            },
+            "signals": [
+              {
+                "selectionId": "7a191395a83e4a2b9619781863338fdd",
+                "signalId": "enable",
+                "declaration": {
+                  "id": "enable",
+                  "role": "instance enable",
+                  "reason": "Independently authored instance enable role tests the writer prediction.",
+                  "hypothesisIds": [
+                    "writer"
+                  ],
+                  "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "memberPath": [
+                    "Conv2",
+                    "Enable"
+                  ],
+                  "datatype": "Bool",
+                  "symbolComponents": [
+                    "DB_Line",
+                    "Conv2",
+                    "Enable"
+                  ],
+                  "namespace": "",
+                  "scopePath": "/projects/Fixture/plc/CPU",
+                  "resolution": "capturedDeclaration",
+                  "unavailableReason": null,
+                  "traceability": "requiresTargetValidation",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                    "xmlLine": 3,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "onlineAddress": null,
+                  "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+                  "selectionEvidence": null
+                }
+              },
+              {
+                "selectionId": "0f04c829c3a04df387a6b2a6b505373c",
+                "signalId": "step",
+                "declaration": {
+                  "id": "step",
+                  "role": "sequence state",
+                  "reason": "Independently authored sequence state role tests the writer prediction.",
+                  "hypothesisIds": [
+                    "writer"
+                  ],
+                  "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                  "memberPath": [
+                    "Conv2",
+                    "Step"
+                  ],
+                  "datatype": "UInt",
+                  "symbolComponents": [
+                    "DB_Line",
+                    "Conv2",
+                    "Step"
+                  ],
+                  "namespace": "",
+                  "scopePath": "/projects/Fixture/plc/CPU",
+                  "resolution": "capturedDeclaration",
+                  "unavailableReason": null,
+                  "traceability": "requiresTargetValidation",
+                  "evidence": {
+                    "objectPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+                    "utf8Sha256": "9a0d8138b614b7a3f704b3ebf6af63a0f46deca28e05f7aadf6e6c606c1ceabf",
+                    "xmlLine": 3,
+                    "origin": "savedNativeXml",
+                    "liveVerified": false
+                  },
+                  "onlineAddress": null,
+                  "inclusionOrigin": "callerProposedWithDeclarationEvidence",
+                  "selectionEvidence": null
+                }
+              }
+            ],
+            "addressMatchVerified": false,
+            "programMatchVerified": false,
+            "sourceAuthenticityVerified": false,
+            "nativeQualified": false
+          }
+        },
+        "committedBytes": 14613,
+        "uncommittedTailPresent": false,
+        "uncommittedDataUnknown": false,
+        "plcChangesBetweenPollsUnknown": true,
+        "acquisitionMode": "polling",
+        "atomicAcrossSignals": false,
+        "scanSynchronized": false,
+        "programMatchVerified": false,
+        "nativeQualified": false
+      },
+      "page": {
+        "schemaVersion": "runtime-capture-page.v1",
+        "snapshotRef": "capture:f3ed9700b2ea438bb6a1d11fa8b51949:1:9050ef7e9ff7f5db7e8d46e065db1b3506916a457f0eefb870f316c34758828c",
+        "offset": 0,
+        "totalRows": 4,
+        "rows": [
+          {
+            "sequence": 0,
+            "kind": "read",
+            "selectionId": "7a191395a83e4a2b9619781863338fdd",
+            "cycle": 0,
+            "scheduledMilliseconds": 0,
+            "elapsedMilliseconds": 27.8247,
+            "observedUtc": "2026-10-18T09:49:47.012705+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Enable\",\"representation\":\"simple\",\"metadataSha256\":\"2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747\"},\"requestId\":\"04d3ddbdf33a42b0b9d3bd887f4872fb\",\"status\":\"read\",\"value\":true,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.0081498+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.0125297+00:00\",\"elapsedMilliseconds\":4.3801,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 1,
+            "kind": "read",
+            "selectionId": "0f04c829c3a04df387a6b2a6b505373c",
+            "cycle": 0,
+            "scheduledMilliseconds": 0,
+            "elapsedMilliseconds": 60.4281,
+            "observedUtc": "2026-10-18T09:49:47.045308+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Step\",\"representation\":\"simple\",\"metadataSha256\":\"cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241\"},\"requestId\":\"e4da4fb70d454b18984a52fa3827b887\",\"status\":\"read\",\"value\":65535,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.0421114+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.0451662+00:00\",\"elapsedMilliseconds\":3.055,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 2,
+            "kind": "read",
+            "selectionId": "7a191395a83e4a2b9619781863338fdd",
+            "cycle": 1,
+            "scheduledMilliseconds": 100,
+            "elapsedMilliseconds": 133.2506,
+            "observedUtc": "2026-10-18T09:49:47.1181296+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Enable\",\"representation\":\"simple\",\"metadataSha256\":\"2739d0432a11659a421390e112036122e4c2e7746309c6260dd87aff88df1747\"},\"requestId\":\"6e7cae360de949c4b885c28872e2a5ce\",\"status\":\"read\",\"value\":true,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.1148864+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.1179568+00:00\",\"elapsedMilliseconds\":3.0707,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 3,
+            "kind": "read",
+            "selectionId": "0f04c829c3a04df387a6b2a6b505373c",
+            "cycle": 1,
+            "scheduledMilliseconds": 100,
+            "elapsedMilliseconds": 159.8676,
+            "observedUtc": "2026-10-18T09:49:47.1447459+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022DB_Line\\u0022.Conv2.Step\",\"representation\":\"simple\",\"metadataSha256\":\"cffac6fc2c2e9133910b19dc2cf440a5515dd66c371c1de5e0c1a6572c3d8241\"},\"requestId\":\"c12f9aadc6df4eac971af8dca76265fa\",\"status\":\"read\",\"value\":65535,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.1399569+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.1445727+00:00\",\"elapsedMilliseconds\":4.6161,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          }
+        ],
+        "nextOffset": null,
+        "nativeQualified": false
+      },
+      "exportSha256": "b6dd620c470fd65d3202d6355870317c3133b3597d3777aaacd64c80e6b95047"
+    },
+    {
+      "captureId": "30ce4728afb749f3b97c896dd4261d13",
+      "snapshotRef": "capture:30ce4728afb749f3b97c896dd4261d13:1:0871a27b398c18b5d88637f649535df4ff7c403931d77583c6fe72d5215090e9",
+      "status": {
+        "schemaVersion": "runtime-capture-status.v1",
+        "captureId": "30ce4728afb749f3b97c896dd4261d13",
+        "snapshotRef": "capture:30ce4728afb749f3b97c896dd4261d13:1:0871a27b398c18b5d88637f649535df4ff7c403931d77583c6fe72d5215090e9",
+        "state": "ended",
+        "recordedProgress": {
+          "state": "ended",
+          "terminalReason": "sampleLimit",
+          "elapsedMilliseconds": 26.3406,
+          "observedUtc": "2026-10-18T09:49:47.4343787+00:00",
+          "rows": 1,
+          "readAttempts": 1,
+          "skippedPolls": 0,
+          "droppedReadResults": 0
+        },
+        "localFailure": null,
+        "plan": {
+          "captureId": "30ce4728afb749f3b97c896dd4261d13",
+          "hostId": "9d39d251ce6c49e5b92824d2e2f50529",
+          "createdUtc": "2026-10-18T09:49:47.3957274+00:00",
+          "request": {
+            "attemptId": "0a4c88298a7f42aea6ccafad5f190e3a",
+            "selectionIds": [
+              "4687627422a843e494b09355c2b45bcb"
+            ],
+            "intervalMilliseconds": 100,
+            "durationSeconds": 5,
+            "maximumSamples": 1,
+            "maximumBytes": 1048576,
+            "reviewId": "d31dec2c75f850bfcd75301a214885f9ed7823459e548103bcd6289768f3a75a",
+            "representation": "simple"
+          },
+          "signals": [
+            {
+              "selectionId": "4687627422a843e494b09355c2b45bcb",
+              "selection": {
+                "context": {
+                  "endpoint": "https://127.0.0.1:60382",
+                  "connectionId": "0a4c88298a7f42aea6ccafad5f190e3a",
+                  "epoch": "390309c5c79e430fa2afe0cbc6dad51f",
+                  "peerCertificateSha256": "44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120"
+                },
+                "symbol": "\"MyDB\".Counter",
+                "representation": "simple",
+                "metadataSha256": "88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e"
+              },
+              "metadata": {
+                "name": "Counter",
+                "datatype": "ulint"
+              }
+            }
+          ]
+        },
+        "committedBytes": 2932,
+        "uncommittedTailPresent": false,
+        "uncommittedDataUnknown": false,
+        "plcChangesBetweenPollsUnknown": true,
+        "acquisitionMode": "polling",
+        "atomicAcrossSignals": false,
+        "scanSynchronized": false,
+        "programMatchVerified": false,
+        "nativeQualified": false
+      },
+      "page": {
+        "schemaVersion": "runtime-capture-page.v1",
+        "snapshotRef": "capture:30ce4728afb749f3b97c896dd4261d13:1:0871a27b398c18b5d88637f649535df4ff7c403931d77583c6fe72d5215090e9",
+        "offset": 0,
+        "totalRows": 1,
+        "rows": [
+          {
+            "sequence": 0,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 0,
+            "scheduledMilliseconds": 0,
+            "elapsedMilliseconds": 26.1291,
+            "observedUtc": "2026-10-18T09:49:47.433538+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"2633fd8b222a4824991b59a5fd7aa197\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.4305489+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.433389+00:00\",\"elapsedMilliseconds\":2.8402,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          }
+        ],
+        "nextOffset": null,
+        "nativeQualified": false
+      },
+      "exportSha256": "deee4a469be4667d2792e6dd142b45a708186038f22021dc928f212cb5f10bdd"
+    },
+    {
+      "captureId": "dd5dc68c2daa4c9cadb03c4e173d93e3",
+      "snapshotRef": "capture:dd5dc68c2daa4c9cadb03c4e173d93e3:1:562ec9313dce2c8d57fce838667ad81ace730eb67b812e0be9736754de328940",
+      "status": {
+        "schemaVersion": "runtime-capture-status.v1",
+        "captureId": "dd5dc68c2daa4c9cadb03c4e173d93e3",
+        "snapshotRef": "capture:dd5dc68c2daa4c9cadb03c4e173d93e3:1:562ec9313dce2c8d57fce838667ad81ace730eb67b812e0be9736754de328940",
+        "state": "interrupted",
+        "recordedProgress": {
+          "state": "running",
+          "terminalReason": null,
+          "elapsedMilliseconds": 1032.2456,
+          "observedUtc": "2026-10-18T09:49:48.5919841+00:00",
+          "rows": 11,
+          "readAttempts": 11,
+          "skippedPolls": 0,
+          "droppedReadResults": 0
+        },
+        "localFailure": null,
+        "plan": {
+          "captureId": "dd5dc68c2daa4c9cadb03c4e173d93e3",
+          "hostId": "9d39d251ce6c49e5b92824d2e2f50529",
+          "createdUtc": "2026-10-18T09:49:47.544324+00:00",
+          "request": {
+            "attemptId": "0a4c88298a7f42aea6ccafad5f190e3a",
+            "selectionIds": [
+              "4687627422a843e494b09355c2b45bcb"
+            ],
+            "intervalMilliseconds": 100,
+            "durationSeconds": 10,
+            "maximumSamples": 100,
+            "maximumBytes": 1048576,
+            "reviewId": null,
+            "representation": "simple"
+          },
+          "signals": [
+            {
+              "selectionId": "4687627422a843e494b09355c2b45bcb",
+              "selection": {
+                "context": {
+                  "endpoint": "https://127.0.0.1:60382",
+                  "connectionId": "0a4c88298a7f42aea6ccafad5f190e3a",
+                  "epoch": "390309c5c79e430fa2afe0cbc6dad51f",
+                  "peerCertificateSha256": "44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120"
+                },
+                "symbol": "\"MyDB\".Counter",
+                "representation": "simple",
+                "metadataSha256": "88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e"
+              },
+              "metadata": {
+                "name": "Counter",
+                "datatype": "ulint"
+              }
+            }
+          ]
+        },
+        "committedBytes": 19523,
+        "uncommittedTailPresent": true,
+        "uncommittedDataUnknown": true,
+        "plcChangesBetweenPollsUnknown": true,
+        "acquisitionMode": "polling",
+        "atomicAcrossSignals": false,
+        "scanSynchronized": false,
+        "programMatchVerified": false,
+        "nativeQualified": false
+      },
+      "page": {
+        "schemaVersion": "runtime-capture-page.v1",
+        "snapshotRef": "capture:dd5dc68c2daa4c9cadb03c4e173d93e3:1:562ec9313dce2c8d57fce838667ad81ace730eb67b812e0be9736754de328940",
+        "offset": 0,
+        "totalRows": 11,
+        "rows": [
+          {
+            "sequence": 0,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 0,
+            "scheduledMilliseconds": 0,
+            "elapsedMilliseconds": 43.6377,
+            "observedUtc": "2026-10-18T09:49:47.6024579+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"7cd279c35c8e420c919c660743d1e48c\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.5991359+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.6023082+00:00\",\"elapsedMilliseconds\":3.1726,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 1,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 1,
+            "scheduledMilliseconds": 100,
+            "elapsedMilliseconds": 127.9181,
+            "observedUtc": "2026-10-18T09:49:47.6867371+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"54d8d6a3fef94d98b68304c21f47b3bc\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.6835476+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.6866047+00:00\",\"elapsedMilliseconds\":3.0572,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 2,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 2,
+            "scheduledMilliseconds": 200,
+            "elapsedMilliseconds": 226.6914,
+            "observedUtc": "2026-10-18T09:49:47.7855088+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"3b062098afdd49bd8edf24e690107211\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.7823024+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.7853567+00:00\",\"elapsedMilliseconds\":3.0544,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 3,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 3,
+            "scheduledMilliseconds": 300,
+            "elapsedMilliseconds": 335.4532,
+            "observedUtc": "2026-10-18T09:49:47.8942686+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"888c4a1c16cf4d76b7478d08d6e4f207\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.8909277+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.8941079+00:00\",\"elapsedMilliseconds\":3.1804,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 4,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 4,
+            "scheduledMilliseconds": 400,
+            "elapsedMilliseconds": 426.7714,
+            "observedUtc": "2026-10-18T09:49:47.9855856+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"d239ec0083e34e87a394dbb2e37156b0\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:47.9824133+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:47.9853935+00:00\",\"elapsedMilliseconds\":2.9803,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 5,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 5,
+            "scheduledMilliseconds": 500,
+            "elapsedMilliseconds": 528.9973,
+            "observedUtc": "2026-10-18T09:49:48.0878096+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"21f44c7e085d4335a0c0b876d4b3639b\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.084711+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.0876716+00:00\",\"elapsedMilliseconds\":2.9607,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 6,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 6,
+            "scheduledMilliseconds": 600,
+            "elapsedMilliseconds": 627.2237,
+            "observedUtc": "2026-10-18T09:49:48.1860342+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"fef31ca70a4749c5a22b8bb35f8a7b8b\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.1827648+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.1858632+00:00\",\"elapsedMilliseconds\":3.0986,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 7,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 7,
+            "scheduledMilliseconds": 700,
+            "elapsedMilliseconds": 737.6462,
+            "observedUtc": "2026-10-18T09:49:48.2964554+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"1ceb9ac67ef14f6c9927f085c039b635\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.2929583+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.2963001+00:00\",\"elapsedMilliseconds\":3.3419,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 8,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 8,
+            "scheduledMilliseconds": 800,
+            "elapsedMilliseconds": 836.9109,
+            "observedUtc": "2026-10-18T09:49:48.3957185+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"f112886d41434997b110bec30af77a34\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.3924876+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.395578+00:00\",\"elapsedMilliseconds\":3.0906,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 9,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 9,
+            "scheduledMilliseconds": 900,
+            "elapsedMilliseconds": 932.4986,
+            "observedUtc": "2026-10-18T09:49:48.4913047+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"0cb1f05b82b7404d90d6b7fcdabee732\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.4875673+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.4911268+00:00\",\"elapsedMilliseconds\":3.5597,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          },
+          {
+            "sequence": 10,
+            "kind": "read",
+            "selectionId": "4687627422a843e494b09355c2b45bcb",
+            "cycle": 10,
+            "scheduledMilliseconds": 1000,
+            "elapsedMilliseconds": 1032.2456,
+            "observedUtc": "2026-10-18T09:49:48.5910498+00:00",
+            "readResultJson": "{\"selection\":{\"context\":{\"endpoint\":\"https://127.0.0.1:60382\",\"connectionId\":\"0a4c88298a7f42aea6ccafad5f190e3a\",\"epoch\":\"390309c5c79e430fa2afe0cbc6dad51f\",\"peerCertificateSha256\":\"44162862aae81b4558bc5812ad59effec87532e7451fa0d990868cc4d08a7120\"},\"symbol\":\"\\u0022MyDB\\u0022.Counter\",\"representation\":\"simple\",\"metadataSha256\":\"88b2b94718b7622972e6ceb980161304b0f0b36bf5a2c2e2d51c90fa11aa023e\"},\"requestId\":\"4243f45f5dc749dca5dae417da859521\",\"status\":\"read\",\"value\":18446744073709551615,\"providerErrorCode\":null,\"requestStartedUtc\":\"2026-10-18T09:49:48.5866757+00:00\",\"responseReceivedUtc\":\"2026-10-18T09:49:48.5909103+00:00\",\"elapsedMilliseconds\":4.2349,\"schemaVersion\":\"physical-runtime-web-read.v1\",\"valueEncoding\":\"siemens-web-api-json\",\"clock\":\"hostUtcAndMonotonicDuration\",\"hostClockWentBackwards\":false,\"sourceTimestamp\":null,\"serverTimestamp\":null,\"atomicAcrossSignals\":false,\"scanSynchronized\":false,\"deviceIdentityVerified\":false,\"programMatchVerified\":false,\"nativeQualified\":false}",
+            "errorCode": null,
+            "skippedPolls": 0
+          }
+        ],
+        "nextOffset": null,
+        "nativeQualified": false
+      },
+      "exportSha256": "ff0f736b06cbe700abd80d4d5b57110f8c65596e45532225c89f607a6bf67e12"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-report-export.v1.schema.json",
+  "title": "Combined diagnostic experiment report export receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "artifact",
+    "schemaVersion",
+    "sourceReportId",
+    "sourceSchemaVersion",
+    "sourceArtifact",
+    "format",
+    "mediaType",
+    "sourceEvidenceRevalidated",
+    "windowAnalysisRecomputed",
+    "sourceAuthenticityVerified",
+    "independentRunsVerified",
+    "clockSynchronizationVerified",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "artifact": {
+      "$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"
+    },
+    "schemaVersion": {
+      "const": "diagnostic-experiment-report-export.v1"
+    },
+    "sourceReportId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "sourceSchemaVersion": {
+      "enum": [
+        "diagnostic-experiment-review.v1",
+        "diagnostic-experiment-repeat.v1"
+      ]
+    },
+    "sourceArtifact": {
+      "$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"
+    },
+    "format": {
+      "enum": [
+        "json",
+        "markdown",
+        "html"
+      ]
+    },
+    "mediaType": {
+      "enum": [
+        "application/json",
+        "text/markdown",
+        "text/html"
+      ]
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "windowAnalysisRecomputed": {
+      "const": true
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "independentRunsVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reportId",
+        "format"
+      ],
+      "properties": {
+        "reportId": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "format": {
+          "enum": [
+            "json",
+            "markdown",
+            "html"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "json"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "markdown"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "text/markdown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "html"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "text/html"
+          }
+        }
+      }
+    }
+  ]
+}

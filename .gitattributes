@@ -1,0 +1,28 @@
+# Normalize text in Git and use LF in working trees across platforms.
+* text=auto eol=lf
+
+# Windows command scripts require CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Keep byte-sensitive fixtures and vendored sources exactly as supplied.
+fixtures/** -text
+tests/**/fixtures/** -text
+third-party/** -text
+
+# Binary assets and native TIA projects/archives.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.7z binary
+*.dll binary
+*.exe binary
+*.pdb binary
+*.ap21 binary
+*.zap21 binary
+*.al21 binary
+*.zal21 binary

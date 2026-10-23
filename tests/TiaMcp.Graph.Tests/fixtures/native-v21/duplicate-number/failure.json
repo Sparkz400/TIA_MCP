@@ -1,0 +1,6 @@
+{
+  "completed": false,
+  "stage": "import-authored-seed",
+  "error": "Siemens.Engineering.EngineeringTargetInvocationException",
+  "message": "Siemens.Engineering.EngineeringTargetInvocationException: Error when calling method 'Import' of type 'Siemens.Engineering.SW.Blocks.PlcBlockComposition'.\r\n\r\nCannot create the 'SW.Blocks.CompileUnit' object with Simatic ML ID '1' at line number 31 at line position 8.\r\n\r\nError when calling method 'Create' of type 'Siemens.Engineering.SW.Blocks.CompileUnitComposition'.\r\n\r\nThe transition number 1 exists twice.\r\n   bei Siemens.Engineering.Private.Session.Siemens.Engineering.Private.IInstanceSession.InvokeFunc[T,TC](LifetimeContractHandle`1 lifetimeContractHandle, String name, IEnumerable`1 parameters, String fullName)\r\n   bei Siemens.Engineering.Private.InternalInstanceAccess`2.InvokeFunc[T](String name, IEnumerable`1 parameters)\r\n   bei Siemens.Engineering.SW.Blocks.PlcBlockComposition.Import(FileInfo path, ImportOptions importOptions)\r\n   bei Program.Run(String[] args) in D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\Program.cs:Zeile 110.\r\n   bei Program.Main(String[] args) in D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\Program.cs:Zeile 32."
+}

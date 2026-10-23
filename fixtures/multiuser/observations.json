@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "multiuser-observations.v1",
+  "before": {
+    "captureId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "capturedAtUtc": "2026-10-18T00:00:00.0000000+00:00",
+    "producer": "Synthetic supplied fixture",
+    "principal": "DOMAIN/user",
+    "server": {
+      "host": "https://server.invalid/",
+      "port": 443,
+      "alias": "Über Server"
+    },
+    "groups": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "path": [
+            "Line"
+          ]
+        }
+      ]
+    },
+    "projects": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "groupPath": [
+            "Line"
+          ],
+          "name": "Project",
+          "revision": "7",
+          "lock": {
+            "state": "locked",
+            "owner": "peer"
+          }
+        }
+      ]
+    },
+    "sessions": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "project": {
+            "groupPath": [
+              "Line"
+            ],
+            "name": "Project"
+          },
+          "sessionId": "session-a",
+          "projectPath": "D:/supplied/project.ap21",
+          "mode": "multiuser",
+          "upToDate": false
+        }
+      ]
+    },
+    "markings": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "project": {
+            "groupPath": [
+              "Line"
+            ],
+            "name": "Project"
+          },
+          "sessionId": "session-a",
+          "objectPath": "PLC/Block",
+          "markState": "MarkedByMeAndOthers"
+        }
+      ]
+    }
+  },
+  "after": {
+    "captureId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "capturedAtUtc": "2026-10-18T00:01:00.0000000+00:00",
+    "producer": "Synthetic supplied fixture",
+    "principal": "DOMAIN/user",
+    "server": {
+      "host": "https://server.invalid/",
+      "port": 443,
+      "alias": "Über Server"
+    },
+    "groups": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "path": [
+            "Line"
+          ]
+        }
+      ]
+    },
+    "projects": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "groupPath": [
+            "Line"
+          ],
+          "name": "Project",
+          "revision": "8",
+          "lock": {
+            "state": "locked",
+            "owner": "peer"
+          }
+        }
+      ]
+    },
+    "sessions": {
+      "coverage": "complete",
+      "diagnostic": null,
+      "rows": [
+        {
+          "project": {
+            "groupPath": [
+              "Line"
+            ],
+            "name": "Project"
+          },
+          "sessionId": "session-a",
+          "projectPath": "D:/supplied/project.ap21",
+          "mode": "multiuser",
+          "upToDate": true
+        }
+      ]
+    },
+    "markings": {
+      "coverage": "partial",
+      "diagnostic": "Deleted objects are not representable; partial supplied capture.",
+      "rows": []
+    }
+  }
+}

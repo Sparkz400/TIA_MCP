@@ -1,0 +1,614 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-component-preview:v1",
+  "title": "Retained PLC component integration preview",
+  "description": "Serialized plan, graph and descriptor consistency only; original XML, full inventory and native qualification remain separate.",
+  "type": "object",
+  "properties": {
+    "integrationPlan": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "status": {
+          "const": "planned_only"
+        },
+        "applySupported": {
+          "const": false
+        },
+        "applyError": {
+          "const": "PlcIntegrationNotQualified"
+        },
+        "nativeMutationDispatched": {
+          "const": false
+        },
+        "qualification": {
+          "const": "offline_planner_only_native_qualification_required"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "typeGuid",
+              "versionGuid",
+              "typeName",
+              "version",
+              "state",
+              "isDefault",
+              "engineeringType",
+              "modifiedDate",
+              "author",
+              "doNotUse",
+              "setForUpdate",
+              "requiredVersionGuids",
+              "contentSha256",
+              "artifact"
+            ],
+            "properties": {
+              "kind": {
+                "const": "version"
+              },
+              "typeGuid": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+              },
+              "versionGuid": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+              },
+              "typeName": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "state": {
+                "const": "Committed"
+              },
+              "isDefault": {
+                "type": "boolean"
+              },
+              "engineeringType": {
+                "enum": [
+                  "Siemens.Engineering.SW.Blocks.CodeBlockLibraryTypeVersion",
+                  "Siemens.Engineering.SW.Types.PlcTypeLibraryTypeVersion"
+                ]
+              },
+              "modifiedDate": {
+                "type": "string"
+              },
+              "author": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "doNotUse": {
+                "const": false
+              },
+              "setForUpdate": {
+                "type": "boolean"
+              },
+              "requiredVersionGuids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+                },
+                "minItems": 0,
+                "maxItems": 1000
+              },
+              "contentSha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+                  },
+                  "bytes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4194304
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "contentPolicy": {
+                "type": "object",
+                "properties": {
+                  "creationDateRule": {
+                    "const": "Only direct content FB CreationDate is provenance: explicit UTC exported leaves retained independently. Native getter ticks/Kind are observations; no unspecified/local timezone inference or chronology acceptance."
+                  },
+                  "documentInfoOptions": {
+                    "const": "None"
+                  },
+                  "policyId": {
+                    "const": "v21-fb-explicit-source-oracle-three-properties-v1"
+                  },
+                  "properties": {
+                    "const": {
+                      "AutoNumber": "true",
+                      "IsIECCheckEnabled": "false",
+                      "MemoryLayout": "Optimized"
+                    }
+                  },
+                  "qualification": {
+                    "const": "Explicit observed profile; production combined apply remains disabled."
+                  },
+                  "remainingContentRule": {
+                    "const": "Full base and full oracle trees preserve every other node, attribute, ID, comment, instruction and significant text. Only exact version OriginalLibrary and direct FB CreationDate are contextual in the oracle; no generic metadata removal."
+                  },
+                  "sourceBaseExportOptions": {
+                    "const": "WithDefaults"
+                  },
+                  "sourceLibraryName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "sourceOracleArtifact": {
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096,
+                        "pattern": "\\S"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+                      },
+                      "bytes": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4194304
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "sha256"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "sourceOracleExportOptions": {
+                    "const": "WithDefaults, WithReadOnly"
+                  },
+                  "sourceOracleSha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+                  },
+                  "sourceOriginalLibrary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  }
+                },
+                "required": [
+                  "creationDateRule",
+                  "documentInfoOptions",
+                  "policyId",
+                  "properties",
+                  "qualification",
+                  "remainingContentRule",
+                  "sourceBaseExportOptions",
+                  "sourceLibraryName",
+                  "sourceOracleArtifact",
+                  "sourceOracleExportOptions",
+                  "sourceOracleSha256",
+                  "sourceOriginalLibrary"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        },
+        "interface": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+              },
+              "direction": {
+                "enum": [
+                  "Input",
+                  "Output",
+                  "InOut"
+                ]
+              },
+              "dataType": {
+                "enum": [
+                  "Bool",
+                  "Byte",
+                  "Word",
+                  "DWord",
+                  "LWord",
+                  "SInt",
+                  "USInt",
+                  "Int",
+                  "UInt",
+                  "DInt",
+                  "UDInt",
+                  "LInt",
+                  "ULInt",
+                  "Real",
+                  "LReal",
+                  "Time",
+                  "LTime"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "direction",
+              "dataType"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameter": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+              },
+              "direction": {
+                "enum": [
+                  "Input",
+                  "Output",
+                  "InOut"
+                ]
+              },
+              "dataType": {
+                "enum": [
+                  "Bool",
+                  "Byte",
+                  "Word",
+                  "DWord",
+                  "LWord",
+                  "SInt",
+                  "USInt",
+                  "Int",
+                  "UInt",
+                  "DInt",
+                  "UDInt",
+                  "LInt",
+                  "ULInt",
+                  "Real",
+                  "LReal",
+                  "Time",
+                  "LTime"
+                ]
+              },
+              "tagPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "nativeTag": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "tablePath": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "dataType": {
+                    "enum": [
+                      "Bool",
+                      "Byte",
+                      "Word",
+                      "DWord",
+                      "LWord",
+                      "SInt",
+                      "USInt",
+                      "Int",
+                      "UInt",
+                      "DInt",
+                      "UDInt",
+                      "LInt",
+                      "ULInt",
+                      "Real",
+                      "LReal",
+                      "Time",
+                      "LTime"
+                    ]
+                  },
+                  "logicalAddress": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "isSafety": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "path",
+                  "tablePath",
+                  "name",
+                  "dataType",
+                  "logicalAddress",
+                  "isSafety"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "parameter",
+              "direction",
+              "dataType",
+              "tagPath",
+              "nativeTag"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "caller": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "enum": [
+                "existing",
+                "createStandaloneFc"
+              ]
+            },
+            "blockPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "initiallyAbsent": {
+              "type": "boolean"
+            },
+            "language": {
+              "enum": [
+                "LAD",
+                "FBD"
+              ]
+            },
+            "obCallAdded": {
+              "const": false
+            }
+          },
+          "required": [
+            "mode",
+            "blockPath",
+            "initiallyAbsent",
+            "language",
+            "obCallAdded"
+          ],
+          "additionalProperties": false
+        },
+        "instanceDb": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "numberPolicy": {
+              "const": "firstAvailable"
+            },
+            "provisionalNumber": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "numberMustBeRecheckedAfterInstantiation": {
+              "const": true
+            }
+          },
+          "required": [
+            "name",
+            "path",
+            "numberPolicy",
+            "provisionalNumber",
+            "numberMustBeRecheckedAfterInstantiation"
+          ],
+          "additionalProperties": false
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "const": "NativeIdPreservationUnsupported"
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 1
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2
+              },
+              "kind": {
+                "enum": [
+                  "library_instantiate",
+                  "graphical_typed_edit"
+                ]
+              },
+              "prepareArguments": {
+                "type": "object"
+              },
+              "requiresFreshPreparation": {
+                "const": true
+              },
+              "mustWaitFor": {
+                "const": "Exact imported FB/dependency identity and content readback; new native project fingerprint."
+              }
+            },
+            "required": [
+              "order",
+              "kind",
+              "prepareArguments",
+              "requiresFreshPreparation"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "recoveryPlan": {
+          "const": {
+            "affectedResource": "The complete selected project, including its project library, caller, and new FB/dependencies/instance DB.",
+            "automaticRetryAllowed": false,
+            "requiredBeforeFirstMutation": "Persist an initial project checkpoint and hashes for all affected and unrelated native exports. No checkpoint is created by this plan.",
+            "separateStepsAreAtomic": false,
+            "sourceLibraryPolicy": "Read-only source; no library publication, default changes or update operation.",
+            "uncertainOutcome": "Read change_status for the dispatched step; never replay. Preserve both step journals and recover the initial project checkpoint into a new owned location, then compare after fresh reopen."
+          }
+        },
+        "qualificationGates": {
+          "const": [
+            "Exact native root and dependency version/content readback after import",
+            "Fresh typed preparation: scope, protection, tag types/addresses, insertion preservation and DB collision checks",
+            "Caller and DB native readback, exact call parameter bindings and compile diagnostics",
+            "Unrelated native content comparison; save and fresh-session reopen",
+            "Initial-checkpoint recovery and interruption/no-replay cases",
+            "Independent simulator input/output and state assertions"
+          ]
+        },
+        "inventorySha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "coordinator": {
+          "const": {
+            "automaticReplayAllowed": false,
+            "implementation": "internal_staged_coordinator_with_existing_native_adapters",
+            "initialRecoveryAnchor": "First library_instantiate complete-project checkpoint; never the subsequent typed-edit checkpoint.",
+            "nativeQualificationExecuted": false,
+            "publicEntryPointAvailable": false,
+            "qualificationEntryPoint": "Explicit --component-qualification launch; library_component_qualification preparation and per-step change_apply, owned scratch only.",
+            "remainingBoundary": "Qualification-only dispatch exists; independent native qualification is still required. Production combined apply remains unavailable.",
+            "stepReviewRequired": true
+          }
+        },
+        "callerArtifact": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4194304
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "status",
+        "applySupported",
+        "applyError",
+        "nativeMutationDispatched",
+        "qualification",
+        "versions",
+        "interface",
+        "mappings",
+        "caller",
+        "instanceDb",
+        "blockers",
+        "steps",
+        "recoveryPlan",
+        "qualificationGates",
+        "inventorySha256",
+        "coordinator"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "integrationPlan"
+  ],
+  "additionalProperties": false
+}

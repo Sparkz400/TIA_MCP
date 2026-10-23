@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:feature-catalog:v1",
+  "type": "object",
+  "required": ["schemaVersion", "catalogVersion", "targetTiaVersions", "qualificationScope", "criteria", "evidence", "features"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "catalogVersion": {"type": "string", "minLength": 1},
+    "targetTiaVersions": {"type": "array", "items": {"type": "integer"}},
+    "qualificationScope": {"type": "string", "minLength": 1},
+    "criteria": {"type": "array", "items": {"type": "object", "required": ["id", "requirement"], "properties": {"id": {"type": "string"}, "requirement": {"type": "string"}}}},
+    "evidence": {"type": "array", "items": {"type": "object", "required": ["id", "status", "profile", "artifacts", "limitations"], "properties": {"id": {"type": "string"}, "status": {"enum": ["passed", "failed", "blocked", "skipped"]}, "profile": {"type": "object"}, "artifacts": {"type": "array", "items": {"type": "string"}}, "limitations": {"type": "array", "items": {"type": "string"}}}}},
+    "features": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {"$ref": "urn:tia-mcp:capability-report:v1#/$defs/feature"},
+          {"type": "object", "required": ["domain", "title", "mcpTools", "changeKind", "prerequisites", "acceptanceCriteria"], "properties": {"domain": {"type": "string"}, "title": {"type": "string"}, "mcpTools": {"type": "array", "items": {"type": "string"}}, "changeKind": {"type": ["string", "null"]}, "prerequisites": {"type": "array", "items": {"type": "string"}}, "acceptanceCriteria": {"type": "array", "minItems": 1, "items": {"type": "string"}}}}
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "kind": "retained-native-category-request-evidence",
+  "captureStartedAtUtc": "2026-10-15T07:16:15.8526501Z",
+  "captureFinishedAtUtc": "2026-10-15T07:16:17.1426936Z",
+  "sourceRun": "native-category-01",
+  "files": [
+    {
+      "fixture": "result.json",
+      "source": "artifacts/production-watch-20261015/translations/native-category-01/result.json",
+      "sha256": "edbe36d8fbacae7dae4f1ffa94bf83cad63f432812d9028634db7aeec7a01110",
+      "bytes": 18569,
+      "copy": "exact retained bytes; no transformation"
+    },
+    {
+      "fixture": "admission.json",
+      "source": "artifacts/production-watch-20261015/translations/native-category-01/admission.json",
+      "sha256": "d782715b783f131edceec30455d588fb099a4e9950c5d749235826ce199d223d",
+      "bytes": 840,
+      "copy": "exact retained bytes; no transformation"
+    }
+  ],
+  "nativeExportPreviouslyExecuted": true,
+  "fixturePreparationInvokedNative": false,
+  "nativeImportExecuted": false,
+  "nativeImportAllowed": false,
+  "scope": "Portable request/response identity matrix only. Native workbook bytes, helper binary and progress duplicate remain in the source capture. This fixture does not qualify export filtering or import."
+}

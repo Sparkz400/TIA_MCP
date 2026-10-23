@@ -1,0 +1,83 @@
+{
+  "roots": [
+    "project"
+  ],
+  "children": {
+    "project": [
+      "devices"
+    ],
+    "devices": [
+      "line-a",
+      "line-b",
+      "hmi"
+    ],
+    "line-a": [
+      "cpu-a",
+      "io"
+    ],
+    "cpu-a": [
+      "plc-a"
+    ],
+    "plc-a": [
+      "blocks-a",
+      "tags-a",
+      "units-a",
+      "to"
+    ],
+    "blocks-a": [
+      "empty-a",
+      "nested-a",
+      "protected",
+      "malicious"
+    ],
+    "empty-a": [],
+    "nested-a": [
+      "start-a"
+    ],
+    "start-a": [],
+    "protected": [],
+    "malicious": [],
+    "tags-a": [
+      "tag-run",
+      "tag-done"
+    ],
+    "tag-run": [],
+    "tag-done": [],
+    "units-a": [
+      "unit-control"
+    ],
+    "unit-control": [
+      "unit-blocks"
+    ],
+    "unit-blocks": [
+      "unit-start",
+      "namespaced-start"
+    ],
+    "unit-start": [],
+    "namespaced-start": [],
+    "line-b": [
+      "cpu-b"
+    ],
+    "cpu-b": [
+      "plc-b"
+    ],
+    "plc-b": [
+      "blocks-b"
+    ],
+    "blocks-b": [
+      "start-b",
+      "empty-b"
+    ],
+    "start-b": [],
+    "empty-b": [],
+    "hmi": [],
+    "to": [],
+    "io": []
+  },
+  "duplicateNamePaths": [
+    "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/blocks/groups/Motion/Start",
+    "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/Start",
+    "/projects/Explorer/devices/Line%20A/items/CPU/plc/PLC/units/Control/blocks/namespaces/Company.Area/Start",
+    "/projects/Explorer/devices/Line%20B/items/CPU/plc/PLC/blocks/Start"
+  ]
+}

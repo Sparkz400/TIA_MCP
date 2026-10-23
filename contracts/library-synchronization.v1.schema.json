@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-synchronization:v1",
+  "title": "Library copy/publication synchronization preview observations",
+  "description": "Recorded policy, source closure and expected version pins. A full destination-before inventory is not retained; local validation cannot independently reconstruct its complete union or establish native identity.",
+  "type": "object",
+  "properties": {
+    "typeSynchronization": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/type"
+      },
+      "minItems": 0,
+      "maxItems": 1000
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/effect"
+      },
+      "minItems": 1,
+      "maxItems": 101
+    }
+  },
+  "required": [
+    "typeSynchronization",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "default": {
+      "allOf": [
+        {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+        },
+        {
+          "properties": {
+            "state": {
+              "const": "Committed"
+            },
+            "isDefault": {
+              "const": true
+            }
+          }
+        }
+      ]
+    },
+    "type": {
+      "type": "object",
+      "properties": {
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "nativeForceUpdateMode": {
+          "const": "SetOnlyHigherUpdatedVersionAsDefault"
+        },
+        "forceUpdate": {
+          "const": false
+        },
+        "beforeDefault": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/default"
+            }
+          ]
+        },
+        "sourceDefault": {
+          "$ref": "#/$defs/default"
+        },
+        "expectedDefault": {
+          "$ref": "#/$defs/default"
+        },
+        "defaultChange": {
+          "type": "boolean"
+        },
+        "defaultEffect": {
+          "enum": [
+            "initializeDefault",
+            "preserveDefault",
+            "promoteNewerSourceDefault"
+          ]
+        },
+        "expectedVersions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "versionGuid": {
+                "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+              },
+              "versionNumber": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "versionGuid",
+              "versionNumber"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 2000
+        },
+        "deleteVersions": {
+          "const": false
+        }
+      },
+      "required": [
+        "typeGuid",
+        "typeName",
+        "nativeForceUpdateMode",
+        "forceUpdate",
+        "beforeDefault",
+        "sourceDefault",
+        "expectedDefault",
+        "defaultChange",
+        "defaultEffect",
+        "expectedVersions",
+        "deleteVersions"
+      ],
+      "additionalProperties": false
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "copyTypeAllVersions"
+            },
+            "versions": {
+              "type": "array",
+              "items": {
+                "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+              },
+              "minItems": 1,
+              "maxItems": 1000
+            },
+            "defaultPolicy": {
+              "const": "Promote source default only when newer; exact per-type effects are in typeSynchronization."
+            }
+          },
+          "required": [
+            "action",
+            "versions",
+            "defaultPolicy"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "enum": [
+                "library_copy_elements",
+                "library_publish"
+              ]
+            },
+            "targetLibraryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "projectPath": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "action",
+            "targetLibraryId",
+            "projectPath"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V21" />
+  <DocumentInfo>
+    <Created>2026-10-08T12:46:54.8720559Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V21 Update 2</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Test Suite Advanced</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V21 HF2</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS DCC</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V21 HF2</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, G200, G220, S200, S210, S220, Innomotics MVD</DisplayName>
+        <DisplayVersion>V21 HF2</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V21 Update 2</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Tech WebApplication</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Basic/Comfort/Advanced</DisplayName>
+        <DisplayVersion>V21 Update 2</DisplayVersion>
+      </Product>
+      <Product>
+        <DisplayName>WinCC Unified</DisplayName>
+        <DisplayVersion>V21 Update 2</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FC ID="0">
+    <AttributeList>
+      <Access>Unpublished</Access>
+      <AutoNumber>true</AutoNumber>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface>
+        <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+          <Section Name="Input">
+            <Member Name="Value" Datatype="Int" Accessibility="Public" />
+          </Section>
+          <Section Name="Output">
+            <Member Name="Result" Datatype="Int" Accessibility="Public" />
+          </Section>
+          <Section Name="InOut">
+            <Member Name="Accumulator" Datatype="Int" Accessibility="Public" />
+          </Section>
+          <Section Name="Temp" />
+          <Section Name="Constant" />
+          <Section Name="Return">
+            <Member Name="Ret_Val" Datatype="Int" Accessibility="Public" />
+          </Section>
+        </Sections>
+      </Interface>
+      <IsIECCheckEnabled>false</IsIECCheckEnabled>
+      <Name>TgpUnit_NumericFC</Name>
+      <Namespace>TiaMcp_UnitA</Namespace>
+      <Number>9</Number>
+      <ProgrammingLanguage>SCL</ProgrammingLanguage>
+      <SetENOAutomatically>false</SetENOAutomatically>
+      <UDABlockProperties />
+      <UDAEnableTagReadback>false</UDAEnableTagReadback>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource>
+            <StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">
+              <NewLine Num="1" UId="21" />
+              <Blank Num="1" UId="22" />
+              <Access Scope="LocalVariable" UId="23">
+                <Symbol UId="24">
+                  <Component Name="Accumulator" UId="25" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="26" />
+              <Token Text=":=" UId="27" />
+              <Blank Num="1" UId="28" />
+              <Access Scope="LocalVariable" UId="29">
+                <Symbol UId="30">
+                  <Component Name="Accumulator" UId="31" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="32" />
+              <Token Text="+" UId="33" />
+              <Blank Num="1" UId="34" />
+              <Access Scope="LocalVariable" UId="35">
+                <Symbol UId="36">
+                  <Component Name="Value" UId="37" />
+                </Symbol>
+              </Access>
+              <Token Text=";" UId="38" />
+              <NewLine Num="1" UId="39" />
+              <Blank Num="1" UId="40" />
+              <Access Scope="LocalVariable" UId="41">
+                <Symbol UId="42">
+                  <Component Name="Result" UId="43" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="44" />
+              <Token Text=":=" UId="45" />
+              <Blank Num="1" UId="46" />
+              <Access Scope="LocalVariable" UId="47">
+                <Symbol UId="48">
+                  <Component Name="Accumulator" UId="49" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="50" />
+              <Token Text="*" UId="51" />
+              <Blank Num="1" UId="52" />
+              <Access Scope="LiteralConstant" UId="53">
+                <Constant UId="54">
+                  <ConstantValue UId="56">2</ConstantValue>
+                </Constant>
+              </Access>
+              <Token Text=";" UId="57" />
+              <NewLine Num="1" UId="58" />
+              <Blank Num="1" UId="59" />
+              <Access Scope="LocalVariable" UId="60">
+                <Symbol UId="61">
+                  <Component Name="TgpUnit_NumericFC" UId="62" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="63" />
+              <Token Text=":=" UId="64" />
+              <Blank Num="1" UId="65" />
+              <Access Scope="LocalVariable" UId="66">
+                <Symbol UId="67">
+                  <Component Name="Accumulator" UId="68" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="69" />
+              <Token Text="+" UId="70" />
+              <Blank Num="1" UId="71" />
+              <Access Scope="LiteralConstant" UId="72">
+                <Constant UId="73">
+                  <ConstantValue UId="75">1</ConstantValue>
+                </Constant>
+              </Access>
+              <Token Text=";" UId="76" />
+              <NewLine Num="1" UId="77" />
+            </StructuredText>
+          </NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="4" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="5" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="6" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="8" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="9" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FC>
+</Document>

@@ -1,0 +1,9 @@
+{
+  "fixtureKind": "synthetic-not-native-qualified",
+  "keys": ["K-001", "K-002", "K-003", "K-004", "K-005", "K-006", "K-007", "K-008-current", "K-009", "K-010", "K-011"],
+  "initialGerman": ["Bereit", null, "Achse {0}: {1:F1} mm", " Temperatur Ω ≤ 80 °C — 東京 ", "Zeile 1\r\nZeile 2\tFertig", "", "Bereit", "Neu erstelltes Objekt", "=1+1", "Fetter Text", "Literal _x0041_"],
+  "expectedGermanMissing": 1,
+  "expectedGermanEmpty": 1,
+  "expectedFrench": "Prêt — untouched",
+  "approvedDemo": {"K-002": "Kühlung aktiviert", "K-007": "Betriebsbereit"}
+}

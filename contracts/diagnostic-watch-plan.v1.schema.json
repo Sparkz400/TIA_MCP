@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-watch-plan.v1.schema.json",
+  "title": "Immutable offline diagnostic watch planning envelope",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-watch-plan.v1"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tiaVersionOrigin": {
+      "const": "callerSuppliedUnverified"
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "sourceEvidencePolicy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "nativeExecutable": {
+      "const": false
+    },
+    "nativeDocumentGenerated": {
+      "const": false
+    },
+    "qualification": {
+      "const": "offlinePlanningOnly"
+    },
+    "watchPlan": {
+      "$ref": "watch-table-plan.v1.schema.json"
+    },
+    "alarmEvidence": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/alarmEvidence"
+    },
+    "alarmBindings": {
+      "$ref": "diagnostic-alarm-bindings.v1.schema.json"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "reviewId",
+    "tiaVersionOrigin",
+    "sourceAuthenticityVerified",
+    "sourceEvidencePolicy",
+    "nativeAccessAttempted",
+    "nativeExecutable",
+    "nativeDocumentGenerated",
+    "qualification",
+    "watchPlan"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "tableName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "tiaVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "maxRows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "externalStorage": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "properties": {
+              "objectPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "objectPath",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "tableName",
+        "tiaVersion"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "schemaVersion": {
+          "const": "diagnostic-watch-plan.v1"
+        },
+        "artifact": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8388608
+            }
+          },
+          "required": [
+            "path",
+            "sha256",
+            "bytes"
+          ],
+          "additionalProperties": false
+        },
+        "caseId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "planSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "rowCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "candidateCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "unresolvedCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "tiaVersionOrigin": {
+          "const": "callerSuppliedUnverified"
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nativeAccessAttempted": {
+          "const": false
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeDocumentGenerated": {
+          "const": false
+        },
+        "qualification": {
+          "const": "offlinePlanningOnly"
+        }
+      },
+      "required": [
+        "id",
+        "schemaVersion",
+        "artifact",
+        "caseId",
+        "reviewId",
+        "planSha256",
+        "rowCount",
+        "candidateCount",
+        "unresolvedCount",
+        "truncated",
+        "tiaVersionOrigin",
+        "sourceAuthenticityVerified",
+        "sourceEvidencePolicy",
+        "nativeAccessAttempted",
+        "nativeExecutable",
+        "nativeDocumentGenerated",
+        "qualification"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "planId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      },
+      "required": [
+        "planId",
+        "request"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "x-tool-contracts": {
+    "diagnostic_watch_plan": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#/$defs/receipt"
+      }
+    }
+  }
+}

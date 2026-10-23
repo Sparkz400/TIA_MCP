@@ -1,0 +1,2427 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-operation:v1",
+  "title": "Operation-specific library payload and returned-result observations",
+  "description": "Projection of kind, original payload and optional journal result. Local observation validation only; unused supplied fields remain evidence, not authority. Native selector resolution, complete compiler evidence, preservation and runtime qualification are separate. PLC integration is plan-only and cannot have a returned combined result.",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "enum": [
+        "library_create",
+        "library_upgrade",
+        "library_copy_elements",
+        "library_instantiate",
+        "library_update_project",
+        "library_integrate",
+        "library_create_type",
+        "library_create_master_copy",
+        "library_edit_version",
+        "library_release_version",
+        "library_discard_version",
+        "library_set_default",
+        "library_type_policy",
+        "library_organize",
+        "library_delete",
+        "library_publish",
+        "library_save",
+        "library_archive"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "result": {}
+  },
+  "required": [
+    "kind",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "pin": {
+      "type": "object",
+      "properties": {
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "versionGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        }
+      },
+      "required": [
+        "typeGuid",
+        "versionGuid"
+      ],
+      "additionalProperties": true,
+      "not": {
+        "required": [
+          "masterCopyPath"
+        ]
+      }
+    },
+    "master": {
+      "type": "object",
+      "properties": {
+        "masterCopyPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "masterCopyPath"
+      ],
+      "additionalProperties": true
+    },
+    "selection": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/pin"
+        },
+        {
+          "$ref": "#/$defs/master"
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "libraryId": {
+          "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+        },
+        "revision": {
+          "$ref": "urn:tia-mcp:library-export:v1#/$defs/hash"
+        }
+      },
+      "required": [
+        "libraryId",
+        "revision"
+      ],
+      "additionalProperties": true
+    },
+    "placement": {
+      "type": "object",
+      "properties": {
+        "left": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "top": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
+      "required": [
+        "left",
+        "top",
+        "width",
+        "height"
+      ],
+      "additionalProperties": true
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "property": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+            "allOf": [
+              {
+                "pattern": "\\S"
+              }
+            ]
+          },
+          "tag": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+            "allOf": [
+              {
+                "pattern": "\\S"
+              }
+            ]
+          },
+          "dataType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+            "allOf": [
+              {
+                "pattern": "\\S"
+              }
+            ]
+          }
+        },
+        "required": [
+          "property",
+          "tag",
+          "dataType"
+        ],
+        "additionalProperties": true
+      },
+      "minItems": 0,
+      "maxItems": 200
+    },
+    "link": {
+      "type": "object",
+      "properties": {
+        "nativeObjectType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "typeGuid": {
+          "anyOf": [
+            {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "versionGuid": {
+          "anyOf": [
+            {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativeLinkVerified": {
+          "type": "boolean"
+        },
+        "runtimeVerified": {
+          "const": false
+        },
+        "linkStatus": {
+          "enum": [
+            "linked",
+            "noService",
+            "unavailable"
+          ]
+        },
+        "linkReadError": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "nativeObjectType",
+        "typeGuid",
+        "versionGuid",
+        "version",
+        "nativeLinkVerified",
+        "runtimeVerified",
+        "linkStatus"
+      ],
+      "additionalProperties": false
+    },
+    "faceplate": {
+      "type": "object",
+      "properties": {
+        "nativeObjectType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "typeGuid": {
+          "anyOf": [
+            {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "versionGuid": {
+          "anyOf": [
+            {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativeLinkVerified": {
+          "type": "boolean"
+        },
+        "runtimeVerified": {
+          "const": false
+        },
+        "linkStatus": {
+          "enum": [
+            "linked",
+            "noService",
+            "unavailable"
+          ]
+        },
+        "linkReadError": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "\\S"
+        },
+        "containedType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "left": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "top": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "interface": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "property": {
+                "type": "string"
+              },
+              "value": {}
+            },
+            "required": [
+              "property",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 200
+        },
+        "interfaceTruncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nativeObjectType",
+        "typeGuid",
+        "versionGuid",
+        "version",
+        "nativeLinkVerified",
+        "runtimeVerified",
+        "linkStatus",
+        "name",
+        "containedType",
+        "left",
+        "top",
+        "width",
+        "height",
+        "interface",
+        "interfaceTruncated"
+      ],
+      "additionalProperties": false
+    },
+    "tagResult": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "\\S"
+        },
+        "dataType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "\\S"
+        },
+        "connection": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runtimeVerified": {
+          "const": false
+        },
+        "defaultConnection": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plcTag": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nativeConnectionResolved": {
+          "const": false
+        }
+      },
+      "required": [
+        "name",
+        "dataType",
+        "connection",
+        "runtimeVerified"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "defaultConnection": [
+          "plcTag",
+          "nativeConnectionResolved"
+        ],
+        "plcTag": [
+          "defaultConnection",
+          "nativeConnectionResolved"
+        ],
+        "nativeConnectionResolved": [
+          "defaultConnection",
+          "plcTag"
+        ]
+      }
+    },
+    "synchronization": {
+      "type": "object",
+      "properties": {
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+        },
+        "defaultVersion": {
+          "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+          },
+          "minItems": 1,
+          "maxItems": 2000
+        },
+        "exactVersionsAndDefaultVerified": {
+          "const": true
+        }
+      },
+      "required": [
+        "typeGuid",
+        "defaultVersion",
+        "versions",
+        "exactVersionsAndDefaultVerified"
+      ],
+      "additionalProperties": false
+    },
+    "classicPayload": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selection"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "family": {
+              "const": "classic"
+            },
+            "hmiPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+              "allOf": [
+                {
+                  "pattern": "\\S"
+                }
+              ]
+            },
+            "composition": {
+              "enum": [
+                "screens",
+                "screenTemplates",
+                "screenPopups",
+                "tagTables",
+                "tags",
+                "scripts"
+              ]
+            },
+            "tagTable": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+              "allOf": [
+                {
+                  "pattern": "\\S"
+                }
+              ]
+            }
+          },
+          "required": [
+            "family",
+            "hmiPath",
+            "composition"
+          ],
+          "additionalProperties": true
+        },
+        "destinationLibraryId": {
+          "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+        },
+        "hmiAction": {
+          "const": "instantiate"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "source",
+        "target",
+        "selection"
+      ],
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "composition": {
+                    "const": "tags"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "required": [
+                  "tagTable"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "selection": {
+                "items": {
+                  "required": [
+                    "versionGuid"
+                  ],
+                  "not": {
+                    "required": [
+                      "masterCopyPath"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "properties": {
+                  "composition": {
+                    "enum": [
+                      "screens",
+                      "scripts"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "unifiedPayload": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "selection": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pin"
+          },
+          "minItems": 0,
+          "maxItems": 1
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "family": {
+              "const": "unified"
+            },
+            "hmiPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+              "allOf": [
+                {
+                  "pattern": "\\S"
+                }
+              ]
+            }
+          },
+          "required": [
+            "family",
+            "hmiPath"
+          ],
+          "additionalProperties": true
+        },
+        "destinationLibraryId": {
+          "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+        },
+        "hmiAction": {
+          "enum": [
+            "tag_create",
+            "faceplate_create",
+            "faceplate_bind"
+          ]
+        },
+        "bindings": {
+          "$ref": "#/$defs/bindings"
+        },
+        "placement": {
+          "$ref": "#/$defs/placement"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "source",
+        "target",
+        "hmiAction"
+      ],
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "hmiAction": {
+                "const": "tag_create"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "name",
+              "dataType"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+                "allOf": [
+                  {
+                    "pattern": "\\S"
+                  }
+                ]
+              },
+              "dataType": {
+                "enum": [
+                  "Bool",
+                  "Byte",
+                  "Word",
+                  "DWord",
+                  "LWord",
+                  "SInt",
+                  "USInt",
+                  "Int",
+                  "UInt",
+                  "DInt",
+                  "UDInt",
+                  "LInt",
+                  "ULInt",
+                  "Real",
+                  "LReal"
+                ]
+              },
+              "connection": false,
+              "plcTag": false,
+              "address": false,
+              "target": {
+                "required": [
+                  "tagTable"
+                ],
+                "properties": {
+                  "tagTable": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+                    "allOf": [
+                      {
+                        "pattern": "\\S"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "selection"
+            ],
+            "properties": {
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "required": [
+                  "screen",
+                  "container"
+                ],
+                "properties": {
+                  "screen": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+                    "allOf": [
+                      {
+                        "pattern": "\\S"
+                      }
+                    ]
+                  },
+                  "container": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+                    "allOf": [
+                      {
+                        "pattern": "\\S"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "hmiAction": {
+                "const": "faceplate_create"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "placement",
+              "integration"
+            ],
+            "properties": {
+              "bindings": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "integration": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "const": "instantiateOnly"
+                  }
+                },
+                "required": [
+                  "mode"
+                ],
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "hmiAction": {
+                "const": "faceplate_bind"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "bindings"
+            ]
+          }
+        }
+      ]
+    },
+    "unifiedResult": {
+      "if": {
+        "properties": {
+          "payload": {
+            "properties": {
+              "hmiAction": {
+                "const": "tag_create"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "$ref": "#/$defs/tagResult"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "result": {
+            "$ref": "#/$defs/faceplate"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_create"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^<>:\"/\\\\|?*\\x00-\\x1f]+(?![\\s\\S])",
+                "allOf": [
+                  {
+                    "pattern": "\\S"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "name"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "library": {
+                "$ref": "urn:tia-mcp:library-identity:v1"
+              }
+            },
+            "required": [
+              "objects",
+              "library"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_upgrade"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "expectedSha256": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{64}(?![\\s\\S])"
+              },
+              "expectedFiles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "relativePath": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "\\S"
+                    },
+                    "bytes": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9223372036854775807
+                    },
+                    "sha256": {
+                      "$ref": "urn:tia-mcp:library-export:v1#/$defs/hash"
+                    }
+                  },
+                  "required": [
+                    "relativePath",
+                    "bytes",
+                    "sha256"
+                  ],
+                  "additionalProperties": true
+                },
+                "minItems": 1,
+                "maxItems": 20000
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "path",
+              "expectedSha256"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "library": {
+                "$ref": "urn:tia-mcp:library-identity:v1"
+              },
+              "sourceSnapshotOwned": {
+                "const": true
+              }
+            },
+            "required": [
+              "objects",
+              "library",
+              "sourceSnapshotOwned"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_copy_elements"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "destinationLibraryId",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "masterCopy": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "masterCopy"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "typeSynchronization": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/synchronization"
+                },
+                "minItems": 0,
+                "maxItems": 1000
+              }
+            },
+            "required": [
+              "objects",
+              "typeSynchronization"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_instantiate"
+          }
+        }
+      },
+      "then": {
+        "if": {
+          "properties": {
+            "payload": {
+              "required": [
+                "target"
+              ],
+              "properties": {
+                "target": {
+                  "required": [
+                    "family"
+                  ],
+                  "properties": {
+                    "family": {
+                      "enum": [
+                        "classic",
+                        "unified",
+                        "hmi"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "if": {
+            "properties": {
+              "payload": {
+                "required": [
+                  "target"
+                ],
+                "properties": {
+                  "target": {
+                    "required": [
+                      "family"
+                    ],
+                    "properties": {
+                      "family": {
+                        "const": "unified"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "$ref": "#/$defs/unifiedPayload"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/$defs/unifiedResult"
+              }
+            ]
+          },
+          "else": {
+            "properties": {
+              "payload": {
+                "$ref": "#/$defs/classicPayload"
+              },
+              "result": {
+                "$ref": "#/$defs/link"
+              }
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "schemaVersion": {
+                  "const": 1
+                },
+                "source": {
+                  "$ref": "#/$defs/source"
+                },
+                "selection": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/selection"
+                  },
+                  "minItems": 1,
+                  "maxItems": 100
+                },
+                "target": {
+                  "type": "object"
+                },
+                "destinationLibraryId": {
+                  "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+                },
+                "destinationComposition": {
+                  "enum": [
+                    "blocks",
+                    "types"
+                  ]
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "source",
+                "selection"
+              ],
+              "additionalProperties": true,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "selection": {
+                        "contains": {
+                          "required": [
+                            "masterCopyPath"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "destinationComposition"
+                    ]
+                  }
+                }
+              ]
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "objects": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/use/properties/nativeInstance"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/use/properties/nativeInstance"
+                          },
+                          "version": {
+                            "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                          },
+                          "linkVerified": {
+                            "const": true
+                          }
+                        },
+                        "required": [
+                          "object",
+                          "version",
+                          "linkVerified"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "objects"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_update_project"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "updateScope": {
+                "const": "entireSelectedPlc"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection",
+              "updateScope"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "objects": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                    },
+                    "minItems": 0,
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "objects"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "objects": {
+                    "type": "array",
+                    "maxItems": 0
+                  },
+                  "noOp": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  }
+                },
+                "required": [
+                  "objects",
+                  "noOp",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_integrate"
+          }
+        }
+      },
+      "then": {
+        "if": {
+          "properties": {
+            "payload": {
+              "required": [
+                "target"
+              ],
+              "properties": {
+                "target": {
+                  "required": [
+                    "family"
+                  ],
+                  "properties": {
+                    "family": {
+                      "enum": [
+                        "classic",
+                        "unified",
+                        "hmi"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "then": {
+          "if": {
+            "properties": {
+              "payload": {
+                "required": [
+                  "target"
+                ],
+                "properties": {
+                  "target": {
+                    "required": [
+                      "family"
+                    ],
+                    "properties": {
+                      "family": {
+                        "const": "unified"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/unifiedPayload"
+                  },
+                  {
+                    "properties": {
+                      "hmiAction": {
+                        "const": "faceplate_bind"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/$defs/unifiedResult"
+              }
+            ]
+          },
+          "else": false
+        },
+        "else": {
+          "properties": {
+            "payload": {
+              "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+            },
+            "result": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_create_type"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "documentDirectory": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "documentName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^<>:\"/\\\\|?*\\x00-\\x1f]+(?![\\s\\S])",
+                "allOf": [
+                  {
+                    "pattern": "\\S"
+                  }
+                ]
+              },
+              "targetEnvironment": {
+                "type": "string"
+              },
+              "destinationComposition": {
+                "enum": [
+                  "blocks",
+                  "types"
+                ]
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "destinationLibraryId",
+              "documentDirectory",
+              "documentName"
+            ],
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "targetEnvironment": {
+                      "const": "selectedPlc"
+                    }
+                  },
+                  "required": [
+                    "targetEnvironment"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "destinationComposition"
+                  ]
+                }
+              }
+            ]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "typeGuid": {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "transferState": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "\\S"
+                    }
+                  },
+                  "required": [
+                    "typeGuid",
+                    "name",
+                    "transferState"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_create_master_copy"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "object": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "destinationLibraryId",
+              "object"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "masterCopy": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "masterCopy"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_edit_version"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "testInstanceName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_release_version"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "versionNumber": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32,
+                "pattern": "\\S"
+              },
+              "author": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "\\S"
+              },
+              "comment": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection",
+              "versionNumber",
+              "author",
+              "comment"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_discard_version"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "discardedVersionGuid": {
+                "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+              },
+              "remainingType": {
+                "anyOf": [
+                  {
+                    "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "objects",
+              "discardedVersionGuid",
+              "remainingType"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_set_default"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_type_policy"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/pin"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "doNotUse": {
+                "type": "boolean"
+              },
+              "setForUpdate": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection"
+            ],
+            "additionalProperties": true,
+            "anyOf": [
+              {
+                "required": [
+                  "doNotUse"
+                ]
+              },
+              {
+                "required": [
+                  "setForUpdate"
+                ]
+              }
+            ]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_organize"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "action": {
+                "enum": [
+                  "create",
+                  "rename",
+                  "delete"
+                ]
+              },
+              "folderKind": {
+                "enum": [
+                  "types",
+                  "masterCopies"
+                ]
+              },
+              "folderPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^<>:\"/\\\\|?*\\x00-\\x1f]+(?![\\s\\S])",
+                "allOf": [
+                  {
+                    "pattern": "\\S"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "action",
+              "folderKind"
+            ],
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "create",
+                        "rename"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "name"
+                  ]
+                }
+              }
+            ]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_delete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_publish"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "destinationLibraryId",
+              "selection"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "masterCopy": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "masterCopy"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "typeSynchronization": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/synchronization"
+                },
+                "minItems": 0,
+                "maxItems": 1000
+              }
+            },
+            "required": [
+              "objects",
+              "typeSynchronization"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_save"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              },
+              "recoveryChangeId": {
+                "type": "string",
+                "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              }
+            },
+            "required": [
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_archive"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/selection"
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "target": {
+                "type": "object"
+              },
+              "destinationLibraryId": {
+                "$ref": "urn:tia-mcp:library-identity:v1#/properties/libraryId"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source"
+            ],
+            "additionalProperties": true
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "archive": {
+                "allOf": [
+                  {
+                    "$ref": "urn:tia-mcp:library-export:v1#/$defs/file"
+                  }
+                ],
+                "properties": {
+                  "mediaType": {
+                    "const": "application/octet-stream"
+                  }
+                },
+                "unevaluatedProperties": false
+              }
+            },
+            "required": [
+              "objects",
+              "archive"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

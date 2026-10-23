@@ -1,0 +1,190 @@
+{
+  "reviewId": "3b2c01bb6733efe17ce384425e5ef527447838f4eac70640e9c433355160225f",
+  "report": "Conveyor 2 occasionally stops although its enable command remains true.",
+  "searchTerms": [
+    "Conveyor",
+    "Conv2"
+  ],
+  "context": {
+    "timing": "Synthetic 10 ms samples only."
+  },
+  "blockPath": "/projects/Fixture/plc/CPU/blocks/FB_Conveyor",
+  "instance": {
+    "dbPath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+    "memberPath": [
+      "Conv2"
+    ]
+  },
+  "signals": [
+    {
+      "id": "enableSource",
+      "role": "enable source",
+      "reason": "Independently authored enable source role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+      "memberPath": [
+        "Enable2"
+      ]
+    },
+    {
+      "id": "enable",
+      "role": "instance enable",
+      "reason": "Independently authored instance enable role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "Enable"
+      ]
+    },
+    {
+      "id": "run",
+      "role": "internal command",
+      "reason": "Independently authored internal command role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "RunCmd"
+      ]
+    },
+    {
+      "id": "final",
+      "role": "final output",
+      "reason": "Independently authored final output role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+      "memberPath": [
+        "Final2"
+      ]
+    },
+    {
+      "id": "feedback",
+      "role": "feedback",
+      "reason": "Independently authored feedback role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+      "memberPath": [
+        "Feedback2"
+      ]
+    },
+    {
+      "id": "permit",
+      "role": "interlock",
+      "reason": "Independently authored interlock role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+      "memberPath": [
+        "Permit2"
+      ]
+    },
+    {
+      "id": "step",
+      "role": "sequence state",
+      "reason": "Independently authored sequence state role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "Step"
+      ]
+    },
+    {
+      "id": "elapsed",
+      "role": "timer elapsed",
+      "reason": "Independently authored timer elapsed role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "Elapsed"
+      ]
+    },
+    {
+      "id": "timerDone",
+      "role": "timer output",
+      "reason": "Independently authored timer output role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "TimerDone"
+      ]
+    },
+    {
+      "id": "fault",
+      "role": "fault status",
+      "reason": "Independently authored fault status role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_Line",
+      "memberPath": [
+        "Conv2",
+        "Fault"
+      ]
+    },
+    {
+      "id": "override",
+      "role": "separate writer guard",
+      "reason": "Independently authored separate writer guard role tests the writer prediction.",
+      "hypothesisIds": [
+        "writer"
+      ],
+      "storagePath": "/projects/Fixture/plc/CPU/blocks/DB_IO",
+      "memberPath": [
+        "Override2"
+      ]
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "writer",
+      "statement": "A separate writer changes the final output while the internal command remains true.",
+      "prediction": {
+        "when": [
+          {
+            "signalId": "final",
+            "op": "eq",
+            "value": false
+          }
+        ],
+        "expect": [
+          {
+            "signalId": "run",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "signalId": "override",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "signalId": "enable",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      }
+    }
+  ]
+}

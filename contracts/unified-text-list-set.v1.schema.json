@@ -1,0 +1,2636 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "unified-text-list-set.v1.schema.json",
+  "title": "Coordinated paired Unified text-list generation v1",
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "additionalProperties": false
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "reviewId",
+        "objectPaths"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "objectPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "destination": {
+      "type": "object",
+      "required": [
+        "reviewId",
+        "hmiPath",
+        "family"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "hmiPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "member": {
+      "type": "object",
+      "required": [
+        "objectPath",
+        "memberPath"
+      ],
+      "properties": {
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "memberPath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 16,
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "id",
+        "outputId",
+        "property",
+        "beforeMember",
+        "afterMember",
+        "declaredHmiType",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "property": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "beforeMember": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/member"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterMember": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/member"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "declaredHmiType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "declaration": {
+      "type": "object",
+      "required": [
+        "objectPath",
+        "memberPath",
+        "status",
+        "dataType",
+        "evidence",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "memberPath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 16,
+          "minItems": 1
+        },
+        "status": {
+          "enum": [
+            "unavailableOrAmbiguous",
+            "capturedDeclaration"
+          ]
+        },
+        "dataType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "bindingReview": {
+      "type": "object",
+      "required": [
+        "id",
+        "selection",
+        "beforeDeclaration",
+        "afterDeclaration",
+        "change",
+        "capturedProperty",
+        "conflicts",
+        "gaps",
+        "nativeCompatibilityVerified",
+        "runtimeStorageVerified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "selection": {
+          "$ref": "#/$defs/binding"
+        },
+        "beforeDeclaration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/declaration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterDeclaration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/declaration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "change": {
+          "enum": [
+            "added",
+            "removed",
+            "typeTextChanged",
+            "explicitMemberMapping",
+            "sameSelectedMember"
+          ]
+        },
+        "capturedProperty": {},
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 32
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 32
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        },
+        "runtimeStorageVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "authorIntent": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-request.v1"
+        },
+        "fileBase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "textLibrary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 35,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "translations": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 32,
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 35,
+                  "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                },
+                "additionalProperties": {
+                  "type": "string",
+                  "maxLength": 16384
+                }
+              }
+            },
+            "required": [
+              "id",
+              "translations"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 4096
+        },
+        "lists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "rangeType": {
+                "enum": [
+                  "Decimal",
+                  "BitNumber",
+                  "Bool"
+                ]
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    },
+                    "type": {
+                      "enum": [
+                        "SingleValue",
+                        "Range",
+                        "From",
+                        "To"
+                      ]
+                    },
+                    "fromValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "toValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    },
+                    "textId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "fromValue",
+                    "toValue",
+                    "isDefault",
+                    "textId"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 4096
+              }
+            },
+            "required": [
+              "name",
+              "rangeType",
+              "entries"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "fileBase",
+        "textLibrary",
+        "languages",
+        "defaultLanguage",
+        "texts",
+        "lists"
+      ],
+      "additionalProperties": false
+    },
+    "componentContext": {
+      "type": "object",
+      "properties": {
+        "reviewRecordId": {
+          "$ref": "#/$defs/hash"
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "afterComponent": {
+          "type": "object"
+        },
+        "destination": {
+          "$ref": "#/$defs/destination"
+        },
+        "binding": {
+          "$ref": "#/$defs/bindingReview"
+        },
+        "dependencyAssociationIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4095
+          },
+          "maxItems": 4096
+        }
+      },
+      "required": [
+        "reviewRecordId",
+        "outputId",
+        "bindingId",
+        "afterComponent",
+        "destination",
+        "binding",
+        "dependencyAssociationIndices"
+      ],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-set-request.v1"
+        },
+        "componentReviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "previousRecordId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "outputId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "bindingId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "profile": {
+                    "const": "unified-bool-binding-text-list.v1"
+                  },
+                  "template": {
+                    "type": "object",
+                    "properties": {
+                      "fileBase": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "textLibrary": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                      },
+                      "languages": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 35,
+                          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 32,
+                        "uniqueItems": true
+                      },
+                      "defaultLanguage": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 35,
+                        "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                      },
+                      "falseText": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 32,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 35,
+                          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 16384
+                        }
+                      },
+                      "trueText": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 32,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 35,
+                          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "maxLength": 16384
+                        }
+                      }
+                    },
+                    "required": [
+                      "fileBase",
+                      "textLibrary",
+                      "languages",
+                      "defaultLanguage",
+                      "falseText",
+                      "trueText"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "previousAuthorRecordId": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/hash"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "outputId",
+                  "bindingId",
+                  "profile",
+                  "template",
+                  "previousAuthorRecordId"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "outputId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "bindingId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "profile": {
+                    "const": "unified-integer-state-text-list.v1"
+                  },
+                  "template": {
+                    "type": "object",
+                    "properties": {
+                      "fileBase": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "textLibrary": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                      },
+                      "languages": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 35,
+                          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 32,
+                        "uniqueItems": true
+                      },
+                      "defaultLanguage": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 35,
+                        "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                      },
+                      "dataType": {
+                        "enum": [
+                          "SInt",
+                          "USInt",
+                          "Int",
+                          "UInt",
+                          "DInt",
+                          "UDInt",
+                          "LInt"
+                        ]
+                      },
+                      "requireFullTypeCoverage": {
+                        "type": "boolean"
+                      },
+                      "states": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/integerState"
+                        },
+                        "minItems": 1,
+                        "maxItems": 256
+                      }
+                    },
+                    "required": [
+                      "fileBase",
+                      "textLibrary",
+                      "languages",
+                      "defaultLanguage",
+                      "dataType",
+                      "requireFullTypeCoverage",
+                      "states"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "previousAuthorRecordId": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/hash"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "outputId",
+                  "bindingId",
+                  "profile",
+                  "template",
+                  "previousAuthorRecordId"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "maxItems": 16,
+          "minItems": 2
+        },
+        "retainOutputIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "requireObservedDependencies": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "componentReviewId",
+        "previousRecordId",
+        "outputs",
+        "retainOutputIds",
+        "requireObservedDependencies"
+      ],
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-set-record.v1"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "componentReviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "previousRecordId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "candidatesReady",
+            "conflict"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/setOutput"
+          },
+          "maxItems": 16,
+          "minItems": 2
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 32
+        },
+        "preservedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16777216
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 8192
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "declaredOutputIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 256
+            },
+            "declaredBindingIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 1024
+            },
+            "uncoveredOutputIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 256
+            },
+            "uncoveredBindingIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 1024
+            },
+            "allDeclaredOutputsCovered": {
+              "type": "boolean"
+            },
+            "allDeclaredBindingsCovered": {
+              "type": "boolean"
+            },
+            "members": {
+              "type": "object",
+              "properties": {
+                "observations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/memberObservation"
+                  },
+                  "maxItems": 4096
+                },
+                "unavailableObjects": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "scope": {
+                        "enum": [
+                          "beforeComponent",
+                          "afterComponent"
+                        ]
+                      },
+                      "objectPath": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "scope",
+                      "objectPath"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 512
+                },
+                "truncated": {
+                  "type": "boolean"
+                },
+                "maximumObservations": {
+                  "const": 4096
+                },
+                "maximumDepth": {
+                  "const": 16
+                },
+                "componentMemberCoverageComplete": {
+                  "const": false
+                }
+              },
+              "required": [
+                "observations",
+                "unavailableObjects",
+                "truncated",
+                "maximumObservations",
+                "maximumDepth",
+                "componentMemberCoverageComplete"
+              ],
+              "additionalProperties": false
+            },
+            "sourceConsumerCoverage": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerCoverage"
+              },
+              "maxItems": 3
+            },
+            "sourceDependencyImpactCoverage": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dependencyImpactCoverageRow"
+              },
+              "maxItems": 4096
+            },
+            "consumerCoverageComplete": {
+              "const": false
+            },
+            "dependencyClosureVerified": {
+              "const": false
+            },
+            "componentMemberCoverageComplete": {
+              "const": false
+            }
+          },
+          "required": [
+            "declaredOutputIds",
+            "declaredBindingIds",
+            "uncoveredOutputIds",
+            "uncoveredBindingIds",
+            "allDeclaredOutputsCovered",
+            "allDeclaredBindingsCovered",
+            "members",
+            "sourceConsumerCoverage",
+            "sourceDependencyImpactCoverage",
+            "consumerCoverageComplete",
+            "dependencyClosureVerified",
+            "componentMemberCoverageComplete"
+          ],
+          "additionalProperties": false
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "ownershipVerified": {
+          "const": false
+        },
+        "policy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "componentReviewId",
+        "previousRecordId",
+        "status",
+        "outputs",
+        "files",
+        "preservedFiles",
+        "conflicts",
+        "gaps",
+        "coverage",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "ownershipVerified",
+        "policy"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-set-record.v1"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "componentReviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "previousRecordId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "candidatesReady",
+            "conflict"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/setOutput"
+          },
+          "maxItems": 16,
+          "minItems": 2
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 32
+        },
+        "preservedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16777216
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 8192
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "declaredOutputIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 256
+            },
+            "declaredBindingIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 1024
+            },
+            "uncoveredOutputIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 256
+            },
+            "uncoveredBindingIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 1024
+            },
+            "allDeclaredOutputsCovered": {
+              "type": "boolean"
+            },
+            "allDeclaredBindingsCovered": {
+              "type": "boolean"
+            },
+            "members": {
+              "type": "object",
+              "properties": {
+                "observations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/memberObservation"
+                  },
+                  "maxItems": 4096
+                },
+                "unavailableObjects": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "scope": {
+                        "enum": [
+                          "beforeComponent",
+                          "afterComponent"
+                        ]
+                      },
+                      "objectPath": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "scope",
+                      "objectPath"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 512
+                },
+                "truncated": {
+                  "type": "boolean"
+                },
+                "maximumObservations": {
+                  "const": 4096
+                },
+                "maximumDepth": {
+                  "const": 16
+                },
+                "componentMemberCoverageComplete": {
+                  "const": false
+                }
+              },
+              "required": [
+                "observations",
+                "unavailableObjects",
+                "truncated",
+                "maximumObservations",
+                "maximumDepth",
+                "componentMemberCoverageComplete"
+              ],
+              "additionalProperties": false
+            },
+            "sourceConsumerCoverage": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/consumerCoverage"
+              },
+              "maxItems": 3
+            },
+            "sourceDependencyImpactCoverage": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dependencyImpactCoverageRow"
+              },
+              "maxItems": 4096
+            },
+            "consumerCoverageComplete": {
+              "const": false
+            },
+            "dependencyClosureVerified": {
+              "const": false
+            },
+            "componentMemberCoverageComplete": {
+              "const": false
+            }
+          },
+          "required": [
+            "declaredOutputIds",
+            "declaredBindingIds",
+            "uncoveredOutputIds",
+            "uncoveredBindingIds",
+            "allDeclaredOutputsCovered",
+            "allDeclaredBindingsCovered",
+            "members",
+            "sourceConsumerCoverage",
+            "sourceDependencyImpactCoverage",
+            "consumerCoverageComplete",
+            "dependencyClosureVerified",
+            "componentMemberCoverageComplete"
+          ],
+          "additionalProperties": false
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "ownershipVerified": {
+          "const": false
+        },
+        "policy": {
+          "type": "string"
+        },
+        "recordId": {
+          "$ref": "#/$defs/hash"
+        },
+        "recordArtifact": {
+          "$ref": "#/$defs/artifact"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "componentReviewId",
+        "previousRecordId",
+        "status",
+        "outputs",
+        "files",
+        "preservedFiles",
+        "conflicts",
+        "gaps",
+        "coverage",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "ownershipVerified",
+        "policy",
+        "recordId",
+        "recordArtifact"
+      ],
+      "additionalProperties": false
+    },
+    "dependencyCoverageRow": {
+      "type": "object",
+      "required": [
+        "scope",
+        "reviewId",
+        "objectPath",
+        "dependencyStatus",
+        "reason",
+        "requiredCount",
+        "selectedIndices",
+        "unassociatedIndices",
+        "repeatedVersionGuids",
+        "selfReferenceIndices",
+        "allObservedIndicesMatched",
+        "dependencyClosureVerified"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "beforeComponent",
+            "afterComponent"
+          ]
+        },
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "dependencyStatus": {
+          "enum": [
+            "observed",
+            "unavailable"
+          ]
+        },
+        "reason": {
+          "enum": [
+            null,
+            "ownerIdentityUnavailable",
+            "dependencyObservationUnavailable",
+            "invalidDependencyObservation"
+          ]
+        },
+        "requiredCount": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selectedIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "maxItems": 1000
+        },
+        "unassociatedIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "maxItems": 1000
+        },
+        "repeatedVersionGuids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "versionGuid",
+              "indices"
+            ],
+            "properties": {
+              "versionGuid": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+                "not": {
+                  "const": "00000000-0000-0000-0000-000000000000"
+                }
+              },
+              "indices": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 999
+                },
+                "maxItems": 1000
+              }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 500
+        },
+        "selfReferenceIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "maxItems": 1000
+        },
+        "allObservedIndicesMatched": {
+          "type": "boolean"
+        },
+        "dependencyClosureVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dependencyAssociationRow": {
+      "type": "object",
+      "required": [
+        "selection",
+        "reviewId",
+        "requiredVersionGuid",
+        "targetTypeGuid",
+        "targetVersionGuid",
+        "exportFile",
+        "exportIdentity",
+        "targetVersionAgreement",
+        "exportVersionAgreement",
+        "targetExportAgreement",
+        "identityConflict",
+        "status",
+        "declaredCycle",
+        "nativeIdentityVerified",
+        "dependencyClosureVerified"
+      ],
+      "properties": {
+        "selection": {
+          "$ref": "#/$defs/dependencyAssociation"
+        },
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "requiredVersionGuid": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "not": {
+            "const": "00000000-0000-0000-0000-000000000000"
+          }
+        },
+        "targetTypeGuid": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetVersionGuid": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+              "not": {
+                "const": "00000000-0000-0000-0000-000000000000"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportFile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/derivedFile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportIdentity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/libraryExportIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetVersionAgreement": {
+          "enum": [
+            "match",
+            "different",
+            "unavailable"
+          ]
+        },
+        "exportVersionAgreement": {
+          "enum": [
+            "match",
+            "different",
+            "unavailable"
+          ]
+        },
+        "targetExportAgreement": {
+          "enum": [
+            "match",
+            "different",
+            "unavailable"
+          ]
+        },
+        "identityConflict": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "match",
+            "different",
+            "unavailable",
+            "conflicting"
+          ]
+        },
+        "declaredCycle": {
+          "type": "boolean"
+        },
+        "nativeIdentityVerified": {
+          "const": false
+        },
+        "dependencyClosureVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "dependencyAssociation": {
+      "type": "object",
+      "required": [
+        "scope",
+        "objectPath",
+        "dependencyIndex",
+        "targetObjectPath",
+        "reason"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "beforeComponent",
+            "afterComponent"
+          ]
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "dependencyIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999
+        },
+        "targetObjectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "derivedFile": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileName",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16777216
+        }
+      },
+      "additionalProperties": false
+    },
+    "libraryExportIdentity": {
+      "type": "object",
+      "required": [
+        "profile",
+        "typeGuid",
+        "versionGuid",
+        "typeName",
+        "versionNumber"
+      ],
+      "properties": {
+        "profile": {
+          "const": "v21-full-fb-library-version.v1"
+        },
+        "typeGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "versionGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "typeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "versionNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "dependencyImpactCoverageRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "associationCount",
+        "includedAssociationCount",
+        "omittedAssociationIndices",
+        "returnedBytes",
+        "maxBytes",
+        "truncated",
+        "consumerCoverageComplete",
+        "outputMappingComplete",
+        "nativeImpactVerified"
+      ],
+      "properties": {
+        "associationCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "includedAssociationCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "omittedAssociationIndices": {
+          "type": "array",
+          "maxItems": 4096,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4095
+          }
+        },
+        "returnedBytes": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 1048576
+        },
+        "maxBytes": {
+          "const": 1048576
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "outputMappingComplete": {
+          "const": false
+        },
+        "nativeImpactVerified": {
+          "const": false
+        }
+      }
+    },
+    "consumerCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "reviewId",
+        "roots",
+        "excludedOutputIds",
+        "traversal"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "beforeComponent",
+            "afterComponent",
+            "destination"
+          ]
+        },
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "excludedOutputIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        },
+        "traversal": {
+          "$ref": "#/$defs/consumerTraversal"
+        }
+      }
+    },
+    "consumerTraversal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "freshness",
+        "truncated",
+        "truncationReasons",
+        "limits",
+        "returnedPaths",
+        "visitedEdges",
+        "pathBytes",
+        "excludedEdges",
+        "supportedRelationshipKinds",
+        "policy",
+        "limitations"
+      ],
+      "properties": {
+        "complete": {
+          "const": false
+        },
+        "freshness": {
+          "const": "savedSnapshotsOnly"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "truncationReasons": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "impactDepth",
+              "maxImpactPaths",
+              "maxImpactEdgeVisits",
+              "maxImpactPathBytes"
+            ]
+          },
+          "maxItems": 4
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "impactDepth",
+            "maxImpactPaths",
+            "maxImpactEdgeVisits",
+            "maxImpactPathBytes"
+          ],
+          "properties": {
+            "impactDepth": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "maxImpactPaths": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "maxImpactEdgeVisits": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20000
+            },
+            "maxImpactPathBytes": {
+              "const": 1048576
+            }
+          }
+        },
+        "returnedPaths": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200
+        },
+        "visitedEdges": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20000
+        },
+        "pathBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "excludedEdges": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "supportedRelationshipKinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "policy": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "string"
+        }
+      }
+    },
+    "integerState": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "type": {
+          "enum": [
+            "SingleValue",
+            "Range"
+          ]
+        },
+        "fromValue": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "toValue": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "translations": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 32,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 35,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 16384
+          }
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "fromValue",
+        "toValue",
+        "isDefault",
+        "translations"
+      ],
+      "additionalProperties": false
+    },
+    "valueCoverage": {
+      "type": "object",
+      "properties": {
+        "dataType": {
+          "enum": [
+            "SInt",
+            "USInt",
+            "Int",
+            "UInt",
+            "DInt",
+            "UDInt",
+            "LInt"
+          ]
+        },
+        "minimum": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": -9223372036854775808,
+          "maximum": 9223372036854775807
+        },
+        "stateCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "unlistedIntervals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fromValue": {
+                "type": "integer",
+                "minimum": -9223372036854775808,
+                "maximum": 9223372036854775807
+              },
+              "toValue": {
+                "type": "integer",
+                "minimum": -9223372036854775808,
+                "maximum": 9223372036854775807
+              }
+            },
+            "required": [
+              "fromValue",
+              "toValue"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 257
+        },
+        "allTypeValuesListed": {
+          "type": "boolean"
+        },
+        "requireFullTypeCoverage": {
+          "type": "boolean"
+        },
+        "defaultCoversUnlistedValuesVerified": {
+          "const": false
+        },
+        "nativeNumericSemanticsVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "dataType",
+        "minimum",
+        "maximum",
+        "stateCount",
+        "unlistedIntervals",
+        "allTypeValuesListed",
+        "requireFullTypeCoverage",
+        "defaultCoversUnlistedValuesVerified",
+        "nativeNumericSemanticsVerified"
+      ],
+      "additionalProperties": false
+    },
+    "numericDependencyCoverage": {
+      "type": "object",
+      "properties": {
+        "selectedScopes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyCoverageRow"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "associations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "associationIndex": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4095
+              },
+              "association": {
+                "$ref": "#/$defs/dependencyAssociationRow"
+              }
+            },
+            "required": [
+              "associationIndex",
+              "association"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 4096
+        },
+        "contradictionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "allObservedSelectedIndicesMatched": {
+          "type": "boolean"
+        },
+        "dependencyClosureVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "sourceImpactCoverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyImpactCoverageRow"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "sourceConsumerCoverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerCoverage"
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "selectedScopes",
+        "associations",
+        "contradictionCount",
+        "allObservedSelectedIndicesMatched",
+        "dependencyClosureVerified",
+        "consumerCoverageComplete",
+        "sourceImpactCoverage",
+        "sourceConsumerCoverage",
+        "policy"
+      ],
+      "additionalProperties": false
+    },
+    "stateShape": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "type": {
+                "enum": [
+                  "SingleValue",
+                  "Range",
+                  "From",
+                  "To"
+                ]
+              },
+              "fromValue": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": -9223372036854775808,
+                "maximum": 9223372036854775807
+              },
+              "toValue": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": -9223372036854775808,
+                "maximum": 9223372036854775807
+              },
+              "isDefault": {
+                "type": "boolean"
+              },
+              "textId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "fromValue",
+              "toValue",
+              "isDefault",
+              "textId"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 4096
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 32,
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 35,
+              "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 16384
+            }
+          },
+          "minItems": 1,
+          "maxItems": 4096
+        }
+      },
+      "required": [
+        "entries",
+        "translations"
+      ],
+      "additionalProperties": false
+    },
+    "stateChange": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "change": {
+          "enum": [
+            "added",
+            "removed",
+            "changed",
+            "unchanged"
+          ]
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stateShape"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stateShape"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "consumerCompatibilityVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "id",
+        "change",
+        "before",
+        "after",
+        "consumerCompatibilityVerified"
+      ],
+      "additionalProperties": false
+    },
+    "setOutput": {
+      "type": "object",
+      "properties": {
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "profile": {
+          "enum": [
+            "unified-bool-binding-text-list.v1",
+            "unified-integer-state-text-list.v1"
+          ]
+        },
+        "authorRecordId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "componentContext": {
+          "$ref": "#/$defs/componentContext"
+        },
+        "intent": {
+          "$ref": "#/$defs/authorIntent"
+        },
+        "dependencyCoverage": {
+          "$ref": "#/$defs/coordinatedDependencyCoverage"
+        },
+        "consumerPaths": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "maxItems": 600
+        },
+        "valueCoverage": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/valueCoverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stateChanges": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/stateChange"
+              },
+              "maxItems": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4096
+        }
+      },
+      "required": [
+        "outputId",
+        "bindingId",
+        "profile",
+        "authorRecordId",
+        "componentContext",
+        "intent",
+        "dependencyCoverage",
+        "consumerPaths",
+        "valueCoverage",
+        "stateChanges",
+        "conflicts",
+        "gaps"
+      ],
+      "additionalProperties": false
+    },
+    "memberObservation": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "enum": [
+            "beforeComponent",
+            "afterComponent"
+          ]
+        },
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "objectPath": {
+          "type": "string"
+        },
+        "memberPath": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 16
+        },
+        "dataType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bindingIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 16
+        },
+        "evidence": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "scope",
+        "reviewId",
+        "objectPath",
+        "memberPath",
+        "dataType",
+        "bindingIds",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "coordinatedDependencyCoverage": {
+      "type": "object",
+      "properties": {
+        "selectedScopes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyCoverageRow"
+          },
+          "minItems": 0,
+          "maxItems": 128
+        },
+        "associations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "associationIndex": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4095
+              },
+              "association": {
+                "$ref": "#/$defs/dependencyAssociationRow"
+              }
+            },
+            "required": [
+              "associationIndex",
+              "association"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 4096
+        },
+        "contradictionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "allObservedSelectedIndicesMatched": {
+          "type": "boolean"
+        },
+        "dependencyClosureVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "sourceImpactCoverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyImpactCoverageRow"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "sourceConsumerCoverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerCoverage"
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "unobservedScopes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scope": {
+                "enum": [
+                  "beforeComponent",
+                  "afterComponent"
+                ]
+              },
+              "objectPath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "scope",
+              "objectPath"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 20000
+        }
+      },
+      "required": [
+        "selectedScopes",
+        "associations",
+        "contradictionCount",
+        "allObservedSelectedIndicesMatched",
+        "dependencyClosureVerified",
+        "consumerCoverageComplete",
+        "sourceImpactCoverage",
+        "sourceConsumerCoverage",
+        "policy",
+        "unobservedScopes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/record"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ]
+}

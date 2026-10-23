@@ -1,0 +1,165 @@
+{
+  "mode": "run-style-group-availability",
+  "processId": 42956,
+  "projectPath": "D:\\TIAW\\ts02\\s\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4.ap21",
+  "scopeProfile": "ownedRootProgramBlocks",
+  "requestedScopeType": "Siemens.Engineering.SW.Blocks.PlcBlockSystemGroup",
+  "plcName": "ScratchPLC",
+  "blockName": "TiaMcp_IsEnabled",
+  "blockType": "Siemens.Engineering.SW.Blocks.FC",
+  "ruleSetName": "TiaMcp_CasingAvailability",
+  "startedAtUtc": "2026-10-15T07:53:16.3484381Z",
+  "beforeModified": false,
+  "automaticReplay": false,
+  "styleExecutionInvoked": true,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "licenseAvailability": "acceptedForObservedStyleExecution",
+  "executionAvailability": "styleCallReturned",
+  "effectiveScope": "unverified",
+  "qualification": false,
+  "nativeQualified": false,
+  "testsPassed": false,
+  "coverageClaim": false,
+  "scopeLimit": "SetScope success records requested scope only; execution availability is not exact-scope or test-coverage proof.",
+  "inventory": {
+    "rootBlocks": [
+      "Main",
+      "TiaMcp_EnableGate",
+      "TiaMcp_EnableGate_DB",
+      "TiaMcp_IsEnabled"
+    ],
+    "userBlockGroups": 0,
+    "allProjectObjectsOwned": "explicitAdmissionAndScratchCreationReceipt",
+    "coverageClaim": false
+  },
+  "ownershipReceipt": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\ownership-receipt.json",
+    "sha256": "3d8e8889480a97f1c149398f286033303074172e0ad85a6425d82a6184c2b8fa",
+    "bytes": 5924
+  },
+  "definitionBefore": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\definition-before.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "blockBefore": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\target-block-before.xml",
+    "sha256": "5224e77bf059282414a3bf889cb32468e79746df41434b59f2939faa1ac316a8",
+    "bytes": 5835
+  },
+  "nativeMetadata": {
+    "attributes": [
+      {
+        "name": "Name",
+        "access": "ReadWrite",
+        "types": [
+          "System.String"
+        ]
+      }
+    ],
+    "compositions": [],
+    "invocations": [
+      {
+        "name": "CopyScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "targetRuleSet",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet"
+          }
+        ]
+      },
+      {
+        "name": "Delete",
+        "type": "System.Void",
+        "parameters": []
+      },
+      {
+        "name": "SaveToFile",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "path",
+            "type": "System.IO.FileInfo"
+          }
+        ]
+      },
+      {
+        "name": "SetScope",
+        "type": "System.Boolean",
+        "parameters": [
+          {
+            "name": "updateOptions",
+            "type": "Siemens.Engineering.TestSuite.StyleGuide.UpdateOptions"
+          },
+          {
+            "name": "selectedInformation",
+            "type": "System.Collections.Generic.IEnumerable`1[[Siemens.Engineering.IEngineeringObject, Siemens.Engineering.Base, Version=21.0.0.0, Culture=neutral, PublicKeyToken=29bfe5fdf4ba5d3b]]"
+          }
+        ]
+      },
+      {
+        "name": "ShowInEditor",
+        "type": "System.Void",
+        "parameters": []
+      }
+    ]
+  },
+  "scopeBefore": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "checkpoint": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\before-availability.zap21",
+    "sha256": "046f454f9d3fd265c6e10d2c4af5b8866996be4f833a279e378c26e8cd13c324",
+    "bytes": 362817
+  },
+  "setScopeReturned": true,
+  "scopeAfterBinding": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "scopeAtExecution": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "rawResult": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\native-results.json",
+    "sha256": "93213e67b6baff6862d5876a85b1a96519f40e42711d1b658fcdeb9b7e09605a",
+    "bytes": 3557
+  },
+  "scopeAfter": {
+    "exactRequestedObjectVerified": false,
+    "routes": [],
+    "state": "publicScopeReadbackUnavailable",
+    "setScopeReturnIsNotReadback": true,
+    "expected": "ScratchPLC/Program blocks"
+  },
+  "definitionAfter": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\definition-after.xml",
+    "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+    "bytes": 1061
+  },
+  "definitionUnchanged": true,
+  "blockAfter": {
+    "path": "D:\\TIAW\\ts02\\evidence\\run-style-group-availability-01\\target-block-after.xml",
+    "sha256": "74a1f766223a6fb594433ccb4f182fbd4201967eb0d5da952bd3289bdd7398dc",
+    "bytes": 5835
+  },
+  "blockExportBytesUnchanged": false,
+  "saved": true,
+  "afterModified": false,
+  "completed": true,
+  "finishedAtUtc": "2026-10-15T07:53:18.2244789Z",
+  "lastStage": "complete"
+}

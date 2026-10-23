@@ -1,0 +1,682 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-case.v1.schema.json",
+  "title": "Offline diagnostic case; stored source evidence is not live target proof",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "reviewId",
+    "report",
+    "hypotheses",
+    "sourceRevision",
+    "candidates",
+    "instances",
+    "signals",
+    "coverageGaps",
+    "nativeExecutable"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-case.v1"
+    },
+    "reviewId": {
+      "$ref": "#/$defs/hash"
+    },
+    "report": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8000
+    },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/hypothesis"
+      }
+    },
+    "signals": {
+      "$ref": "diagnostic-signal-manifest.v1.schema.json"
+    },
+    "nativeExecutable": {
+      "const": false
+    },
+    "qualification": {
+      "const": "offlinePlanningOnly"
+    },
+    "candidates": {
+      "type": "array",
+      "maxItems": 25
+    },
+    "instances": {
+      "type": "array",
+      "maxItems": 200
+    },
+    "selectedInstance": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "sourceRevision": {
+      "type": "object"
+    },
+    "coverageGaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "automaticSelection": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "lineage": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "testSuiteEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewId",
+        "receipt",
+        "input",
+        "report",
+        "junit",
+        "summary",
+        "findingIndex",
+        "finding"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relativePath",
+            "sha256"
+          ],
+          "properties": {
+            "relativePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sha256": {
+              "$ref": "#/$defs/hash"
+            }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relativePath",
+            "sha256"
+          ],
+          "properties": {
+            "relativePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sha256": {
+              "$ref": "#/$defs/hash"
+            }
+          }
+        },
+        "report": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relativePath",
+            "sha256"
+          ],
+          "properties": {
+            "relativePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sha256": {
+              "$ref": "#/$defs/hash"
+            }
+          }
+        },
+        "junit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relativePath",
+            "sha256"
+          ],
+          "properties": {
+            "relativePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sha256": {
+              "$ref": "#/$defs/hash"
+            }
+          }
+        },
+        "summary": {
+          "$ref": "testsuite-result-report.v1.schema.json#/properties/summary"
+        },
+        "findingIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99999
+        },
+        "finding": {
+          "allOf": [
+            {
+              "$ref": "testsuite-result-report.v1.schema.json#/properties/findings/items"
+            },
+            {
+              "properties": {
+                "binding": {
+                  "const": "exactCapturedSource"
+                },
+                "finding": {
+                  "properties": {
+                    "resolvedObject": {
+                      "type": "object",
+                      "properties": {
+                        "object": {
+                          "properties": {
+                            "kind": {
+                              "const": "block"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "alarmEvidence": {
+      "$ref": "#/$defs/alarmEvidence"
+    },
+    "alarmBindings": {
+      "$ref": "diagnostic-alarm-bindings.v1.schema.json"
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "condition": {
+      "type": "object",
+      "required": [
+        "signalId",
+        "op",
+        "value"
+      ],
+      "properties": {
+        "signalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "ne",
+            "lt",
+            "le",
+            "gt",
+            "ge"
+          ]
+        },
+        "value": {
+          "type": [
+            "boolean",
+            "number"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "unit"
+            ]
+          }
+        }
+      ]
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/condition"
+      }
+    },
+    "hypothesis": {
+      "type": "object",
+      "required": [
+        "id",
+        "statement"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "prediction": {
+          "type": "object",
+          "required": [
+            "when",
+            "expect"
+          ],
+          "properties": {
+            "when": {
+              "$ref": "#/$defs/conditions"
+            },
+            "expect": {
+              "$ref": "#/$defs/conditions"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "memberPath": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "signalRequest": {
+      "type": "object",
+      "required": [
+        "id",
+        "role",
+        "reason",
+        "hypothesisIds",
+        "memberPath"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "hypothesisIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "storagePath": {
+          "type": "string"
+        },
+        "memberPath": {
+          "$ref": "#/$defs/memberPath"
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "reviewId",
+        "report"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "report": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "searchTerms": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "hypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/hypothesis"
+          }
+        },
+        "blockPath": {
+          "type": "string"
+        },
+        "instance": {
+          "type": "object",
+          "required": [
+            "dbPath",
+            "memberPath"
+          ],
+          "properties": {
+            "dbPath": {
+              "type": "string"
+            },
+            "memberPath": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "signals": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/signalRequest"
+          }
+        },
+        "autoSignals": {
+          "type": "object",
+          "required": [
+            "seeds"
+          ],
+          "properties": {
+            "maxSignals": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64
+            },
+            "maxDepth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8
+            },
+            "seeds": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "type": "object",
+                "required": [
+                  "scope",
+                  "components",
+                  "reason"
+                ],
+                "properties": {
+                  "scope": {
+                    "enum": [
+                      "LocalVariable",
+                      "GlobalVariable"
+                    ]
+                  },
+                  "components": {
+                    "$ref": "#/$defs/memberPath"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "testSuiteFinding": {
+          "$ref": "#/$defs/testSuiteFindingSelector"
+        },
+        "alarmContext": {
+          "$ref": "#/$defs/alarmContextSelector"
+        },
+        "alarmBindings": {
+          "$ref": "diagnostic-alarm-bindings.v1.schema.json#/$defs/selectors"
+        }
+      },
+      "dependentRequired": {
+        "alarmBindings": [
+          "alarmContext",
+          "instance"
+        ]
+      }
+    },
+    "testSuiteFindingSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relativePath",
+        "sha256",
+        "index"
+      ],
+      "properties": {
+        "relativePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99999
+        }
+      }
+    },
+    "alarmContextSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewId",
+        "nodeId",
+        "objectPath"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    },
+    "alarmEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewId",
+        "selector",
+        "object",
+        "ancestry",
+        "ancestryStatus",
+        "relationships",
+        "sourceAuthenticityVerified",
+        "nativeQualified",
+        "storageSelected",
+        "coverageComplete",
+        "freshness",
+        "limits",
+        "policy",
+        "totalAdjacentObserved",
+        "omittedRelationships",
+        "unusableRelationships",
+        "truncated"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "selector": {
+          "$ref": "#/$defs/alarmContextSelector"
+        },
+        "object": {
+          "type": "object"
+        },
+        "ancestry": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object"
+          }
+        },
+        "ancestryStatus": {
+          "enum": [
+            "capturedToProject",
+            "missingParent",
+            "cycle",
+            "ancestorLimit",
+            "byteLimit"
+          ]
+        },
+        "relationships": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "index",
+              "status",
+              "edge"
+            ],
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 49999
+              },
+              "status": {
+                "enum": [
+                  "exactCapturedEndpoints",
+                  "unresolvedEvidence",
+                  "endpointMismatch",
+                  "unsupportedRelationshipKind"
+                ]
+              },
+              "edge": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "storageSelected": {
+          "const": false
+        },
+        "coverageComplete": {
+          "const": false
+        },
+        "freshness": {
+          "const": "savedSnapshotOnly"
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxAncestors",
+            "maxRelationships",
+            "maxBytes"
+          ],
+          "properties": {
+            "maxAncestors": {
+              "const": 64
+            },
+            "maxRelationships": {
+              "const": 100
+            },
+            "maxBytes": {
+              "const": 262144
+            }
+          }
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "totalAdjacentObserved": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50000
+        },
+        "omittedRelationships": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50000
+        },
+        "unusableRelationships": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50000
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

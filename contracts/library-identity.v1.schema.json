@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-identity:v1",
+  "title": "Observed session-bound library identity; metadata revision is not a content fingerprint",
+  "description": "Validates the serialized LibraryView observation. Does not resolve a live handle, authorize mutation, or establish native content/runtime qualification.",
+  "type": "object",
+  "required": [
+    "origin",
+    "observedAtUtc",
+    "processId",
+    "libraryId",
+    "sessionGeneration",
+    "kind",
+    "name",
+    "path",
+    "ownedWorkingCopy",
+    "writable",
+    "sourcePath",
+    "workingDirectory",
+    "sourceSha256",
+    "originalSourcePath",
+    "packageId",
+    "packageRetentionReference",
+    "revision",
+    "revisionScope"
+  ],
+  "properties": {
+    "origin": {
+      "type": "string"
+    },
+    "observedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "processId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "libraryId": {
+      "type": "string",
+      "pattern": "^library-[a-f0-9]{32}(?![\\s\\S])"
+    },
+    "sessionGeneration": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}(?![\\s\\S])"
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ownedWorkingCopy": {
+      "type": "boolean"
+    },
+    "writable": {
+      "type": "boolean"
+    },
+    "sourcePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workingDirectory": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceSha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "originalSourcePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "packageId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "packageRetentionReference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "revisionScope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "originalSourceModified": {
+      "const": false
+    },
+    "sourceSnapshotOwned": {
+      "const": true
+    }
+  },
+  "additionalProperties": false
+}

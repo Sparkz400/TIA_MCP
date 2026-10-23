@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:project-model-provider:v1",
+  "title": "Independent read-only HMI and typed LAD/FBD provider observation",
+  "type": "object",
+  "required": ["schemaVersion", "provider", "reference", "facet", "status", "capturedAtUtc", "contentRevision", "coverage", "attachments"],
+  "properties": {
+    "schemaVersion": {"const": "project-model-provider.v1"},
+    "provider": {"type": "string", "minLength": 1},
+    "reference": {"$ref": "urn:tia-mcp:project-model:v1#/$defs/reference"},
+    "facet": {"type": "string", "minLength": 1},
+    "status": {"enum": ["available", "partial", "unsupported", "unavailable", "protected", "unresolved"]},
+    "reason": {"type": ["string", "null"]},
+    "capturedAtUtc": {"type": "string", "format": "date-time"},
+    "contentRevision": {"$ref": "urn:tia-mcp:project-model:v1#/$defs/contentRevision"},
+    "coverage": {"type": "array", "items": {"$ref": "urn:tia-mcp:project-model:v1#/$defs/coverage"}},
+    "attachments": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/attachment"}},
+    "engineeringVerified": {"type": "boolean"},
+    "runtimeVerified": {"type": "boolean"}
+  },
+  "allOf": [{"if": {"properties": {"status": {"enum": ["unsupported", "unavailable", "protected", "unresolved"]}}}, "then": {"properties": {"attachments": {"maxItems": 0}}}}],
+  "$defs": {
+    "attachment": {
+      "description": "Read-only structured preview, never executable project scripts or a mutation route. Typed network content remains owned by its instruction-reader provider.",
+      "type": "object", "required": ["kind", "source", "content", "coverage"],
+      "properties": {"kind": {"enum": ["hmiScreen", "ladFbdNetwork"]}, "source": {"type": "object", "required": ["objectPath", "contentRevision", "capturedAtUtc"], "properties": {"objectPath": {"type": "string", "minLength": 1}, "contentRevision": {"$ref": "urn:tia-mcp:project-model:v1#/$defs/contentRevision"}, "capturedAtUtc": {"type": "string", "format": "date-time"}}}, "content": {"type": "object"}, "coverage": {"type": "object"}}
+    }
+  }
+}

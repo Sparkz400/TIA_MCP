@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V21" />
+  <Hmi.Screen.Screen ID="0">
+    <AttributeList>
+      <Name>TiaMcpLibraryScreen</Name>
+      <Number>1</Number>
+      <Width>800</Width>
+      <Height>480</Height>
+    </AttributeList>
+  </Hmi.Screen.Screen>
+</Document>

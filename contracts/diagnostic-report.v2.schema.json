@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-report.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-report.v2"
+    },
+    "measurementId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tracePlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reviewId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "inputArtifact": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/artifact"
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/hypothesis"
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "qualityAssessment": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/assessment"
+    },
+    "clocks": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/clock"
+      },
+      "minItems": 1,
+      "maxItems": 8
+    },
+    "capture": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/capture"
+    },
+    "acquisitionContext": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/context"
+    },
+    "coverageGaps": {
+      "type": "array"
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "measurementId",
+    "tracePlanId",
+    "reviewId",
+    "inputArtifact",
+    "hypotheses",
+    "qualityAssessment",
+    "clocks",
+    "capture",
+    "acquisitionContext",
+    "coverageGaps",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

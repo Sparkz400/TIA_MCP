@@ -1,0 +1,512 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-hmi-preview:v1",
+  "title": "Library HMI target preview observations",
+  "description": "Retained-preview contract; source/native selectors, full preservation, runtime and native interface type evidence remain separate.",
+  "type": "object",
+  "properties": {
+    "targetPreview": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "allOf": [
+                {
+                  "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/target"
+                },
+                {
+                  "properties": {
+                    "family": {
+                      "const": "classic"
+                    }
+                  }
+                }
+              ]
+            },
+            "hmiAction": {
+              "const": "instantiate"
+            },
+            "before": {
+              "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/classicInventory"
+            },
+            "effect": {
+              "type": "object",
+              "properties": {
+                "composition": {
+                  "enum": [
+                    "screens",
+                    "screenTemplates",
+                    "screenPopups",
+                    "tagTables",
+                    "tags",
+                    "scripts"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "sourceNativeType": {
+                  "type": "string"
+                },
+                "nativeVersionGuid": {
+                  "oneOf": [
+                    {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "preservationCoverage": {
+                  "const": "Native copy; compile and independent screen/resource preservation qualification remain required."
+                }
+              },
+              "required": [
+                "composition",
+                "name",
+                "sourceNativeType",
+                "nativeVersionGuid",
+                "preservationCoverage"
+              ],
+              "additionalProperties": false
+            },
+            "targetFingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "compileRequired": {
+              "const": true
+            },
+            "runtimeVerified": {
+              "const": false
+            },
+            "visualVerified": {
+              "const": false
+            }
+          },
+          "required": [
+            "target",
+            "hmiAction",
+            "before",
+            "effect",
+            "targetFingerprint",
+            "compileRequired",
+            "runtimeVerified",
+            "visualVerified"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "allOf": [
+                {
+                  "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/target"
+                },
+                {
+                  "properties": {
+                    "family": {
+                      "const": "unified"
+                    }
+                  }
+                }
+              ]
+            },
+            "hmiAction": {
+              "const": "tag_create"
+            },
+            "before": {
+              "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/unifiedInventory"
+            },
+            "effect": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "dataType": {
+                  "type": "string"
+                },
+                "tagTable": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "scope": {
+                  "const": "internal"
+                }
+              },
+              "required": [
+                "name",
+                "dataType",
+                "tagTable",
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            "targetFingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "compileRequired": {
+              "const": true
+            },
+            "runtimeVerified": {
+              "const": false
+            },
+            "visualVerified": {
+              "const": false
+            }
+          },
+          "required": [
+            "target",
+            "hmiAction",
+            "before",
+            "effect",
+            "targetFingerprint",
+            "compileRequired",
+            "runtimeVerified",
+            "visualVerified"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "allOf": [
+                {
+                  "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/target"
+                },
+                {
+                  "properties": {
+                    "family": {
+                      "const": "unified"
+                    }
+                  }
+                }
+              ]
+            },
+            "hmiAction": {
+              "const": "faceplate_create"
+            },
+            "before": {
+              "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/unifiedInventory"
+            },
+            "effect": {
+              "type": "object",
+              "properties": {
+                "screen": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "container": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "versionGuid": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "containedType": {
+                  "type": "string"
+                },
+                "bindings": {
+                  "type": "array",
+                  "maxItems": 0
+                },
+                "placement": {
+                  "$ref": "urn:tia-mcp:library-operation:v1#/$defs/placement"
+                },
+                "bindingTypeCoverage": {
+                  "const": "Existing HMI tag type checked; native interface compatibility and PLC communication are additionally validated by compile/runtime."
+                }
+              },
+              "required": [
+                "screen",
+                "container",
+                "versionGuid",
+                "containedType",
+                "bindings",
+                "placement",
+                "bindingTypeCoverage"
+              ],
+              "additionalProperties": false
+            },
+            "targetFingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "compileRequired": {
+              "const": true
+            },
+            "runtimeVerified": {
+              "const": false
+            },
+            "visualVerified": {
+              "const": false
+            }
+          },
+          "required": [
+            "target",
+            "hmiAction",
+            "before",
+            "effect",
+            "targetFingerprint",
+            "compileRequired",
+            "runtimeVerified",
+            "visualVerified"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "allOf": [
+                {
+                  "$ref": "urn:tia-mcp:library-hmi-query:v1#/$defs/target"
+                },
+                {
+                  "properties": {
+                    "family": {
+                      "const": "unified"
+                    }
+                  }
+                }
+              ]
+            },
+            "hmiAction": {
+              "const": "faceplate_bind"
+            },
+            "before": {
+              "$ref": "#/$defs/bindingBefore"
+            },
+            "effect": {
+              "type": "object",
+              "properties": {
+                "screen": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "container": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^[^/\\\\\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])"
+                },
+                "versionGuid": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "bindings": {
+                  "$ref": "urn:tia-mcp:library-operation:v1#/$defs/bindings"
+                },
+                "bindingTypeCoverage": {
+                  "const": "Native interface and HMI tag data types matched; PLC communication requires runtime qualification."
+                }
+              },
+              "required": [
+                "screen",
+                "container",
+                "versionGuid",
+                "bindings",
+                "bindingTypeCoverage"
+              ],
+              "additionalProperties": false
+            },
+            "targetFingerprint": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "compileRequired": {
+              "const": true
+            },
+            "runtimeVerified": {
+              "const": false
+            },
+            "visualVerified": {
+              "const": false
+            }
+          },
+          "required": [
+            "target",
+            "hmiAction",
+            "before",
+            "effect",
+            "targetFingerprint",
+            "compileRequired",
+            "runtimeVerified",
+            "visualVerified"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "targetPreview"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "bindingBefore": {
+      "type": "object",
+      "properties": {
+        "nativeObjectType": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/nativeObjectType"
+        },
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/typeGuid"
+        },
+        "versionGuid": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/versionGuid"
+        },
+        "version": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/version"
+        },
+        "nativeLinkVerified": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/nativeLinkVerified"
+        },
+        "runtimeVerified": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/runtimeVerified"
+        },
+        "linkStatus": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/linkStatus"
+        },
+        "linkReadError": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/linkReadError"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "containedType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "left": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "top": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "interface": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "property": {
+                "type": "string"
+              },
+              "value": {}
+            },
+            "required": [
+              "property",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "interfaceTruncated": {
+          "type": "boolean"
+        },
+        "observedTags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "dataType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "hmiDataType": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "connection": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "plcTag": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "dataType",
+              "hmiDataType",
+              "connection",
+              "plcTag"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200
+        }
+      },
+      "required": [
+        "nativeObjectType",
+        "typeGuid",
+        "versionGuid",
+        "version",
+        "nativeLinkVerified",
+        "runtimeVerified",
+        "linkStatus",
+        "name",
+        "containedType",
+        "left",
+        "top",
+        "width",
+        "height",
+        "interface",
+        "interfaceTruncated",
+        "observedTags"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

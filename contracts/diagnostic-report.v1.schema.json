@@ -1,0 +1,12 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://tia-mcp.local/contracts/diagnostic-report.v1.schema.json",
+  "type":"object","required":["schemaVersion","measurementId","tracePlanId","reviewId","hypotheses","acquisitionQuality","qualityAssessment","transitions","nativeQualification","causationProven"],
+  "dependentRequired":{"acquisitionContext":["clockSynchronizationVerified"],"clockSynchronizationVerified":["acquisitionContext"]},
+  "properties":{
+    "schemaVersion":{"const":"diagnostic-report.v1"},"measurementId":{"$ref":"diagnostic-case.v1.schema.json#/$defs/hash"},"tracePlanId":{"$ref":"diagnostic-case.v1.schema.json#/$defs/hash"},"reviewId":{"$ref":"diagnostic-case.v1.schema.json#/$defs/hash"},
+    "hypotheses":{"type":"array","items":{"type":"object","required":["id","verdict","causationProven"],"properties":{"id":{"type":"string"},"verdict":{"enum":["unresolved","supportedPrediction","contradictedPrediction"]},"causationProven":{"const":false}}}},
+    "acquisitionContext":{"$ref":"trace-comparison.v1.schema.json#/$defs/acquisition"}, "clockSynchronizationVerified":{"const":false},
+    "transitions":{"type":"array","maxItems":200},"nativeQualification":{"const":false},"causationProven":{"const":false}
+  }
+}

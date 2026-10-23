@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "component-fb-udt-standalone-source-oracle-fbd-v4",
+  "root": "TiaMcpComponentGate",
+  "dependency": "TiaMcpComponentState",
+  "version": "1.0.0",
+  "caller": "TiaMcpComponentCaller",
+  "instance": "TiaMcpComponentGate_1",
+  "language": "FBD",
+  "table": "TiaMcpComponentSignals",
+  "signals": [
+    {
+      "parameter": "Enable",
+      "direction": "Input",
+      "dataType": "Bool",
+      "name": "ComponentEnable",
+      "address": "%M120.0"
+    },
+    {
+      "parameter": "Active",
+      "direction": "Output",
+      "dataType": "Bool",
+      "name": "ComponentActive",
+      "address": "%M120.1"
+    }
+  ],
+  "expectedDependencyGraph": {
+    "TiaMcpComponentGate": [
+      "TiaMcpComponentState"
+    ],
+    "TiaMcpComponentState": []
+  },
+  "qualification": "unexecuted",
+  "runtimeVerified": false,
+  "callerMode": "createStandaloneFc",
+  "unrelatedCaller": "TiaMcpUnrelatedCaller",
+  "explicitBlockAttributes": {
+    "AutoNumber": "true",
+    "IsIECCheckEnabled": "false",
+    "MemoryLayout": "Optimized"
+  },
+  "rootDocument": "native/TiaMcpComponentGate.xml",
+  "contentPolicyId": "v21-fb-explicit-source-oracle-three-properties-v1",
+  "sourceLibraryName": "ComponentQualification"
+}

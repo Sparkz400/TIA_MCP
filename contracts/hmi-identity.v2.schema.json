@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/hmi-identity.v2.schema.json",
+  "title": "Exact HMI identity, with no synthetic PLC ownership",
+  "type": "object",
+  "required": ["schemaVersion", "projectPath", "projectCopyId", "sessionGeneration", "family", "devicePath", "hmiPath", "kind", "objectPath"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "projectPath": {"type": "string", "minLength": 1},
+    "projectCopyId": {"type": "string", "minLength": 1},
+    "sessionGeneration": {"type": "string", "minLength": 1},
+    "family": {"enum": ["classic", "unified", "unknown"]},
+    "devicePath": {"type": "string", "minLength": 1},
+    "hmiPath": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "pattern": "^hmi"},
+    "objectPath": {"type": "string", "minLength": 1},
+    "scopePath": {"type": "string", "minLength": 1},
+    "screenPath": {"type": "string", "minLength": 1},
+    "exportSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "name": {"type": ["string", "null"]}
+  },
+  "not": {"required": ["plcPath"]},
+  "description": "Paths and project-copy hash are scoped locators, not persistent Siemens GUIDs. Session, rename, move, project retrieval and reopen invalidate references."
+}

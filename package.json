@@ -1,0 +1,23 @@
+{
+  "name": "tia_mcp",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "author": "Nico Schürmann",
+  "description": "[Documentation](docs/README.md) · [Current status](docs/STATUS.md) · [Remaining TODO](docs/TODO.md)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test:explorer": "node --test ui/project-explorer/tests/model.test.cjs ui/project-explorer/tests/client.test.cjs",
+    "test:explorer:browser": "node ui/project-explorer/tests/browser.mjs",
+    "test:playwright:list": "playwright test --list"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5"
+  }
+}

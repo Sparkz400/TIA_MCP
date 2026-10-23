@@ -1,0 +1,22 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "StateList":
+        RangeType: Decimal
+        Entries:
+          "Idle":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "StateTexts.Idle"
+          "Active":
+            Type: Range
+            Value: 1
+            FromValue: 1
+            ToValue: 10
+            IsDefaultEntry: false
+            Text: "StateTexts.Active"

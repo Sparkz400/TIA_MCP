@@ -1,0 +1,135 @@
+using Newtonsoft.Json.Linq;
+using TiaMcp.Openness.V21;
+
+int count = 0;
+const string station = "/projects/P/devices/Remote/items/Rack";
+const string module = station + "/items/DI";
+const string controller = "/projects/P/devices/CPU/items/Rack/items/CPU/items/PN";
+const string remote = station + "/items/IM/items/PN";
+JObject Row(string path, int slot = 0) => new JObject { ["path"] = path, ["name"] = path.Split('/').Last(), ["typeIdentifier"] = "Catalog:DI", ["positionNumber"] = slot,
+    ["containerPath"] = path == station ? null : path.Substring(0, path.LastIndexOf("/items/", StringComparison.Ordinal)),
+    ["attributes"] = new JObject { ["Comment"] = "keep" }, ["addresses"] = new JArray(), ["channels"] = new JArray() };
+JObject SystemRef() => new JObject { ["state"] = "assigned", ["name"] = "Io", ["number"] = 100, ["ownerHardwarePath"] = controller, ["controllerIndex"] = 0, ["subnet"] = "PN" };
+JArray Baseline()
+{
+    var parent = Row(station); var child = Row(module, 2); var cpu = Row(controller); var im = Row(remote);
+    child["channels"] = new JArray(new JObject { ["number"] = 0, ["type"] = "Digital", ["ioType"] = "Input", ["attributes"] = new JObject { ["ChannelActivation"] = true } },
+        new JObject { ["number"] = 1, ["type"] = "Digital", ["ioType"] = "Input", ["attributes"] = new JObject { ["ChannelActivation"] = true } });
+    child["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 0, ["lengthBits"] = 16, ["owners"] = new JArray() });
+    cpu["network"] = new JObject { ["nodes"] = new JArray(), ["controllers"] = new JArray(new JObject { ["index"] = 0, ["system"] = SystemRef() }), ["connectors"] = new JArray() };
+    im["network"] = new JObject { ["nodes"] = new JArray(), ["controllers"] = new JArray(), ["connectors"] = new JArray(Enumerable.Range(0, 4).Select(index => new JObject { ["index"] = index, ["system"] = new JObject { ["state"] = "notAssigned" } })) };
+    return new JArray(parent, child, cpu, im);
+}
+void Check(string name, string kind, JObject payload, Action<JArray> mutate, bool allowed, Action<JArray> setup = null)
+{
+    var before = Baseline(); setup?.Invoke(before); var after = (JArray)before.DeepClone(); mutate(after);
+    try { HardwareEngineeringRules.RequirePreserved(kind, payload, before, after); if (!allowed) throw new Exception("Unexpected preservation acceptance: " + name); }
+    catch (BridgeException error) when (!allowed && error.Code == "MutationVerificationFailed") { }
+    count++; Console.WriteLine("PASS " + name);
+}
+var move = new JObject { ["hardwarePath"] = module, ["positionNumber"] = 3 };
+Check("slot move", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, true);
+Check("unchanged move rejected", "hardware_move", move, _ => { }, false);
+Check("collateral comment rejected", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; rows[0]["attributes"]["Comment"] = "lost"; }, false);
+Check("collateral address rejected", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; rows[1]["addresses"][0]["startAddress"] = 2; }, false);
+Check("non-object after row cannot disappear from preservation", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; rows.Add("unparsed native row"); }, false);
+Check("removed non-object before row cannot disappear from preservation", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; rows.RemoveAt(rows.Count - 1); }, false, rows => rows.Add("unparsed native row"));
+Check("duplicate unrelated path cannot prove preservation", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, false, rows => rows.Add(rows[2].DeepClone()));
+Check("missing unrelated path cannot prove preservation", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, false, rows => ((JObject)rows[0]).Remove("path"));
+Check("numeric unrelated path cannot prove preservation", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, false, rows => rows[0]["path"] = 42);
+Check("empty unrelated path cannot prove preservation", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, false, rows => rows[0]["path"] = "");
+foreach (var token in new JToken[] { JValue.CreateNull(), new JValue(true), new JValue(42), new JArray() })
+    Check("invalid top-level " + token.Type + " row refused", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; rows.Add(token.DeepClone()); }, false);
+Check("control-character path refused", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, false, rows => rows[0]["path"] = station + "\n");
+Check("path case distinctions are retained", "hardware_move", move, rows => rows[1]["positionNumber"] = 3, true, rows => rows.Add(Row(controller.ToLowerInvariant())));
+Check("top-level manifest order is not identity", "hardware_move", move, rows => { rows[1]["positionNumber"] = 3; var row = rows[0]; rows.RemoveAt(0); rows.Add(row); }, true);
+Check("missing selected path is a structured refusal", "hardware_move", new JObject { ["hardwarePath"] = "/projects/P/missing", ["positionNumber"] = 3 }, _ => { }, false);
+foreach (string missing in new[] { "before", "after", "payload" })
+{
+    try { HardwareEngineeringRules.RequirePreserved("hardware_move", missing == "payload" ? null : move, missing == "before" ? null : Baseline(), missing == "after" ? null : Baseline()); throw new Exception("Missing " + missing + " was accepted"); }
+    catch (BridgeException error) when (error.Code == "MutationVerificationFailed") { count++; Console.WriteLine("PASS missing " + missing + " is a structured refusal"); }
+}
+var channel = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 0, ["channelType"] = "Digital", ["channelIoType"] = "Input", ["attributes"] = new JObject { ["ChannelActivation"] = false } };
+Check("one exact channel", "hardware_channel_attributes", channel, rows => rows[1]["channels"][0]["attributes"]["ChannelActivation"] = false, true);
+Check("wrong channel rejected", "hardware_channel_attributes", channel, rows => rows[1]["channels"][1]["attributes"]["ChannelActivation"] = false, false);
+Check("channel collateral rejected", "hardware_channel_attributes", channel, rows => { rows[1]["channels"][0]["attributes"]["ChannelActivation"] = false; rows[1]["channels"][1]["attributes"]["ChannelActivation"] = false; }, false);
+var address = new JObject { ["hardwarePath"] = module, ["ioType"] = "Input", ["oldStartAddress"] = 0, ["startAddress"] = 64 };
+Check("address move", "hardware_address_set", address, rows => rows[1]["addresses"][0]["startAddress"] = 64, true);
+Check("address length rejected", "hardware_address_set", address, rows => { rows[1]["addresses"][0]["startAddress"] = 64; rows[1]["addresses"][0]["lengthBits"] = 32; }, false);
+var plug = new JObject { ["hardwarePath"] = station, ["name"] = "DO", ["typeIdentifier"] = "Catalog:DI", ["positionNumber"] = 3 };
+Check("plug subtree", "hardware_plug", plug, rows => { rows.Add(Row(station + "/items/DO", 3)); rows.Add(Row(station + "/items/DO/items/Child", 1)); }, true);
+Check("plug physical rack with logical sibling", "hardware_plug", plug, rows => { var row = Row("/projects/P/devices/Remote/items/DO", 3); row["containerPath"] = station; rows.Add(row); }, true);
+Check("wrong physical container rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["containerPath"] = "/another/rack"; rows.Add(row); }, false);
+Check("wrong plug type rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["typeIdentifier"] = "Wrong"; rows.Add(row); }, false);
+Check("unrelated addition rejected", "hardware_plug", plug, rows => { rows.Add(Row(station + "/items/DO", 3)); rows.Add(Row(station + "/items/Stranger", 4)); }, false);
+var assign = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 0, ["controllerHardwarePath"] = controller, ["controllerIndex"] = 0, ["addressControllerOwnerPath"] = controller };
+void Assigned(JArray rows) { rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray(controller); }
+Check("exact assignment plus ownership", "network_io_assign", assign, Assigned, true);
+Check("missing selected connector owner refuses structurally", "network_io_assign", assign, rows => rows.RemoveAt(3), false);
+Check("duplicate after identity refuses before assignment readback", "network_io_assign", assign, rows => { Assigned(rows); rows.Add(rows[0].DeepClone()); }, false);
+Check("wrong connector rejected", "network_io_assign", assign, rows => rows[3]["network"]["connectors"][1]["system"] = SystemRef(), false);
+Check("wrong controller rejected", "network_io_assign", assign, rows => { Assigned(rows); rows[3]["network"]["connectors"][0]["system"]["ownerHardwarePath"] = "/other"; }, false);
+Check("shared ownership rejected", "network_io_assign", assign, rows => { Assigned(rows); ((JArray)rows[1]["addresses"][0]["owners"]).Add("/other"); }, false);
+Check("preexisting foreign ownership rejected", "network_io_assign", assign, Assigned, false, rows => rows[1]["addresses"][0]["owners"] = new JArray("/other"));
+Check("another assigned station interface rejected", "network_io_assign", assign, Assigned, false, rows => rows[0]["network"] = new JObject { ["connectors"] = new JArray(new JObject { ["index"] = 0, ["system"] = SystemRef() }) });
+Check("assignment address relocation rejected", "network_io_assign", assign, rows => { Assigned(rows); rows[1]["addresses"][0]["startAddress"] = 20; }, false);
+var create = (JObject)assign.DeepClone(); create["createIoSystemName"] = "Io";
+Check("create exact controller system", "network_io_assign", create, rows => { Assigned(rows); rows[2]["network"]["controllers"][0]["system"] = SystemRef(); }, true,
+    rows => rows[2]["network"]["controllers"][0]["system"] = new JObject { ["state"] = "notAssigned" });
+var disconnect = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 0, ["disconnect"] = true, ["addressControllerOwnerPath"] = controller };
+Check("disconnect preserves system", "network_io_assign", disconnect, rows => { rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray(); }, true, Assigned);
+Check("disconnect retaining owner rejected", "network_io_assign", disconnect, rows => rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }, false, Assigned);
+var companion = (JObject)assign.DeepClone();
+const string serverPath = "/projects/P/devices/Remote/items/Servermodul_1";
+companion["expectedServerModule"] = new JObject { ["name"] = "Servermodul_1", ["typeIdentifier"] = "OrderNumber:6ES7 193-6PA00-0AA0/V1.2", ["containerHardwarePath"] = station, ["positionNumber"] = 1,
+    ["attributes"] = new JObject { ["AdditionalInformation"] = "", ["Author"] = "fixture-author", ["Comment"] = "", ["LocationIdentifier"] = "", ["Name"] = "Servermodul_1", ["PlantDesignation"] = "" } };
+void AssignedWithServer(JArray rows)
+{
+    Assigned(rows);
+    rows.Add(new JObject { ["path"] = serverPath, ["name"] = "Servermodul_1", ["typeIdentifier"] = "OrderNumber:6ES7 193-6PA00-0AA0/V1.2", ["positionNumber"] = 1,
+        ["containerPath"] = station, ["attributes"] = new JObject { ["AdditionalInformation"] = "", ["Author"] = "fixture-author", ["Comment"] = "", ["LocationIdentifier"] = "", ["Name"] = "Servermodul_1", ["PlantDesignation"] = "" }, ["channels"] = new JArray(), ["addresses"] = new JArray() });
+    rows.Add(new JObject { ["path"] = serverPath + "/items/Servermodul_1", ["name"] = "Servermodul_1", ["typeIdentifier"] = null, ["positionNumber"] = 1,
+        ["containerPath"] = serverPath, ["attributes"] = new JObject { ["Comment"] = "", ["Name"] = "Servermodul_1" }, ["channels"] = new JArray(),
+        ["addresses"] = new JArray(new JObject { ["ioType"] = "Diagnosis", ["startAddress"] = -1, ["lengthBits"] = 0, ["owners"] = new JArray() }) });
+}
+Check("declared exact generated server", "network_io_assign", companion, AssignedWithServer, true);
+string absentNativeType = null;
+var rawNativeNull = new JObject { ["typeIdentifier"] = absentNativeType };
+var explicitNull = new JObject { ["typeIdentifier"] = null };
+if (rawNativeNull.ToString() != explicitNull.ToString() || JToken.DeepEquals(rawNativeNull, explicitNull)) throw new Exception("Native nullable-string representation regression did not reproduce");
+if (HardwareEngineeringRules.MetadataString(absentNativeType).Type != JTokenType.Null || HardwareEngineeringRules.MetadataString("").Type != JTokenType.String)
+    throw new Exception("Native metadata capture confused null and empty string");
+count++; Console.WriteLine("PASS native string-null distinction reproduced and explicitly captured");
+Check("canonical native null companion", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = HardwareEngineeringRules.MetadataString(absentNativeType); }, true);
+Check("raw native string-null differs before capture fix", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = absentNativeType; }, false);
+Check("missing companion type field rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); ((JObject)rows[5]).Remove("typeIdentifier"); }, false);
+Check("empty companion type is not null", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = ""; }, false);
+Check("numeric companion type is not null", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = 0; }, false);
+Check("boolean companion type is not null", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["typeIdentifier"] = false; }, false);
+Check("undeclared generated server rejected", "network_io_assign", assign, AssignedWithServer, false);
+Check("missing declared server rejected", "network_io_assign", companion, Assigned, false);
+Check("changed companion author rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[4]["attributes"]["Author"] = "another"; }, false);
+Check("changed companion slot rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[4]["positionNumber"] = 2; }, false);
+Check("changed companion container rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[4]["containerPath"] = controller; }, false);
+Check("changed diagnostic metadata rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["addresses"][0]["lengthBits"] = 16; }, false);
+Check("diagnostic ownership normalization rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["addresses"][0]["owners"] = new JArray(controller); }, false);
+Check("extra generated module rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows.Add(Row("/projects/P/devices/Remote/items/Extra", 2)); }, false);
+void InvalidCompanion(string name, Action<JObject> mutate)
+{
+    var payload = (JObject)companion.DeepClone(); mutate(payload);
+    try { RemoteIoCompanionContract.ExpectedRows(payload); throw new Exception("Unexpected descriptor acceptance: " + name); }
+    catch (BridgeException error) when (error.Code == "InvalidRequest") { }
+    count++; Console.WriteLine("PASS " + name);
+}
+InvalidCompanion("uncaptured companion version rejected", payload => payload["expectedServerModule"]["typeIdentifier"] = "OrderNumber:6ES7 193-6PA00-0AA0/V1.3");
+InvalidCompanion("uncaptured initial companion slot rejected", payload => payload["expectedServerModule"]["positionNumber"] = 2);
+InvalidCompanion("cross-station companion rejected", payload => payload["expectedServerModule"]["containerHardwarePath"] = controller);
+InvalidCompanion("unknown companion metadata rejected", payload => payload["expectedServerModule"]["attributes"]["Unknown"] = "");
+var captured = JObject.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "native-v21-initial-server.json")));
+HardwareEngineeringRules.RequirePreserved(captured.Value<string>("kind"), (JObject)captured["payload"], (JArray)captured["before"], (JArray)captured["after"]);
+count++; Console.WriteLine("PASS captured V21 initial server manifest with explicit contract");
+var undeclaredCaptured = (JObject)captured["payload"].DeepClone(); undeclaredCaptured.Remove("expectedServerModule");
+try { HardwareEngineeringRules.RequirePreserved(captured.Value<string>("kind"), undeclaredCaptured, (JArray)captured["before"], (JArray)captured["after"]); throw new Exception("Undeclared native companion accepted"); }
+catch (BridgeException error) when (error.Code == "MutationVerificationFailed") { }
+count++; Console.WriteLine("PASS captured V21 native failure without explicit contract");
+Console.WriteLine($"{count} hardware preservation checks passed.");

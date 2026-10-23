@@ -1,0 +1,28 @@
+{
+  "completed": true,
+  "projectPath": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10\\project\\GraphScratch\\GraphScratch.ap21",
+  "finishedAtUtc": "2026-10-16T07:33:15.3228569Z",
+  "exports": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10\\baseline.xml",
+      "sha256": "c759e896ba4e24e8e8b19650f73c33485cf992d5164decaa06b02f67d335c3d4",
+      "bytes": 38122
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10\\roundtrip.xml",
+      "sha256": "6ccbf809c3ecb9b475a98cd3e4023e2f61ef57cf420751c31c6ad40ea4432148",
+      "bytes": 38122
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10\\reopened.xml",
+      "sha256": "0ece33a2197fdea3311583ae2218e1d3c7befe35520de9de2c9610863aa1709d",
+      "bytes": 38122
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10\\recovered.xml",
+      "sha256": "a3577706ba269e88838b847d71c255d80ece6c8b35ce94101ec0b3406da8338a",
+      "bytes": 38122
+    }
+  ],
+  "scope": "Native import, software compile, no-op roundtrip, fresh-process reopen and archive recovery; no online or runtime behavior claim."
+}

@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:vci-conflict-report:v1",
+  "title": "vci-conflict-report.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "baselineSha256",
+    "projectSha256",
+    "workspaceSha256",
+    "expectedHashes",
+    "nativeQualified",
+    "canSynchronize",
+    "resolutionApplied",
+    "issues",
+    "rows"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "vci-conflict-report.v1"
+    },
+    "workspaceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "baselineSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "projectSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "workspaceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "expectedHashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline",
+        "project",
+        "workspace"
+      ],
+      "properties": {
+        "baseline": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "project": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workspace": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "canSynchronize": {
+      "const": false
+    },
+    "resolutionApplied": {
+      "const": false
+    },
+    "issues": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "staleManifestBinding",
+          "incompleteEnumeration"
+        ]
+      }
+    },
+    "rows": {
+      "type": "array",
+      "maxItems": 3000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "packageId",
+          "state",
+          "conflict",
+          "projectChange",
+          "workspaceChange",
+          "baselineContentSha256",
+          "projectContentSha256",
+          "workspaceContentSha256",
+          "baselineNativeStatus",
+          "projectNativeStatus",
+          "workspaceNativeStatus",
+          "reasons"
+        ],
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "state": {
+            "enum": [
+              "unchanged",
+              "projectOnly",
+              "workspaceOnly",
+              "bothChangedIdentically",
+              "divergentChange",
+              "deletedProjectOnly",
+              "deletedWorkspaceOnly",
+              "deletedBoth",
+              "deleteVsChange",
+              "addedProjectOnly",
+              "addedWorkspaceOnly",
+              "addedBothIdentically",
+              "divergentAddition",
+              "stale",
+              "identityCollision",
+              "ownershipConflict",
+              "unknown",
+              "incompletePackage"
+            ]
+          },
+          "conflict": {
+            "type": "boolean"
+          },
+          "projectChange": {
+            "enum": [
+              "unchanged",
+              "added",
+              "deleted",
+              "modified",
+              "unknown"
+            ]
+          },
+          "workspaceChange": {
+            "enum": [
+              "unchanged",
+              "added",
+              "deleted",
+              "modified",
+              "unknown"
+            ]
+          },
+          "baselineContentSha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projectContentSha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workspaceContentSha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "baselineNativeStatus": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "projectNativeStatus": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workspaceNativeStatus": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

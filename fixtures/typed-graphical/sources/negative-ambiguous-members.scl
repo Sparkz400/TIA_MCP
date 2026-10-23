@@ -1,0 +1,17 @@
+DATA_BLOCK "Tgp_NegativeOne"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Flag : Bool;
+END_VAR
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "Tgp_NegativeTwo"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Flag : Bool;
+END_VAR
+BEGIN
+END_DATA_BLOCK

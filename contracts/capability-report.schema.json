@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:capability-report:v1",
+  "type": "object",
+  "required": ["schemaVersion", "features", "origin", "observedAtUtc"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "origin": {"type": "string"},
+    "observedAtUtc": {"type": "string", "format": "date-time"},
+    "features": {"type": "array", "items": {"$ref": "#/$defs/feature"}}
+  },
+  "$defs": {
+    "feature": {
+      "type": "object", "required": ["featureId", "api", "implementation", "qualification", "availability"],
+      "properties": {
+        "featureId": {"type": "string", "minLength": 1},
+        "api": {"type": "object", "required": ["status", "reasons"], "properties": {"status": {"enum": ["available", "unavailable", "unknown"]}, "reasons": {"type": "array", "items": {"type": "string"}}}},
+        "implementation": {"type": "object", "required": ["status", "limitations"], "properties": {"status": {"enum": ["implemented", "partial", "not_implemented"]}, "limitations": {"type": "array", "items": {"type": "string"}}}},
+        "qualification": {"type": "object", "required": ["status", "evidenceIds"], "properties": {"status": {"enum": ["verified", "unverified", "failed"]}, "evidenceIds": {"type": "array", "items": {"type": "string"}}}},
+        "availability": {"type": "object", "required": ["status", "reasons"], "properties": {"status": {"enum": ["available", "conditional", "blocked", "unsupported", "unknown"]}, "reasons": {"type": "array", "items": {"type": "string"}}}}
+      }
+    }
+  }
+}

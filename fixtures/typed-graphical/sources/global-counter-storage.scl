@@ -1,0 +1,6 @@
+DATA_BLOCK "Tgp_GlobalCounter"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"IEC_COUNTER"
+BEGIN
+END_DATA_BLOCK

@@ -1,0 +1,69 @@
+{
+  "mode": "inspect",
+  "processId": 51612,
+  "projectPath": "D:\\TIAW\\ts01\\s\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2\\TiaMcpScratch_20261015_074652_bcdafab2.ap21",
+  "startedAtUtc": "2026-10-15T07:51:17.4240603Z",
+  "beforeModified": true,
+  "servicePresence": "observed",
+  "licenseAvailability": "unknown",
+  "executionAvailability": "notAttempted",
+  "automaticReplay": false,
+  "applicationExecutionInvoked": false,
+  "systemExecutionInvoked": false,
+  "metadata": {
+    "groups": [
+      {
+        "type": "Siemens.Engineering.TestSuite.StyleGuide.StyleGuideSystemGroup",
+        "compositions": [
+          {
+            "name": "RuleSets",
+            "creationInfos": [],
+            "definitions": [
+              {
+                "type": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet",
+                "name": "TiaMcp_CasingAvailability"
+              }
+            ]
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.StyleGuide.RuleSetExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.ApplicationTest.ApplicationTestSystemGroup",
+        "compositions": [
+          {
+            "name": "ApplicationTestSets",
+            "creationInfos": [],
+            "definitions": []
+          },
+          {
+            "name": "TestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.ApplicationTest.TestCaseExecutor"
+        ]
+      },
+      {
+        "type": "Siemens.Engineering.TestSuite.SystemTest.SystemTestSystemGroup",
+        "compositions": [
+          {
+            "name": "SystemTestCases",
+            "creationInfos": [],
+            "definitions": []
+          }
+        ],
+        "services": [
+          "Siemens.Engineering.TestSuite.SystemTest.SystemTestCaseExecutor"
+        ]
+      }
+    ]
+  },
+  "afterModified": true,
+  "finishedAtUtc": "2026-10-15T07:51:17.4874391Z",
+  "completed": true
+}

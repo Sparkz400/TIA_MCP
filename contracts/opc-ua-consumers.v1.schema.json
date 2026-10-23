@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:opcua-consumers:v1",
+  "type": "object",
+  "required": ["schemaVersion", "modelSha256", "consumers"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": "opcua-consumers.v1"},
+    "modelSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "consumers": {
+      "type": "array", "maxItems": 1000,
+      "items": {
+        "type": "object", "required": ["id", "nodeKeys"], "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 256},
+          "nodeKeys": {"type": "array", "maxItems": 20000, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  },
+  "$comment": "Also enforce a 1 MiB manifest bound, 20000 aggregate dependencies, unique consumer IDs, exact before-model SHA-256, and node keys present in that model. Keys use nsu=<percent-escaped URI>;<kind>=<identifier>; obtain them from inspection, not namespace indexes. This declares direct dependencies only."
+}

@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OfflineEvidence.cs" Link="OfflineEvidence.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/DependencyRules.cs" Link="DependencyRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/LibraryJournalStore.cs" Link="LibraryJournalStore.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringSources.cs" Link="EngineeringSources.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologySelection.cs" Link="OpennessSession.TechnologySelection.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologyReferences.cs" Link="OpennessSession.TechnologyReferences.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologyConnections.cs" Link="OpennessSession.TechnologyConnections.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.InspectionValues.cs" Link="OpennessSession.InspectionValues.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="OpennessSession.ScanBudget.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/DeviceCompilation.cs" Link="DeviceCompilation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/PlcCompilation.cs" Link="PlcCompilation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TechnologyBlockMembership.cs" Link="TechnologyBlockMembership.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs" Link="OpennessSession.DeviceCompilation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologyRead.cs" Link="OpennessSession.TechnologyRead.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs" Link="OpennessSession.Attributes.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs" Link="OpennessSession.ScalarValues.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologyParameters.cs" Link="OpennessSession.TechnologyParameters.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalResolution.cs" Link="TypedGraphicalResolution.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalModel.cs" Link="TypedGraphicalModel.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphical.cs" Link="TypedGraphical.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs" Link="TypedGraphical.Validation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphical.Native.cs" Link="TypedGraphical.Native.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs" Link="TypedGraphicalPayload.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalCreation.cs" Link="TypedGraphicalCreation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalInstanceTemplate.cs" Link="TypedGraphicalInstanceTemplate.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs" Link="TypedGraphicalMultiInstanceTemplate.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringFingerprintRules.cs" Link="EngineeringFingerprintRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringPaths.cs" Link="EngineeringPaths.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/NativeRuntimeLifetime.cs" Link="NativeRuntimeLifetime.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/CapturedProcessIdentity.cs" Link="CapturedProcessIdentity.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.AddInOwner.cs" Link="OpennessSession.AddInOwner.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ObjectIdentity.cs" Link="ObjectIdentity.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/CapabilityRules.cs" Link="CapabilityRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelStore.cs" Link="ProjectModelStore.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
+  </ItemGroup>
+</Project>

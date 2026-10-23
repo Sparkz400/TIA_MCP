@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "packageId": "TR-F01",
+  "releaseObligation": "D03",
+  "executable": false,
+  "nativeExecuted": false,
+  "nativeQualified": false,
+  "status": "blocked_prerequisites",
+  "missing": [
+    "Genuine Siemens project-text XLSX with independently authored expected text and opaque key capture",
+    "Current native admission for an owned disposable bilingual project and exact binary/source/fixture manifest",
+    "Eligible clean Classic and Unified positive fixtures and exact installed product/device versions",
+    "Documented or observed category IDs, filtered-selection edge semantics and import/empty-source behavior"
+  ],
+  "proposedFixture": {
+    "name": "TranslationFixture_A",
+    "sourceCulture": "en-US",
+    "targetCulture": "de-DE",
+    "peerCulture": "fr-FR",
+    "owners": "two independently keyed PLC owners and eligible HMI owners; no customer project",
+    "expectations": ["Unicode", "multiline", "missing and empty", "native-valid placeholders", "duplicate visible texts with distinct keys", "stale key from deleted/recreated object", "unrelated source/language/native-content sentinels"]
+  },
+  "stepsForLaterReview": [
+    "Capture current languages and stable category identifiers; do not infer IDs from localized names",
+    "Full bilingual XLSX export and exact OPC layout/key inventory",
+    "Five-argument export: one device/category, descendants/overlap and empty/null collections",
+    "Capture no-op, one target edit, source-mode edit, absent/empty/clear and partial stale-key import outcomes",
+    "Independent full effect and untouched-content readback; strict compile, save/fresh reopen, archive restore/reopen",
+    "Retain native log, original failed outcomes and exact owned cleanup; never replay an unknown import"
+  ],
+  "notAuthorizedByPacket": ["TIA launch or attach", "UI resume", "physical PLC access", "installation", "native import"]
+}

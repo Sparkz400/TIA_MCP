@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/watch-table-plan.v1.schema.json",
+  "title": "Pure watch table intent from captured evidence; never a native document or qualified live address",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "tableName", "source", "instance", "diagnosticCaseSha256", "diagnosticSourceRevisionSha256", "template", "templateBindings", "externalStorage", "candidates", "rows", "unresolvedSuggestions", "sourceGaps", "duplicates", "addressObservations", "addressWarnings", "candidateCount", "omittedByBudget", "sourceTruncated", "truncated", "maxRows", "duplicatePolicy", "nativeExecutable", "nativeDocumentGenerated", "qualification", "pendingNativeGates", "planSha256"],
+  "properties": {
+    "schemaVersion": {"const": "watch-table-plan.v1"},
+    "tableName": {"type": "string", "minLength": 1, "maxLength": 128},
+    "source": {"$ref": "engineering-object-reference.v1.schema.json"},
+    "instance": {"type": "object", "additionalProperties": false, "required": ["storage", "memberPath"], "properties": {"storage": {"$ref": "engineering-object-reference.v1.schema.json"}, "memberPath": {"$ref": "#/$defs/path"}}},
+    "diagnosticCaseSha256": {"anyOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+    "diagnosticSourceRevisionSha256": {"anyOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+    "template": {"anyOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["id", "version", "slots"], "properties": {
+      "id": {"type": "string", "minLength": 1, "maxLength": 128}, "version": {"type": "string", "minLength": 1, "maxLength": 64},
+      "slots": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"type": "object", "additionalProperties": false, "required": ["id", "role", "datatype"], "properties": {"id": {"$ref": "#/$defs/id"}, "role": {"$ref": "#/$defs/id"}, "datatype": {"type": "string", "minLength": 1, "maxLength": 128}}}}
+    }}]},
+    "templateBindings": {"type": "array", "maxItems": 10000, "items": {"type": "object", "additionalProperties": false, "required": ["slotId", "candidateId", "reason"], "properties": {"slotId": {"$ref": "#/$defs/id"}, "candidateId": {"$ref": "#/$defs/id"}, "reason": {"$ref": "#/$defs/reason"}}}},
+    "externalStorage": {"type": "array", "maxItems": 1000, "items": {"type": "object", "additionalProperties": false, "required": ["storage", "reason"], "properties": {"storage": {"$ref": "engineering-object-reference.v1.schema.json"}, "reason": {"$ref": "#/$defs/reason"}}}},
+    "candidates": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/candidate"}},
+    "rows": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/row"}},
+    "unresolvedSuggestions": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/gap"}},
+    "sourceGaps": {"type": "array", "maxItems": 10005, "items": {"type": "object"}},
+    "duplicates": {"type": "array", "maxItems": 10000, "items": {"type": "object", "additionalProperties": false, "required": ["candidateId", "firstCandidateId", "policy"], "properties": {"candidateId": {"$ref": "#/$defs/id"}, "firstCandidateId": {"$ref": "#/$defs/id"}, "policy": {"enum": ["preserve", "collapseExact"]}}}},
+    "addressObservations": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/observation"}},
+    "addressWarnings": {"type": "object", "additionalProperties": false, "required": ["items", "truncated"], "properties": {"truncated": {"type": "boolean"}, "items": {"type": "array", "maxItems": 1000, "items": {"type": "object", "required": ["code", "leftCandidateId", "rightCandidateId", "area"], "properties": {"code": {"const": "OverlappingSuppliedRanges"}, "leftCandidateId": {"$ref": "#/$defs/id"}, "rightCandidateId": {"$ref": "#/$defs/id"}, "area": {"type": "string"}}}}}},
+    "candidateCount": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "omittedByBudget": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "maxRows": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "sourceTruncated": {"type": "boolean"}, "truncated": {"type": "boolean"},
+    "duplicatePolicy": {"enum": ["preserve", "collapseExact"]},
+    "nativeExecutable": {"const": false}, "nativeDocumentGenerated": {"const": false}, "qualification": {"const": "offlinePlanningOnly"},
+    "pendingNativeGates": {"const": ["currentOwnerAdmission", "genuineNativeEntryGrammar", "exactTargetSymbolAndProfileValidation", "independentNativeReadback", "preservationCompileApplicability", "saveReopenRecovery"]},
+    "planSha256": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "id": {"type": "string", "minLength": 1, "maxLength": 64},
+    "reason": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "path": {"type": "array", "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 256}},
+    "candidate": {
+      "type": "object",
+      "description": "Original diagnostic extras and opaque provenance are deliberately preserved.",
+      "required": ["id", "sourceKind", "sourceObject", "storage", "memberPath", "datatype", "role", "reason", "resolution", "evidence"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "sourceKind": {"enum": ["diagnostic", "interface", "callGraph", "instanceDb", "selectedNetwork", "ioMap"]},
+        "sourceObject": {"$ref": "engineering-object-reference.v1.schema.json"}, "storage": {"$ref": "engineering-object-reference.v1.schema.json"},
+        "memberPath": {"allOf": [{"$ref": "#/$defs/path"}, {"minItems": 1}]}, "datatype": {"type": "string", "maxLength": 128},
+        "role": {"$ref": "#/$defs/id"}, "reason": {"$ref": "#/$defs/reason"}, "resolution": {"enum": ["capturedDeclaration", "unavailable", "ambiguous"]},
+        "storageClass": {"enum": ["instanceMember", "globalDbMember", "plcTag", "actualParameter", "temp", "inOutAlias", "indirect", "unknown"]},
+        "evidence": {"type": ["object", "null"]}, "onlineAddress": {"type": "null"}, "symbolComponents": {"$ref": "#/$defs/path"}
+      }
+    },
+    "row": {"type": "object", "additionalProperties": false, "required": ["ordinal", "candidateId", "candidate", "displayFormat", "modifyIntention", "modifyValue", "onlineAddress", "suppliedAddressObservation", "selectionReasons"], "properties": {
+      "ordinal": {"type": "integer", "minimum": 0, "maximum": 9999}, "candidateId": {"$ref": "#/$defs/id"}, "candidate": {"$ref": "#/$defs/candidate"},
+      "displayFormat": {"const": "Undef"}, "modifyIntention": {"const": false}, "modifyValue": {"type": "null"}, "onlineAddress": {"type": "null"},
+      "suppliedAddressObservation": {"anyOf": [{"$ref": "#/$defs/observation"}, {"type": "null"}]},
+      "selectionReasons": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"type": "object", "required": ["candidateId", "reason", "evidence"], "properties": {"candidateId": {"$ref": "#/$defs/id"}, "reason": {"$ref": "#/$defs/reason"}, "evidence": {"type": ["object", "null"]}, "candidate": {"$ref": "#/$defs/candidate"}}}}
+    }},
+    "gap": {"type": "object", "additionalProperties": false, "required": ["candidateId", "code", "reason", "candidate"], "properties": {"candidateId": {"$ref": "#/$defs/id"}, "code": {"enum": ["AmbiguousSignal", "UnresolvedSignal", "RowBudgetExceeded", "NotMappedByTemplate"]}, "reason": {"type": "string"}, "candidate": {"$ref": "#/$defs/candidate"}}},
+    "observation": {"type": "object", "additionalProperties": false, "required": ["candidateId", "storage", "memberPath", "datatype", "kind", "observedAtUtc", "evidence", "symbolComponents", "area", "startBit", "widthBits", "dbNumber", "optimizedDb", "verification"], "properties": {
+      "candidateId": {"$ref": "#/$defs/id"}, "storage": {"$ref": "engineering-object-reference.v1.schema.json"}, "memberPath": {"$ref": "#/$defs/path"},
+      "datatype": {"type": "string"}, "kind": {"enum": ["symbolic", "absolute"]}, "observedAtUtc": {"type": "string", "format": "date-time", "pattern": "Z$"},
+      "evidence": {"type": "object", "minProperties": 1}, "symbolComponents": {"anyOf": [{"$ref": "#/$defs/path"}, {"type": "null"}]},
+      "area": {"enum": ["I", "Q", "M", "DB", null]}, "startBit": {"type": ["integer", "null"], "minimum": 0, "maximum": 2147483647},
+      "widthBits": {"type": ["integer", "null"], "minimum": 1, "maximum": 64}, "dbNumber": {"type": ["integer", "null"], "minimum": 1, "maximum": 65535}, "optimizedDb": {"type": ["boolean", "null"]},
+      "verification": {"const": "suppliedOfflineObservationNotNativeQualified"}
+    }}
+  }
+}

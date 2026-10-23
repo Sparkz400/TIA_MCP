@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-compilation:v1",
+  "title": "Library compiler observations",
+  "description": "Current device-path compilation, legacy device-name receipts and single HMI target compilation. Errors, unknown states and truncation remain observations; structure alone does not establish success, authenticity, authorized scope or native qualification.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/deviceProject"
+    },
+    {
+      "$ref": "#/$defs/legacyProject"
+    },
+    {
+      "$ref": "#/$defs/hmi"
+    }
+  ],
+  "$defs": {
+    "message": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        }
+      },
+      "required": [
+        "description",
+        "path",
+        "state",
+        "depth"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/message"
+          },
+          "minItems": 0,
+          "maxItems": 500
+        },
+        "messagesTruncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "target",
+        "state",
+        "errorCount",
+        "warningCount",
+        "messages",
+        "messagesTruncated"
+      ],
+      "additionalProperties": false
+    },
+    "pathTarget": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/message"
+          },
+          "minItems": 0,
+          "maxItems": 500
+        },
+        "messagesTruncated": {
+          "type": "boolean"
+        },
+        "targetPath": {
+          "type": "string",
+          "pattern": "^/projects/\\S[\\s\\S]*"
+        }
+      },
+      "required": [
+        "target",
+        "state",
+        "errorCount",
+        "warningCount",
+        "messages",
+        "messagesTruncated",
+        "targetPath"
+      ],
+      "additionalProperties": false
+    },
+    "deviceProject": {
+      "type": "object",
+      "properties": {
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pathTarget"
+          },
+          "minItems": 1,
+          "maxItems": 50000
+        },
+        "requiredTargets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^/projects/\\S[\\s\\S]*"
+          },
+          "minItems": 1,
+          "maxItems": 50000
+        },
+        "targetIdentityPolicy": {
+          "const": "device-path-v1"
+        },
+        "scope": {
+          "const": "All devices of the explicitly selected affected project."
+        },
+        "scopeComplete": {
+          "const": true
+        }
+      },
+      "required": [
+        "errorCount",
+        "warningCount",
+        "targets",
+        "requiredTargets",
+        "targetIdentityPolicy",
+        "scope",
+        "scopeComplete"
+      ],
+      "additionalProperties": false
+    },
+    "legacyProject": {
+      "type": "object",
+      "properties": {
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/target"
+          },
+          "minItems": 1,
+          "maxItems": 50000
+        },
+        "scope": {
+          "const": "All devices of the explicitly selected affected project."
+        }
+      },
+      "required": [
+        "errorCount",
+        "warningCount",
+        "targets",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "hmi": {
+      "type": "object",
+      "properties": {
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/target"
+          },
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "runtimeVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "errorCount",
+        "warningCount",
+        "targets",
+        "runtimeVerified"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
+  "title": "Revalidated retained runtime acquisition export",
+  "type": "object", "additionalProperties": false,
+  "required": ["id", "artifact", "schemaVersion", "acquisitionId", "sourceArtifact", "format", "mediaType", "sourceEvidenceRevalidated", "analysisRecomputed", "limits", "atomicAcrossSignals", "scanSynchronized", "programMatchVerified", "addressMatchVerified", "sourceAuthenticityVerified", "clockSynchronizationVerified", "assertionsAdmitted", "causationProven", "bugFixProven", "nativeQualification", "nativeAccessAttempted"],
+  "properties": {
+    "id": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "artifact": {"$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"},
+    "schemaVersion": {"const": "diagnostic-runtime-acquisition-export.v1"},
+    "acquisitionId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+    "sourceArtifact": {"$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"},
+    "format": {"enum": ["json", "markdown", "html"]}, "mediaType": {"enum": ["application/json", "text/markdown", "text/html"]},
+    "sourceEvidenceRevalidated": {"const": true}, "analysisRecomputed": {"const": true},
+    "limits": {"type": "string", "minLength": 1},
+    "atomicAcrossSignals": {"const": false}, "scanSynchronized": {"const": false}, "programMatchVerified": {"const": false},
+    "addressMatchVerified": {"const": false}, "sourceAuthenticityVerified": {"const": false}, "clockSynchronizationVerified": {"const": false},
+    "assertionsAdmitted": {"const": false}, "causationProven": {"const": false}, "bugFixProven": {"const": false},
+    "nativeQualification": {"const": false}, "nativeAccessAttempted": {"const": false}
+  },
+  "$defs": {
+    "input": {
+      "type": "object", "additionalProperties": false, "required": ["acquisitionId", "format"],
+      "properties": {
+        "acquisitionId": {"$ref": "diagnostic-case.v1.schema.json#/$defs/hash"},
+        "format": {"enum": ["json", "markdown", "html"]}
+      }
+    }
+  }
+}

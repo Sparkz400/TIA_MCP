@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "unified-text-list-author-request.v1",
+  "fileBase": "QualificationTextLists",
+  "textLibrary": "QualificationText",
+  "languages": [
+    "en-US",
+    "de-DE"
+  ],
+  "defaultLanguage": "en-US",
+  "texts": [
+    {
+      "id": "Text_Off",
+      "translations": {
+        "en-US": "Qualification off",
+        "de-DE": "Qualifikation aus"
+      }
+    },
+    {
+      "id": "Text_Ready",
+      "translations": {
+        "en-US": "Qualification ready",
+        "de-DE": "Qualifikation bereit"
+      }
+    }
+  ],
+  "lists": [
+    {
+      "name": "QualificationStates",
+      "rangeType": "Decimal",
+      "entries": [
+        {
+          "id": "StateOff",
+          "type": "SingleValue",
+          "fromValue": 0,
+          "toValue": 0,
+          "isDefault": true,
+          "textId": "Text_Off"
+        },
+        {
+          "id": "StateReady",
+          "type": "SingleValue",
+          "fromValue": 1,
+          "toValue": 1,
+          "isDefault": false,
+          "textId": "Text_Ready"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "case": "owned-v21-create-one-direct-instance-bool-default-reason",
+  "lifecyclePassed": true,
+  "productionApplyEnabled": false,
+  "rawRunLabel": "wa1604",
+  "operationId": "93db799b413f415c9ca0f730f52f0470",
+  "sourceManifestSha256": "114190360c055b31794bdf7be85600ac62f9437dd172c5265ed9ba8b8d45267a",
+  "binaries": {
+    "TiaMcp.Host.exe": "371ab78953be0026afca604ad7f56fb940f3a869853c9235a2694f438b21820f",
+    "TiaMcp.Host.dll": "0e8ccf64f920cdf73f9391c2eec179b6cd4084568b1faed4b00dba22769e0de5",
+    "TiaMcp.Core.dll": "c42df17638e321bb5e09fb5d4ab220b10e79b3738c02a03944a5793d8135c9aa",
+    "TiaMcp.Openness.V21.exe": "ab3956e0bb551a79e3bbdc00be776dac103413befb495c4993872f8d6216cf4f"
+  },
+  "nativeProfile": {
+    "nativeProfile": "v21-watch-withdefaults-preserving-1",
+    "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+    "admissionScope": "One created root table, one direct instance Active Bool output, default diagnostic reason; six unchanged peer exports.",
+    "productionBlockers": [
+      "Native collision and stale-source refusal trials remain unqualified.",
+      "Generic create/add/ID profile keys also cover cases beyond this one-row creation; exact admission binding is still required."
+    ]
+  },
+  "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+  "installedApiHashes": {
+    "Siemens.Engineering.Base.dll": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+    "Siemens.Engineering.Step7.dll": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba"
+  },
+  "mutationProfileKeys": [
+    "watch.add-instance-bool.v1",
+    "watch.create-instance.v1",
+    "watch.reference-free-authoring-ids.v1"
+  ],
+  "activeCultures": [
+    "de-DE"
+  ],
+  "rows": 1,
+  "symbol": "\"TiaMcp_EnableGate_DB\".Active",
+  "datatype": "Bool",
+  "modifyValue": "",
+  "modifyIntention": false,
+  "sixPeerExportsUnchanged": true,
+  "originalDisposition": "verifiedApplied",
+  "restoredDisposition": "verifiedRestored",
+  "nativeProcessLifetimes": 5,
+  "allOwnedProcessExits": 7,
+  "allExitCodesZero": true,
+  "independentAudit": {
+    "path": "artifacts/wt05-authoring-20261016/create-bool-04-audit.json",
+    "sha256": "a3b7b722b12e7ad97fecb57b7c5c09afec5be8cd6542399381d76bfa31da2e17"
+  },
+  "oracle": {
+    "path": "scripts/verify_watch_authoring.py",
+    "sha256": "eba10ef1232219f8d2da4af06626b3fe257268e8602ff6ca3c6f06dc84346bbd"
+  },
+  "files": [
+    {
+      "path": "creation.applied.xml",
+      "sha256": "9322951e527cf65649518ae6ca2ba4c38a19018ddc4104040ce61b0fc9ee2738",
+      "bytes": 3184
+    },
+    {
+      "path": "creation.reopened.xml",
+      "sha256": "016c1df5e06f853158e1f2182efad5f8560a0cb8874d4085e9afb2bc27672e2b",
+      "bytes": 3184
+    },
+    {
+      "path": "creation.original.xml",
+      "sha256": "895cf8b990845b13640b709836aacf1219de802444cd74b4da5db7ff145f1351",
+      "bytes": 3184
+    },
+    {
+      "path": "absence.before.txt",
+      "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+      "bytes": 44
+    },
+    {
+      "path": "absence.restored.txt",
+      "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+      "bytes": 44
+    }
+  ]
+}

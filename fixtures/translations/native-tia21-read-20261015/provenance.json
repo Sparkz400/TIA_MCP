@@ -1,0 +1,36 @@
+{
+  "sourceReceipt": {
+    "path": "artifacts/expansion-foundation-20261015/native/translations-02/result.json",
+    "sha256": "427c82e89fe9505bc470b83f169c8812b9c3ae09e253ad0275e1f584db860ca7",
+    "bytes": 4560
+  },
+  "nativeExportObserved": true,
+  "nativeImportExecuted": false,
+  "nativeWriteQualified": false,
+  "profiles": [
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+        "sha256": "0d094c2177bb46f4cd17591a57297b3a1b5368d5ada1876316321ba774b64ec5",
+        "bytes": 8339
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-02/legacy.xlsx",
+        "sha256": "60746914a8aa4a292dc8950abdd62178aa3e0e738eba592e421ebba59f448b67",
+        "bytes": 5576
+      }
+    },
+    {
+      "profile": {
+        "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+        "sha256": "b2d66e109cb254f6abac0ad3731ff67204a901414d48f99a543ff6670fe10051",
+        "bytes": 4818
+      },
+      "workbook": {
+        "path": "artifacts/expansion-foundation-20261015/native/translations-02/filtered-plc.xlsx",
+        "sha256": "b1b09ee17e5216b1c6d72d025eebd4bf41cb3d049f778a93cb17ec925c97e3d6",
+        "bytes": 5069
+      }
+    }
+  ]
+}

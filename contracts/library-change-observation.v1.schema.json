@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-change-observation:v1",
+  "title": "Live or recovered library change observation envelope",
+  "description": "Validates envelope shape. The companion validator additionally checks repeated identities, previews and recovered state. Native results and compiler data in the legacy journal remain opaque. Preview hashes are compared as pins, not recomputed with a different JSON serializer.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "changeId",
+        "state",
+        "journal",
+        "automaticRetryAllowed",
+        "previewHash",
+        "preview",
+        "journalPath"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "changeId": {
+          "type": "string",
+          "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "prepared",
+            "checkpointing",
+            "applying",
+            "applied",
+            "recovery_required"
+          ]
+        },
+        "journal": {
+          "$ref": "#/$defs/journal"
+        },
+        "automaticRetryAllowed": {
+          "const": false
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "preview": {
+          "$ref": "urn:tia-mcp:library-plan:v1"
+        },
+        "journalPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "changeId",
+        "state",
+        "journal",
+        "automaticRetryAllowed",
+        "recoveredFromDisk",
+        "note"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "changeId": {
+          "type": "string",
+          "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "prepared",
+            "applied",
+            "outcome_unknown",
+            "recovery_outcome_unknown",
+            "restored_to_new_locations"
+          ]
+        },
+        "journal": {
+          "$ref": "#/$defs/journal"
+        },
+        "automaticRetryAllowed": {
+          "const": false
+        },
+        "recoveredFromDisk": {
+          "const": true
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "journal": {
+      "allOf": [
+        {
+          "$ref": "urn:tia-mcp:library-change-journal:v1"
+        },
+        {
+          "properties": {
+            "changeId": {
+              "type": "string",
+              "pattern": "^lib-[a-f0-9]{32}(?![\\s\\S])"
+            },
+            "kind": {
+              "enum": [
+                "library_create",
+                "library_upgrade",
+                "library_copy_elements",
+                "library_instantiate",
+                "library_update_project",
+                "library_integrate",
+                "library_create_type",
+                "library_create_master_copy",
+                "library_edit_version",
+                "library_release_version",
+                "library_discard_version",
+                "library_set_default",
+                "library_type_policy",
+                "library_organize",
+                "library_delete",
+                "library_publish",
+                "library_save",
+                "library_archive"
+              ]
+            },
+            "sessionGeneration": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}(?![\\s\\S])"
+            },
+            "previewHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "preview": {
+              "$ref": "urn:tia-mcp:library-plan:v1"
+            },
+            "state": {
+              "enum": [
+                "prepared",
+                "checkpointing",
+                "applying",
+                "applied",
+                "recovery_required",
+                "restored_to_new_locations"
+              ]
+            },
+            "updatedUtc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "idempotencyKeyHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+            },
+            "persistenceVerified": {
+              "const": false
+            },
+            "recoveryAttempts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "attemptId",
+                  "startedUtc",
+                  "state",
+                  "resources"
+                ],
+                "properties": {
+                  "attemptId": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{32}(?![\\s\\S])"
+                  },
+                  "startedUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "state": {
+                    "enum": [
+                      "dispatching",
+                      "failed",
+                      "completed"
+                    ]
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
+                    }
+                  },
+                  "completedUtc": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "state": {
+                          "const": "completed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "completedUtc"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "checkpoints": {
+              "type": "array",
+              "items": {
+                "properties": {
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "updatedUtc"
+          ]
+        }
+      ]
+    }
+  }
+}

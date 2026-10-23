@@ -1,0 +1,20 @@
+{
+  "mode": "inspect",
+  "artifactRoot": "D:\\TIAW",
+  "outputDirectory": "D:\\TIAW\\ts02\\evidence\\final-inspect-01",
+  "processId": 42956,
+  "projectPath": "D:\\TIAW\\ts02\\s\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4\\TiaMcpScratch_20261015_075139_5b4719a4.ap21",
+  "binarySha256": "de9747ef394f14732a87d9328a908dbb77467af5b8b26f234c9a933cdd37640b",
+  "testSuiteApiSha256": "03e1b656eea82492ce3852a722d02cbc261c19c6c008035807c6e6d30c3d1fdb",
+  "baseApiSha256": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+  "sourceFiles": [
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteEvidence\\Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd"
+    },
+    {
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\scripts\\native\\TestSuiteEvidence\\TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee"
+    }
+  ]
+}

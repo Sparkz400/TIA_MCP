@@ -1,0 +1,15 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_FB_global_FBD"
+VAR_INPUT
+  Enable : Bool;
+END_VAR
+VAR_OUTPUT
+  Active : Bool;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+  "TiaMcp_EnableGate_DB"( Enable := #Enable, Active => #Active )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

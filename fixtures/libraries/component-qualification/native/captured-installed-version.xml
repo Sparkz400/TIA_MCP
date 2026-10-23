@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V21" />
+  <SW.Blocks.CodeBlockLibraryTypeVersion ID="0">
+    <AttributeList>
+      <Author>TIA MCP qualification</Author>
+      <VersionNumber>1.0.0</VersionNumber>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text>Independent component fixture TiaMcpComponentGate</Text>
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.FB ID="3" CompositionName="ContentObject">
+        <AttributeList>
+          <AutoNumber>true</AutoNumber>
+          <Interface>
+            <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+              <Section Name="Input">
+                <Member Name="Enable" Datatype="Bool" Remanence="NonRetain" Accessibility="Public">
+                  <AttributeList>
+                    <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                  </AttributeList>
+                </Member>
+              </Section>
+              <Section Name="Output">
+                <Member Name="Active" Datatype="Bool" Remanence="NonRetain" Accessibility="Public">
+                  <AttributeList>
+                    <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                  </AttributeList>
+                </Member>
+              </Section>
+              <Section Name="InOut" />
+              <Section Name="Static">
+                <Member Name="State" Datatype="&quot;TiaMcpComponentState&quot;" Remanence="NonRetain" Accessibility="Public">
+                  <AttributeList>
+                    <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                    <BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+                  </AttributeList>
+                  <Sections>
+                    <Section Name="None">
+                      <Member Name="Active" Datatype="Bool" />
+                    </Section>
+                  </Sections>
+                </Member>
+              </Section>
+              <Section Name="Temp" />
+              <Section Name="Constant" />
+            </Sections>
+          </Interface>
+          <IsIECCheckEnabled>false</IsIECCheckEnabled>
+          <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+          <MemoryLayout>Optimized</MemoryLayout>
+          <MemoryReserve>100</MemoryReserve>
+          <Name>TiaMcpComponentGate</Name>
+          <Namespace />
+          <Number>2</Number>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+          <SetENOAutomatically>false</SetENOAutomatically>
+          <UDABlockProperties />
+          <UDAEnableTagReadback>false</UDAEnableTagReadback>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="4" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="5" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <SW.Blocks.CompileUnit ID="6" CompositionName="CompileUnits">
+            <AttributeList>
+              <NetworkSource>
+                <StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">
+                  <NewLine Num="1" UId="21" />
+                  <Blank Num="4" UId="22" />
+                  <Access Scope="LocalVariable" UId="23">
+                    <Symbol UId="24">
+                      <Component Name="State" UId="25" />
+                      <Token Text="." UId="26" />
+                      <Component Name="Active" UId="27" />
+                    </Symbol>
+                  </Access>
+                  <Blank Num="1" UId="28" />
+                  <Token Text=":=" UId="29" />
+                  <Blank Num="1" UId="30" />
+                  <Access Scope="LocalVariable" UId="31">
+                    <Symbol UId="32">
+                      <Component Name="Enable" UId="33" />
+                    </Symbol>
+                  </Access>
+                  <Token Text=";" UId="34" />
+                  <NewLine Num="1" UId="35" />
+                  <Blank Num="4" UId="36" />
+                  <Access Scope="LocalVariable" UId="37">
+                    <Symbol UId="38">
+                      <Component Name="Active" UId="39" />
+                    </Symbol>
+                  </Access>
+                  <Blank Num="1" UId="40" />
+                  <Token Text=":=" UId="41" />
+                  <Blank Num="1" UId="42" />
+                  <Access Scope="LocalVariable" UId="43">
+                    <Symbol UId="44">
+                      <Component Name="State" UId="45" />
+                      <Token Text="." UId="46" />
+                      <Component Name="Active" UId="47" />
+                    </Symbol>
+                  </Access>
+                  <Token Text=";" UId="48" />
+                  <NewLine Num="1" UId="49" />
+                </StructuredText>
+              </NetworkSource>
+              <ProgrammingLanguage>SCL</ProgrammingLanguage>
+            </AttributeList>
+            <ObjectList>
+              <MultilingualText ID="7" CompositionName="Comment">
+                <ObjectList>
+                  <MultilingualTextItem ID="8" CompositionName="Items">
+                    <AttributeList>
+                      <Culture>de-DE</Culture>
+                      <Text />
+                    </AttributeList>
+                  </MultilingualTextItem>
+                </ObjectList>
+              </MultilingualText>
+              <MultilingualText ID="9" CompositionName="Title">
+                <ObjectList>
+                  <MultilingualTextItem ID="A" CompositionName="Items">
+                    <AttributeList>
+                      <Culture>de-DE</Culture>
+                      <Text />
+                    </AttributeList>
+                  </MultilingualTextItem>
+                </ObjectList>
+              </MultilingualText>
+            </ObjectList>
+          </SW.Blocks.CompileUnit>
+          <MultilingualText ID="B" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.FB>
+    </ObjectList>
+  </SW.Blocks.CodeBlockLibraryTypeVersion>
+</Document>

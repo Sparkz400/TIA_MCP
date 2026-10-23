@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/engineering-object-reference.v1.schema.json",
+  "title": "Exact object identity bound to captured source evidence; no live-target freshness claim",
+  "type": "object", "additionalProperties": false,
+  "required": ["object", "snapshot", "contentSha256"],
+  "properties": {
+    "object": {
+      "type": "object", "additionalProperties": false,
+      "required": ["projectPath", "plcPath", "scopePath", "objectPath", "kind"],
+      "properties": {
+        "projectPath": {"$ref": "#/$defs/selector"}, "objectPath": {"$ref": "#/$defs/selector"},
+        "plcPath": {"anyOf": [{"$ref": "#/$defs/selector"}, {"type": "null"}]},
+        "scopePath": {"anyOf": [{"$ref": "#/$defs/selector"}, {"type": "null"}]},
+        "kind": {"type": "string", "minLength": 1, "maxLength": 64}
+      }
+    },
+    "snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observationId", "sourceSha256", "tiaVersion"],
+      "properties": {
+        "observationId": {"type": "string", "minLength": 1, "maxLength": 256},
+        "sourceSha256": {"$ref": "#/$defs/digest"},
+        "tiaVersion": {"type": "integer", "minimum": 1, "maximum": 100}
+      }
+    },
+    "contentSha256": {"anyOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]}
+  },
+  "$defs": {
+    "selector": {"type": "string", "minLength": 1, "maxLength": 8192},
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"}
+  }
+}

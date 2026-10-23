@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-profile.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "sourceCulture",
+    "rows",
+    "allowSharedStringToInline"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "kind": {
+      "enum": [
+        "synthetic",
+        "unqualified-explicit"
+      ]
+    },
+    "sourceCulture": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "rows": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": {
+        "$ref": "#/$defs/row"
+      }
+    },
+    "allowSharedStringToInline": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "part",
+        "cell"
+      ],
+      "properties": {
+        "part": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "cell": {
+          "type": "string",
+          "pattern": "^[A-Z]{1,3}[1-9][0-9]{0,6}$"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "culture",
+        "location",
+        "allowClear",
+        "allowCreateMissing",
+        "maxUtf16Length"
+      ],
+      "properties": {
+        "culture": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "location": {
+          "$ref": "#/$defs/location"
+        },
+        "allowClear": {
+          "type": "boolean"
+        },
+        "allowCreateMissing": {
+          "type": "boolean"
+        },
+        "maxUtf16Length": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nativeKey",
+        "category",
+        "keyCell",
+        "sourceCell",
+        "targets",
+        "tokenGrammar"
+      ],
+      "properties": {
+        "nativeKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1048576
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "keyCell": {
+          "$ref": "#/$defs/location"
+        },
+        "sourceCell": {
+          "$ref": "#/$defs/location"
+        },
+        "targets": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/target"
+          }
+        },
+        "tokenGrammar": {
+          "enum": [
+            "none",
+            "brace-literals-v1",
+            "unknown"
+          ]
+        },
+        "alarmTextPolicy": {
+          "enum": [
+            null,
+            "instance-inheritance-v1"
+          ],
+          "description": "Explicit supplied alarm-instance-text semantics; omitted/null preserves ordinary mapped text. Does not qualify Siemens format or language coverage."
+        }
+      }
+    }
+  }
+}

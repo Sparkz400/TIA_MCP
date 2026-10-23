@@ -1,0 +1,29 @@
+{
+  "operation": "New owned TIA process and new GRAPH scratch project",
+  "seed": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g04\\seed.xml",
+    "sha256": "d8c36c1c48129cf7981d00a4f423612dd32a1171ab24088bdf0562d26b849697",
+    "bytes": 2624
+  },
+  "binary": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\Debug\\net48\\TiaMcp.Graph.Native.exe",
+    "sha256": "bc1c0af42e3ce0f9620df9e626b02943576b13e1df166ce08e341a515eec7385",
+    "bytes": 19968
+  },
+  "attachExistingProcess": false,
+  "onlineAccess": false,
+  "replayOnFailure": false,
+  "startedAtUtc": "2026-10-16T07:17:56.6372788Z",
+  "nativeApi": [
+    {
+      "path": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\PublicAPI\\V21\\net48\\Siemens.Engineering.Base.dll",
+      "sha256": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+      "bytes": 1504168
+    },
+    {
+      "path": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\PublicAPI\\V21\\net48\\Siemens.Engineering.Step7.dll",
+      "sha256": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba",
+      "bytes": 506280
+    }
+  ]
+}

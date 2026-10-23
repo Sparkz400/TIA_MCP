@@ -1,0 +1,721 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/opcua-runtime-capture.v1.schema.json",
+  "title": "Bounded retained OPC UA polling acquisition",
+  "$ref": "#/$defs/captureStatus",
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "namespaceUri",
+        "identifierType",
+        "identifier"
+      ],
+      "properties": {
+        "namespaceUri": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 4096
+        },
+        "identifierType": {
+          "enum": [
+            "numeric",
+            "string",
+            "guid",
+            "opaque"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "applicationUri",
+        "certificateSha256",
+        "authentication"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "pattern": "^opc\\.tcp://",
+          "maxLength": 2048
+        },
+        "applicationUri": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 4096
+        },
+        "certificateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "authentication": {
+          "enum": [
+            "anonymous",
+            "username"
+          ]
+        },
+        "user": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        },
+        "vaultName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 32
+        },
+        "credential": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node",
+        "outcome",
+        "builtInType",
+        "dataType",
+        "valueRank",
+        "arrayDimensions",
+        "statusCode",
+        "quality",
+        "sourceTimestamp",
+        "serverTimestamp",
+        "sourcePicoseconds",
+        "serverPicoseconds",
+        "encoding",
+        "value",
+        "errorCode"
+      ],
+      "properties": {
+        "node": {
+          "$ref": "#/$defs/node"
+        },
+        "outcome": {
+          "enum": [
+            "value",
+            "itemError",
+            "metadataError",
+            "unsupported"
+          ]
+        },
+        "builtInType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dataType": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valueRank": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "arrayDimensions": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "maxItems": 4096,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          }
+        },
+        "statusCode": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{8}$"
+        },
+        "quality": {
+          "enum": [
+            "Good",
+            "Uncertain",
+            "Bad"
+          ]
+        },
+        "sourceTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "serverTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "sourcePicoseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "serverPicoseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "encoding": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attemptId",
+        "startedAt",
+        "completedAt",
+        "items"
+      ],
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/value"
+          }
+        }
+      }
+    },
+    "uaSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "attemptId",
+        "hostId",
+        "selection",
+        "state",
+        "errorCode",
+        "peerVerified",
+        "updatedAt",
+        "securityPolicy",
+        "securityMode",
+        "physicalQualified",
+        "programIdentityVerified",
+        "secretsReturned",
+        "operationErrorCode"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-session.v1"
+        },
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "selection": {
+          "$ref": "#/$defs/selection"
+        },
+        "state": {
+          "enum": [
+            "connecting",
+            "connected",
+            "notConnected",
+            "remoteSessionUnknown",
+            "hostEndedRemoteUnknown",
+            "closed",
+            "abandonedRemoteUnknown"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "peerVerified": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "securityPolicy": {
+          "const": "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+        },
+        "securityMode": {
+          "const": "SignAndEncrypt"
+        },
+        "physicalQualified": {
+          "const": false
+        },
+        "programIdentityVerified": {
+          "const": false
+        },
+        "secretsReturned": {
+          "const": false
+        },
+        "operationErrorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "intervalMilliseconds": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 60000
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maximumSamples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "default": 100000
+        },
+        "maximumBytes": {
+          "type": "integer",
+          "minimum": 1048576,
+          "maximum": 67108864,
+          "default": 67108864
+        },
+        "diagnosticBindingId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional immutable diagnostic_ua_binding_plan ID selected before capture; exact session attempt and ordered nodes are revalidated."
+        }
+      },
+      "required": [
+        "attemptId",
+        "nodes",
+        "intervalMilliseconds",
+        "durationSeconds"
+      ]
+    },
+    "storageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "selectionIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          }
+        },
+        "intervalMilliseconds": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 60000
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "maximumSamples": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "default": 100000
+        },
+        "maximumBytes": {
+          "type": "integer",
+          "minimum": 1048576,
+          "maximum": 67108864,
+          "default": 67108864
+        },
+        "reviewId": {
+          "type": "null"
+        },
+        "representation": {
+          "const": "raw"
+        }
+      },
+      "required": [
+        "attemptId",
+        "selectionIds",
+        "intervalMilliseconds",
+        "durationSeconds",
+        "maximumSamples",
+        "maximumBytes",
+        "reviewId",
+        "representation"
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hostId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "createdUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "request": {
+          "$ref": "#/$defs/storageRequest"
+        },
+        "signals": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "uaContext": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "request": {
+              "$ref": "#/$defs/request"
+            },
+            "session": {
+              "$ref": "#/$defs/uaSession"
+            }
+          },
+          "required": [
+            "request",
+            "session"
+          ]
+        }
+      },
+      "required": [
+        "captureId",
+        "hostId",
+        "createdUtc",
+        "request",
+        "signals",
+        "uaContext"
+      ]
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "running",
+            "ended"
+          ]
+        },
+        "terminalReason": {
+          "enum": [
+            null,
+            "durationLimit",
+            "sampleLimit",
+            "sessionUnavailable",
+            "byteLimit",
+            "valueLimit",
+            "storageFailure",
+            "stopped",
+            "hostShutdown"
+          ]
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observedUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readAttempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skippedPolls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "droppedReadResults": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "state",
+        "terminalReason",
+        "elapsedMilliseconds",
+        "observedUtc",
+        "rows",
+        "readAttempts",
+        "skippedPolls",
+        "droppedReadResults"
+      ]
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "enum": [
+            "read",
+            "gap"
+          ]
+        },
+        "selectionId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cycle": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scheduledMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "elapsedMilliseconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observedUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "readResultJson": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "skippedPolls": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sequence",
+        "kind",
+        "selectionId",
+        "cycle",
+        "scheduledMilliseconds",
+        "elapsedMilliseconds",
+        "observedUtc",
+        "readResultJson",
+        "errorCode",
+        "skippedPolls"
+      ]
+    },
+    "captureStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-capture-status.v1"
+        },
+        "captureId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "snapshotRef": {
+          "type": "string",
+          "pattern": "^capture:[0-9a-f]{32}:[0-9]+:[0-9a-f]{64}$"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "ended",
+            "interrupted",
+            "historicalPrefix"
+          ]
+        },
+        "recordedProgress": {
+          "$ref": "#/$defs/progress"
+        },
+        "localFailure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        },
+        "committedBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uncommittedTailPresent": {
+          "type": "boolean"
+        },
+        "uncommittedDataUnknown": {
+          "type": "boolean"
+        },
+        "plcChangesBetweenPollsUnknown": {
+          "const": true
+        },
+        "acquisitionMode": {
+          "const": "polling"
+        },
+        "atomicAcrossSignals": {
+          "const": false
+        },
+        "scanSynchronized": {
+          "const": false
+        },
+        "programMatchVerified": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "captureId",
+        "snapshotRef",
+        "state",
+        "recordedProgress",
+        "localFailure",
+        "plan",
+        "committedBytes",
+        "uncommittedTailPresent",
+        "uncommittedDataUnknown",
+        "plcChangesBetweenPollsUnknown",
+        "acquisitionMode",
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "programMatchVerified",
+        "nativeQualified"
+      ]
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": "opcua-runtime-capture-export.v1"
+        },
+        "capture": {
+          "$ref": "#/$defs/captureStatus"
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 200000,
+          "items": {
+            "$ref": "#/$defs/row"
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "capture",
+        "rows"
+      ]
+    }
+  }
+}

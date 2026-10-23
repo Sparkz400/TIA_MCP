@@ -1,0 +1,133 @@
+{
+  "id": "tia-v21-project-texts-1.3-read-20261015-03-filtered-plc",
+  "kind": "unqualified-explicit",
+  "sourceCulture": "de-DE",
+  "rows": [
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcK7ERFPJ58JD34dVQbZEVTgfe7BiHKbgiJOinRSfNOGnL3oFBVrxcwpHb2o3yT0c3J1y+Gja2dWtidnervbefQ0rTyeY5S4SywzaGJYsGXZCA6IH2rOKQOM36c0zXIUTuU6RCpwFcO3LBH1/B7ig5qZSHhIFZVMbNmcyTnXgPd+xFfZkbPiN00sYv/rBmzhBjM07X/r89bUkmft+9BGnOG8=",
+      "category": "<HwcnCommentTextCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C2"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E2"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F2"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    },
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcKQUf2R2ZEv0KS29SG0VEodZ6D3PUYSVPldRTUi550E6XgsMtMW6dVd0koxFLOGkUcbRzaKcUYu93lHhhoVDloW5lbgEgw2dtk1xKBCM9sx3NUJ/493X7MNc4QhrVyInUzh2jGo8vzZfTXNoxGHPbaWHJ95y4pTbofeyQKS5UorWE0jHEErGr/hirNFNYVsftsE+Amwmyn0L0UjtMAsjg1g=",
+      "category": "<BlockCommentCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C3"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E3"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F3"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    },
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcKQUf2R2ZEv0KS29SG0VEodZ6D3PUYSVPldRTUi550E6XgsMtMW6dVd0koxFLOGkUcbRzaKcUYu93lHhhoVDloW5lbgEgw2dtk1xKBCM9sx3NUJ/493X7MNc4QhrVyInUzh2jGo8vzZfTXNoxGHPbaWHJ95y4pTbofeyQKS5UorWGJ0AB+pNY01j8s1cHm0jex7v9kY5a16MvDIT1L7EBwU=",
+      "category": "<BlockCommentCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C4"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E4"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F4"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    },
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcKQUf2R2ZEv0KS29SG0VEoe9buPg5k5CpGlPPW0CyM/OKeF++d0U/ZQdPiVeseLgoTijsAYthP8qLfoaIUru4kgiNcsqqv09xG8zGTabujMrWgKjj9hlfyLh20d6NAasHw==",
+      "category": "<BlockCommentCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C5"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E5"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F5"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    },
+    {
+      "nativeKey": "zMKSD2+5TJH/jvYwF4VcdOHRmI/cTuIMHVev+N9yvnuNvTeMTZob9rjxIHLNAzjMZWhiZZXDcqHkQh2B4J23Xe+wfX09wQ3cmneUuVErUlkNYFCpzdG3dTmP4pEHDsnGYSDYc2YE+5C7hCkWCX1vcKQUf2R2ZEv0KS29SG0VEoe9buPg5k5CpGlPPW0CyM/OPTvaV3hxXbl2rffUvmCQEZDp/f93IA7ZIOTISg88Bf7qx2vOjXdXosyK3EEX/rbOxyRX++mHBjdSCjfcQE0ORA==",
+      "category": "<BlockCommentCategoryData>",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "C6"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "E6"
+      },
+      "targets": [
+        {
+          "culture": "en-GB",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "F6"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "unknown"
+    }
+  ],
+  "allowSharedStringToInline": false
+}

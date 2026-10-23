@@ -1,0 +1,48 @@
+# .NET build outputs and local SDK/package caches
+**/bin/
+**/obj/
+.dotnet/
+.packages/
+artifacts/
+
+# Generated reports, screenshots and scratch files
+/.tmp/
+/output/
+
+# Local editor state
+*.user
+*.suo
+.vs/
+
+# Python environments and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local secrets and machine-specific configuration; commit sanitized examples only
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.local.json
+*.local.yaml
+*.local.yml
+*.local.config
+/secrets/
+*.pfx
+*.p12
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

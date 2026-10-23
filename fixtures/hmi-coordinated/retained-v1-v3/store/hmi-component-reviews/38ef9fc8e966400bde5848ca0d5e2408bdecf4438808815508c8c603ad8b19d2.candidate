@@ -1,0 +1,17 @@
+#Version: 2.0
+TextLibraries:
+  "StateLibrary":
+    Type: Text
+    Languages:
+      - "en-US"
+      - "de-DE"
+    DefaultLanguage: "en-US"
+    Entries:
+      "Idle":
+        Text:
+          - "Idle"
+          - "Idle Deutsch"
+      "Running":
+        Text:
+          - "Running"
+          - "Running Deutsch"

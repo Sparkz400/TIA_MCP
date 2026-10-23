@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/testsuite-supplied-results.v1.schema.json",
+  "title": "Supplied Test Suite results; structural validation is not source authenticity or native qualification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "plan",
+    "results",
+    "scope"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "testsuite-supplied-results.v1"
+    },
+    "plan": {
+      "$ref": "testsuite-run.v1.schema.json"
+    },
+    "results": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "definitionId",
+          "definitionReference",
+          "state",
+          "errorCount",
+          "warningCount",
+          "messages",
+          "dispatched",
+          "collectionComplete",
+          "scopeVerified"
+        ],
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "definitionReference": {
+            "$ref": "engineering-object-reference.v1.schema.json"
+          },
+          "state": {
+            "enum": [
+              "Success",
+              "Information",
+              "Warning",
+              "Error",
+              "Unknown"
+            ]
+          },
+          "errorCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "warningCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "messages": {
+            "type": "array",
+            "maxItems": 100000,
+            "items": {
+              "$ref": "#/$defs/message"
+            }
+          },
+          "dispatched": {
+            "type": "boolean"
+          },
+          "collectionComplete": {
+            "type": "boolean"
+          },
+          "scopeVerified": {
+            "type": "boolean"
+          },
+          "failureKind": {
+            "enum": [
+              null,
+              "assertion",
+              "native",
+              "unknown"
+            ]
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "definitionId",
+          "definitionReference",
+          "effectiveScope",
+          "ignoredScope",
+          "observationComplete"
+        ],
+        "properties": {
+          "definitionId": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "definitionReference": {
+            "$ref": "engineering-object-reference.v1.schema.json"
+          },
+          "effectiveScope": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "$ref": "engineering-object-reference.v1.schema.json"
+            }
+          },
+          "ignoredScope": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "$ref": "engineering-object-reference.v1.schema.json"
+            }
+          },
+          "observationComplete": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "description",
+        "path",
+        "nativeTimestamp",
+        "nativeTimestampKind",
+        "errorCount",
+        "warningCount",
+        "messages"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "Success",
+            "Information",
+            "Warning",
+            "Error",
+            "Unknown"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 8192
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 8192
+        },
+        "nativeTimestamp": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "nativeTimestampKind": {
+          "enum": [
+            "Unknown",
+            "Utc",
+            "Local",
+            "Unspecified"
+          ]
+        },
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "messages": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {
+            "$ref": "#/$defs/message"
+          }
+        }
+      }
+    }
+  }
+}

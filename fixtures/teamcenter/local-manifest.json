@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "teamcenter-local-manifest.v1",
+  "rootPath": "D:/declared-cache/project",
+  "coverage": "partial",
+  "diagnostic": "Supplied file declarations; not native cache proof.",
+  "files": [
+    {
+      "path": "Project.ap21",
+      "bytes": 3,
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "path": "Metadata/Über.xml",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

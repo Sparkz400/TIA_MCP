@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:opcua-consumers:v2",
+  "type": "object",
+  "required": ["schemaVersion", "modelSetSha256", "consumers"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": "opcua-consumers.v2"},
+    "modelSetSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "consumers": {
+      "type": "array", "maxItems": 1000,
+      "items": {
+        "type": "object", "required": ["id", "nodeKeys"], "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 256},
+          "nodeKeys": {"type": "array", "maxItems": 20000, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  },
+  "$comment": "Also enforce 1 MiB total, 20000 aggregate node keys, unique consumer IDs, and unique resolution of each key in the before set. Bind modelSetSha256 from the dependencies report. It hashes UTF-8: opcua-model-set.v1 followed by LF, sorted lowercase artifact SHA-256 hashes (duplicates retained), one LF after each hash. Source IDs and argument order are excluded. v1 remains the single-file direct-consumer contract."
+}

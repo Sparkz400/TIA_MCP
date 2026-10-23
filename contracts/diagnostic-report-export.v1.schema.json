@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-report-export.v1.schema.json",
+  "title": "Retained diagnostic report presentation export",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "artifact",
+    "sourceReportId",
+    "sourceSchemaVersion",
+    "sourceArtifact",
+    "format",
+    "mediaType",
+    "nativeQualification",
+    "sourceAuthenticityVerified",
+    "analysisRecomputed",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-report-export.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifact": {
+      "$ref": "#/$defs/artifact"
+    },
+    "sourceReportId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceSchemaVersion": {
+      "enum": [
+        "diagnostic-report.v1",
+        "trace-comparison.v1",
+        "runtime-capture-analysis.v1"
+      ]
+    },
+    "sourceArtifact": {
+      "$ref": "#/$defs/artifact"
+    },
+    "format": {
+      "enum": [
+        "json",
+        "markdown",
+        "html"
+      ]
+    },
+    "mediaType": {
+      "enum": [
+        "application/json",
+        "text/markdown",
+        "text/html"
+      ]
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "analysisRecomputed": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8388608
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "json"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "markdown"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "text/markdown"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "html"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mediaType": {
+            "const": "text/html"
+          }
+        }
+      }
+    }
+  ]
+}

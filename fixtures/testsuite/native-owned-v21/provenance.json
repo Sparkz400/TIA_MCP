@@ -1,0 +1,1074 @@
+{
+  "schemaVersion": 1,
+  "origin": "Genuine public V21 SaveToFile exports collected in separately owned offline scratch projects on 2026-10-15.",
+  "artifactPathsRelativeTo": ".",
+  "rawReceiptPaths": "Original native receipts retain their original machine paths and bytes; this manifest uses relative artifact links.",
+  "notRedistributed": {
+    "reason": "Siemens-copyrighted help pages and manual page; their rows keep the original hashes, but the files are not stored in this repository. Reproduce them from the installed TIA Portal V21 Test Suite help (TestSuiteOLH_enUS) or the Test Suite Function Manual A5E50009374-AA, page 26.",
+    "paths": [
+      "inputs/132400841739.htm",
+      "inputs/154277293323.htm",
+      "inputs/vendor-help-style-setscope.htm",
+      "inputs/vendor-v17-page-26.png",
+      "evidence/ts02/run-style-group-availability-01/source-vendor-help-style-setscope.htm"
+    ]
+  },
+  "definitions": [
+    {
+      "family": "style",
+      "name": "TiaMcp_CasingAvailability",
+      "nativeType": "Siemens.Engineering.TestSuite.StyleGuide.RuleSet",
+      "origin": "nativeSaveToFileAfterStrictLoadFromFile",
+      "artifact": {
+        "path": "definitions/style.xml",
+        "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+        "bytes": 1061
+      },
+      "importSource": {
+        "path": "evidence/ts02/style-import-01/import-source.xml",
+        "sha256": "6efa838d4ef83445a8fe39291afff508cade5f93ce37c1b9856f9f6e9f44c05e",
+        "bytes": 985
+      },
+      "receipt": {
+        "path": "evidence/ts02/style-import-01/result.json",
+        "sha256": "38143b079e1b10997062da80f9d80d8e02b5132755de3531b5545c81f79a6ea5",
+        "bytes": 2621
+      },
+      "nativeOptions": {
+        "importOptions": "None",
+        "familyLoadOptions": "None"
+      },
+      "scopeComplete": false,
+      "effectsReviewedForExecution": false,
+      "nativeExecutionAuthorized": false
+    },
+    {
+      "family": "application",
+      "name": "TiaMcp_ScratchSingleStep",
+      "nativeType": "Siemens.Engineering.TestSuite.ApplicationTest.TestCase",
+      "origin": "nativeSaveToFileAfterStrictLoadFromFile",
+      "artifact": {
+        "path": "definitions/application.tat",
+        "sha256": "e5024900e6eddda8bffa40fda3ea1c005ad1f156d4ace9c985b5dac05697ca8d",
+        "bytes": 418
+      },
+      "importSource": {
+        "path": "evidence/ts02/application-import-01/import-source.tat",
+        "sha256": "e840175e8b0e1a9766e60ccbf9c612bdffb77fd42d4242d7f044ced9c7f100aa",
+        "bytes": 325
+      },
+      "receipt": {
+        "path": "evidence/ts02/application-import-01/result.json",
+        "sha256": "431d1058c32e32ac986cc1c3f79e813f52a0b1b39668592069e1ea51d9cedf07",
+        "bytes": 2815
+      },
+      "nativeOptions": {
+        "importOptions": "None",
+        "familyLoadOptions": "None"
+      },
+      "scopeComplete": false,
+      "effectsReviewedForExecution": false,
+      "nativeExecutionAuthorized": false
+    },
+    {
+      "family": "system",
+      "name": "SingleStep",
+      "nativeType": "Siemens.Engineering.TestSuite.SystemTest.SystemTestCase",
+      "origin": "nativeSaveToFileAfterStrictLoadFromFile",
+      "artifact": {
+        "path": "definitions/system.tst",
+        "sha256": "fba99160b6e881c3561c2175f46395aad51613873eb6e0cfa2ff93a6a0210276",
+        "bytes": 522
+      },
+      "importSource": {
+        "path": "evidence/ts02/system-import-01/import-source.tst",
+        "sha256": "7c139e29b965e7769e32b8cf14be55b2f0ef6f4a83febd1ca78cb10e0c77bcee",
+        "bytes": 625
+      },
+      "receipt": {
+        "path": "evidence/ts02/system-import-01/result.json",
+        "sha256": "8e61767a216e851e87a08bf625432a1e6a706b8dde6a5261e4929548c22364ca",
+        "bytes": 2975
+      },
+      "nativeOptions": {
+        "importOptions": "None",
+        "familyLoadOptions": "None"
+      },
+      "scopeComplete": false,
+      "effectsReviewedForExecution": false,
+      "nativeExecutionAuthorized": false
+    }
+  ],
+  "inputs": [
+    {
+      "origin": "authoredUsingPublishedVendorSchema",
+      "artifact": {
+        "path": "inputs/style-casing-import-source.xml",
+        "sha256": "6efa838d4ef83445a8fe39291afff508cade5f93ce37c1b9856f9f6e9f44c05e",
+        "bytes": 985
+      }
+    },
+    {
+      "origin": "authoredUsingVendorGrammarAndOwnedScratchFixture",
+      "artifact": {
+        "path": "inputs/scratch-import-source.tat",
+        "sha256": "e840175e8b0e1a9766e60ccbf9c612bdffb77fd42d4242d7f044ced9c7f100aa",
+        "bytes": 325
+      }
+    },
+    {
+      "origin": "unchangedVendorDocumentationExampleRejectedForAbsentPLC1",
+      "artifact": {
+        "path": "inputs/vendor-help-example.tat",
+        "sha256": "0bc07b712b823aff72af28afc8150c7342f67661eb5fcdfea21577e884d105a9",
+        "bytes": 352
+      }
+    },
+    {
+      "origin": "unchangedVendorDocumentationExampleImportedWithoutExecution",
+      "artifact": {
+        "path": "inputs/vendor-help-example.tst",
+        "sha256": "7c139e29b965e7769e32b8cf14be55b2f0ef6f4a83febd1ca78cb10e0c77bcee",
+        "bytes": 625
+      }
+    },
+    {
+      "origin": "installedV21ApplicationExampleSourcePage",
+      "artifact": {
+        "path": "inputs/132400841739.htm",
+        "sha256": "4c93a0070425fd75ad28f497c8fbcf7cb985cf8d2a9485d656bf1741aa00c98c",
+        "bytes": 10800
+      }
+    },
+    {
+      "origin": "installedV21SystemExampleSourcePage",
+      "artifact": {
+        "path": "inputs/154277293323.htm",
+        "sha256": "d38c29c83a269c831e18b32ac50ade00911e79d4a04bfc19636501b6710f04e7",
+        "bytes": 10545
+      }
+    },
+    {
+      "origin": "installedV21SupportedStyleScopeSourcePage",
+      "artifact": {
+        "path": "inputs/vendor-help-style-setscope.htm",
+        "sha256": "24d26256aa7d9aaa6c2b38c5e168fcc6fcfdc4627677115db6e9f4df02f3f82f",
+        "bytes": 28867
+      }
+    },
+    {
+      "origin": "renderedPublishedVendorStyleSchemaExample",
+      "artifact": {
+        "path": "inputs/vendor-v17-page-26.png",
+        "sha256": "fbb17be4a787db0a80294374b6a912f47703033c1e3ced08ae340d1e8f195f44",
+        "bytes": 266016
+      }
+    }
+  ],
+  "observations": [
+    {
+      "id": "ts01/after-failed-import-inspect-01",
+      "receipt": {
+        "path": "evidence/ts01/after-failed-import-inspect-01/result.json",
+        "sha256": "3421f14ea280401a5f346f298c10d6a79ca87ebd335cdb25ccf276c4b08fb8bb",
+        "bytes": 2109
+      },
+      "mode": "inspect",
+      "licenseAvailability": "unknown",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": true,
+      "afterModified": true
+    },
+    {
+      "id": "ts01/application-import-01",
+      "receipt": {
+        "path": "evidence/ts01/application-import-01/result.json",
+        "sha256": "356af098c419696ae31f3791367bc433124b57ebd9bf7ce46dec5d022408e8da",
+        "bytes": 2691
+      },
+      "mode": "definition-import",
+      "licenseAvailability": "unknown",
+      "executionAvailability": "notAttempted",
+      "operationFailure": {
+        "type": "Siemens.Engineering.EngineeringTargetInvocationException",
+        "message": "Error when calling method 'LoadFromFile' of type 'Siemens.Engineering.TestSuite.ApplicationTest.TestCaseComposition'.\r\n\r\nThe TIA project does not contains the 'Scope' mentioned",
+        "inner": null,
+        "automaticReplay": false
+      },
+      "beforeModified": false,
+      "afterModified": true
+    },
+    {
+      "id": "ts01/inspect-scope-01",
+      "receipt": {
+        "path": "evidence/ts01/inspect-scope-01/result.json",
+        "sha256": "14daa3fded26e01460f4d11c87771e397764e28df82e7028237b47a8ab88cab6",
+        "bytes": 2895
+      },
+      "mode": "inspect-scope",
+      "licenseAvailability": "unknown",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts01/run-style-availability-01",
+      "receipt": {
+        "path": "evidence/ts01/run-style-availability-01/result.json",
+        "sha256": "d7107df2bfce05708f224d8c720f1d883133e97b79b17adc5f15a482a92fa657",
+        "bytes": 4363
+      },
+      "mode": "run-style-availability",
+      "licenseAvailability": "unknown",
+      "executionAvailability": "notAttempted",
+      "operationFailure": {
+        "type": "Siemens.Engineering.EngineeringTargetInvocationException",
+        "message": "Error when calling method 'SetScope' of type 'Siemens.Engineering.TestSuite.StyleGuide.RuleSet'.\r\n\r\nMentioned objects are not supported by Style guide",
+        "inner": null,
+        "automaticReplay": false
+      },
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts01/style-import-01",
+      "receipt": {
+        "path": "evidence/ts01/style-import-01/result.json",
+        "sha256": "9c103b326568c9e14f8922d6a52acc37ede2089a8140c62ccb1099132c83d420",
+        "bytes": 2621
+      },
+      "mode": "definition-import",
+      "licenseAvailability": "operationCompletedWithoutLicenseException",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts02/application-import-01",
+      "receipt": {
+        "path": "evidence/ts02/application-import-01/result.json",
+        "sha256": "431d1058c32e32ac986cc1c3f79e813f52a0b1b39668592069e1ea51d9cedf07",
+        "bytes": 2815
+      },
+      "mode": "definition-import",
+      "licenseAvailability": "operationCompletedWithoutLicenseException",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts02/final-inspect-01",
+      "receipt": {
+        "path": "evidence/ts02/final-inspect-01/result.json",
+        "sha256": "9767922de54bde1e52bb0077706f45f3ac56c189f0d1f169a0878966c5618fb8",
+        "bytes": 2463
+      },
+      "mode": "inspect",
+      "licenseAvailability": "unknown",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts02/run-style-group-availability-01",
+      "receipt": {
+        "path": "evidence/ts02/run-style-group-availability-01/result.json",
+        "sha256": "bcda503ce82ce26461b0428ac2f7ee62f6493cb74836b6490c0a157406ae82c2",
+        "bytes": 5620
+      },
+      "mode": "run-style-group-availability",
+      "licenseAvailability": "acceptedForObservedStyleExecution",
+      "executionAvailability": "styleCallReturned",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts02/style-import-01",
+      "receipt": {
+        "path": "evidence/ts02/style-import-01/result.json",
+        "sha256": "38143b079e1b10997062da80f9d80d8e02b5132755de3531b5545c81f79a6ea5",
+        "bytes": 2621
+      },
+      "mode": "definition-import",
+      "licenseAvailability": "operationCompletedWithoutLicenseException",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    },
+    {
+      "id": "ts02/system-import-01",
+      "receipt": {
+        "path": "evidence/ts02/system-import-01/result.json",
+        "sha256": "8e61767a216e851e87a08bf625432a1e6a706b8dde6a5261e4929548c22364ca",
+        "bytes": 2975
+      },
+      "mode": "definition-import",
+      "licenseAvailability": "operationCompletedWithoutLicenseException",
+      "executionAvailability": "notAttempted",
+      "operationFailure": null,
+      "beforeModified": false,
+      "afterModified": false
+    }
+  ],
+  "styleAvailability": {
+    "receipt": {
+      "path": "evidence/ts02/run-style-group-availability-01/result.json",
+      "sha256": "bcda503ce82ce26461b0428ac2f7ee62f6493cb74836b6490c0a157406ae82c2",
+      "bytes": 5620
+    },
+    "rawResults": {
+      "path": "evidence/ts02/run-style-group-availability-01/native-results.json",
+      "sha256": "93213e67b6baff6862d5876a85b1a96519f40e42711d1b658fcdeb9b7e09605a",
+      "bytes": 3557
+    },
+    "scopeRequest": "SetScope Override of owned ScratchPLC.BlockGroup (PlcBlockSystemGroup)",
+    "setScopeReturned": true,
+    "executorReturned": true,
+    "license": "acceptedForThisObservedStyleExecution",
+    "effectiveScope": "unverified",
+    "nativeState": "Error",
+    "nativeErrorCount": 3,
+    "nativeWarningCount": 0,
+    "observedViolatingPaths": [
+      "ScratchPLC - Main",
+      "ScratchPLC - TiaMcp_IsEnabled",
+      "ScratchPLC - TiaMcp_EnableGate"
+    ],
+    "violationInterpretation": "Consistent with the authored non-camel-case fixture expectation; not a complete scope/pass claim.",
+    "definitionUnchanged": true,
+    "targetBlockRawBytesUnchanged": false,
+    "targetBlockDifference": "Only Document/DocumentInfo/Created differs; independently compared full retained byte sequences after masking that one element.",
+    "noOtherPeerPreservationClaim": true
+  },
+  "roundTripObservations": {
+    "application": "Native export adds empty PLCSIM_INSTANCE_NAME and TEST_EXECUTION_MODE SystemManagedPlcSimAdvInstance. Definition only; no execution.",
+    "system": "Native export clears source FOLDER_PATH D:\\Simatic to empty and retains SELECTED_SERVER_INTERFACE Standard_SIMATIC. Endpoint address remains sample text; no connection or execution."
+  },
+  "limits": [
+    "Availability is bound to this observed instance and operation; neither general license validity nor future-run authorization is established.",
+    "Application and system import/export succeeded, but their execution/license requirements remain untested.",
+    "Application test-set definitions and fresh-reopen/recovery qualification remain outstanding.",
+    "Checkpoint archives and executable dependencies remain in the original native evidence roots; all referenced hashes were audited before packaging.",
+    "System FOLDER_PATH was cleared from D:\\Simatic to empty; this native round trip is not preserving."
+  ],
+  "nativeCallsByPackagingScript": false,
+  "nativeExecutionAuthorized": false,
+  "effectiveScopeVerified": false,
+  "qualification": false,
+  "testsPassed": false,
+  "sourceArtifactReferencesVerified": 34,
+  "files": [
+    {
+      "path": "definitions/application.tat",
+      "sha256": "e5024900e6eddda8bffa40fda3ea1c005ad1f156d4ace9c985b5dac05697ca8d",
+      "bytes": 418
+    },
+    {
+      "path": "definitions/style.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "definitions/system.tst",
+      "sha256": "fba99160b6e881c3561c2175f46395aad51613873eb6e0cfa2ff93a6a0210276",
+      "bytes": 522
+    },
+    {
+      "path": "evidence/final-cleanup-01.json",
+      "sha256": "cd5c238768862eaa6940c27540dfe14cb29371fd93d9f6c96384462ff9848b1e",
+      "bytes": 1054
+    },
+    {
+      "path": "evidence/ts01/after-failed-import-inspect-01/admission.json",
+      "sha256": "d6b126730011db32b9ecd9d77aa9699163ed3a5bbb39233601988c10ce7c8d1a",
+      "bytes": 1018
+    },
+    {
+      "path": "evidence/ts01/after-failed-import-inspect-01/result.json",
+      "sha256": "3421f14ea280401a5f346f298c10d6a79ca87ebd335cdb25ccf276c4b08fb8bb",
+      "bytes": 2109
+    },
+    {
+      "path": "evidence/ts01/after-failed-import-inspect-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts01/after-failed-import-inspect-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts01/after-failed-import-inspect-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts01/application-import-01/admission.json",
+      "sha256": "67022faa6cbc469032608bf92261181dd4802e04162ebfac08c414cbb20a5795",
+      "bytes": 1330
+    },
+    {
+      "path": "evidence/ts01/application-import-01/checkpoint-intent.json",
+      "sha256": "ef3347f18ac3d8ef3f2e50abb3436a292a42349291374a0fb0395af15bf7477d",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts01/application-import-01/checkpoint.json",
+      "sha256": "086b9e374ce7e9c96f751f13fd1f586a47d74d360192cc1c94b171fb681c60b3",
+      "bytes": 2237
+    },
+    {
+      "path": "evidence/ts01/application-import-01/dispatch-intent.json",
+      "sha256": "d6493a5c030847efb2dff361732f99ca8d84923ac959cd43450774580b918338",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/ts01/application-import-01/import-source.tat",
+      "sha256": "0bc07b712b823aff72af28afc8150c7342f67661eb5fcdfea21577e884d105a9",
+      "bytes": 352
+    },
+    {
+      "path": "evidence/ts01/application-import-01/result.json",
+      "sha256": "356af098c419696ae31f3791367bc433124b57ebd9bf7ce46dec5d022408e8da",
+      "bytes": 2691
+    },
+    {
+      "path": "evidence/ts01/application-import-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts01/application-import-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts01/application-import-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/admission.json",
+      "sha256": "af9d9f787e44d4d277cbdc8021deb7550170601191adc397a71f6551fdbfc60b",
+      "bytes": 1399
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/before.json",
+      "sha256": "923450af06425cc470e2d4cd437d203f0fa3a75d196e6f2b23e8d9a4b78e4ccf",
+      "bytes": 2766
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/definition-before.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/result.json",
+      "sha256": "14daa3fded26e01460f4d11c87771e397764e28df82e7028237b47a8ab88cab6",
+      "bytes": 2895
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/source-Program.cs",
+      "sha256": "8bdf0d6cf1bdab97b721d95a26f7bffcd4c8c2b90d57589da848aa4218be5ad3",
+      "bytes": 18088
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/source-TestSuiteStyleScopeEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c",
+      "bytes": 991
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/target-block-before.xml",
+      "sha256": "d789bd1a0c602634f598da960d7f31e1856e9fc26c5c0a9668e412fffed1ba65",
+      "bytes": 5835
+    },
+    {
+      "path": "evidence/ts01/inspect-scope-01/TestSuiteStyleScopeEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/admission.json",
+      "sha256": "ef774b9cdeb034aaf6e0595d29dbf5ad61f576f27cbc57930a1e17332fe46124",
+      "bytes": 1774
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/before.json",
+      "sha256": "7601770d9ff28e40d19b8b45e7428bc74773854cbc0347b09046ccf3244b5fc7",
+      "bytes": 3623
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/checkpoint-intent.json",
+      "sha256": "d862a2866e0dcfe55aab57b7e4693c3fc6005b859c90bb3845cddca325835e5d",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/checkpoint.json",
+      "sha256": "d094c52c4949345822b91370fc05693510d7ce00047b9933569d45df94c36975",
+      "bytes": 3847
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/definition-before-binding.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/definition-before.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/ownership-receipt.json",
+      "sha256": "1da261ba60f638487fb04c31a38359652ed57bd59ba6ae691278944fb42d254a",
+      "bytes": 5924
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/result.json",
+      "sha256": "d7107df2bfce05708f224d8c720f1d883133e97b79b17adc5f15a482a92fa657",
+      "bytes": 4363
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/scope-binding-intent.json",
+      "sha256": "05f2565d1b709fb6c48c607cadc1640bd8b3b7074f248c68549ac0854fc4e746",
+      "bytes": 537
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/source-Program.cs",
+      "sha256": "1472d38e5e9a1106709590fb6ee39d36cb6e71c5418b3f98d8429ddd1e493495",
+      "bytes": 22168
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/source-TestSuiteStyleAvailabilityEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c",
+      "bytes": 991
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/target-block-before.xml",
+      "sha256": "527e631e21cb9ba402bd72a0dfa7dc4a7a0cae29ad90a8297827c26dfb5c3612",
+      "bytes": 5835
+    },
+    {
+      "path": "evidence/ts01/run-style-availability-01/TestSuiteStyleAvailabilityEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts01/session/admission.json",
+      "sha256": "6afffbeb365df9839e6b104eedaa369c1e969859a927edffc6e77be0a459dfaf",
+      "bytes": 445
+    },
+    {
+      "path": "evidence/ts01/session/after-failure-inspect-admission.json",
+      "sha256": "bb38e51404d7a3c9ddbce0e2ed1c26ccdab33e8bc3819e3eb419f4e47629c702",
+      "bytes": 1020
+    },
+    {
+      "path": "evidence/ts01/session/application-import-admission.json",
+      "sha256": "15083cc9aa5aaab414d7f1037ebc78c14d97de36945fcb83072e87719ef3a1c0",
+      "bytes": 1332
+    },
+    {
+      "path": "evidence/ts01/session/ready-for-probes.json",
+      "sha256": "2278177364517c40feae294a5d0b7a21db7e261ce9a6eb4045ee4dbd4eaea2a2",
+      "bytes": 178
+    },
+    {
+      "path": "evidence/ts01/session/result.json",
+      "sha256": "d0fb8cd9f61f3b4f42c88c2e49d51e24dc83795c8825fe4542c44b72609dc864",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/ts01/session/scope-inspect-admission.json",
+      "sha256": "f529b0e2d8810dca619e6303d1dd6a7eb330d55d955876497be0e0aa055ddc17",
+      "bytes": 1401
+    },
+    {
+      "path": "evidence/ts01/session/step-detach-612e0.json",
+      "sha256": "af6d69c70628bdf5bbf7a0620eff1c62d54f0972a6b7d6e1a796ee3ce2d44c38",
+      "bytes": 4634
+    },
+    {
+      "path": "evidence/ts01/session/step-scratch_create-e566b.json",
+      "sha256": "1da261ba60f638487fb04c31a38359652ed57bd59ba6ae691278944fb42d254a",
+      "bytes": 5924
+    },
+    {
+      "path": "evidence/ts01/session/step-session_status-f5a1c.json",
+      "sha256": "b349c6aaed1843c5e107cefbd5c28eadbb626c0e0e5d0f93c9d1af003e8befae",
+      "bytes": 4876
+    },
+    {
+      "path": "evidence/ts01/session/step-start-feeb9.json",
+      "sha256": "d59faf5a5f9d0b5a6e5c666bef1d0e3ac6d9f4d6419c7e9e4651cd0d8a9a8046",
+      "bytes": 4675
+    },
+    {
+      "path": "evidence/ts01/session/style-availability-admission.json",
+      "sha256": "fc915f31b9e0474a9a125a9f23c2b2c9fc7d2fb313245fefc198e6f8ee4ce634",
+      "bytes": 1776
+    },
+    {
+      "path": "evidence/ts01/session/style-import-admission.json",
+      "sha256": "e6466ce9a3b43aa5e883568c01ad7adf997a2f35607cc03376d956b9e16693f7",
+      "bytes": 1327
+    },
+    {
+      "path": "evidence/ts01/style-import-01/admission.json",
+      "sha256": "ab2b283d348b343054ca51eb0a15287b9fe9236e2e8daee4653910883dd70025",
+      "bytes": 1325
+    },
+    {
+      "path": "evidence/ts01/style-import-01/checkpoint-intent.json",
+      "sha256": "86ab09225993974a275e78579cc439c7a9e0773ab55112373ac57592ee54c1ff",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts01/style-import-01/checkpoint.json",
+      "sha256": "b0c64015e985d65f497069b8d8c1f809021530b4bdd59be9e9291a1670ec9fe7",
+      "bytes": 2053
+    },
+    {
+      "path": "evidence/ts01/style-import-01/dispatch-intent.json",
+      "sha256": "eff8262f986d8b500d5bec1493ab53fa4738ba8f92c492310670ac4699c12ef9",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/ts01/style-import-01/import-source.xml",
+      "sha256": "6efa838d4ef83445a8fe39291afff508cade5f93ce37c1b9856f9f6e9f44c05e",
+      "bytes": 985
+    },
+    {
+      "path": "evidence/ts01/style-import-01/native-definition-1.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts01/style-import-01/result.json",
+      "sha256": "9c103b326568c9e14f8922d6a52acc37ede2089a8140c62ccb1099132c83d420",
+      "bytes": 2621
+    },
+    {
+      "path": "evidence/ts01/style-import-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts01/style-import-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts01/style-import-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts02/application-import-01/admission.json",
+      "sha256": "37201294ae270d6a3b3157b128174a1570e77ef8ecd5288fa6e66893f845cf40",
+      "bytes": 1332
+    },
+    {
+      "path": "evidence/ts02/application-import-01/checkpoint-intent.json",
+      "sha256": "1e261dabd673b3c6e6fab54958b05fd6fc193c3f2d55b1a11efd00e383169d99",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts02/application-import-01/checkpoint.json",
+      "sha256": "9d7d4b449b1e2aa9f2d38bea15bc781a5d664ed154b07b6266e2c5b7d466a0bb",
+      "bytes": 2237
+    },
+    {
+      "path": "evidence/ts02/application-import-01/dispatch-intent.json",
+      "sha256": "3929be8bd0f5c0482969647a9320f82f56f98613473ae51be99c0fa4d949139c",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/ts02/application-import-01/import-source.tat",
+      "sha256": "e840175e8b0e1a9766e60ccbf9c612bdffb77fd42d4242d7f044ced9c7f100aa",
+      "bytes": 325
+    },
+    {
+      "path": "evidence/ts02/application-import-01/native-definition-1.tat",
+      "sha256": "e5024900e6eddda8bffa40fda3ea1c005ad1f156d4ace9c985b5dac05697ca8d",
+      "bytes": 418
+    },
+    {
+      "path": "evidence/ts02/application-import-01/result.json",
+      "sha256": "431d1058c32e32ac986cc1c3f79e813f52a0b1b39668592069e1ea51d9cedf07",
+      "bytes": 2815
+    },
+    {
+      "path": "evidence/ts02/application-import-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts02/application-import-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts02/application-import-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts02/final-inspect-01/admission.json",
+      "sha256": "95a5b06c2095a04962868ba6d52d7c258a606583e636b6e590466fc916a18230",
+      "bytes": 1004
+    },
+    {
+      "path": "evidence/ts02/final-inspect-01/result.json",
+      "sha256": "9767922de54bde1e52bb0077706f45f3ac56c189f0d1f169a0878966c5618fb8",
+      "bytes": 2463
+    },
+    {
+      "path": "evidence/ts02/final-inspect-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts02/final-inspect-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts02/final-inspect-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/admission.json",
+      "sha256": "ebce2f30d14d46c7217168281e1300f3e12e083cf68ad2c9c80336ee4855ca72",
+      "bytes": 2354
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/before.json",
+      "sha256": "78841d6fd805b67d06be25b1e37578710870a008ea81993cc39b5da7caa2bd52",
+      "bytes": 3757
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/checkpoint-intent.json",
+      "sha256": "521562fd9601058c10f72bae861ca42b2524425d0b42841224637e21b72ac966",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/checkpoint.json",
+      "sha256": "d4d4f72aaf240a43d2335f91aa197a6507ad2c4249fe79b03ef6dfae9272a818",
+      "bytes": 3987
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/definition-after.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/definition-before-binding.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/definition-before-execution.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/definition-before.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/execution-intent.json",
+      "sha256": "b420071c2bb511fa41d21f08ee4a4733a1808d7eb17cf692d982c161498bfa9d",
+      "bytes": 867
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/execution-return.json",
+      "sha256": "55a680e5d3d0ff47687d2c331fc52a8b4f321cfd887467bce609c0302de6c2a4",
+      "bytes": 158
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/native-results.json",
+      "sha256": "93213e67b6baff6862d5876a85b1a96519f40e42711d1b658fcdeb9b7e09605a",
+      "bytes": 3557
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/ownership-receipt.json",
+      "sha256": "3d8e8889480a97f1c149398f286033303074172e0ad85a6425d82a6184c2b8fa",
+      "bytes": 5924
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/result.json",
+      "sha256": "bcda503ce82ce26461b0428ac2f7ee62f6493cb74836b6490c0a157406ae82c2",
+      "bytes": 5620
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/scope-binding-intent.json",
+      "sha256": "62186b95d8b9d55c3978e7f83f4c2f6a50c631eb26bf2d9ddfcb63436bc1a7d1",
+      "bytes": 526
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/scope-binding-return.json",
+      "sha256": "0083982d05233c84a610ba065d30a4cf3718a8d76258aafbaf7267182dcd56aa",
+      "bytes": 366
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/source-Program.cs",
+      "sha256": "4d45c2afc85a341215c3df84a7b0297d95ce7a83976099567b69f547bb6b20dc",
+      "bytes": 22642
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/source-style-group-scope-profile.provenance.json",
+      "sha256": "e97024fdc5dc59f6e69e98d228888174373860decbfff5937c1c55d197ac09f4",
+      "bytes": 1176
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/source-TestSuiteStyleGroupAvailabilityEvidence.csproj",
+      "sha256": "7d2affe7166b9e6717c8432a36479bfe59e6df249946b7f1dd9bab1319037b6c",
+      "bytes": 991
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/source-vendor-help-style-setscope.htm",
+      "sha256": "24d26256aa7d9aaa6c2b38c5e168fcc6fcfdc4627677115db6e9f4df02f3f82f",
+      "bytes": 28867
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/target-block-after.xml",
+      "sha256": "74a1f766223a6fb594433ccb4f182fbd4201967eb0d5da952bd3289bdd7398dc",
+      "bytes": 5835
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/target-block-before.xml",
+      "sha256": "5224e77bf059282414a3bf889cb32468e79746df41434b59f2939faa1ac316a8",
+      "bytes": 5835
+    },
+    {
+      "path": "evidence/ts02/run-style-group-availability-01/TestSuiteStyleGroupAvailabilityEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts02/session/admission.json",
+      "sha256": "42e40c505a17fbff688e9336222ee190218e2d74ea7902fc99d77bf8b28b1388",
+      "bytes": 445
+    },
+    {
+      "path": "evidence/ts02/session/application-import-admission.json",
+      "sha256": "3a0907470a8761d13a7f3f5eb679781647f1e0e64fae37eabea2de3fa0f77eb2",
+      "bytes": 1334
+    },
+    {
+      "path": "evidence/ts02/session/final-inspect-admission.json",
+      "sha256": "e92c6968c46701285461446c646de87d120089fe78cc7bb5974253b6d37616b3",
+      "bytes": 1006
+    },
+    {
+      "path": "evidence/ts02/session/ready-for-probes.json",
+      "sha256": "dd539d7ab7fb67c4812a9c9275ff1ed49697698ce2f8277a806b0a079f098127",
+      "bytes": 178
+    },
+    {
+      "path": "evidence/ts02/session/result.json",
+      "sha256": "834a192f0c67cf91c2d783baaef3da5548c524cbe2ea4edd864fcaa4a8158b93",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/ts02/session/step-detach-0ae09.json",
+      "sha256": "ad8dd4a2c74bd654fa00badd5445801d2d0e91044099a945f551cad24803a054",
+      "bytes": 4634
+    },
+    {
+      "path": "evidence/ts02/session/step-scratch_create-d5143.json",
+      "sha256": "3d8e8889480a97f1c149398f286033303074172e0ad85a6425d82a6184c2b8fa",
+      "bytes": 5924
+    },
+    {
+      "path": "evidence/ts02/session/step-session_status-653b0.json",
+      "sha256": "cfc7deb30b71004fd4d4348301132834cbcc17250bffdf332d130929764a67ec",
+      "bytes": 4876
+    },
+    {
+      "path": "evidence/ts02/session/step-start-fa709.json",
+      "sha256": "b6791e48c768e9a2cead11c9688298ea437da6d93a8c0773696b62f6abf99c27",
+      "bytes": 4675
+    },
+    {
+      "path": "evidence/ts02/session/style-group-availability-admission.json",
+      "sha256": "b523089d1ac426c69db6ffacf6b72f7922f3af0fc00cc61f04a5cf0c06705c91",
+      "bytes": 2356
+    },
+    {
+      "path": "evidence/ts02/session/style-import-admission.json",
+      "sha256": "7b0839e676431e52a030bf644d3ce6aaeb396c4facb36f2f62158fbf65b07700",
+      "bytes": 1327
+    },
+    {
+      "path": "evidence/ts02/session/system-import-admission.json",
+      "sha256": "190182bc738ddde71cc0329176534a2f0f8b12fd470758193af2da75aa49111e",
+      "bytes": 1322
+    },
+    {
+      "path": "evidence/ts02/style-import-01/admission.json",
+      "sha256": "6ad5f1110e3489d1fdf1c0f44a9c011aee918d4e6b2b3df9aadcae14134cfefe",
+      "bytes": 1325
+    },
+    {
+      "path": "evidence/ts02/style-import-01/checkpoint-intent.json",
+      "sha256": "ddab1e12c9846206f318b2b4bca8d1689214e3cd8b8276ddad95fe7cd25b0530",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts02/style-import-01/checkpoint.json",
+      "sha256": "a0570f8c4eb2a787f0b6caafb30d2479d5b89217a5d8a7c8f99d15f6749aff0a",
+      "bytes": 2053
+    },
+    {
+      "path": "evidence/ts02/style-import-01/dispatch-intent.json",
+      "sha256": "65d94c8548ff27e9c4c704723b84dac36783aed4487e25cc3bf5f0c2c0b69046",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/ts02/style-import-01/import-source.xml",
+      "sha256": "6efa838d4ef83445a8fe39291afff508cade5f93ce37c1b9856f9f6e9f44c05e",
+      "bytes": 985
+    },
+    {
+      "path": "evidence/ts02/style-import-01/native-definition-1.xml",
+      "sha256": "0561b772ad361a76e922351639e7a319db2c4102f9c5dc790a8c8f88768ad0b1",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/ts02/style-import-01/result.json",
+      "sha256": "38143b079e1b10997062da80f9d80d8e02b5132755de3531b5545c81f79a6ea5",
+      "bytes": 2621
+    },
+    {
+      "path": "evidence/ts02/style-import-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts02/style-import-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts02/style-import-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/ts02/system-import-01/admission.json",
+      "sha256": "fc5cab60e1d45104dbc4948b96ebe2f267083f5b87e5a37112e36239e787b75b",
+      "bytes": 1320
+    },
+    {
+      "path": "evidence/ts02/system-import-01/checkpoint-intent.json",
+      "sha256": "a146079634aad9b177a52b3ea6354f82867c01ad8d3419dca78d494e2c5c579b",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/ts02/system-import-01/checkpoint.json",
+      "sha256": "105a803c1e9880afb2a86990f617ac9348db8d0fb44f4288ea804e2cfc280306",
+      "bytes": 2415
+    },
+    {
+      "path": "evidence/ts02/system-import-01/dispatch-intent.json",
+      "sha256": "70b6518a952cb439056b4f7cb39853a5ade041afdd524174b99b636d10190c83",
+      "bytes": 108
+    },
+    {
+      "path": "evidence/ts02/system-import-01/import-source.tst",
+      "sha256": "7c139e29b965e7769e32b8cf14be55b2f0ef6f4a83febd1ca78cb10e0c77bcee",
+      "bytes": 625
+    },
+    {
+      "path": "evidence/ts02/system-import-01/native-definition-1.tst",
+      "sha256": "fba99160b6e881c3561c2175f46395aad51613873eb6e0cfa2ff93a6a0210276",
+      "bytes": 522
+    },
+    {
+      "path": "evidence/ts02/system-import-01/result.json",
+      "sha256": "8e61767a216e851e87a08bf625432a1e6a706b8dde6a5261e4929548c22364ca",
+      "bytes": 2975
+    },
+    {
+      "path": "evidence/ts02/system-import-01/source-Program.cs",
+      "sha256": "a25e393a9b145ba627e02c7d58fe5a52d5bc2c959b36a78fb6be32650e2f51bd",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/ts02/system-import-01/source-TestSuiteEvidence.csproj",
+      "sha256": "c89d642717535804f9d2ef74a0edab2ed30f09e205998202b605fdc558b29eee",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/ts02/system-import-01/TestSuiteEvidence.exe.config",
+      "sha256": "051099983b896673909e01a1f631b6652abb88da95c9f06f3efef4be033091fa",
+      "bytes": 174
+    },
+    {
+      "path": "inputs/132400841739.htm",
+      "sha256": "4c93a0070425fd75ad28f497c8fbcf7cb985cf8d2a9485d656bf1741aa00c98c",
+      "bytes": 10800
+    },
+    {
+      "path": "inputs/154277293323.htm",
+      "sha256": "d38c29c83a269c831e18b32ac50ade00911e79d4a04bfc19636501b6710f04e7",
+      "bytes": 10545
+    },
+    {
+      "path": "inputs/scratch-import-source.tat",
+      "sha256": "e840175e8b0e1a9766e60ccbf9c612bdffb77fd42d4242d7f044ced9c7f100aa",
+      "bytes": 325
+    },
+    {
+      "path": "inputs/style-casing-import-source.xml",
+      "sha256": "6efa838d4ef83445a8fe39291afff508cade5f93ce37c1b9856f9f6e9f44c05e",
+      "bytes": 985
+    },
+    {
+      "path": "inputs/vendor-help-example.tat",
+      "sha256": "0bc07b712b823aff72af28afc8150c7342f67661eb5fcdfea21577e884d105a9",
+      "bytes": 352
+    },
+    {
+      "path": "inputs/vendor-help-example.tst",
+      "sha256": "7c139e29b965e7769e32b8cf14be55b2f0ef6f4a83febd1ca78cb10e0c77bcee",
+      "bytes": 625
+    },
+    {
+      "path": "inputs/vendor-help-style-setscope.htm",
+      "sha256": "24d26256aa7d9aaa6c2b38c5e168fcc6fcfdc4627677115db6e9f4df02f3f82f",
+      "bytes": 28867
+    },
+    {
+      "path": "inputs/vendor-v17-page-26.png",
+      "sha256": "fbb17be4a787db0a80294374b6a912f47703033c1e3ced08ae340d1e8f195f44",
+      "bytes": 266016
+    },
+    {
+      "path": "README.md",
+      "sha256": "e877a33368fe8216cc096b1f8b94a9361bc2072156cff9c0a599be7fa8a02cbb",
+      "bytes": 2414
+    }
+  ],
+  "apiSha256": {
+    "Base": "8c12b0fa70c298f1cd1221105880752ab204ed63c9f6d9dcb68833d977bcb5d0",
+    "Step7": "dfbbe3863005fa2fbc8cb553a3e7e4612acbaca19124939eb8d29de24c814eba",
+    "TestSuite": "03e1b656eea82492ce3852a722d02cbc261c19c6c008035807c6e6d30c3d1fdb"
+  },
+  "cleanup": {
+    "path": "evidence/final-cleanup-01.json",
+    "sha256": "cd5c238768862eaa6940c27540dfe14cb29371fd93d9f6c96384462ff9848b1e",
+    "bytes": 1054
+  }
+}

@@ -1,0 +1,1111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/unified-text-list-author.v2.schema.json",
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      },
+      "additionalProperties": false
+    },
+    "component": {
+      "type": "object",
+      "required": [
+        "reviewId",
+        "objectPaths"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "objectPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "destination": {
+      "type": "object",
+      "required": [
+        "reviewId",
+        "hmiPath",
+        "family"
+      ],
+      "properties": {
+        "reviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "hmiPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "member": {
+      "type": "object",
+      "required": [
+        "objectPath",
+        "memberPath"
+      ],
+      "properties": {
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "memberPath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 16,
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "id",
+        "outputId",
+        "property",
+        "beforeMember",
+        "afterMember",
+        "declaredHmiType",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "property": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "beforeMember": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/member"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterMember": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/member"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "declaredHmiType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "additionalProperties": false
+    },
+    "declaration": {
+      "type": "object",
+      "required": [
+        "objectPath",
+        "memberPath",
+        "status",
+        "dataType",
+        "evidence",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192
+        },
+        "memberPath": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 16,
+          "minItems": 1
+        },
+        "status": {
+          "enum": [
+            "unavailableOrAmbiguous",
+            "capturedDeclaration"
+          ]
+        },
+        "dataType": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "bindingReview": {
+      "type": "object",
+      "required": [
+        "id",
+        "selection",
+        "beforeDeclaration",
+        "afterDeclaration",
+        "change",
+        "capturedProperty",
+        "conflicts",
+        "gaps",
+        "nativeCompatibilityVerified",
+        "runtimeStorageVerified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "selection": {
+          "$ref": "#/$defs/binding"
+        },
+        "beforeDeclaration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/declaration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterDeclaration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/declaration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "change": {
+          "enum": [
+            "added",
+            "removed",
+            "typeTextChanged",
+            "explicitMemberMapping",
+            "sameSelectedMember"
+          ]
+        },
+        "capturedProperty": {},
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 32
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 32
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        },
+        "runtimeStorageVerified": {
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "authorIntent": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-request.v1"
+        },
+        "fileBase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "textLibrary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 35,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "translations": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 32,
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 35,
+                  "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+                },
+                "additionalProperties": {
+                  "type": "string",
+                  "maxLength": 16384
+                }
+              }
+            },
+            "required": [
+              "id",
+              "translations"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 4096
+        },
+        "lists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "rangeType": {
+                "enum": [
+                  "Decimal",
+                  "BitNumber",
+                  "Bool"
+                ]
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    },
+                    "type": {
+                      "enum": [
+                        "SingleValue",
+                        "Range",
+                        "From",
+                        "To"
+                      ]
+                    },
+                    "fromValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "toValue": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": -9223372036854775808,
+                      "maximum": 9223372036854775807
+                    },
+                    "isDefault": {
+                      "type": "boolean"
+                    },
+                    "textId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "fromValue",
+                    "toValue",
+                    "isDefault",
+                    "textId"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 4096
+              }
+            },
+            "required": [
+              "name",
+              "rangeType",
+              "entries"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "fileBase",
+        "textLibrary",
+        "languages",
+        "defaultLanguage",
+        "texts",
+        "lists"
+      ],
+      "additionalProperties": false
+    },
+    "componentContext": {
+      "type": "object",
+      "properties": {
+        "reviewRecordId": {
+          "$ref": "#/$defs/hash"
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "afterComponent": {
+          "type": "object"
+        },
+        "destination": {
+          "$ref": "#/$defs/destination"
+        },
+        "binding": {
+          "$ref": "#/$defs/bindingReview"
+        },
+        "dependencyAssociationIndices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4095
+          },
+          "maxItems": 4096
+        }
+      },
+      "required": [
+        "reviewRecordId",
+        "outputId",
+        "bindingId",
+        "afterComponent",
+        "destination",
+        "binding",
+        "dependencyAssociationIndices"
+      ],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-request.v2"
+        },
+        "profile": {
+          "const": "unified-bool-binding-text-list.v1"
+        },
+        "componentReviewId": {
+          "$ref": "#/$defs/hash"
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "previousRecordId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "template": {
+          "type": "object",
+          "properties": {
+            "fileBase": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "textLibrary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "languages": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 35,
+                "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+              },
+              "minItems": 1,
+              "maxItems": 32,
+              "uniqueItems": true
+            },
+            "defaultLanguage": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 35,
+              "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+            },
+            "falseText": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 32,
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 35,
+                "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "maxLength": 16384
+              }
+            },
+            "trueText": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 32,
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 35,
+                "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "maxLength": 16384
+              }
+            }
+          },
+          "required": [
+            "fileBase",
+            "textLibrary",
+            "languages",
+            "defaultLanguage",
+            "falseText",
+            "trueText"
+          ],
+          "additionalProperties": false
+        },
+        "retainOutputIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 256,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "profile",
+        "componentReviewId",
+        "outputId",
+        "bindingId",
+        "previousRecordId",
+        "template",
+        "retainOutputIds"
+      ],
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-record.v2"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "profile": {
+          "const": "unified-bool-binding-text-list.v1"
+        },
+        "status": {
+          "enum": [
+            "candidatesReady",
+            "conflict"
+          ]
+        },
+        "previousRecordId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "componentContext": {
+          "$ref": "#/$defs/componentContext"
+        },
+        "intent": {
+          "$ref": "#/$defs/authorIntent"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 2
+        },
+        "preservedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16777216
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 8192
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 16384
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 16384
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "ownershipVerified": {
+          "const": false
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "profile",
+        "status",
+        "previousRecordId",
+        "componentContext",
+        "intent",
+        "files",
+        "preservedFiles",
+        "conflicts",
+        "gaps",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "consumerCoverageComplete",
+        "ownershipVerified",
+        "policy"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "candidatesReady"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "files": {
+                "minItems": 2
+              },
+              "conflicts": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "files": {
+                "maxItems": 0
+              },
+              "conflicts": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "unified-text-list-author-record.v2"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "profile": {
+          "const": "unified-bool-binding-text-list.v1"
+        },
+        "status": {
+          "enum": [
+            "candidatesReady",
+            "conflict"
+          ]
+        },
+        "previousRecordId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hash"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "componentContext": {
+          "$ref": "#/$defs/componentContext"
+        },
+        "intent": {
+          "$ref": "#/$defs/authorIntent"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8388608
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 2
+        },
+        "preservedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16777216
+              },
+              "artifact": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "outputId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "fileName",
+              "bytes",
+              "artifact",
+              "outputId"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 8192
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 16384
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "maxItems": 16384
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "preservationVerified": {
+          "const": false
+        },
+        "consumerCoverageComplete": {
+          "const": false
+        },
+        "ownershipVerified": {
+          "const": false
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "recordId": {
+          "$ref": "#/$defs/hash"
+        },
+        "recordArtifact": {
+          "$ref": "#/$defs/artifact"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "input",
+        "profile",
+        "status",
+        "previousRecordId",
+        "componentContext",
+        "intent",
+        "files",
+        "preservedFiles",
+        "conflicts",
+        "gaps",
+        "nativeExecutable",
+        "nativeQualified",
+        "preservationVerified",
+        "consumerCoverageComplete",
+        "ownershipVerified",
+        "policy",
+        "recordId",
+        "recordArtifact"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "candidatesReady"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "files": {
+                "minItems": 2
+              },
+              "conflicts": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "files": {
+                "maxItems": 0
+              },
+              "conflicts": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/record"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ]
+}

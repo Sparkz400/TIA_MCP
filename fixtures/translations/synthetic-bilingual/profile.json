@@ -1,0 +1,293 @@
+{
+  "id": "synthetic-bilingual.v1",
+  "kind": "synthetic",
+  "sourceCulture": "en-US",
+  "rows": [
+    {
+      "nativeKey": "K-001",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A2"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B2"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C2"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": 20
+        },
+        {
+          "culture": "fr-FR",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "D2"
+          },
+          "allowClear": false,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-002",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A3"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B3"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C3"
+          },
+          "allowClear": true,
+          "allowCreateMissing": true,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-003",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A4"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B4"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C4"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "brace-literals-v1"
+    },
+    {
+      "nativeKey": "K-004",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A5"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B5"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C5"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-005",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A6"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B6"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C6"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-006",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A7"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B7"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C7"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-007",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A8"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B8"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C8"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-008-current",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A9"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B9"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C9"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-009",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A10"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B10"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C10"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-010",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A11"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B11"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C11"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    },
+    {
+      "nativeKey": "K-011",
+      "category": "synthetic.comment",
+      "keyCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "A12"
+      },
+      "sourceCell": {
+        "part": "xl/worksheets/sheet1.xml",
+        "cell": "B12"
+      },
+      "targets": [
+        {
+          "culture": "de-DE",
+          "location": {
+            "part": "xl/worksheets/sheet1.xml",
+            "cell": "C12"
+          },
+          "allowClear": true,
+          "allowCreateMissing": false,
+          "maxUtf16Length": null
+        }
+      ],
+      "tokenGrammar": "none"
+    }
+  ],
+  "allowSharedStringToInline": true
+}

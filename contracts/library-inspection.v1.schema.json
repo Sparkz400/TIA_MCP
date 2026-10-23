@@ -1,0 +1,538 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-inspection:v1",
+  "title": "Paged native library metadata inspection observation",
+  "description": "Checks query-specific serialized rows and paging bounds. Companion validator checks counts and complementary completeness flags. Does not prove current revision, complete dependency closure across pages, complete master contents, preservation or native/runtime qualification.",
+  "type": "object",
+  "required": [
+    "origin",
+    "observedAtUtc",
+    "processId",
+    "libraryId",
+    "revision",
+    "query",
+    "items",
+    "totalCaptured",
+    "nextOffset",
+    "completeness"
+  ],
+  "properties": {
+    "origin": {
+      "type": "string"
+    },
+    "observedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "processId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "libraryId": {
+      "type": "string",
+      "pattern": "^library-[a-f0-9]{32}(?![\\s\\S])"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "query": {
+      "enum": [
+        "elements",
+        "versions",
+        "dependencies",
+        "uses"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {},
+      "maxItems": 200
+    },
+    "totalCaptured": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10001
+    },
+    "nextOffset": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "completeness": {
+      "type": "object",
+      "required": [
+        "scopeComplete",
+        "truncated",
+        "scope"
+      ],
+      "properties": {
+        "scopeComplete": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "scope": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "version": {
+      "type": "object",
+      "required": [
+        "kind",
+        "typeGuid",
+        "versionGuid",
+        "typeName",
+        "version",
+        "state",
+        "isDefault",
+        "engineeringType",
+        "modifiedDate",
+        "author",
+        "doNotUse",
+        "setForUpdate"
+      ],
+      "properties": {
+        "kind": {
+          "const": "version"
+        },
+        "typeGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "versionGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "engineeringType": {
+          "type": "string"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "doNotUse": {
+          "type": "boolean"
+        },
+        "setForUpdate": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "versionAtPath": {
+      "type": "object",
+      "required": [
+        "kind",
+        "typeGuid",
+        "versionGuid",
+        "typeName",
+        "version",
+        "state",
+        "isDefault",
+        "engineeringType",
+        "modifiedDate",
+        "author",
+        "doNotUse",
+        "setForUpdate",
+        "path"
+      ],
+      "properties": {
+        "kind": {
+          "const": "version"
+        },
+        "typeGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "versionGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "engineeringType": {
+          "type": "string"
+        },
+        "modifiedDate": {
+          "type": "string"
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "doNotUse": {
+          "type": "boolean"
+        },
+        "setForUpdate": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "folder": {
+      "type": "object",
+      "required": [
+        "kind",
+        "path",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "typeFolder",
+            "masterCopyFolder"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "type": {
+      "type": "object",
+      "required": [
+        "kind",
+        "path",
+        "name",
+        "typeGuid",
+        "engineeringType",
+        "doNotUse",
+        "setForUpdate",
+        "status",
+        "documentExportAvailable",
+        "supportedExportFormats",
+        "documentExportLimitation"
+      ],
+      "properties": {
+        "kind": {
+          "const": "type"
+        },
+        "path": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "typeGuid": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?![\\s\\S])"
+        },
+        "engineeringType": {
+          "type": "string"
+        },
+        "doNotUse": {
+          "type": "boolean"
+        },
+        "setForUpdate": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "documentExportAvailable": {
+          "type": "boolean"
+        },
+        "supportedExportFormats": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "documentExportLimitation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "documentExportAvailable": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "supportedExportFormats": {
+                "type": "array"
+              },
+              "documentExportLimitation": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "supportedExportFormats": {
+                "type": "null"
+              },
+              "documentExportLimitation": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "masterCopy": {
+      "type": "object",
+      "required": [
+        "kind",
+        "masterCopyPath",
+        "name",
+        "author",
+        "creationDate",
+        "contents"
+      ],
+      "properties": {
+        "kind": {
+          "const": "masterCopy"
+        },
+        "masterCopyPath": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "author": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "creationDate": {
+          "type": "string"
+        },
+        "contents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 201
+        }
+      },
+      "additionalProperties": false,
+      "description": "Producer retains at most 201 native content descriptions. This array has no independent complete-content assertion; query metadata completeness does not certify full master-copy contents."
+    },
+    "element": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/folder"
+        },
+        {
+          "$ref": "#/$defs/type"
+        },
+        {
+          "$ref": "#/$defs/versionAtPath"
+        },
+        {
+          "$ref": "#/$defs/masterCopy"
+        }
+      ]
+    },
+    "use": {
+      "type": "object",
+      "required": [
+        "version",
+        "nativeInstance",
+        "softwarePath",
+        "projectPath"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "nativeInstance": {
+          "type": "object",
+          "required": [
+            "engineeringType"
+          ],
+          "properties": {
+            "engineeringType": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "Name": {},
+            "Number": {},
+            "Namespace": {}
+          },
+          "additionalProperties": false,
+          "description": "Only successfully read native attributes are present. Attribute values retain their native JSON types; absence is not a default value."
+        },
+        "softwarePath": {
+          "type": "string"
+        },
+        "projectPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "query": {
+            "const": "elements"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/element"
+            },
+            "maxItems": 200
+          },
+          "totalCaptured": {
+            "maximum": 10000
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "query": {
+            "const": "versions"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/version"
+            },
+            "maxItems": 200
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "query": {
+            "const": "dependencies"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "urn:tia-mcp:library-lock:v1#/$defs/dependencyVersion"
+            },
+            "maxItems": 200
+          },
+          "totalCaptured": {
+            "maximum": 1000
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "query": {
+            "const": "uses"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/use"
+            },
+            "maxItems": 200
+          },
+          "totalCaptured": {
+            "maximum": 10000
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "opcua-consumers.v1",
+  "modelSha256": "5815918286e0bcaf12440722be72fd000b594fe808514ed8052cec57501f69ba",
+  "consumers": [
+    {"id": "Historian-A", "nodeKeys": ["nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed"]},
+    {"id": "Dashboard-B", "nodeKeys": ["nsu=urn%3Aexample%3Amachine%3A1;s=Machine", "nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Speed"]},
+    {"id": "MES-C", "nodeKeys": ["nsu=urn%3Aexample%3Amachine%3A1;s=Machine.Reset"]}
+  ]
+}

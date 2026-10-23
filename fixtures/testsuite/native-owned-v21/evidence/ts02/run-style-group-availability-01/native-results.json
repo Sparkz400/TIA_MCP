@@ -1,0 +1,96 @@
+{
+  "state": "Error",
+  "errorCount": 3,
+  "warningCount": 0,
+  "messages": [
+    {
+      "state": "Error",
+      "path": "Styleguide",
+      "description": "",
+      "dateTime": "2026-10-15T07:53:17.8386251Z",
+      "errorCount": 3,
+      "warningCount": 0,
+      "messages": [
+        {
+          "state": "Error",
+          "path": "TiaMcp_CasingAvailability",
+          "description": "",
+          "dateTime": "2026-10-15T07:53:17.9066594Z",
+          "errorCount": 3,
+          "warningCount": 0,
+          "messages": [
+            {
+              "state": "Error",
+              "path": "TiaMcp_CamelCase",
+              "description": "Regelverletzung/Validierung Codebaustein (FB,FC,OB) : 3/3, Prozentsatz Regelverletzung - 100 %",
+              "dateTime": "2026-10-15T07:53:17.9076587Z",
+              "errorCount": 3,
+              "warningCount": 0,
+              "messages": [
+                {
+                  "state": "Error",
+                  "path": "Elemente mit Regelverletzung",
+                  "description": "",
+                  "dateTime": "2026-10-15T07:53:17.9096556Z",
+                  "errorCount": 3,
+                  "warningCount": 0,
+                  "messages": [
+                    {
+                      "state": "Error",
+                      "path": "ScratchPLC - Main",
+                      "description": "Konflikte mit Main : Der Objektname Codebaustein (FB,FC,OB) muss in Camel Case geschrieben werden",
+                      "dateTime": "2026-10-15T07:53:17.9293924Z",
+                      "errorCount": 1,
+                      "warningCount": 0,
+                      "messages": []
+                    },
+                    {
+                      "state": "Error",
+                      "path": "ScratchPLC - TiaMcp_IsEnabled",
+                      "description": "Konflikte mit TiaMcp_IsEnabled : Der Objektname Codebaustein (FB,FC,OB) muss in Camel Case geschrieben werden",
+                      "dateTime": "2026-10-15T07:53:17.9533004Z",
+                      "errorCount": 1,
+                      "warningCount": 0,
+                      "messages": []
+                    },
+                    {
+                      "state": "Error",
+                      "path": "ScratchPLC - TiaMcp_EnableGate",
+                      "description": "Konflikte mit TiaMcp_EnableGate : Der Objektname Codebaustein (FB,FC,OB) muss in Camel Case geschrieben werden",
+                      "dateTime": "2026-10-15T07:53:17.9533004Z",
+                      "errorCount": 1,
+                      "warningCount": 0,
+                      "messages": []
+                    }
+                  ]
+                },
+                {
+                  "state": "Success",
+                  "path": "Elemente ohne Regelverletzung",
+                  "description": "",
+                  "dateTime": "2026-10-15T07:53:17.9096556Z",
+                  "errorCount": 0,
+                  "warningCount": 0,
+                  "messages": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "state": "Information",
+      "path": null,
+      "description": "Ausführung von Regelsatz/-sätzen beendet (Fehler : 3 ; Warnungen : 0)",
+      "dateTime": "2026-10-15T07:53:17.9830684Z",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    }
+  ],
+  "effectiveScope": "unverified",
+  "qualification": false,
+  "testsPassed": false,
+  "coverageClaim": false
+}

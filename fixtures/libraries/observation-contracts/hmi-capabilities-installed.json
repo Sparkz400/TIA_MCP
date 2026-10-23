@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "modules": [
+    {
+      "family": "classic",
+      "assembly": "Siemens.Engineering.WinCC.dll",
+      "installedApi": true,
+      "apiAvailability": "available",
+      "nativeQualified": false,
+      "runtimeQualified": false,
+      "assemblyVersion": "21.0.0.0",
+      "assemblyIdentity": {
+        "accepted": true,
+        "code": null,
+        "family": "classic",
+        "requiredAssemblyName": "Siemens.Engineering.WinCC",
+        "observedAssemblyName": "Siemens.Engineering.WinCC",
+        "requiredMajorVersion": 21,
+        "observedMajorVersion": 21,
+        "assemblyVersion": "21.0.0.0",
+        "requiredPublicKeyToken": "29bfe5fdf4ba5d3b",
+        "observedPublicKeyToken": "29bfe5fdf4ba5d3b",
+        "expectedKeySource": "Siemens.Engineering.Base, Version=21.0.0.0, Culture=neutral, PublicKeyToken=29bfe5fdf4ba5d3b",
+        "observedCulture": "",
+        "scope": "Public assembly metadata identity only; no optional assembly is loaded and no license is inferred."
+      }
+    },
+    {
+      "family": "unified",
+      "assembly": "Siemens.Engineering.WinCCUnified.dll",
+      "installedApi": true,
+      "apiAvailability": "available",
+      "nativeQualified": false,
+      "runtimeQualified": false,
+      "assemblyVersion": "21.0.0.0",
+      "assemblyIdentity": {
+        "accepted": true,
+        "code": null,
+        "family": "unified",
+        "requiredAssemblyName": "Siemens.Engineering.WinCCUnified",
+        "observedAssemblyName": "Siemens.Engineering.WinCCUnified",
+        "requiredMajorVersion": 21,
+        "observedMajorVersion": 21,
+        "assemblyVersion": "21.0.0.0",
+        "requiredPublicKeyToken": "29bfe5fdf4ba5d3b",
+        "observedPublicKeyToken": "29bfe5fdf4ba5d3b",
+        "expectedKeySource": "Siemens.Engineering.Base, Version=21.0.0.0, Culture=neutral, PublicKeyToken=29bfe5fdf4ba5d3b",
+        "observedCulture": "",
+        "scope": "Public assembly metadata identity only; no optional assembly is loaded and no license is inferred."
+      }
+    }
+  ],
+  "operations": [
+    {
+      "family": "classic",
+      "operation": "inventory",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "Screens, tag tables, tags, connections and supported master-copy destinations."
+    },
+    {
+      "family": "classic",
+      "operation": "screen_type",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "ScreenComposition.CreateFrom(ScreenLibraryTypeVersion); exact native version readback."
+    },
+    {
+      "family": "classic",
+      "operation": "master_copy",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "One root screen, screen template, popup, tag, tag table or VB script; native root type and collisions checked."
+    },
+    {
+      "family": "classic",
+      "operation": "faceplate_binding",
+      "implementation": "unsupported",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "Classic exposes screen XML instead of a faceplate object model. A separately qualified preserving XML adapter is required."
+    },
+    {
+      "family": "unified",
+      "operation": "inventory",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "Screens, top-level faceplate containers/interfaces, tags and connections."
+    },
+    {
+      "family": "unified",
+      "operation": "faceplate_create",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "A committed exact project-library version, explicit screen rectangle, and native version service readback are required."
+    },
+    {
+      "family": "unified",
+      "operation": "faceplate_bind",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "Existing exact-version container and explicit existing tag/interface mapping; no positional interface guesses."
+    },
+    {
+      "family": "unified",
+      "operation": "tag_create",
+      "implementation": "typed",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "Internal tags with explicit primitive data type; external PLC binding requires a separately verified connection mapping."
+    },
+    {
+      "family": "unified",
+      "operation": "master_copy",
+      "implementation": "unsupported",
+      "engineeringQualified": false,
+      "runtimeQualified": false,
+      "limitation": "No Unified CreateFrom(MasterCopy) route exists in the installed public API; Classic operations are not reused."
+    }
+  ],
+  "qualification": "Implementation is distinct from target qualification. Comfort, Advanced, Professional, Basic, Unified PC and Unified Comfort require independent engineering/runtime fixtures."
+}

@@ -1,0 +1,20 @@
+{
+  "origin": "Synthetic contract fixture; no native authority",
+  "observedAtUtc": "2026-10-23T00:00:00Z",
+  "processId": 1,
+  "libraryId": "library-11111111111111111111111111111111",
+  "sessionGeneration": "22222222222222222222222222222222",
+  "kind": "project",
+  "name": "Fixture",
+  "path": "D:/Synthetic/Fixture.ap21",
+  "ownedWorkingCopy": false,
+  "writable": true,
+  "sourcePath": null,
+  "workingDirectory": null,
+  "sourceSha256": null,
+  "originalSourcePath": null,
+  "packageId": null,
+  "packageRetentionReference": null,
+  "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "revisionScope": "Metadata observation only; not a content fingerprint."
+}

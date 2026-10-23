@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "kind": "actual-prior-producer-synthetic-fixture",
+  "nativeExecuted": false,
+  "recordRef": "composite-engineering:b9b648aa445e44319ab7895c3ed2f398:ad71cf004a1cd8fe805c85bd91bf793ed1f14d47de6a1bf0de8c6e761e8a78fa",
+  "summary": {
+    "recordRef": "composite-engineering:b9b648aa445e44319ab7895c3ed2f398:ad71cf004a1cd8fe805c85bd91bf793ed1f14d47de6a1bf0de8c6e761e8a78fa",
+    "state": "complete",
+    "requestSha256": "26b8cb62b5ad263371e4507904deb1d357fa7b58e286022c6967dcdbe633b93a",
+    "reportSha256": "b527d511533acf73e5e7fb295c316f15fa87a90f08f9b2849d506fb6a222c914",
+    "beforeReviewId": "ee36f6775c20235737ca99d9777c32b9a32968ec97c4417f99f1e793b0876b25",
+    "afterReviewId": "ee36f6775c20235737ca99d9777c32b9a32968ec97c4417f99f1e793b0876b25",
+    "sourceBytesChanged": true,
+    "counts": {
+      "selections": 14,
+      "mappings": 8,
+      "correspondences": 1,
+      "impacts": 10,
+      "coverageGaps": 2
+    },
+    "artifacts": [
+      {
+        "name": "request.json",
+        "bytes": 7223,
+        "sha256": "26b8cb62b5ad263371e4507904deb1d357fa7b58e286022c6967dcdbe633b93a"
+      },
+      {
+        "name": "report.json",
+        "bytes": 36062,
+        "sha256": "b527d511533acf73e5e7fb295c316f15fa87a90f08f9b2849d506fb6a222c914"
+      }
+    ],
+    "receiptName": "receipt.json",
+    "nativeExecutable": false,
+    "nativeQualified": false,
+    "sourceAuthenticityVerified": false,
+    "liveFreshnessVerified": false,
+    "wholeImpactAnalysisComplete": false
+  },
+  "files": [
+    {
+      "path": "automationml-workflow/335d7f8f8c0f4c6998783dca0971a7ea/intent.json",
+      "bytes": 327,
+      "sha256": "b667c7b7417d9cac4348ad6d66f8fbb47ed59fd20a0cba95133f0222debe35ec"
+    },
+    {
+      "path": "automationml-workflow/335d7f8f8c0f4c6998783dca0971a7ea/original.aml",
+      "bytes": 443,
+      "sha256": "0d583f42c994a3fff0b3b320e2e5dcfd0fe4181e4ceab6b9c24e7283b3492bd0"
+    },
+    {
+      "path": "automationml-workflow/335d7f8f8c0f4c6998783dca0971a7ea/receipt.json",
+      "bytes": 327,
+      "sha256": "b667c7b7417d9cac4348ad6d66f8fbb47ed59fd20a0cba95133f0222debe35ec"
+    },
+    {
+      "path": "automationml-workflow/335d7f8f8c0f4c6998783dca0971a7ea/report.json",
+      "bytes": 3320,
+      "sha256": "9a4c83c769591f5db8d76890e6108c8f17375a85217e6d2458c48bc1aa0f63bc"
+    },
+    {
+      "path": "automationml-workflow/a62cd0d1b33047ef93ec8e6e698524c9/intent.json",
+      "bytes": 327,
+      "sha256": "83972f4db8711abd7dad656be9a0297d008085ce5c7413b531a7b978d3a174a3"
+    },
+    {
+      "path": "automationml-workflow/a62cd0d1b33047ef93ec8e6e698524c9/original.aml",
+      "bytes": 443,
+      "sha256": "833421379ef0efa0c65ea0771d944ad8eafb6187447527b60bd2778ab85abf30"
+    },
+    {
+      "path": "automationml-workflow/a62cd0d1b33047ef93ec8e6e698524c9/receipt.json",
+      "bytes": 327,
+      "sha256": "83972f4db8711abd7dad656be9a0297d008085ce5c7413b531a7b978d3a174a3"
+    },
+    {
+      "path": "automationml-workflow/a62cd0d1b33047ef93ec8e6e698524c9/report.json",
+      "bytes": 3320,
+      "sha256": "98f87ed8231fbf3709bb26c6bdd3ac570be2e1fbbe597169054ce77a01580840"
+    },
+    {
+      "path": "composite-engineering-reviews/b9b648aa445e44319ab7895c3ed2f398/intent.json",
+      "bytes": 299,
+      "sha256": "ad71cf004a1cd8fe805c85bd91bf793ed1f14d47de6a1bf0de8c6e761e8a78fa"
+    },
+    {
+      "path": "composite-engineering-reviews/b9b648aa445e44319ab7895c3ed2f398/receipt.json",
+      "bytes": 299,
+      "sha256": "ad71cf004a1cd8fe805c85bd91bf793ed1f14d47de6a1bf0de8c6e761e8a78fa"
+    },
+    {
+      "path": "composite-engineering-reviews/b9b648aa445e44319ab7895c3ed2f398/report.json",
+      "bytes": 36062,
+      "sha256": "b527d511533acf73e5e7fb295c316f15fa87a90f08f9b2849d506fb6a222c914"
+    },
+    {
+      "path": "composite-engineering-reviews/b9b648aa445e44319ab7895c3ed2f398/request.json",
+      "bytes": 7223,
+      "sha256": "26b8cb62b5ad263371e4507904deb1d357fa7b58e286022c6967dcdbe633b93a"
+    },
+    {
+      "path": "connection-reviews/71299e37e7bc4f358fc5615715bc518c1fa41505c665431abdb66e59856815c9.input",
+      "bytes": 995,
+      "sha256": "71299e37e7bc4f358fc5615715bc518c1fa41505c665431abdb66e59856815c9"
+    },
+    {
+      "path": "connection-reviews/8f7705966708d649d062c69325ef567079a1f31af17f69e1aac6979abae30349.json",
+      "bytes": 2662,
+      "sha256": "8f7705966708d649d062c69325ef567079a1f31af17f69e1aac6979abae30349"
+    },
+    {
+      "path": "drive-profile-reviews/8dbbb8c0d14495163c6c4f1d49fc251f4e90aca764d212d4b5c34449a5ee118e.json",
+      "bytes": 2356,
+      "sha256": "8dbbb8c0d14495163c6c4f1d49fc251f4e90aca764d212d4b5c34449a5ee118e"
+    },
+    {
+      "path": "drive-profile-reviews/8e0aaf95a498195b5e2915d53ded544071f32d6a09374899a7dbf0e16d78a94f.input",
+      "bytes": 919,
+      "sha256": "8e0aaf95a498195b5e2915d53ded544071f32d6a09374899a7dbf0e16d78a94f"
+    },
+    {
+      "path": "project-reviews/ee36f6775c20235737ca99d9777c32b9a32968ec97c4417f99f1e793b0876b25.json",
+      "bytes": 1810,
+      "sha256": "ee36f6775c20235737ca99d9777c32b9a32968ec97c4417f99f1e793b0876b25"
+    },
+    {
+      "path": "technology-profile-reviews/01e34d4e290b1b3374480f14d2bbcacdc3bf9f63b07e6e23a6a8b80b14555db0.json",
+      "bytes": 4179,
+      "sha256": "01e34d4e290b1b3374480f14d2bbcacdc3bf9f63b07e6e23a6a8b80b14555db0"
+    },
+    {
+      "path": "technology-profile-reviews/bd2985ad1b69006760f60dfc93128b73d60faef75eedc16a6aa18edd815e6d24.input",
+      "bytes": 1526,
+      "sha256": "bd2985ad1b69006760f60dfc93128b73d60faef75eedc16a6aa18edd815e6d24"
+    }
+  ],
+  "producer": {
+    "correspondingImplementationCommit": "e5ab78b7d4818be46baea9eaca6b64fd8396a951",
+    "sourceManifestSha256": "a7c2c3f145277ece09dae7ae623f11c527b1cbcf08be158b6c66c7e92bc5d853",
+    "bundleManifestSha256": "fa67c15b35f2280621eee6075cc9acef35da57d1531bcbd51d6710e554a227c0",
+    "binaryHashes": {
+      "TiaMcp.Host.exe": "84c51efda84bbfead3d3da38dd682270c22dd6aff227e886d56e54b37e8cae5c",
+      "TiaMcp.Host.dll": "2da0d8dcb7cecbccb419a128d00e551688d3d0b2cde7d207ac2790b0f6a80208",
+      "TiaMcp.Core.dll": "d00edf83516f670c98bfd1cffd4e23128372f89ff068673544d24713e9d78eee"
+    },
+    "shutdown": {
+      "hostExitCode": 0,
+      "forcedHostStop": false,
+      "workerExits": [],
+      "stderrEofObserved": true
+    }
+  }
+}

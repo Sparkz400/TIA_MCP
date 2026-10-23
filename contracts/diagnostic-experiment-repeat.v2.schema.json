@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-repeat.v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-experiment-repeat.v2"
+    },
+    "request": {
+      "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/repeatRequest"
+    },
+    "runPairCount": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 8
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "reviewId": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "beforeWindow": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+          },
+          "afterWindow": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/window"
+          }
+        },
+        "required": [
+          "id",
+          "reviewId",
+          "beforeWindow",
+          "afterWindow"
+        ]
+      },
+      "minItems": 2,
+      "maxItems": 8
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "before": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "runs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "supportedPredictionRuns": {
+                "const": 0
+              },
+              "contradictedPredictionRuns": {
+                "const": 0
+              },
+              "unresolvedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "conditionObservedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              }
+            },
+            "required": [
+              "runs",
+              "supportedPredictionRuns",
+              "contradictedPredictionRuns",
+              "unresolvedRuns",
+              "conditionObservedRuns"
+            ]
+          },
+          "after": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "runs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "supportedPredictionRuns": {
+                "const": 0
+              },
+              "contradictedPredictionRuns": {
+                "const": 0
+              },
+              "unresolvedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "conditionObservedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              }
+            },
+            "required": [
+              "runs",
+              "supportedPredictionRuns",
+              "contradictedPredictionRuns",
+              "unresolvedRuns",
+              "conditionObservedRuns"
+            ]
+          },
+          "causationProven": {
+            "const": false
+          },
+          "bugFixProven": {
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "statement",
+          "before",
+          "after",
+          "causationProven",
+          "bugFixProven"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 32
+    },
+    "beforeDiagnosticPlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterDiagnosticPlanId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "requestedWindowsEqual": {
+      "const": true
+    },
+    "signalMappingsEqual": {
+      "const": true
+    },
+    "independentRunsVerified": {
+      "const": false
+    },
+    "aggregation": {
+      "const": "descriptiveRunCountsOnly"
+    },
+    "clockEpochMappings": {
+      "type": "array",
+      "items": {
+        "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/alignment"
+      },
+      "minItems": 2,
+      "maxItems": 8
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "atomicityVerified": {
+      "const": false
+    },
+    "behavioralAuthority": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "request",
+    "runPairCount",
+    "runs",
+    "hypotheses",
+    "beforeDiagnosticPlanId",
+    "afterDiagnosticPlanId",
+    "requestedWindowsEqual",
+    "signalMappingsEqual",
+    "independentRunsVerified",
+    "aggregation",
+    "clockEpochMappings",
+    "sourceAuthenticityVerified",
+    "clockSynchronizationVerified",
+    "atomicityVerified",
+    "behavioralAuthority",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ]
+}

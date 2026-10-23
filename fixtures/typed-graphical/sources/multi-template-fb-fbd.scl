@@ -1,0 +1,8 @@
+FUNCTION_BLOCK "Tgp_MultiTemplateFB_FBD"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+ Child : "Tgp_TemplateFB_FBD";
+END_VAR
+BEGIN
+END_FUNCTION_BLOCK

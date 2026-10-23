@@ -1,0 +1,860 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 33554432
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kind": {
+          "enum": [
+            "source",
+            "host",
+            "supplied"
+          ]
+        },
+        "timeUnit": {
+          "enum": [
+            "s",
+            "ms",
+            "us",
+            "ns"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "kind",
+        "timeUnit"
+      ]
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "atomicAcrossSignals": {
+          "type": "boolean"
+        },
+        "scanSynchronized": {
+          "type": "boolean"
+        },
+        "programMatchVerified": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "atomicAcrossSignals",
+        "scanSynchronized",
+        "programMatchVerified"
+      ]
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "complete",
+            "incomplete",
+            "truncated",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "reportedDroppedSamples": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "reason",
+        "reportedDroppedSamples"
+      ]
+    },
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "signalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "clockId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "epoch": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selectedReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "excludedReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "usableValueReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "unknownValueReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "selectionExclusions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "absentReading": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "clockNotRecorded": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "unknownTime": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "otherEpoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "outsideWindow": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            }
+          },
+          "required": [
+            "absentReading",
+            "clockNotRecorded",
+            "unknownTime",
+            "otherEpoch",
+            "outsideWindow"
+          ]
+        },
+        "untimedSelectedReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "statusCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "good": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bad": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uncertain": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "missing": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "absent": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "good",
+            "bad",
+            "uncertain",
+            "missing",
+            "absent"
+          ]
+        },
+        "trueReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "falseReadings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firstRecordedTime": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lastRecordedTime": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "clockResets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicateTimes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "epochChanges": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "irregularIntervals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "intervalGaps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "adjacentValueChanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "clockId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "epoch": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "afterTime": {
+                "type": "number",
+                "minimum": -1000000000000000000,
+                "maximum": 1000000000000000000
+              },
+              "byTime": {
+                "type": "number",
+                "minimum": -1000000000000000000,
+                "maximum": 1000000000000000000
+              },
+              "before": {
+                "type": [
+                  "number",
+                  "boolean"
+                ]
+              },
+              "after": {
+                "type": [
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            "required": [
+              "clockId",
+              "epoch",
+              "afterTime",
+              "byTime",
+              "before",
+              "after"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 200
+        },
+        "adjacentValueChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changesTruncated": {
+          "type": "boolean"
+        },
+        "transitionSemantics": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "coverage": {
+          "enum": [
+            "noSelectedReadings",
+            "recordedObservationsOnly"
+          ]
+        }
+      },
+      "required": [
+        "signalId",
+        "clockId",
+        "epoch",
+        "selectedReadings",
+        "excludedReadings",
+        "usableValueReadings",
+        "unknownValueReadings",
+        "selectionExclusions",
+        "untimedSelectedReadings",
+        "statusCounts",
+        "trueReadings",
+        "falseReadings",
+        "minimum",
+        "maximum",
+        "firstRecordedTime",
+        "lastRecordedTime",
+        "clockResets",
+        "duplicateTimes",
+        "epochChanges",
+        "irregularIntervals",
+        "intervalGaps",
+        "adjacentValueChanges",
+        "adjacentValueChangeCount",
+        "changesTruncated",
+        "transitionSemantics",
+        "coverage"
+      ]
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sampleGroups": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "absentReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goodStatusReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "badStatusReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uncertainStatusReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missingStatusReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nullValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errorReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "untimedReadings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sequenceGaps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capture": {
+          "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/capture"
+        },
+        "suppliedQuality": {
+          "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/quality"
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/series"
+          },
+          "minItems": 0,
+          "maxItems": 512
+        },
+        "qualityOrigin": {
+          "const": "unverifiedSuppliedObservationsAndStructuralChecks"
+        },
+        "completenessVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "sampleGroups",
+        "absentReadings",
+        "goodStatusReadings",
+        "badStatusReadings",
+        "uncertainStatusReadings",
+        "missingStatusReadings",
+        "nullValues",
+        "errorReadings",
+        "untimedReadings",
+        "sequenceGaps",
+        "capture",
+        "suppliedQuality",
+        "series",
+        "qualityOrigin",
+        "completenessVerified"
+      ]
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "matchedSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "contradictedSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "unknownSamples": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "verdict": {
+          "const": "unresolved"
+        },
+        "causationProven": {
+          "const": false
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "matchedSamples",
+        "contradictedSamples",
+        "unknownSamples",
+        "verdict",
+        "causationProven",
+        "reason"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "synthetic",
+            "polling",
+            "manualNativeExport"
+          ]
+        },
+        "programIdentity": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "clocks": {
+          "type": "array",
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/clock"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "suppliedQuality": {
+          "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/quality"
+        },
+        "identityVerified": {
+          "const": false
+        },
+        "rowGroupingVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "mode",
+        "programIdentity",
+        "clocks",
+        "suppliedQuality",
+        "identityVerified",
+        "rowGroupingVerified"
+      ]
+    },
+    "alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "beforeClockId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "beforeEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "afterClockId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "afterEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "beforeAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "afterAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "windowStartSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "windowEndSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "allowChangedSource": {
+          "type": "boolean"
+        },
+        "signalMap": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "before": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "after": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            },
+            "required": [
+              "before",
+              "after"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "reason",
+        "beforeClockId",
+        "beforeEpoch",
+        "afterClockId",
+        "afterEpoch",
+        "beforeAnchorSeconds",
+        "afterAnchorSeconds",
+        "windowStartSeconds",
+        "windowEndSeconds"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clockId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "anchorSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "requestedStartSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "requestedEndSeconds": {
+          "type": "number",
+          "minimum": -1000000000000000000,
+          "maximum": 1000000000000000000
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/series"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "completeEpochAssessment": {
+          "type": "array",
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/series"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "hypotheses": {
+          "type": "array",
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/hypothesis"
+          },
+          "minItems": 0,
+          "maxItems": 32
+        },
+        "coverage": {
+          "const": "recordedObservationsOnly"
+        },
+        "verdict": {
+          "const": "unresolved"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "minItems": 0,
+          "maxItems": 256
+        },
+        "completenessVerified": {
+          "const": false
+        },
+        "clockSynchronizationVerified": {
+          "const": false
+        }
+      },
+      "required": [
+        "clockId",
+        "epoch",
+        "anchorSeconds",
+        "requestedStartSeconds",
+        "requestedEndSeconds",
+        "series",
+        "completeEpochAssessment",
+        "hypotheses",
+        "coverage",
+        "verdict",
+        "reasons",
+        "completenessVerified",
+        "clockSynchronizationVerified"
+      ]
+    },
+    "reviewRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "afterExperimentId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "beforeMeasurementId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "afterMeasurementId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "comparison": {
+          "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/alignment"
+        }
+      },
+      "required": [
+        "afterExperimentId",
+        "beforeMeasurementId",
+        "afterMeasurementId",
+        "comparison"
+      ]
+    },
+    "repeatRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "beforeExperimentId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "afterExperimentId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "beforeMeasurementId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "afterMeasurementId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "comparison": {
+                "$ref": "https://tia-mcp.local/contracts/trace-quality-types.v2.schema.json#/$defs/alignment"
+              }
+            },
+            "required": [
+              "id",
+              "beforeExperimentId",
+              "afterExperimentId",
+              "beforeMeasurementId",
+              "afterMeasurementId",
+              "comparison"
+            ]
+          },
+          "minItems": 2,
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "reason",
+        "pairs"
+      ]
+    }
+  }
+}

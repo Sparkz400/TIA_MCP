@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:vci-manifest:v1",
+  "title": "vci-manifest.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "snapshot",
+    "enumerationComplete",
+    "nativeQualified",
+    "targetProbed",
+    "packages",
+    "files"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "vci-manifest.v1"
+    },
+    "workspaceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observationId",
+        "sourceSha256",
+        "tiaVersion"
+      ],
+      "properties": {
+        "observationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "sourceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tiaVersion": {
+          "const": 21
+        }
+      }
+    },
+    "enumerationComplete": {
+      "type": "boolean"
+    },
+    "nativeQualified": {
+      "const": false
+    },
+    "targetProbed": {
+      "const": false
+    },
+    "packages": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "packageId",
+          "object",
+          "profileId",
+          "family",
+          "nativeFormat",
+          "evidenceSha256",
+          "evidenceOrigin",
+          "profileComplete",
+          "libraryTypeGuid",
+          "libraryVersionGuid",
+          "nativeStatus",
+          "nativeObjectIdentity",
+          "expectedFiles",
+          "issues"
+        ],
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "object": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "object",
+              "snapshot",
+              "contentSha256"
+            ],
+            "properties": {
+              "object": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "projectPath",
+                  "plcPath",
+                  "scopePath",
+                  "objectPath",
+                  "kind"
+                ],
+                "properties": {
+                  "projectPath": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "plcPath": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "scopePath": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "objectPath": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "kind": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                }
+              },
+              "snapshot": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "observationId",
+                  "sourceSha256",
+                  "tiaVersion"
+                ],
+                "properties": {
+                  "observationId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "sourceSha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "tiaVersion": {
+                    "const": 21
+                  }
+                }
+              },
+              "contentSha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "profileId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "family": {
+            "enum": [
+              "plcSimaticSd",
+              "unifiedScript",
+              "nativeDocument",
+              "libraryDocument"
+            ]
+          },
+          "nativeFormat": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "evidenceSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "evidenceOrigin": {
+            "enum": [
+              "authoredFixture",
+              "nativeExport"
+            ]
+          },
+          "profileComplete": {
+            "type": "boolean"
+          },
+          "libraryTypeGuid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "libraryVersionGuid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nativeStatus": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nativeObjectIdentity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expectedFiles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20000,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "relativePath",
+                "role"
+              ],
+              "properties": {
+                "relativePath": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "Exact relative forward-slash spelling. Semantic validator rejects Windows traversal/device/ADS/link/Unicode/case/ancestor collisions."
+                },
+                "role": {
+                  "enum": [
+                    "source",
+                    "resources",
+                    "script",
+                    "metadata",
+                    "document",
+                    "libraryVersion",
+                    "auxiliary"
+                  ]
+                }
+              }
+            }
+          },
+          "issues": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "relativePath",
+          "sha256",
+          "bytes"
+        ],
+        "properties": {
+          "relativePath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Exact relative forward-slash spelling. Semantic validator rejects Windows traversal/device/ADS/link/Unicode/case/ancestor collisions."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1073741824
+          }
+        }
+      }
+    }
+  }
+}

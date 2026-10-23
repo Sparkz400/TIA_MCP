@@ -1,0 +1,26 @@
+# Runtime long-soak and advertised-profile increment — 20 October 2026
+
+This increment adds an opt-in fifteen-epoch real-clock capture qualification and 50 independent production-client profile fixtures. Production runtime code is unchanged. The soak uses the linked production poller/store with a test session boundary; profile fixtures use actual pinned loopback TLS and compiled production Core/Graph DLLs. Neither establishes physical-device, native engineering or full C03/D16 qualification.
+
+Evidence is retained under `artifacts/runtime-long-wave3-20261020/`. Commands, fixed resource limits, per-store capacity, repeated same-process recovery and exact evidence boundaries are documented in [the qualification reference](../reference/runtime-long-qualification.md).
+
+The first full request, `long-01/`, remains **failed**. Nine 60-second epochs completed, totaling 540.0681609 measured acquisition seconds. During epoch 10, the existing soak harness assumed one `Task.Delay(60s)` callback meant at least 60 measured seconds had elapsed. The strict lower-bound assertion failed. The original child handle was waited to exit code 3762504530, without forced termination. No crash/recovery phases were launched after that failure. Its stderr, partial resource observations, original captures and exit receipts remain intact. The exact twelve input source files were copied and hash-checked into `long-01-source/`; the original build is retained in `build-01/`.
+
+The harness now rechecks monotonic elapsed time after each callback and waits the positive rounded-up remainder. It keeps the strict acquisition lower bound. Four deterministic checks exercise repeated early wakeups, exact/late completion and cancellation propagation using that same wait helper. This is a harness repair; the earlier production poller deadline fix is unchanged.
+
+Long-mode receipts additionally compare the managed process start time to the original parent's observed birth time, retain every earlier intent and prefix comparison in every later epoch, and check final evidence bytes including summary files. The independent oracle has eight cross-epoch mutations, including process-birth mismatch, in addition to eight original row/timing/resource mutations per epoch. Resource slopes are reported descriptively and never stand in for the fixed resource bounds.
+
+`trial-01/` is the earlier passing two-by-30-second development check. It is not long-run qualification. The repaired `trial-02/` passed 60.0220684 total measured acquisition seconds, all eight mutations in each epoch, eight cross-epoch mutations and original owned process exits 0 / 73 / 0. Its ten-minute qualification flag remains false. The final read-only oracle recheck additionally changes both managed birth receipts consistently, requiring rejection against the separately retained parent's birth observation; the prior oracle is preserved as `trial-02-original-oracle.py`. The full managed suite passed 351 protocol/polling checks in `managed-03.json`, including the four acquisition-wait boundaries, plus the separately logged 43 completion-failure and 71 pressure checks. Isolated build 03 passed with zero warnings/errors. The next fifteen-by-60-second run is reserved for the coordinator's final combined frozen source; the failed run is not promoted to a long-soak pass.
+
+Profile evidence is independent of the incomplete long soak:
+
+| Run | Result | Runtime exercised |
+| --- | --- | --- |
+| `profiles-01/verification.json` | 50 cases, eight mutation controls passed | New isolated test build's compiled production DLLs |
+| `profiles-package-01/verification.json` | 50 cases, eight mutation controls passed | Previous final relocated package's exact Core/Graph DLLs |
+
+The package probe loaded Core SHA-256 `acd88e5738790052c3e5f6d9fb01e5c10a657ce195225f543764b4147a85a9a6` and Graph SHA-256 `5db872dfd0425d1be9e34de46c4f4bc20a887b32ab1c8286998f6071124d1440`. Each probe returned its actual loaded paths/hashes. Original requested DLLs, isolated copies, test entrypoint, relevant source and public TLS fixture bytes are bound before and after execution. All probe children exited normally through their original retained process handles.
+
+The fixtures independently specify expected refusals, retained profile fields and complete RPC order, including initial discovery and explicit cleanup. They cover missing optional methods, malformed or unsupported advertisements, exact signed-64-bit quantities, request-size refusal before login, authentication admission, timeout shortening without later extension, failed identity invalidation and public expiry metadata. Mutation controls reject altered errors, login dispatch, invalidation, integer precision, device-qualification flags and discovery/cleanup traces. The qualifier is integrated through the ordinary aggregate/package workflow after TLS fixture creation; the long soak remains opt-in.
+
+The profile run establishes these explicit synthetic server cases. System-wide memory/handle exhaustion, device transport failures, firmware coverage, online identity/program association and actual disk-full remain outside the evidence. The known VHD mount privilege blocker remains unchanged and was not retried.

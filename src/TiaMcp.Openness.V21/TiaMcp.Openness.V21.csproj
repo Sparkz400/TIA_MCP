@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <DefineConstants Condition="'$(TestSuiteQualification)' == 'true'">$(DefineConstants);TESTSUITE_QUALIFICATION</DefineConstants>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <TiaApiDirectory Condition="'$(TiaApiDirectory)' == ''">C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48</TiaApiDirectory>
+    <SimulatorApiDirectory Condition="'$(SimulatorApiDirectory)' == ''">C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0</SimulatorApiDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj" />
+    <Compile Include="../TiaMcp.Core/WatchTables/WatchTableDocument.cs" Link="WatchTableDocument.cs" />
+    <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />
+    <Compile Include="../TiaMcp.Core/JournalFileReplacement.cs" Link="JournalFileReplacement.cs" />
+    <Compile Include="../../scripts/native/ExpansionEvidence/TranslationCategoryWorkbook.cs" Link="TranslationCategoryWorkbook.cs" />
+    <Compile Include="../../scripts/native/ExpansionEvidence/TranslationCategoryProbe.cs" Link="TranslationCategoryProbe.cs" />
+    <Compile Include="../../scripts/native/ExpansionEvidence/TranslationPopulatedCategoryProbe.cs" Link="TranslationPopulatedCategoryProbe.cs" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Compile Include="../TiaMcp.Core/SimulationCardMoveRetry.cs" Link="SimulationCardMoveRetry.cs" />
+    <Compile Include="../TiaMcp.Core/SimulationDiscoveryWait.cs" Link="SimulationDiscoveryWait.cs" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Security" />
+    <Compile Include="..\TiaMcp.Simulator.V8\SimulationTicket.cs" Link="SimulationTicket.cs" />
+    <Reference Include="Siemens.Simatic.Simulation.Runtime.Api.x64">
+      <HintPath>$(SimulatorApiDirectory)\Siemens.Simatic.Simulation.Runtime.Api.x64.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Safety">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Safety.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <Reference Include="Siemens.Engineering.Base">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Siemens.Engineering.Step7">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Step7.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCC">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.WinCC.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCC.Extension">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.WinCC.Extension.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Siemens.Engineering.WinCCUnified">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.WinCCUnified.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckTiaApi" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(TiaApiDirectory)\Siemens.Engineering.Base.dll')" Text="TIA V21 Openness is required. Set TiaApiDirectory to the installed PublicAPI\V21\net48 directory. Siemens assemblies are never bundled." />
+  </Target>
+  <!-- Every rebuild changes the exe's hash and timestamp, which TIA treats as a new Openness application. -->
+  <Target Name="RegisterDevOpennessWorker" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\Register-DevOpennessWorker.ps1&quot; -WorkerPath &quot;$(TargetPath)&quot;" IgnoreExitCode="true" StandardOutputImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="OpennessAllowListExitCode" />
+    </Exec>
+    <Warning Condition="'$(OpennessAllowListExitCode)' != '0'" Text="TIA will ask to allow this worker build. To stop that, run once in an elevated PowerShell: scripts\Register-DevOpennessWorker.ps1 -Grant" />
+  </Target>
+</Project>

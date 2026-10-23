@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/device-inventory.v1.schema.json",
+  "title": "Immutable device inventory page",
+  "type": "object",
+  "required": ["snapshot", "rows", "offset", "nextCursor"],
+  "properties": {
+    "snapshot": {
+      "type": "object",
+      "required": ["schemaVersion", "snapshotId", "capturedAtUtc", "projectPath", "totalRows", "coverage", "freshness", "hardwareQualification"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "snapshotId": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+        "capturedAtUtc": {"type": "string", "format": "date-time"},
+        "projectPath": {"type": "string", "minLength": 1},
+        "totalRows": {"type": "integer", "minimum": 0, "maximum": 50000},
+        "parentSnapshotId": {"type": ["string", "null"]},
+        "freshness": {"const": "snapshotOnly"},
+        "hardwareQualification": {"const": "unverified"},
+        "coverage": {
+          "type": "object",
+          "required": ["scopeComplete", "truncated", "visitedItems", "maxVisited", "warnings", "scope"],
+          "properties": {
+            "scopeComplete": {"type": "boolean"}, "truncated": {"type": "boolean"},
+            "visitedItems": {"type": "integer", "minimum": 0}, "maxVisited": {"type": "integer", "minimum": 100, "maximum": 50000},
+            "warnings": {"type": "array", "items": {"type": "string"}}, "scope": {"type": "string"},
+            "devicePath": {"type": ["string", "null"]},
+            "projectModifiedBefore": {"type": ["boolean", "null"]}, "projectModifiedAfter": {"type": ["boolean", "null"]}
+          }
+        }
+      }
+    },
+    "rows": {"type": "array", "maxItems": 200, "items": {"$ref": "#/$defs/row"}},
+    "offset": {"type": "integer", "minimum": 0}, "nextCursor": {"type": ["string", "null"]}
+  },
+  "$defs": {
+    "field": {
+      "type": "object", "required": ["value", "state", "source", "reason"],
+      "properties": {
+        "value": {"type": ["string", "null"]}, "source": {"type": "string"}, "reason": {"type": ["string", "null"]},
+        "state": {"enum": ["available", "notConfigured", "notExposed", "notRead", "readError", "unsupported", "unreachable", "permissionDenied", "identityMismatch"]}
+      },
+      "allOf": [{"if": {"properties": {"state": {"const": "available"}}},
+        "then": {"properties": {"value": {"type": "string", "minLength": 1}, "reason": {"type": "null"}}},
+        "else": {"properties": {"value": {"type": "null"}, "reason": {"type": "string", "minLength": 1}}}}]
+    },
+    "row": {
+      "type": "object", "required": ["rowId", "name", "deviceName", "kind", "path", "parentPath", "projectPath", "configured", "actual", "online", "comparisons"],
+      "properties": {
+        "rowId": {"type": "string", "minLength": 1}, "name": {"type": "string"}, "deviceName": {"type": "string"},
+        "kind": {"enum": ["device", "cpu", "headModule", "module", "builtIn"]},
+        "path": {"type": "string", "minLength": 1}, "parentPath": {"type": ["string", "null"]}, "projectPath": {"type": "string", "minLength": 1},
+        "configured": {"type": "object", "required": ["plantDesignation", "locationIdentifier", "productDesignation", "mlfb", "firmware", "hardwareRevision", "slot", "ip", "typeIdentifier"], "additionalProperties": {"$ref": "#/$defs/field"}},
+        "actual": {"type": "object", "required": ["mlfb", "firmware", "serialNumber", "hardwareRevision"], "additionalProperties": {"$ref": "#/$defs/field"}},
+        "online": {
+          "type": "object", "required": ["status"],
+          "properties": {
+            "status": {"enum": ["notRead", "read", "partial", "unsupported", "unreachable", "permissionDenied", "identityMismatch", "readError"]},
+            "endpoint": {"type": ["string", "null"]}, "hardwareId": {"type": ["integer", "null"], "minimum": 0},
+            "observedAtUtc": {"type": ["string", "null"]}, "reason": {"type": ["string", "null"]}, "association": {"type": ["string", "null"]}
+          }
+        },
+        "comparisons": {"type": "object", "required": ["mlfb", "firmware", "hardwareRevision"], "additionalProperties": {"enum": ["match", "mismatch", "notComparable"]}}
+      }
+    }
+  }
+}

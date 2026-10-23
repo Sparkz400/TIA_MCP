@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/translation-reconciliation.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "baselineProject", "currentProject", "baselineWorkbookSha256", "editedWorkbookSha256", "currentWorkbookSha256", "profileSha256", "rows", "proposals", "conflicts", "alreadyApplied", "canReviewProposals", "requiresFreshReview", "preservationVerified", "nativeQualified", "nativeExecuted", "nativeImportAllowed", "reconciliationSha256"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {"const": "translation-offline-reconciliation"},
+    "baselineProject": {"$ref": "engineering-object-reference.v1.schema.json"},
+    "currentProject": {"$ref": "engineering-object-reference.v1.schema.json"},
+    "baselineWorkbookSha256": {"$ref": "#/$defs/sha256"},
+    "editedWorkbookSha256": {"$ref": "#/$defs/sha256"},
+    "currentWorkbookSha256": {"$ref": "#/$defs/sha256"},
+    "profileSha256": {"$ref": "#/$defs/sha256"},
+    "rows": {
+      "type": "array", "maxItems": 1000000,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["nativeKey", "culture", "baseline", "edited", "current", "status", "conflictCode"],
+        "properties": {
+          "nativeKey": {"type": "string", "minLength": 1, "maxLength": 1048576},
+          "culture": {"type": "string", "minLength": 1, "maxLength": 64},
+          "baseline": {"$ref": "translation-review.v1.schema.json#/$defs/state"},
+          "edited": {"$ref": "translation-review.v1.schema.json#/$defs/state"},
+          "current": {"$ref": "translation-review.v1.schema.json#/$defs/state"},
+          "status": {"enum": ["proposed", "conflict", "already-applied"]},
+          "conflictCode": {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 1, "maxLength": 128}]}
+        },
+        "allOf": [{"if": {"properties": {"status": {"const": "conflict"}}}, "then": {"properties": {"conflictCode": {"type": "string"}}}, "else": {"properties": {"conflictCode": {"type": "null"}}}}]
+      }
+    },
+    "proposals": {
+      "type": "array", "maxItems": 1000000,
+      "items": {"allOf": [{"$ref": "translation-review.v1.schema.json#/$defs/edit"}, {"properties": {"approved": {"const": false}, "reviewer": {"type": "null"}, "kind": {"enum": ["set", "clear"]}}}]}
+    },
+    "conflicts": {"type": "integer", "minimum": 0, "maximum": 1000000},
+    "alreadyApplied": {"type": "integer", "minimum": 0, "maximum": 1000000},
+    "canReviewProposals": {"type": "boolean"},
+    "requiresFreshReview": {"const": true},
+    "preservationVerified": {"const": true},
+    "nativeQualified": {"const": false},
+    "nativeExecuted": {"const": false},
+    "nativeImportAllowed": {"const": false},
+    "reconciliationSha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

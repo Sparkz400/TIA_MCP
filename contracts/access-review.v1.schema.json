@@ -1,0 +1,823 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/access-review.v1.schema.json",
+  "title": "Supplied public grant review; no native or effective authorization",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "right": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "sourceId",
+        "version",
+        "securityMode",
+        "unknownReason"
+      ],
+      "properties": {
+        "domain": {
+          "enum": [
+            "projectUmac",
+            "cpuRuntime",
+            "legacyWeb",
+            "siwarexWeb",
+            "opcUa"
+          ]
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "securityMode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "objectPath"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "objectPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "enabled",
+        "rightsComplete",
+        "assignmentsComplete",
+        "rights",
+        "inherits"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "kind": {
+          "enum": [
+            "user",
+            "group",
+            "role"
+          ]
+        },
+        "enabled": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "rightsComplete": {
+          "type": "boolean"
+        },
+        "assignmentsComplete": {
+          "type": "boolean"
+        },
+        "rights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "inherits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "entitiesComplete",
+        "entities"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "entitiesComplete": {
+          "type": "boolean"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entity"
+          },
+          "maxItems": 512
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "owner",
+        "identity",
+        "subjectId",
+        "afterKind",
+        "requiredRights",
+        "allowedRights",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "access-review-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "requiredRights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "allowedRights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "entity"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/entity"
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "subjectId",
+        "visitedIds",
+        "suppliedClosureComplete",
+        "gaps",
+        "potentialRights",
+        "outsideAllowedRights",
+        "requiredNotObserved",
+        "effectiveRightsVerified",
+        "minimumRightsVerified"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "visitedIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+          },
+          "maxItems": 512
+        },
+        "suppliedClosureComplete": {
+          "type": "boolean"
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "reason"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              },
+              "reason": {
+                "enum": [
+                  "inventoryIncomplete",
+                  "missingEntity",
+                  "cycle",
+                  "depthLimit",
+                  "activationUnknown",
+                  "disabledDeclaration",
+                  "rightsIncomplete",
+                  "assignmentsIncomplete"
+                ]
+              }
+            }
+          },
+          "maxItems": 40000
+        },
+        "potentialRights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 32768
+        },
+        "outsideAllowedRights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 32768
+        },
+        "requiredNotObserved": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/right"
+          },
+          "maxItems": 64
+        },
+        "effectiveRightsVerified": {
+          "const": false
+        },
+        "minimumRightsVerified": {
+          "const": false
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "changedFields"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "onlyBefore",
+            "onlyAfter",
+            "unchanged",
+            "changed"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "kind",
+              "enabled",
+              "rightsComplete",
+              "assignmentsComplete",
+              "rights",
+              "inherits"
+            ]
+          },
+          "maxItems": 7
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeCount",
+        "afterCount",
+        "changedCount",
+        "beforeUnexpectedCount",
+        "afterUnexpectedCount",
+        "beforeRequiredNotObservedCount",
+        "afterRequiredNotObservedCount"
+      ],
+      "properties": {
+        "beforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeUnexpectedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterUnexpectedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeRequiredNotObservedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterRequiredNotObservedCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "owner",
+        "identity",
+        "subjectId",
+        "afterKind",
+        "observations",
+        "assessments",
+        "changes",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "effectiveRightsVerified",
+        "minimumRightsVerified",
+        "lockoutSafetyVerified",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "access-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 1024
+        },
+        "assessments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assessment"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          },
+          "maxItems": 1024
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "effectiveRightsVerified": {
+          "const": false
+        },
+        "minimumRightsVerified": {
+          "const": false
+        },
+        "lockoutSafetyVerified": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "access-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "effectiveRightsVerified",
+        "minimumRightsVerified",
+        "lockoutSafetyVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "effectiveRightsVerified": {
+          "const": false
+        },
+        "minimumRightsVerified": {
+          "const": false
+        },
+        "lockoutSafetyVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "effectiveRightsVerified",
+        "minimumRightsVerified",
+        "lockoutSafetyVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "effectiveRightsVerified": {
+          "const": false
+        },
+        "minimumRightsVerified": {
+          "const": false
+        },
+        "lockoutSafetyVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "assessments",
+            "changes"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      },
+                      {
+                        "$ref": "#/$defs/assessment"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "maxItems": 200
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

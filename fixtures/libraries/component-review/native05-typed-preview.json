@@ -1,0 +1,275 @@
+{
+  "state": "graphical_prepared",
+  "previewHash": "6ae77fecd99e5f82685dbf7cde1eab892819ed696b16c21fb757cd61a4a20f10",
+  "review": {
+    "changeId": "ecb8488c619d4022b751a3ca0c811779",
+    "state": "prepared",
+    "previewHash": "6ae77fecd99e5f82685dbf7cde1eab892819ed696b16c21fb757cd61a4a20f10",
+    "preview": {
+      "kind": "graphical_typed_edit",
+      "effects": [
+        {
+          "action": "create",
+          "blockName": "TiaMcpComponentCaller"
+        },
+        {
+          "action": "createInstanceDB",
+          "artifact": {
+            "bytes": 3612,
+            "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\changes\\change-ecb8488c619d4022b751a3ca0c811779\\new-instance-instance.xml",
+            "sha256": "48db5984b2a4e78015f5cd85a746f783ad0830bec6d91d90536a9f2381c9bf0d"
+          },
+          "autoNumber": false,
+          "calleePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+          "instanceOfName": "TiaMcpComponentGate",
+          "name": "TiaMcpComponentGate_1",
+          "number": 2,
+          "path": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate_1",
+          "startValueImpact": "New instance DB initialized from the exact captured system storage or callee's declared start values."
+        },
+        {
+          "description": "Native FBD network replaceNetwork; compilation and complete readback required.",
+          "identity": "3",
+          "kind": "replaceNetwork",
+          "sourceSha256": null
+        },
+        {
+          "description": "Exact FB callee interface dependency.",
+          "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+          "kind": "dependency",
+          "sourceSha256": "05b1a64fc568ba0199b3c3c8f9e1ebf35fac5c199c2955cfccb5d544eb082f77"
+        },
+        {
+          "description": "Explicit instance storage; no internal IEC offsets are synthesized.",
+          "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate_1",
+          "kind": "instanceDependency",
+          "sourceSha256": "48db5984b2a4e78015f5cd85a746f783ad0830bec6d91d90536a9f2381c9bf0d"
+        },
+        {
+          "description": "LiteralConstant Bool operand.",
+          "identity": "constant:Bool:true",
+          "kind": "operandDependency",
+          "sourceSha256": "70a22f4bc3633082e7043cbc5a55f1e045ca77514ecf8968be9b27372a33a64e"
+        },
+        {
+          "description": "GlobalVariable Bool operand.",
+          "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals::15:ComponentEnable",
+          "kind": "operandDependency",
+          "sourceSha256": "8833b0eeeeb6b33f3ede8839dabbe6aea468ca5d4b04fa56ac07fd6d56f7fdd5"
+        },
+        {
+          "description": "GlobalVariable Bool operand.",
+          "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals::15:ComponentActive",
+          "kind": "operandDependency",
+          "sourceSha256": "2962f145bd1ec5eec494d43ad0b34e30e289060debadbf73fac2b485e726496c"
+        }
+      ],
+      "typed": {
+        "blockPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentCaller",
+        "diagnostics": [
+          {
+            "code": "NativeValidationRequired",
+            "message": "Typed validation does not establish native acceptance, preservation, persistence, recovery or runtime behavior. Apply through the existing compiled change workflow.",
+            "node": null,
+            "severity": "information"
+          }
+        ],
+        "idMapping": {
+          "instance:call": "25",
+          "node:call": "24",
+          "operand:enable": "21",
+          "operand:p0": "22",
+          "operand:p1": "23",
+          "wire:$enable:value": "26",
+          "wire:$p0:value": "27",
+          "wire:call:Active": "28"
+        },
+        "language": "FBD",
+        "nativeArtifact": {
+          "bytes": 5898,
+          "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p17n\\c21dfec\\changes\\change-ecb8488c619d4022b751a3ca0c811779\\requested.xml",
+          "sha256": "5e4c979556c48fe7aed8de2dd8b27112e4c3d4e13d7f1010860740ea4bee590e"
+        },
+        "networkId": "3",
+        "operation": "createBlock",
+        "profiles": [
+          "v21.fw41.fbd.call.v1"
+        ],
+        "qualification": {
+          "engineeringVerified": false,
+          "persistenceVerified": false,
+          "preservationVerified": false,
+          "recoveryVerified": false,
+          "runtimeVerified": false
+        },
+        "resolvedCallees": [
+          {
+            "blockType": "FB",
+            "interfaceHash": "05b1a64fc568ba0199b3c3c8f9e1ebf35fac5c199c2955cfccb5d544eb082f77",
+            "name": "TiaMcpComponentGate",
+            "namespace": "",
+            "parameters": [
+              {
+                "dataType": "Bool",
+                "name": "Enable",
+                "required": true,
+                "section": "Input"
+              },
+              {
+                "dataType": "Bool",
+                "name": "Active",
+                "required": true,
+                "section": "Output"
+              }
+            ],
+            "path": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate"
+          }
+        ],
+        "resolvedInstances": [
+          {
+            "calleePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+            "components": [
+              "TiaMcpComponentGate_1"
+            ],
+            "dataType": "\"TiaMcpComponentGate\"",
+            "declarationHash": "48db5984b2a4e78015f5cd85a746f783ad0830bec6d91d90536a9f2381c9bf0d",
+            "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate_1",
+            "scope": "GlobalVariable"
+          }
+        ],
+        "resolvedOperands": [
+          {
+            "components": [
+              "ComponentEnable"
+            ],
+            "dataType": "Bool",
+            "declarationHash": "8833b0eeeeb6b33f3ede8839dabbe6aea468ca5d4b04fa56ac07fd6d56f7fdd5",
+            "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals::15:ComponentEnable",
+            "key": "p0",
+            "scope": "GlobalVariable",
+            "value": null,
+            "writable": true
+          },
+          {
+            "components": [
+              "ComponentActive"
+            ],
+            "dataType": "Bool",
+            "declarationHash": "2962f145bd1ec5eec494d43ad0b34e30e289060debadbf73fac2b485e726496c",
+            "identity": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals::15:ComponentActive",
+            "key": "p1",
+            "scope": "GlobalVariable",
+            "value": null,
+            "writable": true
+          },
+          {
+            "components": [],
+            "dataType": "Bool",
+            "declarationHash": "70a22f4bc3633082e7043cbc5a55f1e045ca77514ecf8968be9b27372a33a64e",
+            "identity": "constant:Bool:true",
+            "key": "enable",
+            "scope": "LiteralConstant",
+            "value": "true",
+            "writable": false
+          }
+        ],
+        "resultSha256": "e233370caaea6f3caf85f1efc39496468a733a7a9ba03e5c47c92f3f53915b78",
+        "schemaVersion": 1,
+        "sourceSha256": "01c65c0feeb056f3b814cd622d6924b65a30d5b9e205e512e4a0e0424dc5daac",
+        "target": {
+          "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+          "route": "standard",
+          "tiaVersion": "V21"
+        }
+      },
+      "payload": {
+        "groupPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks",
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createGlobal",
+            "name": "TiaMcpComponentGate_1"
+          }
+        ],
+        "model": {
+          "connections": [
+            {
+              "from": {
+                "node": "$p0",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$p1",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            }
+          ],
+          "creation": {
+            "blockType": "FC",
+            "interface": [],
+            "name": "TiaMcpComponentCaller"
+          },
+          "language": "FBD",
+          "nodes": [
+            {
+              "calleePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+              "instance": "instance",
+              "key": "call",
+              "kind": "call"
+            }
+          ],
+          "operands": [
+            {
+              "components": [
+                "ComponentEnable"
+              ],
+              "dataType": "Bool",
+              "key": "p0",
+              "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+              "scope": "tag"
+            },
+            {
+              "components": [
+                "ComponentActive"
+              ],
+              "dataType": "Bool",
+              "key": "p1",
+              "ownerPath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/TiaMcpComponentSignals",
+              "scope": "tag"
+            },
+            {
+              "dataType": "Bool",
+              "key": "enable",
+              "scope": "constant",
+              "value": "true"
+            }
+          ],
+          "operation": "createBlock",
+          "schemaVersion": 1
+        },
+        "namespace": "",
+        "scopePath": "/projects/TiaMcpScratch_20261013_043831_58a4ae2c/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"
+      }
+    }
+  }
+}

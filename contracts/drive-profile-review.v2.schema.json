@@ -1,0 +1,1391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/drive-profile-review.v2.schema.json",
+  "title": "Supplied drive parameter and typed telegram review; no native compatibility",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "driveId",
+        "family",
+        "orderNumber",
+        "firmware",
+        "parameterSet",
+        "unknownReason"
+      ],
+      "properties": {
+        "driveId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "family": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "orderNumber": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firmware": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameterSet": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scalar"
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4194304
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "driveId",
+            "parameterName",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "reference"
+            },
+            "driveId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "parameterName": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reason"
+          ],
+          "properties": {
+            "kind": {
+              "const": "unavailable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            }
+          }
+        }
+      ]
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "number",
+        "arrayIndex",
+        "parentName",
+        "unit",
+        "access",
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "arrayIndex": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 32767
+        },
+        "parentName": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "access": {
+          "enum": [
+            "readOnly",
+            "readWrite",
+            "unknown"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "valueDomain",
+        "parametersComplete",
+        "parameters",
+        "telegramsComplete",
+        "telegrams"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "valueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "parametersComplete": {
+          "type": "boolean"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          },
+          "maxItems": 4096
+        },
+        "telegramsComplete": {
+          "type": "boolean"
+        },
+        "telegrams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/telegram"
+          },
+          "maxItems": 128
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "hardwarePath",
+        "afterKind",
+        "before",
+        "after"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review-request.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hardwarePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "parameter",
+        "referenceResolution",
+        "parentResolution"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "parameter": {
+          "$ref": "#/$defs/parameter"
+        },
+        "referenceResolution": {
+          "enum": [
+            "notReference",
+            "outsideSuppliedDrive",
+            "suppliedParameter",
+            "unresolved"
+          ]
+        },
+        "parentResolution": {
+          "enum": [
+            "notDeclared",
+            "suppliedParentChain",
+            "unresolved"
+          ]
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "status",
+        "changedFields",
+        "proposalAssessment"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter",
+            "selectorConflict"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "number",
+              "arrayIndex",
+              "parentName",
+              "unit",
+              "access",
+              "value",
+              "metadata"
+            ]
+          }
+        },
+        "proposalAssessment": {
+          "enum": [
+            "notProposal",
+            "notAssessed",
+            "contradictsSuppliedReadOnly",
+            "accessUnknown"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeCount",
+        "afterCount",
+        "changedCount",
+        "selectorConflictCount",
+        "readOnlyConflictCount",
+        "unknownAccessChangeCount",
+        "unresolvedReferenceCount",
+        "unresolvedParentCount",
+        "beforeTelegramCount",
+        "afterTelegramCount",
+        "changedTelegramCount"
+      ],
+      "properties": {
+        "beforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectorConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "readOnlyConflictCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknownAccessChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedReferenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedParentCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "beforeTelegramCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "afterTelegramCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "changedTelegramCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "hardwarePath",
+        "identity",
+        "afterKind",
+        "beforeValueDomain",
+        "afterValueDomain",
+        "coverage",
+        "observations",
+        "changes",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "limits",
+        "telegrams",
+        "telegramChanges",
+        "telegramPolicy"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hardwarePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "beforeValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "afterValueDomain": {
+          "enum": [
+            "offline",
+            "online"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeParametersComplete",
+            "afterParametersComplete",
+            "beforeTelegramsComplete",
+            "afterTelegramsComplete"
+          ],
+          "properties": {
+            "beforeParametersComplete": {
+              "type": "boolean"
+            },
+            "afterParametersComplete": {
+              "type": "boolean"
+            },
+            "beforeTelegramsComplete": {
+              "type": "boolean"
+            },
+            "afterTelegramsComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 8192
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          },
+          "maxItems": 8192
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "limits": {
+          "type": "string"
+        },
+        "telegrams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/telegramObservation"
+          },
+          "maxItems": 256
+        },
+        "telegramChanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/telegramChange"
+          },
+          "maxItems": 256
+        },
+        "telegramPolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "drive-profile-review-record.v2"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "sourceEvidencePolicy"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "driveIdentityVerified",
+        "wholeDriveAnalysisComplete",
+        "nativeConstraintsVerified",
+        "sourceEvidencePolicy",
+        "section",
+        "offset",
+        "total",
+        "rows",
+        "nextOffset"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "driveIdentityVerified": {
+          "const": false
+        },
+        "wholeDriveAnalysisComplete": {
+          "const": false
+        },
+        "nativeConstraintsVerified": {
+          "const": false
+        },
+        "sourceEvidencePolicy": {
+          "type": "string"
+        },
+        "section": {
+          "enum": [
+            "observations",
+            "changes",
+            "telegrams",
+            "telegramChanges"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "value"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "value": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/observation"
+                      },
+                      {
+                        "$ref": "#/$defs/change"
+                      },
+                      {
+                        "$ref": "#/$defs/telegramObservation"
+                      },
+                      {
+                        "$ref": "#/$defs/telegramChange"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "index",
+                  "omitted",
+                  "reason"
+                ],
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "omitted": {
+                    "const": true
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "nextOffset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "telegramAddress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "plcPath",
+        "direction",
+        "context",
+        "startAddress",
+        "addressUnit",
+        "length",
+        "lengthUnit",
+        "unknownReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "plcPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "enum": [
+            "Input",
+            "Output",
+            null
+          ]
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startAddress": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "addressUnit": {
+          "enum": [
+            "bit",
+            "byte",
+            "unknown"
+          ]
+        },
+        "length": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lengthUnit": {
+          "enum": [
+            "bit",
+            "byte",
+            "unknown"
+          ]
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "plcPath": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "direction": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "context": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "startAddress": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "length": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "addressUnit": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "lengthUnit": {
+                    "const": "unknown"
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "unknownReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "telegram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "number",
+        "inputBytes",
+        "outputBytes",
+        "addressesComplete",
+        "addresses",
+        "unknownReason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "type": {
+          "enum": [
+            "MainTelegram",
+            "TorqueTelegram",
+            "SafetyTelegram",
+            "EdgeTelegram",
+            "SupplementaryTelegram",
+            "AdditionalTelegram",
+            null
+          ]
+        },
+        "number": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inputBytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outputBytes": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "addressesComplete": {
+          "type": "boolean"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/telegramAddress"
+          },
+          "maxItems": 16
+        },
+        "unknownReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "type": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "number": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "inputBytes": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "outputBytes": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "addressesComplete": {
+                    "const": false
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "unknownReason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024,
+                "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "telegramAddressObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceIndex",
+        "address",
+        "plcResolution",
+        "startBit",
+        "lengthBits",
+        "endBitExclusive",
+        "directionalSizeComparison",
+        "nativeAddressVerified"
+      ],
+      "properties": {
+        "sourceIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "address": {
+          "$ref": "#/$defs/telegramAddress"
+        },
+        "plcResolution": {
+          "enum": [
+            "notDeclared",
+            "missing",
+            "ambiguousIdentity",
+            "invalidIdentity",
+            "virtualObject",
+            "wrongKind",
+            "capturedPlc"
+          ]
+        },
+        "startBit": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 17179869176
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lengthBits": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 17179869176
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endBitExclusive": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 34359738352
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "directionalSizeComparison": {
+          "enum": [
+            "unknown",
+            "equalDeclaredSize",
+            "differentDeclaredSize"
+          ]
+        },
+        "nativeAddressVerified": {
+          "const": false
+        }
+      }
+    },
+    "telegramObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "sourceIndex",
+        "telegram",
+        "addresses",
+        "numberSemantics",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "sourceIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "telegram": {
+          "$ref": "#/$defs/telegram"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/telegramAddressObservation"
+          },
+          "maxItems": 16
+        },
+        "numberSemantics": {
+          "enum": [
+            "unknown",
+            "freelyConfigurable",
+            "declaredNumber"
+          ]
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      }
+    },
+    "telegramChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "changedFields",
+        "identityEqualityVerified",
+        "nativeCompatibilityVerified"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "changed",
+            "onlyBefore",
+            "onlyAfter"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "type",
+              "number",
+              "inputBytes",
+              "outputBytes",
+              "addressesComplete",
+              "addresses",
+              "unknownReason"
+            ]
+          },
+          "maxItems": 7
+        },
+        "identityEqualityVerified": {
+          "const": false
+        },
+        "nativeCompatibilityVerified": {
+          "const": false
+        }
+      }
+    }
+  }
+}

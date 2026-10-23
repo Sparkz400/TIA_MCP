@@ -1,0 +1,766 @@
+{
+  "kind": "scoped-repository-history-audit",
+  "auditedHead": "dab0104d83c14c12f25cdab79d58debb6985e279",
+  "date": "2026-10-18",
+  "releaseReady": false,
+  "nativeExecuted": false,
+  "fullGoalComplete": false,
+  "history": {
+    "commits": 106,
+    "reachableObjects": 5042,
+    "blobs": 3440,
+    "blobBytes": 233255788,
+    "trackedFiles": 2170,
+    "historicalPaths": 2170,
+    "unreachableAndReflogObjectsIncluded": false
+  },
+  "scanner": {
+    "version": "8.30.1",
+    "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_windows_x64.zip",
+    "sha256": "d29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e",
+    "verifiedAgainst": "GitHub release asset digest",
+    "exitCode": 1,
+    "rawFindingCount": 69,
+    "confirmedCredentials": 0,
+    "untriagedFindings": 0,
+    "classificationCounts": {
+      "prose-or-assertion": 7,
+      "assembly-sha256": 28,
+      "translation-row-identity": 34
+    },
+    "redacted": true,
+    "decodeDepth": 5,
+    "archiveDepth": 3,
+    "baselineUsed": false,
+    "repositorySuppressionsUsed": false,
+    "scannedDiffBytes": 35075380
+  },
+  "inventory": {
+    "binarySignatures": [
+      {
+        "sha": "dbb92008098d23fe1890782070fba52b47ada4cf",
+        "size": 266016,
+        "paths": [
+          "fixtures/testsuite/native-owned-v21/inputs/vendor-v17-page-26.png"
+        ],
+        "kind": "PNG image"
+      }
+    ],
+    "generatedPaths": [],
+    "archiveAndExecutablePaths": [],
+    "lfsPointers": [],
+    "largeBlobThresholdBytes": 1048576,
+    "largeBlobVersions": 83,
+    "largeBlobPaths": [
+      "contracts/api-coverage/implementation-bindings.v1.json",
+      "docs/plans/expansion-plans/api-coverage-inventory-20261014.json",
+      "docs/plans/release-obligations-20261015.json"
+    ],
+    "largestBlob": {
+      "sha": "9da2f38d6e0c36fe03f3d007db9f094a798ff5eb",
+      "size": 6644657,
+      "path": "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
+    }
+  },
+  "historicalEvidence": {
+    "missing": 106,
+    "originalRowsPreserved": true
+  },
+  "openReleaseGates": [
+    "Verify redistribution permission for retained vendor manual image and examples before public release.",
+    "Review original machine paths, identifiers and retained native scratch evidence for publication; recorded provenance is not independent customer-data clearance.",
+    "Repeat scan when refs or contents change; automated scanning cannot prove absence of every secret."
+  ],
+  "findings": [
+    {
+      "rule": "generic-api-key",
+      "path": "docs/verification/technology-references-20261017.md",
+      "commit": "fc168e370b68ac745e682eaf8810c269aa98f38d",
+      "line": 54,
+      "fingerprint": "fc168e370b68ac745e682eaf8810c269aa98f38d:docs/verification/technology-references-20261017.md:generic-api-key:54",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/style-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/style-import-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/style-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/style-import-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/application-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/application-import-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/application-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/application-import-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/style-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/style-import-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/style-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/style-import-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/application-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/application-import-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/application-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/application-import-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/application-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/application-import-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/application-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/application-import-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/after-failed-import-inspect-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/after-failed-import-inspect-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/after-failed-import-inspect-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/after-failed-import-inspect-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/final-inspect-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/final-inspect-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/final-inspect-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/final-inspect-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/after-failure-inspect-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/after-failure-inspect-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts01/session/after-failure-inspect-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts01/session/after-failure-inspect-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/final-inspect-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/final-inspect-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/final-inspect-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/final-inspect-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/style-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/style-import-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/style-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/style-import-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/style-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/style-import-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/style-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/style-import-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/system-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/system-import-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/system-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/system-import-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/application-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/application-import-admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/session/application-import-admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/session/application-import-admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/system-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 8,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/system-import-01/admission.json:generic-api-key:8",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/testsuite/native-owned-v21/evidence/ts02/system-import-01/admission.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 9,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/testsuite/native-owned-v21/evidence/ts02/system-import-01/admission.json:generic-api-key:9",
+      "classification": "assembly-sha256",
+      "disposition": "non-credential-match",
+      "reason": "Exact 64-character SHA-256 field in retained API admission metadata."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-block.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-block.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 32,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json:generic-api-key:32",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 57,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json:generic-api-key:57",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 82,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json:generic-api-key:82",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 107,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/filtered-plc.profile.json:generic-api-key:107",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 32,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json:generic-api-key:32",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 57,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json:generic-api-key:57",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 82,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json:generic-api-key:82",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 107,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-category.profile.json:generic-api-key:107",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 32,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json:generic-api-key:32",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 57,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json:generic-api-key:57",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 82,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json:generic-api-key:82",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 107,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/filtered-plc.profile.json:generic-api-key:107",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "docs/plans/completion-recheck-20261016.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 1104,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/plans/completion-recheck-20261016.json:generic-api-key:1104",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 32,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:32",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 57,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:57",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 82,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:82",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 107,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:107",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 132,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:132",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 157,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:157",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 182,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:182",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 207,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/legacy.profile.json:generic-api-key:207",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 7,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:7",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 32,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:32",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 57,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:57",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 82,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:82",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 107,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:107",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 132,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:132",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 157,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:157",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 182,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:182",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 207,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:fixtures/translations/native-tia21-read-20261015/capture-03/legacy.profile.json:generic-api-key:207",
+      "classification": "translation-row-identity",
+      "disposition": "non-credential-match",
+      "reason": "Opaque exported C-column identity paired with worksheet cell, source cell and targets; consumed as TranslationRow.NativeKey, not a credential."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "scripts/verify_translation_populated_category_probe.py",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 181,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:scripts/verify_translation_populated_category_probe.py:generic-api-key:181",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "docs/plans/completion-audit-20261016.json",
+      "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
+      "line": 1064,
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/plans/completion-audit-20261016.json:generic-api-key:1064",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+      "commit": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f",
+      "line": 157,
+      "fingerprint": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f:docs/plans/expansion-plans/api-coverage-and-roadmap.md:generic-api-key:157",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "docs/plans/expansion-plans/project-translations.md",
+      "commit": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f",
+      "line": 105,
+      "fingerprint": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f:docs/plans/expansion-plans/project-translations.md:generic-api-key:105",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    },
+    {
+      "rule": "generic-api-key",
+      "path": "docs/plans/release-obligations-20261015.json",
+      "commit": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f",
+      "line": 519,
+      "fingerprint": "557c5e437e9870db9fb9c91d728fa9e80ab29a8f:docs/plans/release-obligations-20261015.json:generic-api-key:519",
+      "classification": "prose-or-assertion",
+      "disposition": "non-credential-match",
+      "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "tia-project-explorer",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "description": "Read-only, portable project-model.v1 explorer; no runtime dependencies",
+  "scripts": {
+    "test": "node --test tests/model.test.cjs tests/client.test.cjs tests/relationship-scope.test.cjs",
+    "test:browser": "node tests/browser.mjs",
+    "benchmark": "node tests/benchmark.cjs",
+    "pack": "node pack.mjs"
+  }
+}

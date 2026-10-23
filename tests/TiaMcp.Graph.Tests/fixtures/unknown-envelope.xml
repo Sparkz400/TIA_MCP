@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?fixture non-native?>
+<Document xmlns:v="urn:fixture:future">
+  <Engineering version="synthetic" />
+  <SW.Blocks.FB ID="0"><AttributeList><Name>Unknown preservation</Name></AttributeList><ObjectList>
+    <SW.Blocks.CompileUnit ID="1"><AttributeList><NetworkSource>
+      <Graph xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/Graph/v6" v:Future="keep">
+        <PreOperations />
+        <Sequence>
+          <Steps><Step Number="1" Name="&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;" Init="true"><Actions><Action Qualifier="N"><Token Text="&lt;/pre&gt;&lt;img src=x onerror=alert(1)&gt;" /></Action></Actions><Supervisions><Supervision ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Supervision></Supervisions><Interlocks><Interlock ProgrammingLanguage="LAD"><FlgNet><Parts /></FlgNet></Interlock></Interlocks><v:Extra><![CDATA[  preserve <bytes> & Unicode: ä中  ]]></v:Extra></Step><v:Step Number="1" Name="foreign lookalike" /></Steps>
+          <Transitions /><Branches /><Connections><Connection><NodeFrom><StepRef Number="1" /></NodeFrom><NodeTo><EndConnection /></NodeTo><LinkType>Direct</LinkType></Connection></Connections>
+        </Sequence>
+        <PostOperations /><AlarmsSettings />
+        <!-- Future extension order and whitespace matter to source retention. -->
+        <v:Extension b="2" a="1"><v:Graph><v:Sequence /></v:Graph></v:Extension>
+      </Graph>
+    </NetworkSource><ProgrammingLanguage>GRAPH</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>
+    <SW.Blocks.CompileUnit ID="2"><AttributeList><NetworkSource><StructuredText xmlns="urn:fixture:scl"><v:Unknown /></StructuredText></NetworkSource></AttributeList></SW.Blocks.CompileUnit>
+  </ObjectList></SW.Blocks.FB>
+</Document>

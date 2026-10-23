@@ -1,0 +1,24 @@
+{
+  "archive": {
+    "path": "C:\\Program Files\\Siemens\\Automation\\Portal V21\\Help\\en-US\\TestSuiteOLH_enUS.zip",
+    "sha256": "952646b8ef6aa166020cbfd122067c42fee70bc7ff45ecfab30584d7533d4ac0",
+    "bytes": 5980581
+  },
+  "entry": "117605381515/137469520651.htm",
+  "rawSourcePage": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\production-watch-20261015\\testsuite\\vendor-help-style-setscope.htm",
+    "sha256": "24d26256aa7d9aaa6c2b38c5e168fcc6fcfdc4627677115db6e9f4df02f3f82f",
+    "bytes": 28867
+  },
+  "supportedObject": "Siemens.Engineering.SW.Blocks.PlcBlockSystemGroup",
+  "documentedRoute": "plc.BlockGroup",
+  "documentedScope": "All available Program blocks excluding System blocks",
+  "selectedOwnedProfile": "ScratchPLC root Program blocks; exactly Main, TiaMcp_EnableGate, TiaMcp_EnableGate_DB, TiaMcp_IsEnabled; zero user block groups",
+  "singleBlockUnsupportedReceipt": {
+    "path": "D:\\TIAW\\ts01\\evidence\\run-style-availability-01\\result.json",
+    "sha256": "d7107df2bfce05708f224d8c720f1d883133e97b79b17adc5f15a482a92fa657",
+    "bytes": 4363
+  },
+  "effectiveScope": "unverified",
+  "qualification": false
+}

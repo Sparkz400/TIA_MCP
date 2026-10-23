@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Explicitly authored FB attributes; no default inference or source/installed normalization.",
+  "nativeAttempt": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\component-native-02\\result.json",
+  "nativeAttemptSha256": "d65d5248aaa7283c667deecd52cc1207a0aa7cc79adcff6eed01a3506609ac0c",
+  "sourceVersionExport": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\n\\cbf2252\\changes\\change-lib-b221f3a088c14bc2ae673a93715afb6d\\integration-version-43b5c338b5894ab58c82cae3e08e9d06.xml",
+  "sourceVersionExportSha256": "878c05c2c41a9b402f4647a16875ffa68e600745eae493d162598a6be0448341",
+  "installedVersionExport": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\n\\cbf2252\\changes\\change-lib-b221f3a088c14bc2ae673a93715afb6d\\component-read-a164c98beaf74ff1b95d6b98df59006a\\43b5c338b5894ab58c82cae3e08e9d06-installed.xml",
+  "installedVersionExportSha256": "4695c02bd6a51025e9cd54ff23bfa7de2d30a9024bb7f3686843295a9f3459a5",
+  "fixture": "TiaMcpComponentGate.xml",
+  "fixtureSha256": "50d0ddb61da63e8d23f5c070c2cf08126ed729e3b54aadfe6eaef8a5a389b6a6",
+  "adaptation": [
+    "Extracted sole SW.Blocks.FB content into standalone Document/Engineering envelope.",
+    "Removed only root CompositionName=ContentObject; retained FB/interface/code/member/native ID attributes.",
+    "New library type/version GUIDs must be assigned and observed by native authoring."
+  ],
+  "explicitBlockAttributes": {
+    "AutoNumber": "true",
+    "IsIECCheckEnabled": "false",
+    "MemoryLayout": "Optimized"
+  },
+  "nativeRequalificationRequired": true,
+  "sourceVersionExportFixture": "captured-source-version.xml",
+  "installedVersionExportFixture": "captured-installed-version.xml"
+}

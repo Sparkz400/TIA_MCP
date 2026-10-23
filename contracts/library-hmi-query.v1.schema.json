@@ -1,0 +1,857 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tia-mcp:library-hmi-query:v1",
+  "title": "Library HMI query request and response observations",
+  "description": "Original capability, target and bounded Classic/Unified inventory responses. API metadata does not establish licensing, native workflow qualification or runtime behavior. Truncation scopes are separate; requested limits and total counts are not present in inventory responses. Request validation covers the inner library_query request object and never resolves its project or target.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/capabilities"
+    },
+    {
+      "$ref": "#/$defs/targets"
+    },
+    {
+      "$ref": "#/$defs/inventory"
+    },
+    {
+      "$ref": "#/$defs/request"
+    }
+  ],
+  "$defs": {
+    "assemblyIdentity": {
+      "type": "object",
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        },
+        "code": {
+          "enum": [
+            null,
+            "HmiVersionMismatch",
+            "HmiAssemblyIdentityMismatch"
+          ]
+        },
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        },
+        "requiredAssemblyName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAssemblyName": {
+          "type": "string"
+        },
+        "requiredMajorVersion": {
+          "const": 21
+        },
+        "observedMajorVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "assemblyVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+(?![\\s\\S])"
+        },
+        "requiredPublicKeyToken": {
+          "type": "string",
+          "pattern": "^(?:[a-f0-9]{16})?(?![\\s\\S])"
+        },
+        "observedPublicKeyToken": {
+          "type": "string",
+          "pattern": "^(?:[a-f0-9]{16})?(?![\\s\\S])"
+        },
+        "expectedKeySource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedCulture": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "accepted",
+        "code",
+        "family",
+        "requiredAssemblyName",
+        "observedAssemblyName",
+        "requiredMajorVersion",
+        "observedMajorVersion",
+        "assemblyVersion",
+        "requiredPublicKeyToken",
+        "observedPublicKeyToken",
+        "expectedKeySource",
+        "observedCulture",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "diagnostic": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "const": "optionalAssembly"
+        },
+        "nativeException": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string"
+        },
+        "retrySafe": {
+          "const": true
+        }
+      },
+      "required": [
+        "code",
+        "operation",
+        "nativeException",
+        "reason",
+        "retrySafe"
+      ],
+      "additionalProperties": false
+    },
+    "module": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        },
+        "assembly": {
+          "type": "string",
+          "minLength": 1
+        },
+        "installedApi": {
+          "type": "boolean"
+        },
+        "apiAvailability": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "runtimeQualified": {
+          "const": false
+        },
+        "assemblyVersion": {
+          "type": "string"
+        },
+        "assemblyIdentity": {
+          "$ref": "#/$defs/assemblyIdentity"
+        },
+        "diagnostic": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/assemblyIdentity"
+            },
+            {
+              "$ref": "#/$defs/diagnostic"
+            }
+          ]
+        }
+      },
+      "required": [
+        "family",
+        "assembly",
+        "installedApi",
+        "apiAvailability",
+        "nativeQualified",
+        "runtimeQualified"
+      ],
+      "additionalProperties": false
+    },
+    "operation": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        },
+        "operation": {
+          "enum": [
+            "inventory",
+            "screen_type",
+            "master_copy",
+            "faceplate_binding",
+            "faceplate_create",
+            "faceplate_bind",
+            "tag_create"
+          ]
+        },
+        "implementation": {
+          "enum": [
+            "typed",
+            "unsupported"
+          ]
+        },
+        "engineeringQualified": {
+          "const": false
+        },
+        "runtimeQualified": {
+          "const": false
+        },
+        "limitation": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "family",
+        "operation",
+        "implementation",
+        "engineeringQualified",
+        "runtimeQualified",
+        "limitation"
+      ],
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/module"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operation"
+          },
+          "maxItems": 9,
+          "minItems": 9
+        },
+        "qualification": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "modules",
+        "operations",
+        "qualification"
+      ],
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        },
+        "hmiPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compileScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compileScopeKind": {
+          "enum": [
+            "hmiSoftware",
+            "owningDeviceHardwareAndSoftware"
+          ]
+        }
+      },
+      "required": [
+        "family",
+        "hmiPath",
+        "name",
+        "compileScope",
+        "compileScopeKind"
+      ],
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/target"
+          },
+          "maxItems": 50000,
+          "minItems": 0
+        },
+        "complete": {
+          "const": true
+        }
+      },
+      "required": [
+        "targets",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "name": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "classicScreen": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "screen"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "classicTagTable": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "tagTable"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "tagsTruncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "name",
+        "tags",
+        "tagsTruncated"
+      ],
+      "additionalProperties": false
+    },
+    "classicInventory": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/target"
+            },
+            {
+              "properties": {
+                "family": {
+                  "const": "classic"
+                }
+              }
+            }
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/classicScreen"
+              },
+              {
+                "$ref": "#/$defs/classicTagTable"
+              }
+            ]
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "connectionsTruncated": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "target",
+        "items",
+        "truncated",
+        "connections",
+        "connectionsTruncated",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "faceplate": {
+      "type": "object",
+      "properties": {
+        "nativeObjectType": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/nativeObjectType"
+        },
+        "typeGuid": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/typeGuid"
+        },
+        "versionGuid": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/versionGuid"
+        },
+        "version": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/version"
+        },
+        "nativeLinkVerified": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/nativeLinkVerified"
+        },
+        "runtimeVerified": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/runtimeVerified"
+        },
+        "linkStatus": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/linkStatus"
+        },
+        "linkReadError": {
+          "$ref": "urn:tia-mcp:library-operation:v1#/$defs/link/properties/linkReadError"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "containedType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "left": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "top": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "interface": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "property": {
+                "type": "string"
+              },
+              "value": {}
+            },
+            "required": [
+              "property",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "interfaceTruncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nativeObjectType",
+        "typeGuid",
+        "versionGuid",
+        "version",
+        "nativeLinkVerified",
+        "runtimeVerified",
+        "linkStatus",
+        "name",
+        "containedType",
+        "left",
+        "top",
+        "width",
+        "height",
+        "interface",
+        "interfaceTruncated"
+      ],
+      "additionalProperties": false
+    },
+    "unifiedScreen": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "faceplates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/faceplate"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "screenItemsTruncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "width",
+        "height",
+        "faceplates",
+        "screenItemsTruncated"
+      ],
+      "additionalProperties": false
+    },
+    "unifiedTag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hmiDataType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "connection": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plcTag": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "table": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "dataType",
+        "hmiDataType",
+        "connection",
+        "plcTag",
+        "table"
+      ],
+      "additionalProperties": false
+    },
+    "unifiedConnection": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "partner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "station": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "driver": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "partner",
+        "station",
+        "driver"
+      ],
+      "additionalProperties": false
+    },
+    "unifiedInventory": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/target"
+            },
+            {
+              "properties": {
+                "family": {
+                  "const": "unified"
+                }
+              }
+            }
+          ]
+        },
+        "screens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/unifiedScreen"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/unifiedTag"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/unifiedConnection"
+          },
+          "maxItems": 200,
+          "minItems": 0
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "target",
+        "screens",
+        "tags",
+        "connections",
+        "truncated",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "inventory": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/classicInventory"
+        },
+        {
+          "$ref": "#/$defs/unifiedInventory"
+        }
+      ]
+    },
+    "requestTarget": {
+      "type": "object",
+      "required": [
+        "family",
+        "hmiPath"
+      ],
+      "properties": {
+        "family": {
+          "enum": [
+            "classic",
+            "unified"
+          ]
+        },
+        "hmiPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^[^\\x00-\\x1f\\x7f-\\x9f]+(?![\\s\\S])",
+          "allOf": [
+            {
+              "pattern": "\\S"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "action"
+      ],
+      "properties": {
+        "action": {
+          "enum": [
+            "hmi_capabilities",
+            "hmi_targets",
+            "hmi_inventory"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "hmi_targets",
+                  "hmi_inventory"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "projectName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "hmi_inventory"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "limit": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "target": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/requestTarget"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "if": {
+              "required": [
+                "target"
+              ],
+              "properties": {
+                "target": {
+                  "type": "object"
+                }
+              }
+            },
+            "then": {},
+            "else": {
+              "$ref": "#/$defs/requestTarget"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

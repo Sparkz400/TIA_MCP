@@ -1,0 +1,1194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/connection-review.v1.schema.json",
+  "title": "Supplied connection review; no native property, resource or communication qualification",
+  "$ref": "#/$defs/request",
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ownerPath",
+        "interfacePath",
+        "reason"
+      ],
+      "properties": {
+        "ownerPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "interfacePath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "origin",
+        "protocol",
+        "local",
+        "partner",
+        "properties"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "origin": {
+          "enum": [
+            "engineering",
+            "program",
+            "hmiSoftware"
+          ]
+        },
+        "protocol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "local": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "partner": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "properties": {
+          "type": "object"
+        }
+      }
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objectPath",
+        "connectionId",
+        "reason"
+      ],
+      "properties": {
+        "objectPath": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "connectionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connectionsComplete",
+        "consumersComplete",
+        "connections",
+        "consumers"
+      ],
+      "properties": {
+        "connectionsComplete": {
+          "type": "boolean"
+        },
+        "consumersComplete": {
+          "type": "boolean"
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/connection"
+          },
+          "maxItems": 512
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumer"
+          },
+          "maxItems": 2048
+        }
+      }
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeId",
+        "afterId"
+      ],
+      "properties": {
+        "beforeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "afterId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "afterKind",
+        "before",
+        "after",
+        "matches"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "connection-review-request.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "before": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "after": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/match"
+          },
+          "maxItems": 512
+        }
+      }
+    },
+    "endpointResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "interfaceCapabilityVerified",
+        "nativeOwnershipVerified"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "capturedHardwareAncestry",
+            "selectorUnknown",
+            "pathNotCaptured",
+            "notHardware",
+            "ownershipUnproven"
+          ]
+        },
+        "interfaceCapabilityVerified": {
+          "const": false
+        },
+        "nativeOwnershipVerified": {
+          "const": false
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "connection",
+        "local",
+        "partner",
+        "advertisedFamily",
+        "resourceAssessment"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "connection": {
+          "$ref": "#/$defs/connection"
+        },
+        "local": {
+          "$ref": "#/$defs/endpointResult"
+        },
+        "partner": {
+          "$ref": "#/$defs/endpointResult"
+        },
+        "advertisedFamily": {
+          "type": "boolean"
+        },
+        "resourceAssessment": {
+          "const": "notAssessed"
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeId",
+        "afterId",
+        "status",
+        "changedFields"
+      ],
+      "properties": {
+        "beforeId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "afterId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "changed",
+            "unchanged",
+            "unmatchedBefore",
+            "unmatchedAfter"
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "consumerRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "evidence",
+        "objectResolution",
+        "connectionResolution",
+        "comparisonStatus"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/consumer"
+        },
+        "objectResolution": {
+          "enum": [
+            "capturedObject",
+            "unresolved"
+          ]
+        },
+        "connectionResolution": {
+          "enum": [
+            "suppliedConnection",
+            "unresolved"
+          ]
+        },
+        "comparisonStatus": {
+          "enum": [
+            "changed",
+            "unchanged",
+            "unmatchedBefore",
+            "unmatchedAfter",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeCount",
+        "afterCount",
+        "matchedCount",
+        "changedCount",
+        "unmatchedBeforeCount",
+        "unmatchedAfterCount",
+        "unresolvedEndpointCount",
+        "consumerCount",
+        "unresolvedConsumerCount"
+      ],
+      "properties": {
+        "beforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "afterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "matchedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmatchedBeforeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unmatchedAfterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedEndpointCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consumerCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolvedConsumerCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "afterKind",
+        "coverage",
+        "observations",
+        "comparisons",
+        "consumers",
+        "matches",
+        "summary",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeProjectAnalysisComplete",
+        "limits"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "connection-review.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "afterKind": {
+          "enum": [
+            "observation",
+            "proposal"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "beforeConnectionsComplete",
+            "afterConnectionsComplete",
+            "beforeConsumersComplete",
+            "afterConsumersComplete"
+          ],
+          "properties": {
+            "beforeConnectionsComplete": {
+              "type": "boolean"
+            },
+            "afterConnectionsComplete": {
+              "type": "boolean"
+            },
+            "beforeConsumersComplete": {
+              "type": "boolean"
+            },
+            "afterConsumersComplete": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          },
+          "maxItems": 1024
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/comparison"
+          },
+          "maxItems": 1024
+        },
+        "consumers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/consumerRow"
+          },
+          "maxItems": 4096
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/match"
+          },
+          "maxItems": 512
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeProjectAnalysisComplete": {
+          "const": false
+        },
+        "limits": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^connection-reviews/[a-f0-9]{64}\\.(input|json)$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "reviewId",
+        "input",
+        "reportArtifact",
+        "summary",
+        "sourceEvidencePolicy",
+        "nativeExecutable",
+        "nativeQualified",
+        "sourceAuthenticityVerified",
+        "liveFreshnessVerified",
+        "wholeProjectAnalysisComplete"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "reportArtifact": {
+          "$ref": "#/$defs/artifact"
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "sourceEvidencePolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8192,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+        },
+        "nativeExecutable": {
+          "const": false
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "liveFreshnessVerified": {
+          "const": false
+        },
+        "wholeProjectAnalysisComplete": {
+          "const": false
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "reviewId",
+        "input",
+        "report"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "connection-review-record.v1"
+        },
+        "reviewId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input": {
+          "$ref": "#/$defs/artifact"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "page": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordId",
+            "reviewId",
+            "input",
+            "reportArtifact",
+            "summary",
+            "sourceEvidencePolicy",
+            "nativeExecutable",
+            "nativeQualified",
+            "sourceAuthenticityVerified",
+            "liveFreshnessVerified",
+            "wholeProjectAnalysisComplete",
+            "section",
+            "offset",
+            "total",
+            "rows",
+            "nextOffset"
+          ],
+          "properties": {
+            "recordId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "input": {
+              "$ref": "#/$defs/artifact"
+            },
+            "reportArtifact": {
+              "$ref": "#/$defs/artifact"
+            },
+            "summary": {
+              "$ref": "#/$defs/summary"
+            },
+            "sourceEvidencePolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "nativeExecutable": {
+              "const": false
+            },
+            "nativeQualified": {
+              "const": false
+            },
+            "sourceAuthenticityVerified": {
+              "const": false
+            },
+            "liveFreshnessVerified": {
+              "const": false
+            },
+            "wholeProjectAnalysisComplete": {
+              "const": false
+            },
+            "section": {
+              "const": "observations"
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "value"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "value": {
+                        "$ref": "#/$defs/observation"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "omitted",
+                      "reason"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "omitted": {
+                        "const": true
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192,
+                        "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 200
+            },
+            "nextOffset": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordId",
+            "reviewId",
+            "input",
+            "reportArtifact",
+            "summary",
+            "sourceEvidencePolicy",
+            "nativeExecutable",
+            "nativeQualified",
+            "sourceAuthenticityVerified",
+            "liveFreshnessVerified",
+            "wholeProjectAnalysisComplete",
+            "section",
+            "offset",
+            "total",
+            "rows",
+            "nextOffset"
+          ],
+          "properties": {
+            "recordId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "input": {
+              "$ref": "#/$defs/artifact"
+            },
+            "reportArtifact": {
+              "$ref": "#/$defs/artifact"
+            },
+            "summary": {
+              "$ref": "#/$defs/summary"
+            },
+            "sourceEvidencePolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "nativeExecutable": {
+              "const": false
+            },
+            "nativeQualified": {
+              "const": false
+            },
+            "sourceAuthenticityVerified": {
+              "const": false
+            },
+            "liveFreshnessVerified": {
+              "const": false
+            },
+            "wholeProjectAnalysisComplete": {
+              "const": false
+            },
+            "section": {
+              "const": "comparisons"
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "value"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "value": {
+                        "$ref": "#/$defs/comparison"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "omitted",
+                      "reason"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "omitted": {
+                        "const": true
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192,
+                        "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 200
+            },
+            "nextOffset": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordId",
+            "reviewId",
+            "input",
+            "reportArtifact",
+            "summary",
+            "sourceEvidencePolicy",
+            "nativeExecutable",
+            "nativeQualified",
+            "sourceAuthenticityVerified",
+            "liveFreshnessVerified",
+            "wholeProjectAnalysisComplete",
+            "section",
+            "offset",
+            "total",
+            "rows",
+            "nextOffset"
+          ],
+          "properties": {
+            "recordId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "input": {
+              "$ref": "#/$defs/artifact"
+            },
+            "reportArtifact": {
+              "$ref": "#/$defs/artifact"
+            },
+            "summary": {
+              "$ref": "#/$defs/summary"
+            },
+            "sourceEvidencePolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "nativeExecutable": {
+              "const": false
+            },
+            "nativeQualified": {
+              "const": false
+            },
+            "sourceAuthenticityVerified": {
+              "const": false
+            },
+            "liveFreshnessVerified": {
+              "const": false
+            },
+            "wholeProjectAnalysisComplete": {
+              "const": false
+            },
+            "section": {
+              "const": "consumers"
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "value"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "value": {
+                        "$ref": "#/$defs/consumerRow"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "omitted",
+                      "reason"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "omitted": {
+                        "const": true
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192,
+                        "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 200
+            },
+            "nextOffset": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recordId",
+            "reviewId",
+            "input",
+            "reportArtifact",
+            "summary",
+            "sourceEvidencePolicy",
+            "nativeExecutable",
+            "nativeQualified",
+            "sourceAuthenticityVerified",
+            "liveFreshnessVerified",
+            "wholeProjectAnalysisComplete",
+            "section",
+            "offset",
+            "total",
+            "rows",
+            "nextOffset"
+          ],
+          "properties": {
+            "recordId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reviewId": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "input": {
+              "$ref": "#/$defs/artifact"
+            },
+            "reportArtifact": {
+              "$ref": "#/$defs/artifact"
+            },
+            "summary": {
+              "$ref": "#/$defs/summary"
+            },
+            "sourceEvidencePolicy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8192,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+            },
+            "nativeExecutable": {
+              "const": false
+            },
+            "nativeQualified": {
+              "const": false
+            },
+            "sourceAuthenticityVerified": {
+              "const": false
+            },
+            "liveFreshnessVerified": {
+              "const": false
+            },
+            "wholeProjectAnalysisComplete": {
+              "const": false
+            },
+            "section": {
+              "const": "matches"
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "value"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "value": {
+                        "$ref": "#/$defs/match"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "index",
+                      "omitted",
+                      "reason"
+                    ],
+                    "properties": {
+                      "index": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "omitted": {
+                        "const": true
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192,
+                        "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "maxItems": 200
+            },
+            "nextOffset": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

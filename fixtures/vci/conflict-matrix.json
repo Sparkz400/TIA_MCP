@@ -1,0 +1,19 @@
+{
+  "origin": "Independently enumerated three-way package-byte outcomes; null means explicitly absent from complete inventory.",
+  "cases": [
+    {"baseline":"A","project":"A","workspace":"A","state":"unchanged","conflict":false},
+    {"baseline":"A","project":"B","workspace":"A","state":"projectOnly","conflict":false},
+    {"baseline":"A","project":"A","workspace":"B","state":"workspaceOnly","conflict":false},
+    {"baseline":"A","project":"B","workspace":"B","state":"bothChangedIdentically","conflict":false},
+    {"baseline":"A","project":"B","workspace":"C","state":"divergentChange","conflict":true},
+    {"baseline":"A","project":null,"workspace":"A","state":"deletedProjectOnly","conflict":false},
+    {"baseline":"A","project":"A","workspace":null,"state":"deletedWorkspaceOnly","conflict":false},
+    {"baseline":"A","project":null,"workspace":null,"state":"deletedBoth","conflict":false},
+    {"baseline":"A","project":null,"workspace":"B","state":"deleteVsChange","conflict":true},
+    {"baseline":"A","project":"B","workspace":null,"state":"deleteVsChange","conflict":true},
+    {"baseline":null,"project":"B","workspace":null,"state":"addedProjectOnly","conflict":false},
+    {"baseline":null,"project":null,"workspace":"B","state":"addedWorkspaceOnly","conflict":false},
+    {"baseline":null,"project":"B","workspace":"B","state":"addedBothIdentically","conflict":false},
+    {"baseline":null,"project":"B","workspace":"C","state":"divergentAddition","conflict":true}
+  ]
+}

@@ -1,0 +1,375 @@
+{
+  "format": "tia-graph-native-fixtures.v1",
+  "profiles": [
+    {
+      "directory": "empty-condition",
+      "outcome": "empty-condition-rejected",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g04",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "d8c36c1c48129cf7981d00a4f423612dd32a1171ab24088bdf0562d26b849697"
+        },
+        {
+          "file": "baseline.xml",
+          "sha256": "f9e5b77f65cf4ee0183b502e2f9dcb5b0d6b6b01a0f33f29b5ca065656c5cebb"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "cb9450fb04a65d819f01390f6b0385efc9613e768e2aa660747dcad06b9090be"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "f02c97bacf7efdb90f6470e54d6fc5843059c4d17ca587f805ede2fe999b185b"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "ecda2ec53586c972f54232b98a0447bcb9a6b0ec8db13e0eb57e9809f9543682"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "9fe184babea011b5f96a9fbd679855ef6408995a19d6b3a69df118664172dd05"
+        },
+        {
+          "file": "compile-imported.json",
+          "sha256": "114a61c3a53011c49296f88169009c16e5fe1038ce03c29824a101fd79c3c400"
+        },
+        {
+          "file": "failure.json",
+          "sha256": "fb3eff0387bf3457e601fac5f1feaf6cfc9f11da49254da7565b3fc434783457"
+        }
+      ]
+    },
+    {
+      "directory": "populated",
+      "outcome": "completed",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g10",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "28bf7a48d49b4cc83a70b31e5cc1d750b7991d3399c310a1907ae4bae0b5d3ba"
+        },
+        {
+          "file": "baseline.xml",
+          "sha256": "c759e896ba4e24e8e8b19650f73c33485cf992d5164decaa06b02f67d335c3d4"
+        },
+        {
+          "file": "roundtrip.xml",
+          "sha256": "6ccbf809c3ecb9b475a98cd3e4023e2f61ef57cf420751c31c6ad40ea4432148"
+        },
+        {
+          "file": "reopened.xml",
+          "sha256": "0ece33a2197fdea3311583ae2218e1d3c7befe35520de9de2c9610863aa1709d"
+        },
+        {
+          "file": "recovered.xml",
+          "sha256": "a3577706ba269e88838b847d71c255d80ece6c8b35ce94101ec0b3406da8338a"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "19b1cadd2b9fccd67936eb61ad19a5a137d7c1b3d5a3083c52b7d9ae84798416"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "57de70ab435737f2d9227f9545a89097e49233c6cf1c2a7d488d1d7a6480957f"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "626f482a103813c4b93d8b9d7ee86ae89996bb0986fefb5889af06eed745087c"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "fbb98eb09647a927189b80409065c76b07b961a42088954898fbc10f32b5a223"
+        },
+        {
+          "file": "process-reopen.json",
+          "sha256": "d0c69e8797fa9e671c7b4baf9cdb4870c127298e701e0c65b816ce56d7367bda"
+        },
+        {
+          "file": "process-recovery.json",
+          "sha256": "5596146eae6111f5229aa714173103bff45f399559b287442492f8825aea739e"
+        },
+        {
+          "file": "recovered-project.json",
+          "sha256": "860729eb66e47913274f90aa08e6bc2d2b2c56137ef796c3824350c15e1a7922"
+        },
+        {
+          "file": "compile-imported.json",
+          "sha256": "de398311636aca953cd209d5d7b6335ebb7ce1f2b485e15727b4424f0c2599f1"
+        },
+        {
+          "file": "compile-roundtrip.json",
+          "sha256": "74a19a4d68ba06f1fe007f010c97966ef7e17749571690c2d41ccf00d07b41f2"
+        },
+        {
+          "file": "compile-reopened.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "compile-recovered.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "result.json",
+          "sha256": "f64dce5ed8d85273851ae45e9412a62704b34d87f112821fe7b3ee6c3e36c7de"
+        }
+      ]
+    },
+    {
+      "directory": "cross-sequence",
+      "outcome": "completed",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g14",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "2e2abd1c5a569bce37b1e116fbd1eab76e09091f372ff418a54bf66499b68434"
+        },
+        {
+          "file": "baseline.xml",
+          "sha256": "8406e59c6f7e1b55d5872fb3c06c5d5481d15c9d4c074d075bb5c0d9e95ce27d"
+        },
+        {
+          "file": "roundtrip.xml",
+          "sha256": "b68da91d746c59c144a2202dd370213694465b7e06c93afd669c46bf7db0fae4"
+        },
+        {
+          "file": "reopened.xml",
+          "sha256": "4bb470f87ff6a8705c4f27e2ef50643254bf660b08fb1edf2f602b4c581a6576"
+        },
+        {
+          "file": "recovered.xml",
+          "sha256": "572d3121e86fa8bdfa86a97956239d8946532fa3dbf0d2d91010ba45eb9d0ebf"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "343e9f4cd60af6b7bcab4600ec420a2dfd9651e9f8b2e4513a532f95f0f1822d"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "1c5ccdbf620a775b7938853369e2e8018b367f857a068fb712d48396d9007ef2"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "54e29a79834efae5a1834dbc85dec04fdbeca16d0fc24de87bea56e0cd0c5463"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "a194db8987792c5fdac03e8db7b2c084da544ffb324751ff3c4814b4ed786d78"
+        },
+        {
+          "file": "process-reopen.json",
+          "sha256": "8cfdf3a1c6c58c062d9fece93726b2adf609befb5f021ccc0ba395e2995799b4"
+        },
+        {
+          "file": "process-recovery.json",
+          "sha256": "96f4288c18951befc0af59c89a8567cdc26699b128aa11d0958ad0dfb4a90cda"
+        },
+        {
+          "file": "recovered-project.json",
+          "sha256": "ea217a7d123f8133b0fb6fd546cf324f966b3f3c9e21891fde94e57f0197c41e"
+        },
+        {
+          "file": "compile-imported.json",
+          "sha256": "d506a18ed34634a096ccb8e4757d79886ef1ac36c02bad6d8086f73ebf2a52ac"
+        },
+        {
+          "file": "compile-roundtrip.json",
+          "sha256": "d4197678fa629ad9f8821e5bb873b088353201e4777e22c8b59706c425002c7b"
+        },
+        {
+          "file": "compile-reopened.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "compile-recovered.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "result.json",
+          "sha256": "f1088295c513d2772cab2c90db5a90043904b9d346952c68db96c4a1a7af0cff"
+        }
+      ]
+    },
+    {
+      "directory": "duplicate-number",
+      "outcome": "duplicate-number-rejected",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g15",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "73aa93193ec3798f1650c8de833cfc805b6ff5ace5fc98b2532ce5003356187d"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "35c120d19f97ee7c626420233bec95bb421f4b5e3bad3e0b84a4616fcd812f82"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "82df1ec1e9d5e2d1974726b06d74d04b004e53c5a89c1296f90e7cf262f6ab24"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "b23e5d4261d6e3b433ea61fa5966c4a10bcfca60c14d60701d9c2a148858af5b"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "102280fa69638862877b8da21149cc0a1fca7cd457dfc19331c65822791b12ae"
+        },
+        {
+          "file": "failure.json",
+          "sha256": "bc31b12717294c1b111f026018f8373a97ae13718b09b573599bce292abf1d69"
+        }
+      ]
+    },
+    {
+      "directory": "parallel",
+      "outcome": "completed",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g22",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "d54eee241f44fe8cb7da4c69a870e7d6afc512a6c9befaee20221cc10a15becc"
+        },
+        {
+          "file": "baseline.xml",
+          "sha256": "dfd7f6a66199039e253494cbd494721be07253cb23e2d9c84cc06e1e6cd22ed7"
+        },
+        {
+          "file": "roundtrip.xml",
+          "sha256": "8f9a78418ade16aa6016d75dff4507e23e00eb3690b63d0bd5b2ee0177eb1fc2"
+        },
+        {
+          "file": "reopened.xml",
+          "sha256": "2dcac9445d37a6cf4321c682aa01912ce6fdab01becc34daed4469a611f5ba34"
+        },
+        {
+          "file": "recovered.xml",
+          "sha256": "988b5598f434e57a64428db9aebd1539b6a99257dfeaf94357ebb943b43c57d8"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "078dc14f2a632416dc7240a090510b50ca9e6b2aaa59d95ecabe00b6e9f00900"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "fe835e3eb022fcf3284084823d01173d9aefa6deffdbb2d6949ed01f4d4b406c"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "ac155aaedf5d7f7ec4abd411a549014402044d18b211e8e43220d443f90a161f"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "428d0d85e89f5b135abe4c42f0098a34a995ce73bcd4ea74aeb0d7abc2a8493d"
+        },
+        {
+          "file": "process-reopen.json",
+          "sha256": "c6b6e475ab8b9c6d6200699b61e8a411a5cdd657d571a45d6cd5958adb6550da"
+        },
+        {
+          "file": "process-recovery.json",
+          "sha256": "f979d573ec8bfef435a6903396df23678209e261c88036f6c10fd58562a060d9"
+        },
+        {
+          "file": "recovered-project.json",
+          "sha256": "c335ad2564021914b0c12624d7d8595a5aef097598d58967b8af9f65e7e4f06d"
+        },
+        {
+          "file": "compile-imported.json",
+          "sha256": "de398311636aca953cd209d5d7b6335ebb7ce1f2b485e15727b4424f0c2599f1"
+        },
+        {
+          "file": "compile-roundtrip.json",
+          "sha256": "74a19a4d68ba06f1fe007f010c97966ef7e17749571690c2d41ccf00d07b41f2"
+        },
+        {
+          "file": "compile-reopened.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "compile-recovered.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "result.json",
+          "sha256": "f0df5e57aa0a726570ffb82d5e0d9d26cbbe61c3484ae0685c9cc90e5801fa9f"
+        }
+      ]
+    },
+    {
+      "directory": "alternative",
+      "outcome": "completed",
+      "sourceRun": "D:\\03_Entwicklung\\TIA_MCP\\tests\\TiaMcp.Graph.Tests\\Native\\bin\\g23",
+      "artifacts": [
+        {
+          "file": "seed.xml",
+          "sha256": "2cfda1a286e784dd58decf0868128046fe88cad2de9fbd24bd2e33b72393389e"
+        },
+        {
+          "file": "baseline.xml",
+          "sha256": "562ae609c7aed1b597d3eed75b35115e8eeb30dbc069489bb2ed756c8e7ed6c1"
+        },
+        {
+          "file": "roundtrip.xml",
+          "sha256": "5041d5a294f563ae9eb1e3eae781a7c5987db7cacabe1471384a637709eb4ba1"
+        },
+        {
+          "file": "reopened.xml",
+          "sha256": "4a81aebf01b7b1be3ff0b1c9ceac1b91741bc8007c9742a70d73d1a2a6ed3ef5"
+        },
+        {
+          "file": "recovered.xml",
+          "sha256": "99ed8908ef00f453d919d656717fb304a8b983ed5fc1b15ca0b0dcc86ea9dc68"
+        },
+        {
+          "file": "intent.json",
+          "sha256": "50773a9edd727cf5f30cf2b261bb3a9ee1e88b695c6178cdc9a5c8705bc85c9d"
+        },
+        {
+          "file": "baseline.json",
+          "sha256": "bb1a181678d225909c596c94cda4895c1cda890afe749be1605e0989cf8f5a63"
+        },
+        {
+          "file": "project-ownership.json",
+          "sha256": "e0bfdf2f473078105c7d47177b96f36591cfff9e4fed7d69c1886a95170962db"
+        },
+        {
+          "file": "process-create.json",
+          "sha256": "4d0f124723582b72c9dd5071f0a07169e7be7e3119742d85805a2fc7f6e25ca8"
+        },
+        {
+          "file": "process-reopen.json",
+          "sha256": "244fa76f88df5af7cddf007b1a7e5f4a2a7bff45192ec3012cbf9f5c117ee6a2"
+        },
+        {
+          "file": "process-recovery.json",
+          "sha256": "93d90b292244e4a08914b8feec048289f5fa0a40a088999dd67fb50a07cab7c4"
+        },
+        {
+          "file": "recovered-project.json",
+          "sha256": "d5df4dcb1187d23ee80ae15e769f8332940dd09c689838a3bb445fd8be26c82e"
+        },
+        {
+          "file": "compile-imported.json",
+          "sha256": "75af2bf798d32800fba89a4dac750970e85fee3dda7a090086c4cde9181908fb"
+        },
+        {
+          "file": "compile-roundtrip.json",
+          "sha256": "505b0fcc94dae28aac98d1b433e7221ba5f1a44426983a362f7df2a5d684227f"
+        },
+        {
+          "file": "compile-reopened.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "compile-recovered.json",
+          "sha256": "a8c14ee3f3f5277759fa04043d0455709623a98d1329a946df5fedf6ea2b6d37"
+        },
+        {
+          "file": "result.json",
+          "sha256": "8afb934efbbb3d9e7a00d640f55920b1686b6b0caa29c1d2a33ffb5ac2f45319"
+        }
+      ]
+    }
+  ]
+}

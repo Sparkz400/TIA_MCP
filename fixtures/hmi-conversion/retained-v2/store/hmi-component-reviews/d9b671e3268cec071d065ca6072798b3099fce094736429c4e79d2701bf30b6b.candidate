@@ -1,0 +1,22 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "RenamedList":
+        RangeType: Bool
+        Entries:
+          "False":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "RenamedTexts.FalseText"
+          "True":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "RenamedTexts.TrueText"

@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-12T08:26:49.284032+00:00",
+  "status": "verified_independent_scl_storage_capture",
+  "scope": "Independent retained native/source/hash/public XML audit; no native calls.",
+  "report": {
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\result.json",
+    "sha256": "28e6296a8314651a0ff59962ad410183f518e709acfd41f09f4b0f92d50dfdca"
+  },
+  "rawXmlExportsVerified": 47,
+  "snapshotObjectCounts": {
+    "before-storage": 9,
+    "after-storage": 10,
+    "reopened-storage": 10,
+    "recovered-before-storage": 9,
+    "reopened-recovery": 9
+  },
+  "comparison": "Exact raw bytes after removal of only one exact direct DocumentInfo provenance element plus its own following line separator; no XML reserialization or whitespace/namespace/content normalization.",
+  "originalBaselinePeerExportsVerified": 7,
+  "importedFbMatchesOriginalFailedPreparation": true,
+  "udtExactCrossEnvelopeRelation": {
+    "comparison": {
+      "indentationLocations": [
+        {
+          "directSpaces": 8,
+          "field": "text",
+          "nodeIndex": 0,
+          "sourceSpaces": 12
+        },
+        {
+          "directSpaces": 6,
+          "field": "tail",
+          "nodeIndex": 0,
+          "sourceSpaces": 10
+        },
+        {
+          "directSpaces": 10,
+          "field": "text",
+          "nodeIndex": 1,
+          "sourceSpaces": 14
+        },
+        {
+          "directSpaces": 6,
+          "field": "tail",
+          "nodeIndex": 1,
+          "sourceSpaces": 10
+        },
+        {
+          "directSpaces": 12,
+          "field": "text",
+          "nodeIndex": 2,
+          "sourceSpaces": 16
+        },
+        {
+          "directSpaces": 8,
+          "field": "tail",
+          "nodeIndex": 2,
+          "sourceSpaces": 12
+        },
+        {
+          "directSpaces": 14,
+          "field": "text",
+          "nodeIndex": 3,
+          "sourceSpaces": 18
+        },
+        {
+          "directSpaces": 10,
+          "field": "tail",
+          "nodeIndex": 3,
+          "sourceSpaces": 14
+        },
+        {
+          "directSpaces": 16,
+          "field": "text",
+          "nodeIndex": 4,
+          "sourceSpaces": 20
+        },
+        {
+          "directSpaces": 12,
+          "field": "tail",
+          "nodeIndex": 4,
+          "sourceSpaces": 16
+        },
+        {
+          "directSpaces": 16,
+          "field": "tail",
+          "nodeIndex": 5,
+          "sourceSpaces": 20
+        },
+        {
+          "directSpaces": 16,
+          "field": "tail",
+          "nodeIndex": 6,
+          "sourceSpaces": 20
+        },
+        {
+          "directSpaces": 16,
+          "field": "tail",
+          "nodeIndex": 7,
+          "sourceSpaces": 20
+        },
+        {
+          "directSpaces": 14,
+          "field": "tail",
+          "nodeIndex": 8,
+          "sourceSpaces": 18
+        }
+      ],
+      "nativeNodes": 9,
+      "policyId": "native04-exact-udt-interface-wrapper-indent-v1",
+      "scope": "Exact captured None/Active Bool interface and four BooleanAttribute leaves only; namespace contexts/attributes/leaf values exact. Unknown nodes, comments/PIs, xml:space and mixed text rejected.",
+      "verified": true
+    },
+    "directArtifact": {
+      "bytes": 3762,
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\before-storage\\0006.xml",
+      "sha256": "e3547683012fdbfa8f4f6c81bbfc881cb94cc13ba1179ad59d8e843d06bacc8c"
+    },
+    "retainedArtifact": {
+      "bytes": 2680,
+      "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\n\\cc9f40f\\changes\\change-lib-58bf477b6ce64e368e668f010d6de2f1\\component-read-7b96b22bd4c047c4ba86402ce8fe77d5\\eee41dd4513748bba42bd7fc64637eec-installed.xml",
+      "sha256": "66b63292b16bec84210eb264de616bb264a519c3e28f3275364d46324869cb6a"
+    },
+    "verified": true
+  },
+  "nativeIdentityChecks": {
+    "phases": 5,
+    "exactVersionsPerPhase": 2,
+    "uniqueUsesPerVersion": 1,
+    "completeDependencyEdges": 1,
+    "committedAndUsable": true
+  },
+  "sclApplyCount": 1,
+  "compileErrorCount": 0,
+  "saveVerified": true,
+  "captureOwnCheckpoint": {
+    "bytes": 433775,
+    "path": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\n\\changes\\change-76f8ef58284a4b878370f3ce46c8af8e\\before.zap21",
+    "sha256": "633ec039ccb5099de3dbc70e08a6b18b0401221e53cf89d51436d75ac5613249"
+  },
+  "checkpointRetrieveCount": 1,
+  "recoveredProject": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\n\\recovery\\r_151a727fbbe3\\TiaMcpScratch_20261012_075201_121a7ed8\\TiaMcpScratch_20261012_075201_121a7ed8.ap21",
+  "firstInstallationCheckpointUsed": false,
+  "freshReopensVerified": 2,
+  "storageArtifacts": {
+    "db": {
+      "bytes": 5570,
+      "file": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\after-storage\\0002.xml",
+      "kind": "block",
+      "name": "TiaMcpComponentStorageCapture",
+      "path": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentStorageCapture",
+      "payloadSha256": "bbe89d00c03a1503bf75c51d7385e52cce8203d331db97d1fb4be68b65bd91dd",
+      "sha256": "5b81c7fce7f9e87b57a0d33f533b97b9ee3619e6f147b25342ec4e314b071797"
+    },
+    "callee": {
+      "bytes": 8419,
+      "file": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\before-storage\\0001.xml",
+      "kind": "block",
+      "name": "TiaMcpComponentGate",
+      "path": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcpComponentGate",
+      "payloadSha256": "9301927bf328a6b475daa7469bb4ce7752a237a899e927d7b786b295d61270f1",
+      "sha256": "f3e5a17c5cd7fb9ff314c403f5c20d4e41e839bfed5cbcc9d4bb596d50ed40ab"
+    },
+    "udt": {
+      "bytes": 3762,
+      "file": "D:\\03_Entwicklung\\TIA_MCP\\artifacts\\p15\\sc01\\before-storage\\0006.xml",
+      "kind": "type",
+      "name": "TiaMcpComponentState",
+      "path": "/projects/TiaMcpScratch_20261012_075201_121a7ed8/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/types/TiaMcpComponentState",
+      "payloadSha256": "427cf1ddaa4642447e0b94921d65b6c341584934184f43ecc635ab531ba2065f",
+      "sha256": "e3547683012fdbfa8f4f6c81bbfc881cb94cc13ba1179ad59d8e843d06bacc8c"
+    }
+  },
+  "storageObservations": {
+    "declarationsVerified": true,
+    "instanceOfName": "TiaMcpComponentGate",
+    "nativeStorageObservations": [
+      {
+        "attributes": {
+          "Accessibility": "Public",
+          "Datatype": "\"TiaMcpComponentState\"",
+          "Name": "State",
+          "Remanence": "NonRetain"
+        },
+        "defaultValues": [],
+        "directChildren": [
+          {
+            "name": "{http://www.siemens.com/automation/Openness/SW/Interface/v5}AttributeList",
+            "xml": "<ns0:AttributeList xmlns:ns0=\"http://www.siemens.com/automation/Openness/SW/Interface/v5\">\n                <ns0:BooleanAttribute Name=\"ExternalAccessible\" SystemDefined=\"true\">true</ns0:BooleanAttribute>\n                <ns0:BooleanAttribute Name=\"ExternalVisible\" SystemDefined=\"true\">true</ns0:BooleanAttribute>\n                <ns0:BooleanAttribute Name=\"ExternalWritable\" SystemDefined=\"true\">true</ns0:BooleanAttribute>\n                <ns0:BooleanAttribute Name=\"SetPoint\" SystemDefined=\"true\">true</ns0:BooleanAttribute>\n              </ns0:AttributeList>\n              "
+          },
+          {
+            "name": "{http://www.siemens.com/automation/Openness/SW/Interface/v5}Sections",
+            "xml": "<ns0:Sections xmlns:ns0=\"http://www.siemens.com/automation/Openness/SW/Interface/v5\">\n                <ns0:Section Name=\"None\">\n                  <ns0:Member Name=\"Active\" Datatype=\"Bool\" />\n                </ns0:Section>\n              </ns0:Sections>\n            "
+          }
+        ],
+        "omissionMeaning": "Absent values remain unobserved; no default/runtime value is inferred.",
+        "path": "Static/State",
+        "startValues": []
+      },
+      {
+        "attributes": {
+          "Datatype": "Bool",
+          "Name": "Active"
+        },
+        "defaultValues": [],
+        "directChildren": [],
+        "omissionMeaning": "Absent values remain unobserved; no default/runtime value is inferred.",
+        "path": "Static/State/Active",
+        "startValues": []
+      }
+    ]
+  },
+  "dbMemoryLayoutLeafPresent": false,
+  "serializedStartOrDefaultValuesPresent": false,
+  "originalInputFilesUnchanged": 140,
+  "originalProjectCompanionsUnchanged": 9,
+  "opaqueHashExclusions": 0,
+  "exactOwnedCleanup": [
+    {
+      "tiaProcessId": 56004,
+      "capturedHandleExitVerified": true,
+      "hostExitCode": 0,
+      "workerProcessIds": [
+        63668
+      ]
+    },
+    {
+      "tiaProcessId": 64572,
+      "capturedHandleExitVerified": true,
+      "hostExitCode": 0,
+      "workerProcessIds": [
+        45684
+      ]
+    },
+    {
+      "tiaProcessId": 67304,
+      "capturedHandleExitVerified": true,
+      "hostExitCode": 0,
+      "workerProcessIds": [
+        46180
+      ]
+    },
+    {
+      "tiaProcessId": 33524,
+      "capturedHandleExitVerified": true,
+      "hostExitCode": 0,
+      "workerProcessIds": [
+        52672
+      ]
+    }
+  ],
+  "rawXmlHashes": {
+    "before-storage\\0000.xml": "ce771b3e44c7c2ea657355b77ec017ebd4ef675f9d105364982286c2b44d1224",
+    "before-storage\\0001.xml": "f3e5a17c5cd7fb9ff314c403f5c20d4e41e839bfed5cbcc9d4bb596d50ed40ab",
+    "before-storage\\0002.xml": "e6c7d40e1a4217d8e27f202e45259e3da941a29955020909b9395e9d21abd298",
+    "before-storage\\0003.xml": "f4c71d9ac87f9298fe141c7535abf5ef7971fa4f6e8fdb30b0c2bafd39586833",
+    "before-storage\\0004.xml": "b955d3d6a62b1e1fd3350b25a2e75e3b613721612d02c5e4b0ea119b8894b0ac",
+    "before-storage\\0005.xml": "8d2115b6606ac0f7cd58448d53b8c3cf4b698b6393cd56e9eb011a1cc611acb0",
+    "before-storage\\0007.xml": "611e35431b949cbf44a1231f69d7a446e8247daf6f81c488d0b0a57ea1914ada",
+    "before-storage\\0008.xml": "dc6fc7841f2a288f64d5908bb52aff30a547f2c55928bbd0c19a4a1d7273f0fa",
+    "before-storage\\0006.xml": "e3547683012fdbfa8f4f6c81bbfc881cb94cc13ba1179ad59d8e843d06bacc8c",
+    "after-storage\\0000.xml": "d75c68b7183198b962d2a3d1978dccb48354a8a920f62ef081e9e059d56fede6",
+    "after-storage\\0001.xml": "c8e6f3856b7050b3df94e5e801237cf17ef0c5ddcc849c49fdd9c053f18023b8",
+    "after-storage\\0002.xml": "5b81c7fce7f9e87b57a0d33f533b97b9ee3619e6f147b25342ec4e314b071797",
+    "after-storage\\0003.xml": "804683db727e629c602ea772c897c0ba955dcc740c7998527993f25561a3974c",
+    "after-storage\\0004.xml": "6c2cc61ecefd938cc080e3dc44ebee99c75689f9fd8d4d0685aef9b52fe92a8c",
+    "after-storage\\0005.xml": "5f093acb8437b3eab8aa5af46f831d1c5b0e2ae12ab789481b08323f354bccb2",
+    "after-storage\\0006.xml": "623c77a683effaad0a5372bf5fa8c1539de20b4ca8755cd0d05df25a629ea841",
+    "after-storage\\0008.xml": "a8f3f01d675ee620f4e8e8126b81efca83d2ae5c16081b718c366be96b236921",
+    "after-storage\\0009.xml": "627a96a9bdc61e9a58a464761ad8777c492c7325eb0c1cfb1f5fd5b243bc704f",
+    "after-storage\\0007.xml": "64861fef86a9204c825ec63d56026060e7d99120a563dbe671483338734579f5",
+    "reopened-storage\\0000.xml": "a14341756aad2003c72b51bf49b35aa56dcafe5a2a0641b65bf71ad068eb5cd3",
+    "reopened-storage\\0001.xml": "fefad2a4488d7a8b8f859741b5abd9b087058762036750d2c24dcb86d95991b7",
+    "reopened-storage\\0002.xml": "4e5a6fd28dba0219a4734ad8d499bb3f5850a08dcddbfab04065a1fbbb8ed4c2",
+    "reopened-storage\\0003.xml": "73e4d5cee856bdcf955d88ee5a865988168315742c5266c300d827bdde7fcd8d",
+    "reopened-storage\\0004.xml": "6d78a2bc5c85e9dffccb111ae3ac4cbbf99efc027596f02bc5816fdffc7a012c",
+    "reopened-storage\\0005.xml": "0796b0ec5ed3c52032e6621c7bb0df362abb3830f87fa9df94b22834ccfaee7c",
+    "reopened-storage\\0006.xml": "e3d5ec7bd7a7d8a190b5d9e07ea09b17f18b52aec98845076c6daa690713c8fb",
+    "reopened-storage\\0008.xml": "a8ab00a6b4df41de6260bf32a503a279b545feb76a1da45a27fd0f367ac9f3f0",
+    "reopened-storage\\0009.xml": "160f7a6a3430a258bdfba6d085a4dfe91d8d06c56e670a3e6c15749259f9a53d",
+    "reopened-storage\\0007.xml": "130f462618ac8c74928a6c53f04174b260a5c66f275d82b43dec8f650561520a",
+    "recovered-before-storage\\0000.xml": "593b45be20d00947e4446ecf6ba7fdf7e89919959e379630bda2f247c1153b81",
+    "recovered-before-storage\\0001.xml": "46885b3817bd8f96baab03cc97a8c26bd4e39ed0fdcc3f4469f7e2f20530f8db",
+    "recovered-before-storage\\0002.xml": "fcd2733f3200d8226ec29351828896578eea365163c25ee344367b9e148d479f",
+    "recovered-before-storage\\0003.xml": "5a0e92567274305535c8b70ff7048205e0e101e03ba462f18dee34f84e124bf3",
+    "recovered-before-storage\\0004.xml": "46842b13f92af0d3f879d880ab8b94e194b289b8efa6b0e9adf610e00dfb202d",
+    "recovered-before-storage\\0005.xml": "1ea681d91e989fabf4d004b903c0ab660f49651f77a14b993254f910cf91138c",
+    "recovered-before-storage\\0007.xml": "9ea6f03122c52cc8f28b0e9955866445c1376e9904c97d3c673074e75bd14eaa",
+    "recovered-before-storage\\0008.xml": "2a6294846a33b62023d72daab5a7cce661a037d60ecf3a1bf1c4c1971255f238",
+    "recovered-before-storage\\0006.xml": "659bf7a825f631d56845c6c00f4d3a992ae1581e5e8b5a15a1651b0813a5aae2",
+    "reopened-recovery\\0000.xml": "1e9ce6760bf1090303300ec7633e45e03520b401e30ef1d1c4f9275643cea3bc",
+    "reopened-recovery\\0001.xml": "ef3c8637945ace0609d4645637e16aa93e1cb05ff334fed04820fa8044c28ef0",
+    "reopened-recovery\\0002.xml": "ed475b092800f8acfc50787cd773ea09804cde88ed30c5676e67775ce3bc4aeb",
+    "reopened-recovery\\0003.xml": "8f6e009e05f944e124389fa40d95481dfd7aa26eee2716aa975a8949ce92a518",
+    "reopened-recovery\\0004.xml": "d66eb40b433d6a2cc8d2a54b09c18c632b07c67871245e5a777eb340566f99b3",
+    "reopened-recovery\\0005.xml": "e0ce76267da9ea721925fed34a6c65d38ccdeb27c17729547735256420ca4866",
+    "reopened-recovery\\0007.xml": "a4aef1f9765222508a3ddeaf32b8ebd11b8585c822b005ee4b91ba6a81355e97",
+    "reopened-recovery\\0008.xml": "40ea171f54ad46602b5d0938aa4075585548a588e96b8be31e77ccd59a9604db",
+    "reopened-recovery\\0006.xml": "89d68051ce54818a74d5b91085a9cc9111440744916b09223eae12f97070da64"
+  },
+  "genericScalarGuardChanged": false,
+  "builderUsed": false,
+  "componentInstallationVerified": false,
+  "runtimeVerified": false,
+  "productionApplySupported": false,
+  "limitations": [
+    "The independently authored DB establishes this exact V21 Update2/CPU1511V4.1 native04 FB+UDT serialized layout only.",
+    "No DB MemoryLayout field and no State/Active starts/defaults were serialized; absence is preserved and no runtime/effective value is inferred.",
+    "This capture does not qualify a builder. Any derived DocumentInfo.None profile must retain original raw hashes and record exact provenance-only extraction.",
+    "Its own before-DB checkpoint retained imported FB/UDT and removes only the new DB. Full future component qualification must independently recover the original first library-import checkpoint.",
+    "Original component04 remains failed and untouched; OB/runtime/production combined apply remain separate gates."
+  ]
+}

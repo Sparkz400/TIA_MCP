@@ -1,0 +1,469 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-experiment-repeat.v1.schema.json",
+  "title": "Explicit repeated diagnostic observations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "request",
+    "runPairCount",
+    "runs",
+    "hypotheses",
+    "beforeDiagnosticPlanId",
+    "afterDiagnosticPlanId",
+    "requestedWindowsEqual",
+    "signalMappingsEqual",
+    "settingsEqualAcrossRuns",
+    "aggregation",
+    "sourceAuthenticityVerified",
+    "independentRunsVerified",
+    "clockSynchronizationVerified",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "limits"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-experiment-repeat.v1"
+    },
+    "request": {
+      "$ref": "#/$defs/request"
+    },
+    "runPairCount": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 8
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "reviewId",
+          "beforeWindow",
+          "afterWindow"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewId": {
+            "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+          },
+          "beforeWindow": {
+            "$ref": "#/$defs/window"
+          },
+          "afterWindow": {
+            "$ref": "#/$defs/window"
+          }
+        }
+      },
+      "minItems": 2,
+      "maxItems": 8
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "statement",
+          "before",
+          "after",
+          "causationProven",
+          "bugFixProven"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "before": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "runs",
+              "supportedPredictionRuns",
+              "contradictedPredictionRuns",
+              "unresolvedRuns",
+              "conditionObservedRuns"
+            ],
+            "properties": {
+              "runs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "supportedPredictionRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "contradictedPredictionRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "unresolvedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "conditionObservedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              }
+            }
+          },
+          "after": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "runs",
+              "supportedPredictionRuns",
+              "contradictedPredictionRuns",
+              "unresolvedRuns",
+              "conditionObservedRuns"
+            ],
+            "properties": {
+              "runs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "supportedPredictionRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "contradictedPredictionRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "unresolvedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              "conditionObservedRuns": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              }
+            }
+          },
+          "causationProven": {
+            "const": false
+          },
+          "bugFixProven": {
+            "const": false
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "beforeDiagnosticPlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "afterDiagnosticPlanId": {
+      "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+    },
+    "requestedWindowsEqual": {
+      "const": true
+    },
+    "signalMappingsEqual": {
+      "const": true
+    },
+    "settingsEqualAcrossRuns": {
+      "type": "boolean"
+    },
+    "aggregation": {
+      "const": "descriptiveRunCountsOnly"
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "independentRunsVerified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "pairs"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "beforeExperimentId",
+              "afterExperimentId",
+              "beforeMeasurementId",
+              "afterMeasurementId",
+              "comparison"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "beforeExperimentId": {
+                "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+              },
+              "afterExperimentId": {
+                "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+              },
+              "beforeMeasurementId": {
+                "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+              },
+              "afterMeasurementId": {
+                "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+              },
+              "comparison": {
+                "$ref": "trace-comparison.v1.schema.json#/$defs/options"
+              }
+            }
+          },
+          "minItems": 2,
+          "maxItems": 8
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestedStartSeconds",
+        "requestedEndSeconds",
+        "anchorSeconds",
+        "firstRecordedSeconds",
+        "lastRecordedSeconds",
+        "samplesInWindow",
+        "firstWindowSampleSeconds",
+        "lastWindowSampleSeconds",
+        "recordedSpanCoversRequestedWindow",
+        "coverage",
+        "qualityGatePassed",
+        "qualityGateReasons",
+        "qualityGateScope",
+        "qualityAssessment",
+        "acquisitionQuality",
+        "acquisitionContext",
+        "hypotheses",
+        "sourceAuthenticityVerified",
+        "clockSynchronizationVerified"
+      ],
+      "properties": {
+        "requestedStartSeconds": {
+          "type": "number"
+        },
+        "requestedEndSeconds": {
+          "type": "number"
+        },
+        "anchorSeconds": {
+          "type": "number"
+        },
+        "firstRecordedSeconds": {
+          "type": "number"
+        },
+        "lastRecordedSeconds": {
+          "type": "number"
+        },
+        "samplesInWindow": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "firstWindowSampleSeconds": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lastWindowSampleSeconds": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "recordedSpanCoversRequestedWindow": {
+          "type": "boolean"
+        },
+        "coverage": {
+          "enum": [
+            "noRecordedSamples",
+            "completeRecordedSpan",
+            "partialRecordedSpan"
+          ]
+        },
+        "qualityGatePassed": {
+          "type": "boolean"
+        },
+        "qualityGateReasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "qualityGateScope": {
+          "const": "conservativeWholeCaptureQualityAndRequestedWindow"
+        },
+        "qualityAssessment": {
+          "type": "object"
+        },
+        "acquisitionQuality": {
+          "type": "object"
+        },
+        "acquisitionContext": {
+          "$ref": "trace-comparison.v1.schema.json#/$defs/acquisition"
+        },
+        "hypotheses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "statement",
+              "matchedSamples",
+              "contradictedSamples",
+              "unknownSamples",
+              "verdict",
+              "reason",
+              "causationProven",
+              "bugFixProven"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "matchedSamples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "contradictedSamples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "unknownSamples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "verdict": {
+                "enum": [
+                  "unresolved",
+                  "supportedPrediction",
+                  "contradictedPrediction"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "causationProven": {
+                "const": false
+              },
+              "bugFixProven": {
+                "const": false
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "sourceAuthenticityVerified": {
+          "const": false
+        },
+        "clockSynchronizationVerified": {
+          "const": false
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request"
+      ],
+      "properties": {
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "artifact",
+        "schemaVersion",
+        "report"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "diagnostic-case.v1.schema.json#/$defs/hash"
+        },
+        "artifact": {
+          "$ref": "diagnostic-experiment.v1.schema.json#/$defs/artifact"
+        },
+        "schemaVersion": {
+          "const": "diagnostic-experiment-repeat.v1"
+        },
+        "report": {
+          "$ref": "#"
+        }
+      }
+    }
+  }
+}
