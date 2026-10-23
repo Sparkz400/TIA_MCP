@@ -56,7 +56,14 @@ renamed `Sparkz400/TIA_MCP-private`. Private vulnerability reporting, secret sca
 protection, Dependabot alerts and security updates are enabled, and a ruleset blocks
 deleting or force-pushing the default branch. Gitleaks on the public history reported only the
 70 already-triaged generic-key matches. Markdown links into the untracked `artifacts/` folder
-and to private pull requests, Actions runs and commits were turned into plain text. The
+and to private pull requests, Actions runs and commits were turned into plain text.
+
+Hosted CI runs on the public repository. The first run on the initial snapshot failed two jobs: the
+Add-In receiver set its pipe owner to the user SID, while `CurrentUserOnly` clients compare with the
+token's default owner (Administrators on the elevated hosted runner), and the isolated OPC UA build
+did not copy Core's linked source files. After both fixes, run 40018817017 passed all four
+Python/.NET jobs (contracts, managed suites, OPC UA, portable package) and run 40018817030 passed
+the Explorer browser checks. The
 private repository keeps the full history and original evidence. Commit hashes,
 Actions runs and pull requests cited in these documents refer to that private
 history.

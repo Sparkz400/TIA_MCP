@@ -50,7 +50,6 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 
 ## Repository and hosted CI
 
-- [ ] Restore hosted Actions availability after the billing/spending-limit blocker, then verify Python, managed .NET and Explorer browser jobs on the intended commit. [Recorded CI blocker](verification/github-readiness-20261018.md).
 - [ ] Review subsequent dependency PRs, especially native NuGet changes, and perform applicable SDK/runtime qualification.
 - [ ] Require independent reviews when additional contributors participate.
 - [ ] After full acceptance, choose the version, create the tag, write release notes with exact limitations, and attach the verified package, license and integrity manifest.
