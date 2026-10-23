@@ -63,8 +63,8 @@ Siemens documents this self-description API in [V21 self-description support](ht
 
 Two successful native runs are recorded:
 
-- [`artifacts/target-capabilities-live.json`](../../artifacts/target-capabilities-live.json): CPU 1511-1 PN V4.0; project, PLC, SCL/STL/LAD/FBD blocks, eight hardware targets, a PLC data type and a tag table. Native network-service availability differed correctly between hardware targets. `maxItems: 1` returned exactly one metadata item and reported truncation. The non-F CPU exposed no safety service and reported that workflow unsupported.
-- [`artifacts/target-capabilities-safety-live.json`](../../artifacts/target-capabilities-safety-live.json): CPU 1511F-1 PN V4.1; safety administration was exposed, while the selected generated/protected F-block reported blocked export and direct mutation. The generated safety import route was also blocked.
+- `artifacts/target-capabilities-live.json`: CPU 1511-1 PN V4.0; project, PLC, SCL/STL/LAD/FBD blocks, eight hardware targets, a PLC data type and a tag table. Native network-service availability differed correctly between hardware targets. `maxItems: 1` returned exactly one metadata item and reported truncation. The non-F CPU exposed no safety service and reported that workflow unsupported.
+- `artifacts/target-capabilities-safety-live.json`: CPU 1511F-1 PN V4.1; safety administration was exposed, while the selected generated/protected F-block reported blocked export and direct mutation. The generated safety import route was also blocked.
 
 In both runs every feature's arbitrary-target qualification remained `unverified`; observed native services did not promote that status. Before/after project inventories, software metadata and hardware metadata matched. A sample standard block's native XML matched after removing only top-level export `DocumentInfo`, and the source archive SHA-256 was unchanged. This is observable metadata and sample-content preservation, not a whole-project binary equivalence proof.
 

@@ -9,15 +9,15 @@ touches only both workflow files, both root npm manifests and
 
 | PR | Change | Review result |
 | --- | --- | --- |
-| [1](https://github.com/Sparkz400/TIA_MCP/pull/1) | upload-artifact v4 → v7 | Existing multi-file uploads retain the default zipped archive mode; artifact names, paths, retention and hidden-file handling are unchanged. |
-| [2](https://github.com/Sparkz400/TIA_MCP/pull/2) | setup-dotnet v4 → v6 | Both installed SDK inputs remain supported. `global.json` contains concrete SDK version `10.0.100` with `latestFeature`; the separate `8.0.x` action input remains unchanged. |
-| [3](https://github.com/Sparkz400/TIA_MCP/pull/3) | checkout v4 → v7 | The workflow uses ordinary push/PR/manual events, not privileged `pull_request_target` or `workflow_run`. It does not inspect checkout credential-file locations or use authenticated Docker container actions. |
-| [4](https://github.com/Sparkz400/TIA_MCP/pull/4) | Playwright 1.64.0 → 1.64.1 | Only the test package and its exact Playwright dependencies change. Clean npm installation and actual Chromium fixture tests pass. |
-| [5](https://github.com/Sparkz400/TIA_MCP/pull/5) | referencing lower bound 0.35 → 0.37.0 | This version was already installed; the upper bound remains `<1`. Full Python checks pass. |
-| [6](https://github.com/Sparkz400/TIA_MCP/pull/6) | setup-node v4 → v7 | Explicit Node 24 and npm caching inputs remain supported. The workflow does not use removed `always-auth` or `registry-url`/dummy-token behavior. |
-| [7](https://github.com/Sparkz400/TIA_MCP/pull/7) | jsonschema lower bound 4.23 → 4.26.0 | This version was already installed; the upper bound remains `<5`. Full Python checks pass. |
-| [8](https://github.com/Sparkz400/TIA_MCP/pull/8) | setup-python v5 → v7 | Explicit Python 3.13 remains supported. Removed `pip-install` is not used; the explicit requirements installation remains. |
-| [9](https://github.com/Sparkz400/TIA_MCP/pull/9) | psutil lower bound 7.1 → 7.2.2 | This version was already installed; the upper bound remains `<8`. Lifecycle/recovery tests pass in the full Python run. |
+| 1 | upload-artifact v4 → v7 | Existing multi-file uploads retain the default zipped archive mode; artifact names, paths, retention and hidden-file handling are unchanged. |
+| 2 | setup-dotnet v4 → v6 | Both installed SDK inputs remain supported. `global.json` contains concrete SDK version `10.0.100` with `latestFeature`; the separate `8.0.x` action input remains unchanged. |
+| 3 | checkout v4 → v7 | The workflow uses ordinary push/PR/manual events, not privileged `pull_request_target` or `workflow_run`. It does not inspect checkout credential-file locations or use authenticated Docker container actions. |
+| 4 | Playwright 1.64.0 → 1.64.1 | Only the test package and its exact Playwright dependencies change. Clean npm installation and actual Chromium fixture tests pass. |
+| 5 | referencing lower bound 0.35 → 0.37.0 | This version was already installed; the upper bound remains `<1`. Full Python checks pass. |
+| 6 | setup-node v4 → v7 | Explicit Node 24 and npm caching inputs remain supported. The workflow does not use removed `always-auth` or `registry-url`/dummy-token behavior. |
+| 7 | jsonschema lower bound 4.23 → 4.26.0 | This version was already installed; the upper bound remains `<5`. Full Python checks pass. |
+| 8 | setup-python v5 → v7 | Explicit Python 3.13 remains supported. Removed `pip-install` is not used; the explicit requirements installation remains. |
+| 9 | psutil lower bound 7.1 → 7.2.2 | This version was already installed; the upper bound remains `<8`. Lifecycle/recovery tests pass in the full Python run. |
 
 The Actions use Node 24 and document minimum runner version 2.327.1. These
 workflows target GitHub-hosted Windows/Ubuntu runners. Their actual execution
@@ -63,7 +63,7 @@ branches were already absent; their temporary local review refs were removed
 after verifying that each original head remains an ancestor of `main`. Only the
 primary checkout is retained.
 
-Follow-up [PR 10](https://github.com/Sparkz400/TIA_MCP/pull/10), first reviewed at
+Follow-up PR 10, first reviewed at
 `1e6aab8283e07374c3617686814cd744516039c0`, updates Newtonsoft.Json 13.0.3 to
 13.0.4 across 29 native harness/worker and test projects. It remained open at
 this earlier checkpoint; the later [dependency validation](newtonsoft-update-20261018.md)

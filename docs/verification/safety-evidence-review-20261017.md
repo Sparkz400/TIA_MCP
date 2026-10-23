@@ -38,11 +38,11 @@ publication reliability is a separate open repair, with investigation at
 that failed aggregate.
 
 Final frozen Git tree: `298c5957cd6b4792125ee9d344ef548501b38c6e` (2018 files).
-[Source manifest](../../artifacts/safety-evidence-03/source-manifest.json) SHA-256:
+Source manifest (`artifacts/safety-evidence-03/source-manifest.json`) SHA-256:
 `d495757989d83238c8295fb375195cd9bc4e62642c70b22ce1176ae3bec01301`.
 Source ZIP SHA-256: `94ae8a22def297a578c4a518c2286aa30386b06d98ac9c71654cb81ff6049d21`.
 
-The [aggregate](../../artifacts/safety-evidence-03/source/artifacts/checks/result.json)
+The aggregate (`artifacts/safety-evidence-03/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,400 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. Safety evidence passes 96 managed checks and 87 actual MCP checks;
@@ -50,9 +50,9 @@ the existing general executable passes 208 checks. The focused MCP harness also
 passes 87 checks under -OO in `artifacts/safety-evidence-01/mcp-optional-fixed`.
 Run: 2026-10-17T11:53:27.8571289Z to 2026-10-17T12:08:24.9294632Z.
 Aggregate receipt SHA-256: `226e66d6835a2c5aec8342ca05ffdb8ab3a91852a7d00ae6da3f24f1622961ae`.
-[Console evidence](../../artifacts/safety-evidence-03/aggregate-console.log).
+Console evidence (`artifacts/safety-evidence-03/aggregate-console.log`).
 
-All 23 [package stages](../../artifacts/safety-evidence-03/source/artifacts/package-checks/result.json)
+All 23 package stages (`artifacts/safety-evidence-03/source/artifacts/package-checks/result.json`)
 pass, including the same 87-check safety workflow through the relocated portable
 Host. Bundle `tia-mcp-offline_20261017_115306_eb1c2003` contains 1427 manifest files.
 Package receipt SHA-256: `2b04310fee07698bd91c0e7821c21a7bdd6570e978c34471e30ba5bf84720072`.
@@ -61,10 +61,10 @@ ZIP SHA-256: `42ad1170e684e724fc6f0e7efd8a978e57cdfcc3db0a69aa6860d70527affd3e`.
 The portable package disables native workers; it is not an SDK build or native
 safety qualification. Browser tests were not repeated for this Host-only increment.
 
-The [source comparison](../../artifacts/safety-evidence-03/final-source-comparison.json)
+The source comparison (`artifacts/safety-evidence-03/final-source-comparison.json`)
 verifies the frozen source remained unchanged and permits only completion docs
 to differ in the final commit. All 106 unavailable historical evidence binding
-rows remain unchanged. The [integration receipt](../../artifacts/safety-evidence-03/integration.json)
+rows remain unchanged. The integration receipt (`artifacts/safety-evidence-03/integration.json`)
 records the pushed commit, exact hosted CI outcome and cleanup.
 
 The full [D14 plan](../plans/expansion-plans/safety-validation-and-fio.md) retains

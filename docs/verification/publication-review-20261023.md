@@ -50,7 +50,13 @@ credential was found. Output is in ignored `artifacts/repository-audit-02/`.
 ## Public snapshot
 
 The public repository starts from one commit whose tree is byte-identical to a
-commit of the private history; its commit message names that source commit. The
+commit of the private history; its commit message names that source commit.
+It was published as `Sparkz400/TIA_MCP` on 23 October 2026; the private repository was
+renamed `Sparkz400/TIA_MCP-private`. Private vulnerability reporting, secret scanning, push
+protection, Dependabot alerts and security updates are enabled, and a ruleset blocks
+deleting or force-pushing the default branch. Gitleaks on the public history reported only the
+70 already-triaged generic-key matches. Markdown links into the untracked `artifacts/` folder
+and to private pull requests, Actions runs and commits were turned into plain text. The
 private repository keeps the full history and original evidence. Commit hashes,
 Actions runs and pull requests cited in these documents refer to that private
 history.

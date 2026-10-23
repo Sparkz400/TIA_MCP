@@ -84,8 +84,8 @@ unavailable here and remains an explicit historical evidence gap.
 ## Hosted status and next work
 
 Base drive-review commit `a9026cd` passed hosted
-[Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38974914709) and
-[Python/managed/package/OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38974914698).
+Explorer and
+Python/managed/package/OPC UA.
 These exact base runs do not establish this increment's hosted result; read its
 new commit's runs separately after push.
 

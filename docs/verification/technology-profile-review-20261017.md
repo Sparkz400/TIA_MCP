@@ -31,14 +31,14 @@ No native worker is installed or launched.
 
 ## Development checks and corrections
 
-Final focused [managed checks](../../artifacts/technology-tests-03/verification.json)
+Final focused managed checks (`artifacts/technology-tests-03/verification.json`)
 pass 81 assertions, covering exact Unicode selection and distinct composed/decomposed
 names, profile/owner mismatches, supplied graph cycles, missing/ambiguous evidence,
 read-only and unknown access, exact large scalar/opaque numeric data, collection/proposal/
 byte bounds, malformed Unicode/depth, graph ancestry, invalid endpoints, retained-byte
 integrity, restart, rehashed forgery, oversized pages and retention capacity.
 
-The [actual MCP run](../../artifacts/technology-mcp-04/verification.json) passes 44
+The actual MCP run (`artifacts/technology-mcp-04/verification.json`) passes 44
 checks across two clean Host lifetimes. It validates strict request/record/receipt/page
 schemas; imports a saved review; uploads exact UTF-8 originals; checks immutable reports,
 all paged sections and unknown/cycle/access results; releases input uploads; restarts;
@@ -57,7 +57,7 @@ available and are not acceptance evidence.
 
 Source: artifacts/technology-01/source, tree
 414070463001f6db5df3df3ff11b614006fd08d4; 1,946 tracked files.
-[Source manifest](../../artifacts/technology-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/technology-01/source-manifest.json`) SHA-256:
 8008420bbe3184b2b799832341fcc6d6ad46f7c536ecc175200613416d1028e7.
 Archive SHA-256:
 574c96449297db20c9e02fccb9a5349cae2f841b6627aadc5fe4b2fda7a34136.
@@ -66,14 +66,14 @@ Base f0572232cec738b3c222c83901196c40179afdea passes all hosted jobs: Explorer
 38998317034 and Python/.NET/OPC UA/package 38998316966. This confirms the prior
 Git timeout fixture repair on the hosted runner. New-source acceptance is separate.
 
-The [frozen aggregate](../../artifacts/technology-01/source/artifacts/checks/result.json)
+The frozen aggregate (`artifacts/technology-01/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,295 Python tests (one existing unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all actual MCP workflows. This
 includes 81 TO checks and 44 TO MCP checks. Run: 2026-10-17T03:29:37.9986714Z to
 2026-10-17T03:39:38.7621776Z; receipt SHA-256:
 96b17f9855f56fea9422601d92bd70a2a405028ad2d64cfdc1197320c7bff9b8.
 
-All 22 [package stages](../../artifacts/technology-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/technology-01/source/artifacts/package-checks/result.json`)
 pass, including the new TO workflow after Unicode relocation: 81 managed checks and
 44 actual MCP checks across two clean Host lifetimes. Receipt SHA-256:
 3c2b85025a457130d18cc928f3d6cb16715a2d7b22af1458677273015edc683b.
@@ -82,10 +82,10 @@ manifest SHA-256: 52d5fa3498e546c8bf1573ada944fb1e2364c96abd4bb9c9491ac9ffa164c9
 ZIP SHA-256: d4d1832cf0f999ec008f5ce7439396503d90d1e81172b9312d6bc4053ce93415.
 These hashes establish retained integrity, not publisher authentication or native acceptance.
 
-The [final source comparison](../../artifacts/technology-01/final-source-comparison.json)
+The final source comparison (`artifacts/technology-01/final-source-comparison.json`)
 permits only completion-documentation updates to status, TODO, queue, D13 remaining
 acceptance and this record. Production source, tests, contracts and scripts remain
-identical to the frozen source. The [integration receipt](../../artifacts/technology-01/integration.json)
+identical to the frozen source. The integration receipt (`artifacts/technology-01/integration.json`)
 records the pushed commit, exact hosted CI state and cleanup. New-commit CI acceptance
 is separate from the local checks above.
 

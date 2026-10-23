@@ -6,13 +6,13 @@ The existing parser and dependency analyzer are now exposed through eight produc
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Private Release Host build | Passed; zero warnings/errors | Command and binary hashes in [delivery.json](../../artifacts/opcua-delivery-20261016/delivery.json) |
-| Managed workflow harness | **24/24 passed** | [workflow-managed.log](../../artifacts/opcua-delivery-20261016/workflow-managed.log) |
-| Workflow JSON Schema tests | **6/6 passed** | [workflow-schema.log](../../artifacts/opcua-delivery-20261016/workflow-schema.log) |
-| Actual stdio production Host | **48/48 passed**, including explicit schema validation of every UA success/error response | [mcp-02 verification](../../artifacts/opcua-delivery-20261016/mcp-02/verification.json) |
+| Private Release Host build | Passed; zero warnings/errors | Command and binary hashes in delivery.json (`artifacts/opcua-delivery-20261016/delivery.json`) |
+| Managed workflow harness | **24/24 passed** | workflow-managed.log (`artifacts/opcua-delivery-20261016/workflow-managed.log`) |
+| Workflow JSON Schema tests | **6/6 passed** | workflow-schema.log (`artifacts/opcua-delivery-20261016/workflow-schema.log`) |
+| Actual stdio production Host | **48/48 passed**, including explicit schema validation of every UA success/error response | mcp-02 verification (`artifacts/opcua-delivery-20261016/mcp-02/verification.json`) |
 | Restart and native exclusion | Two real Host processes exited 0, neither forced; both configured workers nonexistent; zero worker exit receipts, no native operations | Same MCP verification |
 | Upload transport retries in accepted MCP run | Zero | Same MCP verification |
-| Initial standalone parser/dependency rerun | Snapshot refused concurrent watch source change before testing; retained as a failed snapshot, not a regression result | [failed snapshot receipt](../../artifacts/opcua-offline/c65662836d0c457c8a6dcd55bb41cb3d/result.json) |
+| Initial standalone parser/dependency rerun | Snapshot refused concurrent watch source change before testing; retained as a failed snapshot, not a regression result | failed snapshot receipt (`artifacts/opcua-offline/c65662836d0c457c8a6dcd55bb41cb3d/result.json`) |
 | Integration checkpoint `D:/TIAW/iq161/source`: isolated OPC UA package | **9/9 metadata, 31/31 parser, 27/27 dependency/CLI checks passed**, plus independent fixture impact and output-preservation checks; historical wrapper exit was 1 despite the passing receipt | [checkpoint receipt](<D:/TIAW/iq161/source/artifacts/opcua-offline/a03aca16124c40cc8fed0777a8c0ab2d/result.json>) |
 
 Integration owns the final combined frozen-source build, portable aggregate and central CI. The parser **31** and dependency/CLI **27** checks were independently rerun successfully on the intermediate `iq161` checkpoint; this does not certify a later final checkout or the subsequently fixed runner. This handoff's successful managed and MCP builds are individually hashed, and do not assert that their shared Core dependencies are the final combined binaries.
@@ -45,7 +45,7 @@ Use a new output directory for MCP evidence; the harness refuses to overwrite an
 
 ## Source handoff and binary identity
 
-Owned implementation/contracts/tests are recorded in [source-manifest.json](../../artifacts/opcua-delivery-20261016/source-manifest.json), SHA-256 `60305aa0e56962a5c9e6cb37b992211f85f70487c4b32bbe3544edf3ba532e35`. The manifest's scope is the UA lane, not the final combined source checkpoint.
+Owned implementation/contracts/tests are recorded in source-manifest.json (`artifacts/opcua-delivery-20261016/source-manifest.json`), SHA-256 `60305aa0e56962a5c9e6cb37b992211f85f70487c4b32bbe3544edf3ba532e35`. The manifest's scope is the UA lane, not the final combined source checkpoint.
 
 | Accepted evidence binary | SHA-256 |
 | --- | --- |

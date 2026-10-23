@@ -45,7 +45,7 @@ and are not rewritten or silently upgraded into fresh qualification.
 
 ## Verification
 
-[Focused linked-source run](../../artifacts/to-read-tests-03.log): **167/167** general
+Focused linked-source run (`artifacts/to-read-tests-03.log`): **167/167** general
 checks pass, including four new groups for exclusions/access, scalar and error states,
 bounded filtered traversal, and incomplete/duplicate identity reporting. Production
 routines are compiled with synthetic Siemens API shapes; callback renderers exercise
@@ -53,24 +53,24 @@ truncation and rendering errors. The full native inspection renderers and caller
 were inspected in source, not executed. The first build failed only because the new
 tests used an unavailable assertion helper; the original log remains retained.
 
-[Python fixture gates](../../artifacts/to-read-python-01.log): 17 family and nine encoder
+Python fixture gates (`artifacts/to-read-python-01.log`): 17 family and nine encoder
 tests pass. They refuse explicit incomplete/missing capture flags before or after edits,
 even when before/after values match. Synthetic callbacks do not qualify native edits.
 
 Final frozen Git tree: `270ec31fba0804d1f87a7e748572208f76759d21` (1960 files).
-[Source manifest](../../artifacts/to-read-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-read-02/source-manifest.json`) SHA-256:
 `53310f3c4c8f2ebff4b0b7f93d39c4afb502df739414f7ede82c0a1a47568974`.
 Source ZIP SHA-256: `9d7bab3f69a018408bfdd37934bf39320690f408dd9a8847e683d95f1ba1f31b`.
 
-The [aggregate](../../artifacts/to-read-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-read-02/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,299 Python tests (one existing unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all offline MCP workflows. The
 general executable repeats all 167 checks and the four new read/capture groups.
 Run: 2026-10-17T05:23:42.1616948Z to 2026-10-17T05:33:56.1759143Z.
 Receipt SHA-256: `a4417a6e3d9d4eab637b4f73069bf638effeafe3182533ec177d8ccdd811cd8b`.
-[Console evidence](../../artifacts/to-read-02/aggregate-console.log).
+Console evidence (`artifacts/to-read-02/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/to-read-02/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-read-02/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_052406_cdcd8642` contains 1388
 manifest files. Receipt SHA-256: `30dad51e1c93c0e73cef938a3bd22fa8680c6ec8bb924a7804c51e89b2148fed`.
 Manifest SHA-256: `fd50140aafbf36993692c579d6c1ff5115bd1cc54b724063335a9eef5cc4b503`.
@@ -78,17 +78,17 @@ ZIP SHA-256: `7df7d66fdfbd4f289aea23195ecd64b4d99b60730c28d71eb18248328eb1da97`.
 This offline package excludes native workers; it does not compile the Siemens SDK.
 Hashes establish retained byte integrity, not publisher or native authenticity.
 
-The [source comparison](../../artifacts/to-read-02/final-source-comparison.json)
+The source comparison (`artifacts/to-read-02/final-source-comparison.json`)
 permits only completion-documentation changes after the frozen tests.
-The [integration receipt](../../artifacts/to-read-02/integration.json)
+The integration receipt (`artifacts/to-read-02/integration.json`)
 records the pushed commit, hosted CI outcome and cleanup.
 
 The first frozen aggregate (`artifacts/to-read-01`) failed two older conformance
 fixtures that omitted the new completeness fields. Their synthetic observation helper
 now supplies the current fields so those tests again reach dependency refusal and
-initialized creation. The corrected conformance file passes all 33 tests. The [snapshot comparison](../../artifacts/to-read-02/fixture-correction-comparison.json) confirms that production code did not change for that fixture correction.
-The [failed aggregate](../../artifacts/to-read-01/source/artifacts/checks/result.json)
-and [console](../../artifacts/to-read-01/aggregate-console.log) are retained separately.
+initialized creation. The corrected conformance file passes all 33 tests. The snapshot comparison (`artifacts/to-read-02/fixture-correction-comparison.json`) confirms that production code did not change for that fixture correction.
+The failed aggregate (`artifacts/to-read-01/source/artifacts/checks/result.json`)
+and console (`artifacts/to-read-01/aggregate-console.log`) are retained separately.
 
 Three affected read/detail catalog entries are unverified for the changed source,
 with historical evidence IDs preserved. Tool/mutation/feature totals remain 199/55/272.

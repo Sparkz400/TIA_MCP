@@ -115,7 +115,7 @@ scope details in reference, acceptance requirements in plans, and observed
 results in verification. Preserve dated evidence when an outcome changes.
 Native reports, frozen builds and release bundles stay under `artifacts/`.
 
-This reorganization preserved the [original document bytes](../artifacts/docs-reorganization-20261009/before/docs)
-and [old-to-new path map](../artifacts/docs-reorganization-20261009/path-map.json).
+This reorganization preserved the original document bytes (`artifacts/docs-reorganization-20261009/before/docs`)
+and old-to-new path map (`artifacts/docs-reorganization-20261009/path-map.json`).
 Older evidence manifests may name the former document paths; their originals
 remain in that backup. Release bundles and native evidence were not rewritten.

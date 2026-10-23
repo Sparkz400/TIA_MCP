@@ -61,11 +61,11 @@ Focused evidence: `artifacts/manifest-publication-01-general-final.log` and
 `artifacts/manifest-publication-01/mcp/verification.json`.
 
 Final frozen Git tree: `609a231d982cb206cbfc331a233a4a5111057b60` (2021 files).
-[Source manifest](../../artifacts/manifest-publication-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/manifest-publication-02/source-manifest.json`) SHA-256:
 `ca55fe266f3909936801ff801cd0019b8a8d849c458c4e14c67d0f46d65d0c75`.
 Source ZIP SHA-256: `bd9d2f438f21edeb5fe71642c15a4880b718704fdca48f17b6f804044a6d14d4`.
 
-The [aggregate](../../artifacts/manifest-publication-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/manifest-publication-02/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,400 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 215 checks; the new manifest publication
@@ -73,9 +73,9 @@ MCP workflow passes all 26 checks, including Windows lock injection and two clea
 Host lifetimes. The focused MCP run also passes under -OO.
 Run: 2026-10-17T12:24:57.9384595Z to 2026-10-17T12:38:29.7944765Z.
 Aggregate receipt SHA-256: `35b1b9829c090bad8200eccef91dbc4e1165aa3abe2bc8f232253f94aa65a129`.
-[Console evidence](../../artifacts/manifest-publication-02/aggregate-console.log).
+Console evidence (`artifacts/manifest-publication-02/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/manifest-publication-02/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/manifest-publication-02/source/artifacts/package-checks/result.json`)
 pass, including the same 26-check failure/recovery workflow through the relocated
 portable Host. Bundle `tia-mcp-offline_20261017_122529_d967316f` contains 1429 manifest files.
 Package receipt SHA-256: `188566a4056a030ed2a5f678a75cc6696538f863d41ba8fb30debbec3b50704a`.
@@ -84,10 +84,10 @@ ZIP SHA-256: `711d3bb73f21444ae4101294d618783699b115f94c0fa6e5231d52825655dc8d`.
 The portable package disables native workers. Browser tests were not repeated
 for this storage-only increment; SDK/native compilation remains unexecuted.
 
-The [source comparison](../../artifacts/manifest-publication-02/final-source-comparison.json)
+The source comparison (`artifacts/manifest-publication-02/final-source-comparison.json`)
 verifies the frozen source remained unchanged and permits only completion docs
 to differ in the final commit. All 106 unavailable historical evidence binding
-rows remain unchanged. The [integration receipt](../../artifacts/manifest-publication-02/integration.json)
+rows remain unchanged. The integration receipt (`artifacts/manifest-publication-02/integration.json`)
 records the pushed commit, exact hosted CI outcome and cleanup.
 
 This fixes local file publication behavior; it does not qualify native products,

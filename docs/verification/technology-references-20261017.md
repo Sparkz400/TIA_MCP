@@ -48,36 +48,36 @@ compilation, installed-version availability or native channel ownership tests.
 
 ## Executed evidence
 
-The [first managed run](../../artifacts/technology-references-tests-01.log) passed
+The first managed run (`artifacts/technology-references-tests-01.log`) passed
 201/202 checks; the channel null identifier needed an explicit JSON null token.
-The [repaired run](../../artifacts/technology-references-tests-02.log) passes all
+The repaired run (`artifacts/technology-references-tests-02.log`) passes all
 202 checks. Six new groups link the actual reader against synthetic API shapes:
 exact/foreign objects, provider/identifier failures, channel ownership/ambiguity,
 bounds/disposal, identifier collisions and real connection-attribute integration.
 No Siemens assembly or native API was compiled or called.
 
-Targeted Python checks pass [13 encoder cases](../../artifacts/technology-references-python-encoder.log),
-[22 family cases](../../artifacts/technology-references-python-family.log) and
-[33 conformance cases](../../artifacts/technology-references-python-conformance.log).
-The family cases also pass [with optimization](../../artifacts/technology-references-python-optimized.log).
+Targeted Python checks pass 13 encoder cases (`artifacts/technology-references-python-encoder.log`),
+22 family cases (`artifacts/technology-references-python-family.log`) and
+33 conformance cases (`artifacts/technology-references-python-conformance.log`).
+The family cases also pass with optimization (`artifacts/technology-references-python-optimized.log`).
 New negative controls remove/change IDs, reference semantics, context, provider
 coverage, selector metadata and owner/container markers. These validate supplied
 evidence structure; they do not authenticate a supplied report's producer.
 
 Frozen Git tree: `051142536760ee1a74b296fbf8aa652e108520f8` (1975 files).
-[Source manifest](../../artifacts/to-ref-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-ref-01/source-manifest.json`) SHA-256:
 `c6513a1721158b5fd5c7feb0491ebbd9956d1163e31dd783dca7f319ee658ab5`.
 Source ZIP SHA-256: `46a68ddff3020a175c418de0f1810ff027c03f7e1132cbcae9c2c04bbc7d88c6`.
 
-The [aggregate](../../artifacts/to-ref-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-ref-01/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,309 Python tests (one unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all offline MCP workflows.
 The general executable repeats all 202 checks, including the six new reference groups.
 Run: 2026-10-17T07:26:06.5901105Z to 2026-10-17T07:36:47.0824874Z.
 Receipt SHA-256: `9968fca1943cef06e08b4fc7d0f4d21ef13e36965ab870a94990f7c2de398ffb`.
-[Console evidence](../../artifacts/to-ref-01/aggregate-console.log).
+Console evidence (`artifacts/to-ref-01/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/to-ref-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-ref-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_072632_46dac327` contains 1393
 manifest files. Receipt SHA-256: `e03546355f4f96a3e93edda806d1ccfc3cb9447516274fcc5fa3eb3b9bf62092`.
 Manifest SHA-256: `89062d366dba0701bf3425a746116bbc797d0dbc209497888819ba139be600f0`.
@@ -85,10 +85,10 @@ ZIP SHA-256: `9debce02ad76314508ec253972383046efd2735a6cb879413a626891f97284a6`.
 This offline package excludes native workers; it does not compile the Siemens SDK.
 Hashes establish retained byte integrity, not publisher or native authenticity.
 
-The [source comparison](../../artifacts/to-ref-01/final-source-comparison.json)
+The source comparison (`artifacts/to-ref-01/final-source-comparison.json`)
 allows only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/to-ref-01/integration.json) records the
+integration receipt (`artifacts/to-ref-01/integration.json`) records the
 pushed commit, hosted CI results and cleanup.
 
 ## Remaining work

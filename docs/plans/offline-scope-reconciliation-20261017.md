@@ -66,7 +66,7 @@ Every row retains open full-scope acceptance. “Delivered” refers only to the
 
 ## Required completion evidence
 
-The [audit integrity receipt](../../artifacts/offline-scope-audit-20261017/verification.json) verifies every retained requirement reference, 179 immutable source bindings, the selected validation receipts and local report links. Contract coverage also passes at 204 tools, 56 mutation kinds and 278 features. These are document/reference checks; no implementation test suite was repeated for this documentation-only change.
+The audit integrity receipt (`artifacts/offline-scope-audit-20261017/verification.json`) verifies every retained requirement reference, 179 immutable source bindings, the selected validation receipts and local report links. Contract coverage also passes at 204 tools, 56 mutation kinds and 278 features. These are document/reference checks; no implementation test suite was repeated for this documentation-only change.
 
 Each remaining operation/profile needs its exact public route or established format, implementation/caller/schema coverage, independently expected effects, persistence/recovery and bounded failure evidence. Native product/license/SDK/fixture/bench requirements stay separate. A passed local suite is accepted only for the code and scenarios it actually exercises. A catalog label or an existing file is not full-scope completion.
 

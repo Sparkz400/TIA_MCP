@@ -4,17 +4,17 @@ The fourth C04 wave adds compatible v2 supplied measurement, comparison, single/
 
 ## Focused evidence
 
-All paths below are under `artifacts/c04-quality-wave4-20261020/`. The final focused Host is `build-09/bin/TiaMcp.Host/release/TiaMcp.Host.exe`. [Independent summary](../../artifacts/c04-quality-wave4-20261020/independent-summary.json) binds the receipts, source inventory and managed binaries.
+All paths below are under `artifacts/c04-quality-wave4-20261020/`. The final focused Host is `build-09/bin/TiaMcp.Host/release/TiaMcp.Host.exe`. Independent summary (`artifacts/c04-quality-wave4-20261020/independent-summary.json`) binds the receipts, source inventory and managed binaries.
 
 | Validation | Result | Evidence |
 | --- | --- | --- |
-| Managed diagnostics | 44/44 groups; 83 new quality checks | [managed-08.log](../../artifacts/c04-quality-wave4-20261020/managed-08.log) |
-| Host build | Exit 0, 0 warnings, 0 errors | [host-build-09.log](../../artifacts/c04-quality-wave4-20261020/host-build-09.log) |
-| Independent contract boundaries | 4 unittest methods passed | [contracts.log](../../artifacts/c04-quality-wave4-20261020/contracts.log) |
-| Actual Host MCP | 160 checks, 2 clean Host exits, no native worker starts | [mcp-02/result.json](../../artifacts/c04-quality-wave4-20261020/mcp-02/result.json) |
-| Real Chromium HTML/GFM | 44 checks at 1440 and 390 pixels; zero page errors, HTTP requests or dialogs | [browser-04/result.json](../../artifacts/c04-quality-wave4-20261020/browser-04/result.json) |
-| Actual wave3 package producers | 162 checks, 8 clean Host exits, all 298 files present at replay start unchanged | [prior-02/result.json](../../artifacts/c04-quality-wave4-20261020/prior-02/result.json) |
-| Original prior baseline | Exact initial 289-file mapping unchanged; 9 additions distinguished | [prior-original-289-integrity.json](../../artifacts/c04-quality-wave4-20261020/prior-original-289-integrity.json) |
+| Managed diagnostics | 44/44 groups; 83 new quality checks | managed-08.log (`artifacts/c04-quality-wave4-20261020/managed-08.log`) |
+| Host build | Exit 0, 0 warnings, 0 errors | host-build-09.log (`artifacts/c04-quality-wave4-20261020/host-build-09.log`) |
+| Independent contract boundaries | 4 unittest methods passed | contracts.log (`artifacts/c04-quality-wave4-20261020/contracts.log`) |
+| Actual Host MCP | 160 checks, 2 clean Host exits, no native worker starts | `artifacts/c04-quality-wave4-20261020/mcp-02/result.json` |
+| Real Chromium HTML/GFM | 44 checks at 1440 and 390 pixels; zero page errors, HTTP requests or dialogs | `artifacts/c04-quality-wave4-20261020/browser-04/result.json` |
+| Actual wave3 package producers | 162 checks, 8 clean Host exits, all 298 files present at replay start unchanged | `artifacts/c04-quality-wave4-20261020/prior-02/result.json` |
+| Original prior baseline | Exact initial 289-file mapping unchanged; 9 additions distinguished | prior-original-289-integrity.json (`artifacts/c04-quality-wave4-20261020/prior-original-289-integrity.json`) |
 
 The actual prior roots are `artifacts/pw20w3s1/artifacts/package-01/diagnostic-mcp`, `diagnostic-experiment-mcp`, `diagnostic-repeat-mcp` and `runtime-diagnostic-acquisition-mcp`. These are retained outputs from the previous producer, whose Core hash differs from the current Core. The first replay preserved all 289 original files and added nine new exports. The final focused replay preserved those 298 files and added none. Original v1 analysis/comparison, single/repeated reviews, original exports and three original runtime acquisition records, including a prefix snapshot, rederive identically after Host restart. The independent acquisition oracle decodes original plan/segment bytes rather than trusting the derived rows.
 

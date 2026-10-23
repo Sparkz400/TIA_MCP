@@ -1,7 +1,7 @@
 # Closed safety scratch admission — 17 October 2026
 
 The direct safety harness previously admitted an existing project by its workspace
-folder and TiaMcpScratch_ filename alone. A [before/after reproduction](../../artifacts/safety-scratch-admission-reproduction/comparison.json)
+folder and TiaMcpScratch_ filename alone. A before/after reproduction (`artifacts/safety-scratch-admission-reproduction/comparison.json`)
 shows an unproven synthetic project reaching project_open before the fix and
 refusing before Host construction afterward. No Siemens process was started.
 
@@ -51,31 +51,31 @@ Seven new tests cover complete file/directory changes, eight invalid original
 sources before Host construction, required CLI arguments, startup replacement,
 four returned-owner mismatches, close-time report substitution, snapshot failure,
 and fresh creation followed by two successive reuses. All process evidence and
-project contents are synthetic. The [focused run](../../artifacts/safety-scratch-admission-targeted.log)
+project contents are synthetic. The focused run (`artifacts/safety-scratch-admission-targeted.log`)
 passes 42 parent tests, including the optimized -O/-OO child suites.
 
 Frozen Git tree: `ecfe16d9765eed07365257ca3e9c648af85863da` (2004 files).
-[Source manifest](../../artifacts/safety-scratch-admission-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/safety-scratch-admission-01/source-manifest.json`) SHA-256:
 `7b7358efebe44142a87ab89ff215997f98755648927cbc09d9661f767759a0d1`.
 Source ZIP SHA-256: `70848b0988fd4790daaf8115444f44483b0f61bcf44c65382599de621ed10c6c`.
 
-The [full Python aggregate](../../artifacts/safety-scratch-admission-01/source/artifacts/checks/result.json)
+The full Python aggregate (`artifacts/safety-scratch-admission-01/source/artifacts/checks/result.json`)
 passes all 1,391 tests with one unavailable-historical-evidence skip, plus contracts,
 source bindings and retained-evidence inventory. The optimized child suites pass
 within that aggregate.
 Run: 2026-10-17T10:18:35.9329146Z to 2026-10-17T10:19:56.1213645Z.
 Receipt SHA-256: `63b317d9d01bdc459d83309c9b164f1ecf594634ddf3e9f3dca9d2654ee3ce34`.
-[Console evidence](../../artifacts/safety-scratch-admission-01/python-console.log).
+Console evidence (`artifacts/safety-scratch-admission-01/python-console.log`).
 
-The [source comparison](../../artifacts/safety-scratch-admission-01/final-source-comparison.json)
+The source comparison (`artifacts/safety-scratch-admission-01/final-source-comparison.json`)
 confirms only completion-documentation changes after the tested snapshot and
 preservation of all 106 unavailable historical evidence binding rows. The
-[integration receipt](../../artifacts/safety-scratch-admission-01/integration.json) records the
+integration receipt (`artifacts/safety-scratch-admission-01/integration.json`) records the
 pushed commit, hosted CI outcome and cleanup.
 
 This Python-only increment does not repeat managed, package or browser checks.
-The prior [package result](../../artifacts/xml-document-01/source/artifacts/package-checks/result.json)
-and [full managed aggregate](../../artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json)
+The prior package result (`artifacts/xml-document-01/source/artifacts/package-checks/result.json`)
+and full managed aggregate (`artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json`)
 remain evidence for their own snapshots. Historical missing native evidence stays
 missing; no receipt or source hash is replaced to claim a pass.
 

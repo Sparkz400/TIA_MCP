@@ -80,8 +80,8 @@ Console logs remain beside the frozen source as `aggregate-console.log` and
 ## Hosted status and remaining acceptance
 
 The base snapshot-review commit `92726e0` passed hosted
-[Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38972607847) and
-[Python/managed/package/OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38972607823).
+Explorer and
+Python/managed/package/OPC UA.
 These runs belong to that exact base commit; this increment's new runs must be
 read separately after push.
 

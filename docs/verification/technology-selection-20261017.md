@@ -26,7 +26,7 @@ all historical evidence references. Tool/mutation/feature totals are unchanged.
 
 ## Executed portable checks
 
-The [focused managed run](../../artifacts/to-selection-tests-01.log) passes all
+The focused managed run (`artifacts/to-selection-tests-01.log`) passes all
 173 general tests. Six new groups compile the actual production selection,
 traversal, binding, deletion and fingerprint routines against synthetic native
 shapes. Cases cover escaped/Unicode names, exact case, duplicate names and paths,
@@ -35,24 +35,24 @@ missing/mismatched/foreign/malformed selectors, fixed preview paths after moves,
 deletes, failed post-delete scans, no replay and group-sensitive fingerprints.
 These shapes do not compile or authenticate the Siemens SDK ABI.
 
-The [focused Python run](../../artifacts/to-selection-python-01.log) passes 18
+The focused Python run (`artifacts/to-selection-python-01.log`) passes 18
 family-oracle and 33 conformance tests. Baseline path/PLC contradictions refuse
 before mutation; edit/read/delete callbacks assert the exact resolved path.
 
 Final frozen Git tree: `0dcd6156934ccedaed917aa7df8361b2c2b5db5d` (1964 files).
-[Source manifest](../../artifacts/to-select-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-select-01/source-manifest.json`) SHA-256:
 `fe9e423df5e49897820a84becf63d79922659b4fa58ee638b1cbfd4121257bb7`.
 Source ZIP SHA-256: `717bd91a35ac19234933cc90ad5db0fea9eb618dd5f6cfd798eb8ff5ae12be8a`.
 
-The [aggregate](../../artifacts/to-select-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-select-01/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,300 Python tests (one existing unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all offline MCP workflows. The
 general executable repeats all 173 checks and the six new selection groups.
 Run: 2026-10-17T05:45:09.1990467Z to 2026-10-17T05:55:22.8024000Z.
 Receipt SHA-256: `c7c76a885733e97c9d383e3d59b5cd7a11a04b3418326307d274980b3fe15044`.
-[Console evidence](../../artifacts/to-select-01/aggregate-console.log).
+Console evidence (`artifacts/to-select-01/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/to-select-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-select-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_054531_1bffb355` contains 1389
 manifest files. Receipt SHA-256: `2e0e5ea6eba6b6f3fc867a57832f9f12646324d874583c75a2eb723bba013c9f`.
 Manifest SHA-256: `b1194decc4b10eb0cf3fdab1254af81506fbac8a9f44bf24e9f16fd3450aff76`.
@@ -60,10 +60,10 @@ ZIP SHA-256: `dc13ca5a022f55567d2b0885c459ce995acc299f244184c7cf401d4565dd768d`.
 This offline package excludes native workers; it does not compile the Siemens SDK.
 Hashes establish retained byte integrity, not publisher or native authenticity.
 
-The [source comparison](../../artifacts/to-select-01/final-source-comparison.json)
+The source comparison (`artifacts/to-select-01/final-source-comparison.json`)
 permits only completion-documentation changes after the frozen tests and verifies
 all 106 unavailable historical evidence binding rows remain unchanged.
-The [integration receipt](../../artifacts/to-select-01/integration.json)
+The integration receipt (`artifacts/to-select-01/integration.json`)
 records the pushed commit, hosted CI outcome and cleanup.
 
 ## Remaining work

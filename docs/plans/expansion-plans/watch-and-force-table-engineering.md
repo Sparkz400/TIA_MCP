@@ -21,7 +21,7 @@ Current planning ownership is this document and `artifacts/ac01-wave-20261015/wa
 
 ## 2. Public API and format audit
 
-Installed reference root: `C:/Program Files/Siemens/Automation/Portal V21/PublicAPI/V21/`. Inspected `net48/Siemens.Engineering.Step7.xml`, Base XML and installed `Schemas/*.xsd`. [Metadata-only inspector](../../../artifacts/ac01-wave-20261015/watch/Inspect-WatchMetadata.ps1) uses `MetadataLoadContext`, never execution-loads Siemens assemblies, and records before/after DLL hashes. Its [accessor/inheritance report](../../../artifacts/ac01-wave-20261015/watch/public-api-accessors.json) is authoritative for the installed public signatures, not target behavior. [Initial report](../../../artifacts/ac01-wave-20261015/watch/public-api.json) is retained too.
+Installed reference root: `C:/Program Files/Siemens/Automation/Portal V21/PublicAPI/V21/`. Inspected `net48/Siemens.Engineering.Step7.xml`, Base XML and installed `Schemas/*.xsd`. Metadata-only inspector (`artifacts/ac01-wave-20261015/watch/Inspect-WatchMetadata.ps1`) uses `MetadataLoadContext`, never execution-loads Siemens assemblies, and records before/after DLL hashes. Its accessor/inheritance report (`artifacts/ac01-wave-20261015/watch/public-api-accessors.json`) is authoritative for the installed public signatures, not target behavior. Initial report (`artifacts/ac01-wave-20261015/watch/public-api.json`) is retained too.
 
 Use the exact namespace prefix `Siemens.Engineering.SW.WatchAndForceTables` for the types below. Owner accessor is **`Siemens.Engineering.SW.PlcSoftware.WatchAndForceTableGroup`**. The official manual's older sample spelling `PlcWatchAndForceTableGroup` must not be copied into code.
 

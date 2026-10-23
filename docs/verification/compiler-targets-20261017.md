@@ -8,9 +8,9 @@ with the actual selected PLC path. Both views are independent JSON copies of the
 same diagnostic observation; no second compile or diagnostic enumeration occurs.
 
 The linked pure C# SingleTarget helper is used by ScratchCreate and tested without
-the Siemens SDK. Its emitted [synthetic receipt](../../artifacts/compiler-targets-csharp.json)
+the Siemens SDK. Its emitted synthetic receipt (`artifacts/compiler-targets-csharp.json`)
 also passes the Python reader with the selected PLC and refuses a different PLC.
-The [before/after reproduction](../../artifacts/compiler-targets-reproduction.json)
+The before/after reproduction (`artifacts/compiler-targets-reproduction.json`)
 records the old shape refusal and old acceptance of a clean unrelated target.
 
 The shared Python validator now rejects duplicate target identities. Callers that
@@ -44,11 +44,11 @@ Existing safety fixtures now explicitly identify their PLC. The focused run pass
 11 groups and its emitted JSON is consumed by the actual Python validator.
 
 Frozen Git tree: `7c6cd6c6bc1faf977983b25f10dfb6053a357cad` (2005 files).
-[Source manifest](../../artifacts/compiler-targets-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/compiler-targets-01/source-manifest.json`) SHA-256:
 `e9c3ab87e8bf5ca226a64d0fe6d231e5bc0889588fea54637b97a7ec9978dc9d`.
 Source ZIP SHA-256: `4cb79ec32dc6ee093848f46cbcb73484953af7d3d2a750f247462ffa24cfea56`.
 
-The [aggregate](../../artifacts/compiler-targets-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/compiler-targets-01/source/artifacts/checks/result.json`)
 passes 40 managed suites, 1,395 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 202 checks and the linked pure compiler
@@ -56,9 +56,9 @@ suite passes 11 groups. The Python optimization runner executes 123 focused case
 under each of -O and -OO; child counts are not added to the parent count.
 Run: 2026-10-17T10:26:37.4574091Z to 2026-10-17T10:39:38.5963953Z.
 Receipt SHA-256: `78a4d246941bbab830ef8fd5c4004fff8e08553a2020ce40872702507df18150`.
-[Console evidence](../../artifacts/compiler-targets-01/aggregate-console.log).
+Console evidence (`artifacts/compiler-targets-01/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/compiler-targets-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/compiler-targets-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_104017_63edcc56` contains 1421
 manifest files. Receipt SHA-256: `e0952a71567b4eb7317910e02758a56ac2646fac305c8af361a27e114ba5df57`.
 Manifest SHA-256: `97d04a277d25cdb299c5e9b744431a9a799c2e9aab7e1d36c9238754ead26da5`.
@@ -67,10 +67,10 @@ The portable package excludes native workers; neither it nor the linked pure
 compiler tests compile the full Siemens worker against the SDK. Browser tests
 were not repeated; the Explorer model/client tests are not browser acceptance.
 
-The [source comparison](../../artifacts/compiler-targets-01/final-source-comparison.json)
+The source comparison (`artifacts/compiler-targets-01/final-source-comparison.json`)
 allows only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/compiler-targets-01/integration.json) records
+integration receipt (`artifacts/compiler-targets-01/integration.json`) records
 the pushed commit, hosted CI outcome and cleanup.
 
 ## Remaining gates

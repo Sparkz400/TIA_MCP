@@ -2,7 +2,7 @@
 
 **Release scope update — 15 October 2026:** The user requires every feasible capability before 1.0. Read the [current release ledger](release-obligations-20261015.md) before scheduling work. Older wording that permits optional expansions, selected-only release scope or a reduced 1.0 is superseded. Missing prerequisites and unresolved feasibility remain release blockers; recorded passed/failed evidence and native/UI scheduling boundaries remain intact.
 
-Status: implementation in progress; full release acceptance remains open. Date: 8 October 2026. Initial native platform: TIA Portal V21. This document retains the complete intended scope and acceptance gates. See [the implementation guide](../guides/library-management.md) and [recorded verification](../../artifacts/library-implementation-verification.json) for delivered operations and the exact profiles tested; an item appearing in this plan does not establish implementation or qualification.
+Status: implementation in progress; full release acceptance remains open. Date: 8 October 2026. Initial native platform: TIA Portal V21. This document retains the complete intended scope and acceptance gates. See [the implementation guide](../guides/library-management.md) and recorded verification (`artifacts/library-implementation-verification.json`) for delivered operations and the exact profiles tested; an item appearing in this plan does not establish implementation or qualification.
 
 The user requested a stop at the latest checkpoint. Continue from the prioritized [remaining-work TODO](library-management-todo.md); retain this document as the complete acceptance specification.
 

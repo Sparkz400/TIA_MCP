@@ -25,7 +25,7 @@ The integrated worker build exposed an existing unfinished ancillary VCI compile
 | Actual Host registration | Five boundaries | Normal/qualification tool registration and option refusal; no worker launched |
 | Host and worker | Build passed | Host reports zero warnings/errors; worker built through its boundary test project |
 
-The [managed transcript](../../artifacts/ac0203-adapter-20261016/validation/managed.log), [final engineering run](../../artifacts/ac0203-adapter-20261016/engineering-final.log), [Git journal run](../../artifacts/ac0203-adapter-20261016/git-journal.log) and [Host registration run](../../artifacts/ac0203-adapter-20261016/host-registration.log) retain the results. The new boundary tests are registered in the solution and engineering-workstation test script. The genuine capture checks run in the ordinary offline watch suite.
+The managed transcript (`artifacts/ac0203-adapter-20261016/validation/managed.log`), final engineering run (`artifacts/ac0203-adapter-20261016/engineering-final.log`), Git journal run (`artifacts/ac0203-adapter-20261016/git-journal.log`) and Host registration run (`artifacts/ac0203-adapter-20261016/host-registration.log`) retain the results. The new boundary tests are registered in the solution and engineering-workstation test script. The genuine capture checks run in the ordinary offline watch suite.
 
 The repository-wide `scripts/test_contracts.py` audit still fails on three preexisting qualification-only declarations without catalog entries: `qualification_watch_fixture_seed`, `qualification_watch_compete` and `qualification_component_window`. This is not recorded as a passing full-repository audit. No catalog qualification was promoted.
 
@@ -33,7 +33,7 @@ The repository-wide `scripts/test_contracts.py` audit still fails on three preex
 
 The file-only independent oracle revalidated the immutable prior native runs:
 
-- `wt04`: **9/9 stages**, reviewed Bool change → typed/native readback and peer preservation → fresh reopen → checkpoint retrieval, fresh recovered reopen and original/restored reconciliation. [Current verification receipt](../../artifacts/ac0203-adapter-20261016/retained-wt04-verification.json).
-- `wt06`: **8/8 stages**, actual lost worker response → retained unknown ownership → explicit replay refusal → checkpoint recovery and original/restored reconciliation. [Current verification receipt](../../artifacts/ac0203-adapter-20261016/retained-wt06-verification.json).
+- `wt04`: **9/9 stages**, reviewed Bool change → typed/native readback and peer preservation → fresh reopen → checkpoint retrieval, fresh recovered reopen and original/restored reconciliation. Current verification receipt (`artifacts/ac0203-adapter-20261016/retained-wt04-verification.json`).
+- `wt06`: **8/8 stages**, actual lost worker response → retained unknown ownership → explicit replay refusal → checkpoint recovery and original/restored reconciliation. Current verification receipt (`artifacts/ac0203-adapter-20261016/retained-wt06-verification.json`).
 
 Those are the previously frozen binaries and native operations documented in the [production watch wave](production-watch-wave-20261015.md). This turn did not launch TIA or mutate a native project. A fresh native run of the newly hardened binary remains open; the separate startup/controller reconciliation recorded in the active handoff was not adopted or cleared by these offline checks. Broader watch operations remain gated.

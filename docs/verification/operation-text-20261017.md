@@ -7,7 +7,7 @@ and recovery destinations. It adds no public tool, schema or native implementati
 
 ## Reproduced failure
 
-The [baseline binary receipt](../../artifacts/optext-01/baseline-reproduction.json)
+The baseline binary receipt (`artifacts/optext-01/baseline-reproduction.json`)
 runs the final test executable with the previous Core binary from the frozen
 `5181f8ad2654f2ceca8c4bb8cdac8b1e829ca487` production source. It fails as expected.
 Its retained case 31 changes `dispatch.` plus an unpaired surrogate into the distinct
@@ -45,12 +45,12 @@ remains supported; existing records are not rewritten or retrospectively qualifi
 
 Frozen source: `artifacts/optext-01/source`, tree
 `e3d77dc13dd500a2ff69bf346fd98f047b65d539`, 1,934 files.
-[Source manifest](../../artifacts/optext-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/optext-01/source-manifest.json`) SHA-256:
 `a178782d3db9cc7fb898767f7ac8e479d18eb368a23e22d6198abfdcfd25f818`.
 Source archive SHA-256:
 `440b38b6f504f13a1303bfc5f3b0c2e724e7b384d56bc877fe651a4c0d790ca6`.
 
-The [focused receipt](../../artifacts/optext-green-02/verification.json) passes 100
+The focused receipt (`artifacts/optext-green-02/verification.json`) passes 100
 assertions: five malformed UTF-16 shapes across six plan/input fields, twelve
 checkpoint/evidence/recovery entry cases, unchanged durable records/files, and
 exact successful Unicode reopen/idempotency. Literal U+FFFD, a supplementary
@@ -58,7 +58,7 @@ character and composed/decomposed text remain distinct valid input. The same che
 run in the normal engineering suite. The initial fixed run passed 50 assertions;
 final coverage adds file preservation and separate artifact/path cases.
 
-The [actual Host compatibility receipt](../../artifacts/optext-01/compatibility.json),
+The actual Host compatibility receipt (`artifacts/optext-01/compatibility.json`),
 SHA-256 `579db4bd85bc3ca2d0ad4cf01ead8c83efc3ecc459568912411affc1a121100b`,
 compares the previous and current packaged Host on all four valid Unicode records.
 Both return the identical retained records, preserve every retained file, and exit
@@ -66,17 +66,17 @@ normally across eight Host lifetimes without launching workers.
 
 ## Full verification and integration
 
-The [frozen aggregate](../../artifacts/optext-01/source/artifacts/checks/result.json)
+The frozen aggregate (`artifacts/optext-01/source/artifacts/checks/result.json`)
 passes all 38 managed suites, 1,280 Python tests (one existing unavailable-evidence
 skip), 24 Explorer checks, contracts/source bindings and all MCP workflows.
 It ran from `2026-10-17T02:39:42.3140563Z` to
 `2026-10-17T02:49:32.1685212Z`; receipt SHA-256:
 `0090fda074463c1231d047564f78afdfd425a679799c46f41c7dc90c23ee8f1e`.
 The 100 operation-text assertions also pass in that exact aggregate; their retained
-[receipt copy](../../artifacts/optext-01/aggregate-operation-text.json) has SHA-256
+receipt copy (`artifacts/optext-01/aggregate-operation-text.json`) has SHA-256
 `4313dd30fde4da9aaa5037c41f14de25ee7a667bf42c54720c071e293611f905`.
 
-All 21 [package stages](../../artifacts/optext-01/source/artifacts/package-checks/result.json)
+All 21 package stages (`artifacts/optext-01/source/artifacts/package-checks/result.json`)
 pass, including original/Unicode-relocated verification and all existing packaged
 workflows. Receipt SHA-256: `900a1a7ac14854a0bc60be10d4c27e32695f77e783d956f884a25b142e9fa6a8`.
 The bundle `tia-mcp-offline_20261017_024003_824f1348` contains 1,375 manifest files;
@@ -84,10 +84,10 @@ manifest SHA-256: `32c7734b6ea5147b6ee1597181bfd466d5d5508d990ad4e2defd31dd4f410
 ZIP SHA-256: `b1cb7d4a46b9b2babd00e47e685fcc7830ef921854f4c6835fbeebddaf1fe6b7`.
 Hashes establish integrity, not publisher authentication or native qualification.
 
-The [final source comparison](../../artifacts/optext-01/final-source-comparison.json)
+The final source comparison (`artifacts/optext-01/final-source-comparison.json`)
 allows only completion-documentation changes to status, TODO, queue and this record;
 production source, tests, scripts and bindings remain identical to the verified tree.
-The [integration receipt](../../artifacts/optext-01/integration.json) records the
+The integration receipt (`artifacts/optext-01/integration.json`) records the
 pushed commit, hosted CI state and cleanup. Base `5181f8a` now passes Explorer
 `38995419507` and all four Python/.NET jobs `38995419529`; its final managed job
 completed at `2026-10-17T02:47:54Z`. New-commit hosted acceptance is separate.

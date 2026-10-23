@@ -50,20 +50,20 @@ selector substitution, immediate refusal and legacy admission. Read-envelope
 timestamps intentionally differ while unchanged configuration passes.
 
 Final frozen Git tree: `b11a9802bdf1878a721baa6f270f161f459191b8` (2041 files).
-[Source manifest](../../artifacts/encoder-hardware-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-hardware-01/source-manifest.json`) SHA-256:
 `a0bf83c1a17e33414b8a7c7de1ff1fe8c93f448f9cdffcb595613fb9616e8175`.
 Source ZIP SHA-256: `95c41663f040e66ddde8795f53db0439b9d97b53e0b81a059223e45e556c9fb8`.
 
-The [aggregate](../../artifacts/encoder-hardware-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/encoder-hardware-01/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,455 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 226 checks. All 93 encoder methods also
 pass under -OO, including thirteen hardware-preservation methods with populated peers.
 Run: 2026-10-17T15:36:02.3271869Z to 2026-10-17T15:49:20.6457459Z.
 Aggregate receipt SHA-256: `0b462f7e83a8c0e978160880e120aeccab2297cf64d0c21cb17586211d2b706f`.
-[Console evidence](../../artifacts/encoder-hardware-01/aggregate-console.log).
+Console evidence (`artifacts/encoder-hardware-01/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/encoder-hardware-01/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/encoder-hardware-01/source/artifacts/package-checks/result.json`)
 pass, including exact ZIP/manifest verification and relocated MCP workflows.
 Bundle `tia-mcp-offline_20261017_153628_3f885c4c` contains 1443 manifest files.
 Package receipt SHA-256: `6f68159ccb6b22f647c4769c9c59b5d8a3f6cd3da341df14fa38aa592db8b05a`.
@@ -71,11 +71,11 @@ Manifest SHA-256: `92188052074804937f8472cba42b4d7c7757956f537d80007ed2e4b18402a
 ZIP SHA-256: `0cbae06314623360ade51e898920f7ffb8b40a84f515b4cd234dc669bc076721`.
 Browser tests were not repeated for this qualification-harness/inventory change.
 
-The [source comparison](../../artifacts/encoder-hardware-01/final-source-comparison.json)
+The source comparison (`artifacts/encoder-hardware-01/final-source-comparison.json`)
 verifies unchanged tested implementation; only five completion documents differ.
 All 106 unavailable
 historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/encoder-hardware-01/integration.json) records
+integration receipt (`artifacts/encoder-hardware-01/integration.json`) records
 Git/CI and cleanup state.
 
 

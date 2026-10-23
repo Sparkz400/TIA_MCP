@@ -39,18 +39,18 @@ requires Equals for engineering identity; distinct wrappers can represent the
 same native object. The added wrapper regression reproduces 207/208 passing with
 ReferenceEquals and passes after using Equals. The repeated-device guard also
 rejects distinct wrappers sharing one engineering identity. Replacement by a
-new identity at the same path still refuses. [Before log](../../artifacts/device-compile-equality-before.log).
+new identity at the same path still refuses. Before log (`artifacts/device-compile-equality-before.log`).
 
-The [cross-language receipt](../../artifacts/device-compiler-scope-02/cross-language-compiler.json) retains actual output from the linked C# helper and the independently specified Python target set. Missing, wrong-project and duplicate expected targets refuse. The helper, test and Python source bytes match the final frozen snapshot.
+The cross-language receipt (`artifacts/device-compiler-scope-02/cross-language-compiler.json`) retains actual output from the linked C# helper and the independently specified Python target set. Missing, wrong-project and duplicate expected targets refuse. The helper, test and Python source bytes match the final frozen snapshot.
 
-The [frozen aggregate cross-language check](../../artifacts/device-compiler-scope-02/cross-language-frozen-compiler.json) repeats the same independent checks using the actual final C# output and the Python consumer from that frozen source tree.
+The frozen aggregate cross-language check (`artifacts/device-compiler-scope-02/cross-language-frozen-compiler.json`) repeats the same independent checks using the actual final C# output and the Python consumer from that frozen source tree.
 
 Frozen Git tree: `915fd7b7f7b30ff3e46ddcc84242653068580551` (2008 files).
-[Source manifest](../../artifacts/device-compiler-scope-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/device-compiler-scope-02/source-manifest.json`) SHA-256:
 `67c602f11298a39814d168a7cdebf0e57c9a0c30d1953e133aa99c9ed1d92fa7`.
 Source ZIP SHA-256: `c96d3e6521573222ce11e21c9ffa751ef082804c34ccaa20d5418fafe09d0d93`.
 
-The [aggregate](../../artifacts/device-compiler-scope-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/device-compiler-scope-02/source/artifacts/checks/result.json`)
 passes 40 managed suites, 1,400 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 208 checks and the linked pure compiler
@@ -58,9 +58,9 @@ suite passes 11 groups. The Python optimization runner executes 128 focused case
 under each of -O and -OO; child counts are not added to the parent count.
 Run: 2026-10-17T11:16:20.8462519Z to 2026-10-17T11:31:07.6333207Z.
 Receipt SHA-256: `f5ae5a4b23c0b552532c203907691c723e747501c8e466d096a1bd0aaba91bb8`.
-[Console evidence](../../artifacts/device-compiler-scope-02/aggregate-console.log).
+Console evidence (`artifacts/device-compiler-scope-02/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/device-compiler-scope-02/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/device-compiler-scope-02/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_111952_ad0dc863` contains 1422
 manifest files. Receipt SHA-256: `8ea10b7be6039ae01cdc99889c4d883992f6fa044f2f7bcff260346c6124dad6`.
 Manifest SHA-256: `82e2456f0e864d3e0cada15046d7793847d543b97d81c7ed3c8421228a75d830`.
@@ -69,10 +69,10 @@ The portable package excludes native workers; neither it nor the linked pure
 compiler tests compile the full Siemens worker against the SDK. Browser tests
 were not repeated; the Explorer model/client tests are not browser acceptance.
 
-The [source comparison](../../artifacts/device-compiler-scope-02/final-source-comparison.json)
+The source comparison (`artifacts/device-compiler-scope-02/final-source-comparison.json`)
 allows only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/device-compiler-scope-02/integration.json) records
+integration receipt (`artifacts/device-compiler-scope-02/integration.json`) records
 the pushed commit, hosted CI outcome and cleanup.
 
 ## Remaining qualification

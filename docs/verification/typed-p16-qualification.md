@@ -5,15 +5,15 @@ complete native XML preservation, saved changed-project reopen and checkpoint
 recovery/reopen on frozen combined build
 `fa0067bcbd32499485b72d8ea1cef38a`. The exact Int equality, numeric FC/FB and
 existing/created global/multi-instance cells are recorded in the
-[batch](../../artifacts/p16t/advanced-final-01/batch.json). An independent
-[strict audit](../../artifacts/p16t/advanced-final-01-audit.json) verified **794 XML
+batch (`artifacts/p16t/advanced-final-01/batch.json`). An independent
+strict audit (`artifacts/p16t/advanced-final-01-audit.json`) verified **794 XML
 exports, 636 complete comparisons and 36 exact owned TIA process exits**, with
 clean host/worker shutdown. Its SHA-256 is
 `c5cf63d665773017dcffbaeeeb4b0de735380534b89b74be80882b73f0129b17`.
-The [frozen harness manifest](../../artifacts/p16t/advanced-final-harness/manifest.json)
+The frozen harness manifest (`artifacts/p16t/advanced-final-harness/manifest.json`)
 retains the exact inputs separately from later diagnostic work. Runtime was not
 requested for any of these cases.
-A supplemental [compile-diagnostics audit](../../artifacts/p16t/advanced-final-01-compile-audit.json)
+A supplemental compile-diagnostics audit (`artifacts/p16t/advanced-final-01-compile-audit.json`)
 checked all 28 distinct compile objects and 226 diagnostic messages across these
 12 reports: explicit successful target states, integer zero error counts,
 complete message arrays and no Error or unknown diagnostic states. This check
@@ -21,8 +21,8 @@ addresses the separately observed native contradiction of zero aggregate errors
 with an Error message; aggregate counts alone are not treated as success.
 
 The first `typed-unit-eq-lad` pass on `artifacts/p15/merged5` remains a separate
-historical attempt. Its [report](../../artifacts/p16t/advanced-first/typed-unit-eq-lad/result.json)
-and [independent audit](../../artifacts/p16t/advanced-first-audit.json) retain 60
+historical attempt. Its report (`artifacts/p16t/advanced-first/typed-unit-eq-lad/result.json`)
+and independent audit (`artifacts/p16t/advanced-first-audit.json`) retain 60
 native XML exports and 48 complete comparisons, including all type and tag-table
 peers. Three exact owned TIA processes, hosts and workers exited cleanly.
 
@@ -66,15 +66,15 @@ oracle now use the preserving DOM/native-payload comparator. New regression case
 remove actual XML comments/PIs, change inherited QName bindings and alter
 `xml:space="preserve"` text. The first Eq case was separately re-audited under
 this stricter comparator: all 60 exports and 48 comparisons passed in the
-[strict audit](../../artifacts/p16t/advanced-first-strict-audit.json).
+strict audit (`artifacts/p16t/advanced-first-strict-audit.json`).
 Its original report and earlier audit remain unchanged; future reports identify
 `native-payload.v2-comments-pi-qnames` explicitly.
 
 Read-only historical re-audits also passed without altering their original
-reports: [nondefault multi-instance](../../artifacts/p16t/p15-multi-strict-audit.json)
-(84 exports), [six selected namespace cases](../../artifacts/p16t/p15-namespace-strict-audit.json)
+reports: nondefault multi-instance (`artifacts/p16t/p15-multi-strict-audit.json`)
+(84 exports), six selected namespace cases (`artifacts/p16t/p15-namespace-strict-audit.json`)
 (340 exports, 238 comparisons), and
-[stale-address/DB-ambiguity cases](../../artifacts/p16t/p14-p15-stale-ambiguity-strict-audit.json)
+stale-address/DB-ambiguity cases (`artifacts/p16t/p14-p15-stale-ambiguity-strict-audit.json`)
 (270 exports, 215 comparisons). These improve preservation evidence for their
 recorded binary lineages; they do not add fresh native or runtime attempts.
 
@@ -144,22 +144,22 @@ compile cleanly, native typed ambiguity remains unqualified. A successful fixtur
 must then demonstrate the actual MCP `AmbiguousOperand` rejection with complete
 unchanged XML. Neither diagnostic replays an uncertain native operation.
 
-The fresh [unqualified namespace attempt](../../artifacts/p16t/ns-unqualified-LAD-01/result.json)
+The fresh unqualified namespace attempt (`artifacts/p16t/ns-unqualified-LAD-01/result.json`)
 on `fa0067` reached the native UDT import, which rejected
 `Tgp_ResolutionInner` as an unknown datatype. The exact checkpoint was restored
 once, with all 16 complete native payloads matching the original; all 32 retained
 exports and the exact owned cleanup passed the independent
-[audit](../../artifacts/p16t/ns-unqualified-LAD-01-audit.json). Thus the fixture
+audit (`artifacts/p16t/ns-unqualified-LAD-01-audit.json`). Thus the fixture
 prerequisite is blocked by the observed native import, and unqualified propagation
 is still unqualified. The original report's local probe status remains its
 pre-dispatch marker; its failed native call and successful restore, both retained
 unchanged, establish the actual outcome. Repeating this language-independent UDT
 rejection in FBD would not provide a new resolver qualification.
 
-The [direct duplicate-tag attempt](../../artifacts/p16t/tag-native-LAD-01/result.json)
+The direct duplicate-tag attempt (`artifacts/p16t/tag-native-LAD-01/result.json`)
 also reached the native API: `PlcTagComposition.Create` rejected the second
 `Ready` declaration because the object already exists. Compile remained zero
-errors/warnings, and the [independent audit](../../artifacts/p16t/tag-native-LAD-01-audit.json)
+errors/warnings, and the independent audit (`artifacts/p16t/tag-native-LAD-01-audit.json`)
 verified all 19 native exports, nine unchanged original payloads, exactly one new
 empty table and exact owned cleanup. Thus the native ambiguity fixture remains
 blocked; a production MCP collision rejection was not substituted for this

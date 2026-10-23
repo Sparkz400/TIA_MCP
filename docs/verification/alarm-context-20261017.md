@@ -81,8 +81,8 @@ inside it. Expected negative/refusal output is not an aggregate failure.
 
 ## Qualification and continuation
 
-The base commit passes hosted [Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38978662939)
-and all [Python/managed/package/OPC UA jobs](https://github.com/Sparkz400/TIA_MCP/actions/runs/38978662949).
+The base commit passes hosted Explorer
+and all Python/managed/package/OPC UA jobs.
 These results do not establish a later commit's hosted status. GitHub had no open
 issues or PRs at this audit; only the primary main branch/worktree was active.
 

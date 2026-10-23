@@ -3,8 +3,8 @@
 The failed-seeder recovery path computed its expected archive hash at recovery
 time. A synthetic reproduction replaced the checkpoint after creation; the old
 parent dispatched `project_retrieve` using the replacement bytes' hash. The
-[before reproduction](../../artifacts/encoder-checkpoint-before.log) records that
-dispatch. The [repaired reproduction](../../artifacts/encoder-checkpoint-after.log)
+before reproduction (`artifacts/encoder-checkpoint-before.log`) records that
+dispatch. The repaired reproduction (`artifacts/encoder-checkpoint-after.log`)
 refuses retrieval. Neither probe invokes Siemens.
 
 EncoderSeeder now publishes an immutable receipt immediately after archiving the
@@ -53,11 +53,11 @@ Both optimized Python modes pass 74 focused cases. Native SDK compilation and
 native Archive/Retrieve execution have not run.
 
 Frozen Git tree: `6914b63e79fe421f95f642213fc0c88077a08a79` (1990 files).
-[Source manifest](../../artifacts/encoder-checkpoint-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-checkpoint-01/source-manifest.json`) SHA-256:
 `71344e47e47b05e46f6a61892e65d08320846618e655b2139bf2f232198ae987`.
 Source ZIP SHA-256: `bc307e6b68dc040f868235315b69fe43486be37a7a068aa02ca983d03813a574`.
 
-The [aggregate](../../artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json`)
 passes 40 managed suites, 1,353 Python tests (one unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all offline MCP workflows.
 The unchanged general executable passes all 202 checks. The Python aggregate
@@ -67,9 +67,9 @@ The new managed suite runs seven actual file-I/O publisher groups and verifies i
 synthetic receipt through the independent Python reader.
 Run: 2026-10-17T08:51:41.0692233Z to 2026-10-17T09:01:45.9760170Z.
 Receipt SHA-256: `172c91ce0d2659543adf42540b68c3b4f6e13893d6db7a9db2da3808868a0b12`.
-[Console evidence](../../artifacts/encoder-checkpoint-01/aggregate-console.log).
+Console evidence (`artifacts/encoder-checkpoint-01/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/encoder-checkpoint-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/encoder-checkpoint-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_085202_8614680d` contains 1406
 manifest files. Receipt SHA-256: `200b6bd890498e8cad60e7fd0698183c3ba9ba5e2efe9a853be742e4413c003b`.
 Manifest SHA-256: `1a34d4835d961d0e10fac7d5ffdbe5940f0138dcd2c80c3baec51d55ef50fe8f`.
@@ -77,10 +77,10 @@ ZIP SHA-256: `d2c75e18c02823405fde4e9a5cd9c97b42fbd130eaafccfdeea0844df1df8420`.
 This offline package excludes native workers; it does not compile the Siemens SDK.
 Hashes establish retained byte integrity, not publisher or native authenticity.
 
-The [source comparison](../../artifacts/encoder-checkpoint-01/final-source-comparison.json)
+The source comparison (`artifacts/encoder-checkpoint-01/final-source-comparison.json`)
 allows only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/encoder-checkpoint-01/integration.json) records the
+integration receipt (`artifacts/encoder-checkpoint-01/integration.json`) records the
 pushed commit, hosted CI results and cleanup.
 
 ## Remaining gates

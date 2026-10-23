@@ -4,7 +4,7 @@
 
 The previous read-only companion validated compiler, endpoint and process evidence
 but opened retained project paths without proving their saved bytes were unchanged.
-The [previous synthetic reproduction](../../artifacts/encoder-endpoints-01/next-admission-reproduction.json)
+The previous synthetic reproduction (`artifacts/encoder-endpoints-01/next-admission-reproduction.json`)
 changed project bytes and still reached a project-open dispatch.
 
 The producer now publishes `closedCopies` only after all original native/worker/Host
@@ -58,11 +58,11 @@ failure, metadata changes confined to inspection copies, and independent-audit
 tampering. Existing encoder, HMI, runtime guard and safety tests are also exercised.
 
 Final frozen Git tree: `3fdb593b367823909abd24484038bc81d2bebf59` (2033 files).
-[Source manifest](../../artifacts/encoder-copy-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-copy-01/source-manifest.json`) SHA-256:
 `302723951825c4d8bd8e47ae5311cb515deccaba36bce0bcfe607c4cffe47db9`.
 Source ZIP SHA-256: `d9f2bd341f4ce1d3d1518eaa4b8f6a394e6b5f92bd7787bd9f355624ed6ea133`.
 
-The [aggregate](../../artifacts/encoder-copy-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/encoder-copy-01/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,432 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 224 checks. All 70 encoder Python
@@ -70,9 +70,9 @@ methods also pass under -OO, including 33 lifecycle, 5 endpoint and 12 closed-co
 Another 96 shared HMI, safety and runtime-guard tests pass.
 Run: 2026-10-17T14:25:29.3424324Z to 2026-10-17T14:36:52.7245497Z.
 Aggregate receipt SHA-256: `0824aca66506510d145725cd7755b25258c339bda73d1ff480c729441a2517fe`.
-[Console evidence](../../artifacts/encoder-copy-01/aggregate-console.log).
+Console evidence (`artifacts/encoder-copy-01/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/encoder-copy-01/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/encoder-copy-01/source/artifacts/package-checks/result.json`)
 pass, including exact ZIP/manifest verification and relocated MCP workflows.
 Bundle `tia-mcp-offline_20261017_142552_d06da2e5` contains 1437 manifest files.
 Package receipt SHA-256: `416b8367dbd77aaead8a85854d59dedcdfb8c98eb31bd808996e2803d2eacb0d`.
@@ -81,13 +81,13 @@ ZIP SHA-256: `c9855b6a6e00dd9e822047100bf50c48bcbba42305201abd7ad2a34339e05dfa`.
 The portable package disables native workers. Browser tests were not repeated
 for this file-admission and qualification-harness repair.
 
-The [source comparison](../../artifacts/encoder-copy-01/final-source-comparison.json)
+The source comparison (`artifacts/encoder-copy-01/final-source-comparison.json`)
 verifies unchanged frozen source and permits only five completion documents to
 differ in the final commit. All 106 unavailable historical evidence binding rows
-remain unchanged. The [integration receipt](../../artifacts/encoder-copy-01/integration.json)
+remain unchanged. The integration receipt (`artifacts/encoder-copy-01/integration.json`)
 records the pushed commit, exact hosted CI outcome and cleanup.
 
-The retained [synthetic scope demonstration](../../artifacts/encoder-copy-01/next-preservation-scope.json)
+The retained synthetic scope demonstration (`artifacts/encoder-copy-01/next-preservation-scope.json`)
 changes unobserved data before terminal snapshots while selected-encoder and later
 copy checks pass. This illustrates missing pre-edit peer-content evidence, not a
 native corruption result. Raw binary project-file equality across compilation

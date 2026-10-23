@@ -1,7 +1,7 @@
 # Safety signature evidence — 17 October 2026
 
 The safety qualification helper accepted Boolean, negative, string, array and
-overflow signature values. The [before/after reproduction](../../artifacts/safety-signature-comparison.json)
+overflow signature values. The before/after reproduction (`artifacts/safety-signature-comparison.json`)
 compares the committed baseline with the repaired helper using synthetic receipts.
 
 The shared helper now requires the existing CPU 1511F fixture's exact four program
@@ -35,33 +35,33 @@ The existing recovery test now covers bad values and types before Host creation,
 while retaining the original archive bytes. Fixtures in both test modules now
 represent the explicit supported shape.
 
-The [focused run](../../artifacts/safety-signature-targeted.log) passes all 54
+The focused run (`artifacts/safety-signature-targeted.log`) passes all 54
 parent tests, including conformance and the optimization subprocess runner. The
 runner executes the evidence suites under both -O and -OO; these are child tests,
 not additional parent tests. No Siemens process starts.
 
 Frozen Git tree: `b8ac8ad27d5952215c0e0765455b9f2a87013bba` (1994 files).
-[Source manifest](../../artifacts/safety-signature-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/safety-signature-01/source-manifest.json`) SHA-256:
 `8bbd52da720f97cb956d4f7cc0f1c3106c11f2e9c25e5d94e4122368520dce43`.
 Source ZIP SHA-256: `7cd24219143c2feac930e429a1760365c68695b7e217d3b31773ae3882e0c639`.
 
-The [full Python aggregate](../../artifacts/safety-signature-01/source/artifacts/checks/result.json)
+The full Python aggregate (`artifacts/safety-signature-01/source/artifacts/checks/result.json`)
 passes all 1,370 tests with one unavailable-historical-evidence skip, plus contracts,
 source bindings and retained-evidence inventory. The optimized child suites pass
 within that aggregate.
 Run: 2026-10-17T09:36:02.8202334Z to 2026-10-17T09:37:23.4031008Z.
 Receipt SHA-256: `20a952bc2655abec3b3467c4df35de4a743046149464fe921c8f052baf3261b7`.
-[Console evidence](../../artifacts/safety-signature-01/python-console.log).
+Console evidence (`artifacts/safety-signature-01/python-console.log`).
 
-The [source comparison](../../artifacts/safety-signature-01/final-source-comparison.json)
+The source comparison (`artifacts/safety-signature-01/final-source-comparison.json`)
 confirms only completion-documentation changes after the tested snapshot and
 preservation of all 106 unavailable historical evidence binding rows. The
-[integration receipt](../../artifacts/safety-signature-01/integration.json) records the
+integration receipt (`artifacts/safety-signature-01/integration.json`) records the
 pushed commit, hosted CI outcome and cleanup.
 
 This Python-only increment does not repeat managed, package or browser checks.
-The prior [package result](../../artifacts/xml-document-01/source/artifacts/package-checks/result.json)
-and [full managed aggregate](../../artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json)
+The prior package result (`artifacts/xml-document-01/source/artifacts/package-checks/result.json`)
+and full managed aggregate (`artifacts/encoder-checkpoint-01/source/artifacts/checks/result.json`)
 remain evidence for their own source snapshots.
 
 ## Remaining gates

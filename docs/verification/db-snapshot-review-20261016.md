@@ -79,8 +79,8 @@ Console logs are retained beside the frozen source as `aggregate-console.log` an
 ## Hosted status and remaining acceptance
 
 The prior connection-review commit `4c334c0` passed hosted
-[Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38970136889) and
-[Python/managed/package/OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38970136863).
+Explorer and
+Python/managed/package/OPC UA.
 These runs belong to that exact base commit; this increment's new runs must be
 read separately after push.
 

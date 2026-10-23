@@ -1,7 +1,7 @@
 # Newtonsoft.Json update and Framework fixture repair
 
 The update from 13.0.3 to 13.0.4 covers exactly 29 native worker, harness and
-managed-test project references in [PR 10](https://github.com/Sparkz400/TIA_MCP/pull/10),
+managed-test project references in PR 10,
 reviewed at `1e6aab8283e07374c3617686814cd744516039c0`. Each original PR change
 is only the package-version replacement. The original PR head is retained as a
 merge parent; final integration state is recorded in the local receipt below.

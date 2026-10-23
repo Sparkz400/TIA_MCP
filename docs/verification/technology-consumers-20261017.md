@@ -13,7 +13,7 @@ and hashes are preserved; no qualification status is promoted.
 
 ## Focused evidence
 
-[Managed checks](../../artifacts/to-consumers-tests-03/verification.json): 205 passed.
+Managed checks (`artifacts/to-consumers-tests-03/verification.json`): 205 passed.
 Coverage includes exact Unicode/case/ID matching, broken subjects, missing/ambiguous/
 mismatched/out-of-scope/virtual/unknown-scope nodes; both phases and changed/absent
 associations; no inferred members/links; incoming transitive paths, diamonds, cycles,
@@ -24,14 +24,14 @@ Ambiguity lookup reads at most two matching nodes; a 10,000-duplicate-ID case ve
 all ambiguous peers are excluded without choosing an arbitrary node. The earlier
 203-check run and first frozen package pass remain retained development evidence.
 
-[Actual MCP](../../artifacts/to-consumers-mcp-02/verification.json): 125 passed across
+Actual MCP (`artifacts/to-consumers-mcp-02/verification.json`): 125 passed across
 two clean Host lifetimes. Requests/records/pages validate against all three contract
 versions. Tests upload/import the exact saved graph, page all v3 sections, compose
 sources and consumers, release every upload, restart and reopen, and refuse invalid
 intake/corruption/rehashed reports without modifying retained workflow bytes.
 Native worker paths deliberately name absent executables. Host build: no warnings/errors.
 
-[Previous/current actual Host compatibility](../../artifacts/to-consumers-compatibility-02.json)
+Previous/current actual Host compatibility (`artifacts/to-consumers-compatibility-02.json`)
 opens three historical v1/v2 records from the previous increment with both Host versions.
 Receipts and all retained saved/workflow files remain identical; both processes exit
 cleanly without native workers. Production source is unchanged since the focused Host build.
@@ -40,19 +40,19 @@ cleanly without native workers. Production source is unchanged since the focused
 
 Final source: artifacts/to-consumers-02/source, Git tree
 54a334aadba734269549bd20b820c7cbea51ce25; 1950 tracked files.
-[Source manifest](../../artifacts/to-consumers-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-consumers-02/source-manifest.json`) SHA-256:
 39b472101053eae9820953f2c2a0c3575c971360643c3ed26f74256af91086ea.
 Source ZIP SHA-256: 3324dbf819a6ae8812eb262ba232af79f39ef3a7fd20427b7ab689deeb9f45b4.
 
-The [aggregate](../../artifacts/to-consumers-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-consumers-02/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,295 Python tests (one existing unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all actual MCP workflows.
 The TO workflow passes 205 managed and 125 actual MCP checks.
 Run: 2026-10-17T04:20:41.6540845Z to 2026-10-17T04:31:01.5791605Z.
 Receipt SHA-256: bef499e6ebc01d5afd6f5836cbc9a4e37130fc725bd236b84ba6523b2efd5b1d.
-[Console log](../../artifacts/to-consumers-02/aggregate-console.log) retains test output.
+Console log (`artifacts/to-consumers-02/aggregate-console.log`) retains test output.
 
-All 22 [package stages](../../artifacts/to-consumers-02/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-consumers-02/source/artifacts/package-checks/result.json`)
 pass, including the 205 managed/125 MCP technology checks after Unicode relocation.
 Receipt SHA-256: 072cdd8f620837883adbd2fb93c8ab9770dea1b709b500b15cb237979b2665bf.
 Bundle tia-mcp-offline_20261017_042105_c1c63d9e: 1385 manifest files;
@@ -62,9 +62,9 @@ Hashes establish integrity, not publisher authenticity or native qualification.
 
 The earlier to-consumers-01 source and its validation are retained development evidence;
 the final snapshot includes the bounded duplicate-ID lookup and its regression case.
-The [final source comparison](../../artifacts/to-consumers-02/final-source-comparison.json)
+The final source comparison (`artifacts/to-consumers-02/final-source-comparison.json`)
 permits only completion-documentation changes after the tested snapshot. The
-[integration receipt](../../artifacts/to-consumers-02/integration.json) records the pushed
+integration receipt (`artifacts/to-consumers-02/integration.json`) records the pushed
 commit, its separately observed hosted CI state, and cleanup.
 
 ## Remaining acceptance

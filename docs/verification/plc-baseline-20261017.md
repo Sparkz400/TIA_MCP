@@ -58,11 +58,11 @@ original safety-inspection call by tool identity. Its failed log is retained at
 `artifacts/plc-compile-safety-01.log`.
 
 Final frozen Git tree: `d44bdc53596ba927bde5f9c3ed8e235794b0946e` (2027 files).
-[Source manifest](../../artifacts/plc-baseline-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/plc-baseline-01/source-manifest.json`) SHA-256:
 `66a646c9500ca0d3d2b0158c8ba078ea5a8c323b0377b6c9d8de3eb20a79c089`.
 Source ZIP SHA-256: `146dc7102905319348ac4270bf54166f50ba5b131f231bb086e8f495dbc76d01`.
 
-The [aggregate](../../artifacts/plc-baseline-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/plc-baseline-01/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,411 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 222 checks. Targeted optimization runs
@@ -70,9 +70,9 @@ pass 29 encoder lifecycle, 14 compiler-proof, 26 safety qualification and 7 safe
 source-admission methods under -OO.
 Run: 2026-10-17T13:34:21.7041951Z to 2026-10-17T13:45:46.2982170Z.
 Aggregate receipt SHA-256: `30287f2f29a659714645e16da7a9d6d64988d1116f4683ba79c4fd620a04fa26`.
-[Console evidence](../../artifacts/plc-baseline-01/aggregate-console.log).
+Console evidence (`artifacts/plc-baseline-01/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/plc-baseline-01/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/plc-baseline-01/source/artifacts/package-checks/result.json`)
 pass. Bundle `tia-mcp-offline_20261017_133444_d2b5a5c8` contains 1431 manifest files.
 Package receipt SHA-256: `4860ef874a25fe74fcccc5632da4c6c13a50a71390be9836ddd5468a4601819e`.
 Manifest SHA-256: `37872f695c89028cc898150c813d0fbd90ecee8e437841b567d3788e433dd667`.
@@ -80,15 +80,15 @@ ZIP SHA-256: `912af4ef20e677b086d80b5ce56ec537c6e6e2121e820a1c95e6c416c4bb287a`.
 The portable package disables native workers. Browser tests were not repeated
 for this compiler/harness increment; SDK/native compilation remains unexecuted.
 
-The [source comparison](../../artifacts/plc-baseline-01/final-source-comparison.json)
+The source comparison (`artifacts/plc-baseline-01/final-source-comparison.json`)
 verifies unchanged frozen source and permits only six completion documents to
 differ in the final commit. All 106 unavailable historical evidence binding rows
-remain unchanged. The [integration receipt](../../artifacts/plc-baseline-01/integration.json)
+remain unchanged. The integration receipt (`artifacts/plc-baseline-01/integration.json`)
 records the pushed commit, exact hosted CI outcome and cleanup.
 
 ## Next reproduced recovery-copy defect
 
-The retained [synthetic reproduction](../../artifacts/plc-baseline-01/next-endpoint-reproduction.json)
+The retained synthetic reproduction (`artifacts/plc-baseline-01/next-endpoint-reproduction.json`)
 contains two individually valid channel-reference observations with the same
 module/channel profile and different owning project paths. Their raw attribute
 maps differ, so the existing recovery equality rejects a correctly re-owned copy.

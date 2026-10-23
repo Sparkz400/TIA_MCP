@@ -67,8 +67,8 @@ retained hashes.
 ## Hosted CI availability
 
 Implementation commit `32e52d9d6f0a4c29f910abb4c62712681dd4220b` reached
-`origin/main`. Both [offline CI](https://github.com/Sparkz400/TIA_MCP/actions/runs/38947656909)
-and [Explorer CI](https://github.com/Sparkz400/TIA_MCP/actions/runs/38947656835)
+`origin/main`. Both offline CI
+and Explorer CI
 ended in failure before any test step started. GitHub's check annotations cite
 failed recent account payments or a spending limit needing increase. This is an
 account-level execution refusal, not an executed test failure. The exact run,

@@ -64,7 +64,7 @@ Application/system execution, scope authoring/import, native list/group profiles
 
 ## Verification and integration handoff
 
-Evidence is isolated under [artifacts/ts03-production-20261016](../../artifacts/ts03-production-20261016/). The [handoff](../../artifacts/ts03-production-20261016/handoff.json) records final commands, results, changed-file ownership and source hashes. [Shared catalog handoff](../../artifacts/ts03-production-20261016/shared-catalog-handoff.json) records the pre/post hashes of append-only TS entries; unrelated current records were preserved. No shared Host startup, worker dispatch, project references, solution, WatchTable files, native reservations, frozen binaries or historical receipts were changed by this lane.
+Evidence is isolated under `artifacts/ts03-production-20261016/`. The handoff (`artifacts/ts03-production-20261016/handoff.json`) records final commands, results, changed-file ownership and source hashes. Shared catalog handoff (`artifacts/ts03-production-20261016/shared-catalog-handoff.json`) records the pre/post hashes of append-only TS entries; unrelated current records were preserved. No shared Host startup, worker dispatch, project references, solution, WatchTable files, native reservations, frozen binaries or historical receipts were changed by this lane.
 
 The [review](../../contracts/testsuite-style-review.v1.schema.json) and [job](../../contracts/testsuite-style-job.v1.schema.json) schemas add structural contracts. Runtime reconstruction and the shared journal still enforce hashes, revisions, idempotency, complete evidence and state transitions. The actual MCP registration/restart harness uses deliberately nonexistent engineering and simulator workers.
 

@@ -15,10 +15,10 @@ package are outside this increment's mutation scope.
   captured routes, and their individual native outcomes. An authored fixture
   or passing offline oracle is not native or runtime acceptance.
   All twelve advanced-unit cases now pass on the first frozen combined build.
-  The [strict independent audit](../../artifacts/p16t/advanced-final-01-audit.json)
+  The strict independent audit (`artifacts/p16t/advanced-final-01-audit.json`)
   verifies 794 XML exports, 636 complete payload comparisons and 36 exact owned
   TIA exits. Runtime remains unqualified by this engineering run.
-  A [supplemental compile audit](../../artifacts/p16t/advanced-final-01-compile-audit.json)
+  A supplemental compile audit (`artifacts/p16t/advanced-final-01-compile-audit.json`)
   checks 28 retained compile objects and 226 messages across all twelve cases;
   no contradictory Error diagnostics or truncated evidence were found.
 - [HMI qualification](hmi-qualification.md) records real Unified bindings and
@@ -67,7 +67,7 @@ Siemens enum documentation explicitly permits `Information` as a successful
 compile result, so zero-error `Success`, `Information` and `Warning` results are
 accepted only with complete clean diagnostics.
 
-The [guard evidence manifest](../../artifacts/p16h/compile-guard-final-assessment.json)
+The guard evidence manifest (`artifacts/p16h/compile-guard-final-assessment.json`)
 records exact sources and isolated builds, ten pure guard checks, 192 coordinator
 checks and 35 HMI checks. These are offline regression results, not new native
 qualification. Simulator ownership and backend guards were unchanged.
@@ -77,7 +77,7 @@ qualification. Simulator ownership and backend guards were unchanged.
 The first frozen combined Release snapshot is
 `artifacts/deployment-build/fa0067bcbd32499485b72d8ea1cef38a`. Build and publication
 completed with zero warnings/errors, and the compiled worker guard passed.
-Its [full regression](../../artifacts/p16r/full-regression-01.log) ran 518 Python
+Its full regression (`artifacts/p16r/full-regression-01.log`) ran 518 Python
 tests in 37 suites (517 passed, one existing skip), plus all C# suites. The
 simulator self-checks did not initialize Siemens APIs. The existing 21 explorer
 client/model tests also passed independently.
@@ -92,7 +92,7 @@ An exploratory invocation of `verify_feature_catalog.py` used its legacy Debug
 host and default `artifacts/feature-catalog-live.json` destination. Its 79-feature,
 43-tool, 18-backlog and zero-exit results match the documented historical values,
 but the previous file hash was not available. The
-[incident receipt](../../artifacts/p16r/legacy-catalog-repeat.json) explicitly
+incident receipt (`artifacts/p16r/legacy-catalog-repeat.json`) explicitly
 excludes this rerun from current-source qualification. No native worker was
 started and native reports were unaffected. The helper now rejects an existing
 report path before host startup and uses exclusive report creation to prevent

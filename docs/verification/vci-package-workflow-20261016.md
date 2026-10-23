@@ -28,8 +28,8 @@ No new dependency was introduced. The final aggregate below passes.
 ## Hosted CI finding and repair
 
 The preceding commit `b51f3da` passed hosted managed, isolated OPC UA and
-[Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38897383902) checks.
-Its [Python job](https://github.com/Sparkz400/TIA_MCP/actions/runs/38897383981)
+Explorer checks.
+Its Python job
 failed before tests: three generated contract JSON inputs contained CRLF locally,
 whereas `.gitattributes` publishes/checks them out with LF. The locally generated
 binding hashes consequently did not describe the GitHub checkout.

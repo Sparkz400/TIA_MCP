@@ -40,7 +40,7 @@ Read the [workflow and trust boundary](../reference/protected-credentials.md#fre
 
 Final frozen source: `artifacts/recover-02/source`, tree
 `c43c2987778a5fc7165ac508d5c0fa953798f4a9`, 1,932 files.
-[Manifest](../../artifacts/recover-02/source-manifest.json) SHA-256:
+Manifest (`artifacts/recover-02/source-manifest.json`) SHA-256:
 `4d72c9f099153598c48dc6dd155cf8f40e71c0c574ddfa8c1e161a25351e00fa`.
 Archive SHA-256:
 `568f376eb75ce821aa424503224d816f42e5683299044d7adb7c1a85bafcc964`.
@@ -86,7 +86,7 @@ schema/MCP validation and the frozen source. No failed command is counted as a p
 
 ## Binary compatibility
 
-The [compatibility receipt](../../artifacts/recover-02/legacy-compatibility.json),
+The compatibility receipt (`artifacts/recover-02/legacy-compatibility.json`),
 SHA-256 `df315f159628cf6d71a02a040817924065cac225498c6d1d39d4d7eea279f208`,
 compares the previous and current Host binaries against the explicit historical
 local-recovery shape. Both return identical independently reconciled records without
@@ -97,7 +97,7 @@ This uses synthetic recovery evidence and does not certify a native restore.
 
 ## Full frozen verification
 
-The final frozen [aggregate receipt](../../artifacts/recover-02/source/artifacts/checks/result.json)
+The final frozen aggregate receipt (`artifacts/recover-02/source/artifacts/checks/result.json`)
 passes all 38 managed suites, 1,280 Python tests (one existing unavailable-evidence
 skip), 24 Explorer model/client checks and all MCP workflows, contracts and source
 bindings. It ran from `2026-10-17T02:23:12.7483019Z` to
@@ -109,7 +109,7 @@ Credential checks in that aggregate and the packaged run include 55 storage,
 29 operation-status MCP and 32 recovery-status MCP checks. These remain portable
 synthetic contracts plus actual local Windows DPAPI/ACL and Host process checks.
 
-All 21 [package stages](../../artifacts/recover-02/source/artifacts/package-checks/result.json)
+All 21 package stages (`artifacts/recover-02/source/artifacts/package-checks/result.json`)
 pass, including original and Unicode-relocated verification and the recovery workflow.
 Receipt SHA-256: `b5c5c10b9e4ad0ac38b15b9f73d9fc2ba0d04c23416b1cbfa52e737fa0682f4c`.
 The bundle `tia-mcp-offline_20261017_022336_ab0bf374` contains 1,374 manifest files;
@@ -117,11 +117,11 @@ manifest SHA-256: `74824d0b90a0d8c77f9af395db28607e01c6c25e7a54eaab60164a076c049
 ZIP SHA-256: `e41a511f1bf28b527b63524c12b3c1495a3325f5a3752c4123bb25d2509552f3`.
 Manifest integrity is not a publisher signature or native compatibility claim.
 
-The [final source comparison](../../artifacts/recover-02/final-source-comparison.json)
+The final source comparison (`artifacts/recover-02/final-source-comparison.json`)
 records only completion-documentation differences from the frozen source: status,
 TODO, this verification record and the execution queue. Production source, schemas,
 tests, build scripts and source bindings are unchanged after successful verification.
-The [integration receipt](../../artifacts/recover-02/integration.json) records the
+The integration receipt (`artifacts/recover-02/integration.json`) records the
 pushed commit and its separate hosted CI status.
 
 ## Open work

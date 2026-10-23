@@ -87,8 +87,8 @@ native execution or qualification.
 
 ## Qualification and continuation
 
-The base commit passes hosted [Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38976973727)
-and [Python/managed/package/OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38976973487).
+The base commit passes hosted Explorer
+and Python/managed/package/OPC UA.
 These base results do not establish a later commit's hosted result. GitHub had no
 open issues or PRs at this audit; only the primary main branch/worktree was active.
 

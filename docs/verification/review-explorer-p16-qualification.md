@@ -6,7 +6,7 @@ PLC execution, complete project dependency coverage, or qualification of later
 binaries. Original failed attempts remain unchanged.
 
 After a separate HMI audit found contradictory native compile summaries, a
-[supplemental diagnostic audit](../../artifacts/p16r/compile-diagnostics-audit-01.json)
+supplemental diagnostic audit (`artifacts/p16r/compile-diagnostics-audit-01.json`)
 checked all fifteen retained review/scale compile objects and 1,061 messages.
 All have zero-error summaries, successful target states, complete nontruncated
 messages and no Error-state diagnostics. Original report hashes remain unchanged.
@@ -18,7 +18,7 @@ SCL functions in a new owned offline project: `ReviewRoot` calls `ReviewLeft` an
 `ReviewRight`, and both call `ReviewLeaf`. The leaf changes from `Int`/literal 1 to
 `DInt`/literal 2, with a corresponding source marker. Both programs compile.
 
-The [successful report](../../artifacts/p16r/rv02/result.json) verifies:
+The successful report (`artifacts/p16r/rv02/result.json`) verifies:
 
 - Twelve exact dependency paths to the leaf in each saved snapshot. The native
   provider exposes both `calls` and `dependsOn`, retaining the distinct paths
@@ -33,7 +33,7 @@ The [successful report](../../artifacts/p16r/rv02/result.json) verifies:
 - Exact exits for the three owned Portal processes (46660, 63900, 21660), their
   workers and hosts.
 
-The [separate strict audit](../../artifacts/p16r/rv02-strict-audit.json) re-reads
+The separate strict audit (`artifacts/p16r/rv02-strict-audit.json`) re-reads
 45 retained exports and performs 36 complete XML comparisons, including an exact
 leaf-change oracle. Only its return datatype, literal and marker differ. IDs,
 comments, processing instructions, significant whitespace, namespace bindings
@@ -42,10 +42,10 @@ excludes native top-level export provenance and serializer indentation only.
 The saved review tool itself retains its separately documented comparison policy.
 The leaf oracle also derives its expected edit through a preserving DOM, so a
 namespace used only in an opaque QName value cannot disappear during the
-comparison. Its [supplemental audit](../../artifacts/p16r/rv02-dom-leaf-audit.json)
+comparison. Its supplemental audit (`artifacts/p16r/rv02-dom-leaf-audit.json`)
 passes against the original retained exports and pins the unchanged report hash.
 
-The first [attempt](../../artifacts/p16r/rv01/result.json) remains failed: its
+The first attempt (`artifacts/p16r/rv01/result.json`) remains failed: its
 initial oracle incorrectly required only four call paths per side and omitted
 the additional dependency-edge combinations. Exact owned cleanup passed. The
 corrected fresh attempt and supplemental audits do not rewrite that result.
@@ -79,9 +79,9 @@ are measured separately.
 Native execution status is taken from the resulting report, not runner presence.
 The historical 500,000-Openness-instance failure and its recovery remain retained.
 
-The [completed native run](../../artifacts/p16r/sc01/result.json) passed all ten
+The completed native run (`artifacts/p16r/sc01/result.json`) passed all ten
 batches and the final fresh reopen on frozen build `fa0067bcbd32499485b72d8ea1cef38a`.
-Its [independent final audit](../../artifacts/p16r/sc01-audit-final-01.json)
+Its independent final audit (`artifacts/p16r/sc01-audit-final-01.json`)
 verifies all 1,000 function identities, 30 source samples, unchanged baseline
 payloads, authored relationship evidence, exports, and twelve exact owned TIA
 lifetimes with worker/host cleanup. The final metadata capture contains 1,070
@@ -94,7 +94,7 @@ reaches its existing traversal bound. The audit records this separately from
 the passed authored-edge and complete metadata/lifecycle gates. The run does
 not prove every generated function's source payload or runtime behaviour.
 
-The [native-workload browser run](../../artifacts/p16r/scale-browser-01/result.json)
+The native-workload browser run (`artifacts/p16r/scale-browser-01/result.json`)
 passes six checks using the installed Chromium: all 1,000 names across search
 pages, bounded rendered rows, exact final-function selection/details, authored
 call/instance/read/write edges and evidence, directional filters, SVG export,
@@ -104,7 +104,7 @@ pins the source snapshot, current UI, harness, package and screenshots. The
 visually inspected. This portable viewer evidence does not qualify the actual
 desktop MCP Apps host.
 
-A [second native-workload browser run](../../artifacts/p16r/scale-browser-02/result.json)
+A second native-workload browser run (`artifacts/p16r/scale-browser-02/result.json`)
 also passes all six checks after strengthening the oracle to compare the entire
 SVG evidence/coverage manifest and assert page width at both viewport sizes.
 An independent agent verified the first run's actual files already retained all
@@ -126,9 +126,9 @@ The user then installed project-local `@playwright/test` 1.64.0 and explicitly
 requested its use. Node resolves the package from this repository; Chromium,
 Firefox and WebKit all launched successfully. The existing explorer browser
 runner used the installed Chromium directly, without a test HTTP server, and
-passed [24 checks](../../artifacts/p16r/browser01/browser-results.json) with no
+passed 24 checks (`artifacts/p16r/browser01/browser-results.json`) with no
 page errors or network requests. The
-[installation receipt](../../artifacts/p16r/browser01/installation-receipt.json)
+installation receipt (`artifacts/p16r/browser01/installation-receipt.json`)
 pins the package/lockfile, browser versions, harness and report hashes.
 
 The browser run covers native-reference identity in synthetic fixtures,
@@ -147,20 +147,20 @@ directories, and prefers the locally installed Chromium. Root npm scripts
 The generated `e2e/example.spec.js` remains a separate installation example.
 Desktop MCP Apps product rendering is still a distinct outstanding gate.
 
-A [second current-UI run](../../artifacts/p16r/browser02/browser-results.json)
+A second current-UI run (`artifacts/p16r/browser02/browser-results.json`)
 also passed all 24 checks using automatic selection of the project-installed
-Chromium. Its [source receipt](../../artifacts/p16r/browser02/source-receipt.json)
+Chromium. Its source receipt (`artifacts/p16r/browser02/source-receipt.json`)
 binds the updated runner and HMI binding filter correction. The HMI-specific
 native binding acceptance is recorded separately by that workstream.
 
-The HMI workstream also passed [six browser checks on actual captured native
-data](../../artifacts/p16h/browser-current-01/browser-results.json), including
+The HMI workstream also passed six browser checks on actual captured native
+data (`artifacts/p16h/browser-current-01/browser-results.json`), including
 populated binding/alarm relationships and light/dark layouts. Its corrected
 current renderer is bound separately from the frozen HTML export, whose
 original HMI filter failure remains retained. See [HMI evidence](hmi-qualification.md).
 
 The first combined frozen build passed with zero warnings/errors. Its
-[full regression](../../artifacts/p16r/full-regression-01.log) passed 518 Python
+full regression (`artifacts/p16r/full-regression-01.log`) passed 518 Python
 tests across 37 suites (one existing skip) and all C# suites, including 144 core,
 22 hardware-preservation, and 27 simulator self-checks. The simulator API was not
 initialized. Later harness/preservation refinements require their own recorded

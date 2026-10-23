@@ -8,7 +8,7 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 
 The exact native04 source-reuse preflight passes against all 27 retained original
 inputs without opening the failed project or replaying an operation. Its
-[receipt](../../artifacts/p17n/component-source-preflight-01/preflight.json)
+receipt (`artifacts/p17n/component-source-preflight-01/preflight.json`)
 binds the same archived FB/UDT identities and FBD fixture. The independent fixture
 oracle now rejects duplicate native type/version identities and unresolved or
 duplicate dependency edges. Offline interruption checks cover all five component
@@ -17,7 +17,7 @@ failures never replay or continue. The three focused Python suites pass 74 tests
 These checks do not qualify an actual worker crash during a Siemens mutation.
 
 The remote-I/O b7 worker lacked deployed typed resources, which preflight caught
-before native component dispatch. A [separate immutable component package](../../artifacts/p17n/component-worker-package.json)
+before native component dispatch. A separate immutable component package (`artifacts/p17n/component-worker-package.json`)
 combines its unchanged guarded executable with 417 unchanged resource files from
 the fa0067 deployment snapshot. All runtime profile resources match current source;
 the copied historical qualification ledger is separately disclosed. The pending
@@ -25,7 +25,7 @@ native sequence remains exact import, FC/DB/call/bindings, full preservation,
 fresh reopen and recovery from the new consumer's first checkpoint. Production
 combined apply and runtime remain unqualified.
 
-The [fifth component attempt](../../artifacts/p17n/component-native-05/result.json)
+The fifth component attempt (`artifacts/p17n/component-native-05/result.json`)
 subsequently imported the exact source, compiled and saved it, verified its source
 oracle, and prepared the standalone FBD caller and instance DB. The harness then
 failed because it expected every preview effect to contain `action`; native typed
@@ -41,25 +41,25 @@ The [retained proposed preview fixture](../../fixtures/libraries/component-revie
 and negative regressions cover the original mixed-effect shape. This is an offline
 review correction, not proof of native typed installation.
 
-The separately admitted [first-checkpoint recovery](../../artifacts/p17n/component-recovery-05/result.json)
+The separately admitted first-checkpoint recovery (`artifacts/p17n/component-recovery-05/result.json`)
 passed exact archive retrieval into a distinct owned project, complete seven-object
 baseline comparison and fresh reopen, with the component library types absent.
-The [independent audit](../../artifacts/p17n/component-recovery05-independent.json)
+The independent audit (`artifacts/p17n/component-recovery05-independent.json`)
 checks all 21 XML exports, original archive/report/journal preservation and both
 captured-handle native exits. No apply, restore or failed-consumer reopen occurred.
 This separate result leaves the original installation attempt failed.
 
-The subsequent [fresh sixth attempt](../../artifacts/p17n/component-native-06/result.json)
+The subsequent fresh sixth attempt (`artifacts/p17n/component-native-06/result.json`)
 passed the corrected exact preview review and compiled the new FBD FC and instance
 DB with complete zero-error diagnostics. Strict storage readback then rejected the
 document before save: the native export omitted one blank CRLF line immediately
-after the unchanged BOM/XML declaration. The [independent byte-span audit](../../artifacts/p17n/component06-independent-failure-audit.json)
+after the unchanged BOM/XML declaration. The independent byte-span audit (`artifacts/p17n/component06-independent-failure-audit.json`)
 proves every remaining byte identical. The original failure remains
 `outcome_unknown` at coordinator level and `recovery_required` in the typed journal;
 no mutation was replayed. Exact owned cleanup and all 27 original source hashes
-passed. The separately admitted [recovery06](../../artifacts/p17n/component-recovery-06/result.json)
+passed. The separately admitted recovery06 (`artifacts/p17n/component-recovery-06/result.json`)
 then passed exact first-import checkpoint retrieval, seven-object baseline and fresh
-reopen equality, and library-type absence. Its [independent audit](../../artifacts/p17n/component-recovery06-independent.json)
+reopen equality, and library-type absence. Its independent audit (`artifacts/p17n/component-recovery06-independent.json`)
 verifies 21 XML exports, preserved original evidence and both clean owned lifetimes.
 This does not qualify installation preservation or persistence and does not change
 the failed installation result. A fresh installation requires the reviewed document
@@ -110,11 +110,11 @@ and their independent audits. Latest source/build evidence is in the
 
 ## Continuation — 9 October 2026
 
-The [fresh uninterrupted type lifecycle run](../../artifacts/l09/nt_69d941cf/qualification.json) passed all 63 stages and 17 prepared changes on frozen build `1c5dce3e17c54670a5aa8761a7a60029`, including authoring, archive generations, consumption, negative cleanup guard, referenced update, unrelated-content checks and exact FB/UDT links after fresh reopen. Host shutdown was clean and all three owned Portal IDs were subsequently absent. A separate [strict audit](../../artifacts/continuation-20261009/audit_strict_native_preservation.json) compared the six unrelated native export pairs while ignoring only exporter creation time. The second release remains metadata-only; dependency closure, behavior-changing releases and combined PLC integration are still open. Existing VM proof is accepted for this continuation. See the [current delivery/evidence record](continuation-20261009.md).
+The fresh uninterrupted type lifecycle run (`artifacts/l09/nt_69d941cf/qualification.json`) passed all 63 stages and 17 prepared changes on frozen build `1c5dce3e17c54670a5aa8761a7a60029`, including authoring, archive generations, consumption, negative cleanup guard, referenced update, unrelated-content checks and exact FB/UDT links after fresh reopen. Host shutdown was clean and all three owned Portal IDs were subsequently absent. A separate strict audit (`artifacts/continuation-20261009/audit_strict_native_preservation.json`) compared the six unrelated native export pairs while ignoring only exporter creation time. The second release remains metadata-only; dependency closure, behavior-changing releases and combined PLC integration are still open. Existing VM proof is accepted for this continuation. See the [current delivery/evidence record](continuation-20261009.md).
 
 Checkpoint: 8 October 2026. Work stopped here at the user's request. The core PLC library subsystem is implemented; the full feature plan remains open. This list is the continuation backlog, not a claim that every remaining item is a known defect.
 
-See [implementation and usage](../guides/library-management.md), [full intended scope](../plans/library-management-plan.md), [HMI support](../reference/library-hmi-support.md), and [exact verification evidence](../../artifacts/library-implementation-verification.json).
+See [implementation and usage](../guides/library-management.md), [full intended scope](../plans/library-management-plan.md), [HMI support](../reference/library-hmi-support.md), and exact verification evidence (`artifacts/library-implementation-verification.json`).
 
 ## Completed at this checkpoint
 

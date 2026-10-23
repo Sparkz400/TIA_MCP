@@ -13,11 +13,11 @@ foreach ($folder in @('src/TiaMcp.Core','src/TiaMcp.Graph','src/TiaMcp.OpcUa','s
 foreach ($file in @('Directory.Build.props','global.json','NuGet.Config','scripts/probe_opcua_api.py','scripts/Inspect-OpcUaApi.ps1','scripts/test_opcua_api.py','scripts/Test-OpcUaOffline.ps1')) {
     $files += Get-Item -LiteralPath (Join-Path $repoRoot $file)
 }
-# Core can embed fixture resources outside its source directory. Include its declared files
-# without making this runner depend on any unrelated optional fixture by name.
+# Core can embed fixture resources and link source files outside its source directory. Include
+# its declared files without making this runner depend on any unrelated optional fixture by name.
 $coreProjectPath = Join-Path $repoRoot 'src/TiaMcp.Core/TiaMcp.Core.csproj'
 $coreProject = [xml](Get-Content -LiteralPath $coreProjectPath -Raw)
-foreach ($resource in $coreProject.SelectNodes('//EmbeddedResource[@Include]')) {
+foreach ($resource in $coreProject.SelectNodes('//EmbeddedResource[@Include] | //Compile[@Include]')) {
     $resourcePath = Join-Path (Split-Path $coreProjectPath -Parent) $resource.GetAttribute('Include')
     if (Test-Path -LiteralPath $resourcePath -PathType Leaf) { $files += Get-Item -LiteralPath $resourcePath }
 }

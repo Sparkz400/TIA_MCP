@@ -84,8 +84,8 @@ binary hashes are inside it. Expected refusal output is not an aggregate failure
 
 ## CI, limits and continuation
 
-The base commit passes hosted [Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38982488660)
-and all [Python/managed/package/OPC UA jobs](https://github.com/Sparkz400/TIA_MCP/actions/runs/38982488699).
+The base commit passes hosted Explorer
+and all Python/managed/package/OPC UA jobs.
 These results do not establish a later commit's hosted status. GitHub had no open
 issues or PRs; only the primary main branch/worktree was active.
 

@@ -361,7 +361,7 @@ Native qualification and production activation remain separate, unexecuted gates
 
 **Production Host qualification — 16 October 2026:** The [frozen updated Host/worker](verification/production-host-qualification-20261016.md) passed catalog coverage, clean startup, the owned Bool edit/readback/fresh-reopen/checkpoint-recovery workflow, and actual worker-loss plus Host-loss/restart cases. Both loss cases retain ownership and refuse duplicate/competing dispatch until fresh original/restored reconciliation. All owned resources are reconciled; original failed startup attempts remain failed. Qualification applies to `binary-01`, not later concurrent watch-authoring edits or broader profiles.
 
-**Latest recovery expansion — 15 October 2026:** [Shared mutation admission and interruption hardening](verification/recovery-expansion-wave-20261015.md) now cover existing mutation routes, restart/competing-owner tests, lost retrieval receipts and final-proof recovery. Expanded watch comment/clone/reorder/delete profiles are implemented but remain production-gated pending genuine native review/readback/reopen/restoration. Two new-worker startup attempts timed out before project commands; the old frozen worker control succeeded. Exact owned cleanup is retained, including forced cleanup of the second timeout. The cause is unresolved. Parallel VCI/translation/Test Suite preservation gates remain closed where evidence fails. Typed candidates advanced offline; [the runtime queue](../artifacts/recovery-expansion-20261015/obligations/runtime-window-02/native-queue.manifest.json) is conditional and unlaunched. See the wave report for validation and all residuals; native engineering qualification remains open.
+**Latest recovery expansion — 15 October 2026:** [Shared mutation admission and interruption hardening](verification/recovery-expansion-wave-20261015.md) now cover existing mutation routes, restart/competing-owner tests, lost retrieval receipts and final-proof recovery. Expanded watch comment/clone/reorder/delete profiles are implemented but remain production-gated pending genuine native review/readback/reopen/restoration. Two new-worker startup attempts timed out before project commands; the old frozen worker control succeeded. Exact owned cleanup is retained, including forced cleanup of the second timeout. The cause is unresolved. Parallel VCI/translation/Test Suite preservation gates remain closed where evidence fails. Typed candidates advanced offline; the runtime queue (`artifacts/recovery-expansion-20261015/obligations/runtime-window-02/native-queue.manifest.json`) is conditional and unlaunched. See the wave report for validation and all residuals; native engineering qualification remains open.
 
 **Current integration update — 15 October 2026:** The [production watch wave](verification/production-watch-wave-20261015.md) connects native identity rechecks, durable dispatch, ownership and recovery through the Host/worker. The first scoped owned Bool watch edit passed independent review, readback/peer preservation, saved fresh reopen and verified recovery. Actual worker loss retained an unknown outcome, refused replay and reconciled through fresh checkpoint recovery. The preserving editor uses genuine exports. VCI Git journal callbacks pass 108 checks; native translation category mismatches keep imports disabled. Test Suite has three genuine definition families and observed style license/execution availability, with exact scope qualification still open. Broader AC-02/03 and watch qualification remain open. See [owner handoffs](plans/active-handoffs-20261015.md).
 
@@ -390,7 +390,7 @@ the independent c02 audit, c01 prefix persistence and profile activation remaine
 open. No new qualification batch, runtime, build or deployment was started
 before the resume.
 [TODO](TODO.md) records the resume order.
-The [stop handoff](../artifacts/p16r/user-stop-handoff-01.json) preserves exact
+The stop handoff (`artifacts/p16r/user-stop-handoff-01.json`) preserves exact
 reports, cleanup receipts and remaining source hashes.
 
 As of 12 October 2026, the fifth parallel increment adds strict typed insertion
@@ -418,7 +418,7 @@ proof is accepted; repeating VM qualification is not a delivery gate.
 | HMI | Copied-project inspection passed both bilingual owners, all 16 comparisons, binding/relationship and explorer gates, and 56 response contracts. All 195 original files and 76 directories were preserved; exact cleanup passed. Clean Classic/Unified compile prerequisites, bridge archive retrieval, operation preservation/recovery and production writes remain open. The original failed overall outcome is retained. |
 | Network | Native07 on the pinned b7 worker passed all nine configured-module-lifecycle gates, including controller assignment, explicit server relocation, DI creation, slot/address edits, complete two-target compile, preservation, fresh reopen and exact checkpoint recovery. Independent audit and all three owned lifetimes passed. Native06 remains a failed full run: the chosen DI exposes no reviewed writable channel attribute. Channel writes, the full remote-I/O route and physical/runtime topology remain unqualified. |
 | Explorer browser | Project-local Playwright is installed correctly: 24 general browser checks and six checks on the completed native 1,000-function workload passed. Its independent audit confirms all metadata identities, 30 source samples, authored relationships and twelve exact cleanup lifetimes. Full global relationship coverage and actual desktop MCP Apps rendering remain unqualified. |
-| Build/package | Current p17 frozen build `4824de5911a3472bb9e30f8264fff9d5` passed with zero warnings/errors, full workstation regression and complete offline validation: 654 Python tests run/one existing skip, 657 managed checks across twelve suites, and 21 explorer model/client checks. The actual browser suite passed 24 checks; 27 simulator selftests passed without initializing Siemens. [Independent validation receipt](../artifacts/p17r/combined-validation-02.json). Final packaging is separate; installed package unchanged. |
+| Build/package | Current p17 frozen build `4824de5911a3472bb9e30f8264fff9d5` passed with zero warnings/errors, full workstation regression and complete offline validation: 654 Python tests run/one existing skip, 657 managed checks across twelve suites, and 21 explorer model/client checks. The actual browser suite passed 24 checks; 27 simulator selftests passed without initializing Siemens. Independent validation receipt (`artifacts/p17r/combined-validation-02.json`). Final packaging is separate; installed package unchanged. |
 
 The new runner supports cooperative stop requests between cases and writes an exact
 remaining-case selection. Native engineering-suite stopping now verifies active-suite
@@ -462,13 +462,13 @@ equality failed. All original project companions were unchanged; one added
 not reached; this is neither requested-stop nor corpus qualification.
 
 Historical 9 October runtime build: `cb6299c72baf44d4b05278d878a536a0`.
-[Historical package](../artifacts/releases/tia-mcp-v21_20261009_081229_c1cbb7f3).
+Historical package (`artifacts/releases/tia-mcp-v21_20261009_081229_c1cbb7f3`).
 Different native fixtures retain their own exact build identities; they do not
 automatically qualify every later binary.
 
 See the [full checkpoint](history/continuation-20261009.md),
-[runtime audit](../artifacts/continuation-20261009/runtime06-final-audit.json),
-[resource audit](../artifacts/continuation-20261009/audit-isolation06.json) and
-[saved handoff](../artifacts/continuation-20261009/clean-stop-handoff16.json).
+runtime audit (`artifacts/continuation-20261009/runtime06-final-audit.json`),
+resource audit (`artifacts/continuation-20261009/audit-isolation06.json`) and
+saved handoff (`artifacts/continuation-20261009/clean-stop-handoff16.json`).
 Documentation was reorganized after that checkpoint; the released package and
 native results remain unchanged.

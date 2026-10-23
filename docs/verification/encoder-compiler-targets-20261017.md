@@ -71,11 +71,11 @@ native path convention; the stronger production check was retained. The failed
 log remains at `artifacts/encoder-targets-lifecycle-optimized-01.log`.
 
 Final frozen Git tree: `92e17fed1de61ab210ceeb2fc25f5c8e9d707095` (2024 files).
-[Source manifest](../../artifacts/encoder-targets-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-targets-02/source-manifest.json`) SHA-256:
 `47575b37ed69f872f071765ed1cda96bbbfacf7b03152db448f9d894815366f0`.
 Source ZIP SHA-256: `0028b9b8fccfc4fff7d37fd6acd4e2878a9cce867d178ae29325bf7d33b80965`.
 
-The [aggregate](../../artifacts/encoder-targets-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/encoder-targets-02/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,406 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 219 checks, including the linked shared
@@ -83,9 +83,9 @@ device compiler and hardware traversal. Targeted optimization runs pass 27 encod
 lifecycle methods and 13 compiler/selection methods under -OO.
 Run: 2026-10-17T13:05:33.6736771Z to 2026-10-17T13:16:59.6702667Z.
 Aggregate receipt SHA-256: `3a6f5728d75c096b3614a51670700e9faaf13d36b3eff7cd6cdecf9c7c98a453`.
-[Console evidence](../../artifacts/encoder-targets-02/aggregate-console.log).
+Console evidence (`artifacts/encoder-targets-02/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/encoder-targets-02/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/encoder-targets-02/source/artifacts/package-checks/result.json`)
 pass. Bundle `tia-mcp-offline_20261017_130600_08c4e936` contains 1430 manifest files.
 Package receipt SHA-256: `cb020ef3d22689f2f59cc97c5f98289139ee9aa1837286ede3fe6afb662b1176`.
 Manifest SHA-256: `69cb4ed52efb257652bc1ed3e27521ac05f2a7afc1a43adec7cc85f89aa00eab`.
@@ -93,10 +93,10 @@ ZIP SHA-256: `79b3ae6f6b99b63b1dbc950ea36770d680bfb1eeb5a09a75e8cddc5e899cfc6f`.
 The portable package disables native workers. Browser tests were not repeated
 for this compiler/harness increment; SDK/native compilation remains unexecuted.
 
-The [source comparison](../../artifacts/encoder-targets-02/final-source-comparison.json)
+The source comparison (`artifacts/encoder-targets-02/final-source-comparison.json`)
 verifies the frozen source remained unchanged and permits only completion docs
 to differ in the final commit. All 106 unavailable historical evidence binding
-rows remain unchanged. The [integration receipt](../../artifacts/encoder-targets-02/integration.json)
+rows remain unchanged. The integration receipt (`artifacts/encoder-targets-02/integration.json`)
 records the pushed commit, exact hosted CI outcome and cleanup.
 
 This increment does not complete the full 44-workstream goal or qualify the

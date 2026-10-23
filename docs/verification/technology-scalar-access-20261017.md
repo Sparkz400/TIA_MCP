@@ -11,7 +11,7 @@ application routine. [Behavior and limits](../guides/engineering-workflows.md#te
 `OpennessSession.TechnologyParameters.cs` contains the actual production routines.
 The existing scalar conversion, protected-name and scalar-presentation methods moved
 unchanged to `OpennessSession.ScalarValues.cs`; all hardware/network callers still use
-the same partial-class methods. The [byte comparison](../../artifacts/to-write-scalar-move.json)
+the same partial-class methods. The byte comparison (`artifacts/to-write-scalar-move.json`)
 compares both original method spans to the moved file. No shared conversion behavior
 was changed by the move. Native dispatch sites in Changes.cs still call the shared
 apply path for both create and parameter edit; edit preview now calls its shared
@@ -24,7 +24,7 @@ control flow on .NET 10; it does not prove the real SDK ABI, whole worker build,
 actual native metadata availability, CPU eligibility, preservation or recovery.
 No Siemens product, SDK, PLCSIM or PLC was installed or executed.
 
-[Final focused run](../../artifacts/to-write-tests-02.log): 159/159 general executable
+Final focused run (`artifacts/to-write-tests-02.log`): 159/159 general executable
 checks pass, including five new scenario groups: access/type boundaries; whole-batch
 preflight and 0/500/501 bounds; revalidation/partial setter failure/typed readback;
 supported scalar round trips and invalid conversions; explicit types for null values.
@@ -45,19 +45,19 @@ axis/encoder evidence references and all 106 unavailable evidence rows/hashes re
 preserved. Static totals remain 199 tools, 55 mutation kinds and 272 features.
 Final source: artifacts/to-write-01/source, Git tree
 c38ef123047e877f4ac1a02500e9395696560be8; 1954 tracked files.
-[Source manifest](../../artifacts/to-write-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-write-01/source-manifest.json`) SHA-256:
 fd1d165f7ece3e8e85209ecb710ae66cf8aabca6ac519355db2348ce472a5a82.
 Source ZIP SHA-256: 6317ccf7a6ff63b0ed6c11988b903c56697cc6ab96b499fec9a20b437dddc620.
 
-The [aggregate](../../artifacts/to-write-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-write-01/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,295 Python tests (one existing unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all actual offline MCP workflows.
 The general executable repeats all 159 checks, including the five new linked-routine
 groups. Run: 2026-10-17T04:45:57.1661141Z to 2026-10-17T04:56:08.0288801Z.
 Receipt SHA-256: 6fa9157d75f93e3bef96a5f93eb00b879d48280a5aed35d5e948664399670a84.
-[Console output](../../artifacts/to-write-01/aggregate-console.log) retains test results.
+Console output (`artifacts/to-write-01/aggregate-console.log`) retains test results.
 
-All 22 [package stages](../../artifacts/to-write-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-write-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. This offline package intentionally excludes native workers;
 its success is not an SDK build or native execution of the changed scalar routines.
 Receipt SHA-256: 5dc0996d2c39b9284d9cfbaeb8326e975026140b63e2ccabc2b36913c04fb9ec.
@@ -66,9 +66,9 @@ manifest SHA-256: c09d716602376e9e43ef7ba6e4b9966489ee380464177eb05a57879ea754c7
 ZIP SHA-256: 5d649f23503f7d2a5afe6013ffaa182d8deb05241459121fa96bba581a21be5e.
 Hashes establish integrity, not publisher authenticity or native qualification.
 
-The [final comparison](../../artifacts/to-write-01/final-source-comparison.json)
+The final comparison (`artifacts/to-write-01/final-source-comparison.json`)
 permits only completion-documentation edits after this source snapshot. The
-[integration receipt](../../artifacts/to-write-01/integration.json) records the pushed
+integration receipt (`artifacts/to-write-01/integration.json`) records the pushed
 commit, hosted CI state and cleanup.
 
 Outer evidence capture and the full native worker were inspected in source, not executed.

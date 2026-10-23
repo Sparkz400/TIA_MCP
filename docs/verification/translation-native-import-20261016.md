@@ -2,11 +2,11 @@
 
 The disabled adapter now has a concrete Siemens owning-worker implementation. The smallest native packet passed on one disposable de-DE/en-GB fixture: one no-op import and one existing nonempty English Main OB1 block-comment edit. Both operations passed complete native readback, engineering preservation, compilation, save/fresh reopen and distinct-copy checkpoint recovery. Production import remains disabled.
 
-The [independent final verification](../../artifacts/translation-native-20261016-02/native-verification-final.json) reads the retained original workbooks, XML exports, journals, native results and process proofs. It verifies all ten rows across both native sheets, exact candidate changes, recovered original peers/languages, stale plan/revision and repeated-dispatch refusals, two imports, two restorations, no pending fixture resources and six normal retained-handle process exits across the two accepted continuation windows.
+The independent final verification (`artifacts/translation-native-20261016-02/native-verification-final.json`) reads the retained original workbooks, XML exports, journals, native results and process proofs. It verifies all ten rows across both native sheets, exact candidate changes, recovered original peers/languages, stale plan/revision and repeated-dispatch refusals, two imports, two restorations, no pending fixture resources and six normal retained-handle process exits across the two accepted continuation windows.
 
 ## Accepted native evidence
 
-Original native evidence remains under `D:\TIAW\tr1603`. The final receipt directory is `D:\TIAW\tr1603\continuation-02`; its hashed prior packet is `continuation-01`. The [delivery manifest](../../artifacts/translation-native-20261016-02/delivery.json) binds these locations, package manifests and verification receipts.
+Original native evidence remains under `D:\TIAW\tr1603`. The final receipt directory is `D:\TIAW\tr1603\continuation-02`; its hashed prior packet is `continuation-01`. The delivery manifest (`artifacts/translation-native-20261016-02/delivery.json`) binds these locations, package manifests and verification receipts.
 
 | Trial | Durable operation | Result |
 | --- | --- | --- |
@@ -35,12 +35,12 @@ The original `wt02` operation `8dc3fe356740412d8de54f8e5d0f6f2f` remains untouch
 
 ## Checks and boundaries
 
-- [Combined managed run](../../artifacts/translation-native-20261016-02/combined-managed/result.json): 21 suites plus actual offline MCP passed, including 90 import and 49 Host checks, before the final continuation/strict-field additions.
-- [Final import checks](../../artifacts/translation-native-20261016-02/import-strict/verification.json): **95/95**, including continuation, exact-field normalization, interruptions, tampering, competing ownership and actual managed child-process loss after flushed dispatch intent.
-- [Python checks](../../artifacts/translation-native-20261016-02/python-final.log): **99 passed**; [final verifier checks](../../artifacts/translation-native-20261016-02/python-verifier-final.log) rerun the eight native-packet adversarial checks after final verifier strengthening.
-- [Worker boundary checks](../../artifacts/translation-native-20261016-02/production-final-boundary.log): **31 passed**, including the durable JSON timestamp regression.
-- [Standard-worker gate checks](../../artifacts/translation-native-20261016-02/production-worker-gates.log): all four qualification entry routes refused before native lookup; exact worker exited normally.
-- [Standard Host offline/registration check](../../artifacts/translation-native-20261016-02/production-host-registration/verification.json): full offline workflow and real Host restart passed with nonexistent native workers; native qualification tools were absent.
+- Combined managed run (`artifacts/translation-native-20261016-02/combined-managed/result.json`): 21 suites plus actual offline MCP passed, including 90 import and 49 Host checks, before the final continuation/strict-field additions.
+- Final import checks (`artifacts/translation-native-20261016-02/import-strict/verification.json`): **95/95**, including continuation, exact-field normalization, interruptions, tampering, competing ownership and actual managed child-process loss after flushed dispatch intent.
+- Python checks (`artifacts/translation-native-20261016-02/python-final.log`): **99 passed**; final verifier checks (`artifacts/translation-native-20261016-02/python-verifier-final.log`) rerun the eight native-packet adversarial checks after final verifier strengthening.
+- Worker boundary checks (`artifacts/translation-native-20261016-02/production-final-boundary.log`): **31 passed**, including the durable JSON timestamp regression.
+- Standard-worker gate checks (`artifacts/translation-native-20261016-02/production-worker-gates.log`): all four qualification entry routes refused before native lookup; exact worker exited normally.
+- Standard Host offline/registration check (`artifacts/translation-native-20261016-02/production-host-registration/verification.json`): full offline workflow and real Host restart passed with nonexistent native workers; native qualification tools were absent.
 - Standard Host/worker builds passed. Package 06 and the standard worker emitted one warning from the concurrent Test Suite qualification field defaulting to false; no translation build error remains.
 
 This qualifies only the observed installed V21 package, full bilingual layout and existing plain Main comment target shape. Production profiles, arbitrary category/object subsets, source writes, clear/empty-target writes, rich text and broader native interruption matrices remain outside this packet. The [adapter reference](../reference/translation-native-import.md) describes the closed production boundary and exact continuation rules.

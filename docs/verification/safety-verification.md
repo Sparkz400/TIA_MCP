@@ -9,7 +9,7 @@ used the installed **CPU 1511F-1 PN**, catalog identifier
 connect to a physical PLC, perform a download, or execute a safety login.
 
 The machine-readable proof is
-[safety-roundtrip-verified.json](../../artifacts/safety-roundtrip-verified.json).
+safety-roundtrip-verified.json (`artifacts/safety-roundtrip-verified.json`).
 The [runner](../../scripts/smoke_safety_direct.py) uses the actual stdio MCP tools
 and detaches its owned TIA connection in a `finally` block.
 
@@ -29,8 +29,8 @@ and detaches its owned TIA connection in a `finally` block.
 | Cleanup | Explicit `tia_detach` succeeded and the MCP host exited. |
 
 The verified change ID is `ce7754ae3e3840ee8b075766b452703d`. Its retained
-[recovery archive](../../artifacts/changes/change-ce7754ae3e3840ee8b075766b452703d/before.zap21)
-and [journal](../../artifacts/changes/change-ce7754ae3e3840ee8b075766b452703d/journal.json)
+recovery archive (`artifacts/changes/change-ce7754ae3e3840ee8b075766b452703d/before.zap21`)
+and journal (`artifacts/changes/change-ce7754ae3e3840ee8b075766b452703d/journal.json`)
 record the operation.
 
 | Native signature | Before | After |
@@ -65,9 +65,9 @@ tested V21 configuration.
 
 The first creation attempt saved and compiled successfully, then encountered
 Siemens' prohibition on exporting generated `FOB_RTG1`. Its
-[creation report](../../artifacts/safety-direct-smoke.json) preserves that partial
+creation report (`artifacts/safety-direct-smoke.json`) preserves that partial
 result. The test reopened that exact saved scratch for the successful
-[read inspection](../../artifacts/safety-direct-read.json) and final round trip.
+read inspection (`artifacts/safety-direct-read.json`) and final round trip.
 
 The round-trip report also exposed a reporting defect: `change_apply.safetyAfter`
 had been captured immediately after import and contained temporary zero software
@@ -77,7 +77,7 @@ that reporting correction was made after this recorded run.
 
 ## Comment-change failure and separate checkpoint retrieval
 
-The later [expanded safety run](../../artifacts/safety-expanded.json) used a fresh
+The later expanded safety run (`artifacts/safety-expanded.json`) used a fresh
 scratch with the same CPU profile and changed one existing user F-block comment.
 Native import, compilation with **0 errors and 0 warnings**, and project save
 completed. The subsequent project fingerprint failed because Siemens rejected
@@ -85,13 +85,13 @@ completed. The subsequent project fingerprint failed because Siemens rejected
 inconsistent. This was a fingerprint failure after mutation, not a passed
 comment-change qualification.
 
-The [retained journal](../../artifacts/changes/change-3cd5bd1d42c6468e92c934ef6a9bc9ad/journal.json)
+The retained journal (`artifacts/changes/change-3cd5bd1d42c6468e92c934ef6a9bc9ad/journal.json`)
 has state `recovery_required` and `afterFingerprint: null`. `change_restore`
 correctly rejected automatic recovery with `StaleRevision`, since there was no
 recorded post-change state against which to check for subsequent edits. The
 failed project and journal were preserved; the restore guard was not bypassed.
 
-A [separate checkpoint retrieval](../../artifacts/safety-expanded-checkpoint-retrieval.json)
+A separate checkpoint retrieval (`artifacts/safety-expanded-checkpoint-retrieval.json`)
 then passed in a new empty worker-owned TIA instance. `project_retrieve` verified
 the original archive SHA-256
 `ebaa73af2ca2f0f667c462826854fe8c39a1f92991c14d5492a205fd07b92757`
@@ -113,7 +113,7 @@ exclusion, and user/editable fingerprint errors still fail closed.
 The corrected source built successfully and passed **82/82 C# regression tests**,
 including the generated/user-block fingerprint distinction. Fresh native
 qualification remains unavailable: the
-[isolated post-fix run](../../artifacts/safety-expanded-isolated-start-timeout.json)
+isolated post-fix run (`artifacts/safety-expanded-isolated-start-timeout.json`)
 stopped at `tia_start` after approximately 300 seconds with
 `TimeoutOutcomeUnknown`, before any scratch creation or mutation request. The
 report records `completed: false` and host exit code 0. Subsequent native

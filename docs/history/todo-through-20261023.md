@@ -306,14 +306,14 @@ separate-module implementation may proceed concurrently. Root coordinates
 shared-file edits, immutable builds and one native TIA qualification queue;
 PLCSIM requires a separate exclusive window after owned native work closes.
 
-- Typed: the independent [c02 audit](../../artifacts/p17t/c02-independent-audit-01.json)
+- Typed: the independent c02 audit (`artifacts/p17t/c02-independent-audit-01.json`)
   passed its ten captured inputs, original hashes, preservation, persistence and
   exact cleanup. This does not qualify typed builders or runtime. The Python
   capture gate now accepts a successful target `Information` state while
   rejecting incomplete/error diagnostics. The final typed harness, finalizer,
   candidate staging and owned-lifetime suites passed 98 focused checks. A separate
-  [c01 copied-project finalization](../../artifacts/p17t/f01/finalization.json) and
-  [independent audit](../../artifacts/p17t/c01-finalization-independent-audit-01.json)
+  c01 copied-project finalization (`artifacts/p17t/f01/finalization.json`) and
+  independent audit (`artifacts/p17t/c01-finalization-independent-audit-01.json`)
   passed all 54 native payloads, complete original-file preservation and exact
   cleanup. Its original report remains stopped. Four TON profiles were staged
   and independently audited as inactive candidates. Their native prerequisite
@@ -322,15 +322,15 @@ PLCSIM requires a separate exclusive window after owned native work closes.
   captured all 19 remaining inputs and its final saved snapshot, then failed
   host/worker cleanup before fresh reopen: the host exited 1 and the worker
   exceeded its 30-second wait. Exact TIA exit and later absence of the worker
-  are retained in a [cleanup supplement](../../artifacts/p17t/c03-all19-cleanup-supplement-01.json).
+  are retained in a cleanup supplement (`artifacts/p17t/c03-all19-cleanup-supplement-01.json`).
   The failed original is immutable. A separate
-  [copied read-only finalizer](../../artifacts/p17t/f02/finalization.json) passed all
+  copied read-only finalizer (`artifacts/p17t/f02/finalization.json`) passed all
   55 payloads, preserved all nine original files and closed cleanly. Independent
   audits reconcile 38 distinct inputs and 45 reference blocks across the
   separate capture/persistence chains. Twenty-two comparison, four TON and two
   auxiliary call candidate rows remain inactive. See
   [typed evidence](../verification/typed-p17-qualification.md) and the
-  [final typed handoff](../../artifacts/p17t/workstream-handoff-02.json).
+  final typed handoff (`artifacts/p17t/workstream-handoff-02.json`).
 - Libraries/remote I/O: the original b7 worker/host/harness hashes and native04
   cleanup were checked. Native05 passed the controller assignment and its
   independent preservation audit, then correctly rejected module placement in
@@ -338,9 +338,9 @@ PLCSIM requires a separate exclusive window after owned native work closes.
   Native06 passed controller assignment, explicit server relocation, DI creation,
   slot movement and input-address editing. It stopped before channel editing:
   this fixture exposes no reviewed writable channel attribute. The separate
-  [native07 lifecycle run](../../artifacts/p17n/native-07.json) passed all nine
+  native07 lifecycle run (`artifacts/p17n/native-07.json`) passed all nine
   configured-module-lifecycle gates, fresh/recovered reopen, exact preservation
-  and all three owned lifetimes. Its [independent audit](../../artifacts/p17n/native07-independent-audit.json)
+  and all three owned lifetimes. Its independent audit (`artifacts/p17n/native07-independent-audit.json`)
   passed; channel writes and the full remote-I/O route remain unqualified.
   Component05 and component06 first checkpoints recovered
   separately with complete seven-object baseline equality, fresh reopen and
@@ -350,7 +350,7 @@ PLCSIM requires a separate exclusive window after owned native work closes.
   fix passes 25 storage checks without changing the readback comparator. The
   new frozen build passed full regression. Component07 subsequently failed at
   `tia_start: AccessDenied`, with `detach, owned_process_exit` cleanup failure.
-  Its [terminal result](../../artifacts/p17n/component-native-07/result.json) leaves
+  Its terminal result (`artifacts/p17n/component-native-07/result.json`) leaves
   installation preservation, fresh reopen, first-checkpoint recovery and runtime
   unqualified. Reconcile that exact outcome before a fresh admitted run.
 - HMI: compiler diagnostic truncation and resource-source reassessment were
@@ -370,7 +370,7 @@ PLCSIM requires a separate exclusive window after owned native work closes.
   simulator selftests without Siemens initialization. Earlier relocated
   fixture/path-test failures are retained; native path limits are unchanged.
   The actual explorer browser command passed all 24 checks, and its assets
-  match the current freeze. [Independent validation receipt](../../artifacts/p17r/combined-validation-02.json).
+  match the current freeze. Independent validation receipt (`artifacts/p17r/combined-validation-02.json`).
   Hosted CI has not run from this workspace. Final native evidence and
   packaging remain separate.
 - Desktop MCP Apps acceptance remains blocked: the current Computer Use
@@ -385,19 +385,19 @@ Their current source/finalization reached supported boundaries and all three
 capture TIA lifetimes, workers and hosts closed with exact cleanup receipts.
 No new separate qualification, partition, runtime, build or profile activation
 was started after the request and before the 13 October resume.
-The [stop handoff](../../artifacts/p16r/user-stop-handoff-01.json) binds final capture
+The stop handoff (`artifacts/p16r/user-stop-handoff-01.json`) binds final capture
 reports, exact cleanup receipts, remaining source hashes and the preserved
 cross-workstream evidence.
-The [typed handoff](../../artifacts/p16t/stop-handoff.json) additionally records the
+The typed handoff (`artifacts/p16t/stop-handoff.json`) additionally records the
 CLI exits, selection hashes and every completed/remaining typed source hash.
 
 - Typed agent: all twelve advanced-unit cases passed with strict independent
   preservation and exact cleanup audits. TIA rejected the unqualified nested
   UDT fixture and refused duplicate tag creation; both diagnostics preserved
-  their outcomes and cleaned up exactly. [Capture c01](../../artifacts/p16t/c01/capture.json)
+  their outcomes and cleaned up exactly. Capture c01 (`artifacts/p16t/c01/capture.json`)
   stopped after its active input: 11 of 30 inputs completed, 19 remain. Its stop
   branch did not perform final saved/reopened snapshots, so prefix persistence
-  remains open. [Capture c02](../../artifacts/p16t/c02/capture.json) completed its
+  remains open. Capture c02 (`artifacts/p16t/c02/capture.json`) completed its
   already-running finalization: all ten inputs, save/reopen verification and
   exact cleanup passed the runner. Its independent final audit remains pending.
   No new capture profiles were extracted or activated. Capture evidence does
@@ -430,12 +430,12 @@ retain the final outcomes.
 This list records the 12 October handoff. The resumed section above and linked
 current workstream evidence supersede its completed audit/finalization steps.
 
-1. Read the [final stop handoff](../../artifacts/p16r/user-stop-handoff-01.json) and verify every original report/hash and owned
+1. Read the final stop handoff (`artifacts/p16r/user-stop-handoff-01.json`) and verify every original report/hash and owned
    cleanup receipt. Preserve stopped/failed outcomes; do not replay an uncertain
    mutation or continue an old native process.
 2. Audit completed c02 with the prepared
-   [file-only auditor](../../artifacts/p16h/audit_c02.py). Its
-   [review checkpoint](../../artifacts/p16h/c02-review-stop-checkpoint.json) is partial,
+   file-only auditor (`artifacts/p16h/audit_c02.py`). Its
+   review checkpoint (`artifacts/p16h/c02-review-stop-checkpoint.json`) is partial,
    not an overall independent pass. Ten inputs comprise two prerequisites and eight TON
    routes; capture evidence does not establish timer runtime behaviour.
 3. Resolve c01 prefix persistence before profile extraction. The existing stop
@@ -446,7 +446,7 @@ current workstream evidence supersede its completed audit/finalization steps.
    `Information` enum state after the active pinned harness has stopped. Keep
    the zero-error, complete-message and no-Error requirements.
 5. Resume remote-I/O only from the reviewed combined b7 worker and fresh native05
-   run described in its [stop handoff](../../artifacts/p16n/user-stop-handoff-01.json).
+   run described in its stop handoff (`artifacts/p16n/user-stop-handoff-01.json`).
    The prior native04 remains failed despite its separately audited exact JSON
    delta and successful checkpoint recovery.
 6. Finish independent capture/profile audits, then freeze the combined source
@@ -462,7 +462,7 @@ current workstream evidence supersede its completed audit/finalization steps.
 - [x] Implement cooperative stop requests at case/cleanup boundaries with explicit incomplete coverage and hash-bound remaining-case selections; offline regression passed.
 - [x] Qualify native stopping between engineering suites: active change/suite completes, fresh reopen and owned cleanup pass, next suite never starts. [Evidence](../verification/parallel-next-20261012.md#native-cooperative-stopping).
 - [ ] Qualify an actual native requested stop and cleanup before another long runtime batch. See [runner usage](../guides/block-testing.md#cooperative-stopping-and-remaining-cases).
-- [ ] After isolation, preservation and native requested-stop prerequisites pass, complete one frozen 65-case / 358-step / 478-assertion runtime attempt and its independent audit. The [17 remaining cases](../../artifacts/continuation-20261009/remaining-after-corpus06.json) can support separate diagnosis; combined subset results do not establish a full-corpus pass.
+- [ ] After isolation, preservation and native requested-stop prerequisites pass, complete one frozen 65-case / 358-step / 478-assertion runtime attempt and its independent audit. The 17 remaining cases (`artifacts/continuation-20261009/remaining-after-corpus06.json`) can support separate diagnosis; combined subset results do not establish a full-corpus pass.
 
 ## 1.0 acceptance contract
 
@@ -501,7 +501,7 @@ partial entry is already release-ready.
 | --- | --- | --- |
 | 1 | All twelve advanced-unit cases passed, and all 38 authored reference inputs have separate saved-reference/persistence evidence. Complete candidate lineage and builder engineering, peer preservation, persistence and recovery before activating new route profiles. Finish namespace/ambiguity and scoped operand/storage qualification, the advertised Boolean/comparison/FC/FB/IEC runtime matrix, and native insertion preserving every unrelated ID | [Typed evidence](../verification/typed-p17-qualification.md), [Typed TODO](../plans/typed-lad-fbd-todo.md) |
 | 2 | Explicit post-boot isolation, Unified prerequisite settings and configured-fixture reopen/archive retrieval/recovered reopen now pass. All three captured states match both owners with clean strict compiles; these captures include no native exports. Next qualify the exact production bridge retrieval and read-only inspection/reference/Explorer workflow. Preserve the historical unknown reporter cleanup and default quarantine. Complete HMI preservation, normal lifecycle, independent lock release, interrupted writes and production write profiles remain unqualified | [HMI TODO](../plans/hmi-remaining-work.md), [Configured recovery](../verification/hmi-configured-recovery-20261021.md) |
-| 3 | The recorded module/slot/address/controller lifecycle passed compile, independent preservation, fresh reopen and recovery on b7. Qualify channel writes using a fixture with an eligible reviewed writable attribute, then complete the full remote-I/O route. Additional layouts/controllers and physical runtime remain separate | [Network boundary](../guides/network-inspection.md), [native07 audit](../../artifacts/p17n/native07-independent-audit.json) |
+| 3 | The recorded module/slot/address/controller lifecycle passed compile, independent preservation, fresh reopen and recovery on b7. Qualify channel writes using a fixture with an eligible reviewed writable attribute, then complete the full remote-I/O route. Additional layouts/controllers and physical runtime remain separate | [Network boundary](../guides/network-inspection.md), native07 audit (`artifacts/p17n/native07-independent-audit.json`) |
 | 4 | Native dependency-impact fixture, 1,000-function metadata/lifecycle workload, authored relationship/export checks and six native-workload browser checks passed on their recorded sources. Saved relationship provider/scope/budget declarations, independent 1k/10k/50k edge tests and browser checks now pass. Repeatable portable-file 50k first-viewport performance now passes 80 cold/warm imports on unchanged production assets. Complete native relationship coverage and actual desktop MCP Apps rendering remain open | [Current evidence](../verification/review-explorer-p16-qualification.md), [Explorer qualification](../verification/project-explorer-qualification.md) |
 | 5 | Standalone FC caller mode, the exact FBD-only storage profile and source-archive reuse harness are integrated and pass combined offline regression. Native import/readback and independent nested-UDT DB capture passed their scoped gates. Finish the fresh full FC/DB/call/bindings sequence, preservation, reopen, first-checkpoint recovery and behavior. The first checkpoints from both failed installation attempts recovered separately with fresh reopen. Keep production apply gated and OB insertion separate. Existing-caller metadata preservation remains a separate blocker | [Recipe/coordinator boundary](../guides/plc-library-integration-recipes.md), [Library TODO](../plans/library-management-todo.md) |
 | 5 | Qualify real behavior-changing/breaking library updates, dependency closure, collision handling and interrupted-write recovery | [Library acceptance](../plans/library-management-plan.md) |
@@ -537,8 +537,8 @@ current commit's hosted status.
 
 Read-only recheck on 23 October confirms the latest recorded runs still failed
 before their jobs started because GitHub reports failed account payments or a
-spending limit. The [Python/.NET run](https://github.com/Sparkz400/TIA_MCP/actions/runs/39549885812)
-and [Explorer run](https://github.com/Sparkz400/TIA_MCP/actions/runs/39549885838)
+spending limit. The Python/.NET run
+and Explorer run
 both reference `85bfd65e01422680a8388d0ca70ad4b5c6a19152`; neither validates the
 current local changes. The original run annotations are retained under
 `artifacts/todo-20261023/github-*-run.txt`.
@@ -558,7 +558,7 @@ current local changes. The original run annotations are retained under
   and Python); preserve their commits in integration history. [Evidence](../verification/dependency-updates-20261018.md).
 - [ ] Verify the updated Actions on hosted runners after billing is restored;
   review subsequent dependency PRs, especially native NuGet changes, separately.
-- [x] Validate and integrate the portable portion of [PR 10](https://github.com/Sparkz400/TIA_MCP/pull/10)
+- [x] Validate and integrate the portable portion of PR 10
   (Newtonsoft.Json 13.0.4); see [exact verification](../verification/newtonsoft-update-20261018.md).
   Siemens SDK build/runtime qualification remains separate.
 - [ ] Confirm the Python, managed .NET and explorer browser jobs pass on

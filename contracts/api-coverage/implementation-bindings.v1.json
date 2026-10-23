@@ -817,8 +817,8 @@
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
-      "sha256": "d9f7ae769832bbd282b47bd2b3eaf67587856f32f0037bbdcf9a7642d2435b75",
-      "bytes": 13395
+      "sha256": "8c21bb9a9be7a90334024411e6d793a1113c61921952eb1a749d0a2d59b8da66",
+      "bytes": 13530
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInSelection.cs",
@@ -14881,8 +14881,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -18460,8 +18460,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -22948,8 +22948,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -23308,8 +23308,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -24887,8 +24887,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -29884,8 +29884,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -35427,8 +35427,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -47851,8 +47851,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
           "name": "Parse",
-          "line": 167,
-          "endLine": 187,
+          "line": 168,
+          "endLine": 188,
           "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
         },
         {
@@ -91002,7 +91002,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "ad4451bffca7ea2aa6fb1818a3ea0b62e158c6a2c2712bfe376f09679c141b0d"
+      "sha256": "1567bc9af2ed68dc1b9015a18af8338eeba10ada68943c7048543c731b47d628"
     },
     {
       "path": "docs/verification/typed-lad-fbd-qualification.md",

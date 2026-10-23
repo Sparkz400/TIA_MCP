@@ -4,8 +4,8 @@ Six injected bad compilation receipts were accepted by the encoder preservation
 auditor: missing targets, a Boolean error count, an Error target state, nested
 Error diagnostics, a message without a state, and a non-object message. The
 existing typed-route guard also accepted the last two cases. See the retained
-[before probe](../../artifacts/encoder-compile-before.json) and
-[after probe](../../artifacts/encoder-compile-after.json). These probes use synthetic
+before probe (`artifacts/encoder-compile-before.json`) and
+after probe (`artifacts/encoder-compile-after.json`). These probes use synthetic
 receipts and XML; no Siemens process ran.
 
 The typed-route guard is now shared in `scripts/compilation_evidence.py`. It
@@ -49,25 +49,25 @@ The C# test executable compiles the actual shared validator without a Siemens
 reference; it does not compile or execute EncoderSeeder.
 
 Frozen Git tree: `4b165584dda0c86b888ab6f71a066712708cd756` (1984 files).
-[Source manifest](../../artifacts/encoder-compile-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-compile-01/source-manifest.json`) SHA-256:
 `6b391b6256aaefa6e962158007c7115a4de44d3562dc52df18bb114197e7a462`.
 Source ZIP SHA-256: `152d9d575fed96c792dbea0bf3e191017d064787de8e16a3b660a028ad3b3123`.
 
-The [Python aggregate](../../artifacts/encoder-compile-01/source/artifacts/checks/result.json)
+The Python aggregate (`artifacts/encoder-compile-01/source/artifacts/checks/result.json`)
 passes 1,342 tests with one unavailable-native-evidence skip, plus contracts,
 source bindings and retained evidence inventory. Its optimization subprocess
 checks 63 focused cases under each optimization mode; those child cases are not
 added to the parent test count. Run: 2026-10-17T08:33:26.7751138Z to 2026-10-17T08:34:40.6513741Z.
 Receipt SHA-256: `2acbbf1ff95b70a7b7af708f99effa8180d0a06a9190b04ab8efa93fc0e2f9ff`.
-[Python console](../../artifacts/encoder-compile-01/python-console.log).
+Python console (`artifacts/encoder-compile-01/python-console.log`).
 
-All ten [pure C# compilation groups](../../artifacts/encoder-compile-01/compiler-console.log)
+All ten pure C# compilation groups (`artifacts/encoder-compile-01/compiler-console.log`)
 pass from the frozen source. Console SHA-256: `9c62c416b5b89e51af9927b6e46afcbb8d197cfaa23694a37f406414510d204c`.
-[Seeder project evaluation](../../artifacts/encoder-compile-01/seeder-project-items.json)
+Seeder project evaluation (`artifacts/encoder-compile-01/seeder-project-items.json`)
 confirms the linked shared validator and net48 target; evaluation does not run an
 SDK compilation or native code.
 
-All 22 [package stages](../../artifacts/encoder-compile-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/encoder-compile-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_083348_cd4f6974` contains 1402
 manifest files. Receipt SHA-256: `f9698a0cc1df63259fc98a8f16c0bc5ac1b61f1899d6230dad130eefd014f38c`.
 Manifest SHA-256: `b65602ff0bd4c674faefedddce2034b867555442d4c42fbb3fa12487f7a87156`.
@@ -75,10 +75,10 @@ ZIP SHA-256: `c70bc9e5570554caa77e87c305608ebf3895e7d48de9583d4a38dc0493c4b750`.
 The offline package excludes native workers. Hashes establish byte consistency,
 not publisher or native authenticity.
 
-The [source comparison](../../artifacts/encoder-compile-01/final-source-comparison.json)
+The source comparison (`artifacts/encoder-compile-01/final-source-comparison.json`)
 permits only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/encoder-compile-01/integration.json) records
+integration receipt (`artifacts/encoder-compile-01/integration.json`) records
 the pushed commit, hosted CI and cleanup. The full managed aggregate and browser
 suite were not repeated for this increment.
 

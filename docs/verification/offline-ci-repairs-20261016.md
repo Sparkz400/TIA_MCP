@@ -37,7 +37,7 @@ read/write/delete sharing; granting write sharing did not resolve the race.
 
 | Check | Observed result |
 | --- | --- |
-| Hosted CI at `8b35c1c880c01d992662b8f0d3d4278ab47c9203` | [Python, managed and OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38889549909) and [Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38889549575) pass. These runs contain the Git selection fix, not the later journal/report repairs. |
+| Hosted CI at `8b35c1c880c01d992662b8f0d3d4278ab47c9203` | Python, managed and OPC UA and Explorer pass. These runs contain the Git selection fix, not the later journal/report repairs. |
 | Core targeted suite | 145/145 pass, including concurrent artifact downloads against the real library journal writer, finite retry exhaustion, partial-replacement/error refusal and interrupted-delay propagation. |
 | Standalone PLC library integration | 192 pass, zero fail after correcting its linked helper dependency. |
 | .NET Framework compatibility probe | Shared helper compiled against installed .NET Framework 4.6.2 reference assemblies and replaced a real file on runtime `4.0.30319.42000`. Probe retained at `artifacts/journal-probe/FrameworkProbe.cs`; this is not a Siemens worker build. |

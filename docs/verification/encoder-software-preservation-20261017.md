@@ -44,20 +44,20 @@ profile refusal and fresh copied inspections. Native membership tests exercise
 identity equality, ambiguity, truncation and 50,000-entry limits without Siemens.
 
 Final frozen Git tree: `6909e2c9649be934a7b4f038112ecc7b3b966b51` (2038 files).
-[Source manifest](../../artifacts/encoder-software-02/source-manifest.json) SHA-256:
+Source manifest (`artifacts/encoder-software-02/source-manifest.json`) SHA-256:
 `e9769fa09b48fdd60a26b2ecee41b2f50e2b633828fce37e661720f3c03879d9`.
 Source ZIP SHA-256: `5b2014435b692de87080f5fc7a22cbc9fb4a124ceec91412b9c9e3794e624e80`.
 
-The [aggregate](../../artifacts/encoder-software-02/source/artifacts/checks/result.json)
+The aggregate (`artifacts/encoder-software-02/source/artifacts/checks/result.json`)
 passes 41 managed suites, 1,442 Python tests (one unavailable-evidence skip),
 24 Explorer model/client checks, contracts/source bindings and all offline MCP
 workflows. The general executable passes 226 checks. All 80 encoder methods also
 pass under -OO, including ten software-preservation methods with populated peers.
 Run: 2026-10-17T15:05:16.4315284Z to 2026-10-17T15:18:25.3803503Z.
 Aggregate receipt SHA-256: `7fd3ac2019a4478c6adc13d9f7c77eb69cda13cf3a0c91a7132ded82fb86f8b5`.
-[Console evidence](../../artifacts/encoder-software-02/aggregate-console.log).
+Console evidence (`artifacts/encoder-software-02/aggregate-console.log`).
 
-All 24 [package stages](../../artifacts/encoder-software-02/source/artifacts/package-checks/result.json)
+All 24 package stages (`artifacts/encoder-software-02/source/artifacts/package-checks/result.json`)
 pass, including exact ZIP/manifest verification and relocated MCP workflows.
 Bundle `tia-mcp-offline_20261017_150543_9c2cc5a7` contains 1440 manifest files.
 Package receipt SHA-256: `2327efb5e2d035160cead127353366b484009521156fee833e10ad5c3755f135`.
@@ -65,20 +65,20 @@ Manifest SHA-256: `c807fb0f08a0dc92c68fb4f29d3103a9561025c123d113eae48e0b02fd454
 ZIP SHA-256: `114248be76e10bbbbfdd87fed771292f836fde6624d268bf0ac11e2d89a6a067`.
 Browser tests were not repeated for this qualification-harness/inventory change.
 
-The [source comparison](../../artifacts/encoder-software-02/final-source-comparison.json)
+The source comparison (`artifacts/encoder-software-02/final-source-comparison.json`)
 verifies unchanged tested implementation; only five completion documents differ.
 All 106 unavailable
 historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/encoder-software-02/integration.json) records
+integration receipt (`artifacts/encoder-software-02/integration.json`) records
 Git/CI and cleanup state.
 
-A retained [synthetic scope check](../../artifacts/encoder-software-02/next-hardware-scope.json)
+A retained synthetic scope check (`artifacts/encoder-software-02/next-hardware-scope.json`)
 shows that different unrelated CPU settings remain unobserved while these software
 checks pass. It is a coverage demonstration, not native corruption evidence.
 
 The first frozen revision exposed a numeric-Boolean admission gap during review:
 a synthetic report changing the required `true` profile value to numeric `1`
-passed both source and independent audit. [Reproduction](../../artifacts/encoder-software-01/numeric-boolean-reproduction.json).
+passed both source and independent audit. Reproduction (`artifacts/encoder-software-01/numeric-boolean-reproduction.json`).
 The final revision compares JSON value kinds and rejects integer, float and
 string substitutes. Its targeted ten-method preservation suite passes.
 

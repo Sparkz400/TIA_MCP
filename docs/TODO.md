@@ -6,13 +6,11 @@ are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.
 
 ## Resume and integration
 
-- [x] Reconcile the interrupted full offline regression and portable-package checks, then run fresh validation against one frozen source. Preserve stopped logs; neither interrupted batch is an overall pass. [Exact checkpoint](verification/user-stop-20261023.md). Fresh aggregate and package pass: [offline rerun](verification/offline-rerun-20261023.md).
-- [ ] Finalize independent review of the two vendor intake receipts, licenses and prerequisites; qualify applicable native import/upgrade, readback and preservation. [Vendor evidence](../artifacts/vendor-library-intake-20261023/).
+- [ ] Finalize independent review of the two vendor intake receipts, licenses and prerequisites; qualify applicable native import/upgrade, readback and preservation. Vendor evidence (`artifacts/vendor-library-intake-20261023/`).
 - [ ] Reconcile the feature catalog, support matrix and embedded catalog with exact current source, binary and evidence profiles. Keep implementation, offline validation and native qualification separate.
 
 ## Native admission and runtime
 
-- [x] On this PC (clean guard registry): TIA Portal crashed on every start because SiVArc Upd2 HF1 referenced a WinCC Basic version replaced by Upd3. SiVArc was uninstalled and the contained empty startup passed (attempts 03 and 04). [First startup](verification/first-native-startup-20261023.md).
 - [ ] Decide how provisioning isolation treats the zero-address `Accessible device` (`00-00-00-00-00-00`) on PN/IE / PLCSIM. The probe shows the PLCSIM Advanced Runtime Manager itself creates it with zero registered instances, so the current guard can never pass on this PC. A narrow exclusion on branch `review/plcsim-placeholder-guard-v2` passed two independent review passes and applies natively. [Review](verification/plcsim-placeholder-guard-review-20261023.md).
 - [ ] After startup the owned PLCSIM Advanced CPU (`192.168.0.1`) never appears in PN/IE / PLCSIM discovery within 10 s, so provisioning refuses at `discoverExactRuntimeAddress`. Find out why TIA cannot see it on this PC.
 - [ ] Card staging failed once with access denied (`0x80070005`) for 15 s and then not again in later runs; cause unidentified. A failed provisioning always leaves an `outcomeUnknown` admission with no reconciliation route, which blocks the rest of that suite's cases (`ResourceBusy`). [Native stop](verification/native-stop-20261023.md).
@@ -48,13 +46,11 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 - [ ] Qualify native interruption/transport loss and uncertain-outcome reconciliation for every advertised recoverable mutation, including multi-resource recovery and no replay.
 - [ ] Complete missing feature-specific remote/VM transfer, interrupted upload/reconnect and machine-prerequisite checks. Do not repeat accepted general VM evidence without a new reason.
 - [ ] Validate the intended immutable engineering package, launcher and deployment against the full matrix. An offline bundle does not establish native support or authorize installation.
-- [x] Publication review of vendor manuals/examples and machine-specific identifiers in retained native evidence. [Decisions](verification/publication-review-20261023.md).
 - [ ] Publish the clean single-commit snapshot as the public repository; the full history stays private as the evidence archive. [Public snapshot](verification/publication-review-20261023.md#public-snapshot).
 
 ## Repository and hosted CI
 
 - [ ] Restore hosted Actions availability after the billing/spending-limit blocker, then verify Python, managed .NET and Explorer browser jobs on the intended commit. [Recorded CI blocker](verification/github-readiness-20261018.md).
 - [ ] Review subsequent dependency PRs, especially native NuGet changes, and perform applicable SDK/runtime qualification.
-- [ ] Enable private vulnerability reporting, secret scanning and push protection on the public repository.
 - [ ] Require independent reviews when additional contributors participate.
 - [ ] After full acceptance, choose the version, create the tag, write release notes with exact limitations, and attach the verified package, license and integrity manifest.

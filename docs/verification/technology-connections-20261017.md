@@ -39,39 +39,39 @@ members; the retained public member inventory is not a substitute for SDK compil
 
 ## Executed evidence
 
-The [baseline run](../../artifacts/technology-connections-before.log) reproduces
+The baseline run (`artifacts/technology-connections-before.log`) reproduces
 unbounded null-sensor enumeration and skipped peer services (188/190 checks pass).
-The [first repaired run](../../artifacts/technology-connections-after-01.log) and
-[final targeted run](../../artifacts/technology-connections-after-03.log) pass all
+The first repaired run (`artifacts/technology-connections-after-01.log`) and
+final targeted run (`artifacts/technology-connections-after-03.log`) pass all
 196 checks. Eight groups link the actual production reader against synthetic native
 shapes: service states, null sensors, getter/budget ordering, independent failures,
 enumeration disposal/errors, optional slots, exact paths, attribute errors and typed
 projection refusal. This does not compile the Siemens SDK/native worker. The final targeted and frozen runs include the exact-technology-path assertion.
 
-The [first Python attempt](../../artifacts/technology-connections-python-01.log)
+The first Python attempt (`artifacts/technology-connections-python-01.log`)
 exposed the oracle mistaking fieldStatus.attributes for an attribute list. Validation
 now checks attribute lists at the connection-row boundary. The
-[repaired targeted checks](../../artifacts/technology-connections-python-03.log)
+repaired targeted checks (`artifacts/technology-connections-python-03.log`)
 pass 22 family, 10 encoder and 33 conformance tests. The 22 family cases also pass
-[with Python optimization](../../artifacts/technology-connections-python-optimized-02.log).
+with Python optimization (`artifacts/technology-connections-python-optimized-02.log`).
 Adversarial cases include missing/duplicate services, false absence, foreign owner,
 missing/duplicate sensor positions, failed field declarations, invalid state types,
 nested incomplete identities and cyclic/oversized supplied evidence.
 
 Frozen Git tree: `d299a8a4665e2a901fa53bdb9252c885677e50cb` (1972 files).
-[Source manifest](../../artifacts/to-conn-01/source-manifest.json) SHA-256:
+Source manifest (`artifacts/to-conn-01/source-manifest.json`) SHA-256:
 `899cb9893b141948d5327f14221eaf8095a6bb39ac687c4a62f793458c265d14`.
 Source ZIP SHA-256: `eab3afcf1b1963759cbe6908de519a5c69802ec261eca3ccb6820583be61da48`.
 
-The [aggregate](../../artifacts/to-conn-01/source/artifacts/checks/result.json)
+The aggregate (`artifacts/to-conn-01/source/artifacts/checks/result.json`)
 passes 39 managed suites, 1,306 Python tests (one unavailable-evidence skip),
 24 Explorer checks, contracts/source bindings and all offline MCP workflows.
 The general executable repeats all 196 checks, including the eight new connection groups.
 Run: 2026-10-17T06:57:17.1139223Z to 2026-10-17T07:07:57.4790448Z.
 Receipt SHA-256: `120ec381ae4453790ad835975329f9c16b69c0906289f7e09122b5cf85047f37`.
-[Console evidence](../../artifacts/to-conn-01/aggregate-console.log).
+Console evidence (`artifacts/to-conn-01/aggregate-console.log`).
 
-All 22 [package stages](../../artifacts/to-conn-01/source/artifacts/package-checks/result.json)
+All 22 package stages (`artifacts/to-conn-01/source/artifacts/package-checks/result.json`)
 pass, including relocation. Bundle `tia-mcp-offline_20261017_065739_02f08338` contains 1392
 manifest files. Receipt SHA-256: `13cd775b1a5c8bc1f51ac3867a286d6a956909cb77f6dabada71f2b1b47ee003`.
 Manifest SHA-256: `5a9a84d15167120cd283932f360b5c30a3dacbea68086b26d7dc1cb31fb662bb`.
@@ -79,10 +79,10 @@ ZIP SHA-256: `9ff0bb88d14de01fb75670edbcf6da69ea8ad65757cd5288fbe9006d79bd9c3f`.
 This offline package excludes native workers; it does not compile the Siemens SDK.
 Hashes establish retained byte integrity, not publisher or native authenticity.
 
-The [source comparison](../../artifacts/to-conn-01/final-source-comparison.json)
+The source comparison (`artifacts/to-conn-01/final-source-comparison.json`)
 allows only completion-documentation changes after testing and verifies all 106
 unavailable historical evidence binding rows remain unchanged. The
-[integration receipt](../../artifacts/to-conn-01/integration.json) records the
+integration receipt (`artifacts/to-conn-01/integration.json`) records the
 pushed commit, hosted CI results and cleanup.
 
 ## Remaining work

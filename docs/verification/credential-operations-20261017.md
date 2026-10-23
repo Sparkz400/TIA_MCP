@@ -40,7 +40,7 @@ for ordering, required retained artifacts and recovery limits.
 | `artifacts/pins-03/source` | `15e2112aa8a1ec570ec81dc30266ce76b8787823` | Final production source, including the Unicode fix; full aggregate and all 20 package stages pass. |
 
 Each snapshot contains 1,930 files. Final source manifest:
-[`artifacts/pins-03/source-manifest.json`](../../artifacts/pins-03/source-manifest.json),
+`artifacts/pins-03/source-manifest.json`,
 SHA-256 `2e44f75811a44019a088a5b9a66946261d605b974aea502969bab61baf64e2f3`.
 Its archive SHA-256 is
 `9eaafc8f5061aae72f40a1c5d2c42ac4237d34b1c668434dff4603792e27d5dc`.
@@ -59,7 +59,7 @@ invocation lacked `jsonschema` and failed before starting a Host; subsequent che
 use the existing repository test environment.
 
 A separate real defect was reproduced in
-[`pins-dev-05-unicode-reproduction.json`](../../artifacts/pins-dev-05-unicode-reproduction.json):
+`pins-dev-05-unicode-reproduction.json` (`artifacts/pins-dev-05-unicode-reproduction.json`):
 raw session UTF-16 units `[98,97,100,55296]` became persisted
 `[98,97,100,65533]` in a prepared journal. No native call occurred. The existing
 exact-text validator now rejects malformed session, hardware, native identity and
@@ -82,14 +82,14 @@ retirement of both generations until separate reconciliation evidence is retaine
 No real credential, PLC, endpoint or provider is used.
 
 The final-source compatibility receipt
-[`legacy-compatibility.json`](../../artifacts/pins-03/legacy-compatibility.json),
+`legacy-compatibility.json` (`artifacts/pins-03/legacy-compatibility.json`),
 SHA-256 `733bb0cbce35e7ae04a51c479a27d205db51e1bc3bd8587236271baeb7893be6`,
 compares old/new Host results for four original journals (prepared, reconciled,
 succeeded and unknown) and preserves all 74 evidence files. It also verifies actual
 DPAPI readability of an active version-1 credential while preserving all eight
 old vault files. Both Hosts exit normally without worker startup.
 
-The separate [downgrade check](../../artifacts/pins-02/downgrade-refusal.json)
+The separate downgrade check (`artifacts/pins-02/downgrade-refusal.json`)
 shows that the previous Host refuses a credential-bearing plan with `JournalInvalid`
 and the previous vault rejects pinned lifecycle version 2. All 41 test files stay
 unchanged. Unknown new ownership cannot silently become an old unreserved record.
@@ -102,7 +102,7 @@ Its 20-stage package receipt hash is
 `8e9237157dcaf270df4c596c84554a5ae57c3dea12ec0d2c753cfa1188f88087`.
 
 Final `pins-03` package and Unicode relocation pass all 20 stages. Receipt:
-[`result.json`](../../artifacts/pins-03/source/artifacts/package-checks/result.json),
+`result.json` (`artifacts/pins-03/source/artifacts/package-checks/result.json`),
 SHA-256 `0806f1d8610c2b9a25bb0af831e931f80c957c69504751b6bb06d3af5c529267`.
 Both original and relocated bundles pass strict verification of 1,373 files with
 manifest SHA-256 `123c34599f9f3e39e161103bd5be8a8b155e1cf901d5457b6d9036897b780b3b`.
@@ -119,14 +119,14 @@ Final `pins-03` aggregate passes all 38 managed suites, 1,280 Python tests
 (one existing unavailable-evidence skip), 24 Explorer model/client checks, schemas,
 source bindings and every MCP workflow. It ran from
 `2026-10-17T01:48:04.8305401Z` through `2026-10-17T01:58:08.0919262Z` and exited zero.
-Receipt: [`result.json`](../../artifacts/pins-03/source/artifacts/checks/result.json),
+Receipt: `result.json` (`artifacts/pins-03/source/artifacts/checks/result.json`),
 SHA-256 `a8d7e248be5fd0b856cd2a4670999e489a654012bea990ece402a5179ee94c03`.
 The aggregate operation receipt contains 81 checks and has SHA-256
 `3f8d01664d293008e1e8f0dd997ff6ab50185deb29395e7867bf360dec002b66`.
 Its 29-check MCP receipt has the same digest as the package receipt above.
 
 Only completion documentation changes after the final frozen source. The
-[final source comparison](../../artifacts/pins-03/final-source-comparison.json)
+final source comparison (`artifacts/pins-03/final-source-comparison.json`)
 records those exact paths; no executable source, tests, schema, CI command or
 binding changes after this passing full run. Frozen archives, failed receipts,
 compatibility evidence and exact built packages are retained for review.

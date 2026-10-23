@@ -13,16 +13,16 @@ The scoped production watch workflow, Git callbacks and earlier foundation work 
 
 ## Evidence and ownership
 
-- [Coordinator manifest and limitations](../../artifacts/parallel-resume-20261016/coordinator/handoff.json), [independent startup review](../../artifacts/parallel-resume-20261016/translations/STARTUP-REVIEW.md).
-- [VCI handoff](../../artifacts/parallel-resume-20261016/vci/handoff.md) and [frozen package](../../artifacts/parallel-resume-20261016/vci/package.json).
-- [Translation handoff](../../artifacts/parallel-resume-20261016/translations/HANDOFF.md) and [validation](../../artifacts/parallel-resume-20261016/translations/verification.json).
-- [Test Suite handoff, source hashes and build receipt](../../artifacts/parallel-resume-20261016/testsuite/handoff.json).
+- Coordinator manifest and limitations (`artifacts/parallel-resume-20261016/coordinator/handoff.json`), independent startup review (`artifacts/parallel-resume-20261016/translations/STARTUP-REVIEW.md`).
+- VCI handoff (`artifacts/parallel-resume-20261016/vci/handoff.md`) and frozen package (`artifacts/parallel-resume-20261016/vci/package.json`).
+- Translation handoff (`artifacts/parallel-resume-20261016/translations/HANDOFF.md`) and validation (`artifacts/parallel-resume-20261016/translations/verification.json`).
+- Test Suite handoff, source hashes and build receipt (`artifacts/parallel-resume-20261016/testsuite/handoff.json`).
 
 The earlier reviewed lifecycle/client/reindexed-watch repair remains byte-identical to its independent Oct16 review. This batch changed the separate empty-startup entry point, its new tests, two VCI verifier files, two translation verifier files, and the six Test Suite implementation/test/reference files listed in that lane's handoff. Shared adapter, Host/worker, contract/catalog, solution and build-runner changes visible in the workspace belong to other work and are not claimed by this batch. Historical failed evidence remains immutable.
 
 ## Native continuation
 
-The [read-only startup observation](../../artifacts/parallel-resume-20261016/coordinator/historical-startup-observation.json) records an OS boot at **2026-10-15 15:36:50 UTC**, after the failed `startup/reindex-worker-02` attempt, and no current entries for its historical lookup PIDs. This cannot recover lost Host/worker terminal codes or original-handle disposal receipts. The separately retained native PID6372 exit proof remains valid within its original scope; the failure's PID55160 role is not inferred. No reconciliation, process intervention or reservation clearing occurred here.
+The read-only startup observation (`artifacts/parallel-resume-20261016/coordinator/historical-startup-observation.json`) records an OS boot at **2026-10-15 15:36:50 UTC**, after the failed `startup/reindex-worker-02` attempt, and no current entries for its historical lookup PIDs. This cannot recover lost Host/worker terminal codes or original-handle disposal receipts. The separately retained native PID6372 exit proof remains valid within its original scope; the failure's PID55160 role is not inferred. No reconciliation, process intervention or reservation clearing occurred here.
 
 The native coordinator must retain the failed attempt as failed, explicitly resolve its evidence-loss/current-resource disposition, and freeze a fresh complete dependency package before a new empty start/status/detach/close qualification. Old controller manifests do not admit the newly changed files. The new runner's own receipt requires independent review and is not that qualification.
 

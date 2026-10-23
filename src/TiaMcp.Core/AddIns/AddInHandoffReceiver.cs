@@ -68,7 +68,8 @@ internal sealed class AddInHandoffReceiver : IAsyncDisposable
         if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
         using var identity = WindowsIdentity.GetCurrent();
         var security = new PipeSecurity();
-        security.SetOwner(identity.User!); security.SetAccessRuleProtection(true, false);
+        // CurrentUserOnly clients compare against the token's default owner, which is Administrators when elevated.
+        security.SetOwner(identity.Owner ?? identity.User!); security.SetAccessRuleProtection(true, false);
         // CurrentUserOnly would replace this ACL and discard the network-logon denial.
         security.AddAccessRule(new(new SecurityIdentifier(WellKnownSidType.NetworkSid, null), PipeAccessRights.FullControl, AccessControlType.Deny));
         security.AddAccessRule(new(identity.User!, PipeAccessRights.FullControl, AccessControlType.Allow));

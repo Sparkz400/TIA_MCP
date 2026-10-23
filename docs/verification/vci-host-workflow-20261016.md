@@ -70,8 +70,8 @@ Only documentation changed after this tested source snapshot. Hosted commit
 failed on CRLF-versus-LF source binding hashes. The [following package increment](vci-package-workflow-20261016.md)
 records that failure and repairs checkout-stable source collection. The previous
 repair commit `caa4c30` passed
-[Python/.NET/OPC UA](https://github.com/Sparkz400/TIA_MCP/actions/runs/38892144946) and
-[Explorer](https://github.com/Sparkz400/TIA_MCP/actions/runs/38892144734); those runs
+Python/.NET/OPC UA and
+Explorer; those runs
 precede this VCI increment.
 
 ## Unexecuted gates

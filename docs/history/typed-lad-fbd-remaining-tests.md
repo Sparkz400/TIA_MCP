@@ -3,7 +3,7 @@
 Historical record. See [current status](../STATUS.md) and [remaining TODO](../TODO.md) for the latest checkpoint and work order.
 
 Update, 9 October 2026: all 28 standard engineering cells that remained at the
-checkpoint below passed in [continuation attempt 03](../../artifacts/continuation-20261009/typed-standard-engineering-03/batch.json).
+checkpoint below passed in continuation attempt 03 (`artifacts/continuation-20261009/typed-standard-engineering-03/batch.json`).
 That covers the 12 remaining storage-creation cells, four numeric FC/FB cells and
 12 existing-global IEC cells. The independent audit passed 489 XML comparisons,
 with all 84 exact owned TIA exits verified. These are engineering-only results;
