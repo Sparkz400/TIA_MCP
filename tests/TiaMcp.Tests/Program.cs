@@ -132,6 +132,8 @@ internal static partial class Program
             ("Discovery retains nonempty snapshots and requires repeated absence", SimulationDiscoveryWaitTests.TransientEntriesAndStableAbsence),
             ("Discovery never accepts persistent devices or late empty snapshots", SimulationDiscoveryWaitTests.PersistentDevicesAndLateSnapshots),
             ("Discovery guard, read and evidence errors are not retried", SimulationDiscoveryWaitTests.GuardAndReadFailuresNeverRetry),
+            ("Runtime Manager placeholder exclusion is exact and narrow", SimulationDiscoveryWaitTests.RuntimePlaceholderIsExactAndNarrow),
+            ("Runtime Manager placeholder baseline is short-lived and session-bound", SimulationDiscoveryWaitTests.RuntimePlaceholderBaselineLifetime),
             ("Project reviews survive restart and reject tampering", ProjectReviewStoreTests.PersistenceAndTamper),
             ("Project reviews preserve native content and direct impacts", ProjectReviewStoreTests.ContentAndImpact),
             ("Project reviews retain incomplete coverage and exact copy identity", ProjectReviewStoreTests.CoverageAndCopyIdentity),

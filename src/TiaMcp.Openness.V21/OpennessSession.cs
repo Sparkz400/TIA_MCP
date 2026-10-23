@@ -140,6 +140,7 @@ namespace TiaMcp.Openness.V21
                 case "library_capabilities": return LibraryCapabilities(arguments);
                 case "simulation_download": return SimulationDownload(arguments);
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
+                case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);
                 default: throw new BridgeException("UnknownOperation", "Unknown worker operation: " + operation);
@@ -182,6 +183,7 @@ namespace TiaMcp.Openness.V21
                 Capability("safety_engineering", "conditional", "Exposed safety metadata/signatures and dedicated eligible F-block XML import. Protection is respected; safety acceptance/commissioning is outside this workflow."),
                 Capability("simulation_download", "conditional", "Offline memory-card generation for an independently verified owned PLCSIM Advanced V8 instance; no physical PLC download route."),
                 Capability("simulation_provision_scratch_credential", "conditional", "Existing generated scratch credential provisioning only for a ticket-bound owned local PLCSIM instance over isolated Softbus; runtime qualification is separate."),
+                Capability("simulation_discovery_baseline", "conditional", "PLCSIM discovery before any instance registration; may start the Runtime Manager. Lets the next provisioning attempt in the same session, project and PLC, within five minutes, exclude only the single exact all-zero Runtime Manager entry from the same process."),
                 Capability("runtime_values", "conditional", "Separate PLCSIM Advanced V8 adapter provides typed values and bounded test scenarios; installed runtime license and compatible CPU/program are required."),
                 Capability("physical_plc", "unsupported", "No physical PLC runtime writes, forces, downloads or CPU state changes are exposed."));
         }

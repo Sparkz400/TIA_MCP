@@ -26,6 +26,7 @@ namespace TiaMcp.Openness.V21
         // supplied address, adapter, password, reset, or user login is accepted.
         private JObject SimulationProvision(JObject args)
         {
+            var discoveryBaseline = TakeSimulationDiscoveryBaseline();
             var trustArgument = args["trustOwnedEmptyCpuCertificate"];
             if (trustArgument != null && trustArgument.Type != JTokenType.Boolean)
                 throw new BridgeException("InvalidSimulationTlsTrustPolicy", "The optional owned empty CPU certificate trust policy must be an explicit boolean.");
@@ -47,6 +48,7 @@ namespace TiaMcp.Openness.V21
             }).Take(2).ToArray();
             if (budget.Truncated || hardware.Length != 1)
                 throw new BridgeException("AmbiguousTarget", "Cannot uniquely resolve the scratch PLC hardware for credential provisioning.");
+            discoveryBaseline = UsableSimulationDiscoveryBaseline(discoveryBaseline, plc);
             var credential = ValidateSimulationCredential(args, plc.Project, hardware[0].Item);
             if (credential == null)
                 throw new BridgeException("SimulationCredentialRequired", "Supply the exact generated scratch CPU credential metadata and any required recovery lineage.");
@@ -97,6 +99,7 @@ namespace TiaMcp.Openness.V21
             report["reportPath"] = reportPath;
             report["checkpointPath"] = checkpointPath;
             report["provisioningStrategy"] = "Provision the same owned empty virtual CPU before restoring its unchanged protected program card.";
+            report["preRegistrationDiscoveryBaseline"] = discoveryBaseline?.Evidence.DeepClone();
             report["stagedProtectedCardPath"] = stagedCard;
             report["emptyCardBackupPath"] = emptyCardBackup;
             report["originalProgramCardRestored"] = false;
@@ -226,9 +229,11 @@ namespace TiaMcp.Openness.V21
                         () => {
                             var beforePc = provider.Configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
                             var beforeDevices = beforePc == null ? null : beforePc.GetAccessibleDevices().Take(65).ToArray();
-                            bool empty = beforeDevices == null || beforeDevices.Length == 0;
+                            var unexplained = beforeDevices == null ? null : WithoutSimulationPlaceholder(beforeDevices, AcceptedSimulationPlaceholder(discoveryBaseline), beforeDevices.Length > 64);
+                            bool empty = beforeDevices == null || unexplained.Length == 0;
                             discoverySnapshot = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
-                                ["status"] = beforePc == null ? "routeAbsent" : empty ? "queriedEmpty" : "preexistingDevices",
+                                ["status"] = beforePc == null ? "routeAbsent" : beforeDevices.Length == 0 ? "queriedEmpty" : empty ? "baselinePlaceholderOnly" : "preexistingDevices",
+                                ["baselinePlaceholderExcluded"] = beforeDevices == null ? 0 : beforeDevices.Length - unexplained.Length,
                                 ["mode"] = "PN/IE", ["interfaceName"] = beforePc?.Name, ["interfaceNumber"] = beforePc?.Number,
                                 ["providerState"] = provider.State.ToString(), ["queryPerformed"] = beforePc != null, ["truncated"] = beforeDevices != null && beforeDevices.Length > 64,
                                 ["basis"] = beforePc == null ? "Siemens documents PLCSIM absent from PcInterfaces when not running." : "Successful snapshot on explicit PN/IE / PLCSIM (1); only zero observed devices establishes absence.",
@@ -322,17 +327,19 @@ namespace TiaMcp.Openness.V21
                         // Siemens documents this operation for Softbus; it ignores
                         // the subnet/gateway and remanence flag in that mode.
                         const string documentedStartupAddress = "192.168.0.1";
-                        var before = pc.GetAccessibleDevices().Take(65).ToArray();
+                        var observedBefore = pc.GetAccessibleDevices().Take(65).ToArray();
+                        var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
                         report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
-                            ["accessibleDevices"] = new JArray(before.Take(64).Select(device => new JObject {
+                            ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
                                 ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
-                            ["truncated"] = before.Length > 64, ["causalTargetVerified"] = false };
+                            ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
+                            ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
                         if (before.Length != 1 || before[0].Address != documentedStartupAddress ||
                             (before[0].DeviceSeries != "S7-1500" && before[0].DeviceSeries != "S7-1500 CPU"))
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
                         string bootstrapAddress = before[0].Address;
                         report["postStartupDiscovery"]["causalTargetVerified"] = true;
-                        report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint; exact IInstance address assignment and readback; fresh exact discovery match.";
+                        report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint; exact IInstance address assignment and readback; fresh exact discovery match.";
                         var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
                         report["addressBootstrap"] = new JObject {
                             ["purpose"] = "Align the exact owned virtual CPU with its newly observed default Softbus endpoint after verified absent-to-present startup; no physical or shared adapter configuration.",
@@ -395,14 +402,15 @@ namespace TiaMcp.Openness.V21
                             report["connectionInventory"] = SimulationProvisionConnectionInventory(configuration);
                             throw new BridgeException("SimulationProvisionRouteUnavailable", "The exact PLCSIM (1) route disappeared during read-only address discovery.");
                         }
-                        accessible = pc.GetAccessibleDevices().Take(65).ToArray();
-                        var visible = new JArray(accessible.Take(64).Select(device => new JObject {
+                        var observedAccessible = pc.GetAccessibleDevices().Take(65).ToArray();
+                        accessible = WithoutSimulationPlaceholder(observedAccessible, AcceptedSimulationPlaceholder(discoveryBaseline), observedAccessible.Length > 64);
+                        var visible = new JArray(observedAccessible.Take(64).Select(device => new JObject {
                             ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries }));
                         report["accessibleDevices"] = visible;
-                        report["accessibleDevicesTruncated"] = accessible.Length > 64;
+                        report["accessibleDevicesTruncated"] = observedAccessible.Length > 64;
                         discoverySamples.Add(new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
                             ["elapsedMs"] = discoveryClock.ElapsedMilliseconds, ["runtimeAddresses"] = new JArray(currentIps),
-                            ["accessibleDevices"] = visible.DeepClone() });
+                            ["accessibleDevices"] = visible.DeepClone(), ["baselinePlaceholderExcluded"] = observedAccessible.Length - accessible.Length });
                         if (accessible.Length == 1 && ips.Contains(accessible[0].Address, StringComparer.Ordinal)) break;
                         int discoveryDelay = SimulationProvisionDiscoveryDelayMilliseconds(accessible.Length, discoveryClock.ElapsedMilliseconds);
                         if (discoveryDelay == 0)
@@ -567,7 +575,8 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed before credential submission.");
-                    var rechecked = pc.GetAccessibleDevices().Take(2).ToArray();
+                    var read = pc.GetAccessibleDevices().Take(3).ToArray();
+                    var rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before credential submission.");
                     // ApplyConfiguration chooses a session route; it does not
@@ -594,7 +603,8 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed while establishing the scratch connection.");
-                    rechecked = pc.GetAccessibleDevices().Take(2).ToArray();
+                    read = pc.GetAccessibleDevices().Take(3).ToArray();
+                    rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact unique PLCSIM endpoint changed while establishing the scratch connection.");
                     if (callbackFailure != null) throw callbackFailure;

@@ -110,6 +110,8 @@ def main(argv=None):
         attached = True
         opened = call("project_open", {"path": str(project)})
         call("sim_status")
+        if args.provision_runtime_credential:
+            report["discoveryBaseline"] = call("simulation_discovery_baseline")["baseline"]
         created = call("sim_create", {"cpuType": "CPU1511"})
         instance_id = created["instance"]["id"]
         assert created["instance"]["owned"] and created["instance"]["operatingState"] == "Off"

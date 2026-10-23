@@ -61,6 +61,8 @@ class Simulator:
 
     def __call__(self, tool, arguments):
         self.calls.append((tool, copy.deepcopy(arguments)))
+        if tool == "simulation_discovery_baseline":
+            return {"baseline": {"classification": "placeholder", "registeredInstanceCount": 0}}
         if tool == "sim_create":
             return {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"}, "downloadTicket": "TOP-SECRET-TICKET"}
         if tool == "simulation_download":
@@ -119,6 +121,32 @@ class BackendTests(unittest.TestCase):
         self.assertTrue(self.backend.close()["completed"])
         self.assertEqual(("sim_release", {"instanceId": 0, "deleteOwned": True}), self.native.calls[-1])
         self.assertNotIn("simulation_provision_scratch_credential", [tool for tool, _ in self.native.calls])
+        self.assertNotIn("simulation_discovery_baseline", [tool for tool, _ in self.native.calls])
+
+    def test_discovery_baseline_precedes_registration_and_failure_creates_nothing(self):
+        self.backend.provision_runtime_credential = True
+        self.backend.card_verifier = mock.Mock(return_value={"programRevision": "a" * 64, "files": []})
+        evidence = self.backend.start()
+        names = [tool for tool, _ in self.native.calls]
+        self.assertEqual(["simulation_discovery_baseline", "sim_create"], names[:2])
+        self.assertEqual("placeholder", evidence["discoveryBaseline"]["classification"])
+        native = Simulator(self.program)
+        def refuse(tool, arguments):
+            native.calls.append((tool, copy.deepcopy(arguments)))
+            if tool == "simulation_discovery_baseline":
+                raise NativeToolError(tool, {"error": {"code": "SimulationDiscoveryBaselineUnavailable"}})
+            raise AssertionError(tool)
+        backend = McpRuntimeBackend(refuse, self.program, {"sourceRevision": "known"}, "credential.json",
+                                    provision_runtime_credential=True)
+        with self.assertRaises(NativeToolError):
+            backend.start()
+        self.assertFalse(backend.identity_verified)
+        self.assertEqual(["simulation_discovery_baseline"], [tool for tool, _ in native.calls])
+        cleanup = backend.close()  # nothing was created, so cleanup is certain, not "outcome unknown"
+        self.assertFalse(cleanup["instanceCreationAttempted"])
+        self.assertNotEqual("unknown", cleanup.get("instanceCreationOutcome"))
+        self.assertFalse(cleanup["runtimeStateUncertain"])
+        self.assertEqual(["simulation_discovery_baseline"], [tool for tool, _ in native.calls])
 
     def test_opt_in_provisions_after_card_verification_before_normal_power_on(self):
         self.backend.provision_runtime_credential = True
@@ -469,7 +497,9 @@ class BaselineCliTests(unittest.TestCase):
                 tool, arguments = params["name"], params["arguments"]
                 events.append(tool)
                 requests.append((tool, copy.deepcopy(arguments)))
-                if tool == "sim_create":
+                if tool == "simulation_discovery_baseline":
+                    result = {"baseline": {"classification": "placeholder", "registeredInstanceCount": 0}}
+                elif tool == "sim_create":
                     result = {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"},
                               "downloadTicket": "PRIVATE-TICKET"}
                 elif tool == "simulation_download":
@@ -525,6 +555,7 @@ class BaselineCliTests(unittest.TestCase):
             self.assertEqual(0, exit_code)
             self.assertTrue(report["simulationVerified"])
             self.assertTrue(report["provisionRuntimeCredential"])
+            self.assertEqual(events.index("simulation_discovery_baseline") + 1, events.index("sim_create"))
             index = events.index("simulation_download")
             self.assertEqual(["simulation_download", "verify_memory_card", "simulation_provision_scratch_credential", "verify_memory_card", "sim_state"], events[index:index + 5])
             self.assertEqual(report["memoryCard"], report["restoredMemoryCard"])

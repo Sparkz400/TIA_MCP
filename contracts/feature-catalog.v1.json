@@ -2423,6 +2423,49 @@
       ]
     },
     {
+      "featureId": "simulation_discovery_baseline",
+      "domain": "simulation",
+      "title": "Record PLCSIM discovery before owned instance registration",
+      "mcpTools": [
+        "simulation_discovery_baseline"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 ConnectionConfiguration PcInterface.GetAccessibleDevices and V8 SimulationRuntimeManager registration/network-mode reads."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Read-only; requires zero registered PLCSIM instances and an existing Softbus network mode, which is never changed.",
+          "Accepts only nothing or exactly one all-zero address/MAC entry with empty device series, stable across two consecutive snapshots.",
+          "Lets only the next provisioning attempt in the same TIA session, project and PLC, within five minutes, exclude that single exact entry, and only while the same Runtime Manager process runs; duplicates or a truncated read exclude nothing.",
+          "Initializes the PLCSIM Advanced API, which may start the Runtime Manager for the worker's lifetime.",
+          "The exclusion rule is a draft pending independent review; see docs/verification/native-stop-20261023.md."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a worker-owned scratch PLC, an installed PLCSIM Advanced V8 runtime and its Softbus route."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA connection to the validated scratch project",
+        "No registered PLCSIM Advanced instance"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "sim_status",
       "domain": "simulation",
       "title": "Read local PLCSIM Advanced runtime state",

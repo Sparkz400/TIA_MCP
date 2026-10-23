@@ -819,6 +819,12 @@
       ]
     },
     {
+      "featureId": "simulation_discovery_baseline",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "sim_status",
       "obligations": [
         "L03"

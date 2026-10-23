@@ -112,7 +112,7 @@ class NativeClient:
         if method == "tools/list":
             allowed = ENGINEERING_TOOLS | (NativeAudit.ALLOWED_TOOLS if self.runtime else set())
             if self.provisioning:
-                allowed |= {"simulation_provision_scratch_credential"}
+                allowed |= {"simulation_discovery_baseline", "simulation_provision_scratch_credential"}
             return {"tools": [{"name": name} for name in allowed]}
         if method != "tools/call":
             raise AssertionError(method)

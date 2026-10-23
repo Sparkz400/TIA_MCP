@@ -63,7 +63,7 @@ class NativeAudit:
     ALLOWED_TOOLS = frozenset({"tia_start", "tia_create_scratch", "tia_detach", "change_prepare", "change_apply",
                               "change_status", "block_interface", "block_read", "type_read", "sim_create",
                               "simulation_download", "sim_state", "sim_tags", "sim_read", "sim_write", "sim_release"})
-    OPTIONAL_TOOLS = frozenset({"simulation_provision_scratch_credential"})
+    OPTIONAL_TOOLS = frozenset({"simulation_provision_scratch_credential", "simulation_discovery_baseline"})
 
     def __init__(self, client, records, persist):
         self.client, self.records, self.persist = client, records, persist
@@ -279,6 +279,9 @@ class McpRuntimeBackend:
         if self.started_once:
             raise RuntimeError("Backend start cannot be retried or reused.")
         self.started_once = True
+        if self.provision_runtime_credential:
+            # Before registration and before creation is attempted; a refusal leaves nothing owned.
+            self.evidence["discoveryBaseline"] = self.native("simulation_discovery_baseline", {})["baseline"]
         self.creation_attempted = True
         self.evidence["creationId"] = uuid.uuid4().hex
         try:

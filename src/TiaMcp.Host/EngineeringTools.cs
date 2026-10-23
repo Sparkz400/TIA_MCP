@@ -21,6 +21,11 @@ public sealed partial class TiaTools
         bool trustOwnedEmptyCpuCertificate = false)
         => Call("simulation_provision_scratch_credential", new { downloadTicket, projectName, plcPath, credentialMetadataPath, credentialLineageJournalPath, credentialLineageJournalPaths, trustOwnedEmptyCpuCertificate }, cancellationToken);
 
+    [McpServerTool(Name = "simulation_discovery_baseline", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read-only PN/IE / PLCSIM discovery for the worker-owned scratch PLC, before sim_create, while no PLCSIM Advanced instance is registered. Requires Softbus and does not change it. Records either nothing or exactly one all-zero Runtime Manager entry; the next simulation_provision_scratch_credential in this worker, same TIA session, project and PLC, may exclude only that single exact entry, at each of its discovery checks only while the baseline is under five minutes old and the same Runtime Manager process runs. A new baseline call first discards any earlier one. Never accepts any other device. Side effects: initializes the PLCSIM Advanced API, which may start the Runtime Manager and keeps it for the worker's lifetime, and stores that one baseline, which loosens the next provisioning isolation check as described.")]
+    public Task<CallToolResult> SimulationDiscoveryBaseline(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null)
+        => Call("simulation_discovery_baseline", new { projectName, plcPath }, cancellationToken);
+
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
     [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken)

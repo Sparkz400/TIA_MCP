@@ -262,7 +262,7 @@ class CaseRuntimeBackend(McpRuntimeBackend):
             "clientInfo": {"name": "tia-block-test-case", "version": "1.0.0"}})
         self.client.notify("notifications/initialized")
         available = {item["name"] for item in self.client.request("tools/list")["tools"]}
-        required = CaseSessionAudit.ALLOWED_TOOLS | ({"simulation_provision_scratch_credential"} if self.provision_runtime_credential else set())
+        required = CaseSessionAudit.ALLOWED_TOOLS | ({"simulation_discovery_baseline", "simulation_provision_scratch_credential"} if self.provision_runtime_credential else set())
         if required - available:
             raise RuntimeError("Required case MCP tools unavailable: " + ", ".join(sorted(required - available)))
         self.session_call = CaseSessionAudit(self.client, self.audit["calls"], self.persist, self.project_path)
@@ -581,7 +581,7 @@ def qualify_suite(suite, output, host, timeout, *, engineering_only=False, worke
         available = {item["name"] for item in client.request("tools/list")["tools"]}
         required = EngineeringAudit.ALLOWED_TOOLS | (frozenset() if engineering_only else NativeAudit.ALLOWED_TOOLS)
         if provision_runtime_credential:
-            required |= {"simulation_provision_scratch_credential"}
+            required |= {"simulation_discovery_baseline", "simulation_provision_scratch_credential"}
         missing = required - available
         if missing:
             raise RuntimeError("Required MCP tools unavailable: " + ", ".join(sorted(missing)))
