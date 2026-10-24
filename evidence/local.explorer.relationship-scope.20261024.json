@@ -1,0 +1,133 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.explorer.relationship-scope.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T18:04:06+00:00",
+  "source": {
+    "commit": "53a3807aeaa6ee7c25ca56a124982204cc396263",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_project_explorer.py default profile on a new owned TIA V21 scratch project (73 captured nodes): relationship graph from TiaMcp_EnableGate matches exactly the 7 resolved and 8 unresolved member edges authored from the fixed scratch SCL source; a depth-5/500-node/1,000-edge traversal returns all 21 retained native edges with relationshipScope complete, no stop reasons and every endpoint owned by the four fixture blocks; a 3-edge budget visibly truncates (stopReasons depth+edges). Native performance: cold capture 187 ms, warm 136 ms, details 255/372 ms, relationships 149-541 ms, cached MCP search p95 16 ms; relationship payloads 27.6-99.6 KB, JSON export 134,840 bytes, HTML 286,877 bytes; resident memory TIA Portal 2.62 GB, Host 127 MB, worker 98 MB, unchanged by warm recapture.",
+  "limitations": [
+    "One small fixed fixture with four blocks; no generated large programs, second PLC, HMI or library relationships, configured-I/O positives or protected/indirect references; whole-project relationship completeness remains notEstablished by contract.",
+    "Single-session measurements on one machine; not a contention-independent latency or memory guarantee. Worker memory sums descendants of the Host process, which include the owned TIA process."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1a0d5816585fcb98539c794b45a53472b33e7d8817b3f094984198b5aed5f40d"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7d6df86f31f80bf14519650b97646419f12b981e9e830c4feeb65411fd74315c"
+    }
+  ],
+  "runs": [
+    {
+      "report": "explorer-01.json",
+      "sha256": "e09cba3f785eae8fc68870971773a08afb7a98bb63eb85accae846a6c1011e1e",
+      "bytes": 996553,
+      "completed": true,
+      "steps": [
+        "new tools are read-only and available",
+        "unnegotiated clients receive no app UI metadata",
+        "tia_start",
+        "tia_create_scratch",
+        "project_inventory",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "project_index",
+        "capture",
+        "search",
+        "search",
+        "search",
+        "search",
+        "search",
+        "all children have captured parents",
+        "native and virtual identities stay separate",
+        "native empty groups and exact ancestry",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "all native child pages exact without duplication",
+        "project_index",
+        "explorer reads preserve legacy project_index snapshot",
+        "details",
+        "block_read",
+        "exact selected path survives independent native inspection",
+        "relationships",
+        "independent authored calls, instance direction and unresolved member reads/writes match",
+        "relationships",
+        "relationships",
+        "exact authored relationships, complete bounded traversal and visible edge truncation",
+        "details",
+        "hardware_inspect",
+        "hardware details agree with independent native position/address evidence",
+        "relationships",
+        "hardware reverse query is bounded and preserves configured-I/O ownership uncertainty",
+        "verify",
+        "metadata verification explicitly excludes content",
+        "export",
+        "export",
+        "capture",
+        "release",
+        "session mismatch cannot resolve selection",
+        "capture",
+        "bounded capture reports partial coverage",
+        "release",
+        "released snapshot cannot be read",
+        "viewer endpoint rejects mutation action",
+        "tia_detach",
+        "disconnect invalidates exact selection"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_index",
+        "project_inventory",
+        "project_model_capture",
+        "project_model_children",
+        "project_model_details",
+        "project_model_export",
+        "project_model_relationships",
+        "project_model_release",
+        "project_model_search",
+        "project_model_verify",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_model"
+      ]
+    }
+  ]
+}

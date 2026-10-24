@@ -64,6 +64,72 @@ def validate_fixture_relationships(graph, plc_path):
                 "Authored FB member " + kind + " evidence missing or incorrectly substituted with a project object")
 
 
+FIXTURE_BLOCKS = ("Main", "TiaMcp_EnableGate", "TiaMcp_EnableGate_DB", "TiaMcp_IsEnabled")
+# Authored from the fixed scratch SCL source: Main calls the FB through its
+# instance DB, the FB calls the FC, the DB is an instance of the FB.
+REQUIRED_RESOLVED = {("calls", "Main", "TiaMcp_EnableGate"), ("calls", "TiaMcp_EnableGate", "TiaMcp_IsEnabled"),
+                     ("instanceOf", "TiaMcp_EnableGate_DB", "TiaMcp_EnableGate")}
+SEED_RESOLVED = REQUIRED_RESOLVED | {("usesType", "TiaMcp_EnableGate_DB", "TiaMcp_EnableGate"), ("dependsOn", "Main", "TiaMcp_EnableGate"),
+                                     ("dependsOn", "TiaMcp_EnableGate", "TiaMcp_IsEnabled"), ("dependsOn", "TiaMcp_EnableGate_DB", "TiaMcp_EnableGate")}
+# FB member access, both as local and as instance-qualified native names.
+SEED_MEMBERS = {(kind, name) for kind, names in (("reads", ("Enable", '"TiaMcp_EnableGate_DB".Enable')), ("writes", ("Active", '"TiaMcp_EnableGate_DB".Active')),
+                ("dependsOn", ("Enable", '"TiaMcp_EnableGate_DB".Enable', "Active", '"TiaMcp_EnableGate_DB".Active'))) for name in names}
+RELATIONSHIP_KINDS = {"calls", "reads", "writes", "instanceOf", "usesType", "dependsOn"}
+
+
+def _endpoint(edge, side, plc_path):
+    """Resolved fixture block name, or the unresolved native member identity."""
+    resolved = edge.get(side) or {}
+    if resolved.get("objectPath"):
+        prefix = plc_path + "/blocks/"
+        require(resolved["objectPath"].startswith(prefix) and resolved["objectPath"][len(prefix):] in FIXTURE_BLOCKS,
+                "Relationship endpoint outside the authored fixture: " + resolved["objectPath"])
+        return ("block", resolved["objectPath"][len(prefix):])
+    member = ((edge.get("unresolved") or {}).get(side)) or {}
+    identity = member.get("nativeIdentity") or {}
+    owner = (identity.get("nativePath") or "").rsplit("\\", 1)[-1]
+    name = member.get("name") or ""
+    require(owner in FIXTURE_BLOCKS or any(name.startswith('"' + block + '".') for block in FIXTURE_BLOCKS),
+            "Unresolved endpoint is not owned by an authored fixture block: " + name)
+    return ("member", name)
+
+
+def relationship_sets(graph, plc_path):
+    resolved, members = set(), set()
+    require(len({e["edgeId"] for e in graph["edges"]}) == len(graph["edges"]), "Duplicate relationship edge identities")
+    for edge in graph["edges"]:
+        require(edge["kind"] in RELATIONSHIP_KINDS, "Unexpected native relationship kind " + edge["kind"])
+        source, target = _endpoint(edge, "source", plc_path), _endpoint(edge, "target", plc_path)
+        if source[0] == target[0] == "block":
+            resolved.add((edge["kind"], source[1], target[1]))
+        else:
+            members.add((edge["kind"], source[1], target[1]))
+    return resolved, members
+
+
+def validate_relationship_scope(seed, full, truncated, plc_path):
+    """Exact authored edges at depth 1; every retained edge within the maximum budget; visible truncation."""
+    resolved, members = relationship_sets(seed, plc_path)
+    require(resolved == SEED_RESOLVED, "Seed resolved relationships differ from the authored source: " + repr(sorted(resolved ^ SEED_RESOLVED)))
+    seed_members = {(kind, name) for kind, source, name in members if source == "TiaMcp_EnableGate"}
+    require(seed_members == SEED_MEMBERS and len(seed_members) == len(members),
+            "Seed member relationships differ from the authored FB interface: " + repr(sorted(seed_members ^ SEED_MEMBERS)))
+    scope = full["relationshipScope"]
+    require(scope["status"] == "complete" and scope["stopReasons"] == [] and full["truncated"] is False
+            and scope["returnedEdges"] == scope["retainedEdges"] == len(full["edges"]) and scope["projectCompleteness"] == "notEstablished",
+            "Bounded traversal did not return every retained edge with a complete scope")
+    require(full["nativeCoverage"]["scopeComplete"] is True and full["nativeCoverage"]["truncated"] is False, "Native acquisition scope is incomplete")
+    full_resolved, full_members = relationship_sets(full, plc_path)
+    require(REQUIRED_RESOLVED <= full_resolved and resolved <= full_resolved and members <= full_members,
+            "Whole fixture graph lost authored or seed relationships")
+    cut = truncated["relationshipScope"]
+    require(truncated["truncated"] is True and cut["status"] != "complete" and "edges" in cut["stopReasons"]
+            and len(truncated["edges"]) == cut["returnedEdges"] <= truncated["limits"]["maxEdges"] < len(seed["edges"]),
+            "Edge budget truncation is not visible")
+    return {"seedEdges": len(seed["edges"]), "retainedEdges": scope["retainedEdges"], "resolved": sorted(map(list, full_resolved)),
+            "unresolvedMembers": sorted(map(list, full_members)), "truncatedReturnedEdges": cut["returnedEdges"], "truncatedStopReasons": cut["stopReasons"]}
+
+
 def validate_typed_preview(details, reference, language):
     providers = [p for p in details.get("previews", []) if p.get("provider") == "typedLadFbd.v21"]
     require(len(providers) == 1, "Exactly one native typed preview provider must respond")
@@ -86,6 +152,34 @@ def validate_typed_preview(details, reference, language):
     require(expected <= observed_names, "Expected native fixture instruction names are absent from preview")
     require(provider.get("runtimeVerified") is False, "Inspection must not claim runtime qualification")
     return provider
+
+
+def memory_sample(client, tia_pid):
+    """Resident memory of the owned TIA process, the Host and its worker children."""
+    import psutil
+    sample = {"tiaPortalRss": psutil.Process(tia_pid).memory_info().rss}
+    host = getattr(getattr(client, "process", None), "pid", None)
+    if host:
+        process = psutil.Process(host)
+        sample["hostRss"] = process.memory_info().rss
+        sample["workerRss"] = {str(child.pid): child.memory_info().rss for child in process.children(recursive=True)}
+    return sample
+
+
+def native_performance(steps, client, tia_pid, model, snapshot_id, output, stem):
+    """Cold capture comes from the first timed capture step; a warm recapture runs on the same session."""
+    timed = lambda name: [step["milliseconds"] for step in steps if step.get("name") == name and "milliseconds" in step]
+    before = memory_sample(client, tia_pid)
+    warm = model("capture", lifetimeSeconds=900)
+    warm_ms = timed("capture")[-1]
+    model("release", snapshotId=warm["snapshotId"])
+    relationships = [step["result"].get("payloadBytes") for step in steps if step.get("name") == "relationships" and step.get("passed")]
+    return {"captureMilliseconds": {"cold": timed("capture")[0], "warm": warm_ms, "warmVisited": warm.get("usage", {}).get("visited")},
+            "detailsMilliseconds": timed("details"), "relationshipsMilliseconds": timed("relationships"),
+            "payloadBytes": {"relationships": relationships, **{fmt: (output / (stem + suffix)).stat().st_size
+                             for fmt, suffix in (("json", ".snapshot.json"), ("html", ".html")) if (output / (stem + suffix)).exists()}},
+            "memoryBytes": {"afterQueries": before, "afterWarmCapture": memory_sample(client, tia_pid)},
+            "snapshotId": snapshot_id, "method": "Single owned session; cold is the first capture after fixture edits, warm repeats it without edits."}
 
 
 def qualify(args):
@@ -249,6 +343,11 @@ def qualify(args):
         graph = model("relationships", reference=reference, depth=1, maxNodes=100, maxEdges=200)
         validate_fixture_relationships(graph, plc_path)
         check("independent authored calls, instance direction and unresolved member reads/writes match", True)
+        if not args.count and not args.seeder and not args.two_plcs:
+            full_graph = model("relationships", reference=reference, depth=5, maxNodes=500, maxEdges=1000)
+            cut_graph = model("relationships", reference=reference, depth=1, maxNodes=100, maxEdges=3)
+            report["relationshipScopeQualification"] = validate_relationship_scope(graph, full_graph, cut_graph, plc_path)
+            check("exact authored relationships, complete bounded traversal and visible edge truncation", True)
         hardware = next(n for n in nodes if n["kind"] == "hardware" and n["objectPath"] == plc_path.rsplit("/plc/", 1)[0])
         hardware_reference = exact_reference(snapshot, hardware)
         hardware_details = model("details", reference=hardware_reference)
@@ -297,6 +396,8 @@ def qualify(args):
             transfer(client, exported["artifact"], target)
             report.setdefault("exports", {})[format] = str(target)
             save()
+        report["nativePerformance"] = native_performance(report["steps"], client, pid, model, snapshot["snapshotId"], output, args.report.stem)
+        save()
         invalid_ref = {**reference, "sessionGeneration": "different-session"}
         rejected({"action": "details", "reference": invalid_ref}, {"SessionMismatch", "StaleSelection", "InvalidSelection"}, "session mismatch cannot resolve selection")
         partial = model("capture", maxVisited=12, lifetimeSeconds=900)
