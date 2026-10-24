@@ -65,7 +65,7 @@ def main():
     summary = summarize(args.id, args.report, args.binary, args.scope, args.limitation)
     destination = ROOT / "evidence" / (args.id + ".json")
     destination.parent.mkdir(exist_ok=True)
-    destination.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    destination.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     print(f"{summary['outcome'].upper()} {destination.relative_to(ROOT).as_posix()}")
     return 0 if summary["outcome"] == "passed" else 1
 
