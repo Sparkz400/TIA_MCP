@@ -797,8 +797,8 @@
     },
     {
       "path": "scripts/test_api_coverage_bindings.py",
-      "sha256": "034ce8d541f285630aef88d1bbfe2c89c77b8a5903c93753c1443e6f124348c4",
-      "bytes": 12860
+      "sha256": "80cfb843b00cf2f92b015da35a1d484ace4c40983657bba172fbc7877f3a3a4e",
+      "bytes": 13740
     },
     {
       "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
