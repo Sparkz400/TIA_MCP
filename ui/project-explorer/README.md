@@ -22,6 +22,11 @@ node ui/project-explorer/pack.mjs artifacts/project-explorer-native-live.snapsho
 
 ## Interaction
 
+The brutalist light/dark themes use square panels and the shared connector mark.
+Yellow highlights identify selections; warning and error labels remain distinct.
+Keyboard focus has a blue outline. Reduced-motion preferences disable loading
+animations. Exported diagrams keep a self-contained light paper palette.
+
 - Search names and exact paths; filter object kind and software scope. Identical names in different PLCs or software units retain different references.
 - Arrow keys navigate; right/left expand/collapse; Home/End jump; Enter selects. Ctrl/Cmd+F focuses project search; Escape clears the search text.
 - The tree virtualizes visible rows and uses bounded lazy child pages through a live transport. Native empty groups are separate from virtual display folders.
