@@ -1,5 +1,7 @@
 # Current status
 
+**PLCSIM provisioning unblocked — 24 October 2026:** Credential provisioning reads discovery through a fresh discovery-only observer Portal and passed end to end (download, provisioning, RUN, stimulus assertions). `simulation_download` is verified; catalog `0.4.4`. [Evidence](verification/plcsim-startup-discovery-20261024.md#production-integration).
+
 **Catalog requalified — 24 October 2026:** Catalog `0.4.3` verifies 34 of the 36 demoted features again from TIA V21 runs on this PC, each backed by a committed summary under `evidence/`. `simulation_download` (power-on timeout after download) and `deployment.vm_qualification` (no VM here) stay unverified. [Evidence](verification/catalog-requalification-20261024.md).
 
 **Feature catalog reconciled — 24 October 2026:** Catalog `0.4.2` now matches all 262 tools and 56 mutation kinds. Its 36 former `verified` labels are `unverified`, because no cited evidence has its artifacts in this repository; the evidence IDs remain as history. A new contract check refuses `verified` without retained artifacts. No native work ran. [Evidence](verification/catalog-reconciliation-20261024.md).

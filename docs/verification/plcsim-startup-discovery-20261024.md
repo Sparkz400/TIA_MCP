@@ -559,3 +559,24 @@ ten retained handles exited 0 without forced termination; the coordinator again
 records only "Exact terminal deadline exceeded; late exit is cleanup only" for
 the file-storage helper, so `normalLifecyclePassed` stays false. The guard
 ticket has its terminal receipt, and source pins and worker files are unchanged.
+
+## Production integration
+
+`simulation_provision_scratch_credential` now reads PLCSIM discovery through a
+`SimulationDiscoveryObserver`: a second owned headless Portal with an empty
+project, started after the verified empty OFF-to-STOP power-on. It provides the
+post-start, address-match and both credential-boundary identity reads. Route
+application, `GoOnline` and `SetPlcMasterSecret` stay on the original Portal and
+its sole PLCSIM interface, and the observer never sees a device, route or
+credential. The observer project is declared as a new destination in the shared
+mutation scope before dispatch. Its process ID, birth time and image are recorded
+with the process handle retained, and cleanup verifies project close, Portal
+disposal and process exit.
+
+On 24 October the end-to-end `validate_simulation.py --provision-runtime-credential`
+run passed on a fresh scratch: the observer saw `192.168.0.1` in its first sample,
+the credential was provisioned, the CPU reached RUN and the stimulus assertions
+passed; the observer exited with code 0 (`evidence/local.sim.provision.20261024.json`).
+An earlier attempt reached the same point but failed its own observer exit check
+(the by-ID process handle was not retained); it left an `outcomeUnknown`
+admission that is still held, see [requalification](catalog-requalification-20261024.md).

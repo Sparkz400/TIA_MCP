@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.3",
+  "catalogVersion": "0.4.4",
   "targetTiaVersions": [
     21
   ],
@@ -1259,6 +1259,24 @@
       "limitations": [
         "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
         "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only; failure-boundary modes use the test-double worker, not Siemens."
+      ]
+    },
+    {
+      "id": "local.sim.provision.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ed3584e3b34c0542f056f71fa47a7017e6cb2741",
+        "passedScope": "scripts/validate_simulation.py --provision-runtime-credential --trust-owned-empty-cpu-certificate on the saved scratch project from a fresh validate_milestones.py run: owned TIA V21 start, project_open, discovery baseline, owned CPU1511 creation, simulation_download to a generated protected card, generated-state save, runtime credential provisioning with identity reads from a fresh discovery-only observer Portal (endpoint 192.168.0.1 in the first sample; observer project closed, Portal disposed, process exit 0 verified), card restored, power-on, RUN, tag listing, read/write and a stimulus scenario whose assertions all passed, owned release and detach."
+      },
+      "artifacts": [
+        "evidence/local.sim.provision.20261024.json"
+      ],
+      "limitations": [
+        "One scratch fixture and one simple stimulus scenario; this is not the 65-case runtime suite.",
+        "Project preservation after provisioning is not independently verified, so simulation_provision_scratch_credential stays unverified (AC-preserve).",
+        "First-use TLS trust was granted under the explicit owned-empty-CPU policy for this attempt only."
       ]
     }
   ],
@@ -2551,16 +2569,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.download.v02"
+          "local.sim.provision.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [

@@ -1,21 +1,21 @@
 # Catalog requalification with committed evidence — 24 October 2026
 
-Catalog `0.4.3` verifies 34 of the 36 features demoted in `0.4.2` again. Each
+Catalog `0.4.4` verifies 35 of the 36 features demoted in `0.4.2` again. Each
 one now cites a new evidence record whose curated summary is committed under
 [`evidence/`](../../evidence/README.md), and the contract check confirms that
 every bound MCP tool answered without error in a completed run. The runs used
 TIA Portal V21 and the local simulator on this PC (`PCNico`), with the Debug
 Host and workers built from this branch.
 
-Two stay `unverified`:
+`deployment.vm_qualification` stays `unverified`: its proof needs the VMware
+guest, and no VMware Workstation is installed on this PC.
 
-- `simulation_download`: a full `validate_milestones.py` run (with simulation)
-  downloaded to an owned CPU1511, but the following `powerOn` timed out (PLCSIM
-  error -11) and `sim_release` then answered `InstanceNotRunning`. The run is not
-  complete, so it qualifies nothing; the raw report is local only. The simulator
-  registry was empty afterwards.
-- `deployment.vm_qualification`: its proof needs the VMware guest, and no
-  VMware Workstation is installed on this PC.
+`simulation_download` first failed here: a `validate_milestones.py` run powers on
+the downloaded protected program without provisioning its runtime credential, and
+`powerOn` timed out (PLCSIM -11). It is now verified by the end-to-end
+provisioning run (`local.sim.provision.20261024`), which became possible once
+provisioning used a fresh discovery observer
+([integration](plcsim-startup-discovery-20261024.md#production-integration)).
 
 ## Evidence format
 
@@ -46,6 +46,7 @@ client) record tool calls, and the runners below copy them into their reports.
 | `local.sim.creation.20261024` | `qualify_simulator_creation.py` | `sim_status`, `sim_create`, `sim_release`, `sim_creation_status` |
 | `local.library_intake.20261024` | `qualify_library_intake.py` (Host only) | `artifact_upload_status`, `artifact_upload_release`, `library_package_inspect`, `library_package_status`, `library_package_release` |
 | `local.catalog.20261024` | `verify_feature_catalog.py` (Host only) | `feature_catalog` |
+| `local.sim.provision.20261024` | `validate_simulation.py --provision-runtime-credential` | `simulation_download` |
 
 Each record's scope and limitations are in the catalog and in its summary. All
 runs used new repository scratch projects or the saved scratch from an earlier
@@ -71,8 +72,10 @@ The earlier evidence records stay in the catalog as history, uncited.
 
 ## What stays open
 
-- `simulation_download`: rerun once power-on after download is reliable (see the
-  runtime lifecycle work); `deployment.vm_qualification`: needs the VMware guest.
+- `deployment.vm_qualification`: needs the VMware guest.
+- One `outcomeUnknown` provisioning admission from a failed attempt is still held
+  (`artifacts/engineering-admissions/9547a9a83cfc42b388fbcab53c1204cb`); trusted
+  reconciliation does not exist yet.
 - Native evidence applies to the recorded binary tree hashes. The Host embeds
   the catalog, so the Host built after this catalog change has a different hash
   from the one that ran; later binaries need their own runs.

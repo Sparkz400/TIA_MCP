@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "2053b05eadc38e782bdde2cd16fa1e710aa8ef43db89eb049eb0d104721d5058",
-      "bytes": 686865
+      "sha256": "f54040f75d4f3f353308bef744243d51ad87acf11f5d37b8fbd10ca88fd766da",
+      "bytes": 688108
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2347,8 +2347,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "a52d83b4925da600825623b123fd6be8a116dcc52968c641fb452af91e2cb70d",
-      "bytes": 24879
+      "sha256": "81b6d6161e126264d3ce7e7c4c4b88a7ec137ca93a015062768bc531b1e72af7",
+      "bytes": 25409
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -2372,8 +2372,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "c1ad560275ab65af98aac2ab7421c4df15fd655068801a29b4e53cd0ca5d3b2b",
-      "bytes": 94098
+      "sha256": "efd66f3453a90d0413b3b74d240bf555621a7666dacafb70acb1e0c06b3fc9b4",
+      "bytes": 96265
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologyConnections.cs",
@@ -2539,6 +2539,11 @@
       "path": "src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs",
       "sha256": "9a9c5c7bed377d3b09d5a7ad11042fc9de6c27933742198b1651183b88bd26f3",
       "bytes": 3565
+    },
+    {
+      "path": "src/TiaMcp.Openness.V21/SimulationDiscoveryObserver.cs",
+      "sha256": "48c43ae7786d778ea083f628102f0f3dbf27ac6515eec00381ad3202bb2f5c9f",
+      "bytes": 6288
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationDownloadEvidenceRules.cs",
@@ -49781,8 +49786,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
               "name": "SimulationProvision",
               "line": 27,
-              "endLine": 813,
-              "sha256": "223cf3d7faf5648beb28fc8372184106a8a6dbbeba67d3d34044470e44d2b40c"
+              "endLine": 844,
+              "sha256": "73404f2b967b1714ed1c0a54ce92accf206e0286aa552d1ac5f4d081bfed54b9"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -86781,10 +86786,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.sim.download.v02",
-          "profileSha256": "2e94a2cf11a15e127003f7af2c6c472a0f8e08cd75fffb8ea41fe3af8e76535b",
+          "id": "local.sim.provision.20261024",
+          "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913",
           "artifacts": [
-            "artifacts/simulation-validation-first.json"
+            "evidence/local.sim.provision.20261024.json"
           ]
         }
       ],
@@ -90948,6 +90953,11 @@
       "sha256": "878e9514d47bb2616a92b6b188c0308fb86a92f8839e8be59a3df840bd434c6f"
     },
     {
+      "path": "evidence/local.sim.provision.20261024.json",
+      "state": "observed",
+      "sha256": "805bf5a116fd67619dd06045d5aeb05af37e44426b3897910d09f79efa2f34cd"
+    },
+    {
       "path": "evidence/local.smoke.20261024.json",
       "state": "observed",
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
@@ -91141,6 +91151,10 @@
     {
       "id": "local.sim.download.v02",
       "profileSha256": "2e94a2cf11a15e127003f7af2c6c472a0f8e08cd75fffb8ea41fe3af8e76535b"
+    },
+    {
+      "id": "local.sim.provision.20261024",
+      "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913"
     },
     {
       "id": "local.sim.startup.20261024",
