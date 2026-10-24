@@ -1,5 +1,12 @@
 # Exact source reuse for standalone component qualification
 
+Without `--reuse-source-report`, the qualifier authors a fresh simulation-capable
+source and installs it; the captured storage profile then binds by complete
+installed FB/UDT content equality. That route passed on 24 October 2026 with
+native runtime acceptance; see [fresh installation](../verification/component-fresh-install-20261024.md).
+Run it from a short checkout path (TIA limits project paths to 143 characters)
+with a worker registered in the Openness AllowList.
+
 `qualify_plc_component.py --reuse-source-report` uses the exact source archive
 created by `component-native-04` in a **new consumer scratch project**. It never
 runs source authoring, opens the old consumer, resumes its component operation,

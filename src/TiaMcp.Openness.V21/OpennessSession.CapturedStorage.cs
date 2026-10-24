@@ -22,7 +22,7 @@ namespace TiaMcp.Openness.V21
         {
             internal LibraryChange Plan;
             internal JObject Descriptor;
-            internal string CatalogPath, PlanHash;
+            internal string CatalogPath, PlanHash, SourceBinding;
             internal JArray Artifacts;
         }
 
@@ -30,7 +30,12 @@ namespace TiaMcp.Openness.V21
         // accepted from a request or persisted/reconstructed as a live handle.
         private CapturedStorageQualification CapturedStorageContext(LibraryChange plan)
         {
-            if (plan.Source?.SourceHash != CapturedStorageArchiveHash) return null;
+            if (string.IsNullOrEmpty(plan.Source?.SourceHash)) return null;
+            // native04's archive keeps its exact identity pins; any other archived
+            // source is bound only by complete installed FB/UDT content equality.
+            bool exactArchive = plan.Source.SourceHash == CapturedStorageArchiveHash;
+            var names = (plan.Preview["integrationPlan"]?["versions"] as JArray)?.Select(v => v.Value<string>("typeName")) ?? Enumerable.Empty<string>();
+            if (!exactArchive && (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(plan.Payload) || !names.Contains(TypedGraphicalCapturedStorageTemplate.FbName))) return null;
             RequireComponentScratch(plan.Project);
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(plan.Payload))
                 throw new BridgeException("CapturedStorageProfileUnavailable", "Exact captured storage qualification requires a new standalone FC caller.");
@@ -51,13 +56,15 @@ namespace TiaMcp.Openness.V21
                 artifacts.Add(new JObject { ["path"] = path, ["bytes"] = bytes.Length, ["sha256"] = row.Value<string>("sha256") });
             }
             var pins = (JArray)plan.Preview["integrationPlan"]["versions"];
-            CapturedStorageContract.RequirePlan(profile, pins, plan.Source.SourceHash);
+            if (exactArchive) CapturedStorageContract.RequirePlan(profile, pins, plan.Source.SourceHash);
+            else CapturedStorageContract.RequireContentBoundPlan(profile, pins);
             foreach (JObject pin in pins)
             {
                 PlcComponentContentContract.ValidatePin(pin);
             }
             return new CapturedStorageQualification { Plan = plan, Descriptor = profile, CatalogPath = catalog,
-                PlanHash = ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)), Artifacts = artifacts };
+                PlanHash = ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)), Artifacts = artifacts,
+                SourceBinding = exactArchive ? "exactNative04Archive" : "installedContentEquality" };
         }
         private static string CapturedBytesHash(byte[] bytes)
         { using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant(); }
@@ -82,8 +89,9 @@ namespace TiaMcp.Openness.V21
                 string path = assembly.Location;
                 var expected = ((JArray)context.Descriptor["loadedApiFiles"]).OfType<JObject>().SingleOrDefault(x => x.Value<string>("name") == Path.GetFileName(path));
                 var version = FileVersionInfo.GetVersionInfo(path);
-                if (expected == null || !string.Equals(Path.GetDirectoryName(path), Path.GetFullPath(_apiDirectory), StringComparison.OrdinalIgnoreCase) ||
-                    !string.Equals(Path.GetFullPath(path), Path.GetFullPath(expected.Value<string>("path")), StringComparison.OrdinalIgnoreCase) ||
+                // The installation root may differ per machine; the configured API
+                // directory, file name, version and bytes remain exact.
+                if (expected == null || !string.Equals(Path.GetDirectoryName(path), Path.GetFullPath(_apiDirectory).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase) ||
                     version.FileVersion != expected.Value<string>("fileVersion") || ChangeFileHash(path) != expected.Value<string>("sha256"))
                     throw new BridgeException("CapturedStorageProfileUnavailable", "Actual loaded Siemens API path/version/bytes differ from the accepted profile.");
                 observations.Add(new JObject { ["path"] = path, ["assemblyVersion"] = assembly.GetName().Version.ToString(), ["fileVersion"] = version.FileVersion, ["sha256"] = expected["sha256"].DeepClone() });
@@ -104,7 +112,8 @@ namespace TiaMcp.Openness.V21
             if (!_libraryChanges.TryGetValue(plan.Id, out var current) || !ReferenceEquals(current, plan) ||
                 plan.Project.Path.FullName != change.ProjectPath || ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)) != context.PlanHash)
                 throw new BridgeException("StaleDeclaration", "Captured-storage prepared plan/session changed.");
-            if (plan.Source.SourceHash != CapturedStorageArchiveHash || !File.Exists(plan.Source.SourcePath) || ChangeFileHash(plan.Source.SourcePath) != CapturedStorageArchiveHash)
+            if ((context.SourceBinding == "exactNative04Archive") != (plan.Source.SourceHash == CapturedStorageArchiveHash) ||
+                !File.Exists(plan.Source.SourcePath) || ChangeFileHash(plan.Source.SourcePath) != plan.Source.SourceHash)
                 throw new BridgeException("ArtifactChanged", "Exact captured source archive changed.");
             foreach (JObject artifact in context.Artifacts)
                 if (!File.Exists(artifact.Value<string>("path")) || ChangeFileHash(artifact.Value<string>("path")) != artifact.Value<string>("sha256"))
@@ -210,7 +219,7 @@ namespace TiaMcp.Openness.V21
             foreach (JObject artifact in context.Artifacts) change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = artifact.DeepClone() });
             change.TypedDependencies.Add(new JObject { ["kind"] = "capturedStorageQualification", ["qualificationOnly"] = true, ["productionApplySupported"] = false,
                 ["planChangeId"] = context.Plan.Id, ["planPreviewHash"] = context.Plan.PreviewHash, ["planContentHash"] = context.PlanHash,
-                ["sourceArchive"] = ChangeArtifact(context.Plan.Source.SourcePath), ["profileSha256"] = CapturedStorageProfileHash,
+                ["sourceArchive"] = ChangeArtifact(context.Plan.Source.SourcePath), ["sourceBinding"] = context.SourceBinding, ["profileSha256"] = CapturedStorageProfileHash,
                 ["name"] = name, ["number"] = number, ["bindings"] = observation["bindings"].DeepClone(), ["artifacts"] = observation["artifacts"].DeepClone(),
                 ["environment"] = observation["environment"].DeepClone(), ["cpuIdentifier"] = observation["cpuIdentifier"].DeepClone(),
                 ["route"] = observation["route"].DeepClone(), ["callerLanguage"] = observation["callerLanguage"].DeepClone() });
@@ -232,7 +241,8 @@ namespace TiaMcp.Openness.V21
             if (dependencies.Length != 1 || change.CapturedStorageQualification == null) throw new BridgeException("StaleDeclaration", "Captured storage receipt/current-session context is ambiguous or unavailable.");
             var dependency = dependencies[0]; var context = change.CapturedStorageQualification;
             if (dependency.Value<string>("planChangeId") != context.Plan.Id || dependency.Value<string>("planPreviewHash") != context.Plan.PreviewHash ||
-                dependency.Value<string>("planContentHash") != context.PlanHash || dependency.Value<string>("profileSha256") != CapturedStorageProfileHash)
+                dependency.Value<string>("planContentHash") != context.PlanHash || dependency.Value<string>("profileSha256") != CapturedStorageProfileHash ||
+                dependency.Value<string>("sourceBinding") != context.SourceBinding)
                 throw new BridgeException("StaleDeclaration", "Captured storage receipt no longer matches the private plan/profile.");
             foreach (JObject artifact in (JArray)dependency["artifacts"])
                 if (!File.Exists(artifact.Value<string>("path")) || ChangeFileHash(artifact.Value<string>("path")) != artifact.Value<string>("sha256"))

@@ -57,11 +57,41 @@ tests.Add(("Complete native template clone changes only allowed direct fields", 
     Require(before == db.ToString(SaveOptions.DisableFormatting), "Capture was mutated");
     Require(result.Descendants("UnmappedNative").Single().Attribute("ID")!.Value == "9", "Unknown payload/ID lost");
 }));
-tests.Add(("Exact UDT identity tuple required even with equal content", () => {
+tests.Add(("Swapped or duplicated identities are rejected even with equal content", () => {
     Reject(() => Build(udt: boundType with { TypeGuid = FbTypeGuid }));
     Reject(() => Build(udt: boundType with { VersionGuid = FbVersionGuid }));
     Reject(() => Build(callee: boundFb with { TypeGuid = UdtTypeGuid }));
     Reject(() => Build(callee: boundFb with { VersionGuid = UdtVersionGuid }));
+}));
+tests.Add(("Freshly authored identities bind by closure shape and content, never by GUID constants", () => {
+    string fbType = Guid.NewGuid().ToString("D"), fbVersion = Guid.NewGuid().ToString("D"), udtType = Guid.NewGuid().ToString("D"), udtVersion = Guid.NewGuid().ToString("D");
+    var freshFb = boundFb with { TypeGuid = fbType, VersionGuid = fbVersion, RequiredVersionGuids = new[] { udtVersion } };
+    var freshType = boundType with { TypeGuid = udtType, VersionGuid = udtVersion };
+    Build(callee: freshFb, udt: freshType);
+    Reject(() => Build(callee: freshFb, udt: boundType));
+    Reject(() => Build(callee: freshFb with { TypeGuid = Guid.Empty.ToString("D") }, udt: freshType));
+    Reject(() => Build(callee: freshFb with { VersionGuid = fbVersion.ToUpperInvariant() }, udt: freshType));
+    Reject(() => Build(callee: freshFb with { TypeGuid = udtType }, udt: freshType));
+    Reject(() => Build(callee: freshFb, udt: freshType with { Document = ArtifactOf(Mutate(typeDoc, d => d.Descendants(ns + "Member").Single().SetAttributeValue("Datatype", "Byte"))) }));
+}));
+tests.Add(("Content-bound fresh source plan requires exact committed FB to UDT closure", () => {
+    string udtVersion = Guid.NewGuid().ToString("D");
+    JArray Pins() => new(
+        new JObject { ["typeName"] = FbName, ["typeGuid"] = Guid.NewGuid().ToString("D"), ["versionGuid"] = Guid.NewGuid().ToString("D"), ["state"] = "Committed",
+            ["doNotUse"] = false, ["requiredVersionGuids"] = new JArray(udtVersion), ["contentPolicy"] = new JObject { ["policyId"] = "p" } },
+        new JObject { ["typeName"] = TypeName, ["typeGuid"] = Guid.NewGuid().ToString("D"), ["versionGuid"] = udtVersion, ["state"] = "Committed",
+            ["doNotUse"] = false, ["requiredVersionGuids"] = new JArray() });
+    var descriptor = new JObject { ["qualificationOnly"] = true, ["productionApplySupported"] = false };
+    CapturedStorageContract.RequireContentBoundPlan(descriptor, Pins());
+    foreach (Action<JArray> change in new Action<JArray>[] {
+        p => p.RemoveAt(1), p => p.Add(p[1].DeepClone()), p => p[0]["typeName"] = "Other", p => p[1]["state"] = "InWork", p => p[0]["doNotUse"] = true,
+        p => p[0]["requiredVersionGuids"] = new JArray(), p => p[1]["requiredVersionGuids"] = new JArray(p[0]["versionGuid"]!.ToString()),
+        p => ((JObject)p[0]).Remove("contentPolicy"), p => p[1]["contentPolicy"] = new JObject(), p => p[0]["typeGuid"] = "not-a-guid" }) {
+        var pins = Pins(); change(pins);
+        Reject(() => CapturedStorageContract.RequireContentBoundPlan(descriptor, pins), "StaleCapturedStorageContract");
+    }
+    var production = (JObject)descriptor.DeepClone(); production["productionApplySupported"] = true;
+    Reject(() => CapturedStorageContract.RequireContentBoundPlan(production, Pins()), "StaleCapturedStorageContract");
 }));
 tests.Add(("Current plan and native object paths are exact", () => {
     Reject(() => Build(udt: boundType with { NativePath = plc + "/types/Folder/" + TypeName }));

@@ -1,0 +1,107 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plc_component.runtime.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T20:53:13+00:00",
+  "source": {
+    "commit": "1e8ec3d2cea6a38d3cbb800470511b4ee0aa318c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/component_runtime.py --run-native on the c09 installation: saved installed project proven equal to its fresh-reopen snapshot, simulation-capable compilation enabled as its own change, OB1 Main call to TiaMcpComponentCaller as a separate reviewed source_upsert changing only OB1, then fresh owned PLCSIM Advanced V8 instance with verified card, generated-state save, scratch credential provisioning (owned empty-CPU trust) and restored-card check; ComponentEnable true/false/true/false drives ComponentActive on every edge. r05 continues r04 and r03 by recorded hash from the exact post-OB snapshot.",
+  "limitations": [
+    "Wall-clock polling, not scan-accurate; one component (Bool Enable/Active) on CPU1511.",
+    "OB insertion is a separate operation with its own acceptance; it is not part of component installation.",
+    "r03 stopped at the CPU configuration password and r04 at an unloaded simulator tag list; both harness gaps were fixed and r05 continued from the same saved post-OB project."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e49474b2a071290e831f8c3b735c54f079116bd96bdc4c04c47b9c3cc033ad30"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9a3888362e7a30e461b325d2aae956f2d1d97a7e776f266e5a581c3c850346fb"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "d461df20094199d3d0393d6ebbe5b0d6f9db488592722108e4aac9246bb923a2"
+    }
+  ],
+  "runs": [
+    {
+      "report": "component-runtime-r05.json",
+      "sha256": "9eaa2c4521a66a833bd53b95d0874ab1fbb71dd8c438cbfc4250862f73f8ccdb",
+      "bytes": 20496,
+      "completed": true,
+      "steps": [
+        "author_new_source: explicitSourceAttributesVerified=True",
+        "author_new_source: sourceContentPolicyVerified=True",
+        "author_new_source: preservationVerified=True",
+        "author_new_source: freshReopenVerified=True",
+        "author_new_source: firstCheckpointRecoveryVerified=True",
+        "author_new_source: runtimeVerified=False",
+        "author_new_source: component_window_begin=reserved",
+        "author_new_source: component_window_start=library_prepared",
+        "author_new_source: observation=library_prepared",
+        "author_new_source: step_reviewed=prepared",
+        "author_new_source: response=library_applied",
+        "author_new_source: observation=library_applied",
+        "author_new_source: response=import_verified",
+        "author_new_source: observation=import_verified",
+        "author_new_source: response=graphical_prepared",
+        "author_new_source: observation=graphical_prepared",
+        "author_new_source: step_reviewed=prepared",
+        "author_new_source: response=graphical_applied",
+        "author_new_source: observation=graphical_applied",
+        "author_new_source: response=installation_verified",
+        "author_new_source: observation=installation_verified",
+        "author_new_source: component_window_owner-resume=installation_verified",
+        "author_new_source: component_window_owner-resume=active",
+        "author_new_source: component_window_recover=restored_to_new_locations",
+        "author_new_source: initial_checkpoint_restore_result=restored_to_new_locations",
+        "author_new_source: component_window_owner-resume=installation_verified",
+        "author_new_source: component_window_complete=released",
+        "plc_component_runtime: installedProjectVerified=False",
+        "plc_component_runtime: obCallVerified=True",
+        "plc_component_runtime: runtimeVerified=True"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "qualification_component_window",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_test",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

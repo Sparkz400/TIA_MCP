@@ -459,6 +459,7 @@ namespace TiaMcp.Openness.V21
             {
                 _scratchProject = _portal.Projects.Create(new DirectoryInfo(runDirectory), name);
                 stages.Add("project_created");
+                ComponentScratchLanguage(_scratchProject, result);
                 // Siemens requires an open project for catalog access. Never invent an order number.
                 string catalogFilter = "1511-1 PN";
                 if (!string.IsNullOrWhiteSpace(cpuType))

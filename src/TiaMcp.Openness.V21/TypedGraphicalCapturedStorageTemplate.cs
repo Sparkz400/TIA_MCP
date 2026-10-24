@@ -16,10 +16,6 @@ internal static class TypedGraphicalCapturedStorageTemplate
     internal const string Cpu = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1";
     internal const string FbName = "TiaMcpComponentGate";
     internal const string TypeName = "TiaMcpComponentState";
-    internal const string FbTypeGuid = "f566f7e9-d5bc-415e-b552-4828e3b1027c";
-    internal const string FbVersionGuid = "e129ccee-1eaa-456b-b2f7-1581fcc3b6b9";
-    internal const string UdtTypeGuid = "35c9be87-892c-4ce6-a724-545ab1d41683";
-    internal const string UdtVersionGuid = "eee41dd4-5137-48bb-a42b-d7fc64637eec";
     private static readonly XNamespace Interface = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
 
     internal sealed class Artifact
@@ -75,8 +71,15 @@ internal static class TypedGraphicalCapturedStorageTemplate
         if (string.IsNullOrWhiteSpace(plcPath) || !plcPath.StartsWith("/projects/", StringComparison.Ordinal) ||
             plcPath.EndsWith("/", StringComparison.Ordinal) || plcPath.Contains("//") || plcPath.Split('/').Any(p => p == "." || p == ".."))
             Fail("A complete exact current PLC scope path is required.");
-        ValidateBinding(callee, plcPath, "/blocks/" + FbName, FbTypeGuid, FbVersionGuid, new[] { UdtVersionGuid });
-        ValidateBinding(type, plcPath, "/types/" + TypeName, UdtTypeGuid, UdtVersionGuid, Array.Empty<string>());
+        // Library identities come from the exact reviewed plan (the adapter binds
+        // them through FindVersion); storage eligibility is the complete content
+        // equality below, so only identity shape and the one-edge closure are fixed here.
+        ValidateBinding(callee, plcPath, "/blocks/" + FbName, new[] { type?.VersionGuid });
+        ValidateBinding(type, plcPath, "/types/" + TypeName, Array.Empty<string>());
+        var identities = new[] { callee.TypeGuid, callee.VersionGuid, type.TypeGuid, type.VersionGuid };
+        if (identities.Any(id => !Guid.TryParse(id, out var parsed) || parsed == Guid.Empty || parsed.ToString("D") != id) ||
+            identities.Distinct(StringComparer.Ordinal).Count() != identities.Length)
+            Fail("Committed library identities must be complete, canonical and distinct.");
 
         var reference = Read(profile.ReferenceCallee); var referenceType = Read(profile.ReferenceType);
         var source = Read(callee.Document); var sourceType = Read(type.Document);
@@ -115,12 +118,11 @@ internal static class TypedGraphicalCapturedStorageTemplate
         return result;
     }
 
-    private static void ValidateBinding(Binding binding, string plcPath, string suffix, string type, string version, string[] dependencies)
+    private static void ValidateBinding(Binding binding, string plcPath, string suffix, string[] dependencies)
     {
         if (binding == null || binding.PlannedPath != plcPath + suffix || binding.NativePath != binding.PlannedPath ||
             binding.ScopePath != plcPath || binding.Namespace != "" || !binding.ScopeComplete || binding.NativeUseCount != 1 ||
-            binding.VersionState != "Committed" || binding.DoNotUse ||
-            binding.TypeGuid != type || binding.VersionGuid != version || binding.RequiredVersionGuids == null ||
+            binding.VersionState != "Committed" || binding.DoNotUse || binding.RequiredVersionGuids == null ||
             !binding.RequiredVersionGuids.OrderBy(x => x, StringComparer.Ordinal).SequenceEqual(dependencies.OrderBy(x => x, StringComparer.Ordinal)))
             Fail("Exact planned/native path, scope, committed library identity and dependency closure must agree.");
     }
