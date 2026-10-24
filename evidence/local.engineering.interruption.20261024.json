@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.engineering.interruption.20261024",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-10-24T18:38:31+00:00",
+  "source": {
+    "commit": "4d653aa808bf7cda4b3ddec0a4a9346040435bb4",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_interruption.py, TIA V21 owned scratch projects, one artifact root per scenario. Each scenario terminated the exact worker and its owned TIA, or the exact Host, at a journal-observed boundary; a fresh Host and fresh owned TIA called engineering_admission_reconcile once; the change journal was unchanged by reconciliation and no mutation was re-dispatched. Results: change_apply killed while applying -> released (project unchanged vs retrieved checkpoint); killed while checkpointing -> held (no complete checkpoint archive); Host killed while applying (dispatchIntent, worker finished and saved) -> released (project verifiedApplied: fresh fingerprint equals the journal's afterFingerprint); change_restore killed while retrieving -> held (partial destination project cannot be opened; original project unchanged, archive unchanged); project_retrieve killed -> released (destination verifiedApplied); scratch creation killed -> held (partial project cannot be opened); library_create_master_copy apply killed -> held; library two-checkpoint restore killed at its first retrieval -> released (7 resources: originals not written, archives unchanged, destinations without content); the real held simulation_download admission 63974f72776f486ebbbd111464869c2f -> released (report completed after admission and card manifest matched; project LastModified 13:27:15Z UTC before admission 13:28:13Z).",
+  "limitations": [
+    "Case restore-kill-preserving failed: the qualifier's plain 20 ms journal reads blocked the worker's File.Replace, so change_restore failed with EngineeringError before writing 'restoring' (journal.json.new left behind). Rerun after the fix in local.engineering.interruption.rerun.20261024.",
+    "The library_create_master_copy hold came from a matcher bug (a library checkpoint below its admitted directory was not matched, so write times decided); fixed and rerun in local.engineering.interruption.rerun.20261024.",
+    "Interruption is process termination of the worker and its owned TIA, or of the Host; power loss, disk faults and network transport to a remote worker are not exercised. Each scenario ran once; where the kill landed inside a phase is timing-dependent and recorded per case.",
+    "TIA reported Project.LastModified with DateTimeKind.Utc in every case."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "8389e5e4b07c3eb4fb5992f8b849f62f121ff6a5f0ffb8d63f463dd2e226991e"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "5102e63ded24944829ae9daa1db70f98f23c8f1c5c05d63e20f40ffafe898ffd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "interruption-b2.json",
+      "sha256": "4be0c2be99265d025acbbc6e6255162da5619188ea17122e30662ed71b62ff43",
+      "bytes": 509120,
+      "completed": false,
+      "steps": [],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
