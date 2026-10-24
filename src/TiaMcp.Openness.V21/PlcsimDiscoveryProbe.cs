@@ -6,6 +6,7 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.Connection;
+using Siemens.Engineering.Download;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.Online;
 using Siemens.Engineering.Upload;
@@ -19,13 +20,15 @@ namespace TiaMcp.Openness.V21
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false)
+        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false)
         {
+            if (lateDiscovery && !startCpu) throw new ArgumentException("Late discovery requires the explicit empty startup probe.");
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
             result["emptyStartupRequested"] = startCpu;
             result["portalMode"] = visible ? "WithUserInterface" : "WithoutUserInterface";
+            result["preStartDiscoverySkipped"] = lateDiscovery;
             Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
@@ -54,12 +57,12 @@ namespace TiaMcp.Openness.V21
                     if (projectDiscovery == null) throw new InvalidOperationException("Project discovery service is unavailable.");
                     result["cpu"] = cpu.TypeIdentifier;
 
-                    states.Add(Observe("A-nothing-touched", provider, projectDiscovery));
+                    states.Add(lateDiscovery ? Skipped("A-nothing-touched") : Observe("A-nothing-touched", provider, projectDiscovery));
                     runtimeInitializationAttempted = true;
                     result["runtimeVersion"] = SimulationRuntimeManager.Version.ToString("X8"); // initializes the PLCSIM Advanced API
                     result["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString();
                     var preexisting = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo.Select(i => new JObject { ["id"] = i.ID, ["name"] = i.Name }));
-                    var stateB = Observe("B-runtime-initialized", provider, projectDiscovery);
+                    var stateB = lateDiscovery ? Skipped("B-runtime-initialized") : Observe("B-runtime-initialized", provider, projectDiscovery);
                     stateB["registeredInstances"] = preexisting;
                     states.Add(stateB);
 
@@ -73,7 +76,7 @@ namespace TiaMcp.Openness.V21
                         owned = SimulationRuntimeManager.RegisterInstance(ECPUType.CPU1511, ownedName);
                         owned.StoragePath = Directory.CreateDirectory(Path.Combine(root.FullName, "sim", ownedName)).FullName;
                         result["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName, ["storagePath"] = owned.StoragePath };
-                        var stateC = Observe("C-owned-off-softbus-instance", provider, projectDiscovery);
+                        var stateC = lateDiscovery ? Skipped("C-owned-off-softbus-instance") : Observe("C-owned-off-softbus-instance", provider, projectDiscovery);
                         stateC["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName,
                             ["operatingState"] = owned.OperatingState.ToString(), ["communicationInterface"] = owned.CommunicationInterface.ToString() };
                         states.Add(stateC);
@@ -107,6 +110,18 @@ namespace TiaMcp.Openness.V21
                                 VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
                                 checkpoint();
                             }
+                            if (lateDiscovery)
+                            {
+                                result["discoveryMetadata"] = new JObject {
+                                    ["plc"] = DescribeDiscovery(provider, provider.Configuration),
+                                    ["project"] = DescribeDiscovery(projectDiscovery, projectDiscovery.Configuration) };
+                                checkpoint();
+                            }
+                            // Compare a provider whose configuration was not queried before startup.
+                            var download = AllItems(device.DeviceItems).Select(i => i.GetService<DownloadProvider>()).First(p => p != null);
+                            result["downloadProviderFirstObservation"] = ObserveConfiguration(download.Configuration);
+                            states.Add(Observe("C3-after-first-download-provider-query", provider, projectDiscovery));
+                            checkpoint();
                             owned.PowerOff(60000);
                             VerifySoleOwned(owned, ownedName, EOperatingState.Off);
                             result["ownedPowerOffVerified"] = true;
@@ -169,6 +184,32 @@ namespace TiaMcp.Openness.V21
         {
             if (SimulationRuntimeManager.RegisteredInstanceInfo.Count(i => i.ID == instance.ID && i.Name == name) != 1)
                 throw new InvalidOperationException("Owned simulator registration identity changed; no cleanup mutation attempted.");
+        }
+
+        private static JObject Skipped(string label) => new JObject {
+            ["state"] = label, ["discoverySkipped"] = true,
+            ["scope"] = "Delayed first enumeration experiment only; no pre-start discovery isolation proof and no provisioning authority." };
+
+        private static JObject DescribeDiscovery(IEngineeringObject provider, ConnectionConfiguration configuration)
+        {
+            var mode = configuration.Modes.Find("PN/IE");
+            var pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+            var result = new JObject();
+            foreach (var entry in new[] { new { Name = "provider", Target = provider },
+                new { Name = "configuration", Target = (IEngineeringObject)configuration },
+                new { Name = "mode", Target = (IEngineeringObject)mode },
+                new { Name = "pcInterface", Target = (IEngineeringObject)pc } })
+            {
+                if (entry.Target == null) { result[entry.Name] = null; continue; }
+                var actions = entry.Target.GetInvocationInfos().Take(65).ToArray();
+                var attributes = entry.Target.GetAttributeInfos().Take(65).ToArray();
+                result[entry.Name] = new JObject {
+                    ["type"] = entry.Target.GetType().FullName, ["actionsExecuted"] = false,
+                    ["truncated"] = actions.Length > 64 || attributes.Length > 64,
+                    ["actions"] = new JArray(actions.Take(64).Select(a => new JObject { ["name"] = a.Name, ["returnType"] = a.Type?.FullName })),
+                    ["attributes"] = new JArray(attributes.Take(64).Select(a => new JObject { ["name"] = a.Name, ["accessMode"] = a.AccessMode.ToString() })) };
+            }
+            return result;
         }
 
         private static JObject Observe(string label, OnlineProvider provider, StationUploadProvider projectDiscovery, int count = SnapshotsPerState)

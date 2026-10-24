@@ -274,3 +274,68 @@ Only the primary `main` checkout exists; no task branch or unused worktree was
 created. Unique native reports, UI captures, worker builds and manual/API evidence
 are retained. No full offline aggregate was rerun for this diagnostic lifetime
 change, and no runtime or release acceptance is inferred.
+
+### Delayed first enumeration and runtime metadata
+
+The explicit `--plcsim-late-discovery-probe <new-directory>` mode tests whether
+pre-start connection-configuration discovery affects later observations. It
+creates the same isolated scratch project and sole owned empty CPU, but skips
+all three pre-start discovery phases. Each skipped phase and the top-level
+`preStartDiscoverySkipped` field explicitly record the missing isolation proof;
+this diagnostic cannot authorize provisioning. Normal production provisioning
+and its pre-start isolation checks are unchanged. The first connection-
+configuration enumeration occurs only after the exact owned CPU reaches STOP.
+
+`artifacts/p24-late/` uses the `n24an` worker headlessly, with no UI action.
+Both providers return the exact endpoint in every one of 61 paired samples over
+65,033 ms; the first pair completes at 1,722 ms. Every sample reports address
+`192.168.0.1`, MAC `FF-FF-C0-A8-00-01`, series `S7-1500 CPU`, and the matching
+owned instance's address and Softbus interface. The independent
+`independent-assessment.json` checks the entire sequence, skipped phases and
+initial empty registration list, and binds the native report by hash. This
+supports a startup-order/cache hypothesis; it does not make omission of the
+production isolation check an acceptable remedy.
+
+After the samples, public runtime self-description reads action names, return
+types and attribute descriptors on each provider, its connection configuration,
+PN/IE mode and PLCSIM interface. All eight metadata observations are bounded and
+untruncated. Both PC interfaces expose only `GetAccessibleDevices` as an action;
+both modes expose none, and both configurations expose the two
+`ApplyConfiguration` overloads. No separate refresh action is advertised by
+these targets. No described action is invoked by the metadata reader, and no
+attribute value is written. Siemens documents this read-only descriptor route
+under [self-description](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/general-functions/self-description-support-for-attributes-navigators-actions-and-services).
+Context7 again fails to launch; no Context7 answer was substituted for native
+metadata or the official reference.
+
+OFF, unregister and connection disposal succeed. All ten job members are
+terminal; all eight retained handles exit zero and close. The storage helper
+again misses the normal deadline, so the overall coordinator remains failed.
+Source and worker-dependency pins remain unchanged. This establishes a headless
+endpoint observation in this specific ordering, not provisioning, full runtime,
+normal shutdown or preservation acceptance.
+
+The final diagnostic also records a first lookup through `DownloadProvider`
+after the 61 startup samples, then three follow-up observations through the
+original two providers. This lets the next comparison retain its pre-start
+baseline while testing a previously unqueried configuration. It performs no
+download, connection apply, credential submission or PLC write. The final
+`n24ao` worker builds cleanly, passes the compiled lifecycle guard and all 48
+ordered/mixed/duplicate diagnostic-mode refusal checks. The previous worker
+fails the newly added mode's negative control before Siemens loading. Source
+bindings validate with all historical evidence rows preserved.
+
+The fresh `artifacts/p24-fresh-provider/` comparison retains all pre-start
+observations. All 61 startup pairs over 63,346 ms, the first DownloadProvider
+lookup, and three subsequent original-provider pairs return only the
+placeholder. Its independent assessment checks all 129 device snapshots and
+pins the native report. No UI input, download or connection apply occurs.
+A previously unqueried provider therefore does not refresh the warm discovery
+cache in this experiment.
+
+OFF, unregister and connection disposal complete. All ten job members are
+terminal and all eight retained handles exit zero and close without forced
+termination. Source and worker pins remain unchanged. The normal deadline
+still fails because the storage helper exits late. The final guard assessment
+was read under the registry lock after the coordinator exited; these cleanup
+results do not release any earlier uncertain provisioning reservation.
