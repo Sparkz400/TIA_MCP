@@ -11,6 +11,7 @@ import os
 import pathlib
 from datetime import datetime, timezone
 from block_test_runtime import digest
+from typed_runtime_semantic_preservation import evaluate as semantic_runtime_preservation
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -35,6 +36,11 @@ def attempt(path):
     runtime = report.get("runtime", {})
     assertions = [assertion for case in runtime.get("cases", []) for step in case.get("steps", []) for assertion in step.get("assertions", [])]
     gates = {key: report.get(key) is True for key in GATES}
+    semantic = None
+    if not gates["runtimeVerified"] and report.get("runtimeBehaviorVerified") is True and report.get("runtimePreservation"):
+        # Retained observations judged by the integrator's semantic rule; the in-run byte verdict stays in the report.
+        semantic = semantic_runtime_preservation(report)
+        gates["runtimeVerified"] = semantic["verified"]
     if gates["runtimeVerified"]:
         assert runtime.get("status") == "passed" and runtime.get("caseCoverage", {}).get("fullSuitePassed") is True
         assert assertions and all(item.get("status") == "passed" for item in assertions), "Runtime pass lacks complete executed assertions: " + str(path)
@@ -59,6 +65,8 @@ def attempt(path):
         "assertionCount": len(assertions), "target": preview.get("target"), "operation": preview.get("operation"),
         "profiles": preview.get("profiles", []), "binaries": binaries,
         "failure": report.get("failure"), "runtimeStatus": runtime.get("status"), "runtimeFailures": failures,
+        "runtimeVerifiedBasis": "semantic-preservation.v1" if semantic and semantic["verified"] else ("in-run" if gates["runtimeVerified"] else None),
+        "semanticRuntimePreservation": semantic,
         "compileObservedSuccess": report.get("compileObservedSuccess", False),
         "failedChangeOriginalRecovered": report.get("failureRecoveryOriginalVerified", False),
         "failureRecoveryError": report.get("failureRecoveryError")}
@@ -95,6 +103,18 @@ def summarize(runs):
         "cells": cells, "attempts": records}
 
 
+def curation_report(ledger):
+    """One report in the shape scripts/curate_evidence.py reads: completed only when every selected cell passed all five gates."""
+    calls = []
+    for record in ledger["attempts"]:
+        report = json.loads((ROOT / record["report"]).read_bytes())
+        calls.extend({"name": call["tool"], "isError": call["status"] != "passed"} for call in report.get("calls", []))
+    cells = ledger["cells"]
+    return {"completed": bool(cells) and all(cell["allFiveGates"] for cell in cells),
+            "steps": [{"name": cell["fixtureId"] + ": " + ("passed" if cell["allFiveGates"] else "failed")} for cell in cells],
+            "toolCalls": calls, "ledgerCounts": ledger["counts"]}
+
+
 def markdown(ledger, markdown_path=None):
     markdown_path = pathlib.Path(markdown_path or ROOT / "docs/verification/typed-lad-fbd-qualification.md").resolve()
     counts = ledger["counts"]
@@ -115,8 +135,11 @@ if __name__ == "__main__":
     parser.add_argument("--run", action="append", required=True, type=pathlib.Path)
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "fixtures/typed-graphical/qualification.v1.json")
     parser.add_argument("--markdown", type=pathlib.Path, default=ROOT / "docs/verification/typed-lad-fbd-qualification.md")
+    parser.add_argument("--curation-report", type=pathlib.Path, help="Also write the aggregated report for scripts/curate_evidence.py.")
     args = parser.parse_args()
     ledger = summarize(args.run)
+    if args.curation_report:
+        args.curation_report.write_text(json.dumps(curation_report(ledger), indent=2) + "\n", encoding="utf-8")
     args.output.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     args.markdown.write_text(markdown(ledger, args.markdown), encoding="utf-8")
     print(json.dumps(ledger["counts"]))

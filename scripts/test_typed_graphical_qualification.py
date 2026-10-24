@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from xml.etree import ElementTree as ET
 
-from typed_graphical_native_expectations import topology, adapt_reference_bindings
+from typed_graphical_native_expectations import topology, adapt_reference_bindings, adapt_reference_culture, project_culture
 from qualify_typed_graphical import selected_blocks, snapshot, read_graph, independent_behavior
 from block_test_program import generate_program, inspect_interface
 from block_test_executor import validate_suite
@@ -24,6 +24,14 @@ class IndependentTopologyTests(unittest.TestCase):
             if "UId" in node.attrib:
                 node.set("UId", str(int(node.get("UId")) + 1000))
         self.assertEqual(topology(baseline), topology(ET.tostring(document, encoding="unicode")))
+
+    def test_reference_culture_moves_only_empty_text(self):
+        baseline = self.xml("Tgp_Boolean_LAD")
+        adapted, count = adapt_reference_culture(baseline, "en-US")
+        self.assertEqual((4, "en-US"), (count, project_culture(adapted)))
+        self.assertEqual(topology(baseline), topology(adapted))
+        with self.assertRaises(ValueError):
+            adapt_reference_culture(baseline.replace("<Text />", "<Text>Kommentar</Text>", 1), "en-US")
 
     def test_wrong_operand_and_wrong_comparison_do_not_match(self):
         baseline = self.xml("Tgp_Eq_LAD")

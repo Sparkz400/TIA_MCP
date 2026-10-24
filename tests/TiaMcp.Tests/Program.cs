@@ -248,6 +248,7 @@ internal static partial class Program
             ("Typed raw payload rejects unknown fields, nulls and JSON coercions", TypedGraphicalTests.RawPayloadRejectsUnknownNullAndCoercedValues),
             ("Typed payload identities reject line breaks without trimming or rewriting", TypedGraphicalTextBoundaryTests.CompleteIdentityTextIsRequired),
             ("Typed reader retains opaque native content and reports incomplete coverage", TypedGraphicalTests.ReaderRetainsOpaqueContentAndReportsCoverage),
+            ("Typed template cultures follow the target project without discarding text", TypedGraphicalTests.TemplateCulturesFollowTheTargetProject),
             ("Typed network insertion preserves prior XML with deterministic collision-free IDs", TypedGraphicalTests.InsertPreservesEntirePriorDocumentAndAllocatesDeterministically),
             ("Typed versions, languages and invalid topology fail closed", TypedGraphicalTests.VersionsLanguagesAndTopologyFailClosed),
             ("Typed operand resolution never guesses types or writable outputs", TypedGraphicalTests.TypesWritesAndUnresolvedOperandsNeverGuess),
