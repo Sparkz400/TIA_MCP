@@ -329,6 +329,16 @@ def diff(before,after):
     if changed or old!=new: result['affectedFeatureIds']=sorted(old|new)
     return result
 
+def refresh(binding_path, repo=ROOT):
+    """Recollect bindings, keeping each historical evidence input whose artifact is absent here."""
+    retained={e['path']:e for e in inventory.json_read(binding_path).get('evidenceInputs',[])}
+    value=collect(repo)
+    value['evidenceInputs']=[retained[e['path']] if e['state']=='missing' and e['path'] in retained else e for e in value['evidenceInputs']]
+    validate(value,repo,allow_missing_evidence=True)
+    staged=binding_path.with_name(binding_path.name+'.refresh')
+    staged.unlink(missing_ok=True); inventory.write_new(staged,value); staged.replace(binding_path)
+    return value
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('--repo',type=Path,default=ROOT)
     sub=parser.add_subparsers(dest='command',required=True)
@@ -336,10 +346,12 @@ def main():
     p=sub.add_parser('validate'); p.add_argument('binding',type=Path); p.add_argument('--allow-missing-evidence',action='store_true')
     p=sub.add_parser('impact'); p.add_argument('binding',type=Path); p.add_argument('--path',action='append',default=[]); p.add_argument('--evidence',action='append',default=[])
     p=sub.add_parser('diff'); p.add_argument('before',type=Path); p.add_argument('after',type=Path)
+    p=sub.add_parser('refresh'); p.add_argument('binding',type=Path)
     args=parser.parse_args()
     if args.command=='collect':
         value=collect(args.repo); validate(value); inventory.write_new(args.out,value); print(json.dumps(value['counts']))
     elif args.command=='validate': print(json.dumps(validate(inventory.json_read(args.binding),args.repo,allow_missing_evidence=args.allow_missing_evidence)))
+    elif args.command=='refresh': print(json.dumps(refresh(args.binding,args.repo)['counts']))
     elif args.command=='impact': print(json.dumps(impact(inventory.json_read(args.binding),args.path,args.evidence)))
     else: print(json.dumps(diff(inventory.json_read(args.before),inventory.json_read(args.after))))
 if __name__=='__main__': main()

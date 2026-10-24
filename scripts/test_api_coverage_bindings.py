@@ -57,6 +57,17 @@ class OpennessSession {
     def test_changed_mutation_population(self):
         x=self.collect(); y=copy.deepcopy(x); y['mutations'].clear()
         with self.assertRaises(ValueError): b.validate(y)
+    def test_refresh_updates_sources_and_keeps_absent_historical_evidence(self):
+        self.put('artifacts/proof.json','{"passed": true}')
+        binding=self.root/'bindings.json'; b.inventory.write_new(binding,self.collect())
+        observed=[e for e in b.inventory.json_read(binding)['evidenceInputs'] if e['path']=='artifacts/proof.json'][0]
+        (self.root/'artifacts/proof.json').unlink()
+        self.put('src/TiaMcp.Openness.V21/Other.cs','class Other { private object Helper() => 2; }')
+        with self.assertRaisesRegex(ValueError,'Stale'): b.validate(b.inventory.json_read(binding),self.root,allow_missing_evidence=True)
+        b.refresh(binding,self.root)
+        refreshed=b.inventory.json_read(binding)
+        self.assertTrue(b.validate(refreshed,self.root,allow_missing_evidence=True)['valid'])
+        self.assertIn(observed,refreshed['evidenceInputs'])
     def test_source_change_stales(self):
         x=self.collect(); self.put('src/TiaMcp.Openness.V21/Other.cs','class Other { private object Helper() => 2; }')
         with self.assertRaisesRegex(ValueError,'Stale'): b.validate(x,self.root)
