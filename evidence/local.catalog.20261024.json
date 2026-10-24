@@ -1,0 +1,48 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.catalog.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T08:53:13+00:00",
+  "source": {
+    "commit": "f6ab3a307ce02f837ec7e96212fd421dd0636e94",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/verify_feature_catalog.py: feature_catalog through MCP with native workers intentionally absent; full pagination, package catalog comparison, unimplemented backlog without bindings, sim_state history, and rejected invalid queries.",
+  "limitations": [
+    "Host-only; the catalog is a static bundled contract, so no TIA Portal or worker is involved and none is qualified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "dfcd1cb08739ae6208ca48a54f42c268d8635c8d8f9f2e4fe5590d0bdab2b255"
+    }
+  ],
+  "runs": [
+    {
+      "report": "feature-catalog.json",
+      "sha256": "1449674c502a5c121f9bb77d3274efba309a48e08f1e2964c658883f07694fa2",
+      "bytes": 5334,
+      "completed": true,
+      "steps": [
+        "catalog pagination without native workers",
+        "package catalog comparison without native workers",
+        "unimplemented backlog has no callable bindings",
+        "scoped empty startup success and historical failure do not qualify all CPU controls",
+        "rejected FeatureNotFound",
+        "rejected InvalidRequest"
+      ],
+      "toolsPassed": [
+        "feature_catalog"
+      ],
+      "toolsRejected": [
+        "feature_catalog"
+      ]
+    }
+  ]
+}

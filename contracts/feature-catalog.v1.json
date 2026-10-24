@@ -1142,6 +1142,92 @@
         "safety_inspect returned UnsupportedCapability on the non-safety scratch CPU; safety is not covered.",
         "One generated scratch fixture; results are not evidence for arbitrary customer projects, protection states or large-scale completeness."
       ]
+    },
+    {
+      "id": "local.library_intake.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+        "passedScope": "scripts/qualify_library_intake.py through the stdio MCP Host with native workers intentionally absent: chunked upload with host restart and byte-identical retry, incomplete commit rejected, repeated commit, package staging, paged candidate inspection, documents, upload release, durable package status across restart, package release, ZIP traversal rejected."
+      },
+      "artifacts": [
+        "evidence/local.library_intake.20261024.json"
+      ],
+      "limitations": [
+        "Host-only by design: upload and package intake run in the Host and no Siemens worker is involved; this is not native library import, compatibility or compilation evidence.",
+        "Synthetic ZIP fixture; no vendor authenticity claim."
+      ]
+    },
+    {
+      "id": "local.hardware.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+        "passedScope": "scripts/smoke_hardware_to.py --skip-technology on a new worker-owned TIA V21 scratch project (CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1): hardware catalog search and catalog-driven central DI/DO/AI/AO module plug, address, attribute and delete changes with prepare/apply and readback, UDT and tag table XML read and roundtrip, software and engineering reads, detach."
+      },
+      "artifacts": [
+        "evidence/local.hardware.20261024.json"
+      ],
+      "limitations": [
+        "Technology objects were skipped (--skip-technology); PID, axis and encoder routes are not covered by this record.",
+        "One generated scratch project and the default central I/O families; no distributed I/O, safety modules or customer hardware configurations."
+      ]
+    },
+    {
+      "id": "local.reliability.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+        "passedScope": "scripts/qualify_reliability.py --live --modes early-exit with a checkpoint journal from local.milestones.20261024: fresh Host reads the persisted change journal (change_status), owned TIA V21 start, wrong archive hash rejected, hash-verified checkpoint retrieval into a new owned project, read-only observer attach and detach on the owner's process, owner session status preserved after observer detach and observer Host exit, block XML unchanged, second retrieval from a fresh Host into a new directory."
+      },
+      "artifacts": [
+        "evidence/local.reliability.20261024.json"
+      ],
+      "limitations": [
+        "Only the early-exit fake-worker mode ran; the other ten failure-boundary modes fail against the current Host because the fake worker predates mutation_begin, and are not part of this record.",
+        "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
+        "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only."
+      ]
+    },
+    {
+      "id": "local.sim.creation.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+        "passedScope": "scripts/qualify_simulator_creation.py through two MCP Hosts and the local simulator worker: empty registry, owned CPU1511 creation in OFF, durable creation receipt, ownership refused to a second Host until the creator exits, adoption after verified worker exit, owned release with exact unregistration, empty registry again."
+      },
+      "artifacts": [
+        "evidence/local.sim.creation.20261024.json"
+      ],
+      "limitations": [
+        "Empty CPU only; no power-on, download, program, RUN or I/O behavior is covered.",
+        "Ran while a separate TIA Portal run was active on this PC; no Portal-simulator interaction was exercised."
+      ]
+    },
+    {
+      "id": "local.reviews.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+        "passedScope": "scripts/qualify_project_reviews.py on a new owned TIA V21 scratch project: owned session status, two source changes with zero-error compile, before/after review snapshots, marker search, snapshot comparison and health report, then a fresh Host restart with identical persisted comparison, search and health report."
+      },
+      "artifacts": [
+        "evidence/local.reviews.20261024.json"
+      ],
+      "limitations": [
+        "One scratch project with two SCL marker revisions; the network subnet check (--check-network) was not run.",
+        "Review content is checked for the planted markers and stable comparison, not for completeness on large projects."
+      ]
     }
   ],
   "features": [
@@ -1250,16 +1336,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.reliability.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -1293,16 +1378,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.reliability.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -1510,16 +1594,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.restart.v02"
+          "local.reliability.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -1728,7 +1811,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.20261024"
+          "local.milestones.20261024",
+          "local.hardware.20261024"
         ]
       },
       "availability": {
@@ -1768,16 +1852,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.hardware.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -2167,16 +2250,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.hardware.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -2575,16 +2657,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.package.v02"
+          "local.sim.creation.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -2619,16 +2700,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.download.v02"
+          "local.sim.creation.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -2910,16 +2990,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.download.v02"
+          "local.sim.creation.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -5937,16 +6016,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Writable bounded artifact storage is required."
         ]
       },
       "prerequisites": [
@@ -6063,16 +6141,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Writable bounded artifact storage is required."
         ]
       },
       "prerequisites": [
@@ -6147,16 +6224,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Writable bounded artifact storage is required."
         ]
       },
       "prerequisites": [
@@ -6189,16 +6265,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Writable bounded artifact storage is required."
         ]
       },
       "prerequisites": [
@@ -6231,16 +6306,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Writable bounded artifact storage is required."
         ]
       },
       "prerequisites": [
@@ -7931,16 +8005,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "sim.creation.20261009"
+          "local.sim.creation.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires an exact creationId and the current-user protected receipt on the simulation machine.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Requires an exact creationId and the current-user protected receipt on the simulation machine."
         ]
       },
       "prerequisites": [
@@ -8022,17 +8095,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "reviews.native.20261009",
-          "reviews.native.diamond.20261012"
+          "local.reviews.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
         ]
       },
       "prerequisites": [
@@ -8066,17 +8137,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "reviews.native.20261009",
-          "reviews.native.diamond.20261012"
+          "local.reviews.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
         ]
       },
       "prerequisites": [
@@ -8112,17 +8181,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "reviews.native.20261009",
-          "reviews.native.diamond.20261012"
+          "local.reviews.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
         ]
       },
       "prerequisites": [

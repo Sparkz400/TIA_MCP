@@ -1,0 +1,64 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.sim.creation.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T09:03:33+00:00",
+  "source": {
+    "commit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_simulator_creation.py through two MCP Hosts and the local simulator worker: empty registry, owned CPU1511 creation in OFF, durable creation receipt, ownership refused to a second Host until the creator exits, adoption after verified worker exit, owned release with exact unregistration, empty registry again.",
+  "limitations": [
+    "Empty CPU only; no power-on, download, program, RUN or I/O behavior is covered.",
+    "Ran while a separate TIA Portal run was active on this PC; no Portal-simulator interaction was exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "21030d089231770beaf8d0aac36102e00b6eb6c6d176b13f65a4a02e2af66a65"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "c25667d78b8bd0609d643163a7349a9d8081e722ddb22dfd876b27e331d2ccac"
+    }
+  ],
+  "runs": [
+    {
+      "report": "sim-creation.json",
+      "sha256": "3a52e08eb1aff85c0b830754167a842e5d9addd2cc10e71d5da39f2db64feab9",
+      "bytes": 26596,
+      "completed": true,
+      "steps": [
+        "sim_status",
+        "sim_create",
+        "sim_creation_status",
+        "sim_select",
+        "sim_select",
+        "sim_select",
+        "sim_status",
+        "sim_creation_status",
+        "sim_select",
+        "sim_release",
+        "sim_creation_status",
+        "sim_status"
+      ],
+      "toolsPassed": [
+        "sim_create",
+        "sim_creation_status",
+        "sim_release",
+        "sim_select",
+        "sim_status"
+      ],
+      "toolsRejected": [
+        "sim_select"
+      ]
+    }
+  ]
+}

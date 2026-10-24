@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.smoke.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T08:53:12+00:00",
+  "source": {
+    "commit": "f6ab3a307ce02f837ec7e96212fd421dd0636e94",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/smoke_mcp.py --scratch through the stdio MCP Host: capabilities and discovery, owned headless TIA V21 start, new scratch project with zero-error compile, inventory, SCL block XML export, FC-to-FB cross-reference, detach of the owned Portal.",
+  "limitations": [
+    "One generated scratch project with standard SCL blocks; no customer project, other languages, protection states or attachment to an existing Portal.",
+    "Exercises only the listed tools; inventory and references are checked for the expected fixture objects, not for completeness on large projects."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "dfcd1cb08739ae6208ca48a54f42c268d8635c8d8f9f2e4fe5590d0bdab2b255"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8c152b4302faf7a80422c88c3d0a850bc5b62a81ea684e89f54661d3e17510a8"
+    }
+  ],
+  "runs": [
+    {
+      "report": "smoke-scratch.json",
+      "sha256": "416fcba7e75087222a9b3ccbe35ecc27216858c0d36c59fd80940e8b158496ba",
+      "bytes": 69175,
+      "completed": true,
+      "steps": [
+        "initialize",
+        "tools/list",
+        "capabilities",
+        "discovery",
+        "start isolated TIA",
+        "create scratch",
+        "scratch inventory",
+        "scratch block export",
+        "scratch references",
+        "detach scratch"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "project_inventory",
+        "tia_capabilities",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start",
+        "xref_query"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
