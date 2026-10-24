@@ -150,7 +150,7 @@ def run_case(case, args, output):
     else:
         report["binaries"] = binary_manifest(args.host, args.worker, args.sim_worker if args.live else None)
         # TIA limits project directories to 143 characters; keep native roots short.
-        native_artifacts = ROOT / "artifacts" / ("q" + uuid.uuid4().hex[:6])
+        native_artifacts = pathlib.Path(getattr(args, "artifacts", None) or ROOT / "artifacts").resolve() / ("q" + uuid.uuid4().hex[:6])
         native_artifacts.mkdir(exist_ok=False)
         report["nativeArtifacts"] = str(native_artifacts)
         session = TypedOwnedSession(args.host, args.worker, native_artifacts, report, persist,
@@ -455,6 +455,7 @@ def main():
     parser.add_argument("--timeout", type=int, default=330, help="Configured transport request bound in seconds.")
     parser.add_argument("--sim-worker", type=pathlib.Path)
     parser.add_argument("--output", type=pathlib.Path, required=True)
+    parser.add_argument("--artifacts", type=pathlib.Path, help="Native host artifact root; choose a short path for TIA's 143-character project limit.")
     parser.add_argument("--stop-file", type=pathlib.Path, help="Presence-only sentinel; finish active case and cleanup, then admit no next case.")
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--engineering-only", action="store_true", help="Skip runtime harness generation; never claims behavioral qualification.")
