@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "1ce636b1515d63288084b73bbbfddcb542ec5e4c640be576cbb1245e604e8e97",
-      "bytes": 695169
+      "sha256": "3f9eb5b6505b85e52c8ddb5282de1172ec53511f2c794fd58c65f233ea9488b1",
+      "bytes": 696153
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -86949,21 +86949,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.sim.startup.v02",
-          "profileSha256": "b386c47d89bce8ce0c521bfb28ed5c5beade9733d60a536af21fa01dc33baf10",
+          "id": "local.sim.state.20261024",
+          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
           "artifacts": [
-            "artifacts/simulator-startup-validation.json"
-          ]
-        },
-        {
-          "id": "local.sim.startup.20261024",
-          "profileSha256": "46b4ddeb54d904eb1307e20db7aae39a6a9da71bfd440b36d92dd2dac8dd1cf1",
-          "artifacts": [
-            "artifacts/p24-simstate04/request.json",
-            "artifacts/p24-simstate04/startup.json",
-            "artifacts/p24-simstate04/result.json",
-            "artifacts/p24-simstate04/owned-job-terminal.json",
-            "docs/verification/simulator-startup-20261024.md"
+            "evidence/local.sim.state.20261024.json"
           ]
         }
       ],
@@ -91374,6 +91363,11 @@
       "sha256": "fd4e17cf687b3b681602f4f22257afc341639a82065fc67f1d6fd9f238f832a0"
     },
     {
+      "path": "evidence/local.sim.state.20261024.json",
+      "state": "observed",
+      "sha256": "adbf2ad4b7b84c01b8aca8368f906486949a9b26c9c5b37e31c3a4334c166a2f"
+    },
+    {
       "path": "evidence/local.smoke.20261024.json",
       "state": "observed",
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
@@ -91587,6 +91581,10 @@
     {
       "id": "local.sim.startup.v02",
       "profileSha256": "b386c47d89bce8ce0c521bfb28ed5c5beade9733d60a536af21fa01dc33baf10"
+    },
+    {
+      "id": "local.sim.state.20261024",
+      "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff"
     },
     {
       "id": "local.smoke.20261024",
