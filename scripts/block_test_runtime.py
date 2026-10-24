@@ -171,6 +171,34 @@ def verify_memory_card(download):
             "runtimeReadbackVerified": False}
 
 
+def save_generated_scratch_project(call, download):
+    """Explicitly checkpoint, compile and save the card generator's exact project."""
+    from compilation_evidence import require_compile_only
+    project = download.get("project", {}).get("path")
+    plc = download.get("plcPath")
+    if (not isinstance(project, str) or not pathlib.Path(project).is_absolute()
+            or pathlib.Path(project).suffix.lower() != ".ap21" or not isinstance(plc, str) or not plc
+            or type(download.get("processId")) is not int or download["processId"] <= 0):
+        raise RuntimeError("Generated-state save requires the exact downloaded project and PLC.")
+    prepared = call("change_prepare", {"kind": "plc_compile", "plcPath": plc, "payload": {}})
+    preview = prepared.get("preview", {})
+    effects = preview.get("effects")
+    if (preview.get("project", {}).get("path") != project or preview.get("kind") != "plc_compile"
+            or preview.get("payload") != {} or prepared.get("state") != "prepared"
+            or not isinstance(effects, list) or len(effects) != 1 or not isinstance(effects[0], dict)
+            or effects[0].get("action") != "compile" or effects[0].get("plcPath") != plc
+            or not isinstance(prepared.get("changeId"), str) or not prepared["changeId"]
+            or prepared["changeId"] != preview.get("changeId")
+            or not isinstance(prepared.get("previewHash"), str) or not prepared["previewHash"]
+            or type(prepared.get("processId")) is not int or prepared["processId"] <= 0
+            or prepared["processId"] != download.get("processId")):
+        raise RuntimeError("Generated-state save preparation differs from the downloaded project.")
+    applied = call("change_apply", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
+        "idempotencyKey": uuid.uuid4().hex, "checkpointSave": True, "compile": True, "save": True})
+    require_compile_only(prepared, applied, plc)
+    return {"prepared": prepared, "applied": applied}
+
+
 def verify_credential_provisioning(provisioned, download, *, trust_owned_empty_cpu_certificate=False):
     """Bind provisioning evidence to the already verified generated image and owned CPU.
 
@@ -330,6 +358,11 @@ class McpRuntimeBackend:
             self._uncertain("simulation_download_outcome_unverified", "simulation_download", error)
             raise
         if self.provision_runtime_credential:
+            try:
+                self.evidence["generatedProjectSave"] = save_generated_scratch_project(self.native, download)
+            except Exception as error:
+                self._uncertain("generated_project_save_unverified", "change_apply", error)
+                raise
             provision_arguments = dict(download_arguments)
             if self.trust_owned_empty_cpu_certificate:
                 provision_arguments["trustOwnedEmptyCpuCertificate"] = True

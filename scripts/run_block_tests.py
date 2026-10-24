@@ -202,17 +202,44 @@ def wait_owned_tia_exit(watcher, attempted, record, timeout_ms=120000):
 
 
 class CaseSessionAudit(NativeAudit):
-    """Read the exact qualified scratch project in a new owned session."""
-    ALLOWED_TOOLS = (NativeAudit.ALLOWED_TOOLS - {"tia_create_scratch", "change_prepare", "change_apply", "change_status"}) | {"project_open"}
+    """Read the qualified scratch; allow one exact generated-state save for provisioning."""
+    ALLOWED_TOOLS = (NativeAudit.ALLOWED_TOOLS - {"tia_create_scratch", "change_status"}) | {"project_open"}
 
-    def __init__(self, client, records, persist, project_path):
+    def __init__(self, client, records, persist, project_path, *, allow_generated_state_save=False):
         super().__init__(client, records, persist)
         self.project_path = project_path
+        self.allow_generated_state_save = allow_generated_state_save
+        self.generated_plc_path = self.compile_change = None
+        self.generated_save_attempted = False
 
     def __call__(self, name, arguments=None):
         if name == "project_open" and arguments != {"path": self.project_path}:
             raise ValueError("A case may reopen only its exact already qualified scratch project.")
-        return super().__call__(name, arguments)
+        if name == "change_prepare":
+            if (not self.allow_generated_state_save or self.generated_save_attempted or not self.generated_plc_path or arguments != {
+                    "kind": "plc_compile", "plcPath": self.generated_plc_path, "payload": {}}):
+                raise ValueError("A case may prepare only its downloaded PLC's explicit generated-state save.")
+            self.generated_plc_path = None
+            self.generated_save_attempted = True
+        if name == "change_apply":
+            prepared = self.compile_change
+            if (not self.allow_generated_state_save or prepared is None or not isinstance(arguments, dict)
+                    or set(arguments) != {"changeId", "previewHash", "idempotencyKey", "checkpointSave", "compile", "save"}
+                    or arguments["changeId"] != prepared["changeId"] or arguments["previewHash"] != prepared["previewHash"]
+                    or not isinstance(arguments["idempotencyKey"], str) or not re.fullmatch(r"[0-9a-f]{32}", arguments["idempotencyKey"])
+                    or any(arguments[flag] is not True for flag in ("checkpointSave", "compile", "save"))):
+                raise ValueError("A case may apply only its exact checkpointed compile/save preparation once.")
+            self.compile_change = None
+        result = super().__call__(name, arguments)
+        if name == "simulation_download" and self.allow_generated_state_save:
+            if result.get("project", {}).get("path") != self.project_path or not isinstance(result.get("plcPath"), str) or not result["plcPath"]:
+                raise ValueError("The generated card must identify this case's exact qualified project and PLC.")
+            self.generated_plc_path = result["plcPath"]
+        if name == "change_prepare":
+            if result.get("preview", {}).get("project", {}).get("path") != self.project_path:
+                raise ValueError("Generated-state preparation changed the case project.")
+            self.compile_change = result
+        return result
 
 
 class CaseRuntimeBackend(McpRuntimeBackend):
@@ -265,7 +292,8 @@ class CaseRuntimeBackend(McpRuntimeBackend):
         required = CaseSessionAudit.ALLOWED_TOOLS | ({"simulation_discovery_baseline", "simulation_provision_scratch_credential"} if self.provision_runtime_credential else set())
         if required - available:
             raise RuntimeError("Required case MCP tools unavailable: " + ", ".join(sorted(required - available)))
-        self.session_call = CaseSessionAudit(self.client, self.audit["calls"], self.persist, self.project_path)
+        self.session_call = CaseSessionAudit(self.client, self.audit["calls"], self.persist, self.project_path,
+                                            allow_generated_state_save=self.provision_runtime_credential)
         self.attached = True  # A failed start can still leave an owned partial attachment.
         self.tia_start_attempted = True
         started = self._call("tia_start")
@@ -765,7 +793,7 @@ def main(argv=None):
     parser.add_argument("--host", type=pathlib.Path, default=ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker executable; required for either native mode.")
     parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker executable; required only for --live.")
-    parser.add_argument("--provision-runtime-credential", action="store_true", help="With --live, provision each owned instance with its generated scratch credential before normal power-on.")
+    parser.add_argument("--provision-runtime-credential", action="store_true", help="With --live, explicitly checkpoint/compile/save generated scratch state, then provision each owned instance before normal power-on.")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true",
                         help="With provisioning, authorize first-use TLS trust for each owned empty CPU, pinned within each attempt.")
     parser.add_argument("--timeout", type=int, default=300)

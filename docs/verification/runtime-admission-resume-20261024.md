@@ -229,6 +229,82 @@ actual provisioning route and independently retrieve/read back its archive under
 retained process ownership; complete storage reconciliation still needs a provider
 that respects the opaque-content boundary.
 
+## Native provisioning checkpoint and saved-state sequencing
+
+Two fresh actual MCP attempts use the frozen `n24ah` Host, `n24aj` V21 worker
+and `n24` simulator worker. Their original requests, binary/dependency hashes,
+calls, retained process handles and kernel-job accounting are preserved under
+`artifacts/p24cp` and `artifacts/p24cp2`. Neither attempt requests RUN or first-use
+TLS trust, retries provisioning, or releases an uncertain mutation admission.
+
+The first attempt reproduces `UnsavedProject` immediately after successful
+memory-card generation. The scratch project had been explicitly saved by the
+preceding simulation-setting change, but native generation leaves it modified.
+The provisioning guard correctly refuses before creating an archive, checkpoint
+stream or provisioning report. Exact owned simulator unregistration and Host exit
+are verified. This exposes a missing explicit save step in the runtime callers;
+it is not a reason to bypass the saved-project guard or silently save user edits.
+
+The second attempt inserts the existing `plc_compile` prepare/apply operation
+with the exact returned PLC path and `checkpointSave`, `compile` and `save`
+enabled. Its original preview, process identity, complete compiler diagnostics
+and ordered checkpoint/save stages pass `require_compile_only`. Provisioning
+then creates `before-provision.zap21` (395,884 bytes, SHA-256
+`995103e567f2e4ecac88702a63a554361c9e5f60b06c02ec178bf9ec8dd23f06`).
+Independent inspection confirms the archive receipt is durably recorded before
+card staging and empty-CPU startup, and its recovery scope exactly matches the
+Host's durable admission. Five altered-evidence controls are rejected. The
+verifier reads the project archive and original generated card only; it does not
+open opaque runtime storage contents.
+
+The second attempt still fails at `discoverExactRuntimeAddress` with
+`SimulationProvisionTargetAmbiguous`. It neither opens nor submits the credential.
+The original generated card matches every original file's size/hash after cleanup,
+and exact owned unregistration succeeds. Admission
+`f52861eccea147ce96158249e7a16759` remains `outcomeUnknown`; verified card restoration
+and archive creation do not establish full project/storage preservation or release
+that reservation. The independent receipt is
+`artifacts/p24cp2/checkpoint-verified.json`.
+
+Both jobs are fully terminal: sixteen members in the first and seventeen in the
+second, without coordinator-forced termination. Both Portal/crash-detector pairs
+return `0xffffffff`; both storage helpers exit naturally after their terminal
+deadlines. Host and bridge workers exit with code zero. Normal native lifecycle
+remains failed.
+
+Independent archive retrieval is attempted through a fresh coordinator window
+with the original storage included in its reservation scan. That scan refuses the
+overlapping `outcomeUnknown` admission before starting a Host, worker or TIA.
+`artifacts/p24cr/window-close.json` retains the refusal and successful lock closure.
+No retrieval occurs, the reservation is not bypassed, and no archive-restoration or
+full project-preservation claim is made. A trusted checkpoint-read recovery route
+is required before independent native retrieval/readback can proceed.
+
+Both Python runtime callers now use the existing explicit compile-only operation
+between verified card generation and provisioning. Preparation must identify the
+same project, exact PLC and worker process; application must retain the original
+preview and prove ordered checkpoint/compile/save stages with complete diagnostics.
+The per-case audit permits only that opt-in operation for its own downloaded
+project, once. A failed or unverifiable save stops provisioning and leaves project
+uncertainty unresolved even after simulator unregistration.
+
+The previous runtime backend reproduces `UnsavedProject` in the regression control;
+the repaired block-test suite passes 192 checks with one existing skip. Checks cover
+foreign targets, malformed preparation, missing save evidence, incomplete compiler
+diagnostics, one-use admission and uncertain-save cleanup. The updated caller also
+accepts the original native prepare/apply receipts in a read-only compatibility
+check. That is retained-receipt evidence, not a new end-to-end native runner pass.
+Logs and the compatibility receipt are under
+`artifacts/todo-resume-20261024/generated-save-*`.
+
+The full Python suite passes 1,952 tests with one existing skip. Current source
+bindings validate without changes, retain all historical evidence, and report 106
+unavailable historical inputs with release acceptance false. The final read-only
+native guard scan verifies ten terminal tickets; no TIA/bridge/file-storage process
+from these attempts remains running. Only the primary `main` checkout exists, so
+there is no task branch or worktree to remove. Unique native evidence and the
+unresolved project/storage admission remain retained.
+
 ## Remaining work
 
 The reviewed placeholder exclusion is already in public `main` through `54f0237`;

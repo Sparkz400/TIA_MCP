@@ -5,7 +5,7 @@ import json
 import pathlib
 
 from smoke_mcp import Client, ROOT
-from block_test_runtime import verify_credential_provisioning, verify_download, verify_memory_card, verify_owned_instance
+from block_test_runtime import verify_credential_provisioning, verify_download, verify_memory_card, verify_owned_instance, save_generated_scratch_project
 
 
 def artifact_path(value, suffix=None):
@@ -64,7 +64,7 @@ def main(argv=None):
     parser.add_argument("--host", type=pathlib.Path, default=ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker build for an isolated host run.")
     parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker build for an isolated host run.")
-    parser.add_argument("--provision-runtime-credential", action="store_true", help="Provision this owned simulator with the exact generated scratch credential before normal power-on.")
+    parser.add_argument("--provision-runtime-credential", action="store_true", help="Explicitly checkpoint/compile/save generated scratch state, then provision this owned simulator before normal power-on.")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true",
                         help="Authorize first-use TLS trust only for this owned empty CPU, pinned within this attempt; requires --provision-runtime-credential.")
     args = parser.parse_args(argv)
@@ -127,6 +127,9 @@ def main(argv=None):
             provision_arguments = dict(download_arguments)
             if args.trust_owned_empty_cpu_certificate:
                 provision_arguments["trustOwnedEmptyCpuCertificate"] = True
+            if download.get("project", {}).get("path") != str(project):
+                raise RuntimeError("Generated-state save must target the exact opened scratch project.")
+            report["generatedProjectSave"] = save_generated_scratch_project(call, download)
             provisioned = call("simulation_provision_scratch_credential", provision_arguments)
             report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download,
                 trust_owned_empty_cpu_certificate=args.trust_owned_empty_cpu_certificate)

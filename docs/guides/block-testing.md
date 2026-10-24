@@ -58,6 +58,15 @@ python scripts/run_block_tests.py --live --provision-runtime-credential `
 
 This flag is rejected without `--live`. Only opted-in runs require the provisioning operation, and the flag is recorded in the index and each suite report. Original card hashes are verified before provisioning. The response must match that revision and exact instance, confirm empty startup and restoration of the original program card, preserve protection, identify a report in that instance's storage and return OFF. The backend independently rechecks the same original manifest after provisioning and records `restoredMemoryCard` before normal protected-program power-on. Runtime-created protection storage does not replace the original generated-card evidence. The installer-required restart, scoped credential provisioning and eight-assertion protected baseline have passed; nine-family runtime qualification remains pending; see [current runtime evidence](simulation.md#post-restart-check-and-credential-investigation--8-october-2026).
 
+Provisioning also explicitly checkpoints, compiles and saves the exact scratch PLC
+after card generation, because native generation can leave the project modified.
+The runner retains and validates that prepare/apply receipt as `generatedProjectSave`
+before requesting the separate provisioning archive. A missing, mismatched or
+incomplete save stops provisioning and further cases; successful simulator cleanup
+does not resolve an uncertain project save. A case permits this save only for its
+own downloaded project/PLC, once, with all checkpoint/compile/save flags enabled.
+This does not add implicit saving to the provisioning tool or non-provisioning runs.
+
 The additional `--trust-owned-empty-cpu-certificate` flag requires provisioning and explicit authorization for first-use trust on each fresh owned empty CPU. It is false by default and is recorded in the index, suite and instance evidence. Each attempt pins its first observed certificate and rejects any subsequent change; fresh instances have different fingerprints. The backend requires the exact attempt pin, one untruncated certificate, valid dates, revalidated ownership, and a recorded `Trusted` decision before normal startup. `certificateIdentityIndependentlyVerified` remains false: caller-authorized first-use trust does not establish CA authentication. The user authorized this scoped trust for the baseline and corpus. Attempt fifteen first passed the protected baseline, and attempt seventeen reconfirmed it with the current evidence snapshot (`artifacts/runtime-proof-20261008/evidence-snapshot-20261008T113602982412Z.json`) and binary manifest (`artifacts/runtime-proof-20261008/provisioned-17-binaries.json`). Nine-family runtime qualification remains incomplete.
 
 ## Execution and timing

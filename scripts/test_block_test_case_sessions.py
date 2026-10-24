@@ -20,6 +20,7 @@ class CaseClient:
     def __init__(self, program, project, ordinal, events, fault=None):
         self.simulator = Simulator(program)
         self.project, self.ordinal, self.events, self.fault = project, ordinal, events, fault
+        self.simulator.project = project
         self.process = types.SimpleNamespace(returncode=7 if fault == "exit" else 0)
 
     def notify(self, *args):

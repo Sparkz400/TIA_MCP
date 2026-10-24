@@ -59,6 +59,8 @@ class Simulator:
         self.counter_increment = 1
         self.provision_overrides = {}
         self.storage = (run_block_tests.ROOT / "artifacts/block-tests/fake-instance").resolve()
+        self.project = str(self.storage / "owned.ap21")
+        self.plc = "/projects/Owned/devices/Station/items/CPU/plc/PLC"
 
     def __call__(self, tool, arguments):
         self.calls.append((tool, copy.deepcopy(arguments)))
@@ -67,10 +69,20 @@ class Simulator:
         if tool == "sim_create":
             return {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"}, "downloadTicket": "TOP-SECRET-TICKET"}
         if tool == "simulation_download":
-            return {"completed": True, "download": {"state": "Success", "errors": self.download_errors, "truncated": False, "messages": []},
+            return {"completed": True, "project": {"path": self.project}, "plcPath": self.plc, "processId": 1,
+                    "download": {"state": "Success", "errors": self.download_errors, "truncated": False, "messages": []},
                     "compilation": {"state": "Success", "errors": 0, "truncated": False, "messages": []}, "instanceId": self.download_id,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
                     "reportPath": str(self.storage / "simulation-download.json"), "memoryCardPath": str(self.storage / "SIMATIC_MC")}
+        if tool == "change_prepare":
+            from test_compilation_evidence import compile_only_records
+            assert arguments == {"kind": "plc_compile", "plcPath": self.plc, "payload": {}}
+            self.prepared_save, self.applied_save = compile_only_records(self.plc, self.project, 1)
+            return copy.deepcopy(self.prepared_save)
+        if tool == "change_apply":
+            assert arguments["changeId"] == self.prepared_save["changeId"]
+            assert all(arguments[k] is True for k in ("checkpointSave", "compile", "save"))
+            return copy.deepcopy(self.applied_save)
         if tool == "simulation_provision_scratch_credential":
             return {"completed": True, "credentialProvisioned": True, "instanceId": 0, "instanceName": "owned",
                     "originalProgramRevision": "a" * 64, "operatingState": "Off", "protectionDisabled": False,
@@ -162,7 +174,7 @@ class BackendTests(unittest.TestCase):
         names = [tool for tool, _ in self.native.calls]
         download_index = names.index("simulation_download")
         provision_index = names.index("simulation_provision_scratch_credential")
-        self.assertEqual(download_index + 1, provision_index)
+        self.assertEqual(["change_prepare", "change_apply"], names[download_index + 1:provision_index])
         self.assertEqual(self.native.calls[download_index][1], self.native.calls[provision_index][1])
         self.assertEqual("powerOn", self.native.calls[provision_index + 1][1]["action"])
         self.assertEqual(["simulation_download", "simulation_provision_scratch_credential"], verification_phases)
@@ -518,7 +530,8 @@ class BaselineCliTests(unittest.TestCase):
             path.write_text("fixture", encoding="utf-8")
         report_path = root / "report.json"
         events, requests = [], []
-        download = {"completed": True, "download": {"state": "Success", "errors": 0, "truncated": False, "messages": []},
+        download = {"completed": True, "project": {"path": str(project)}, "plcPath": "/projects/P/plc/PLC", "processId": 1,
+                    "download": {"state": "Success", "errors": 0, "truncated": False, "messages": []},
                     "compilation": {"state": "Success", "errors": 0, "truncated": False, "messages": []}, "instanceId": 0,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
                     "reportPath": str(root / "simulation-download.json"), "memoryCardPath": str(root / "SIMATIC_MC"),
@@ -542,6 +555,12 @@ class BaselineCliTests(unittest.TestCase):
                               "downloadTicket": "PRIVATE-TICKET"}
                 elif tool == "simulation_download":
                     result = download
+                elif tool == "change_prepare":
+                    from test_compilation_evidence import compile_only_records
+                    self.prepared_save, self.applied_save = compile_only_records(download["plcPath"], str(project), 1)
+                    result = copy.deepcopy(self.prepared_save)
+                elif tool == "change_apply":
+                    result = copy.deepcopy(self.applied_save)
                 elif tool == "simulation_provision_scratch_credential":
                     result = {"completed": True, "credentialProvisioned": True, "instanceId": 0, "instanceName": "owned",
                               "originalProgramRevision": "a" * 64, "operatingState": "Off", "protectionDisabled": False,
@@ -595,7 +614,8 @@ class BaselineCliTests(unittest.TestCase):
             self.assertTrue(report["provisionRuntimeCredential"])
             self.assertEqual(events.index("simulation_discovery_baseline") + 1, events.index("sim_create"))
             index = events.index("simulation_download")
-            self.assertEqual(["simulation_download", "verify_memory_card", "simulation_provision_scratch_credential", "verify_memory_card", "sim_state"], events[index:index + 5])
+            self.assertEqual(["simulation_download", "verify_memory_card", "change_prepare", "change_apply",
+                              "simulation_provision_scratch_credential", "verify_memory_card", "sim_state"], events[index:index + 7])
             self.assertEqual(report["memoryCard"], report["restoredMemoryCard"])
             by_tool = dict(requests)
             self.assertEqual(by_tool["simulation_download"], by_tool["simulation_provision_scratch_credential"])
