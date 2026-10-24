@@ -45,13 +45,22 @@ namespace TiaMcp.Openness.V21
             result["originalProcessRunning"] = PortalProcesses.Discover().Any(p => p.ProcessId == admittedProcess);
             result["resources"] = rows;
             var check = new AdmissionReconcileCheck(this, rows, retrieveRoot, admittedAt);
-            switch (operation)
+            try
             {
-                case "change_apply": case "change_restore": AdmissionReconcileChange(check, operation); break;
-                case "simulation_download": AdmissionReconcileDownload(check); break;
-                case "scratch_create": AdmissionReconcileScratch(check); break;
-                case "project_retrieve": AdmissionReconcileRetrieve(check, observationSha256); break;
-                case "library_open": AdmissionReconcileLibraryOpen(check, observationSha256); break;
+                switch (operation)
+                {
+                    case "change_apply": case "change_restore": AdmissionReconcileChange(check, operation); break;
+                    case "simulation_download": AdmissionReconcileDownload(check); break;
+                    case "scratch_create": AdmissionReconcileScratch(check); break;
+                    case "project_retrieve": AdmissionReconcileRetrieve(check, observationSha256); break;
+                    case "library_open": AdmissionReconcileLibraryOpen(check, observationSha256); break;
+                }
+            }
+            catch (Exception error)
+            {
+                // A damaged journal, report or receipt holds everything with its reason instead of failing the call.
+                result["verificationFailure"] = error.GetType().FullName + ": " + error.Message;
+                check.HoldAll("Verification could not complete: " + error.Message);
             }
             foreach (JObject row in rows.Where(r => r["disposition"].Type == JTokenType.Null && !((JArray)r["reasons"]).Any()))
                 ((JArray)row["reasons"]).Add("No reconciliation rule proves this effect.");
@@ -83,6 +92,9 @@ namespace TiaMcp.Openness.V21
             foreach (var row in new[] { check.Row("checkpointMutationCompileSave"), check.Row("preserveAndRecover") }.Where(r => r != null))
                 if (!SameSimulationPath(row.Value<string>("path"), projectPath)) { check.HoldAll("The change journal names a different project than the admission."); return; }
             string kind = journal.Value<string>("kind") ?? "";
+            // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware.
+            bool covered = !AdmissionReconcileTargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
+            if (HardwareEngineeringRules.Applies(kind)) check.FingerprintKind = kind;
             Func<Project, string> outcome = project => {
                 if (AdmissionReconcileTargetKinds.Contains(kind) || kind.StartsWith("to_", StringComparison.Ordinal) || journal.Value<string>("afterFingerprint") == null) return null;
                 var replay = new EngineeringChange { Kind = kind, Payload = journal["preview"]?["payload"] as JObject ?? new JObject() };
@@ -93,6 +105,7 @@ namespace TiaMcp.Openness.V21
                 var projectRow = check.Row("checkpointMutationCompileSave");
                 if (projectRow == null) return;
                 if (!archiveValid) { check.Hold(projectRow, "No complete hash-verified checkpoint archive exists to compare the project with."); return; }
+                if (!covered) { check.Hold(projectRow, "The project fingerprint does not cover the effect of change kind " + kind + "."); return; }
                 string checkpoint = check.ArchiveFingerprint(projectRow, archive);
                 var current = check.OpenProject(projectRow, projectPath, outcome);
                 if (current == null || checkpoint == null) return;
@@ -217,6 +230,7 @@ namespace TiaMcp.Openness.V21
             private readonly string _retrieveRoot;
             private int _retrievals;
             internal readonly DateTime AdmittedAt;
+            internal string FingerprintKind = "admission_reconcile";
             internal AdmissionReconcileCheck(OpennessSession session, JArray rows, string retrieveRoot, DateTime admittedAt)
             { _session = session; _rows = rows; _retrieveRoot = retrieveRoot; AdmittedAt = admittedAt; }
 
@@ -265,10 +279,9 @@ namespace TiaMcp.Openness.V21
                         var raw = project.LastModified;
                         var modified = raw.Kind == DateTimeKind.Local ? raw.ToUniversalTime() : raw.Kind == DateTimeKind.Utc ? raw
                             : new DateTime(Math.Max(DateTime.SpecifyKind(raw, DateTimeKind.Utc).Ticks, DateTime.SpecifyKind(raw, DateTimeKind.Local).ToUniversalTime().Ticks), DateTimeKind.Utc);
-                        var neutral = new EngineeringChange { Kind = "admission_reconcile" };
                         var observed = new JObject { ["path"] = project.Path.FullName, ["lastModifiedUtc"] = modified.ToString("O"),
                             ["lastModifiedRaw"] = raw.ToString("O"), ["lastModifiedKind"] = raw.Kind.ToString(), ["isModifiedAfterOpen"] = project.IsModified,
-                            ["fingerprint"] = _session.EngineeringFingerprint(neutral, project, true), ["fingerprintCoverage"] = neutral.FingerprintCoverage };
+                            ["fingerprint"] = Fingerprint(project) };
                         if (outcome != null) observed["outcomeFingerprint"] = outcome(project);
                         Evidence(row, "project", observed);
                         return observed;
@@ -278,6 +291,13 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) { Hold(row, "The project could not be opened read-only for evidence: " + error.Message); return null; }
             }
 
+            /// <summary>Location-independent project fingerprint plus the project library revision, which the engineering fingerprint omits.</summary>
+            private string Fingerprint(Project project)
+            {
+                string engineering = _session.EngineeringFingerprint(new EngineeringChange { Kind = FingerprintKind }, project, true);
+                return ChangeHash(engineering + "|" + LibraryRevision(new ManagedLibrary { Native = project.ProjectLibrary, Project = project }));
+            }
+
             /// <summary>Retrieves an archive into a new reconcile directory and returns its location-independent fingerprint.</summary>
             internal string ArchiveFingerprint(JObject row, string archive)
             {
@@ -285,7 +305,7 @@ namespace TiaMcp.Openness.V21
                 {
                     string target = NextRetrieveDirectory();
                     var copy = _session._portal.Projects.Retrieve(new FileInfo(archive), new DirectoryInfo(target));
-                    try { string value = _session.EngineeringFingerprint(new EngineeringChange { Kind = "admission_reconcile" }, copy, true); Evidence(row, "archiveFingerprint", value); return value; }
+                    try { string value = Fingerprint(copy); Evidence(row, "archiveFingerprint", value); return value; }
                     finally { copy.Close(); }
                 }
                 catch (Exception error) { Hold(row, "The archive could not be retrieved for comparison: " + error.Message); return null; }
