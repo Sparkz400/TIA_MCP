@@ -816,8 +816,12 @@ namespace TiaMcp.Openness.V21
                         try
                         {
                             cleanupCheckpoint("beforeReleaseInterface");
+                            // Off now: release this and the download's interface before anyone unregisters the instance.
                             RetainSimulationInterface(instance);
-                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = true, ["retainedUntilWorkerExit"] = true });
+                            var released = ReleaseRetainedSimulationInterfaces();
+                            bool all = released.All(r => r.Value<bool>("released"));
+                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = all, ["interfaces"] = released });
+                            if (!all && failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "An owned simulator interface could not be released after credential recovery.");
                             cleanupCheckpoint("afterReleaseInterface");
                         }
                         catch (Exception ex)

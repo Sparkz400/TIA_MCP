@@ -166,10 +166,11 @@ namespace TiaMcp.Openness.V21
             }
         }
 
-        // shortcut: PLCSIM's CInstanceNet Dispose/finalizer intermittently raised an uncatchable
-        // AccessViolationException right after a completed download (frozen runtime run, 24 Oct 2026).
-        // Interfaces are held without finalization until worker exit, where the runtime manager shuts
-        // down; revisit if Siemens fixes the wrapper or one worker must create many interfaces.
+        // PLCSIM's CInstanceNet Dispose once raised an AccessViolationException right after a completed
+        // download, killing the worker (frozen runtime run, 24 Oct 2026). Holding interfaces until worker
+        // exit kept the instance's Softbus endpoint visible after unregistration, which blocked the next
+        // case's discovery baseline. So interfaces are held (without finalization) only until this worker
+        // next powers the instance off, released there before any unregistration, and at worker exit.
         private static readonly List<IInstance> RetainedSimulationInterfaces = new List<IInstance>();
 
         private static void RetainSimulationInterface(IInstance instance)
@@ -177,6 +178,21 @@ namespace TiaMcp.Openness.V21
             if (instance == null) return;
             lock (RetainedSimulationInterfaces) RetainedSimulationInterfaces.Add(instance);
             GC.SuppressFinalize(instance);
+        }
+
+        /// <summary>Disposes every held interface; an access violation is reported, not fatal.</summary>
+        [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions, System.Security.SecurityCritical]
+        private static JArray ReleaseRetainedSimulationInterfaces()
+        {
+            var receipts = new JArray();
+            IInstance[] held;
+            lock (RetainedSimulationInterfaces) { held = RetainedSimulationInterfaces.ToArray(); RetainedSimulationInterfaces.Clear(); }
+            foreach (var instance in held)
+            {
+                try { instance.Dispose(); receipts.Add(new JObject { ["released"] = true }); }
+                catch (Exception ex) { receipts.Add(new JObject { ["released"] = false, ["exceptionType"] = ex.GetType().FullName }); }
+            }
+            return receipts;
         }
 
         private void RetainSimulationRuntimeUntilWorkerExit()
@@ -189,6 +205,7 @@ namespace TiaMcp.Openness.V21
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private static void ShutdownSimulationRuntime()
         {
+            ReleaseRetainedSimulationInterfaces();
             if (SimulationRuntimeManager.IsInitialized) SimulationRuntimeManager.Shutdown();
         }
 
