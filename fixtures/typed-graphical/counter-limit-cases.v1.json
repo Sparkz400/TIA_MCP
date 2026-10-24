@@ -154,7 +154,7 @@
       "runtimeSources": [
         {
           "language": "SCL",
-          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_LAD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    Counter : \"Tgp_CTU_LAD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
+          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_LAD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    // COUNTER is a reserved SCL data type keyword, so the instance has a distinct name.\n    CtuInstance : \"Tgp_CTU_LAD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #CtuInstance(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #CtuInstance(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #CtuInstance(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
           "expectedBlockNames": [
             "Tgp_CTU_LimitDriver_LAD"
           ]
@@ -162,7 +162,7 @@
       ],
       "runtimeDriverProvenance": {
         "path": "fixtures/typed-graphical/sources/ctu-limit-driver-lad.scl",
-        "sha256": "03e22d300a216be6d3fab6309b64ce8872bff7a1d0fa7563c9a43b140ad17e3f",
+        "sha256": "61f8ec1e47f3b199080c4e4cc09bc093d53012d4612c4f77e763d7404cd0cf22",
         "nativeDutCallsPerDriverInvocationAtMost": 1024,
         "attemptedRisingEdges": 32768,
         "assertionScope": "Signed Int CTU upper saturation and reset, not exact scan timing."
@@ -302,7 +302,7 @@
       "runtimeSources": [
         {
           "language": "SCL",
-          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_FBD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    Counter : \"Tgp_CTU_FBD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
+          "source": "FUNCTION_BLOCK \"Tgp_CTU_LimitDriver_FBD\"\n{ S7_Optimized_Access := 'TRUE' }\nVAR_INPUT\n    Edges : Int;\n    Reset : Bool;\nEND_VAR\nVAR_OUTPUT\n    Count : Int;\n    Done : Bool;\n    Rejected : Bool;\nEND_VAR\nVAR\n    // COUNTER is a reserved SCL data type keyword, so the instance has a distinct name.\n    CtuInstance : \"Tgp_CTU_FBD\";\nEND_VAR\nVAR_TEMP\n    Index : Int;\nEND_VAR\nBEGIN\n    #Rejected := (#Edges < 0) OR (#Edges > 512);\n    IF NOT #Rejected THEN\n        IF #Reset OR (#Edges = 0) THEN\n            #CtuInstance(Enable := FALSE, Down := FALSE, Reset := #Reset,\n                     Load := FALSE, Preset := 32767,\n                     Done => #Done, Count => #Count);\n        ELSE\n            FOR #Index := 1 TO #Edges DO\n                #CtuInstance(Enable := FALSE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n                #CtuInstance(Enable := TRUE, Down := FALSE, Reset := FALSE,\n                         Load := FALSE, Preset := 32767,\n                         Done => #Done, Count => #Count);\n            END_FOR;\n        END_IF;\n    END_IF;\nEND_FUNCTION_BLOCK\n",
           "expectedBlockNames": [
             "Tgp_CTU_LimitDriver_FBD"
           ]
@@ -310,7 +310,7 @@
       ],
       "runtimeDriverProvenance": {
         "path": "fixtures/typed-graphical/sources/ctu-limit-driver-fbd.scl",
-        "sha256": "5a678c35a22e4f7deec6e4dde1d1f26cf673bb5c3c56a66573936288ae5f5807",
+        "sha256": "53399791087a8ad2d86e123f4bdd6931a91bc41cba596ac254303d6cc2c96f97",
         "nativeDutCallsPerDriverInvocationAtMost": 1024,
         "attemptedRisingEdges": 32768,
         "assertionScope": "Signed Int CTU upper saturation and reset, not exact scan timing."

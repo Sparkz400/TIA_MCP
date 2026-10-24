@@ -1,0 +1,52 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.engineering.interruption.rerun.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T18:41:28+00:00",
+  "source": {
+    "commit": "5e3b79931e914da8d48aa6e78fbca4ac58d5cae7",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched.",
+  "limitations": [
+    "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
+    "Library revision covers library structure, type versions and master copies, not unexposed object document content."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "cd0d09b26c662cd2caea7e7f7f986454c8566a1067717c1a7cecc7e5d92911a5"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "278d6af293ba17ed80db6888a0ebffb26f36666aa2114d70bd38514a0664cbaf"
+    }
+  ],
+  "runs": [
+    {
+      "report": "interruption-b3.json",
+      "sha256": "b891cf7913c226a8b8ced2849a8b0098396d55b6427558701bac31a8db0a1fe5",
+      "bytes": 130287,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -212,10 +212,12 @@ class _Types:
                     raise InterfaceError("FB dependency is only valid as instance state")
                 if not {"Input", "Output", "InOut", "Static"}.issubset(sections):
                     raise InterfaceError(f"Incomplete FB dependency interface: {type_name}")
-                # Reference parameters and local TEMP data are not instance-owned storage.
-                rows = [row for section in ("Input", "Output", "Static") for row in sections[section]]
+                # Optimized S7-1500 FBs store elementary IN_OUT by value in the instance, between
+                # Output and Static; structured IN_OUT is a reference and TEMP is not instance storage.
+                by_value = [row for row in sections["InOut"] if str(row.get("dataType", "")).strip().lower() in SCALARS]
+                rows = [*sections["Input"], *sections["Output"], *by_value, *sections["Static"]]
                 kind = "instance"
-                self.limits.append(f"{type_name}: dependency instance captures omit referenced IN_OUT and local TEMP storage.")
+                self.limits.append(f"{type_name}: dependency instance captures omit structured (by-reference) IN_OUT and local TEMP storage.")
             elif set(sections) == {"None"} and (not kinds or kinds == ["SW.Types.PlcStruct"]):
                 rows = sections["None"]
             else:

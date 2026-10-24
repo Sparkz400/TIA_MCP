@@ -57,13 +57,24 @@ namespace TiaMcp.Openness.V21
                 ["identityCoverage"] = "Native ancestor type and exposed Name/Number chain, including software-unit ancestors; no unit payload traversal or workspace writes." };
         }
 
+        // TIA keeps an open project file with write access on some V21 installs; callers
+        // already require the saved, unmodified project, so a shared read is exact.
+        private static string OpenProjectFileHash(string path)
+        {
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            using (var sha = System.Security.Cryptography.SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+        }
+
         private static JArray QualificationNativeIdentity(IEngineeringObject value)
         {
             if (value == null) throw new BridgeException("ComponentScopeIncomplete", "VCI mapping has no native engineering identity.");
-            var identity = new JArray(); int depth = 0;
-            for (var current = value; current != null; current = current.Parent)
+            var identity = new JArray(); int depth = 0; var visited = new List<IEngineeringObject>();
+            // The Portal root (or an object reporting itself/an ancestor as Parent) ends
+            // the chain; otherwise VCI groups never reach null on some V21 installs.
+            for (var current = value; current != null && !visited.Any(seen => ReferenceEquals(seen, current) || seen.Equals(current)); current = current is TiaPortal ? null : current.Parent)
             {
                 if (++depth > 64) throw new BridgeException("ComponentScopeIncomplete", "VCI native identity ancestry exceeds its bound.");
+                visited.Add(current);
                 var row = new JObject { ["type"] = current.GetType().FullName };
                 foreach (var info in current.GetAttributeInfos().Where(i => i.Name == "Name" || i.Name == "Number").OrderBy(i => i.Name, StringComparer.Ordinal))
                 {
@@ -83,7 +94,7 @@ namespace TiaMcp.Openness.V21
             string projectPath = ChangeText(args, "projectPath", 4096); ChangeText(args, "plcPath", 4096);
             var plc = SelectPlc(args); EnsureProjectOffline(plc.Project);
             if (!ProjectPathIsAbsolute(projectPath) || plc.Project.Path.FullName != projectPath || plc.Project.IsModified ||
-                ChangeFileHash(projectPath) != ChangeText(args, "expectedProjectFileSha256", 64))
+                OpenProjectFileHash(projectPath) != ChangeText(args, "expectedProjectFileSha256", 64))
                 throw new BridgeException("ComponentReadbackMismatch", "Ancillary capture requires the exact saved admitted project bytes.");
             return plc;
         }
@@ -107,7 +118,7 @@ namespace TiaMcp.Openness.V21
             var scope = new JObject { ["operation"] = "component_window_ancillary_read", ["requestSha256"] = SharedMutationHash(args), ["sessionEpoch"] = _libraryGeneration,
                 ["adapterSha256"] = ChangeFileHash(Assembly.GetExecutingAssembly().Location), ["processId"] = _processId,
                 ["resources"] = new JArray(resources.OrderBy(r => r.Value<string>("kind") + ":" + r.Value<string>("path"), StringComparer.Ordinal)),
-                ["observationSha256"] = SharedMutationHash(new JObject { ["projectPath"] = plc.Project.Path.FullName, ["projectFileSha256"] = ChangeFileHash(plc.Project.Path.FullName), ["plcPath"] = plc.Path, ["vci"] = vci }) };
+                ["observationSha256"] = SharedMutationHash(new JObject { ["projectPath"] = plc.Project.Path.FullName, ["projectFileSha256"] = OpenProjectFileHash(plc.Project.Path.FullName), ["plcPath"] = plc.Path, ["vci"] = vci }) };
             scope["scopeSha256"] = SharedMutationHash(scope); return scope;
         }
 
@@ -117,12 +128,12 @@ namespace TiaMcp.Openness.V21
             string directory = SharedMutationPlannedDestination("ancillaryCapture", () => { throw new BridgeException("MutationAdmissionRequired", "Ancillary output requires complete shared admission."); });
             Directory.CreateDirectory(directory);
             var metadata = ComponentWindowPeerMetadata(plc.Project, plc, directory, out var tables);
-            if (plc.Project.IsModified || ChangeFileHash(plc.Project.Path.FullName) != args.Value<string>("expectedProjectFileSha256"))
+            if (plc.Project.IsModified || OpenProjectFileHash(plc.Project.Path.FullName) != args.Value<string>("expectedProjectFileSha256"))
                 throw new BridgeException("ComponentReadbackMismatch", "Ancillary capture altered the saved project state.");
             using (var process = Process.GetProcessById(_processId.Value))
             {
                 var result = new JObject { ["schemaVersion"] = 1, ["profile"] = "qualification-global-ancillary-v1", ["projectPath"] = plc.Project.Path.FullName, ["plcPath"] = plc.Path,
-                    ["processId"] = _processId, ["nativeBirthUtc"] = process.StartTime.ToUniversalTime().ToString("O"), ["sessionEpoch"] = _libraryGeneration, ["projectFileSha256"] = ChangeFileHash(plc.Project.Path.FullName),
+                    ["processId"] = _processId, ["nativeBirthUtc"] = process.StartTime.ToUniversalTime().ToString("O"), ["sessionEpoch"] = _libraryGeneration, ["projectFileSha256"] = OpenProjectFileHash(plc.Project.Path.FullName),
                     ["readOnly"] = true, ["saveInvoked"] = false, ["projectModified"] = false, ["scopeCompleteWithinProfile"] = true, ["peerMetadata"] = metadata, ["watchForceTables"] = tables,
                     ["coverage"] = "Root PLC watch/force XML and groups/access, exposed configured hardware, project languages, sole software owner, global VCI settings/workspaces/mapping identity ancestry. Existing software units are permitted; their blocks/types/tags require the independent typed Host snapshot. Unexposed vendor payloads, project-library contents and runtime are outside this ancillary profile." };
                 string path = Path.Combine(directory, "ancillary.json"); File.WriteAllText(path, result.ToString()); result["receipt"] = ChangeArtifact(path); return result;

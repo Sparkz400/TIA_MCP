@@ -157,8 +157,8 @@ public static class ComponentWindowEvidence
         Need(final["sourceSnapshotSha256"]?.GetValue<string>() == r.Manifest.SourceSnapshotSha256, "Original source content drifted.");
         Need(SourceHash(r.Manifest.SourceSnapshotPath, r.Manifest.SourceSnapshotIsDirectory) == r.Manifest.SourceSnapshotSha256, "Retained source snapshot bytes changed.");
         Need(SourceHash(r.Manifest.OriginalSourcePath, r.Manifest.OriginalSourceIsDirectory) == r.Manifest.SourceSnapshotSha256, "Original source bytes changed.");
-        Need(PackageStorage.FileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256"), "Saved original project changed after fresh native verification.");
-        Need(PackageStorage.FileHash(recoveredPath) == Text(reopened, "projectFileSha256"), "Saved recovered project changed after fresh native verification.");
+        Need(ProjectFileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256"), "Saved original project changed after fresh native verification.");
+        Need(ProjectFileHash(recoveredPath) == Text(reopened, "projectFileSha256"), "Saved recovered project changed after fresh native verification.");
     }
 
     // Narrow recovery-only release: the original, recovered and fresh-reopened project must all equal the baseline.
@@ -202,7 +202,7 @@ public static class ComponentWindowEvidence
         Need(Text(resource, "archiveSha256") == Text(checkpoint, "sha256") && resource["retrieved"]?.GetValue<bool>() == true && Text(Object(resource, "project"), "path") == Text(restored, "projectPath"), "Exact recovered checkpoint receipt differs.");
         Need(final["sourceSnapshotSha256"]?.GetValue<string>() == r.Manifest.SourceSnapshotSha256 && SourceHash(r.Manifest.SourceSnapshotPath, r.Manifest.SourceSnapshotIsDirectory) == r.Manifest.SourceSnapshotSha256 &&
             SourceHash(r.Manifest.OriginalSourcePath, r.Manifest.OriginalSourceIsDirectory) == r.Manifest.SourceSnapshotSha256, "Recovery-only source resources changed.");
-        Need(PackageStorage.FileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256") && PackageStorage.FileHash(Text(reopened, "projectPath")) == Text(reopened, "projectFileSha256"), "Saved original/recovered files changed after current native observation.");
+        Need(ProjectFileHash(r.Manifest.ProjectPath) == Text(original, "projectFileSha256") && ProjectFileHash(Text(reopened, "projectPath")) == Text(reopened, "projectFileSha256"), "Saved original/recovered files changed after current native observation.");
     }
 
     private static void ValidateSnapshot(ComponentWindowManifest m, JsonObject snapshot)
@@ -378,5 +378,13 @@ public static class ComponentWindowEvidence
     private static bool IsUnder(string parent, string path) => EngineeringResourceKey.ForPath("workspace", path).StartsWith(EngineeringResourceKey.ForPath("workspace", parent) + Path.DirectorySeparatorChar, StringComparison.Ordinal);
     private static JsonObject Object(JsonObject value, string name) => value[name] as JsonObject ?? throw new BridgeException("ComponentAcceptanceIncomplete", "Required evidence object absent: " + name);
     private static string Text(JsonObject value, string name) => value[name]?.GetValue<string>() ?? throw new BridgeException("ComponentAcceptanceIncomplete", "Required evidence field absent: " + name);
+    // TIA may keep an open project file with write access; a shared read of the saved
+    // project is still exact because every caller compares against a fresh native observation.
+    private static string ProjectFileHash(string path)
+    {
+        PackageStorage.EnsureNoLinks(path);
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        return Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(file));
+    }
     private static void Need(bool condition, string message) { if (!condition) throw new BridgeException("ComponentAcceptanceIncomplete", message); }
 }
