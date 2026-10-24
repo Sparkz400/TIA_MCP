@@ -5,6 +5,7 @@ using TiaMcp.Core.Engineering;
 if (args.Length > 0 && args[0] == "--multiuser-only") { MultiuserReviewChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--teamcenter-only") { TeamcenterReviewChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--watch-authoring-only") { await WatchAuthoringChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--admission-reconcile-only") { await AdmissionReconciliationChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--operation-text-only") { OperationTextChecks.Run(args.Length > 1 ? args[1] : null); return; }
 if (args.Length > 0 && args[0] == "--resource-path-only") { EngineeringOperationChecks.LongPaths(); return; }
 
@@ -65,5 +66,6 @@ await WatchInterruptionMatrixChecks.Run();
 await WatchExpandedEditChecks.Run();
 await MutationAdmissionChecks.Run();
 await ProvisionReconciliationChecks.Run();
+await AdmissionReconciliationChecks.Run();
 await ProductionAdapterChecks.Run();
 await WatchAuthoringChecks.Run();

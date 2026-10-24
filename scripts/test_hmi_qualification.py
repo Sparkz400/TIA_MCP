@@ -623,6 +623,21 @@ class HmiQualificationTests(unittest.TestCase):
         native["sections"]["TagTables"][0]["attributes"]["Name"] = "C"
         self.assertEqual(len(native_section_entries(native, "tags", "unified")), 5)
 
+    def test_classic_screens_span_every_role_and_tolerate_older_reports(self):
+        def screen(kind, name="Overview_A"):
+            return {"nativeType": "Siemens.Engineering.Hmi.Screen." + kind, "attributes": {"Name": name}}
+        native = {"sections": {
+            "ScreenFolder": {"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenSystemFolder", "Screens": [screen("Screen")]},
+            "ScreenTemplateFolder": {"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenTemplateSystemFolder", "ScreenTemplates": [screen("ScreenTemplate")]},
+            "ScreenPopupFolder": {"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenPopupSystemFolder", "ScreenPopups": [screen("ScreenPopup")]},
+            "ScreenSlideinFolder": {"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenSlideinSystemFolder", "ScreenSlideins": [screen("ScreenSlidein", "Top")]},
+            "ScreenGlobalElements": screen("ScreenGlobalElements", "Global"), "ScreenOverview": None}}
+        kinds = sorted(row["nativeType"].rsplit(".", 1)[-1] for row in native_section_entries(native, "screens", "classic"))
+        self.assertEqual(kinds, ["Screen", "ScreenGlobalElements", "ScreenPopup", "ScreenSlidein", "ScreenTemplate"])
+        for key in ("ScreenGlobalElements", "ScreenOverview"):
+            del native["sections"][key]
+        self.assertEqual(len(native_section_entries(native, "screens", "classic")), 4)
+
     def test_item_geometry_must_match_precisely(self):
         native = {"ScreenItems": [{"nativeType": "Rectangle", "attributes": {"Name": "A", "Left": 31, "Width": 120}}]}
         observed = {"items": [{"nativeType": "Rectangle", "name": "A", "properties": {"Name": "A", "Left": 30, "Width": 120}}], "lastPage": {"coverage": {"status": "complete"}}}

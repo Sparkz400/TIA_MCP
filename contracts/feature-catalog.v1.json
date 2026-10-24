@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.6",
+  "catalogVersion": "0.4.7",
   "targetTiaVersions": [
     21
   ],
@@ -2722,6 +2722,49 @@
         "status": "conditional",
         "reasons": [
           "Requires an empty worker-owned TIA instance and the retained provisioning report, archive and card."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Empty worker-owned TIA instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "engineering_admission_reconcile",
+      "domain": "engineering",
+      "title": "Release an unresolved mutation admission on fresh native evidence",
+      "mcpTools": [
+        "engineering_admission_reconcile"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Projects.Retrieve/Open, GlobalLibraries.Retrieve/Open, block FingerprintProvider and TiaPortal.GetProcesses; managed admission store reconciliation."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Supports dispatchIntent and outcomeUnknown admissions of simulation_download, change_apply, change_restore (engineering and library), scratch_create, project_retrieve and library_open; provisioning delegates to simulation_provision_reconcile.",
+          "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
+          "Engineering kinds whose fingerprint needs prepared in-memory targets (HMI, attribute, technology) can only be proven unchanged against their checkpoint; library apply outputs and partial destinations stay held.",
+          "Never replays, saves, powers or downloads."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an empty worker-owned TIA instance, the retained journals, checkpoints and reports, and that the admitted TIA process has exited."
         ]
       },
       "prerequisites": [
