@@ -23,17 +23,21 @@ namespace TiaMcp.Openness.V21
                     ? _portal.GlobalLibraries.RetrieveWithUpgrade(new FileInfo(snapshotPath), new DirectoryInfo(directory), OpenMode.ReadWrite)
                     : _portal.GlobalLibraries.OpenWithUpgrade(new FileInfo(Path.Combine(directory, fileName)));
             }
-            catch (EngineeringException error)
+            catch (Exception error)
             {
                 var upgraded = Directory.GetFiles(directory, "*_V21.al21", SearchOption.AllDirectories);
                 if (upgraded.Length != 1) throw;
                 string logDirectory = Path.Combine(Path.GetDirectoryName(upgraded[0]), "Logs");
                 var logs = Directory.Exists(logDirectory) ? Directory.GetFiles(logDirectory, "ConversionLog_*_to_21.0.0.0.xml") : new string[0];
                 if (logs.Length != 1 || !File.ReadAllText(logs[0]).Contains("ConversionInfoTabLibrarySucceeded")) throw;
-                if (_portal.GlobalLibraries.Any(x => string.Equals(x.Path?.FullName, upgraded[0], StringComparison.OrdinalIgnoreCase))) throw;
-                result["upgradeReturnFailure"] = new JObject { ["nativeMessage"] = error.Message, ["upgradedLibrary"] = upgraded[0], ["conversionLog"] = FileArtifact(new FileInfo(logs[0])),
+                GlobalLibrary opened = null;
+                try { opened = _portal.GlobalLibraries.FirstOrDefault(x => string.Equals(x.Path?.FullName, upgraded[0], StringComparison.OrdinalIgnoreCase)); }
+                catch (Exception) { } // Enumerating can hit the same type-load failure; opening by path follows.
+                result["upgradeReturnFailure"] = new JObject { ["nativeType"] = error.GetType().FullName, ["nativeMessage"] = error.Message, ["upgradedLibrary"] = upgraded[0],
+                    ["conversionLog"] = FileArtifact(new FileInfo(logs[0])), ["openedBy"] = opened != null ? "alreadyOpenInstance" : "openByPath",
                     ["handling"] = "The conversion log records a successful upgrade; the saved V21 library was opened explicitly. Readback, archive and reopen remain the caller's verification." };
-                return _portal.GlobalLibraries.Open(new FileInfo(upgraded[0]), OpenMode.ReadWrite);
+                try { return opened ?? _portal.GlobalLibraries.Open(new FileInfo(upgraded[0]), OpenMode.ReadWrite); }
+                catch (Exception second) { throw new BridgeException("NativeLibraryError", error.Message + " Opening the saved V21 library also failed: " + second.Message, (JObject)result["upgradeReturnFailure"].DeepClone()); }
             }
         }
     }

@@ -85,7 +85,8 @@ def interrupted_apply(h, kind, payload, stage):
     return prepared
 
 
-def reconcile(h, prepared):
+def reconcile(h, prepared, label):
+    """Fresh host: durable unknown outcome, then in a fresh owned portal no replay and admission reconciliation."""
     restart_host(h)
 
     def status():
@@ -94,19 +95,22 @@ def reconcile(h, prepared):
                 and result.get("automaticRetryAllowed") is False, "Fresh host did not reconcile an unknown outcome from disk")
         return result
     h.stage("fresh host reconciles unknown outcome", status)
+    h.owned_portal(label)
 
     def no_replay():
         error = h.call_error("change_apply", h.apply_args(prepared))
         # Shared admission refuses first (ResourceBusy); the library journal refuses otherwise (OutcomeUnknown).
         require(error.get("code") in ("ResourceBusy", "OutcomeUnknown"), "Replay was not refused: %s" % error)
         return error
-    h.stage("fresh host refuses replay", no_replay)
+    h.stage("fresh session refuses replay", no_replay)
+    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
+    if h.tool("tia_session_status").get("projects"):  # Restore needs an empty owned instance.
+        h.stage("close verification session", lambda: h.tool("tia_detach"))
+        h.owned_portal(label + " (empty)")
 
 
 def reconcile_and_recover(h, prepared, verify):
-    reconcile(h, prepared)
-    h.owned_portal("recovery " + prepared["changeId"][-6:])
-    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
+    reconcile(h, prepared, "recovery " + prepared["changeId"][-6:])
     restored = h.stage("restore every checkpointed resource", lambda: h.tool("change_restore", {
         "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
     require(restored["state"] == "restored_to_new_locations" and restored.get("originalsPreserved") is True, "Restore incomplete")
@@ -150,7 +154,7 @@ def body(h):
                                "documentDirectory": str(documents), "documentName": "TiaMcpLibraryState", "targetEnvironment": "selectedPlc",
                                "destinationComposition": "types", "target": {"plcPath": plc}}, "checkpoint_project_archive")
 
-    reconcile(h, second)
+    reconcile(h, second, "checkpoint recovery")
 
     def no_checkpoint():
         error = h.call_error("change_restore", {"changeId": second["changeId"], "previewHash": second["previewHash"]})
@@ -159,8 +163,6 @@ def body(h):
         stages = [e["stage"] for e in journal["events"]]
         require("native_mutation" not in stages and not journal["checkpoints"], "Journal does not prove the mutation was never dispatched")
         return {"error": error, "stages": stages}
-    h.owned_portal("checkpoint recovery")
-    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
     h.stage("refuse restore without a completed checkpoint", no_checkpoint)
 
     def original_unchanged():
