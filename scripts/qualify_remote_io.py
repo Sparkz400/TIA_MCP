@@ -22,6 +22,9 @@ HARDWARE_ATTRIBUTES = CHANNEL_ATTRIBUTES | {'Name', 'Author', 'Comment', 'Inform
 NETWORK_ATTRIBUTES = {'Address', 'SubnetMask', 'RouterAddress', 'UseRouter', 'UseIpProtocol', 'IpProtocolSelection', 'PnDeviceName', 'PnDeviceNameAutoGeneration', 'PnDeviceNameSetDirectly', 'DhcpClientId'}
 QUALIFICATION_SCOPES = ('full', 'configured-module-lifecycle')
 # Catalog search filter and article prefix for each reviewed ET 200SP input module family.
+# TIA names the generated server module in its UI language; the remote head's
+# native interface name identifies that language before the assignment.
+SERVER_MODULE_NAMES = {'PROFINET interface': 'Server module_1', 'PROFINET-Schnittstelle': 'Servermodul_1'}
 MODULE_FAMILIES = {'di': ('DI 8x24VDC ST', '6ES7 131-6'), 'ai': ('AI 4xU/I 2-wire ST', '6ES7 134-6HD')}
 
 
@@ -100,7 +103,7 @@ def server_relocation(manifest, expected_companion):
     require(len(expected_companion) == 2, 'Expected exact server and diagnostic-child contract.')
     server = expected_companion[0]
     require(server['typeIdentifier'] == 'OrderNumber:6ES7 193-6PA00-0AA0/V1.2'
-            and server['name'] == 'Servermodul_1' and server['positionNumber'] == 1,
+            and server['name'] in SERVER_MODULE_NAMES.values() and server['positionNumber'] == 1,
             'Server relocation requires the captured initial slot-1 companion.')
     rows = {row['path']: row for row in manifest}
     require(len(rows) == len(manifest), 'Configured manifest contains duplicate hardware paths.')
@@ -292,13 +295,15 @@ def main():
         head_rows = [row for row in rows if row['name'] == 'TiaMcpRemoteHead' and row['path'].count('/items/') == 1]
         require(len(head_rows) == 1, 'The remote head identity is ambiguous.')
         head = head_rows[0]
+        server_name = SERVER_MODULE_NAMES.get(remote['name'])
+        require(server_name, 'No captured server-module name for the observed interface name ' + repr(remote['name']))
         author = next(value['value'] for value in head['attributes'] if value['name'] == 'Author' and 'error' not in value)
         for index, target in enumerate((cpu, remote), start=10):
             apply('network_configure', {'hardwarePath': target['path'], 'nodeName': target['network']['nodes'][0]['name'], 'subnetName': 'RemoteIoProofSubnet',
                                        'attributes': {'Address': '192.0.2.' + str(index), 'SubnetMask': '255.255.255.0'}}, prerequisite=True)
         assignment = {'hardwarePath': remote['path'], 'connectorIndex': 0, 'controllerHardwarePath': cpu['path'], 'controllerIndex': 0, 'createIoSystemName': 'RemoteIoProofSystem',
-                      'expectedServerModule': {'name': 'Servermodul_1', 'typeIdentifier': 'OrderNumber:6ES7 193-6PA00-0AA0/V1.2', 'containerHardwarePath': rail['path'], 'positionNumber': 1,
-                                               'attributes': {'AdditionalInformation': '', 'Author': author, 'Comment': '', 'LocationIdentifier': '', 'Name': 'Servermodul_1', 'PlantDesignation': ''}}}
+                      'expectedServerModule': {'name': server_name, 'typeIdentifier': 'OrderNumber:6ES7 193-6PA00-0AA0/V1.2', 'containerHardwarePath': rail['path'], 'positionNumber': 1,
+                                               'attributes': {'AdditionalInformation': '', 'Author': author, 'Comment': '', 'LocationIdentifier': '', 'Name': server_name, 'PlantDesignation': ''}}}
         assignment_prepared, assignment_result = apply('network_io_assign', assignment)
         report['gates']['controllerAssignment'] = True
         companion = next(effect['expectedNativeCompanion'] for effect in assignment_prepared['preview']['effects']
