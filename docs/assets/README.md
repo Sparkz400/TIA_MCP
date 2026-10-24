@@ -10,7 +10,7 @@ their own colors and text labels.
   committing this file does not change the repository's hosting settings.
 - [Project icon](tia-mcp-icon.png): 256 × 256 PNG and
   [SVG source](tia-mcp-icon.svg). The connector mark also appears in the Explorer
-  header and its embedded favicon. It can be reused wherever a project avatar
+  header. It can be reused wherever a project avatar
   is supported; it does not replace the owner's account avatar.
 - [Architecture](architecture.svg): component boundaries, with a
   [text explanation](../guides/architecture.md).
