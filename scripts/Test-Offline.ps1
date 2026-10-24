@@ -1,8 +1,12 @@
 param(
     [ValidateSet('Debug','Release')][string]$Configuration = 'Release',
     [string]$OutputDirectory,
-    [ValidateSet('All','Python','Managed')][string]$Suite = 'All'
+    [ValidateSet('All','Python','Managed')][string]$Suite = 'All',
+    # CI splits the managed suites across parallel runners; the default runs every suite.
+    [ValidateRange(1, 16)][int]$ShardCount = 1,
+    [ValidateRange(0, 15)][int]$ShardIndex = 0
 )
+if ($ShardIndex -ge $ShardCount) { throw 'ShardIndex must be below ShardCount.' }
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 if (-not $OutputDirectory) {
@@ -22,6 +26,84 @@ New-Item -ItemType Directory -Path $output -Force | Out-Null
 $buildOutput = Join-Path $output 'dotnet'
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
+# Measured hosted-runner seconds per managed suite (CI run 40077018589); suites missing here count as 60 s.
+$ManagedSuiteSeconds = @{
+    'TiaMcp.Access.Tests' = 2.7
+    'TiaMcp.AutomationMl.Tests' = 2.0
+    'TiaMcp.CapturedStorage.Tests' = 1.1
+    'TiaMcp.CompilationEvidence.Tests' = 0.7
+    'TiaMcp.ComponentWindow.Tests' = 3.4
+    'TiaMcp.CompositeEngineering.Tests' = 12.8
+    'TiaMcp.Connections.Tests' = 1.6
+    'TiaMcp.Credentials.Tests' = 4.3
+    'TiaMcp.DbSnapshots.Tests' = 1.0
+    'TiaMcp.Deployment.Tests' = 1.8
+    'TiaMcp.Diagnostics.Tests' = 24.1
+    'TiaMcp.DriveProfiles.Tests' = 2.0
+    'TiaMcp.EncoderEvidence.Tests' = 0.6
+    'TiaMcp.Engineering.Tests' = 23.7
+    'TiaMcp.Graph.Tests' = 2.1
+    'TiaMcp.Graph.Workflow.Tests' = 1.3
+    'TiaMcp.HardwareEngineering.Tests' = 0.6
+    'TiaMcp.Hmi.Engineering.Tests' = 1.1
+    'TiaMcp.Hmi.Model.Tests' = 1.0
+    'TiaMcp.Hmi.Tests' = 0.8
+    'TiaMcp.HmiComponents.Tests' = 20.9
+    'TiaMcp.HmiRepairAdmission.Tests' = 2.8
+    'TiaMcp.Inventory.Tests' = 10.1
+    'TiaMcp.Library.Tests' = 1.7
+    'TiaMcp.LibraryHmi.Tests' = 0.6
+    'TiaMcp.OpcUa.Dependencies.Tests' = 5.1
+    'TiaMcp.OpcUa.Runtime.Tests' = 26.9
+    'TiaMcp.OpcUa.Tests' = 1.6
+    'TiaMcp.OpcUa.Workflow.Tests' = 1.2
+    'TiaMcp.PhysicalRuntime.Tests' = 15.2
+    'TiaMcp.PlcLibraryIntegration.Tests' = 3.1
+    'TiaMcp.ProjectModel.Tests' = 4.3
+    'TiaMcp.PublicCertificates.Tests' = 0.7
+    'TiaMcp.SafetyEvidence.Tests' = 3.6
+    'TiaMcp.SoftwareUnits.Tests' = 1.7
+    'TiaMcp.TechnologyProfiles.Tests' = 10.7
+    'TiaMcp.TestSuite.Tests' = 28.3
+    'TiaMcp.Tests' = 36.9
+    'TiaMcp.TranslationHost.Tests' = 10.5
+    'TiaMcp.TranslationImport.Tests' = 27.8
+    'TiaMcp.Translations.Tests' = 1.0
+    'TiaMcp.VersionControl.Tests' = 97.2
+    'TiaMcp.VersionControl.Workflow.Tests' = 44.0
+    'TiaMcp.WatchTables.Tests' = 1.9
+    'TiaMcp.WebApplications.Tests' = 2.3
+}
+# Checks after the suite loop read suite outputs, so each group runs in shard (index % ShardCount)
+# together with every suite it reads from. Seconds are the measured check time (CI run 40077726200).
+$ManagedCheckGroups = @(
+    @{seconds=300; suites=@('TiaMcp.PhysicalRuntime.Tests','TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests','TiaMcp.ProjectModel.Tests')},
+    @{seconds=15; suites=@('TiaMcp.Tests','TiaMcp.TestSuite.Tests','TiaMcp.EncoderEvidence.Tests')},
+    @{seconds=160; suites=@('TiaMcp.CompositeEngineering.Tests','TiaMcp.HmiComponents.Tests','TiaMcp.SoftwareUnits.Tests','TiaMcp.Connections.Tests','TiaMcp.DbSnapshots.Tests','TiaMcp.SafetyEvidence.Tests')},
+    @{seconds=70; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')}
+)
+function Invoke-CheckGroup([int]$group, [scriptblock]$checks) {
+    if (($group % $ShardCount) -ne $ShardIndex) { return }
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    & $checks
+    $result.managedCheckSeconds["$group"] = [math]::Round([double]$result.managedCheckSeconds["$group"] + $clock.Elapsed.TotalSeconds, 1)
+}
+# Deterministic longest-first split, so every suite runs in exactly one shard.
+function Select-ManagedShard([string[]]$names, [int]$count, [int]$index) {
+    if ($count -eq 1) { return $names }
+    $weight = { param($n) if ($ManagedSuiteSeconds.ContainsKey($n)) { [double]$ManagedSuiteSeconds[$n] } else { 60.0 } }
+    $loads = [double[]]::new($count); $assigned = @{}
+    for ($g = 0; $g -lt $ManagedCheckGroups.Count; $g++) {
+        $loads[$g % $count] += $ManagedCheckGroups[$g].seconds
+        foreach ($name in $ManagedCheckGroups[$g].suites) { $assigned[$name] = $g % $count; $loads[$g % $count] += & $weight $name }
+    }
+    foreach ($name in ($names | Where-Object { -not $assigned.ContainsKey($_) } | Sort-Object @{Expression={ & $weight $_ }; Descending=$true}, @{Expression={ $_ }})) {
+        $target = 0
+        for ($i = 1; $i -lt $count; $i++) { if ($loads[$i] -lt $loads[$target]) { $target = $i } }
+        $loads[$target] += & $weight $name; $assigned[$name] = $target
+    }
+    return @($names | Where-Object { $assigned[$_] -eq $index })
+}
 $result = @{schemaVersion=1;status='running';suite=$Suite;startedAtUtc=[DateTime]::UtcNow.ToString('O');nativeQualification=$false;managedSuites=@()}
 Push-Location $repoRoot
 try {
@@ -71,6 +153,10 @@ try {
         'TiaMcp.CompilationEvidence.Tests', 'TiaMcp.EncoderEvidence.Tests'
     )
     if ($Suite -in @('All','Managed')) {
+        $suites = @(Select-ManagedShard $suites $ShardCount $ShardIndex)
+        $result.managedShard = @{index=$ShardIndex;count=$ShardCount;suites=$suites}
+        $result.managedSuiteSeconds = [ordered]@{}
+        $result.managedCheckSeconds = [ordered]@{}
         dotnet build src/TiaMcp.OpcUa.Cli/TiaMcp.OpcUa.Cli.csproj --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'OPC UA CLI build failed.' }
         $gitExecutable = (Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
@@ -79,11 +165,13 @@ try {
         dotnet new sln --name managed-suites --output $solutionDirectory | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite solution could not be created.' }
         $solution = (Get-ChildItem -LiteralPath $solutionDirectory -File | Where-Object { $_.Name -like 'managed-suites.sln*' } | Select-Object -First 1).FullName
-        dotnet sln $solution add @($suites | ForEach-Object { "tests/$_/$_.csproj" }) | Out-Null
+        # Checks run the Host even in shards whose suites do not reference it.
+        dotnet sln $solution add @($suites | ForEach-Object { "tests/$_/$_.csproj" }) src/TiaMcp.Host/TiaMcp.Host.csproj | Out-Null
         if ($LASTEXITCODE -ne 0) { throw 'Managed suites could not be added to the build solution.' }
         dotnet build $solution --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite build failed.' }
         foreach ($managedSuite in $suites) {
+            $suiteClock = [Diagnostics.Stopwatch]::StartNew()
             if ($managedSuite -eq 'TiaMcp.PhysicalRuntime.Tests') {
                 dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'physical-runtime-results.json')
             } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Runtime.Tests') {
@@ -153,241 +241,257 @@ try {
             }
             if ($LASTEXITCODE -ne 0) { throw "Managed offline tests failed: $managedSuite" }
             $result.managedSuites += $managedSuite
+            $result.managedSuiteSeconds[$managedSuite] = [math]::Round($suiteClock.Elapsed.TotalSeconds, 1)
         }
-        if ($Suite -eq 'All') {
-            $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
-            $previousExplorerModel = $env:TIA_EXPLORER_MODEL
-            try {
-                $env:TIA_RELATIONSHIP_EVIDENCE = Join-Path $output 'relationship-scope'
-                $env:TIA_EXPLORER_MODEL = Join-Path $repoRoot 'ui/project-explorer/model.js'
-                node --test ui/project-explorer/tests/relationship-scope.test.cjs
-                if ($LASTEXITCODE -ne 0) { throw 'Independent saved relationship scope checks failed.' }
-                node ui/project-explorer/tests/relationship-benchmark.cjs (Join-Path $output 'relationship-scale.json')
-                if ($LASTEXITCODE -ne 0) { throw 'Bounded relationship scale qualification failed.' }
-                $result.relationshipScope = 'passed; independent expected edges, C# export/reopen and 1k/10k/50k retained snapshots'
-            } finally {
-                $env:TIA_RELATIONSHIP_EVIDENCE = $previousRelationshipEvidence
-                $env:TIA_EXPLORER_MODEL = $previousExplorerModel
+        Invoke-CheckGroup 0 {
+            if ($Suite -eq 'All') {
+                $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
+                $previousExplorerModel = $env:TIA_EXPLORER_MODEL
+                try {
+                    $env:TIA_RELATIONSHIP_EVIDENCE = Join-Path $output 'relationship-scope'
+                    $env:TIA_EXPLORER_MODEL = Join-Path $repoRoot 'ui/project-explorer/model.js'
+                    node --test ui/project-explorer/tests/relationship-scope.test.cjs
+                    if ($LASTEXITCODE -ne 0) { throw 'Independent saved relationship scope checks failed.' }
+                    node ui/project-explorer/tests/relationship-benchmark.cjs (Join-Path $output 'relationship-scale.json')
+                    if ($LASTEXITCODE -ne 0) { throw 'Bounded relationship scale qualification failed.' }
+                    $result.relationshipScope = 'passed; independent expected edges, C# export/reopen and 1k/10k/50k retained snapshots'
+                } finally {
+                    $env:TIA_RELATIONSHIP_EVIDENCE = $previousRelationshipEvidence
+                    $env:TIA_EXPLORER_MODEL = $previousExplorerModel
+                }
             }
         }
-        python -B scripts/test_composite_engineering_contracts.py --fixture (Join-Path $output 'composite-engineering')
-        if ($LASTEXITCODE -ne 0) { throw 'Composite engineering independent input/schema check failed.' }
-        $result.compositeEngineering = 'passed; v1 mapping and v2 consumer context fixtures with independent original-source checks; no native qualification'
-        & (Join-Path $PSScriptRoot 'Test-AddInOwner.ps1') -OutputDirectory (Join-Path $output 'addin-owner-framework')
-        python -B scripts/test_addin_handoff.py --log (Join-Path $output 'general-managed.log') --output (Join-Path $output 'addin-handoff-lifecycle.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Add-In handoff independent receipt-chain checks failed.' }
-        $result.addInHandoffLifecycle = 'passed; internal lifecycle with synthetic authority, no transport or production enrollment'
-        python -B scripts/test_addin_receiver.py --log (Join-Path $output 'general-managed.log') --output (Join-Path $output 'addin-receiver-processes.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Add-In receiver independent process evidence checks failed.' }
-        $result.addInReceiverProcesses = 'passed; actual Windows processes and pipes, synthetic enrollment only'
-        python -B scripts/test_addin_owner_context.py --fixture (Join-Path $output 'addin-owner-framework/result.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Add-In owner Framework/schema check failed.' }
-        $result.addInOwnerContext = 'passed; actual OS handles and Framework runtime, synthetic native-ID route'
-        # Real stdio Host workflow, deliberately absent native workers. No native
-        # queue ownership is needed; startup of a Siemens worker would fail.
-        python -B scripts/test_physical_runtime_contracts.py --fixture (Join-Path $output 'physical-runtime-results.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Physical runtime protocol contract cross-check failed.' }
-        $result.physicalRuntimeContracts = 'passed; protocol only, no network or native execution'
-        python -B scripts/runtime_pressure_checks.py (Join-Path $output 'physical-runtime-results.json.polling/pressure')
-        if ($LASTEXITCODE -ne 0) { throw 'Independent runtime pressure chain/value/schedule checks failed.' }
-        $result.runtimePressure = 'passed; bounded load and capacity, actual disk-full remains a separate prerequisite'
-        dotnet (Join-Path $buildOutput "bin/TiaMcp.PhysicalRuntime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.PhysicalRuntime.Tests.dll") --tls-fixtures (Join-Path $output 'runtime-tls')
-        if ($LASTEXITCODE -ne 0) { throw 'Runtime TLS fixture generation failed.' }
-        python -B scripts/qualify_runtime_profiles.py --assembly (Join-Path $buildOutput "bin/TiaMcp.PhysicalRuntime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.PhysicalRuntime.Tests.dll") --tls (Join-Path $output 'runtime-tls') --runtime-directory (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())") --output (Join-Path $output 'runtime-profiles')
-        if ($LASTEXITCODE -ne 0) { throw 'Advertised runtime profile and refusal qualification failed.' }
-        $result.runtimeProfiles = 'passed; exact Host client binaries and pinned loopback fixtures, no device qualification'
-        python -B scripts/test_runtime_session_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --tls (Join-Path $output 'runtime-tls') --output (Join-Path $output 'runtime-session-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Runtime session TLS/MCP workflow failed.' }
-        $result.runtimeSessionMcp = 'passed; loopback TLS and DPAPI, no physical PLC'
-        python -B scripts/test_runtime_handoff_lifecycle.py --fixture (Join-Path $output 'runtime-session-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Bound runtime lifecycle independent verification failed.' }
-        $result.runtimeHandoffLifecycle = 'passed; original capture chains, migration inputs and TLS/process observations'
-        python -B scripts/test_runtime_capture_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'runtime-capture-compatibility-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Prior runtime capture compatibility failed.' }
-        $result.runtimeCaptureCompatibility = 'passed; actual prior producer bytes'
-        python -B scripts/qualify_opcua_runtime.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-runtime-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Secure OPC UA local-server/MCP qualification failed.' }
-        $result.opcUaRuntimeMcp = 'passed; exact Host runtime and explicit local server, no physical target qualification'
-        python -B scripts/qualify_opcua_capture.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-capture-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'OPC UA capture lifecycle and retained export qualification failed.' }
-        $result.opcUaCaptureMcp = 'passed; actual encrypted loopback acquisition, quality/time preservation and interrupted capture reopen'
-        python -B scripts/qualify_opcua_subscription.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-subscription-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'OPC UA subscription acquisition workflow failed.' }
-        $result.opcUaSubscriptionMcp = 'passed; encrypted loopback subscription, original sequence evidence and interrupted reopen without replay'
-        python -B scripts/test_teamcenter_review_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'teamcenter-review-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Teamcenter observation workflow failed.' }
-        python -B scripts/test_multiuser_review_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'multiuser-review-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Multiuser observation workflow failed.' }
-        python -B scripts/test_addin_selection_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'addin-selection-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Offline Add-In selection workflow failed.' }
-        $result.addInSelectionMcp = 'passed; supplied selections, no native companion'
-        python -B scripts/test_addin_receiver_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'addin-receiver-host')
-        if ($LASTEXITCODE -ne 0) { throw 'Production Add-In receiver enrollment gate failed.' }
-        $result.addInReceiverHost = 'passed; production enrollment unavailable, no worker launched'
-        python -B scripts/test_encoder_checkpoint.py --fixture (Join-Path $output 'encoder-checkpoint/fixture.json')
-        if ($LASTEXITCODE -ne 0) { throw 'C# encoder checkpoint receipt failed independent Python verification.' }
-        $result.encoderCheckpointReceipt = 'passed'
-        python -B scripts/test_translation_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'translation-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Offline translation MCP workflow failed.' }
-        $result.translationMcp = 'passed'
-        python -B scripts/test_translation_host_admission.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'translation-admission-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Translation native admission and qualification boundary failed.' }
-        $result.translationAdmissionMcp = 'passed'
-        $testSuiteFixture = Join-Path $output 'testsuite-production/host-fixture.json'
-        python -B scripts/test_testsuite_style_contracts.py --fixture $testSuiteFixture --report (Join-Path $output 'testsuite-schema.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Test Suite JSON Schema harness failed.' }
-        $result.testSuiteSchemas = 'passed'
-        python -B scripts/test_testsuite_production_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture $testSuiteFixture --report (Join-Path $output 'testsuite-mcp.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Test Suite actual offline MCP workflow failed.' }
-        $result.testSuiteMcp = 'passed'
-        python -B scripts/test_testsuite_result_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'testsuite-intake/mcp-fixture.json') --output (Join-Path $output 'testsuite-result-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Supplied Test Suite result MCP workflow failed.' }
-        $result.testSuiteResultMcp = 'passed'
-        python -B scripts/test_software_unit_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'software-units/mcp-fixture.json') --output (Join-Path $output 'software-unit-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Software-unit MCP workflow failed.' }
-        $result.softwareUnitMcp = 'passed'
-        python -B scripts/test_connection_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'connections/mcp-fixture.json') --output (Join-Path $output 'connection-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Connection MCP workflow failed.' }
-        $result.connectionMcp = 'passed'
-        python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/mcp-fixture.json') --output (Join-Path $output 'composite-engineering-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Composite engineering MCP workflow failed.' }
-        $result.compositeEngineeringMcp = 'passed'
-        python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/consumer-v2/mcp-fixture.json') --output (Join-Path $output 'composite-consumers-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Composite consumer context MCP workflow failed.' }
-        $result.compositeConsumersMcp = 'passed'
-        python -B scripts/test_composite_engineering_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'composite-prior-v1-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual prior composite v1 compatibility failed.' }
-        $result.compositePriorCompatibility = 'passed'
-        python -B scripts/test_composite_typed_contracts.py --fixture (Join-Path $output 'composite-engineering/typed-v3')
-        if ($LASTEXITCODE -ne 0) { throw 'Independent typed composite verification failed.' }
-        python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/typed-v3/mcp-fixture.json') --output (Join-Path $output 'composite-typed-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Composite typed mapping MCP workflow failed.' }
-        python -B scripts/test_composite_engineering_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture fixtures/composite-engineering/retained-v1-v2 --output (Join-Path $output 'composite-prior-v1-v2-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual prior composite v1/v2 compatibility failed.' }
-        $result.compositeTypedAndPriorCompatibility = 'passed'
-        python -B scripts/test_hmi_component_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/mcp-fixture.json') --output (Join-Path $output 'hmi-component-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Component/HMI MCP workflow failed.' }
-        python -B scripts/test_hmi_text_list_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-generation/mcp-fixture.json') --output (Join-Path $output 'hmi-text-generation-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Bound HMI text-list generation MCP workflow failed.' }
-        python -B scripts/test_hmi_numeric_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-numeric/mcp-fixture.json') --output (Join-Path $output 'hmi-numeric-generation-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Numeric HMI state generation MCP workflow failed.' }
-        python -B scripts/test_hmi_coordinated_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-coordinated/mcp-fixture.json') --output (Join-Path $output 'hmi-coordinated-generation-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Coordinated HMI generation-set MCP workflow failed.' }
-        $result.hmiCoordinatedGeneration = 'passed; exact declared output/binding set and original dependency/consumer limits'
-        python -B scripts/qualify_hmi_coordinated_prior.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-coordinated-prior')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual prior text-list author compatibility failed.' }
-        $result.hmiAuthorPriorCompatibility = 'passed; retained actual v1/v2/v3 producer bytes'
-        python -B scripts/test_hmi_set_evolution_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-evolution/mcp-fixture.json') --output (Join-Path $output 'hmi-set-evolution-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Explicit HMI set evolution and conflict workflow failed.' }
-        python -B scripts/qualify_hmi_set_evolution_prior.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-set-evolution-prior')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual prior HMI generation-set compatibility failed.' }
-        $result.hmiSetEvolution = 'passed; explicit membership, identity and binding changes with retained v1 set compatibility'
-        python -B scripts/test_hmi_integer_conversion_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-conversion/mcp-fixture.json') --output (Join-Path $output 'hmi-integer-conversion-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Explicit integer text-list conversion workflow failed.' }
-        $result.hmiIntegerConversion = 'passed; explicit checked listed-value conversion, overflow/manual-edit refusals and retained lineage'
-        $result.hmiTextListGeneration = 'passed; exact supplied component binding and retained candidates'
-        $result.hmiComponentMcp = 'passed'
-        python -B scripts/hmi_derived_effect_checks.py --fixture (Join-Path $output 'hmi-component-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Independent HMI expected-effect checks failed.' }
-        python -B scripts/test_hmi_component_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-component-prior-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual prior HMI record compatibility failed.' }
-        $result.hmiDerivedEffectsAndPrior = 'passed'
-        python -B scripts/test_db_snapshot_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'db-snapshots/mcp-fixture.json') --output (Join-Path $output 'db-snapshot-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'DB snapshot MCP workflow failed.' }
-        $result.dbSnapshotMcp = 'passed'
-        python -B scripts/test_safety_evidence_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'safety-evidence/mcp-fixture.json') --output (Join-Path $output 'safety-evidence-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Safety evidence MCP workflow failed.' }
-        $result.safetyEvidenceMcp = 'passed'
-        python -B scripts/test_manifest_publication_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'manifest-publication-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Manifest publication MCP recovery workflow failed.' }
-        $result.manifestPublicationMcp = 'passed'
-        python -B scripts/test_drive_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'drive-profiles/mcp-fixture.json') --output (Join-Path $output 'drive-profile-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Drive profile MCP workflow failed.' }
-        $result.driveProfileMcp = 'passed'
-        python -B scripts/test_drive_telegram_contracts.py --fixture (Join-Path $output 'drive-profiles/telegrams-v2')
-        if ($LASTEXITCODE -ne 0) { throw 'Typed telegram independent input/schema checks failed.' }
-        python -B scripts/test_drive_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'drive-profiles/telegrams-v2/mcp-fixture.json') --output (Join-Path $output 'drive-telegrams-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Typed telegram MCP workflow failed.' }
-        $result.driveTelegramsMcp = 'passed'
-        python -B scripts/test_technology_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'technology-profiles/mcp-fixture.json') --output (Join-Path $output 'technology-profile-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Technology profile MCP workflow failed.' }
-        $result.technologyProfileMcp = 'passed'
-        python -B scripts/test_technology_encoder_contracts.py --fixture (Join-Path $output 'technology-profiles/encoders-v4')
-        if ($LASTEXITCODE -ne 0) { throw 'Typed encoder independent source/schema checks failed.' }
-        python -B scripts/test_technology_profile_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'technology-prior-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Prior technology record compatibility failed.' }
-        $result.technologyPriorMcp = 'passed'
-        python -B scripts/test_access_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'access/mcp-fixture.json') --output (Join-Path $output 'access-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Public access MCP workflow failed.' }
-        $result.accessMcp = 'passed'
-        python -B scripts/test_runtime_handoff_contracts.py --fixture (Join-Path $output 'access/handoff')
-        if ($LASTEXITCODE -ne 0) { throw 'Security/runtime handoff original-evidence checks failed.' }
-        python -B scripts/test_access_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'access-prior-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Prior access record compatibility failed.' }
-        $result.runtimeHandoffOriginals = 'passed'
-        $result.accessPriorMcp = 'passed'
-        python -B scripts/test_runtime_handoff_workflow.py --fixture (Join-Path $output 'access/handoff-workflow')
-        if ($LASTEXITCODE -ne 0) { throw 'Retained handoff original-evidence checks failed.' }
-        python -B scripts/test_runtime_handoff_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'access/handoff-workflow/mcp-fixture.json') --output (Join-Path $output 'runtime-handoff-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Security/runtime handoff MCP workflow failed.' }
-        $result.runtimeHandoffMcp = 'passed'
-        python -B scripts/test_public_certificate_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'public-certificates/mcp-fixture.json') --output (Join-Path $output 'public-certificate-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Public certificate MCP workflow failed.' }
-        $result.publicCertificateMcp = 'passed'
-        python -B scripts/test_web_application_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'web-applications/mcp-fixture.json') --output (Join-Path $output 'web-application-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Web application MCP workflow failed.' }
-        $result.webApplicationMcp = 'passed'
-        python -B scripts/test_external_resource_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'external-resources/mcp-fixture.json') --output (Join-Path $output 'external-resource-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'External resource MCP workflow failed.' }
-        $result.externalResourceMcp = 'passed'
-        python -B scripts/test_credential_cli.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'credential-cli')
-        if ($LASTEXITCODE -ne 0) { throw 'Protected credential local CLI failed.' }
-        $result.credentialCli = 'passed'
-        python -B scripts/test_credential_operation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'credentials/operations/mcp-fixture.json') --output (Join-Path $output 'credential-operation-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Credential operation status checks failed.' }
-        $result.credentialOperations = 'passed'
-        python -B scripts/test_credential_operation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'credentials/recovery/mcp-fixture.json') --output (Join-Path $output 'credential-recovery-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Credential recovery status checks failed.' }
-        $result.credentialRecovery = 'passed'
+        Invoke-CheckGroup 2 {
+            python -B scripts/test_composite_engineering_contracts.py --fixture (Join-Path $output 'composite-engineering')
+            if ($LASTEXITCODE -ne 0) { throw 'Composite engineering independent input/schema check failed.' }
+            $result.compositeEngineering = 'passed; v1 mapping and v2 consumer context fixtures with independent original-source checks; no native qualification'
+        }
+        Invoke-CheckGroup 1 {
+            & (Join-Path $PSScriptRoot 'Test-AddInOwner.ps1') -OutputDirectory (Join-Path $output 'addin-owner-framework')
+            python -B scripts/test_addin_handoff.py --log (Join-Path $output 'general-managed.log') --output (Join-Path $output 'addin-handoff-lifecycle.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Add-In handoff independent receipt-chain checks failed.' }
+            $result.addInHandoffLifecycle = 'passed; internal lifecycle with synthetic authority, no transport or production enrollment'
+            python -B scripts/test_addin_receiver.py --log (Join-Path $output 'general-managed.log') --output (Join-Path $output 'addin-receiver-processes.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Add-In receiver independent process evidence checks failed.' }
+            $result.addInReceiverProcesses = 'passed; actual Windows processes and pipes, synthetic enrollment only'
+            python -B scripts/test_addin_owner_context.py --fixture (Join-Path $output 'addin-owner-framework/result.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Add-In owner Framework/schema check failed.' }
+            $result.addInOwnerContext = 'passed; actual OS handles and Framework runtime, synthetic native-ID route'
+        }
+        Invoke-CheckGroup 0 {
+            # Real stdio Host workflow, deliberately absent native workers. No native
+            # queue ownership is needed; startup of a Siemens worker would fail.
+            python -B scripts/test_physical_runtime_contracts.py --fixture (Join-Path $output 'physical-runtime-results.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Physical runtime protocol contract cross-check failed.' }
+            $result.physicalRuntimeContracts = 'passed; protocol only, no network or native execution'
+            python -B scripts/runtime_pressure_checks.py (Join-Path $output 'physical-runtime-results.json.polling/pressure')
+            if ($LASTEXITCODE -ne 0) { throw 'Independent runtime pressure chain/value/schedule checks failed.' }
+            $result.runtimePressure = 'passed; bounded load and capacity, actual disk-full remains a separate prerequisite'
+            dotnet (Join-Path $buildOutput "bin/TiaMcp.PhysicalRuntime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.PhysicalRuntime.Tests.dll") --tls-fixtures (Join-Path $output 'runtime-tls')
+            if ($LASTEXITCODE -ne 0) { throw 'Runtime TLS fixture generation failed.' }
+            python -B scripts/qualify_runtime_profiles.py --assembly (Join-Path $buildOutput "bin/TiaMcp.PhysicalRuntime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.PhysicalRuntime.Tests.dll") --tls (Join-Path $output 'runtime-tls') --runtime-directory (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())") --output (Join-Path $output 'runtime-profiles')
+            if ($LASTEXITCODE -ne 0) { throw 'Advertised runtime profile and refusal qualification failed.' }
+            $result.runtimeProfiles = 'passed; exact Host client binaries and pinned loopback fixtures, no device qualification'
+            python -B scripts/test_runtime_session_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --tls (Join-Path $output 'runtime-tls') --output (Join-Path $output 'runtime-session-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Runtime session TLS/MCP workflow failed.' }
+            $result.runtimeSessionMcp = 'passed; loopback TLS and DPAPI, no physical PLC'
+            python -B scripts/test_runtime_handoff_lifecycle.py --fixture (Join-Path $output 'runtime-session-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Bound runtime lifecycle independent verification failed.' }
+            $result.runtimeHandoffLifecycle = 'passed; original capture chains, migration inputs and TLS/process observations'
+            python -B scripts/test_runtime_capture_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'runtime-capture-compatibility-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Prior runtime capture compatibility failed.' }
+            $result.runtimeCaptureCompatibility = 'passed; actual prior producer bytes'
+            python -B scripts/qualify_opcua_runtime.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-runtime-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Secure OPC UA local-server/MCP qualification failed.' }
+            $result.opcUaRuntimeMcp = 'passed; exact Host runtime and explicit local server, no physical target qualification'
+            python -B scripts/qualify_opcua_capture.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-capture-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'OPC UA capture lifecycle and retained export qualification failed.' }
+            $result.opcUaCaptureMcp = 'passed; actual encrypted loopback acquisition, quality/time preservation and interrupted capture reopen'
+            python -B scripts/qualify_opcua_subscription.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --output (Join-Path $output 'opcua-subscription-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'OPC UA subscription acquisition workflow failed.' }
+            $result.opcUaSubscriptionMcp = 'passed; encrypted loopback subscription, original sequence evidence and interrupted reopen without replay'
+        }
+        Invoke-CheckGroup 1 {
+            python -B scripts/test_teamcenter_review_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'teamcenter-review-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Teamcenter observation workflow failed.' }
+            python -B scripts/test_multiuser_review_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'multiuser-review-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Multiuser observation workflow failed.' }
+            python -B scripts/test_addin_selection_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'addin-selection-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Offline Add-In selection workflow failed.' }
+            $result.addInSelectionMcp = 'passed; supplied selections, no native companion'
+            python -B scripts/test_addin_receiver_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'addin-receiver-host')
+            if ($LASTEXITCODE -ne 0) { throw 'Production Add-In receiver enrollment gate failed.' }
+            $result.addInReceiverHost = 'passed; production enrollment unavailable, no worker launched'
+            python -B scripts/test_encoder_checkpoint.py --fixture (Join-Path $output 'encoder-checkpoint/fixture.json')
+            if ($LASTEXITCODE -ne 0) { throw 'C# encoder checkpoint receipt failed independent Python verification.' }
+            $result.encoderCheckpointReceipt = 'passed'
+            python -B scripts/test_translation_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'translation-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Offline translation MCP workflow failed.' }
+            $result.translationMcp = 'passed'
+            python -B scripts/test_translation_host_admission.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'translation-admission-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Translation native admission and qualification boundary failed.' }
+            $result.translationAdmissionMcp = 'passed'
+            $testSuiteFixture = Join-Path $output 'testsuite-production/host-fixture.json'
+            python -B scripts/test_testsuite_style_contracts.py --fixture $testSuiteFixture --report (Join-Path $output 'testsuite-schema.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Test Suite JSON Schema harness failed.' }
+            $result.testSuiteSchemas = 'passed'
+            python -B scripts/test_testsuite_production_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture $testSuiteFixture --report (Join-Path $output 'testsuite-mcp.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Test Suite actual offline MCP workflow failed.' }
+            $result.testSuiteMcp = 'passed'
+            python -B scripts/test_testsuite_result_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'testsuite-intake/mcp-fixture.json') --output (Join-Path $output 'testsuite-result-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Supplied Test Suite result MCP workflow failed.' }
+            $result.testSuiteResultMcp = 'passed'
+        }
+        Invoke-CheckGroup 2 {
+            python -B scripts/test_software_unit_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'software-units/mcp-fixture.json') --output (Join-Path $output 'software-unit-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Software-unit MCP workflow failed.' }
+            $result.softwareUnitMcp = 'passed'
+            python -B scripts/test_connection_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'connections/mcp-fixture.json') --output (Join-Path $output 'connection-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Connection MCP workflow failed.' }
+            $result.connectionMcp = 'passed'
+            python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/mcp-fixture.json') --output (Join-Path $output 'composite-engineering-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Composite engineering MCP workflow failed.' }
+            $result.compositeEngineeringMcp = 'passed'
+            python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/consumer-v2/mcp-fixture.json') --output (Join-Path $output 'composite-consumers-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Composite consumer context MCP workflow failed.' }
+            $result.compositeConsumersMcp = 'passed'
+            python -B scripts/test_composite_engineering_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'composite-prior-v1-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual prior composite v1 compatibility failed.' }
+            $result.compositePriorCompatibility = 'passed'
+            python -B scripts/test_composite_typed_contracts.py --fixture (Join-Path $output 'composite-engineering/typed-v3')
+            if ($LASTEXITCODE -ne 0) { throw 'Independent typed composite verification failed.' }
+            python -B scripts/test_composite_engineering_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'composite-engineering/typed-v3/mcp-fixture.json') --output (Join-Path $output 'composite-typed-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Composite typed mapping MCP workflow failed.' }
+            python -B scripts/test_composite_engineering_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture fixtures/composite-engineering/retained-v1-v2 --output (Join-Path $output 'composite-prior-v1-v2-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual prior composite v1/v2 compatibility failed.' }
+            $result.compositeTypedAndPriorCompatibility = 'passed'
+            python -B scripts/test_hmi_component_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/mcp-fixture.json') --output (Join-Path $output 'hmi-component-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Component/HMI MCP workflow failed.' }
+            python -B scripts/test_hmi_text_list_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-generation/mcp-fixture.json') --output (Join-Path $output 'hmi-text-generation-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Bound HMI text-list generation MCP workflow failed.' }
+            python -B scripts/test_hmi_numeric_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-numeric/mcp-fixture.json') --output (Join-Path $output 'hmi-numeric-generation-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Numeric HMI state generation MCP workflow failed.' }
+            python -B scripts/test_hmi_coordinated_generation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-coordinated/mcp-fixture.json') --output (Join-Path $output 'hmi-coordinated-generation-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Coordinated HMI generation-set MCP workflow failed.' }
+            $result.hmiCoordinatedGeneration = 'passed; exact declared output/binding set and original dependency/consumer limits'
+            python -B scripts/qualify_hmi_coordinated_prior.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-coordinated-prior')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual prior text-list author compatibility failed.' }
+            $result.hmiAuthorPriorCompatibility = 'passed; retained actual v1/v2/v3 producer bytes'
+            python -B scripts/test_hmi_set_evolution_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-evolution/mcp-fixture.json') --output (Join-Path $output 'hmi-set-evolution-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Explicit HMI set evolution and conflict workflow failed.' }
+            python -B scripts/qualify_hmi_set_evolution_prior.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-set-evolution-prior')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual prior HMI generation-set compatibility failed.' }
+            $result.hmiSetEvolution = 'passed; explicit membership, identity and binding changes with retained v1 set compatibility'
+            python -B scripts/test_hmi_integer_conversion_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'hmi-components/text-conversion/mcp-fixture.json') --output (Join-Path $output 'hmi-integer-conversion-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Explicit integer text-list conversion workflow failed.' }
+            $result.hmiIntegerConversion = 'passed; explicit checked listed-value conversion, overflow/manual-edit refusals and retained lineage'
+            $result.hmiTextListGeneration = 'passed; exact supplied component binding and retained candidates'
+            $result.hmiComponentMcp = 'passed'
+            python -B scripts/hmi_derived_effect_checks.py --fixture (Join-Path $output 'hmi-component-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Independent HMI expected-effect checks failed.' }
+            python -B scripts/test_hmi_component_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'hmi-component-prior-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual prior HMI record compatibility failed.' }
+            $result.hmiDerivedEffectsAndPrior = 'passed'
+            python -B scripts/test_db_snapshot_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'db-snapshots/mcp-fixture.json') --output (Join-Path $output 'db-snapshot-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'DB snapshot MCP workflow failed.' }
+            $result.dbSnapshotMcp = 'passed'
+            python -B scripts/test_safety_evidence_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'safety-evidence/mcp-fixture.json') --output (Join-Path $output 'safety-evidence-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Safety evidence MCP workflow failed.' }
+            $result.safetyEvidenceMcp = 'passed'
+        }
+        Invoke-CheckGroup 3 {
+            python -B scripts/test_manifest_publication_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'manifest-publication-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Manifest publication MCP recovery workflow failed.' }
+            $result.manifestPublicationMcp = 'passed'
+            python -B scripts/test_drive_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'drive-profiles/mcp-fixture.json') --output (Join-Path $output 'drive-profile-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Drive profile MCP workflow failed.' }
+            $result.driveProfileMcp = 'passed'
+            python -B scripts/test_drive_telegram_contracts.py --fixture (Join-Path $output 'drive-profiles/telegrams-v2')
+            if ($LASTEXITCODE -ne 0) { throw 'Typed telegram independent input/schema checks failed.' }
+            python -B scripts/test_drive_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'drive-profiles/telegrams-v2/mcp-fixture.json') --output (Join-Path $output 'drive-telegrams-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Typed telegram MCP workflow failed.' }
+            $result.driveTelegramsMcp = 'passed'
+            python -B scripts/test_technology_profile_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'technology-profiles/mcp-fixture.json') --output (Join-Path $output 'technology-profile-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Technology profile MCP workflow failed.' }
+            $result.technologyProfileMcp = 'passed'
+            python -B scripts/test_technology_encoder_contracts.py --fixture (Join-Path $output 'technology-profiles/encoders-v4')
+            if ($LASTEXITCODE -ne 0) { throw 'Typed encoder independent source/schema checks failed.' }
+            python -B scripts/test_technology_profile_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'technology-prior-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Prior technology record compatibility failed.' }
+            $result.technologyPriorMcp = 'passed'
+            python -B scripts/test_access_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'access/mcp-fixture.json') --output (Join-Path $output 'access-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Public access MCP workflow failed.' }
+            $result.accessMcp = 'passed'
+            python -B scripts/test_runtime_handoff_contracts.py --fixture (Join-Path $output 'access/handoff')
+            if ($LASTEXITCODE -ne 0) { throw 'Security/runtime handoff original-evidence checks failed.' }
+            python -B scripts/test_access_compatibility.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'access-prior-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Prior access record compatibility failed.' }
+            $result.runtimeHandoffOriginals = 'passed'
+            $result.accessPriorMcp = 'passed'
+            python -B scripts/test_runtime_handoff_workflow.py --fixture (Join-Path $output 'access/handoff-workflow')
+            if ($LASTEXITCODE -ne 0) { throw 'Retained handoff original-evidence checks failed.' }
+            python -B scripts/test_runtime_handoff_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'access/handoff-workflow/mcp-fixture.json') --output (Join-Path $output 'runtime-handoff-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Security/runtime handoff MCP workflow failed.' }
+            $result.runtimeHandoffMcp = 'passed'
+            python -B scripts/test_public_certificate_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'public-certificates/mcp-fixture.json') --output (Join-Path $output 'public-certificate-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Public certificate MCP workflow failed.' }
+            $result.publicCertificateMcp = 'passed'
+            python -B scripts/test_web_application_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'web-applications/mcp-fixture.json') --output (Join-Path $output 'web-application-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Web application MCP workflow failed.' }
+            $result.webApplicationMcp = 'passed'
+            python -B scripts/test_external_resource_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'external-resources/mcp-fixture.json') --output (Join-Path $output 'external-resource-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'External resource MCP workflow failed.' }
+            $result.externalResourceMcp = 'passed'
+            python -B scripts/test_credential_cli.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'credential-cli')
+            if ($LASTEXITCODE -ne 0) { throw 'Protected credential local CLI failed.' }
+            $result.credentialCli = 'passed'
+            python -B scripts/test_credential_operation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'credentials/operations/mcp-fixture.json') --output (Join-Path $output 'credential-operation-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Credential operation status checks failed.' }
+            $result.credentialOperations = 'passed'
+            python -B scripts/test_credential_operation_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --fixture (Join-Path $output 'credentials/recovery/mcp-fixture.json') --output (Join-Path $output 'credential-recovery-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Credential recovery status checks failed.' }
+            $result.credentialRecovery = 'passed'
 
 
-        python -B scripts/verify_feature_catalog.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --report (Join-Path $output 'catalog-mcp.json')
-        if ($LASTEXITCODE -ne 0) { throw 'Actual Host feature catalog checks failed.' }
-        $result.catalogMcp = 'passed'
-        python -B scripts/test_watch_qualification_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe")
-        if ($LASTEXITCODE -ne 0) { throw 'Watch qualification registration boundary failed.' }
-        $result.watchQualificationBoundary = 'passed'
-        python -B scripts/test_opcua_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'opcua-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'OPC UA actual offline MCP workflow failed.' }
-        $result.opcUaMcp = 'passed'
-        python -B scripts/test_vci_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --git-executable $gitExecutable --output (Join-Path $output 'vci-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'VCI actual offline MCP workflow failed.' }
-        $result.vciMcp = 'passed'
-        python -B scripts/test_graph_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'graph-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'GRAPH actual offline MCP workflow failed.' }
-        $result.graphMcp = 'passed'
-        python -B scripts/test_automationml_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'automationml-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Offline AutomationML MCP workflow failed.' }
-        $result.automationmlMcp = 'passed'
-        python -B scripts/qualify_trace_diagnostics_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Offline review intake and diagnostic MCP workflow failed.' }
-        $result.diagnosticMcp = 'passed'
-        python -B scripts/qualify_diagnostic_experiments_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-experiment-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Offline diagnostic experiment composition and before/after workflow failed.' }
-        $result.diagnosticExperiments = 'passed; original source, instance, Test Suite/alarm and measurement lineage'
-        python -B scripts/qualify_repeated_diagnostic_experiments_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-repeat-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Repeated diagnostic experiments and combined report export failed.' }
-        $result.diagnosticRepeatedExperiments = 'passed; repeated windows, quality and original evidence rederivation'
-        python -B scripts/qualify_runtime_diagnostic_acquisition_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'runtime-diagnostic-acquisition-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Retained runtime acquisition and diagnostic report workflow failed.' }
-        $result.runtimeDiagnosticAcquisition = 'passed; exact immutable capture sources and unresolved sequential observations'
-        python -B scripts/qualify_diagnostic_quality_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-quality-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Diagnostic sample quality, clock epochs and qualified report workflow failed.' }
-        $result.diagnosticQuality = 'passed; quality-aware measurement, comparison and repeated experiment reports'
-        python -B scripts/qualify_diagnostic_ua_binding.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-ua-binding-mcp')
-        if ($LASTEXITCODE -ne 0) { throw 'Prebound UA diagnostic intent and capture restart workflow failed.' }
-        $result.diagnosticUaBinding = 'passed; pre-acquisition intent, retained observations, adverse quality/sequence evidence, readable exports and restart without replay'
-
+            python -B scripts/verify_feature_catalog.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --report (Join-Path $output 'catalog-mcp.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Actual Host feature catalog checks failed.' }
+            $result.catalogMcp = 'passed'
+            python -B scripts/test_watch_qualification_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe")
+            if ($LASTEXITCODE -ne 0) { throw 'Watch qualification registration boundary failed.' }
+            $result.watchQualificationBoundary = 'passed'
+            python -B scripts/test_opcua_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'opcua-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'OPC UA actual offline MCP workflow failed.' }
+            $result.opcUaMcp = 'passed'
+            python -B scripts/test_vci_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --git-executable $gitExecutable --output (Join-Path $output 'vci-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'VCI actual offline MCP workflow failed.' }
+            $result.vciMcp = 'passed'
+            python -B scripts/test_graph_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'graph-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'GRAPH actual offline MCP workflow failed.' }
+            $result.graphMcp = 'passed'
+            python -B scripts/test_automationml_host_mcp.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'automationml-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Offline AutomationML MCP workflow failed.' }
+            $result.automationmlMcp = 'passed'
+        }
+        Invoke-CheckGroup 0 {
+            python -B scripts/qualify_trace_diagnostics_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Offline review intake and diagnostic MCP workflow failed.' }
+            $result.diagnosticMcp = 'passed'
+            python -B scripts/qualify_diagnostic_experiments_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-experiment-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Offline diagnostic experiment composition and before/after workflow failed.' }
+            $result.diagnosticExperiments = 'passed; original source, instance, Test Suite/alarm and measurement lineage'
+            python -B scripts/qualify_repeated_diagnostic_experiments_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-repeat-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Repeated diagnostic experiments and combined report export failed.' }
+            $result.diagnosticRepeatedExperiments = 'passed; repeated windows, quality and original evidence rederivation'
+            python -B scripts/qualify_runtime_diagnostic_acquisition_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'runtime-diagnostic-acquisition-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Retained runtime acquisition and diagnostic report workflow failed.' }
+            $result.runtimeDiagnosticAcquisition = 'passed; exact immutable capture sources and unresolved sequential observations'
+            python -B scripts/qualify_diagnostic_quality_offline.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-quality-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Diagnostic sample quality, clock epochs and qualified report workflow failed.' }
+            $result.diagnosticQuality = 'passed; quality-aware measurement, comparison and repeated experiment reports'
+            python -B scripts/qualify_diagnostic_ua_binding.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --server (Join-Path $buildOutput "bin/TiaMcp.OpcUa.Runtime.Tests/$($Configuration.ToLowerInvariant())/TiaMcp.OpcUa.Runtime.Tests.dll") --samples (Join-Path $output 'diagnostic-samples.json') --output (Join-Path $output 'diagnostic-ua-binding-mcp')
+            if ($LASTEXITCODE -ne 0) { throw 'Prebound UA diagnostic intent and capture restart workflow failed.' }
+            $result.diagnosticUaBinding = 'passed; pre-acquisition intent, retained observations, adverse quality/sequence evidence, readable exports and restart without replay'
+        }
     }
     $result.status = 'passed'
     Write-Output "PASS Offline validation ($Suite). No Siemens/native or runtime qualification is claimed."
