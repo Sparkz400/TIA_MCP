@@ -105,6 +105,21 @@ namespace TiaMcp.Openness.V21
             return unit;
         }
 
+        /// <summary>Captured templates carry the capture project's culture; an import fails when the target project lacks it.
+        /// Empty-text items move to the editing language (or are dropped when that culture already has an item); text is never discarded.</summary>
+        internal static void RetargetTemplateCultures(XDocument document, ICollection<string> activeCultures, string editingCulture)
+        {
+            foreach (var item in document.Descendants("MultilingualTextItem").ToArray())
+            {
+                var culture = item.Element("AttributeList")?.Element("Culture");
+                if (culture == null || activeCultures.Contains(culture.Value)) continue;
+                if (!string.IsNullOrEmpty(item.Element("AttributeList").Element("Text")?.Value))
+                    Fail("ProjectCultureUnavailable", "A captured template has text in culture " + culture.Value + ", which is not active in the target project.");
+                bool taken = item.Parent.Elements("MultilingualTextItem").Any(other => other.Element("AttributeList")?.Element("Culture")?.Value == editingCulture);
+                if (taken) item.Remove(); else culture.Value = editingCulture;
+            }
+        }
+
         private static void RequireInsertionIdPreservation(XDocument document, XElement block, XElement target, XElement insertedUnit)
         {
             var following = target == null

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.6",
+  "catalogVersion": "0.4.8",
   "targetTiaVersions": [
     21
   ],
@@ -1313,6 +1313,58 @@
         "Earlier attempts 01-03 failed (observer exit wait, PLCSIM interface access violation, interface lifetime blocking discovery); their fixes are in this build, and those attempts are not part of this record.",
         "Device discovery always showed one all-zero placeholder, excluded under the reviewed placeholder rule; certificate trust is the authorized first-use pin, not independent CA verification; timing covers host-observed windows only, no scan synchronization.",
         "PLCSIM on this PC with the generated scratch fixtures only; not physical PLCs, other CPUs or untested instruction profiles."
+      ]
+    },
+    {
+      "id": "local.sim.state.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e7497e5426a11cc4e526fefe6a5be1a10ec25c8d",
+        "passedScope": "scripts/validate_milestones.py with simulation and --trust-owned-empty-cpu-certificate on a new owned TIA V21 scratch project: full engineering phase, discovery baseline, owned CPU1511, download, generated-state save, runtime credential provisioning, power-on (STOP), run (RUN), stimulus test passed, then sim_state stop (STOP) and powerOff (OFF), with OFF confirmed independently by a fresh sim_select through a new interface, owned release and detach."
+      },
+      "artifacts": [
+        "evidence/local.sim.state.20261024.json"
+      ],
+      "limitations": [
+        "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
+        "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
+      ]
+    },
+    {
+      "id": "local.explorer.relationship-scope.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "53a3807aeaa6ee7c25ca56a124982204cc396263",
+        "passedScope": "scripts/qualify_project_explorer.py default profile on a new owned TIA V21 scratch project (73 captured nodes): relationship graph from TiaMcp_EnableGate matches exactly the 7 resolved and 8 unresolved member edges authored from the fixed scratch SCL source; a depth-5/500-node/1,000-edge traversal returns all 21 retained native edges with relationshipScope complete, no stop reasons and every endpoint owned by the four fixture blocks; a 3-edge budget visibly truncates (stopReasons depth+edges). Native performance: cold capture 187 ms, warm 136 ms, details 255/372 ms, relationships 149-541 ms, cached MCP search p95 16 ms; relationship payloads 27.6-99.6 KB, JSON export 134,840 bytes, HTML 286,877 bytes; resident memory TIA Portal 2.62 GB, Host 127 MB, worker 98 MB, unchanged by warm recapture."
+      },
+      "artifacts": [
+        "evidence/local.explorer.relationship-scope.20261024.json"
+      ],
+      "limitations": [
+        "One small fixed fixture with four blocks; no generated large programs, second PLC, HMI or library relationships, configured-I/O positives or protected/indirect references; whole-project relationship completeness remains notEstablished by contract.",
+        "Single-session measurements on one machine; not a contention-independent latency or memory guarantee. Worker memory sums descendants of the Host process, which include the owned TIA process.",
+        "Relationship completeness is proven only within the declared provider scope and budgets on the fixed scratch fixture; projectCompleteness stays notEstablished."
+      ]
+    },
+    {
+      "id": "local.engineering.interruption.rerun.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5e3b79931e914da8d48aa6e78fbca4ac58d5cae7",
+        "passedScope": "Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched."
+      },
+      "artifacts": [
+        "evidence/local.engineering.interruption.rerun.20261024.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
+        "Library revision covers library structure, type versions and master copies, not unexposed object document content."
       ]
     }
   ],
@@ -2718,6 +2770,52 @@
       ]
     },
     {
+      "featureId": "engineering_admission_reconcile",
+      "domain": "engineering",
+      "title": "Release an unresolved mutation admission on fresh native evidence",
+      "mcpTools": [
+        "engineering_admission_reconcile"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Projects.Retrieve/Open, GlobalLibraries.Retrieve/Open, block FingerprintProvider and TiaPortal.GetProcesses; managed admission store reconciliation."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Supports dispatchIntent and outcomeUnknown admissions of simulation_download, change_apply, change_restore (engineering and library), scratch_create, project_retrieve and library_open; provisioning delegates to simulation_provision_reconcile.",
+          "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
+          "Engineering kinds whose fingerprint needs prepared in-memory targets (HMI, attribute, technology) can only be proven unchanged against their checkpoint; library apply outputs and partial destinations stay held.",
+          "Never replays, saves, powers or downloads.",
+          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering.interruption.rerun.20261024"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an empty worker-owned TIA instance, the retained journals, checkpoints and reports, and that the admitted TIA process has exited."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Empty worker-owned TIA instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "simulation_discovery_baseline",
       "domain": "simulation",
       "title": "Record PLCSIM discovery before owned instance registration",
@@ -2910,10 +3008,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.startup.v02",
-          "local.sim.startup.20261024"
+          "local.sim.state.20261024"
         ]
       },
       "availability": {
@@ -7427,7 +7524,8 @@
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
           "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.relationship-scope.20261024"
         ]
       },
       "availability": {

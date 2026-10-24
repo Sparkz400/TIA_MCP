@@ -10,32 +10,48 @@ keep their own entry: the subkey with the same Path is updated, otherwise a new 
 Exits 1 without changes when the current user cannot write there.
 
 -Grant, run once in an elevated PowerShell: creates the application key and lets -User read, create and
-set values in its subkeys. Nothing outside that key is changed. Release bundles keep using
+set values in its subkeys. Nothing outside that key is changed. -AllNativeTools also grants a key for each
+repository tool under scripts/native that references Siemens.Engineering (fixture seeders and probes),
+so their builds can be registered later without elevation. Registration uses the key named after the
+executable's file name. Release bundles keep using
 Register-TiaOpennessApplication.ps1.
 #>
 param(
     [string]$WorkerPath,
     [switch]$Grant,
+    [switch]$AllNativeTools,
     [string]$User = "$env:USERDOMAIN\$env:USERNAME"
 )
 $ErrorActionPreference = 'Stop'
-$appPath = 'SOFTWARE\Siemens\Automation\Openness\AllowList\TiaMcp.Openness.V21.exe'
+$allowList = 'SOFTWARE\Siemens\Automation\Openness\AllowList'
 $hklm = [Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, [Microsoft.Win32.RegistryView]::Registry64)
 
 if ($Grant) {
-    $key = $hklm.CreateSubKey($appPath)
-    try {
-        $acl = $key.GetAccessControl()
-        # Inherited, so entries TIA adds itself after "Yes to all" stay updatable too.
-        $acl.AddAccessRule([Security.AccessControl.RegistryAccessRule]::new($User, 'ReadKey, SetValue, CreateSubKey',
-            [Security.AccessControl.InheritanceFlags]::ContainerInherit, [Security.AccessControl.PropagationFlags]::None, 'Allow'))
-        $key.SetAccessControl($acl)
-    } finally { $key.Dispose() }
-    "Granted $User permission to maintain entries under HKLM\$appPath"
+    $apps = @('TiaMcp.Openness.V21.exe')
+    if ($AllNativeTools) {
+        foreach ($project in Get-ChildItem -Path (Join-Path $PSScriptRoot 'native') -Filter *.csproj -Recurse) {
+            $text = Get-Content -LiteralPath $project.FullName -Raw
+            if ($text -notmatch 'Siemens\.Engineering') { continue }
+            $assembly = if ($text -match '<AssemblyName>([^<]+)</AssemblyName>') { $Matches[1] } else { $project.BaseName }
+            $apps += "$assembly.exe"
+        }
+    }
+    foreach ($app in $apps | Sort-Object -Unique) {
+        $key = $hklm.CreateSubKey("$allowList\$app")
+        try {
+            $acl = $key.GetAccessControl()
+            # Inherited, so entries TIA adds itself after "Yes to all" stay updatable too.
+            $acl.AddAccessRule([Security.AccessControl.RegistryAccessRule]::new($User, 'ReadKey, SetValue, CreateSubKey',
+                [Security.AccessControl.InheritanceFlags]::ContainerInherit, [Security.AccessControl.PropagationFlags]::None, 'Allow'))
+            $key.SetAccessControl($acl)
+        } finally { $key.Dispose() }
+        "Granted $User permission to maintain entries under HKLM\$allowList\$app"
+    }
     return
 }
 
 $file = Get-Item -LiteralPath $WorkerPath
+$appPath = "$allowList\$($file.Name)"
 $sha = [Security.Cryptography.SHA256]::Create()
 $stream = $file.OpenRead()
 try { $hash = [Convert]::ToBase64String($sha.ComputeHash($stream)) } finally { $stream.Dispose(); $sha.Dispose() }
@@ -45,7 +61,7 @@ $values = [ordered]@{
     FileHash = $hash
 }
 
-$denied = "No write access under HKLM\$appPath. Run once in an elevated PowerShell: $PSCommandPath -Grant"
+$denied = "No write access under HKLM\$appPath. Run once in an elevated PowerShell: $PSCommandPath -Grant -AllNativeTools"
 $readWrite = [Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree
 try {
     # Request only what -Grant gives; the default writable open would also ask for rights it does not have.

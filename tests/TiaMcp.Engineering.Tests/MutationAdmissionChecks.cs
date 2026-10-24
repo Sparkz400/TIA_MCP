@@ -171,6 +171,47 @@ internal static class MutationAdmissionChecks
                 Reject(() => new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(provisionNative.Scope, new('a', 64)), "ResourceBusy");
             }
         }
+        // A live worker's structured change failure is returned: the journal's recovery state drives change_restore.
+        string failedProject = Path.Combine(dispatcherRoot, "verification-failed.ap21");
+        var verificationFailed = new AdmissionNative(Scope(failedProject)) {
+            DispatchError = new BridgeOperationException("MutationVerificationFailed", "Applied change failed native readback", JsonSerializer.SerializeToElement(new { state = "recovery_required" })) };
+        try { await new WatchTableDispatcher(verificationFailed, dispatcherRoot).CallAsync("change_apply", new { changeId = "failed-apply" }); throw new Exception("Expected verification failure"); }
+        catch (BridgeOperationException error) when (error.Code == "MutationVerificationFailed")
+        {
+            string id = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!;
+            var returned = new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id);
+            Check(returned.State == "returned" && JsonNode.Parse(File.ReadAllText(Path.Combine(dispatcherRoot, returned.Response!.RelativePath)))!["nativeOutcome"]!.GetValue<string>() == "returnedFailure",
+                "Structured change_apply failure from a live worker is a returned outcome with its failure proof");
+            Check(error.Details!.Value.GetProperty("state").GetString() == "recovery_required", "Native failure details keep the journal state for the caller");
+        }
+        var restore = new AdmissionNative(Scope(failedProject) with { Operation = "change_restore", ScopeSha256 = new('5', 64) });
+        var restored = await new WatchTableDispatcher(restore, dispatcherRoot).CallAsync("change_restore", new { changeId = "failed-apply" });
+        Check(restored.GetProperty("legacyShape").GetString() == "preserved" && restore.Calls.Contains("mutation_dispatch"), "Restore of a cleanly failed apply is admitted and dispatched");
+        var failedRestore = new AdmissionNative(Scope(Path.Combine(dispatcherRoot, "restore-failed.ap21")) with { Operation = "change_restore" }) {
+            DispatchError = new BridgeOperationException("RecoveryRequired", "Archive recovery did not complete") };
+        try { await new WatchTableDispatcher(failedRestore, dispatcherRoot).CallAsync("change_restore", new { changeId = "failed-restore" }); throw new Exception("Expected restore failure"); }
+        catch (BridgeOperationException error) when (error.Code == "RecoveryRequired")
+        { Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!).State == "returned", "Structured change_restore failure is returned too"); }
+        // Transport loss and deliberate simulator retention stay unknown and keep their reservation.
+        foreach (var (route, failure) in new (string, Exception)[] {
+            ("change_apply", new BridgeException("WorkerDisconnected", "The TIA worker connection failed")),
+            ("change_apply", new BridgeException("TimeoutOutcomeUnknown", "The bridge call was interrupted")),
+            ("change_restore", new BridgeException("CancelledOutcomeUnknown", "The bridge call was interrupted")),
+            ("simulation_download", new BridgeOperationException("SimulationDownloadFailed", "Card generation failed")) })
+        {
+            string held = Path.Combine(dispatcherRoot, Guid.NewGuid().ToString("N") + ".ap21");
+            var heldNative = new AdmissionNative(Scope(held) with { Operation = route }) { DispatchError = failure };
+            try { await new WatchTableDispatcher(heldNative, dispatcherRoot).CallAsync(route, new { }); throw new Exception("Expected failure"); }
+            catch (BridgeOperationException error)
+            {
+                string id = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!;
+                Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id).State == "outcomeUnknown", $"{route} {failure.GetType().Name} {((BridgeException)failure).Code} stays outcomeUnknown");
+            }
+            var follower = new AdmissionNative(Scope(held) with { Operation = "change_restore", ScopeSha256 = new('4', 64) });
+            try { await new WatchTableDispatcher(follower, dispatcherRoot).CallAsync("change_restore", new { }); throw new Exception("Expected ResourceBusy"); }
+            catch (BridgeException error) when (error.Code == "ResourceBusy") { passed++; }
+            Check(!follower.Calls.Contains("mutation_dispatch"), "A held reservation blocks restore before dispatch");
+        }
         Console.WriteLine($"PASS Shared legacy mutation admission: {passed} checks, including cross-process operation/admission conflicts; no native execution.");
         await RecoveryBoundaryAuditChecks.Run();
     }

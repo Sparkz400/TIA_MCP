@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 
 from smoke_mcp import Client, ROOT
 from validate_simulation import artifact_path, redact
+from block_test_runtime import save_generated_scratch_project, verify_credential_provisioning, verify_memory_card
 
 
 def main():
@@ -21,6 +22,8 @@ def main():
     parser.add_argument("--credential-journal", type=pathlib.Path, action="append", default=[], help="Repeat for each prior recovery journal when reopening a recovered project.")
     parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker executable.")
     parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker executable.")
+    parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true",
+                        help="Authorize first-use TLS trust for each fresh owned empty CPU during credential provisioning.")
     parser.add_argument("--artifacts", type=pathlib.Path, help="Short artifact directory under this repo's artifacts; keeps scratch paths within the native limit.")
     args = parser.parse_args()
     extra_arguments = [part for option, path in (("--worker", args.worker), ("--sim-worker", args.sim_worker), ("--artifacts", args.artifacts)) if path
@@ -180,16 +183,26 @@ END_ORGANIZATION_BLOCK
 '''
             apply("source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": ["TiaMcp_TestIO", "Main"]}, "simulation stimulus program")
             call("sim_status")
+            call("simulation_discovery_baseline")
             created = call("sim_create")
             sim_id = created["instance"]["id"]
             report["simulationInstance"] = created["instance"]
             try:
                 if not credential_metadata:
                     raise ValueError("Supply --credential-metadata for simulation on a reopened project; no generated credential will be guessed.")
-                call("simulation_download", {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": credential_metadata,
-                    "credentialLineageJournalPaths": lineage_journals})
-                call("sim_state", {"instanceId": sim_id, "action": "powerOn"})
-                call("sim_state", {"instanceId": sim_id, "action": "run"})
+                download_arguments = {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": credential_metadata,
+                    "credentialLineageJournalPaths": lineage_journals}
+                download = call("simulation_download", download_arguments)
+                # The scratch CPU is password-protected: provision its runtime credential before power-on.
+                report["memoryCard"] = verify_memory_card(download)
+                report["generatedProjectSave"] = save_generated_scratch_project(call, download)
+                provisioned = call("simulation_provision_scratch_credential",
+                    dict(download_arguments, trustOwnedEmptyCpuCertificate=args.trust_owned_empty_cpu_certificate))
+                report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download,
+                    trust_owned_empty_cpu_certificate=args.trust_owned_empty_cpu_certificate)
+                report["restoredMemoryCard"] = verify_memory_card(download)
+                call("sim_state", {"instanceId": sim_id, "action": "powerOn", "timeoutMs": 60000})
+                call("sim_state", {"instanceId": sim_id, "action": "run", "timeoutMs": 30000})
                 tags = call("sim_tags", {"instanceId": sim_id, "maxItems": 2000})
                 report["simulationSymbols"] = tags
                 signals = [{"symbol": "TiaMcp_TestIO.Active", "type": "bool"}, {"symbol": "TiaMcp_TestIO.AnalogOut", "type": "int16"}]
@@ -201,6 +214,13 @@ END_ORGANIZATION_BLOCK
                      "assertions": [{"symbol": "TiaMcp_TestIO.Active", "type": "bool", "operator": "eq", "expected": False}, {"symbol": "TiaMcp_TestIO.AnalogOut", "type": "int16", "operator": "eq", "expected": -6}]}
                 ]})
                 report["simulationBehavior"] = simulation
+                stopped = call("sim_state", {"instanceId": sim_id, "action": "stop", "timeoutMs": 30000})
+                if stopped["instance"]["operatingState"] != "Stop": raise RuntimeError("sim_state stop did not reach STOP")
+                off = call("sim_state", {"instanceId": sim_id, "action": "powerOff", "timeoutMs": 60000})
+                if off["instance"]["operatingState"] != "Off": raise RuntimeError("sim_state powerOff did not reach OFF")
+                # Independent observation through a fresh selection, not the state call's own echo.
+                observed = call("sim_select", {"instanceId": sim_id, "expectedName": created["instance"]["name"]})
+                if observed["instance"].get("operatingState") != "Off": raise RuntimeError("A fresh selection does not show the instance OFF")
                 report["simulationVerified"] = True
             except Exception as error:
                 report["limitations"].append({"stage": "simulation", "error": str(error)})

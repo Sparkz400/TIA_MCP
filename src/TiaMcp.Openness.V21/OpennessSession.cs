@@ -84,6 +84,7 @@ namespace TiaMcp.Openness.V21
                 case "mutation_dispatch": return SharedMutationDispatch(arguments);
                 case "mutation_end": return SharedMutationEnd(arguments);
                 case "simulation_provision_reconcile_verify": return SimulationProvisionReconcileVerify(arguments);
+                case "engineering_admission_reconcile_verify": return AdmissionReconcileVerify(arguments);
                 case "component_window_plan": return ComponentWindowPlan(arguments);
                 case "component_window_bind": return ComponentWindowBind(arguments);
                 case "component_window_source": return ComponentWindowSourceObservation(arguments);

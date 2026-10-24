@@ -89,6 +89,20 @@ internal static class TypedGraphicalTests
         return Task.CompletedTask;
     }
 
+    internal static Task TemplateCulturesFollowTheTargetProject()
+    {
+        static XDocument Text(params (string Culture, string Text)[] items) => new XDocument(new XElement("MultilingualText",
+            new XElement("ObjectList", items.Select(i => new XElement("MultilingualTextItem", new XElement("AttributeList", new XElement("Culture", i.Culture), new XElement("Text", i.Text)))))));
+        static string Cultures(XDocument d) => string.Join(",", d.Descendants("Culture").Select(c => c.Value));
+        var active = new[] { "en-US" };
+        var moved = Text(("de-DE", "")); TypedGraphical.RetargetTemplateCultures(moved, active, "en-US"); Check.Equal("en-US", Cultures(moved));
+        var dropped = Text(("de-DE", ""), ("en-US", "")); TypedGraphical.RetargetTemplateCultures(dropped, active, "en-US"); Check.Equal("en-US", Cultures(dropped));
+        var kept = Text(("en-US", "")); TypedGraphical.RetargetTemplateCultures(kept, active, "en-US"); Check.Equal("en-US", Cultures(kept));
+        try { TypedGraphical.RetargetTemplateCultures(Text(("de-DE", "Kommentar")), active, "en-US"); }
+        catch (EngineeringBridgeException error) { Check.Equal("ProjectCultureUnavailable", error.Code); return Task.CompletedTask; }
+        throw new InvalidOperationException("Template text in an inactive culture was discarded.");
+    }
+
     internal static Task InsertPreservesEntirePriorDocumentAndAllocatesDeterministically()
     {
         foreach (var language in new[] { "LAD", "FBD" })

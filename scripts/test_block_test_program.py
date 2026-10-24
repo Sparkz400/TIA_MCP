@@ -126,16 +126,19 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(len(program["interfaceRevision"]), 64)
         self.assertEqual(program["qualification"], "generated_not_compiled_or_runtime_qualified")
 
-    def test_native_dependency_fb_capture_excludes_inout_references_and_temp(self):
+    def test_native_dependency_fb_capture_keeps_elementary_inout_and_excludes_references_and_temp(self):
+        # Optimized FBs store elementary IN_OUT by value in the instance; structured IN_OUT is a reference.
         child = native("FB", name="Child", inputs=[member("Enable", "Bool")], outputs=[member("Count", "Int")],
-                       inouts=[member("Reference", "Int")], state=[member("Memory", "Bool")])
+                       inouts=[member("Accumulator", "Int"), member("Reference", '"Pair"')], state=[member("Memory", "Bool")])
         child["sections"].append({"name": "Temp", "members": [member("Local", "Int")]})
         parent = native("FB", state=[member("First", '"Child"')])
         interface = inspect_interface(parent, {"Child": child})
         self.assertEqual(interface["state"][0]["type"]["kind"], "instance")
+        self.assertEqual([m["name"] for m in interface["state"][0]["type"]["members"]], ["Enable", "Count", "Accumulator", "Memory"])
         program = generate_program(interface)
-        self.assertEqual(set(program["bindings"]["dut"]), {"state.First.Enable", "state.First.Count", "state.First.Memory"})
-        self.assertIn("IN_OUT", program["stateCaptureLimitations"][0])
+        self.assertEqual(set(program["bindings"]["dut"]),
+                         {"state.First.Enable", "state.First.Count", "state.First.Accumulator", "state.First.Memory"})
+        self.assertIn("structured (by-reference) IN_OUT", program["stateCaptureLimitations"][0])
 
     def test_private_members_reserved_tokens_and_void_children_rejected(self):
         private = member("Memory", "Bool")
