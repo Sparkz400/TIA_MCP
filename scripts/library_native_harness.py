@@ -185,14 +185,53 @@ class Harness:
                 "Native release state/version/GUID differs")
         return committed[0]
 
-    def edit_source(self, library, plc, previous, block, source):
-        """Edit a released FB version and replace its test instance; returns the distinct InWork version."""
-        self.apply("library_edit_version", self.selected(library, [previous], testInstanceName=block, target={"plcPath": plc}))
-        in_work = [x for x in self.versions(library, block) if x["state"] == "InWork"]
-        require(len(in_work) == 1 and in_work[0]["versionGuid"] != previous["versionGuid"], "Edit did not create a distinct InWork GUID")
-        self.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": source, "expectedBlockNames": [block]})
-        self.stage("verify edited test instance still linked " + block, lambda: self.verify_use(library, in_work[0], 1))
-        return in_work[0]
+    # Siemens refuses replacing an edited version's test instance by source generation, so a content
+    # change creates the next version from documents. Which meta files must accompany authored SCL is
+    # not documented; layouts are tried in this order and the first accepted one is reused.
+    DOCUMENT_LAYOUTS = ("authored+libinfo", "authored+libinfo+libint", "authored")
+
+    def export_documents(self, library, version):
+        rows = [x for x in self.query(library)["items"] if x.get("kind") == "type" and x.get("typeGuid") == version["typeGuid"]]
+        require(len(rows) == 1 and rows[0]["supportedExportFormats"], "No native export format")
+        formats = rows[0]["supportedExportFormats"]
+        preferred = next((x for x in formats if x.lower() in ("simaticml", "xml", ".xml")), formats[0])
+        result = self.query(library, query="export", format=preferred, **identity(version))
+        require(result["files"] and not result["filesTruncated"], "Native export is empty or truncated")
+        for artifact in result["files"]:
+            require(hashlib.sha256(Path(artifact["path"]).read_bytes()).hexdigest() == artifact["sha256"], "Native export hash differs")
+        return result
+
+    def edit_source(self, library, plc, previous, block, source, composition="blocks", extension=".scl"):
+        """Create the next InWork version of a released type from authored source; returns that version."""
+        exported = self.export_documents(library, previous)
+        files = {Path(a["path"]).name: Path(a["path"]) for a in exported["files"]}
+        stem = exported["documentName"]
+        attempts = self.report.setdefault("documentVersionAttempts", [])
+        layouts = [self.document_layout] if getattr(self, "document_layout", None) else self.DOCUMENT_LAYOUTS
+        for layout in layouts:
+            folder = self.directory / "version-documents" / uuid.uuid4().hex[:8]
+            folder.mkdir(parents=True)
+            (folder / (stem + extension)).write_text(source, encoding="utf-8")
+            for meta in (".libinfo", ".libint"):
+                if ("+" + meta[1:]) in layout and stem + meta in files:
+                    (folder / (stem + meta)).write_bytes(files[stem + meta].read_bytes())
+            prepared = self.prepare("library_edit_version", self.selected(library, [previous], documentDirectory=str(folder), documentName=stem,
+                                    destinationComposition=composition, target={"plcPath": plc}))
+            result = self.client.request("tools/call", {"name": "change_apply", "arguments": self.apply_args(prepared)})
+            content = result.get("structuredContent") or {}
+            row = {"layout": layout, "changeId": prepared["changeId"], "accepted": not result.get("isError"), "error": content.get("error")}
+            attempts.append(row)
+            self.persist()
+            in_work = [x for x in self.versions(library, previous["typeName"]) if x["state"] == "InWork"]
+            if row["accepted"]:
+                require(len(in_work) == 1 and in_work[0]["versionGuid"] != previous["versionGuid"], "Document version is not one distinct InWork version")
+                row["transfer"] = {k: content["journal"]["result"].get(k) for k in ("transferState", "transferMessages")}
+                self.document_layout = layout
+                self.persist()
+                return in_work[0]
+            for leftover in in_work:  # A rejected layout must not block the next attempt.
+                self.apply("library_discard_version", self.selected(library, [leftover]))
+        raise AssertionError("No document layout created a version: %s" % attempts[-len(layouts):])
 
     def archive(self, identifier):
         result = self.apply("library_archive", {"schemaVersion": 1, "source": self.source_ref(identifier)})["journal"]["result"]["archive"]

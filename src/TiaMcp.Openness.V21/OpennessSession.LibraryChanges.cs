@@ -22,6 +22,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private readonly Dictionary<string, LibraryChange> _libraryChanges = new Dictionary<string, LibraryChange>(StringComparer.Ordinal);
+        private static readonly HashSet<string> LibraryPolicyAttributes = new HashSet<string>(new[] { "DoNotUse", "SetForUpdate" }, StringComparer.Ordinal);
         private static readonly string[] LibraryChangeKinds = { "library_create", "library_upgrade", "library_copy_elements", "library_instantiate", "library_update_project", "library_integrate", "library_create_type", "library_create_master_copy", "library_edit_version", "library_release_version", "library_discard_version", "library_set_default", "library_type_policy", "library_organize", "library_delete", "library_publish", "library_save", "library_archive" };
 
         private sealed class LibraryChange
@@ -257,7 +258,9 @@ namespace TiaMcp.Openness.V21
                         if (change.Versions[0].State != LibraryTypeVersionState.InWork) throw new BridgeException("InvalidChangeState", "Release requires an InWork version.");
                     }
                     if (new[] { "library_edit_version", "library_release_version", "library_discard_version" }.Contains(change.Kind) && change.Source.Project == null) throw new BridgeException("TargetIncompatible", "Native version authoring is performed in a project library; publish released results to a global working library.");
-                    if (change.Kind == "library_edit_version" && (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion))
+                    if (change.Kind == "library_edit_version" && (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion) && payload["documentDirectory"] != null)
+                        PrepareLibraryVersionDocuments(change);
+                    else if (change.Kind == "library_edit_version" && (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion))
                     {
                         var plc = SelectPlc(change.Selector);
                         var uses = change.Versions[0].FindInstances(plc.Software).ToList();
@@ -270,28 +273,19 @@ namespace TiaMcp.Openness.V21
                          payload["doNotUse"] != null && payload["doNotUse"].Type != JTokenType.Boolean ||
                          payload["setForUpdate"] != null && payload["setForUpdate"].Type != JTokenType.Boolean))
                         throw new BridgeException("InvalidRequest", "Specify at least one policy flag; every supplied doNotUse/setForUpdate value must be a boolean.");
+                    if (change.Kind == "library_type_policy")
+                        foreach (var flag in new[] { "DoNotUse", "SetForUpdate" }.Where(x => payload[char.ToLowerInvariant(x[0]) + x.Substring(1)] != null))
+                            ReadAttributeValue(change.Versions[0].TypeObject, flag, LibraryPolicyAttributes, true, out _); // Native types can expose a flag read-only.
                     break;
                 case "library_create_type":
                     if (change.Destination == null) throw new BridgeException("InvalidRequest", "destinationLibraryId is required.");
                     if (change.Destination.Project == null) throw new BridgeException("TargetIncompatible", "CreateFromDocuments type authoring requires a project library. Publish its released versions separately.");
-                    string documentDirectory = ChangeText(payload, "documentDirectory", 4096);
-                    if (!ProjectPathIsAbsolute(documentDirectory) || !Directory.Exists(documentDirectory)) throw new BridgeException("InvalidRequest", "An absolute documentDirectory containing native exported library documents is required.");
-                    ChangeText(payload, "documentName", 256);
-                    ValidateLibraryName(payload.Value<string>("documentName"));
                     if (payload.Value<string>("targetEnvironment") == "selectedPlc")
                     {
                         LibraryPlcScope(change, out _);
                         if (payload.Value<string>("destinationComposition") != "blocks" && payload.Value<string>("destinationComposition") != "types") throw new BridgeException("InvalidRequest", "PLC document authoring requires destinationComposition=blocks or types and an exact selected PLC/software-unit scope.");
                     }
-                    documentDirectory = Path.GetFullPath(documentDirectory);
-                    string documentsHash = LibraryDirectoryHash(documentDirectory);
-                    change.DocumentDirectory = Path.Combine(change.Directory, "document-source");
-                    Directory.CreateDirectory(change.DocumentDirectory);
-                    LibraryCopyDirectory(documentDirectory, change.DocumentDirectory);
-                    if (LibraryDirectoryHash(change.DocumentDirectory) != documentsHash || LibraryDirectoryHash(documentDirectory) != documentsHash)
-                        throw new BridgeException("PackageChanged", "Native authoring documents changed while capturing their immutable managed snapshot.");
-                    change.Preview["documentsHash"] = documentsHash;
-                    change.Preview["documentSource"] = new JObject { ["originalDirectory"] = documentDirectory, ["snapshotDirectory"] = change.DocumentDirectory, ["sha256"] = documentsHash, ["hashScope"] = "Complete sorted companion-file paths and SHA-256 digests", ["ownedSnapshot"] = true };
+                    PrepareLibraryDocumentSnapshot(change);
                     break;
                 case "library_create_master_copy":
                     if (change.Destination == null) throw new BridgeException("InvalidRequest", "destinationLibraryId is required.");
@@ -1081,7 +1075,8 @@ namespace TiaMcp.Openness.V21
                     var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)ResolveObjectTarget(selector).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;
                 case "library_edit_version":
                     LibraryTypeVersion edited;
-                    if (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion)
+                    if (change.DocumentDirectory != null) edited = ApplyLibraryVersionDocuments(change, result);
+                    else if (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion)
                     {
                         var use = change.Versions[0].FindInstances(SelectPlc(change.Selector).Software).Single(x => LibraryObjectDescription(x.LibraryTypeInstance).Value<string>("Name") == payload.Value<string>("testInstanceName"));
                         edited = change.Versions[0].Edit(use);

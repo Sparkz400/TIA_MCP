@@ -144,14 +144,15 @@ def body(h):
     def mixed_package():
         staged = h.tool("library_package_stage", {"hostPath": str(mixed)})
         candidates = h.tool("library_package_inspect", {"packageId": staged["packageId"]})["items"]
-        observed = sorted((c["kind"], c.get("completeness"), c["relativePath"].split("/")[0]) for c in candidates)
+        top = lambda c: c["relativePath"].removeprefix("content/").split("/")[0]  # Staging roots the package at content/.
+        observed = sorted((c["kind"], c.get("completeness"), top(c)) for c in candidates)
         require(observed == sorted([("globalLibraryArchive", "nativeVerificationRequired", "archive"),
                                     ("globalLibraryDirectory", "nativeVerificationRequired", "directory"),
                                     ("globalLibraryDirectory", "missingCompanionFiles", "lone"),
                                     ("sourceFile", "sourceImportRequired", "source")]), "Mixed package classification differs: %s" % observed)
         opened = []
         for candidate in candidates:
-            if candidate["relativePath"].split("/")[0] in ("archive", "directory"):
+            if top(candidate) in ("archive", "directory"):
                 library = h.tool("library_open", {"request": {"packageId": staged["packageId"], "candidateId": candidate["candidateId"]}})
                 opened.append(library["name"])
                 h.tool("library_close", {"libraryId": library["libraryId"]})

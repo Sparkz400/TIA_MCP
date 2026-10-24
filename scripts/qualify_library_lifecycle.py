@@ -40,11 +40,14 @@ def body(h):
     global_library = h.apply("library_create", {"schemaVersion": 1, "name": "LifecycleQualification"})["journal"]["result"]["library"]["libraryId"]
     h.refuse("refuse publishing a DoNotUse type", "library_publish", h.selected(library, [udt], destinationLibraryId=global_library),
              "DependencyConflict")
-    h.apply("library_type_policy", h.selected(library, [udt], doNotUse=False, setForUpdate=True))
+    # PLC data types expose SetForUpdate read-only; it is refused before mutation, not half-applied.
+    h.refuse("refuse read-only setForUpdate on a PLC data type", "library_type_policy",
+             h.selected(library, [udt], doNotUse=False, setForUpdate=True), "AttributeNotWritable", "SetForUpdate")
+    h.apply("library_type_policy", h.selected(library, [udt], doNotUse=False))
 
     def policy():
         row = [x for x in h.versions(library, UDT) if identity(x) == identity(udt)][0]
-        require(row["doNotUse"] is False and row["setForUpdate"] is True, "Type policy readback differs")
+        require(row["doNotUse"] is False, "Type policy readback differs")
         return row
     h.stage("type policy readback", policy)
 
@@ -80,12 +83,13 @@ def body(h):
 
     # Deletion constraints, then a permitted deletion of an unused non-default version.
     h.refuse("refuse deleting the default used version", "library_delete", h.selected(library, [fb]), "DependencyConflict")
-    in_work = h.edit_source(library, plc, fb, FB, (documents / (FB + ".scl")).read_text())
-    second = h.release(library, in_work, "1.1.0")
+    source_text = (documents / (FB + ".scl")).read_text()
+    unused = h.release(library, h.edit_source(library, plc, fb, FB, source_text), "1.1.0")
+    second = h.release(library, h.edit_source(library, plc, unused, FB, source_text), "1.2.0")
     h.apply("library_set_default", h.selected(library, [second]))
-    h.stage("test instance moved to 1.1.0", lambda: h.verify_use(library, fb, 0) and h.verify_use(library, second, 1))
-    h.apply("library_delete", h.selected(library, [fb]))
-    h.stage("deleted unused version is absent", lambda: require(numbers(FB) == ["1.1.0"], "Version deletion readback differs") or numbers(FB))
+    h.stage("1.1.0 is neither default nor used", lambda: h.verify_use(library, unused, 0))
+    h.apply("library_delete", h.selected(library, [unused]))
+    h.stage("deleted unused version is absent", lambda: require(numbers(FB) == ["1.0.0", "1.2.0"], "Version deletion readback differs") or numbers(FB))
     h.apply("library_publish", h.selected(library, [second], destinationLibraryId=global_library))
     h.apply("library_set_default", h.selected(global_library, [second]))
     h.refuse("refuse deleting a non-default global-library version", "library_delete", h.selected(global_library, [fb]),
@@ -101,7 +105,7 @@ def body(h):
     consumer = h.owned_scratch("consumer")
     source = h.open_archive(archive)
     h.apply("library_instantiate", h.selected(source, [second], target={"plcPath": consumer}))
-    h.stage("consumer uses exact 1.1.0", lambda: h.verify_use(h.project_library(), second, 1))
+    h.stage("consumer uses exact 1.2.0", lambda: h.verify_use(h.project_library(), second, 1))
 
     def numbering():
         rows = [b for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == consumer]
@@ -123,7 +127,7 @@ def body(h):
     recovered = rows[0]["library"]["libraryId"]
     h.stage("recovered library holds the deleted master copy and exact types", lambda: require(
         [x["name"] for x in h.query(recovered)["items"] if x.get("kind") == "masterCopy"] == ["TiaMcp_IsEnabled"]
-        and [identity(x) for x in h.versions(recovered, FB) if x["version"] == "1.1.0"] == [identity(second)],
+        and [identity(x) for x in h.versions(recovered, FB) if x["version"] == "1.2.0"] == [identity(second)],
         "Recovered library differs from its checkpoint") or {"libraryId": recovered})
 
 
@@ -137,6 +141,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "lc_", "V21 library maintenance lifecycle: discard, policy, folders, publication, master copies, deletion, consumer and recovery", [
-        "The 1.1.0 release re-applies the original FB document; it is a lifecycle generation, not a behavior change.",
+        "Releases 1.1.0 and 1.2.0 are created from the original FB document; they are lifecycle generations, not behavior changes.",
         "Folder moves are not offered; folders are created, renamed and deleted empty.",
         "Version deletion is qualified only in project libraries; global-library external consumers cannot be enumerated."], []).run(body)
