@@ -80,8 +80,12 @@ namespace TiaMcp.Openness.V21
             return pc.GetAccessibleDevices().Take(take).ToArray();
         }
 
+        // A disposed Portal usually exits within seconds, but on 24 October one observer took about
+        // 300 s, the same idle shutdown measured for the FileStorage server; same measured bound.
+        internal const int ExitTimeoutMs = 360000;
+
         // Closes the empty project, disposes the owned Portal and waits for its exact process to exit.
-        internal JObject Stop(int exitTimeoutMs = 60000)
+        internal JObject Stop(int exitTimeoutMs = ExitTimeoutMs)
         {
             var receipt = new JObject { ["action"] = "stopDiscoveryObserver", ["processId"] = Evidence["processId"].DeepClone() };
             try
@@ -95,7 +99,10 @@ namespace TiaMcp.Openness.V21
             catch (Exception ex) { receipt["portalDisposeExceptionType"] = ex.GetType().FullName; }
             try
             {
+                var clock = Stopwatch.StartNew();
                 bool exited = _process.WaitForExit(exitTimeoutMs);
+                receipt["exitWaitMs"] = clock.ElapsedMilliseconds;
+                receipt["exitTimeoutMs"] = exitTimeoutMs;
                 receipt["processExitVerified"] = exited;
                 if (exited) receipt["exitCode"] = _process.ExitCode;
             }
