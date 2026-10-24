@@ -825,6 +825,12 @@
       ]
     },
     {
+      "featureId": "engineering_admission_reconcile",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "simulation_discovery_baseline",
       "obligations": [
         "L03"
