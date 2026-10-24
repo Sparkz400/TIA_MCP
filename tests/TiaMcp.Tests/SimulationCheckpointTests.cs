@@ -69,7 +69,8 @@ namespace TiaMcp.Tests
 
         private sealed class Fixture : IDisposable
         {
-            internal readonly string Root = Path.Combine(Path.GetTempPath(), "simulation-checkpoint-" + Guid.NewGuid().ToString("N"));
+            // Leave room for the native 143-character archive staging limit under CI's isolated temp root.
+            internal readonly string Root = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             internal Fixture() => Directory.CreateDirectory(Root);
             public void Dispose()
             {
