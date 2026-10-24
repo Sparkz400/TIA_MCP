@@ -777,8 +777,8 @@
     },
     {
       "path": "scripts/api_coverage_bindings.py",
-      "sha256": "cc279275534abef560d80cc7dabe1d56b5ddf1c3b96585482b9da0a6e31d6051",
-      "bytes": 24402
+      "sha256": "2596d0dc310805ea4bc2399528128dc7832d2d4a3fbbc379b4c6a37ba11478aa",
+      "bytes": 25199
     },
     {
       "path": "scripts/public_api_metadata/MetadataInspector.cs",
