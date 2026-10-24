@@ -32,6 +32,10 @@ SCENARIOS = {
     "restore-kill-retrieving": ("change_restore", "worker", lambda j: "previous_project_closed" in (j.get("stages") or []), None),
     "retrieve-kill": ("project_retrieve", "worker", None, None),
     "scratch-kill": ("scratch_create", "worker", None, None),
+    # A master copy from the scratch project into a new global library checkpoints both the project and the library.
+    "library-apply-kill": ("change_apply", "worker", lambda j: j.get("state") == "applying", None),
+    "library-restore-kill": ("change_restore", "worker", lambda j: any(r.get("state") == "dispatching"
+                             for a in (j.get("recoveryAttempts") or []) for r in a.get("resources", [])), None),
 }
 
 
@@ -131,15 +135,17 @@ class Scenario:
                 "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited}
 
     def run(self, operation, mode, trigger, expected):
+        if self.name.startswith("library-"):
+            return self.run_library(operation, mode, trigger, expected)
         client = self.client()
         try:
             client.initialize()
             tia = self.start(client)
             if operation == "scratch_create":
-                request = client.begin("tools/call", {"name": "scratch_create", "arguments": {}})
+                request = client.begin("tools/call", {"name": "tia_create_scratch", "arguments": {}})
                 wait_until(lambda: any((self.root / "scratch").glob("*/*/*.ap21")), "Scratch project file never appeared", 600)
                 return self.finish(client, request, tia, operation, mode, None, expected)
-            scratch = self.step("scratch_create", client.tool("scratch_create"))
+            scratch = self.step("tia_create_scratch", client.tool("tia_create_scratch"))
             project = scratch["artifactDirectory"]
             if operation == "project_retrieve":
                 # The archive is the project's own checkpoint from a completed apply.
@@ -165,6 +171,38 @@ class Scenario:
                     "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}})
             wait_until(lambda: trigger(read_json(journal) or {}), "Journal never reached the interruption boundary", 900)
             return self.finish(client, request, tia, operation, mode, journal, expected, project)
+        finally:
+            client.close()
+
+    def run_library(self, operation, mode, trigger, expected):
+        client = self.client()
+        try:
+            client.initialize()
+            tia = self.start(client)
+            self.step("tia_create_scratch", client.tool("tia_create_scratch"))
+            inventory = client.tool("project_inventory", {"maxItems": 1000})
+            block = next(b for b in inventory["blocks"] if b["name"] == "TiaMcp_IsEnabled")
+            created = self.step("library_create", client.tool("change_apply", self.apply_arguments(
+                client.tool("change_prepare", {"kind": "library_create", "payload": {"schemaVersion": 1, "name": "LaneELib"}}))))
+            require(created["state"] == "applied", "Fixture library was not created")
+            prepared = self.step("change_prepare library_create_master_copy", client.tool("change_prepare", {"kind": "library_create_master_copy", "payload": {
+                "schemaVersion": 1, "destinationLibraryId": created["journal"]["result"]["library"]["libraryId"],
+                "target": {"plcPath": inventory["plcs"][0]["path"]}, "object": {"kind": "block", "objectPath": block["path"]}}}))
+            journal = pathlib.Path(prepared["journalPath"])
+            if operation == "change_apply":
+                request = client.begin("tools/call", {"name": "change_apply", "arguments": self.apply_arguments(prepared)})
+            else:
+                applied = self.step("change_apply library_create_master_copy", client.tool("change_apply", self.apply_arguments(prepared)))
+                require(applied["state"] == "applied" and len(applied["journal"]["checkpoints"]) == 2, "Expected a project and a library checkpoint")
+                client.tool("tia_detach")
+                client.close()
+                client = self.client()
+                client.initialize()
+                tia = self.start(client, "tia_start (empty owned instance)")
+                request = client.begin("tools/call", {"name": "change_restore", "arguments": {
+                    "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}})
+            wait_until(lambda: trigger(read_json(journal) or {}), "Journal never reached the interruption boundary", 900)
+            return self.finish(client, request, tia, operation, mode, journal, expected)
         finally:
             client.close()
 
