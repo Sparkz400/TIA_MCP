@@ -131,6 +131,34 @@ internal static class MutationAdmissionChecks
         try { await new WatchTableDispatcher(outsideNative, dispatcherRoot).CallAsync("change_apply", new { artifactDirectory = Path.Combine(root, "outside") }); throw new Exception("Expected outside-root refusal"); }
         catch (BridgeException error) when (error.Code == "ArtifactRootMismatch") { passed++; }
         Check(outsideNative.Calls.Count == 0, "Outside artifact root is refused before any native scope call");
+        foreach (JsonElement? nativeDetails in new JsonElement?[] {
+            JsonSerializer.SerializeToElement(new { stage = "discoverExactRuntimeAddress", originalProgramCardRestored = true }),
+            JsonSerializer.SerializeToElement("retained native detail"), null })
+        {
+            var provisionNative = new AdmissionNative(Scope(Path.Combine(dispatcherRoot, Guid.NewGuid() + ".ap21")) with {
+                Operation = "simulation_provision_scratch_credential" }) {
+                DispatchError = new BridgeOperationException("SimulationProvisionTargetAmbiguous", "Original provisioning failure", nativeDetails) };
+            var provisionDispatcher = new WatchTableDispatcher(provisionNative, dispatcherRoot);
+            try { await provisionDispatcher.CallAsync("simulation_provision_scratch_credential", new { }); throw new Exception("Expected provisioning failure"); }
+            catch (BridgeOperationException error)
+            {
+                Check(error.Code == "SimulationProvisionTargetAmbiguous" && error.Message == "Original provisioning failure", "Admission diagnostics preserve native error identity");
+                var details = error.Details!.Value;
+                var admission = details.GetProperty("mutationAdmission");
+                string id = admission.GetProperty("admissionId").GetString()!;
+                Check(admission.GetProperty("statusTool").GetString() == "engineering_operation_status" &&
+                    !admission.GetProperty("automaticReplay").GetBoolean(), "Failure identifies the existing read-only status tool and no-replay boundary");
+                var retained = await provisionDispatcher.CallAsync("engineering_operation_status", new { operationId = id });
+                Check(retained.GetProperty("state").GetString() == "outcomeUnknown" &&
+                    retained.GetProperty("scope").GetProperty("operation").GetString() == "simulation_provision_scratch_credential", "Reported admission identifies the actual durable failed provisioning");
+                Check(provisionNative.Calls.SequenceEqual(["mutation_begin", "mutation_dispatch", "mutation_end"]), "Status inspection performs no native replay");
+                if (nativeDetails?.ValueKind == JsonValueKind.Object)
+                    Check(details.GetProperty("stage").GetString() == "discoverExactRuntimeAddress" && details.GetProperty("originalProgramCardRestored").GetBoolean(), "Native object details retain their existing shape");
+                else if (nativeDetails is not null)
+                    Check(details.GetProperty("nativeDetails").GetString() == "retained native detail", "Non-object native details are retained");
+                Reject(() => new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(provisionNative.Scope, new('a', 64)), "ResourceBusy");
+            }
+        }
         Console.WriteLine($"PASS Shared legacy mutation admission: {passed} checks, including cross-process operation/admission conflicts; no native execution.");
         await RecoveryBoundaryAuditChecks.Run();
     }
@@ -139,6 +167,7 @@ internal static class MutationAdmissionChecks
     {
         internal EngineeringMutationScope Scope => scope;
         internal bool FailDispatch;
+        internal Exception? DispatchError;
         internal JsonElement? Arguments;
         internal List<string> Calls { get; } = [];
         public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
@@ -146,6 +175,7 @@ internal static class MutationAdmissionChecks
             Calls.Add(operation);
             if (operation == "mutation_begin") Arguments = JsonSerializer.SerializeToElement(arguments, BridgeProtocol.Json);
             if (operation == "mutation_dispatch" && FailDispatch) throw new IOException("Synthetic lost native response");
+            if (operation == "mutation_dispatch" && DispatchError is not null) throw DispatchError;
             object value = operation switch {
                 "mutation_begin" => new { leaseToken = "synthetic-lease", scope },
                 "mutation_dispatch" => new { legacyShape = "preserved", nativeQualified = false },

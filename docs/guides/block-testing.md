@@ -135,6 +135,13 @@ Native runs record absolute selected executable paths and SHA-256 manifests of a
 
 An assertion failure stops that case; independent cases can continue after confirmed cleanup. A failed or uncertain simulator cleanup stops remaining cases. ID zero is a valid simulator identity and is cleaned up. Generated projects, sources and memory cards are retained for diagnosis.
 
+A failed credential-provisioning call always stops the remaining runtime cases.
+Even a complete worker cleanup report and exact simulator unregistration do not
+reconcile the Host's durable mutation admission. The original error and cleanup
+facts remain in `runtimeOutcomes`; when supplied by the Host, `mutationAdmission`
+identifies the reservation for `engineering_operation_status`. Inspecting that
+status neither releases resources nor authorizes retrying the credential operation.
+
 Offline verification uses no Siemens process:
 
 ```powershell

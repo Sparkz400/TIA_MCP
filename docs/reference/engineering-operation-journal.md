@@ -54,6 +54,15 @@ The additive [admission contract](../../contracts/engineering-mutation-admission
 
 ## Verification and residuals
 
+Failed admitted calls that return a bridge error include
+`details.mutationAdmission.admissionId`. Pass that ID as `operationId` to the
+existing `engineering_operation_status` tool to inspect the retained journal
+without a native call. The original error code/message and object detail fields
+remain unchanged; non-object native details are retained under `nativeDetails`.
+The identifier does not assert a terminal state, release a reservation or permit
+automatic replay. If a journal update fails, its earlier dispatch intent still
+owns the resources. Failures before acquiring an admission do not invent an ID.
+
 [Engineering tests](../../tests/TiaMcp.Engineering.Tests/EngineeringOperationChecks.cs) exercise separate-process ownership/restart/locking, exact freshness, changed artifacts, lost outcomes, no replay, invalid terminal journals, interrupted preparation, retained diagnostics, recovery destinations, absent checkpoints, path overlap and real NTFS hard links. All callbacks and archive bytes in this suite are synthetic. Native watch/workbook/VCI evidence is separately recorded in the [current wave report](../verification/expansion-foundation-wave-20261015.md).
 
 Still required: native qualification of migrated routes, historical unknown-journal reconciliation, complete component resource manifests, broader native manifests/probe providers, cross-host configuration, complete queued cancellation/deadline behavior, every native interruption point and resource-specific restoration profile, broader target profiles, bounded retention/administration, and the remaining AC-01 semantic/schema/manual mapping. The scoped native outcomes are recorded separately; they do not close these 1.0 obligations.

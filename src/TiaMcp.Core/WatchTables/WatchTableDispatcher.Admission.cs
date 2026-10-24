@@ -69,6 +69,16 @@ public sealed partial class WatchTableDispatcher
                     }
                 }
                 catch { /* The prior write-ahead intent still holds ownership; never mask the primary exception. */ }
+                if (error is BridgeException bridgeError)
+                {
+                    var nativeDetails = (bridgeError as BridgeOperationException)?.Details;
+                    var details = nativeDetails?.ValueKind == JsonValueKind.Object
+                        ? JsonNode.Parse(nativeDetails.Value.GetRawText())!.AsObject()
+                        : new JsonObject { ["nativeDetails"] = nativeDetails is null ? null : JsonNode.Parse(nativeDetails.Value.GetRawText()) };
+                    details["mutationAdmission"] = new JsonObject { ["admissionId"] = record.Id,
+                        ["statusTool"] = "engineering_operation_status", ["automaticReplay"] = false };
+                    throw new BridgeOperationException(bridgeError.Code, bridgeError.Message, Element(details));
+                }
             }
             throw;
         }

@@ -248,7 +248,7 @@ class McpRuntimeBackend:
                "nativeErrorCode": native_error.get("code"),
                "exceptionType": details.get("exceptionType") or (type(error).__name__ if error else None)}
         for key in ("stage", "reportPath", "originalProgramCardRestored", "credentialOpened", "credentialSubmissionAttempted",
-                    "credentialNativeCallReturned", "cleanup"):
+                    "credentialNativeCallReturned", "cleanup", "mutationAdmission"):
             if key in details:
                 row[key] = copy.deepcopy(details[key])
         self.runtime_outcomes.append(redact(row))
@@ -318,25 +318,9 @@ class McpRuntimeBackend:
             try:
                 provisioned = self.native("simulation_provision_scratch_credential", provision_arguments)
             except Exception as error:
-                failure = native_error_record(error)
-                details = failure.get("details", {})
-                details = details if isinstance(details, dict) else {}
-                cleanup_rows = details.get("cleanup", [])
-                preservation_verified = (details.get("completed") is False and bool(details.get("completedAtUtc"))
-                    and type(details.get("instanceId")) is int and details["instanceId"] == self.instance_id
-                    and details.get("instanceName") == instance["name"]
-                    and details.get("originalProgramRevision") == download["programRevision"]
-                    and details.get("operatingState") == "Off" and details.get("protectionDisabled") is False
-                    and details.get("originalProgramCardRestored") is True
-                    and isinstance(cleanup_rows, list) and bool(cleanup_rows)
-                    and all(isinstance(row, dict) and row.get("completed") is True for row in cleanup_rows)
-                    and all(any(row.get("action") == action and row.get("completed") is True for row in cleanup_rows)
-                            for action in ("powerOff", "restoreOriginalProtectedCard"))
-                    and (details.get("goOnlineAttempted") is not True or any(row.get("action") == "disconnectOwnedTiaConnection"
-                            and row.get("onlineState") == "Offline" for row in cleanup_rows)))
-                if not preservation_verified or failure.get("code") == "SimulationProvisionIsolationRequired":
-                    self._uncertain("credential_provisioning_preservation_or_isolation_unverified",
-                                    "simulation_provision_scratch_credential", error)
+                # Worker cleanup does not reconcile the Host's durable mutation admission.
+                self._uncertain("credential_provisioning_admission_unreconciled",
+                                "simulation_provision_scratch_credential", error)
                 raise
             try:
                 self.evidence["credentialProvisioning"] = verify_credential_provisioning(provisioned, download,

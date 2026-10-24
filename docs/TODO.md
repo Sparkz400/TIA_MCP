@@ -1,20 +1,21 @@
 # Open TODO
 
-Work is paused at the [23 October checkpoint](verification/user-stop-20261023.md).
+Work resumed autonomously on 24 October; the [23 October checkpoint](verification/user-stop-20261023.md) remains historical evidence.
 This list contains unresolved work only. Earlier progress and completed checklists
 are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.md).
 
 ## Resume and integration
 
+- [ ] Reject Boolean/fractional substitutes for integer runtime evidence. The 24 October probe reproduced acceptance of `instanceId: false` as simulator zero and `bytes: true` as a one-byte card file. Cover both runtime entry points and retain strict identity/content checks. [Findings](verification/runtime-admission-resume-20261024.md#next-reproduced-bugs).
+- [ ] Align environment diagnostics with the worker's installed TIA API path selection. The default-path doctor reported missing files although the registered installation and `TiaApiDirectory` override point to the usable D: installation. Preserve explicit path precedence and supplied-evidence isolation.
 - [ ] Finalize independent review of the two vendor intake receipts, licenses and prerequisites; qualify applicable native import/upgrade, readback and preservation. Vendor evidence (`artifacts/vendor-library-intake-20261023/`).
 - [ ] Reconcile the feature catalog, support matrix and embedded catalog with exact current source, binary and evidence profiles. Keep implementation, offline validation and native qualification separate.
 
 ## Native admission and runtime
 
-- [ ] Decide how provisioning isolation treats the zero-address `Accessible device` (`00-00-00-00-00-00`) on PN/IE / PLCSIM. The probe shows the PLCSIM Advanced Runtime Manager itself creates it with zero registered instances, so the current guard can never pass on this PC. A narrow exclusion on branch `review/plcsim-placeholder-guard-v2` passed two independent review passes and applies natively. [Review](verification/plcsim-placeholder-guard-review-20261023.md).
 - [ ] After startup the owned PLCSIM Advanced CPU (`192.168.0.1`) never appears in PN/IE / PLCSIM discovery within 10 s, so provisioning refuses at `discoverExactRuntimeAddress`. Find out why TIA cannot see it on this PC.
-- [ ] Card staging failed once with access denied (`0x80070005`) for 15 s and then not again in later runs; cause unidentified. A failed provisioning always leaves an `outcomeUnknown` admission with no reconciliation route, which blocks the rest of that suite's cases (`ResourceBusy`). [Native stop](verification/native-stop-20261023.md).
-- [ ] Qualify actual native requested stop, independent worker exit, lock release and owned cleanup before another long runtime batch. Engineering-level stop passed; live stop is blocked by the zero-address entry, and project-lock release is not observed. [Native stop](verification/native-stop-20261023.md), [stop requirements](guides/block-testing.md#cooperative-stopping-and-remaining-cases).
+- [ ] Card staging failed once with access denied (`0x80070005`) for 15 s and then not again in later runs; cause unidentified. Implement trusted reconciliation for failed provisioning's `outcomeUnknown` admission. The runner now stops remaining cases even when the worker reports successful cleanup; errors identify the retained admission for read-only inspection. This does not release reservations. [Resume evidence](verification/runtime-admission-resume-20261024.md), [native stop](verification/native-stop-20261023.md).
+- [ ] Qualify actual native requested stop, independent worker exit, lock release and owned cleanup before another long runtime batch. Engineering-level stop passed; the placeholder exclusion is integrated, but exact CPU discovery and native prerequisites remain blockers, and project-lock release is not observed. [Native stop](verification/native-stop-20261023.md), [stop requirements](guides/block-testing.md#cooperative-stopping-and-remaining-cases).
 - [ ] Complete one frozen 65-case / 358-step / 478-assertion runtime attempt and independent audit after admission and preservation prerequisites pass. Separate subsets do not replace the full attempt.
 
 ### Other native machine (VM), not this PC
@@ -46,7 +47,6 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 - [ ] Qualify native interruption/transport loss and uncertain-outcome reconciliation for every advertised recoverable mutation, including multi-resource recovery and no replay.
 - [ ] Complete missing feature-specific remote/VM transfer, interrupted upload/reconnect and machine-prerequisite checks. Do not repeat accepted general VM evidence without a new reason.
 - [ ] Validate the intended immutable engineering package, launcher and deployment against the full matrix. An offline bundle does not establish native support or authorize installation.
-- [ ] Publish the clean single-commit snapshot as the public repository; the full history stays private as the evidence archive. [Public snapshot](verification/publication-review-20261023.md#public-snapshot).
 
 ## Repository and hosted CI
 

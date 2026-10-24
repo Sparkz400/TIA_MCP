@@ -34,6 +34,15 @@ class CaseClient:
         self.events.append((self.ordinal, tool))
         if tool == self.fault:
             return {"isError": True, "structuredContent": {"error": {"code": "InjectedFailure"}}}
+        if tool == "simulation_provision_scratch_credential" and self.fault == "helper_clean_failure":
+            return {"isError": True, "structuredContent": {"error": {
+                "code": "SimulationProvisionTargetAmbiguous",
+                "details": {"completed": False, "completedAtUtc": "2026-10-24T00:00:00Z",
+                    "instanceId": 0, "instanceName": "owned", "originalProgramRevision": "a" * 64,
+                    "operatingState": "Off", "protectionDisabled": False, "originalProgramCardRestored": True,
+                    "goOnlineAttempted": False, "cleanup": [
+                        {"action": action, "completed": True}
+                        for action in ("powerOff", "restoreOriginalProtectedCard", "releaseInterface")]}}}}
         if tool == "simulation_provision_scratch_credential" and self.fault in ("helper_restore", "helper_isolation"):
             return {"isError": True, "structuredContent": {"error": {
                 "code": "SimulationProvisionCardRestoreFailed" if self.fault == "helper_restore" else "SimulationProvisionIsolationRequired",
@@ -106,7 +115,7 @@ class CaseSessions(unittest.TestCase):
             output=self.root / ("case-" + str(len(self.audits))), audit=audit, persist=lambda: None,
             binaries=self.binaries, timeout=300, client_factory=self.client_factory,
             process_watcher_factory=self.watcher,
-            provision_runtime_credential=self.fault in ("helper_restore", "helper_isolation"),
+            provision_runtime_credential=self.fault in ("helper_restore", "helper_isolation", "helper_clean_failure"),
             card_verifier=lambda value: {"programRevision": value["programRevision"]})
 
     def watcher(self, pid):
@@ -219,7 +228,7 @@ class CaseSessions(unittest.TestCase):
                 self.assertIn((ordinal, "host_close"), self.events)
 
     def test_uncertain_runtime_stops_next_case_after_all_independent_cleanup(self):
-        for fault in ("sim_create", "simulation_download", "helper_restore", "helper_isolation", "poweron_unknown"):
+        for fault in ("sim_create", "simulation_download", "helper_restore", "helper_isolation", "helper_clean_failure", "poweron_unknown"):
             with self.subTest(fault=fault):
                 before = len(self.clients)
                 self.fault = fault

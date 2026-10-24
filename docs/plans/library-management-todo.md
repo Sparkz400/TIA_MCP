@@ -1,6 +1,6 @@
 # Library management: open work
 
-Work is paused at the [23 October checkpoint](../verification/user-stop-20261023.md).
+Work resumed autonomously on 24 October; the [23 October checkpoint](../verification/user-stop-20261023.md) remains historical evidence.
 Completed checklists and dated progress are in [history](../history/library-todo-through-20261023.md).
 The [main TODO](../TODO.md) sets priorities; the [release ledger](release-obligations-20261015.md) retains the full required scope.
 

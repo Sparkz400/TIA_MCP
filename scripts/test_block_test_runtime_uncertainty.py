@@ -136,11 +136,13 @@ class RuntimeUncertaintyTests(unittest.TestCase):
                     self.assertEqual(tool, closed.exception.cleanup["runtimeOutcomes"][0]["tool"])
                     self.assertFalse(closed.exception.cleanup["runtimeOutcomes"][0]["reconciled"])
 
-    def test_helper_failure_requires_complete_terminal_exact_preservation_evidence(self):
+    def test_helper_cleanup_report_cannot_reconcile_host_admission(self):
         details = {"completed": False, "completedAtUtc": "2026-10-08T00:00:00Z", "instanceId": 0,
             "instanceName": "owned", "originalProgramRevision": "a" * 64, "operatingState": "Off", "protectionDisabled": False,
             "originalProgramCardRestored": True, "goOnlineAttempted": False,
-            "cleanup": [{"action": "powerOff", "completed": True}, {"action": "restoreOriginalProtectedCard", "completed": True}]}
+            "mutationAdmission": {"admissionId": "a" * 32, "statusTool": "engineering_operation_status", "automaticReplay": False},
+            "cleanup": [{"action": "powerOff", "completed": True}, {"action": "restoreOriginalProtectedCard", "completed": True},
+                        {"action": "releaseInterface", "completed": True}]}
         for field, value in ((None, None), ("completedAtUtc", None), ("instanceName", "other"), ("originalProgramRevision", "b" * 64),
                              ("operatingState", "Stop"), ("cleanup", []), ("goOnlineAttempted", True)):
             with self.subTest(field=field):
@@ -153,11 +155,16 @@ class RuntimeUncertaintyTests(unittest.TestCase):
                     failure("simulation_provision_scratch_credential", "SimulationCredentialProvisionFailed", changed))
                 with self.assertRaises(NativeToolError):
                     self.backend.start()
-                if field:
-                    with self.assertRaises(RuntimeCleanupUncertain):
-                        self.backend.close()
-                else:
-                    self.assertTrue(self.backend.close()["completed"])
+                with self.assertRaises(RuntimeCleanupUncertain) as closed:
+                    self.backend.close()
+                cleanup = closed.exception.cleanup
+                self.assertTrue(cleanup["instanceUnregistrationVerified"])
+                self.assertFalse(cleanup["completed"])
+                outcome = cleanup["runtimeOutcomes"][0]
+                self.assertFalse(outcome["reconciled"])
+                self.assertEqual(changed["cleanup"], outcome["cleanup"])
+                self.assertEqual(changed["mutationAdmission"], outcome["mutationAdmission"])
+                self.assertEqual("SimulationCredentialProvisionFailed", outcome["nativeErrorCode"])
 
     def test_wrong_release_identity_or_failed_release_keeps_timeout_unresolved(self):
         for result in ({"instanceId": 1, "instanceName": "owned", "unregistered": True},
