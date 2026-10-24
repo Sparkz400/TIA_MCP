@@ -5,11 +5,30 @@ These checks complement JSON Schema documents; they are not a general JSON Schem
 import json
 import pathlib
 import re
+import unittest
 
 from generate_conformance import build_manifest, load_specifications, validate_manifest
 from api_coverage import validate_feature_obligations
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+
+
+def claim_errors(features, evidence, root=ROOT):
+    """Return catalog claims that outrun the evidence retained in this checkout."""
+    def retained(artifact):
+        # Ignored output trees are never part of a published checkout.
+        return not artifact.startswith(("artifacts/", "output/")) and (root / artifact).is_file()
+    errors = []
+    for identifier, feature in features.items():
+        status = feature["qualification"]["status"]
+        if status == "verified":
+            missing = [a for proof in feature["qualification"]["evidenceIds"]
+                       for a in evidence[proof]["artifacts"] if not retained(a)]
+            if missing:
+                errors.append(f"{identifier}: verified without retained artifacts {missing}")
+        if feature["availability"]["status"] == "available" and status != "verified":
+            errors.append(f"{identifier}: available without verified qualification")
+    return errors
 
 
 def check_contracts():
@@ -70,6 +89,8 @@ def check_contracts():
         if feature["changeKind"]:
             assert identifier == "change." + feature["changeKind"]
             assert {"AC-preview", "AC-native", "AC-recovery", "AC-preserve"} <= set(feature["acceptanceCriteria"])
+    errors = claim_errors(features, evidence)
+    assert not errors, "Catalog claim exceeds retained evidence: " + "; ".join(errors)
     for proof in evidence.values():
         assert proof["status"] in {"passed", "failed", "blocked", "skipped"}
         assert proof["profile"] and proof["limitations"], "Evidence requires exact scope and limits"
@@ -84,6 +105,29 @@ def check_contracts():
         validate_manifest(manifest)
         assert set(manifest["featureIds"]) <= features.keys(), manifest["fixtureId"]
     print(f"PASS Contract coverage: {len(tools)} MCP tools, {len(kinds)} mutation kinds, {len(features)} feature entries; evidence/criteria references valid.")
+
+
+class ClaimErrorTests(unittest.TestCase):
+    def setUp(self):
+        self.evidence = {"kept": {"artifacts": ["docs/README.md"]},
+                         "ignored": {"artifacts": ["docs/README.md", "artifacts/run.json"]},
+                         "absent": {"artifacts": ["docs/not-present.md"]}}
+
+    def feature(self, status, proofs, availability="conditional"):
+        return {"x": {"qualification": {"status": status, "evidenceIds": proofs}, "availability": {"status": availability}}}
+
+    def test_verified_needs_every_cited_artifact_retained(self):
+        self.assertEqual(claim_errors(self.feature("verified", ["kept"]), self.evidence), [])
+        for proof in ("ignored", "absent"):
+            with self.subTest(proof=proof):
+                self.assertEqual(len(claim_errors(self.feature("verified", ["kept", proof]), self.evidence)), 1)
+
+    def test_unverified_may_keep_historical_evidence_but_not_claim_available(self):
+        self.assertEqual(claim_errors(self.feature("unverified", ["ignored"]), self.evidence), [])
+        self.assertEqual(len(claim_errors(self.feature("unverified", [], "available"), self.evidence)), 1)
+
+    def test_bundled_catalog(self):
+        check_contracts()
 
 
 if __name__ == "__main__":

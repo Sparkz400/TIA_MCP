@@ -39,15 +39,17 @@ internal static partial class Program
         using var stream = typeof(FeatureCatalog).Assembly.GetManifestResourceStream("TiaMcp.FeatureCatalog.v1.json")!;
         using var reader = new StreamReader(stream);
         var original = reader.ReadToEnd();
+        // The bundled catalog has no verified entry; claim one so the verified-only rules are exercised.
+        static JsonNode Verified(JsonNode root) { root["features"]![0]!["qualification"]!["status"] = "verified"; return root; }
         foreach (var corrupt in new Action<JsonNode>[] {
             root => root["features"]![1]!["featureId"] = root["features"]![0]!["featureId"]!.GetValue<string>(),
             root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("invented-proof"),
-            root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray(),
-            root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.sim.startup.v02"),
+            root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray(),
+            root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.sim.startup.v02"),
             root => { root["features"]![0]!["qualification"]!["status"] = "failed";
                 root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.offline.v02"); },
-            root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "blocked",
-            root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "skipped",
+            root => Verified(root)["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "blocked",
+            root => Verified(root)["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "skipped",
             root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "perfect",
             root => root["features"]![0]!["implementation"]!["status"] = "not_implemented",
             root => root["features"]![0]!["acceptanceCriteria"] = new JsonArray("unknown-criterion")

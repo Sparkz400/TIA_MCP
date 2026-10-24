@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.1",
+  "catalogVersion": "0.4.2",
   "targetTiaVersions": [
     21
   ],
@@ -1115,7 +1115,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1123,7 +1123,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1157,7 +1158,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.package.v02"
         ]
@@ -1165,7 +1166,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1199,7 +1201,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1207,7 +1209,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1241,7 +1244,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1249,7 +1252,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1283,7 +1287,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02",
           "local.session.startup-requalified.20261008"
@@ -1292,7 +1296,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1326,7 +1331,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1334,7 +1339,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1411,7 +1417,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.sim.download.v02",
           "local.units.v03",
@@ -1423,7 +1429,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1457,7 +1464,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.restart.v02"
         ]
@@ -1465,7 +1472,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1499,7 +1507,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1507,7 +1515,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1586,7 +1595,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03",
@@ -1596,7 +1605,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1631,7 +1641,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03"
@@ -1640,7 +1650,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1674,7 +1685,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.hardware.v02",
           "local.conformance.v03",
@@ -1684,7 +1695,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1718,7 +1730,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.hardware.v02"
         ]
@@ -1726,7 +1738,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1898,7 +1911,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1906,7 +1919,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1941,7 +1955,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03",
@@ -1951,7 +1965,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -1985,7 +2000,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -1993,7 +2008,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2027,7 +2043,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -2035,7 +2051,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2118,7 +2135,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.hardware.v02"
         ]
@@ -2126,7 +2143,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2160,7 +2178,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03"
@@ -2169,7 +2187,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2393,7 +2412,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.sim.download.v02"
         ]
@@ -2401,7 +2420,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2525,7 +2545,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.package.v02"
         ]
@@ -2533,7 +2553,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2568,7 +2589,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.sim.download.v02"
         ]
@@ -2576,7 +2597,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2858,7 +2880,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.sim.download.v02"
         ]
@@ -2866,7 +2888,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2901,7 +2924,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.offline.v02"
         ]
@@ -2909,7 +2932,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -2943,7 +2967,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.catalog.v03"
         ]
@@ -2951,7 +2975,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -4618,7 +4643,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "vm.ssh.recovery.20261008"
         ]
@@ -4626,7 +4651,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires a usable Windows engineering session, Openness application registration and valid engineering license; interactive relay additionally requires the same user to be logged in."
+          "Requires a usable Windows engineering session, Openness application registration and valid engineering license; interactive relay additionally requires the same user to be logged in.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -4679,7 +4705,7 @@
         "status": "partial",
         "limitations": [
           "Web API connect/browse/read/status/disconnect, retained polling captures and sequential analyses preserve observed profiles and original evidence.",
-          "The isolated OPC UA client provides explicit secure connect, bounded browse/typed read and owned status/disconnect, qualified against local servers only.",
+          "The isolated OPC UA client provides explicit secure connect, bounded browse/typed read and owned status/disconnect, exercised against local servers only; no catalog qualification evidence is recorded.",
           "Physical CPU/firmware qualification, independent online program/address association, broader runtime profiles and write/control remain open.",
           "Explicit OPC UA polling captures reuse durable bounded capture storage, preserve per-item quality/time/type metadata and reopen after Host interruption without resuming acquisition. Physical-device qualification remains open.",
           "Separate bounded UA subscription acquisition retains requested/revised settings, item failures, sequence/gap/overflow/duplicate/retransmission observations and unknown cleanup/loss. Restart only reopens committed evidence; automatic reconnect and transfer remain unsupported."
@@ -5883,7 +5909,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.library_intake.20261008"
         ]
@@ -5891,7 +5917,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required."
+          "Writable bounded artifact storage is required.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -6008,7 +6035,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.library_intake.20261008"
         ]
@@ -6016,7 +6043,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required."
+          "Writable bounded artifact storage is required.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -6091,7 +6119,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.library_intake.20261008"
         ]
@@ -6099,7 +6127,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required."
+          "Writable bounded artifact storage is required.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -6132,7 +6161,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.library_intake.20261008"
         ]
@@ -6140,7 +6169,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required."
+          "Writable bounded artifact storage is required.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -6173,7 +6203,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.library_intake.20261008"
         ]
@@ -6181,7 +6211,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Writable bounded artifact storage is required."
+          "Writable bounded artifact storage is required.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -7499,7 +7530,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "local.explorer.native-browser.20261008"
         ]
@@ -7507,7 +7538,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires authorized TIA V21 session and available native services; portable exports are independent of TIA."
+          "Requires authorized TIA V21 session and available native services; portable exports are independent of TIA.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -7730,9 +7762,9 @@
         ]
       },
       "availability": {
-        "status": "available",
+        "status": "conditional",
         "reasons": [
-          "Assembly/version evidence, bridge implementation, native qualification and current target availability are independent facts."
+          "Optional HMI modules, license, protection and target access are observed per call; no retained qualification evidence supports unconditional availability."
         ]
       },
       "prerequisites": [
@@ -7871,7 +7903,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "sim.creation.20261009"
         ]
@@ -7879,7 +7911,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires an exact creationId and the current-user protected receipt on the simulation machine."
+          "Requires an exact creationId and the current-user protected receipt on the simulation machine.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -7961,7 +7994,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "reviews.native.20261009",
           "reviews.native.diamond.20261012"
@@ -7970,7 +8003,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -8004,7 +8038,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "reviews.native.20261009",
           "reviews.native.diamond.20261012"
@@ -8013,7 +8047,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
@@ -8049,7 +8084,7 @@
         ]
       },
       "qualification": {
-        "status": "verified",
+        "status": "unverified",
         "evidenceIds": [
           "reviews.native.20261009",
           "reviews.native.diamond.20261012"
@@ -8058,7 +8093,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store."
+          "Capture needs an attached V21 project; other review tools need an intact saved review in this host artifact store.",
+          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
         ]
       },
       "prerequisites": [
