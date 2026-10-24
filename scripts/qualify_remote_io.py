@@ -21,6 +21,8 @@ CHANNEL_ATTRIBUTES = {'ChannelActivation', 'MeasuringType', 'MeasuringRange', 'I
 HARDWARE_ATTRIBUTES = CHANNEL_ATTRIBUTES | {'Name', 'Author', 'Comment', 'InformationText', 'PlantDesignation', 'LocationIdentifier', 'AdditionalInformation'}
 NETWORK_ATTRIBUTES = {'Address', 'SubnetMask', 'RouterAddress', 'UseRouter', 'UseIpProtocol', 'IpProtocolSelection', 'PnDeviceName', 'PnDeviceNameAutoGeneration', 'PnDeviceNameSetDirectly', 'DhcpClientId'}
 QUALIFICATION_SCOPES = ('full', 'configured-module-lifecycle')
+# Catalog search filter and article prefix for each reviewed ET 200SP input module family.
+MODULE_FAMILIES = {'di': ('DI 8x24VDC ST', '6ES7 131-6'), 'ai': ('AI 4xU/I 2-wire ST', '6ES7 134-6HD')}
 
 
 def channel_gate(subtree, scope):
@@ -152,13 +154,15 @@ def main():
     parser.add_argument('--report', type=pathlib.Path, required=True)
     parser.add_argument('--scope', choices=QUALIFICATION_SCOPES, default='full',
                         help='Explicit limited lifecycle qualification retains unsupported channel evidence and cannot qualify the full route.')
+    parser.add_argument('--module', choices=sorted(MODULE_FAMILIES), default='di',
+                        help='Catalog-selected ET 200SP input module family whose channels are reviewed.')
     args = parser.parse_args()
     require(not args.report.exists(), 'Existing evidence must not be overwritten.')
     directory = args.artifacts.resolve() / ('n_' + uuid.uuid4().hex[:6])
     report = {'schemaVersion': 1, 'startedAtUtc': utc_now(), 'completed': False, 'steps': [], 'gates': {}, 'binaries': {},
-              'qualificationScope': args.scope, 'fullRemoteIoRouteQualified': False, 'channelWriteQualified': False,
+              'qualificationScope': args.scope, 'moduleFamily': args.module, 'fullRemoteIoRouteQualified': False, 'channelWriteQualified': False,
               'harnessSha256': hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),
-              'scope': 'Fresh offline CPU 1511-1 PN and catalog-selected ET 200SP IM/DI; no runtime, shared-device or physical topology qualification.'}
+              'scope': 'Fresh offline CPU 1511-1 PN and catalog-selected ET 200SP IM/' + args.module.upper() + ' module; no runtime, shared-device or physical topology qualification.'}
     for role, path in [('host', args.host.with_suffix('.dll')), ('worker', args.worker)]:
         report['binaries'][role] = {'path': str(path.resolve()), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
     client = watcher = None
@@ -307,22 +311,24 @@ def main():
         # No automatic displacement or generic preservation exception is allowed.
         apply('hardware_move', server_move)
         report['gates']['fixtureServerRelocation'] = True
-        modules = call('hardware_catalog_search', {'filter': 'DI 8x24VDC ST', 'maxItems': 500})
-        candidates = sorted([row for row in modules['entries'] if '6ES7 131-6' in (row.get('articleNumber') or '')], key=lambda row: row['typeIdentifier'], reverse=True)
+        module_filter, article_prefix = MODULE_FAMILIES[args.module]
+        module_name = 'Remote' + args.module.upper()
+        modules = call('hardware_catalog_search', {'filter': module_filter, 'maxItems': 500})
+        candidates = sorted([row for row in modules['entries'] if article_prefix in (row.get('articleNumber') or '')], key=lambda row: row['typeIdentifier'], reverse=True)
         selected = None
         for candidate in candidates:
-            payload = {'hardwarePath': rail['path'], 'typeIdentifier': candidate['typeIdentifier'], 'name': 'RemoteDI', 'positionNumber': 1}
+            payload = {'hardwarePath': rail['path'], 'typeIdentifier': candidate['typeIdentifier'], 'name': module_name, 'positionNumber': 1}
             proposed = prepare('hardware_plug', payload, allow_error=True)
             if proposed.get('changeId'):
                 apply('hardware_plug', payload, proposed)
                 selected = candidate
                 break
             require(proposed.get('error', {}).get('code') == 'IncompatibleHardware', 'Unexpected module preparation failure: ' + str(proposed))
-        require(selected, 'No catalog-selected DI module can plug into the reviewed ET 200SP slot.')
-        report['digitalInputModule'] = selected
+        require(selected, 'No catalog-selected ' + args.module.upper() + ' module can plug into the reviewed ET 200SP slot.')
+        report['inputModule'] = selected
         report['gates']['moduleCreation'] = True
         rows = inspect()
-        module = next(row for row in rows if row['name'] == 'RemoteDI')
+        module = next(row for row in rows if row['name'] == module_name)
         apply('hardware_move', {'hardwarePath': module['path'], 'positionNumber': 3})
         report['gates']['slotMove'] = True
         rows = inspect()
