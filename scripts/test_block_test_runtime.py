@@ -569,8 +569,8 @@ class BaselineCliTests(unittest.TestCase):
                 elif tool == "sim_state":
                     self.state = {"powerOn": "Stop", "run": "Run", "stop": "Stop", "powerOff": "Off"}[arguments["action"]]
                     result = {"instance": {"operatingState": self.state}}
-                elif tool == "sim_status":
-                    result = {"instances": [{"id": 0, "operatingState": getattr(self, "state", "Off")}]}
+                elif tool == "sim_select":
+                    result = {"instance": {"id": 0, "name": "owned", "operatingState": getattr(self, "state", "Off")}}
                 elif tool == "sim_tags":
                     result = {"tags": [{"symbol": "TiaMcp_TestIO." + member}
                                        for member in ("Enable", "Active", "AnalogIn", "AnalogOut")]}

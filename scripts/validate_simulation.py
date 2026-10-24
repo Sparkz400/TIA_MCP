@@ -161,9 +161,9 @@ def main(argv=None):
         if stopped["instance"]["operatingState"] != "Stop": raise RuntimeError("sim_state stop did not reach STOP")
         off = call("sim_state", {"instanceId": instance_id, "action": "powerOff", "timeoutMs": 60000})
         if off["instance"]["operatingState"] != "Off": raise RuntimeError("sim_state powerOff did not reach OFF")
-        # Independent observation through the registry, not the state call's own echo.
-        row = [i for i in call("sim_status")["instances"] if i["id"] == instance_id]
-        if len(row) != 1 or row[0].get("operatingState") != "Off": raise RuntimeError("sim_status does not show the instance OFF")
+        # Independent observation through a fresh selection, not the state call's own echo.
+        observed = call("sim_select", {"instanceId": instance_id, "expectedName": instance["name"]})
+        if observed["instance"].get("operatingState") != "Off": raise RuntimeError("A fresh selection does not show the instance OFF")
         report["simulationVerified"] = True
         report["simulationReportPath"] = tested["reportPath"]
         report["completed"] = True
