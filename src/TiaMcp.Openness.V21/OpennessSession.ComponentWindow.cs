@@ -275,7 +275,7 @@ namespace TiaMcp.Openness.V21
             using (var process = Process.GetProcessById(_processId.Value))
                 return new JObject { ["phase"] = phase, ["projectPath"] = project.Path.FullName, ["plcPath"] = _componentWindowManifest["plcPath"].DeepClone(),
                     ["processId"] = _processId, ["nativeBirthUtc"] = process.StartTime.ToUniversalTime().ToString("O"), ["sessionEpoch"] = _libraryGeneration,
-                    ["projectFileSha256"] = ChangeFileHash(project.Path.FullName), ["scopeComplete"] = true, ["isModified"] = false, ["inventory"] = inventory, ["objects"] = objects, ["componentVersions"] = versions,
+                    ["projectFileSha256"] = OpenProjectFileHash(project.Path.FullName), ["scopeComplete"] = true, ["isModified"] = false, ["inventory"] = inventory, ["objects"] = objects, ["componentVersions"] = versions,
                     ["peerMetadata"] = peerMetadata, ["watchForceTables"] = watchForceTables, ["projectLibrary"] = new JObject { ["scopeComplete"] = true, ["metadata"] = libraryMetadata } };
         }
         private JObject ComponentWindowPeerMetadata(Project project, PlcSelection plc, string directory, out JObject tables)

@@ -13,6 +13,8 @@ import ctypes
 from ctypes import wintypes
 import hashlib
 import json
+import msvcrt
+import os
 import pathlib
 import subprocess
 import time
@@ -22,7 +24,8 @@ from qualify_reliability import ReliabilityClient, decoded, require, terminate_o
 from smoke_mcp import ROOT
 
 TIA_EXE = pathlib.Path(r"D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe")
-PROBE = "FUNCTION \"LaneEProbe\" : Int\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nBEGIN\n    #LaneEProbe := 7;\nEND_FUNCTION\n"
+def probe(name="LaneEProbe"):
+    return f"FUNCTION \"{name}\" : Int\n{{ S7_Optimized_Access := 'TRUE' }}\nVERSION : 0.1\nBEGIN\n    #{name} := 7;\nEND_FUNCTION\n"
 # name: (operation, interruption, journal trigger, expected outcome or None when evidence decides)
 SCENARIOS = {
     "apply-kill-applying": ("change_apply", "worker", lambda j: j.get("state") == "applying", "released"),
@@ -36,6 +39,15 @@ SCENARIOS = {
     "library-apply-kill": ("change_apply", "worker", lambda j: j.get("state") == "applying", None),
     "library-restore-kill": ("change_restore", "worker", lambda j: any(r.get("state") == "dispatching"
                              for a in (j.get("recoveryAttempts") or []) for r in a.get("resources", [])), None),
+    # MCP cancellation while the native apply runs: the Host gives up, the worker finishes its call.
+    "apply-cancel": ("change_apply", "cancel", lambda j: j.get("state") == "applying", None),
+    # Boundaries that must refuse before any admission: a stale preview, a concurrent change from a second Host
+    # attached to the same TIA, and an apply after the owned TIA disappeared.
+    "stale-concurrent": ("change_apply", "none", None, None),
+    "tia-unavailable": ("change_apply", "none", None, None),
+    "library-open-kill": ("library_open", "worker", None, None),
+    # A completed two-checkpoint recovery, then both recovered copies reopened in a fresh Host.
+    "library-restore-complete": ("change_restore", "none", None, None),
 }
 
 
@@ -69,10 +81,21 @@ def wait_until(predicate, description, timeout, interval=0.02):
 
 
 def read_json(path):
+    """Read with full sharing: a plain open blocks the worker's File.Replace of its journal (seen natively)."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    handle = kernel.CreateFileW(str(path), 0x80000000, 0x7, None, 3, 0, None)  # GENERIC_READ, share read/write/delete, OPEN_EXISTING
+    if handle in (None, wintypes.HANDLE(-1).value):
+        return None
     try:
-        return json.loads(path.read_text(encoding="utf-8-sig"))
+        with os.fdopen(msvcrt.open_osfhandle(handle, os.O_RDONLY), "rb") as stream:
+            handle = None
+            return json.loads(stream.read().decode("utf-8-sig"))
     except (OSError, ValueError):
         return None
+    finally:
+        if handle is not None:
+            kernel.CloseHandle(handle)
 
 
 def admissions(root, operation):
@@ -109,9 +132,30 @@ class Scenario:
         self.worker_pid = workers[0]
         return tia
 
-    def interrupt(self, client, tia_pid, mode):
-        """Terminate exactly this Host's worker (and its owned TIA), or exactly this Host."""
+    def wait_exit(self, tia_pid, worker_timeout=600):
+        """Let the worker and its owned TIA exit on their own; terminate only the exact processes that do not."""
+        worker_exited = tia_exited = True
+        try:
+            wait_until(lambda: not alive(self.worker_pid), "Worker did not exit", worker_timeout, 0.5)
+        except TimeoutError:
+            worker_exited = False
+            terminate_owned_test_worker(self.worker_pid, self.worker)
+        try:
+            wait_until(lambda: not alive(tia_pid), "Owned TIA did not exit after its worker", 120, 0.5)
+        except TimeoutError:
+            tia_exited = False
+            terminate_owned_test_worker(tia_pid, TIA_EXE)
+        return {"workerPid": self.worker_pid, "workerExitedAlone": worker_exited, "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited}
+
+    def interrupt(self, client, tia_pid, mode, request=None):
+        """Terminate exactly this Host's worker (and its owned TIA), or exactly this Host, or cancel the MCP request."""
         workers = [self.worker_pid]
+        if mode == "cancel":
+            client.notify("notifications/cancelled", {"requestId": request, "reason": "Qualification cancellation during apply"})
+            following = decoded(client.raw_tool("tia_capabilities")).get("error", {}).get("code")
+            require(following == "BridgeFaulted", "After cancellation the bridge must refuse further calls")
+            client.close()
+            return {"terminated": None, "cancelled": True, "followingCallError": following, **self.wait_exit(tia_pid)}
         if mode == "worker":
             terminate_owned_test_worker(workers[0], self.worker)
             tia_exited_alone = not alive(tia_pid)
@@ -137,6 +181,10 @@ class Scenario:
     def run(self, operation, mode, trigger, expected):
         if self.name.startswith("library-"):
             return self.run_library(operation, mode, trigger, expected)
+        if self.name == "stale-concurrent":
+            return self.run_stale_concurrent()
+        if self.name == "tia-unavailable":
+            return self.run_tia_unavailable()
         client = self.client()
         try:
             client.initialize()
@@ -179,6 +227,8 @@ class Scenario:
         try:
             client.initialize()
             tia = self.start(client)
+            if operation == "library_open":
+                return self.run_library_open(client, tia)
             self.step("tia_create_scratch", client.tool("tia_create_scratch"))
             inventory = client.tool("project_inventory", {"maxItems": 1000})
             block = next(b for b in inventory["blocks"] if b["name"] == "TiaMcp_IsEnabled")
@@ -194,11 +244,14 @@ class Scenario:
             else:
                 applied = self.step("change_apply library_create_master_copy", client.tool("change_apply", self.apply_arguments(prepared)))
                 require(applied["state"] == "applied" and len(applied["journal"]["checkpoints"]) == 2, "Expected a project and a library checkpoint")
+                library_path = next(c["originalPath"] for c in applied["journal"]["checkpoints"] if c["kind"] == "library")
                 client.tool("tia_detach")
                 client.close()
                 client = self.client()
                 client.initialize()
                 tia = self.start(client, "tia_start (empty owned instance)")
+                if mode == "none":
+                    return self.complete_library_restore(client, prepared, library_path, block["name"])
                 request = client.begin("tools/call", {"name": "change_restore", "arguments": {
                     "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}})
             wait_until(lambda: trigger(read_json(journal) or {}), "Journal never reached the interruption boundary", 900)
@@ -206,9 +259,127 @@ class Scenario:
         finally:
             client.close()
 
-    def prepare(self, client):
-        return self.step("change_prepare", client.tool("change_prepare", {"kind": "source_upsert", "payload": {
-            "language": "SCL", "source": PROBE, "expectedBlockNames": ["LaneEProbe"]}}))
+    def run_library_open(self, client, tia):
+        created = self.step("library_create", client.tool("change_apply", self.apply_arguments(
+            client.tool("change_prepare", {"kind": "library_create", "payload": {"schemaVersion": 1, "name": "LaneEOpen"}}))))
+        library_id = created["journal"]["result"]["library"]["libraryId"]
+        revision = next(x["revision"] for x in client.tool("library_list")["libraries"] if x["libraryId"] == library_id)
+        archived = self.step("library_archive", client.tool("change_apply", self.apply_arguments(client.tool("change_prepare", {
+            "kind": "library_archive", "payload": {"schemaVersion": 1, "source": {"libraryId": library_id, "revision": revision}}}))))
+        archive = archived["journal"]["result"]["archive"]
+        request = client.begin("tools/call", {"name": "library_open", "arguments": {"request": {"path": archive["path"], "expectedSha256": archive["sha256"]}}})
+        wait_until(lambda: any((self.root / "libraries").glob("l_*/open-receipt.json")), "library_open never wrote its receipt", 600)
+        return self.finish(client, request, tia, "library_open", "worker", None, None)
+
+    def complete_library_restore(self, client, prepared, library_path, block_name):
+        restored = self.step("change_restore (complete)", client.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
+        resources = restored["resources"]
+        require(restored.get("originalsPreserved") is True and len(resources) == 2 and all(r["state"] == "completed" for r in resources),
+                "Both checkpoints must be recovered into new locations")
+        client.tool("tia_detach")
+        client.close()
+        pending = [a for a in admissions(self.root, "change_restore") if a["state"] in ("dispatchIntent", "outcomeUnknown")]
+        require(not pending, "A completed recovery leaves no unresolved admission")
+        fresh = self.client()
+        try:
+            fresh.initialize()
+            self.start(fresh, "fresh tia_start")
+            project = next(r for r in resources if r["kind"] == "project")["project"]["path"]
+            self.step("project_open recovered", fresh.tool("project_open", {"path": project}))
+            names = {b["name"] for b in fresh.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+            require(block_name in names, "Recovered project lost its fixture block")
+            destination = pathlib.Path(next(r for r in resources if r["kind"] == "library")["destination"])
+            markers = list(destination.rglob("*.al21"))
+            require(len(markers) == 1, "Recovered library directory must hold exactly one library")
+
+            def masters(path):
+                opened = fresh.tool("library_open", {"request": {"path": str(path), "expectedSha256": hashlib.sha256(path.read_bytes()).hexdigest()}})
+                items = fresh.tool("library_query", {"request": {"libraryId": opened["libraryId"]}})["items"]
+                return sorted(x["name"] for x in items if x.get("kind") == "masterCopy")
+            recovered_masters, original_masters = masters(markers[0]), masters(pathlib.Path(library_path))
+            self.step("library_open recovered and original", {"recovered": recovered_masters, "original": original_masters})
+            require(block_name in original_masters and block_name not in recovered_masters,
+                    "The recovered library must equal its pre-change checkpoint while the original keeps the applied master copy")
+            fresh.tool("tia_detach")
+        finally:
+            fresh.close()
+        self.report.update({"outcome": "recovered", "recoveredProject": project, "recoveredLibrary": str(markers[0]),
+                            "recoveredMasters": recovered_masters, "originalMasters": original_masters})
+        self.report["passed"] = True
+        return self.report
+
+    def run_stale_concurrent(self):
+        owner = self.client()
+        try:
+            owner.initialize()
+            tia = self.start(owner)
+            self.step("tia_create_scratch", owner.tool("tia_create_scratch"))
+            stale = self.prepare(owner, "LaneEStaleX")
+            observer = self.client()
+            try:
+                observer.initialize()
+                self.step("second Host tia_attach", observer.tool("tia_attach", {"processId": tia}))
+                concurrent = self.step("second Host change_apply", observer.tool("change_apply", self.apply_arguments(self.prepare(observer, "LaneEConcurrentY"))))
+                require(concurrent["state"] == "applied", "Concurrent change did not apply")
+                observer.tool("tia_detach")
+            finally:
+                observer.close()
+            refused = decoded(owner.raw_tool("change_apply", self.apply_arguments(stale)))
+            self.step("apply after concurrent change", refused)
+            later = self.prepare(owner, "LaneEStaleW")
+            self.step("change_apply other preview", owner.tool("change_apply", self.apply_arguments(self.prepare(owner, "LaneEStaleV"))))
+            refused_same = decoded(owner.raw_tool("change_apply", self.apply_arguments(later)))
+            self.step("apply stale preview", refused_same)
+            codes = [r.get("error", {}).get("code") for r in (refused, refused_same)]
+            require(all(c in ("StaleRevision", "StaleMutationScope", "PreviewStale") for c in codes), f"Stale applies must be refused: {codes}")
+            names = {b["name"] for b in owner.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+            require({"LaneEConcurrentY", "LaneEStaleV"} <= names and not {"LaneEStaleX", "LaneEStaleW"} & names, "Only the fresh changes may be present")
+            journals = [read_json(pathlib.Path(p["journalPath"])) for p in (stale, later)]
+            require(all(j["state"] == "prepared" and not j.get("idempotencyKey") for j in journals), "Refused previews must stay prepared and unclaimed")
+            unresolved = [a for a in admissions(self.root, "change_apply") if a["state"] in ("dispatchIntent", "outcomeUnknown")]
+            require(not unresolved, "Refusal before dispatch must not leave an admission")
+            owner.tool("tia_detach")
+        finally:
+            owner.close()
+        self.report.update({"outcome": "refused", "codes": codes, "blocks": sorted(names)})
+        self.report["passed"] = True
+        return self.report
+
+    def run_tia_unavailable(self):
+        client = self.client()
+        try:
+            client.initialize()
+            tia = self.start(client)
+            self.step("tia_create_scratch", client.tool("tia_create_scratch"))
+            prepared = self.prepare(client)
+            terminate_owned_test_worker(tia, TIA_EXE)
+            self.step("owned TIA terminated while idle", {"tiaPid": tia})
+            refused = decoded(client.raw_tool("change_apply", self.apply_arguments(prepared)))
+            self.step("apply without TIA", refused)
+            require("error" in refused, "An apply without its TIA must fail")
+            journal = read_json(pathlib.Path(prepared["journalPath"]))
+            require(journal["state"] == "prepared" and not journal.get("idempotencyKey"), "No apply may be claimed without TIA")
+            unresolved = [a for a in admissions(self.root, "change_apply") if a["state"] in ("dispatchIntent", "outcomeUnknown")]
+        finally:
+            client.close()
+        fresh = self.client()
+        try:
+            fresh.initialize()
+            self.start(fresh, "fresh tia_start")
+            fresh.tool("project_open", {"path": prepared["preview"]["project"]["path"]})
+            names = {b["name"] for b in fresh.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+            require("LaneEProbe" not in names, "The project must be unchanged")
+            fresh.tool("tia_detach")
+        finally:
+            fresh.close()
+        self.report.update({"outcome": "refused", "code": refused["error"].get("code"), "unresolvedAdmissions": [a["id"] for a in unresolved]})
+        require(not unresolved, "Refusal before dispatch must not leave an admission")
+        self.report["passed"] = True
+        return self.report
+
+    def prepare(self, client, name="LaneEProbe"):
+        return self.step("change_prepare " + name, client.tool("change_prepare", {"kind": "source_upsert", "payload": {
+            "language": "SCL", "source": probe(name), "expectedBlockNames": [name]}}))
 
     def apply_arguments(self, prepared):
         return {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "idempotencyKey": uuid.uuid4().hex,
@@ -222,7 +393,7 @@ class Scenario:
 
     def finish(self, client, request, tia, operation, mode, journal, expected, project=None):
         before = journal.read_bytes() if journal else None
-        self.step("interrupt", {"journalAtInterrupt": read_json(journal) if journal else None, **self.interrupt(client, tia, mode)})
+        self.step("interrupt", {"journalAtInterrupt": read_json(journal) if journal else None, **self.interrupt(client, tia, mode, request)})
         if mode == "worker":
             response = client.receive(request)
             self.step("interrupted response", {"isError": response.get("isError"), "error": decoded(response).get("error", {}).get("code")})

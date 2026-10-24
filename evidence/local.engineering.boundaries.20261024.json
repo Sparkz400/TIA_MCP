@@ -1,0 +1,62 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.engineering.boundaries.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T20:23:16+00:00",
+  "source": {
+    "commit": "54e4bd6ff5bda932e35a34eaf3b6f4f33f726df5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_interruption.py, TIA V21 owned scratch projects, one artifact root per scenario. apply-cancel: MCP notifications/cancelled while change_apply was applying; the next call got BridgeFaulted, the worker finished its call and exited with its TIA; a fresh Host reconciled the outcomeUnknown admission -> released (project verifiedApplied: fresh fingerprint equals journal afterFingerprint). stale-concurrent: a second Host attached to the same TIA applied a change between prepare and apply -> StaleRevision; a stale preview in the same Host after another apply -> StaleRevision; both previews stayed prepared and unclaimed, no admission was left, only the fresh changes are in the project. tia-unavailable: the owned TIA was terminated while idle; change_apply failed (EngineeringError: TIA Portal disposed or stopped) before any admission, the journal stayed prepared and a fresh session showed the project unchanged. library-open-kill: worker and TIA terminated after the open receipt was written -> held (source library unchanged; working copy partial). library-restore-complete: a library_create_master_copy change with project and global-library checkpoints was restored completely into new locations, then a fresh Host reopened both: the recovered project kept its fixture block, the recovered library had no master copies (its pre-change checkpoint) while the original library kept the applied master copy TiaMcp_IsEnabled.",
+  "limitations": [
+    "Each scenario ran once; interruption is MCP cancellation or process termination, and where it landed inside a phase is timing-dependent.",
+    "Protected/know-how content is not covered: no protected fixture exists and creating one needs a protection password and new fixture code.",
+    "Fresh reopen after recovery compares fixture blocks and library master copies, not full object content."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "dc67273d6426dbcb1ecf7108d577501b428f5a004758dab900c514b50768fc63"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "45991212fb2541f54db398430af3f7cb3ed0e9e454bbb7eb88e029204efeb039"
+    }
+  ],
+  "runs": [
+    {
+      "report": "interruption-b4.json",
+      "sha256": "c5820f35da65e885a422167d1261691f989c3ee846741acc4e0506cce4b65757",
+      "bytes": 266847,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "tia_attach",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "tia_capabilities"
+      ]
+    }
+  ]
+}
