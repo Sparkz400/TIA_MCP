@@ -20,10 +20,11 @@ namespace TiaMcp.Openness.V21
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false, bool configureRoute = false)
+        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false, bool configureRoute = false, bool freshPortal = false)
         {
             if (lateDiscovery && !startCpu) throw new ArgumentException("Late discovery requires the explicit empty startup probe.");
             if (configureRoute && (!startCpu || lateDiscovery || visible)) throw new ArgumentException("Configured discovery requires headless startup with the pre-start baseline.");
+            if (freshPortal && !configureRoute) throw new ArgumentException("Fresh Portal comparison requires the configured discovery baseline.");
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
@@ -31,6 +32,7 @@ namespace TiaMcp.Openness.V21
             result["portalMode"] = visible ? "WithUserInterface" : "WithoutUserInterface";
             result["preStartDiscoverySkipped"] = lateDiscovery;
             result["routeConfigurationRequested"] = configureRoute;
+            result["freshPortalRequested"] = freshPortal;
             Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
@@ -153,9 +155,7 @@ namespace TiaMcp.Openness.V21
                                 project.Close();
                                 result["projectReload"]["closed"] = true;
                                 checkpoint();
-                                project = portal.Projects.Open(savedPath);
-                                if (project.Path.FullName != savedPath.FullName || project.IsModified || project.Devices.Count != 1 || project.Devices.Single().Name != deviceName)
-                                    throw new InvalidOperationException("Reopened scratch project identity or saved state changed.");
+                                project = OpenProbeProject(portal, savedPath, deviceName);
                                 device = project.Devices.Single();
                                 provider = AllItems(device.DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
                                 projectDiscovery = project.GetService<StationUploadProvider>();
@@ -166,6 +166,68 @@ namespace TiaMcp.Openness.V21
                                 states.Add(Observe("C5-after-project-reload", provider, projectDiscovery));
                                 VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
                                 checkpoint();
+                                if (freshPortal)
+                                {
+                                    var nonce = Guid.NewGuid().ToString("N");
+                                    File.WriteAllText(Path.Combine(root.FullName, "second-start-intent.json"), new JObject { ["nonce"] = nonce }.ToString());
+                                    using (var comparisonPortal = new TiaPortal(TiaPortalMode.WithoutUserInterface))
+                                    {
+                                        var comparisonId = PortalProcesses.CurrentId(comparisonPortal);
+                                        if (comparisonId == result.Value<int>("processId")) throw new InvalidOperationException("Fresh Portal process identity was reused.");
+                                        result["comparisonProcessId"] = comparisonId;
+                                        File.WriteAllText(Path.Combine(root.FullName, "second-start-return.json"), new JObject { ["processId"] = comparisonId, ["nonce"] = nonce }.ToString());
+                                        var receiptPath = Path.Combine(root.FullName, "second-handle-captured.json");
+                                        var wait = Stopwatch.StartNew();
+                                        while (!File.Exists(receiptPath) && wait.ElapsedMilliseconds < 30000) Thread.Sleep(100);
+                                        var receipt = JObject.Parse(File.ReadAllText(receiptPath));
+                                        if (receipt.Value<int>("processId") != comparisonId || receipt.Value<string>("nonce") != nonce || receipt.Value<bool>("originalHandleRetained") != true)
+                                            throw new InvalidOperationException("Fresh Portal original handle receipt does not match this attempt.");
+                                        result["comparisonHandleReceiptVerified"] = true;
+                                        VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                        var discoveryDirectory = Path.Combine(root.FullName, "discovery");
+                                        Directory.CreateDirectory(discoveryDirectory);
+                                        var discoveryProject = comparisonPortal.Projects.Create(new DirectoryInfo(discoveryDirectory), "DiscoveryProbe");
+                                        var discoveryProvider = discoveryProject.GetService<StationUploadProvider>();
+                                        if (discoveryProvider == null) throw new InvalidOperationException("Empty-project discovery service is unavailable.");
+                                        var discoverySamples = new JArray();
+                                        result["emptyProjectDiscovery"] = new JObject { ["projectPath"] = discoveryProject.Path.FullName,
+                                            ["originalProjectStillOpen"] = project.Path.FullName == savedPath.FullName && !project.IsModified,
+                                            ["snapshots"] = discoverySamples };
+                                        if (!result["emptyProjectDiscovery"].Value<bool>("originalProjectStillOpen"))
+                                            throw new InvalidOperationException("Original scratch project changed before independent discovery.");
+                                        for (int i = 0; i < SnapshotsPerState; i++)
+                                        {
+                                            if (i > 0) Thread.Sleep(1000);
+                                            VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                            discoverySamples.Add(ObserveConfiguration(discoveryProvider.Configuration));
+                                            VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                            checkpoint();
+                                        }
+                                        discoveryProject.Close();
+                                        result["emptyProjectDiscovery"]["closed"] = true;
+                                        project.Close();
+                                        var comparisonProject = OpenProbeProject(comparisonPortal, savedPath, deviceName);
+                                        var comparisonProvider = AllItems(comparisonProject.Devices.Single().DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
+                                        var comparisonDiscovery = comparisonProject.GetService<StationUploadProvider>();
+                                        if (comparisonDiscovery == null || comparisonProvider.State != OnlineState.Offline)
+                                            throw new InvalidOperationException("Fresh Portal discovery services are unavailable or online.");
+                                        states.Add(Observe("C6-fresh-portal", comparisonProvider, comparisonDiscovery));
+                                        VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                        if (comparisonProject.IsModified) throw new InvalidOperationException("Fresh Portal observation modified the scratch project.");
+                                        comparisonProject.Close();
+                                        checkpoint();
+                                    }
+                                    result["comparisonPortalConnectionDisposed"] = true;
+                                    project = OpenProbeProject(portal, savedPath, deviceName);
+                                    provider = AllItems(project.Devices.Single().DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
+                                    projectDiscovery = project.GetService<StationUploadProvider>();
+                                    if (projectDiscovery == null || provider.State != OnlineState.Offline)
+                                        throw new InvalidOperationException("Original Portal discovery services are unavailable or online.");
+                                    VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                    states.Add(Observe("C7-original-portal-after-comparison", provider, projectDiscovery));
+                                    VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                    checkpoint();
+                                }
                             }
                             owned.PowerOff(60000);
                             VerifySoleOwned(owned, ownedName, EOperatingState.Off);
@@ -214,6 +276,14 @@ namespace TiaMcp.Openness.V21
                 File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             }
             return result.Value<bool>("completed") ? 0 : 1;
+        }
+
+        private static Project OpenProbeProject(TiaPortal portal, FileInfo path, string deviceName)
+        {
+            var project = portal.Projects.Open(path);
+            if (project.Path.FullName != path.FullName || project.IsModified || project.Devices.Count != 1 || project.Devices.Single().Name != deviceName)
+                throw new InvalidOperationException("Reopened scratch project identity or saved state changed.");
+            return project;
         }
 
         private static void VerifySoleOwned(IInstance instance, string name, EOperatingState expected)

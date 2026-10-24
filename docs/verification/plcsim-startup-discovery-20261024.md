@@ -400,3 +400,113 @@ match, and the final locked registry scan finds eighteen terminal tickets.
 Its only process-proof error is the exceeded original terminal deadline; late
 exit is cleanup evidence only. Both comparison fixtures and their binaries are
 retained as unique evidence. No extra branch or worktree was created.
+
+## Fresh Portal process comparison
+
+The explicit `--plcsim-fresh-portal-discovery-probe` extends the configured
+comparison with a second newly created headless Portal process. The original
+Portal remains alive, but closes the scratch project before the second opens
+that exact saved path. Both sessions require one matching device, saved state,
+offline providers and the same sole owned STOP/Softbus simulator. The second
+session observes three paired samples, closes its project and disposes its
+connection. The original session then reopens the same project and records
+three further paired samples before powering OFF and unregistering the CPU.
+This compares two Portal processes in one Openness worker; it does not compare
+two independent worker processes or retire every original helper first.
+
+Before the second session may open the project, its reported process ID and
+fresh nonce must be acknowledged by the coordinator. The coordinator requires
+a distinct live Portal process, direct ancestry from the original owned worker,
+verified birth/image, original retained handle and membership in the existing
+non-breakaway job. It publishes the acknowledgement by rename after a durable
+write. Missing second-process capture leaves the process-tree proof incomplete.
+The original editor identity is never replaced in the lifecycle tracker.
+
+The `n24ar` worker builds without warnings/errors and passes the compiled
+lifecycle guard plus all 84 argument-refusal checks. Nine independent checks
+exercise the new coordinator capture predicate, including nonce, ancestry,
+birth, duplicate identity, already-exited process and incomplete-capture refusal.
+The previous worker fails the new-mode negative control without loading Siemens.
+Siemens documents creating multiple Portal instances through Openness in the
+official [V21 connection reference](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/general-functions/connecting-to-the-tia-portal).
+Context7's launcher remains unavailable; the official reference and installed
+SDK were used directly.
+
+`artifacts/p24-fresh-portal/` succeeds in observing the exact endpoint in all
+three paired samples in the fresh Portal: address `192.168.0.1`, MAC
+`FF-FF-C0-A8-00-01`, series `S7-1500 CPU`. All three paired samples back in the
+original Portal still show the placeholder. The independent assessment checks
+177 device observations, including six exact endpoint observations and twelve
+absent-route observations, plus the nonce/handle acknowledgement. Pre-start
+discovery was retained, and the owned CPU was powered OFF and unregistered.
+This strongly supports Portal-process-local discovery state in this sequence.
+
+All twelve job members subsequently exit naturally. Ten retained handles,
+including both separately captured Portal processes, exit zero and close.
+The storage-helper deadline remains failed. All coordinator source and worker
+pins match, and the final locked registry scan finds nineteen terminal tickets.
+
+### Independent empty discovery project
+
+The next variant first creates an empty project in the second Portal and reads
+its StationUploadProvider while the original scratch project remains open.
+It then performs the saved-project comparison above. The extra project path is
+declared in the coordinator's resource scope before native dispatch. This tests
+an observer route that would not require closing the production scratch project.
+
+The first `n24as` attempt in `artifacts/p24-empty-discovery/` fails before that
+observation: Siemens rejects the result of `Directory.CreateDirectory` passed
+directly to `Projects.Create` as a relative `TargetDirectory`. Its owned CPU is
+powered OFF and unregistered during failure cleanup; no discovery-only result
+is inferred from this failed attempt.
+
+An exact .NET Framework probe reproduces the argument distinction:
+`Directory.CreateDirectory(absolutePath).FullName` is absolute, but its
+`ToString()` is only the final directory name. An explicit
+`new DirectoryInfo(absolutePath)` retains the full path in both properties.
+The initial PowerShell runtime comparison did not reproduce this distinction;
+the Framework executable does (`artifacts/todo-resume-20261024/directoryinfo-shape.log`).
+The diagnostic now creates the directory separately and passes an explicitly
+constructed absolute DirectoryInfo, matching the established project-creation
+code. No other direct SDK call with this pattern was found in the worker.
+The final `n24at` worker builds cleanly and passes the compiled lifecycle guard
+and all 84 argument checks.
+
+The failed `n24as` process job is terminal: twelve total members, ten retained
+handles, nine zero exits and the expected worker exit code 1. Both exact Portal
+handles are captured and closed; no process is forcibly terminated. The normal
+deadline and nonzero worker outcome remain failed. A locked final scan finds
+twenty terminal job tickets; no uncertain provisioning reservation is released.
+
+The fresh `artifacts/p24-empty-discovery-fixed/` run with `n24at` confirms the
+path repair and the independent observer route. Its empty project's first three
+StationUploadProvider snapshots all show the exact `192.168.0.1` endpoint while
+the original saved scratch project remains open. The empty project has no
+configured addresses or target interfaces. After that project closes, opening
+the original saved project in the second Portal also returns the endpoint in
+all three paired samples. The original Portal remains stale in all three paired
+follow-up samples. The independent assessment checks all 180 device observations,
+including nine exact endpoint observations, the original-open assertion and
+the second-process handle receipt. OFF, unregister and both Portal connection
+disposals return successfully.
+
+This proves an automatic diagnostic discovery route that preserves the
+pre-start observations and does not need to close the working project for the
+first fresh read. It does not yet qualify production credential provisioning.
+Integration must declare the extra discovery project before shared mutation
+dispatch, retain its process/lifecycle evidence, preserve the original
+project/PLC/Runtime Manager baseline binding and five-minute lifetime, and use
+fresh endpoint observations at the existing post-start and credential-boundary
+identity checks. The actual connection and authentication must remain bound to
+the original scratch PLC and sole PLCSIM route; the observer must never select
+an alternative network interface or remove the current ambiguity refusals.
+
+The corrected run's process job is now terminal: twelve total members, ten
+retained zero-exit handles (including both Portal processes), no forced
+termination, and unchanged source/worker pins. The final locked registry scan
+finds twenty-one terminal tickets. Its original storage-helper deadline still
+fails; successful late cleanup does not qualify normal shutdown. All three
+comparison roots and worker builds remain retained as unique evidence. The
+final source bindings validate with all 117 historical rows preserved and
+106 unavailable historical inputs still explicit. No extra worktree or branch
+was created, and no production qualification profile was promoted.

@@ -31,15 +31,17 @@ namespace TiaMcp.Openness.V21
                 bool visibleDiscoveryProbe = false;
                 bool lateDiscoveryProbe = false;
                 bool configuredDiscoveryProbe = false;
+                bool freshPortalDiscoveryProbe = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     if (args[i] == "--pipe" && i + 1 < args.Length) pipe = args[++i];
-                    else if ((args[i] == "--plcsim-discovery-probe" || args[i] == "--plcsim-startup-discovery-probe" || args[i] == "--plcsim-ui-discovery-probe" || args[i] == "--plcsim-late-discovery-probe" || args[i] == "--plcsim-configured-discovery-probe") && i + 1 < args.Length)
+                    else if ((args[i] == "--plcsim-discovery-probe" || args[i] == "--plcsim-startup-discovery-probe" || args[i] == "--plcsim-ui-discovery-probe" || args[i] == "--plcsim-late-discovery-probe" || args[i] == "--plcsim-configured-discovery-probe" || args[i] == "--plcsim-fresh-portal-discovery-probe") && i + 1 < args.Length)
                     {
                         if (discoveryProbe != null) throw new ArgumentException("Only one discovery probe mode is allowed.");
                         visibleDiscoveryProbe = args[i] == "--plcsim-ui-discovery-probe";
                         lateDiscoveryProbe = args[i] == "--plcsim-late-discovery-probe";
-                        configuredDiscoveryProbe = args[i] == "--plcsim-configured-discovery-probe";
+                        freshPortalDiscoveryProbe = args[i] == "--plcsim-fresh-portal-discovery-probe";
+                        configuredDiscoveryProbe = freshPortalDiscoveryProbe || args[i] == "--plcsim-configured-discovery-probe";
                         startupDiscoveryProbe = visibleDiscoveryProbe || lateDiscoveryProbe || configuredDiscoveryProbe || args[i] == "--plcsim-startup-discovery-probe";
                         discoveryProbe = args[++i];
                     }
@@ -63,7 +65,7 @@ namespace TiaMcp.Openness.V21
                     throw new InvalidOperationException("Only the TIA V21 API is supported by this worker.");
                 simulatorApiDirectory = Path.GetFullPath(simulatorApiDirectory);
                 AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) => ResolveSiemens(eventArgs, apiDirectory, simulatorApiDirectory);
-                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe, visibleDiscoveryProbe, lateDiscoveryProbe, configuredDiscoveryProbe);
+                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe, visibleDiscoveryProbe, lateDiscoveryProbe, configuredDiscoveryProbe, freshPortalDiscoveryProbe);
                 if (testSuiteScopeProbe && componentQualification) throw new ArgumentException("Separate qualification modes required.");
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
@@ -105,7 +107,7 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int RunDiscoveryProbe(string outputDirectory, bool startCpu, bool visible, bool late, bool configured) => PlcsimDiscoveryProbe.Run(outputDirectory, startCpu, visible, late, configured);
+        private static int RunDiscoveryProbe(string outputDirectory, bool startCpu, bool visible, bool late, bool configured, bool freshPortal) => PlcsimDiscoveryProbe.Run(outputDirectory, startCpu, visible, late, configured, freshPortal);
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]

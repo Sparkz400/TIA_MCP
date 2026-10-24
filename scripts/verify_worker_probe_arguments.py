@@ -8,7 +8,7 @@ import tempfile
 
 
 def verify(worker):
-    modes = ('--plcsim-discovery-probe', '--plcsim-startup-discovery-probe', '--plcsim-ui-discovery-probe', '--plcsim-late-discovery-probe', '--plcsim-configured-discovery-probe')
+    modes = ('--plcsim-discovery-probe', '--plcsim-startup-discovery-probe', '--plcsim-ui-discovery-probe', '--plcsim-late-discovery-probe', '--plcsim-configured-discovery-probe', '--plcsim-fresh-portal-discovery-probe')
     checked = []
     with tempfile.TemporaryDirectory(prefix='tia-probe-arguments-') as temporary:
         root = Path(temporary)
