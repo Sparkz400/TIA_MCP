@@ -23,5 +23,6 @@ python -B scripts/curate_evidence.py --id local.smoke.20261024 `
 
 Then add the record to `contracts/feature-catalog.v1.json` with
 `"artifacts": ["evidence/<evidence-id>.json"]` and cite it from the features it
-qualifies. A summary with `source.dirty: true` ran uncommitted `src/` or
-`scripts/` changes; commit first.
+qualifies. The summary records the commit at curation time, so commit before
+the run and curate before changing `src/` or the runner again. A summary with
+`source.dirty: true` ran uncommitted `src/` or `scripts/` changes.

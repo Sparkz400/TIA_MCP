@@ -39,8 +39,10 @@ internal static partial class Program
         using var stream = typeof(FeatureCatalog).Assembly.GetManifestResourceStream("TiaMcp.FeatureCatalog.v1.json")!;
         using var reader = new StreamReader(stream);
         var original = reader.ReadToEnd();
-        // The bundled catalog has no verified entry; claim one so the verified-only rules are exercised.
+        // Claim verified explicitly so the verified-only rules do not depend on the bundled entry's state.
         static JsonNode Verified(JsonNode root) { root["features"]![0]!["qualification"]!["status"] = "verified"; return root; }
+        static JsonNode Cited(JsonNode root) => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() ==
+            root["features"]![0]!["qualification"]!["evidenceIds"]![0]!.GetValue<string>())!;
         foreach (var corrupt in new Action<JsonNode>[] {
             root => root["features"]![1]!["featureId"] = root["features"]![0]!["featureId"]!.GetValue<string>(),
             root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("invented-proof"),
@@ -48,8 +50,8 @@ internal static partial class Program
             root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.sim.startup.v02"),
             root => { root["features"]![0]!["qualification"]!["status"] = "failed";
                 root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.offline.v02"); },
-            root => Verified(root)["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "blocked",
-            root => Verified(root)["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "skipped",
+            root => Cited(Verified(root))["status"] = "blocked",
+            root => Cited(Verified(root))["status"] = "skipped",
             root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "perfect",
             root => root["features"]![0]!["implementation"]!["status"] = "not_implemented",
             root => root["features"]![0]!["acceptanceCriteria"] = new JsonArray("unknown-criterion")
