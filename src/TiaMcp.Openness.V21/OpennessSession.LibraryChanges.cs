@@ -998,7 +998,7 @@ namespace TiaMcp.Openness.V21
                         if (LibraryDirectoryHash(snapshot) != expected || !string.Equals(ChangeFileHash(snapshotPath), payload.Value<string>("expectedSha256"), StringComparison.OrdinalIgnoreCase)) throw new BridgeException("PackageChanged", "The immutable upgrade directory snapshot differs from the approved native marker or companion-file manifest.");
                         if (payload["expectedFiles"] is JArray expectedFiles) VerifyLibraryExpectedFiles(snapshot, expectedFiles);
                         if (System.IO.Directory.GetFiles(snapshot, "*", SearchOption.AllDirectories).Length < 2) throw new BridgeException("PackageInvalid", "A lone native library marker is incomplete. Supply its companion files or a native archive.");
-                        LibraryCopyDirectory(snapshot, directory);
+                        LibraryCopyWorkingDirectory(snapshot, directory);
                         if (LibraryDirectoryHash(directory) != expected) throw new BridgeException("PackageChanged", "The mutable upgrade working copy differs from its approved immutable snapshot.");
                     }
                     change.Journal["upgradeSourceSnapshot"] = new JObject { ["path"] = snapshotPath, ["sha256"] = expected, ["hashScope"] = change.Preview["upgradeSourceHashScope"], ["originalSourcePath"] = path, ["owned"] = true, ["workingDirectory"] = directory };

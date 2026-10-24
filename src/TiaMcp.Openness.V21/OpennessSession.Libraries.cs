@@ -74,7 +74,7 @@ namespace TiaMcp.Openness.V21
                 if (args["packageId"] != null && expectedFiles == null) throw new BridgeException("PackageInvalid", "A staged native directory requires its original companion-file manifest.");
                 if (expectedFiles != null) VerifyLibraryExpectedFiles(snapshot, expectedFiles);
                 if (System.IO.Directory.GetFiles(snapshot, "*", SearchOption.AllDirectories).Length < 2) throw new BridgeException("PackageInvalid", "A lone .al21 marker is not a complete native library directory. Supply the companion files or native archive.");
-                LibraryCopyDirectory(snapshot, directory);
+                LibraryCopyWorkingDirectory(snapshot, directory);
                 library = _portal.GlobalLibraries.Open(new FileInfo(Path.Combine(directory, Path.GetFileName(path))), writable ? OpenMode.ReadWrite : OpenMode.ReadOnly);
             }
             var entry = RegisterLibrary(library, null, library, true, writable);
@@ -410,6 +410,14 @@ namespace TiaMcp.Openness.V21
                 }
             }
             return ChangeHash(new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal)).ToString(Formatting.None));
+        }
+
+        // A read-only source must still yield a writable owned working copy; the snapshot keeps its attributes.
+        private static void LibraryCopyWorkingDirectory(string snapshot, string directory)
+        {
+            LibraryCopyDirectory(snapshot, directory);
+            foreach (string file in System.IO.Directory.GetFiles(directory, "*", SearchOption.AllDirectories))
+                File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
         }
 
         private static void LibraryCopyDirectory(string source, string destination)

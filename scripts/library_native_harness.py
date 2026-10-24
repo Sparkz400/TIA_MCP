@@ -113,14 +113,15 @@ class Harness:
         require(result.get("isError") is True, name + " unexpectedly succeeded")
         return (result.get("structuredContent") or {}).get("error") or {}
 
-    def refuse(self, label, kind, payload, code, text=None):
+    def refuse(self, label, kind, payload, code, text=None, project=True):
         """A refused preparation must change nothing in the selected PLC inventory."""
         def check():
-            before = self.tool("project_inventory", {"maxItems": 1000})
+            inventory = (lambda: self.tool("project_inventory", {"maxItems": 1000})) if project else dict
+            before = inventory()
             error = self.call_error("change_prepare", {"kind": kind, "payload": payload})
             require(error.get("code") == code, "Expected %s, observed %s: %s" % (code, error.get("code"), error.get("message")))
             require(text is None or text in (error.get("message") or ""), "Refusal message lacks " + str(text))
-            after = self.tool("project_inventory", {"maxItems": 1000})
+            after = inventory()
             for key in ("blocks", "types"):
                 require(before.get(key) == after.get(key), "Refused preparation changed the native inventory")
             return error
