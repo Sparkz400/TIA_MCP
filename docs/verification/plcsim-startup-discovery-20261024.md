@@ -578,5 +578,5 @@ run passed on a fresh scratch: the observer saw `192.168.0.1` in its first sampl
 the credential was provisioned, the CPU reached RUN and the stimulus assertions
 passed; the observer exited with code 0 (`evidence/local.sim.provision.20261024.json`).
 An earlier attempt reached the same point but failed its own observer exit check
-(the by-ID process handle was not retained); it left an `outcomeUnknown`
-admission that is still held, see [requalification](catalog-requalification-20261024.md).
+(the by-ID process handle was not retained); its `outcomeUnknown` admission
+was later released by [trusted reconciliation](provision-reconciliation-20261024.md).

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.4",
+  "catalogVersion": "0.4.5",
   "targetTiaVersions": [
     21
   ],
@@ -1277,6 +1277,24 @@
         "One scratch fixture and one simple stimulus scenario; this is not the 65-case runtime suite.",
         "Project preservation after provisioning is not independently verified, so simulation_provision_scratch_credential stays unverified (AC-preserve).",
         "First-use TLS trust was granted under the explicit owned-empty-CPU policy for this attempt only."
+      ]
+    },
+    {
+      "id": "local.sim.reconcile.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4db98c34b629f681e7d69cfc6d2657d7a0ba2871",
+        "passedScope": "scripts/reconcile_provision.py on the real outcomeUnknown admission left by a failed provisioning attempt (observer exit check bug): fresh owned TIA V21 session (different Portal process), pre-provision archive hash matched, archive retrieved to a new directory and its location-independent fingerprint (8 native block fingerprints) equal to the current scratch project, all 87 card files equal to the original manifest, discovery observer project empty; the store reconciled all three resources with separate evidence."
+      },
+      "artifacts": [
+        "evidence/local.sim.reconcile.20261024.json"
+      ],
+      "limitations": [
+        "Only the release path ran natively; every refusal reason (project, card, archive, observer, same process, other scope, mutation claimed) is covered by managed tests with a fake worker.",
+        "Runtime credential state inside the simulator storage is not verified; the card manifest and project are.",
+        "The fingerprint excludes generated payload bytes and unexposed vendor data, as EngineeringFingerprint policy 2 documents."
       ]
     }
   ],
@@ -2660,8 +2678,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.reconcile.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",

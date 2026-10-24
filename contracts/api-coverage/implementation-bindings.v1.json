@@ -5,9 +5,9 @@
   "releaseAccepted": false,
   "scope": "Static anchored entrypoints and mutation branches; conservative unresolved dependencies, not compiled C# call graph.",
   "counts": {
-    "tools": 262,
+    "tools": 263,
     "mutations": 56,
-    "features": 336
+    "features": 337
   },
   "sourceInputs": [
     {
@@ -57,8 +57,8 @@
     },
     {
       "path": "contracts/api-coverage/registry.v1.json",
-      "sha256": "177d440ed875487730c9bf59369d807f2c27478fa8af5c6c4d3a4933e0cb963e",
-      "bytes": 69950
+      "sha256": "bc8effbf115293807c682fc2328a40629de3ae069590f2d373413e5e7a801a7f",
+      "bytes": 70061
     },
     {
       "path": "contracts/automationml-workflow.v1.schema.json",
@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f54040f75d4f3f353308bef744243d51ad87acf11f5d37b8fbd10ca88fd766da",
-      "bytes": 688108
+      "sha256": "f5573f3371a4aa1794587fa6c71464a1642efa35e377bf6b14db0df8b0bc2055",
+      "bytes": 691191
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1116,6 +1116,11 @@
       "bytes": 7892
     },
     {
+      "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+      "sha256": "d4f78a24c8221de87c26e9d7467eb8ae4f4aeb833940da8478be38fef6e3059f",
+      "bytes": 5728
+    },
+    {
       "path": "src/TiaMcp.Core/FeatureCatalog.cs",
       "sha256": "767508cf3958c5dd67f9cc6c4ec68fc9dc1d996378508c4a55999fe245db32bd",
       "bytes": 6750
@@ -1551,14 +1556,19 @@
       "bytes": 13451
     },
     {
+      "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.ProvisionReconcile.cs",
+      "sha256": "283a59e586ce04bad13998df852b6a62a284884b8abafb0953d090574babc847",
+      "bytes": 1691
+    },
+    {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.SourceNegative.cs",
       "sha256": "a57281890986b927fefdac98d508ce536af917438a2335708e58d3710121cb84",
       "bytes": 4754
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-      "sha256": "1d7551881b11a1989056f961a716c0a7705cf4f9babe4750c8664c2527c5c7f8",
-      "bytes": 35858
+      "sha256": "651daf2dcb260c3fb7a3ec2aaab189540817d5248d8a41d6f052e0e14eae21e0",
+      "bytes": 35970
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDocument.cs",
@@ -1707,8 +1717,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "866a9b078753e15c8ae338172e28668c676223a64dcf01a1c315cf8588feedb7",
-      "bytes": 16721
+      "sha256": "11d5d4fb61da0892eae7aeef638fec85bf90a7b9f48941032ccdd1a806a3eeb7",
+      "bytes": 17510
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -2177,8 +2187,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "7f46a1ba469c7b1defc8ad5ba4333c73d48a3795c6b3ed7a7a49a6016812cc49",
-      "bytes": 93845
+      "sha256": "caaa03f600ac7c3bc1db5149dbf81cdc520cb64e71395a3910d2fb2598c83366",
+      "bytes": 94150
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ComponentWindow.cs",
@@ -2376,6 +2386,11 @@
       "bytes": 96265
     },
     {
+      "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvisionReconcile.cs",
+      "sha256": "23b03f2115caaf5b7ee011ab727c58f48851f980f4c3549e623eab176ed86599",
+      "bytes": 5263
+    },
+    {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologyConnections.cs",
       "sha256": "c51a5c3203016052fbf4b5a81b8debe928a3f967e2c574bfc08db00ee9032f13",
       "bytes": 11124
@@ -2462,8 +2477,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
-      "sha256": "ce546d8c3ec1dba742d2616c34a2ad7a2a9887b5bec17096846609ee90dab84a",
-      "bytes": 48744
+      "sha256": "05bd704305b8069b7ba50b2f033b75f2b588c7f4e7c0bdc6023b82b8f85fcdf6",
+      "bytes": 48860
     },
     {
       "path": "src/TiaMcp.Openness.V21/OwnedQualificationPortal.cs",
@@ -8662,8 +8677,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "BlockInterface",
-        "line": 56,
-        "endLine": 57,
+        "line": 61,
+        "endLine": 62,
         "sha256": "c9c9668eaaf4dac8e63a5879cc580fbdd781859179a34b761156b8a2b8227364"
       },
       "bridgeOperations": [
@@ -8677,8 +8692,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "BlockInterface",
-          "line": 56,
-          "endLine": 57,
+          "line": 61,
+          "endLine": 62,
           "sha256": "c9c9668eaaf4dac8e63a5879cc580fbdd781859179a34b761156b8a2b8227364"
         },
         {
@@ -8710,8 +8725,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -8817,15 +8832,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "BlockRead",
-              "line": 337,
-              "endLine": 355,
+              "line": 338,
+              "endLine": 356,
               "sha256": "36646140f8c94626368a284b108332da8a44f1376150a1ef413d01a371d530fe"
             }
           ],
@@ -8868,8 +8883,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "CallGraph",
-        "line": 71,
-        "endLine": 73,
+        "line": 76,
+        "endLine": 78,
         "sha256": "356ed30b31fbc8dbea6e1b5872f155e13297db5e47d37ef8c376648924fe0562"
       },
       "bridgeOperations": [
@@ -8883,8 +8898,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "CallGraph",
-          "line": 71,
-          "endLine": 73,
+          "line": 76,
+          "endLine": 78,
           "sha256": "356ed30b31fbc8dbea6e1b5872f155e13297db5e47d37ef8c376648924fe0562"
         },
         {
@@ -8916,8 +8931,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -8974,8 +8989,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangeApply",
-        "line": 108,
-        "endLine": 109,
+        "line": 113,
+        "endLine": 114,
         "sha256": "96e2b8640adb90f356218964acf16f52d2969788f916a7b6745eac2e7b3d6717"
       },
       "bridgeOperations": [
@@ -8988,8 +9003,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeApply",
-          "line": 108,
-          "endLine": 109,
+          "line": 113,
+          "endLine": 114,
           "sha256": "96e2b8640adb90f356218964acf16f52d2969788f916a7b6745eac2e7b3d6717"
         },
         {
@@ -9014,8 +9029,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -9065,8 +9080,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangeImpact",
-        "line": 83,
-        "endLine": 85,
+        "line": 88,
+        "endLine": 90,
         "sha256": "8af3827e3527e82604206106be9f5b60c28098df900ce2a595004c14e4112b8c"
       },
       "bridgeOperations": [
@@ -9080,8 +9095,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeImpact",
-          "line": 83,
-          "endLine": 85,
+          "line": 88,
+          "endLine": 90,
           "sha256": "8af3827e3527e82604206106be9f5b60c28098df900ce2a595004c14e4112b8c"
         },
         {
@@ -9113,8 +9128,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -9171,8 +9186,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangePrepare",
-        "line": 103,
-        "endLine": 104,
+        "line": 108,
+        "endLine": 109,
         "sha256": "d6b41e62ee83190759fe3ce0c0189905044c33f5b91f95a9364dd0cd3421a7aa"
       },
       "bridgeOperations": [
@@ -9187,15 +9202,15 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangePrepare",
-          "line": 103,
-          "endLine": 104,
+          "line": 108,
+          "endLine": 109,
           "sha256": "d6b41e62ee83190759fe3ce0c0189905044c33f5b91f95a9364dd0cd3421a7aa"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -9220,8 +9235,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -9270,8 +9285,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -9285,8 +9300,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangeRestore",
-        "line": 118,
-        "endLine": 120,
+        "line": 123,
+        "endLine": 125,
         "sha256": "5826259334ca5024078a31947b9beb8cb88011da6c933e1d5ae081740ec820fe"
       },
       "bridgeOperations": [
@@ -9301,8 +9316,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeRestore",
-          "line": 118,
-          "endLine": 120,
+          "line": 123,
+          "endLine": 125,
           "sha256": "5826259334ca5024078a31947b9beb8cb88011da6c933e1d5ae081740ec820fe"
         },
         {
@@ -9327,8 +9342,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -9378,8 +9393,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ChangeStatus",
-        "line": 113,
-        "endLine": 114,
+        "line": 118,
+        "endLine": 119,
         "sha256": "2908657d7edd4a02690ce55633d3d2a314dc5998c1e116ca8e63a9d317a49c7a"
       },
       "bridgeOperations": [
@@ -9393,8 +9408,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ChangeStatus",
-          "line": 113,
-          "endLine": 114,
+          "line": 118,
+          "endLine": 119,
           "sha256": "2908657d7edd4a02690ce55633d3d2a314dc5998c1e116ca8e63a9d317a49c7a"
         },
         {
@@ -9419,8 +9434,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -13672,8 +13687,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -13786,8 +13801,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -15494,6 +15509,13 @@
           "sha256": "36aec8b0d4cbd4a61b0a4195f095885c58c060a42e4ffb787757ad637fcdc9f9"
         },
         {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "Plan",
+          "line": 15,
+          "endLine": 37,
+          "sha256": "dd899113cc4cf45a0b2e9a45999353ea1086464ce043e5b36ef3c5ed25075745"
+        },
+        {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Plan",
           "line": 66,
@@ -16034,6 +16056,13 @@
           "line": 73,
           "endLine": 81,
           "sha256": "36aec8b0d4cbd4a61b0a4195f095885c58c060a42e4ffb787757ad637fcdc9f9"
+        },
+        {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "Plan",
+          "line": 15,
+          "endLine": 37,
+          "sha256": "dd899113cc4cf45a0b2e9a45999353ea1086464ce043e5b36ef3c5ed25075745"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -16609,6 +16638,13 @@
           "line": 73,
           "endLine": 81,
           "sha256": "36aec8b0d4cbd4a61b0a4195f095885c58c060a42e4ffb787757ad637fcdc9f9"
+        },
+        {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "Plan",
+          "line": 15,
+          "endLine": 37,
+          "sha256": "dd899113cc4cf45a0b2e9a45999353ea1086464ce043e5b36ef3c5ed25075745"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -17339,6 +17375,13 @@
           "line": 73,
           "endLine": 81,
           "sha256": "36aec8b0d4cbd4a61b0a4195f095885c58c060a42e4ffb787757ad637fcdc9f9"
+        },
+        {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "Plan",
+          "line": 15,
+          "endLine": 37,
+          "sha256": "dd899113cc4cf45a0b2e9a45999353ea1086464ce043e5b36ef3c5ed25075745"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -18381,8 +18424,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "EngineeringRead",
-        "line": 89,
-        "endLine": 94,
+        "line": 94,
+        "endLine": 99,
         "sha256": "a7a943c46140fdd51f69aa5db46f123705da2affa178a0d3cda60ea0fc804f03"
       },
       "bridgeOperations": [
@@ -18399,15 +18442,15 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "EngineeringRead",
-          "line": 89,
-          "endLine": 94,
+          "line": 94,
+          "endLine": 99,
           "sha256": "a7a943c46140fdd51f69aa5db46f123705da2affa178a0d3cda60ea0fc804f03"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -18432,8 +18475,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -18468,8 +18511,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -18698,8 +18741,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "FixtureSources",
-        "line": 98,
-        "endLine": 99,
+        "line": 103,
+        "endLine": 104,
         "sha256": "471037a7b76568fdddb56955ea7b7565c47e59f57e307305e209a0348c276435"
       },
       "bridgeOperations": [
@@ -18713,8 +18756,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "FixtureSources",
-          "line": 98,
-          "endLine": 99,
+          "line": 103,
+          "endLine": 104,
           "sha256": "471037a7b76568fdddb56955ea7b7565c47e59f57e307305e209a0348c276435"
         },
         {
@@ -18739,8 +18782,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -20682,15 +20725,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "CatalogQuery",
-              "line": 422,
-              "endLine": 436,
+              "line": 423,
+              "endLine": 437,
               "sha256": "302d714784ffa6f4947becf249fe1b638d60f4d3655665202fc0ba41ea2b4377"
             }
           ],
@@ -20740,8 +20783,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "HardwareInspect",
-        "line": 61,
-        "endLine": 62,
+        "line": 66,
+        "endLine": 67,
         "sha256": "85c4e64cf2e8dea1789a26d9c4fbfe363d014333b73d8ce8d565b104930c4290"
       },
       "bridgeOperations": [
@@ -20755,8 +20798,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "HardwareInspect",
-          "line": 61,
-          "endLine": 62,
+          "line": 66,
+          "endLine": 67,
           "sha256": "85c4e64cf2e8dea1789a26d9c4fbfe363d014333b73d8ce8d565b104930c4290"
         },
         {
@@ -20788,8 +20831,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -20868,8 +20911,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -20894,8 +20937,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -20930,8 +20973,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -21920,8 +21963,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -21946,8 +21989,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22026,8 +22069,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -22052,8 +22095,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22641,8 +22684,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22725,8 +22768,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22791,8 +22834,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -22817,8 +22860,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22853,8 +22896,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -22894,8 +22937,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -22920,8 +22963,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -22956,8 +22999,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -23151,8 +23194,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -23247,8 +23290,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -23266,8 +23309,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -23309,8 +23352,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -24833,8 +24876,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -24859,8 +24902,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -24895,8 +24938,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -26018,8 +26061,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -26044,8 +26087,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -26080,8 +26123,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -28616,8 +28659,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -28642,8 +28685,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -28678,8 +28721,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -28741,15 +28784,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Inventory",
-              "line": 293,
-              "endLine": 335,
+              "line": 294,
+              "endLine": 336,
               "sha256": "cdaa7ed614aa9f589de3d65e02ec29443b45f1add05401794b66f23ad0f4b139"
             }
           ],
@@ -28839,8 +28882,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -28916,8 +28959,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -28993,8 +29036,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29070,8 +29113,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29147,8 +29190,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29224,8 +29267,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29301,8 +29344,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29378,8 +29421,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29455,8 +29498,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29492,8 +29535,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ProjectOpen",
-        "line": 31,
-        "endLine": 32,
+        "line": 36,
+        "endLine": 37,
         "sha256": "23ccfa077495530060a4ff33f346ae6df9a9435b03a707236d61ced619d5fb1e"
       },
       "bridgeOperations": [
@@ -29506,8 +29549,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ProjectOpen",
-          "line": 31,
-          "endLine": 32,
+          "line": 36,
+          "endLine": 37,
           "sha256": "23ccfa077495530060a4ff33f346ae6df9a9435b03a707236d61ced619d5fb1e"
         },
         {
@@ -29532,8 +29575,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29576,8 +29619,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "ProjectRetrieve",
-        "line": 36,
-        "endLine": 37,
+        "line": 41,
+        "endLine": 42,
         "sha256": "b82b77a9622eb1b8ba553b51ae3d7dc8ecf1efdf63e80932282ddcfac24b7475"
       },
       "bridgeOperations": [
@@ -29591,8 +29634,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ProjectRetrieve",
-          "line": 36,
-          "endLine": 37,
+          "line": 41,
+          "endLine": 42,
           "sha256": "b82b77a9622eb1b8ba553b51ae3d7dc8ecf1efdf63e80932282ddcfac24b7475"
         },
         {
@@ -29617,8 +29660,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29749,15 +29792,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "BlockRead",
-              "line": 337,
-              "endLine": 355,
+              "line": 338,
+              "endLine": 356,
               "sha256": "36646140f8c94626368a284b108332da8a44f1376150a1ef413d01a371d530fe"
             }
           ],
@@ -29772,8 +29815,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -29879,8 +29922,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -30123,8 +30166,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Save",
-          "line": 400,
-          "endLine": 400,
+          "line": 401,
+          "endLine": 401,
           "sha256": "8abfcea588c012c382774bac364df5e3df093e9e1c2af6c35a463a9f01f58c7c"
         },
         {
@@ -31516,8 +31559,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -31568,8 +31611,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -31598,8 +31641,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -31782,8 +31825,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -31812,8 +31855,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -31853,8 +31896,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -32288,8 +32331,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -32318,8 +32361,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -32338,8 +32381,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 214,
-          "endLine": 257,
+          "line": 215,
+          "endLine": 258,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -32581,6 +32624,13 @@
           "sha256": "38d208d9e7155716cee8b0c71c5ccd74c6c369c5d68c70f80cb521ff41f65b5d"
         },
         {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "new",
+          "line": 47,
+          "endLine": 51,
+          "sha256": "9a485a43e7be9ae6460de7c5cc576cdfdd6848d671022a66dc2810d66de3b3ad"
+        },
+        {
           "path": "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
           "name": "new",
           "line": 32,
@@ -32725,8 +32775,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -32755,8 +32805,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -32840,8 +32890,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
-          "line": 115,
-          "endLine": 185,
+          "line": 116,
+          "endLine": 186,
           "sha256": "dece3f792ba8e88d53f8250929cdfcf995807a240dbe0cc73ddaa541c753b9af"
         },
         {
@@ -33306,8 +33356,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -33336,8 +33386,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -33383,8 +33433,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -33413,8 +33463,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -33640,8 +33690,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -34051,6 +34101,13 @@
           "sha256": "38d208d9e7155716cee8b0c71c5ccd74c6c369c5d68c70f80cb521ff41f65b5d"
         },
         {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "new",
+          "line": 47,
+          "endLine": 51,
+          "sha256": "9a485a43e7be9ae6460de7c5cc576cdfdd6848d671022a66dc2810d66de3b3ad"
+        },
+        {
           "path": "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
           "name": "new",
           "line": 32,
@@ -34427,8 +34484,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 214,
-          "endLine": 257,
+          "line": 215,
+          "endLine": 258,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -34753,8 +34810,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -34851,8 +34908,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -35006,8 +35063,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -35331,8 +35388,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "CallAsync",
           "line": 14,
-          "endLine": 40,
-          "sha256": "73fc2d41105d867315542f097a96092c6ab1be59a9e0976cfd4107655e93d575"
+          "endLine": 41,
+          "sha256": "5af33d5effdb2aca14308a151849722747ad9ae14f3613e4ae89c2910cabb46b"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -48435,8 +48492,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SafetyInspect",
-        "line": 126,
-        "endLine": 127,
+        "line": 131,
+        "endLine": 132,
         "sha256": "b2bdc3a91c6ad93c11d6b24246fab7ed9ab8b5fd10b98cab49603128c607499e"
       },
       "bridgeOperations": [
@@ -48450,8 +48507,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SafetyInspect",
-          "line": 126,
-          "endLine": 127,
+          "line": 131,
+          "endLine": 132,
           "sha256": "b2bdc3a91c6ad93c11d6b24246fab7ed9ab8b5fd10b98cab49603128c607499e"
         },
         {
@@ -48483,8 +48540,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -49570,8 +49627,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SimulationDiscoveryBaseline",
-        "line": 26,
-        "endLine": 27,
+        "line": 31,
+        "endLine": 32,
         "sha256": "64d11bea2fa39996195f869ec29e8f4e91bb8038500844ea2e42307426a34513"
       },
       "bridgeOperations": [
@@ -49584,8 +49641,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SimulationDiscoveryBaseline",
-          "line": 26,
-          "endLine": 27,
+          "line": 31,
+          "endLine": 32,
           "sha256": "64d11bea2fa39996195f869ec29e8f4e91bb8038500844ea2e42307426a34513"
         },
         {
@@ -49610,8 +49667,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -49694,8 +49751,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -49710,6 +49767,75 @@
           "gaps": [
             "Overload and runtime control flow are not compiler-resolved."
           ]
+        }
+      ],
+      "localHandlers": [
+        {
+          "path": "src/TiaMcp.Host/SimulatorTools.cs",
+          "name": "Call",
+          "line": 69,
+          "endLine": 77,
+          "sha256": "c9c34b54560a042f4c5daca1d088cea5edcc8272c7db9e76f6c3384711cb6d8f"
+        },
+        {
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Call",
+          "line": 75,
+          "endLine": 88,
+          "sha256": "2a781165a4d78addf65d5ebc455151bc598d2af6eb28fb77ba4bbb0cd15f7c9b"
+        }
+      ],
+      "reviewState": "static_entrypoint_bound",
+      "gaps": [
+        "Local method-name matches may include overloads or unrelated receiver types; transitive dependencies are conservative."
+      ]
+    },
+    {
+      "tool": "simulation_provision_reconcile",
+      "host": {
+        "path": "src/TiaMcp.Host/EngineeringTools.cs",
+        "name": "SimulationProvisionReconcile",
+        "line": 26,
+        "endLine": 27,
+        "sha256": "f11091b56a4ca61c98b511d69b284de80eb93f32fcd196100c81a303cfd47466"
+      },
+      "bridgeOperations": [
+        "simulation_provision_reconcile"
+      ],
+      "localCallNames": [
+        "Call"
+      ],
+      "hostDelegationAnchors": [
+        {
+          "path": "src/TiaMcp.Host/EngineeringTools.cs",
+          "name": "SimulationProvisionReconcile",
+          "line": 26,
+          "endLine": 27,
+          "sha256": "f11091b56a4ca61c98b511d69b284de80eb93f32fcd196100c81a303cfd47466"
+        },
+        {
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Call",
+          "line": 75,
+          "endLine": 88,
+          "sha256": "2a781165a4d78addf65d5ebc455151bc598d2af6eb28fb77ba4bbb0cd15f7c9b"
+        },
+        {
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Result",
+          "line": 90,
+          "endLine": 95,
+          "sha256": "5c6813004ae398a34fe7ebfc6a923269264624de84681743aa4988df92d7fde6"
+        }
+      ],
+      "workerRoutes": [
+        {
+          "operation": "simulation_provision_reconcile",
+          "reviewState": "unresolved",
+          "gaps": [
+            "No matching native dispatcher."
+          ],
+          "handlers": []
         }
       ],
       "localHandlers": [
@@ -49778,8 +49904,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -49822,8 +49948,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SoftwareInspect",
-        "line": 41,
-        "endLine": 42,
+        "line": 46,
+        "endLine": 47,
         "sha256": "9d874ac2267e9dc08e1af434d053f90378747cbf95b3b02dc78b9de2a7f511a7"
       },
       "bridgeOperations": [
@@ -49837,8 +49963,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SoftwareInspect",
-          "line": 41,
-          "endLine": 42,
+          "line": 46,
+          "endLine": 47,
           "sha256": "9d874ac2267e9dc08e1af434d053f90378747cbf95b3b02dc78b9de2a7f511a7"
         },
         {
@@ -49870,8 +49996,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -50874,8 +51000,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "SymbolTrace",
-        "line": 77,
-        "endLine": 79,
+        "line": 82,
+        "endLine": 84,
         "sha256": "c27ca52ef21a2759f5fbd9bbba182966728e6b334562f3d4cf8f6212ad358555"
       },
       "bridgeOperations": [
@@ -50889,8 +51015,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "SymbolTrace",
-          "line": 77,
-          "endLine": 79,
+          "line": 82,
+          "endLine": 84,
           "sha256": "c27ca52ef21a2759f5fbd9bbba182966728e6b334562f3d4cf8f6212ad358555"
         },
         {
@@ -50922,8 +51048,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -50980,8 +51106,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "TagTableRead",
-        "line": 51,
-        "endLine": 52,
+        "line": 56,
+        "endLine": 57,
         "sha256": "41aad72c466c414ba44869794c65fab9d8afee9ed36992aa9154ef91d8e520bf"
       },
       "bridgeOperations": [
@@ -50994,8 +51120,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "TagTableRead",
-          "line": 51,
-          "endLine": 52,
+          "line": 56,
+          "endLine": 57,
           "sha256": "41aad72c466c414ba44869794c65fab9d8afee9ed36992aa9154ef91d8e520bf"
         },
         {
@@ -51020,8 +51146,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -51086,8 +51212,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         },
         {
@@ -51112,8 +51238,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -51148,8 +51274,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
-          "line": 128,
-          "endLine": 128,
+          "line": 133,
+          "endLine": 133,
           "sha256": "8fc0e294ebcfbdd7e24969b93e6e942f5735aa8a2b85e75ca49f08c3c3801dda"
         }
       ],
@@ -53055,8 +53181,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "TechnologyRead",
-        "line": 66,
-        "endLine": 67,
+        "line": 71,
+        "endLine": 72,
         "sha256": "ec5da74682cb2135d38f3a977066cfc78d0d2d40bb83fc96717299e93e48d33c"
       },
       "bridgeOperations": [
@@ -53070,8 +53196,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "TechnologyRead",
-          "line": 66,
-          "endLine": 67,
+          "line": 71,
+          "endLine": 72,
           "sha256": "ec5da74682cb2135d38f3a977066cfc78d0d2d40bb83fc96717299e93e48d33c"
         },
         {
@@ -53103,8 +53229,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -53584,8 +53710,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -53734,6 +53860,13 @@
           "line": 75,
           "endLine": 75,
           "sha256": "38d208d9e7155716cee8b0c71c5ccd74c6c369c5d68c70f80cb521ff41f65b5d"
+        },
+        {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "new",
+          "line": 47,
+          "endLine": 51,
+          "sha256": "9a485a43e7be9ae6460de7c5cc576cdfdd6848d671022a66dc2810d66de3b3ad"
         },
         {
           "path": "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
@@ -54067,8 +54200,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 214,
-          "endLine": 257,
+          "line": 215,
+          "endLine": 258,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -54998,6 +55131,13 @@
           "sha256": "38d208d9e7155716cee8b0c71c5ccd74c6c369c5d68c70f80cb521ff41f65b5d"
         },
         {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "new",
+          "line": 47,
+          "endLine": 51,
+          "sha256": "9a485a43e7be9ae6460de7c5cc576cdfdd6848d671022a66dc2810d66de3b3ad"
+        },
+        {
           "path": "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
           "name": "new",
           "line": 32,
@@ -55155,15 +55295,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Attach",
-              "line": 206,
-              "endLine": 217,
+              "line": 207,
+              "endLine": 218,
               "sha256": "979bb1ad3e0346763957116b69f511017c5e86187bba503da2894afcd7b71530"
             }
           ],
@@ -55239,15 +55379,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "BridgeInfo",
-              "line": 150,
-              "endLine": 162,
+              "line": 151,
+              "endLine": 163,
               "sha256": "25506de9a9aa06f87f378fa669685a12db5a3ec283aababd6c16343b87b78901"
             }
           ],
@@ -55324,15 +55464,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "ScratchCreate",
-              "line": 438,
-              "endLine": 534,
+              "line": 439,
+              "endLine": 535,
               "sha256": "d683ae7428bbe82e10f6ee2a7f72dcfb42f2842845b609ce9a090925072d6c71"
             }
           ],
@@ -55408,15 +55548,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Detach",
-              "line": 249,
-              "endLine": 257,
+              "line": 250,
+              "endLine": 258,
               "sha256": "b1cabfb43da7b54d262eceb2f758dcba1acbbc90a00bbc80d743a4b733e8c37e"
             }
           ],
@@ -55492,15 +55632,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Discover",
-              "line": 193,
-              "endLine": 204,
+              "line": 194,
+              "endLine": 205,
               "sha256": "2c43e72c19a4c2de37885be9b577ab457189a73188065b280a4251728ab4709a"
             }
           ],
@@ -55576,15 +55716,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Status",
-              "line": 235,
-              "endLine": 247,
+              "line": 236,
+              "endLine": 248,
               "sha256": "e58748d6ca907319d607b153ad817e4457cd1f950763df85229f8d2d5ac29e39"
             },
             {
@@ -55667,15 +55807,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "Start",
-              "line": 219,
-              "endLine": 233,
+              "line": 220,
+              "endLine": 234,
               "sha256": "855bbb23acab11acb708d834187c842985da18d5388334a576ac19b0a37e2b8d"
             }
           ],
@@ -56176,8 +56316,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -58146,8 +58286,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
-          "line": 115,
-          "endLine": 185,
+          "line": 116,
+          "endLine": 186,
           "sha256": "dece3f792ba8e88d53f8250929cdfcf995807a240dbe0cc73ddaa541c753b9af"
         },
         {
@@ -59111,8 +59251,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -59513,6 +59653,13 @@
           "line": 75,
           "endLine": 75,
           "sha256": "38d208d9e7155716cee8b0c71c5ccd74c6c369c5d68c70f80cb521ff41f65b5d"
+        },
+        {
+          "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
+          "name": "new",
+          "line": 47,
+          "endLine": 51,
+          "sha256": "9a485a43e7be9ae6460de7c5cc576cdfdd6848d671022a66dc2810d66de3b3ad"
         },
         {
           "path": "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
@@ -60159,8 +60306,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 214,
-          "endLine": 257,
+          "line": 215,
+          "endLine": 258,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -60793,8 +60940,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
-          "line": 59,
-          "endLine": 114,
+          "line": 60,
+          "endLine": 115,
           "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
         },
         {
@@ -61934,8 +62081,8 @@
       "host": {
         "path": "src/TiaMcp.Host/EngineeringTools.cs",
         "name": "TypeRead",
-        "line": 46,
-        "endLine": 47,
+        "line": 51,
+        "endLine": 52,
         "sha256": "04f8faac89220419fcc53fbc804b7ce1e34a0d9eeb56696a52c57cd7b82ce7f8"
       },
       "bridgeOperations": [
@@ -61949,8 +62096,8 @@
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "TypeRead",
-          "line": 46,
-          "endLine": 47,
+          "line": 51,
+          "endLine": 52,
           "sha256": "04f8faac89220419fcc53fbc804b7ce1e34a0d9eeb56696a52c57cd7b82ce7f8"
         },
         {
@@ -61982,8 +62129,8 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
@@ -66904,15 +67051,15 @@
             "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
             "name": "Execute",
             "line": 45,
-            "endLine": 148,
-            "sha256": "e22092419777cb722614f3ebd5e82fcc260081c7ab73f8db233ffe4a3488d008"
+            "endLine": 149,
+            "sha256": "35856c9d60ffc828159912b7a12147f6f1f382dccbf6699b94e3a04397d9bc22"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "XrefQuery",
-              "line": 357,
-              "endLine": 390,
+              "line": 358,
+              "endLine": 391,
               "sha256": "9451a5b463565bf0bc574642d946623bc9c22d3edd1ba373143d730256cf4218"
             }
           ],
@@ -67034,8 +67181,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67075,8 +67222,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67113,8 +67260,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -67127,8 +67274,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67162,22 +67309,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "RequireChangeBool",
-              "line": 1258,
-              "endLine": 1258,
+              "line": 1260,
+              "endLine": 1260,
               "sha256": "b38928d00d37b23d352b240fd3ea49c694b2324d81b37be356c70fde5ea37bfc"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67203,8 +67350,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67217,15 +67364,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67318,8 +67465,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67352,8 +67499,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67397,8 +67544,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -67439,8 +67586,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -67459,8 +67606,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67473,15 +67620,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67532,8 +67679,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -67574,8 +67721,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -67594,8 +67741,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67608,15 +67755,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67769,8 +67916,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -67811,8 +67958,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -67831,8 +67978,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67845,15 +67992,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -67904,8 +68051,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -67946,8 +68093,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -67966,8 +68113,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -67980,15 +68127,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -68039,8 +68186,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -68081,8 +68228,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -68101,8 +68248,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -68115,15 +68262,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -68245,8 +68392,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -68303,8 +68450,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -68361,8 +68508,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -68420,8 +68567,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ValidateCatalogIdentifier",
-              "line": 1090,
-              "endLine": 1097,
+              "line": 1092,
+              "endLine": 1099,
               "sha256": "5d39e8462969982c190270bce8c2522e78bdb30be0dfff1be8ce58d04a4d70d0"
             }
           ]
@@ -68529,15 +68676,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -68577,8 +68724,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             }
           ]
@@ -68635,8 +68782,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -68680,15 +68827,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureHardwareDeleteEligible",
-              "line": 1105,
-              "endLine": 1109,
+              "line": 1107,
+              "endLine": 1111,
               "sha256": "b5889ebc483d0a751fff71cf1b947dbefcde85070c6c59a7f8b776035af96827"
             }
           ]
@@ -68707,15 +68854,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureHardwareDeleteEligible",
-              "line": 1105,
-              "endLine": 1109,
+              "line": 1107,
+              "endLine": 1111,
               "sha256": "b5889ebc483d0a751fff71cf1b947dbefcde85070c6c59a7f8b776035af96827"
             }
           ]
@@ -68810,8 +68957,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
@@ -68824,8 +68971,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ValidateCatalogIdentifier",
-              "line": 1090,
-              "endLine": 1097,
+              "line": 1092,
+              "endLine": 1099,
               "sha256": "5d39e8462969982c190270bce8c2522e78bdb30be0dfff1be8ce58d04a4d70d0"
             }
           ]
@@ -68844,8 +68991,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             }
           ]
@@ -68882,8 +69029,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "AllTagTables",
-              "line": 1143,
-              "endLine": 1148,
+              "line": 1145,
+              "endLine": 1150,
               "sha256": "68a4974c2951c75d1e990ef4329fb24c399ef16824d3bfe76b3cdec20e23096a"
             },
             {
@@ -68896,36 +69043,36 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeArtifact",
-              "line": 1261,
-              "endLine": 1261,
+              "line": 1263,
+              "endLine": 1263,
               "sha256": "97e54c3534dc5e39796f6f0a0340ab8317d273178f3ddf1f9d4ef3a2d45ec989"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeNode",
-              "line": 1080,
-              "endLine": 1088,
+              "line": 1082,
+              "endLine": 1090,
               "sha256": "07a5974ee613ca6385d04dc9a9b8eb8a1786edbfb84d8cdc9fb366210b41fc1d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -68959,22 +69106,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureHardwareDeleteEligible",
-              "line": 1105,
-              "endLine": 1109,
+              "line": 1107,
+              "endLine": 1111,
               "sha256": "b5889ebc483d0a751fff71cf1b947dbefcde85070c6c59a7f8b776035af96827"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ExplicitChangeBool",
-              "line": 1253,
-              "endLine": 1257,
+              "line": 1255,
+              "endLine": 1259,
               "sha256": "083110e8b7a7d3da2050d6ed7e02afaf27e6154cafaec58b7d9ff83bc1863ace"
             },
             {
@@ -69120,8 +69267,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "PrepareTypeTargets",
-              "line": 1119,
-              "endLine": 1135,
+              "line": 1121,
+              "endLine": 1137,
               "sha256": "c4e33490f40464ea90fe8bb30b01a16389688b9ce92ed095ecf59bf3c36a74e2"
             },
             {
@@ -69134,8 +69281,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
@@ -69148,8 +69295,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "RequireChangeBool",
-              "line": 1258,
-              "endLine": 1258,
+              "line": 1260,
+              "endLine": 1260,
               "sha256": "b38928d00d37b23d352b240fd3ea49c694b2324d81b37be356c70fde5ea37bfc"
             },
             {
@@ -69162,15 +69309,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ValidateCatalogIdentifier",
-              "line": 1090,
-              "endLine": 1097,
+              "line": 1092,
+              "endLine": 1099,
               "sha256": "5d39e8462969982c190270bce8c2522e78bdb30be0dfff1be8ce58d04a4d70d0"
             },
             {
@@ -69266,22 +69413,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeHardware",
-              "line": 1071,
-              "endLine": 1078,
+              "line": 1073,
+              "endLine": 1080,
               "sha256": "c3c55370ecb3b334015768c673725057fcbb63e25b26273966e5a21763c320c2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeNode",
-              "line": 1080,
-              "endLine": 1088,
+              "line": 1082,
+              "endLine": 1090,
               "sha256": "07a5974ee613ca6385d04dc9a9b8eb8a1786edbfb84d8cdc9fb366210b41fc1d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -69308,15 +69455,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureHardwareDeleteEligible",
-              "line": 1105,
-              "endLine": 1109,
+              "line": 1107,
+              "endLine": 1111,
               "sha256": "b5889ebc483d0a751fff71cf1b947dbefcde85070c6c59a7f8b776035af96827"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -69406,22 +69553,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "RequiredTechnologyObject",
-              "line": 1102,
-              "endLine": 1103,
+              "line": 1104,
+              "endLine": 1105,
               "sha256": "dd1bad198d1e99cf6d5e3096c24453729ffbf37ed99e9309f261a3fbaada8892"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -69479,8 +69626,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -69513,8 +69660,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "FileArtifact",
-              "line": 683,
-              "endLine": 689,
+              "line": 684,
+              "endLine": 690,
               "sha256": "330f202ab83640773ac2813c4a29cbb51c36a5b131d7ffef01753152f0ffdd4f"
             }
           ]
@@ -69917,8 +70064,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -69982,8 +70129,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70023,8 +70170,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70447,8 +70594,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70512,8 +70659,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -70583,8 +70730,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70655,8 +70802,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70741,8 +70888,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70782,8 +70929,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -70813,8 +70960,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -70868,8 +71015,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -70955,8 +71102,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeNode",
-              "line": 1080,
-              "endLine": 1088,
+              "line": 1082,
+              "endLine": 1090,
               "sha256": "07a5974ee613ca6385d04dc9a9b8eb8a1786edbfb84d8cdc9fb366210b41fc1d"
             },
             {
@@ -71003,8 +71150,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeNode",
-              "line": 1080,
-              "endLine": 1088,
+              "line": 1082,
+              "endLine": 1090,
               "sha256": "07a5974ee613ca6385d04dc9a9b8eb8a1786edbfb84d8cdc9fb366210b41fc1d"
             },
             {
@@ -71113,8 +71260,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71151,22 +71298,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "AllTagTables",
-              "line": 1143,
-              "endLine": 1148,
+              "line": 1145,
+              "endLine": 1150,
               "sha256": "68a4974c2951c75d1e990ef4329fb24c399ef16824d3bfe76b3cdec20e23096a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeArtifact",
-              "line": 1261,
-              "endLine": 1261,
+              "line": 1263,
+              "endLine": 1263,
               "sha256": "97e54c3534dc5e39796f6f0a0340ab8317d273178f3ddf1f9d4ef3a2d45ec989"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -71200,8 +71347,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "PrepareTypeTargets",
-              "line": 1119,
-              "endLine": 1135,
+              "line": 1121,
+              "endLine": 1137,
               "sha256": "c4e33490f40464ea90fe8bb30b01a16389688b9ce92ed095ecf59bf3c36a74e2"
             },
             {
@@ -71214,8 +71361,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71241,8 +71388,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -71286,8 +71433,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ExplicitChangeBool",
-              "line": 1253,
-              "endLine": 1257,
+              "line": 1255,
+              "endLine": 1259,
               "sha256": "083110e8b7a7d3da2050d6ed7e02afaf27e6154cafaec58b7d9ff83bc1863ace"
             }
           ]
@@ -71329,8 +71476,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -71343,8 +71490,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -71378,22 +71525,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "RequireChangeBool",
-              "line": 1258,
-              "endLine": 1258,
+              "line": 1260,
+              "endLine": 1260,
               "sha256": "b38928d00d37b23d352b240fd3ea49c694b2324d81b37be356c70fde5ea37bfc"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -71419,8 +71566,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "EnsureSafetyWritable",
-              "line": 1150,
-              "endLine": 1155,
+              "line": 1152,
+              "endLine": 1157,
               "sha256": "c86bfc69aedd163d6bb61e9800e4da3ddd1a8524a0e7a5136690b58bb7e61bba"
             },
             {
@@ -71433,15 +71580,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ReadSafety",
-              "line": 1157,
-              "endLine": 1167,
+              "line": 1159,
+              "endLine": 1169,
               "sha256": "9977a06de32b9bec29c757e0103d7132747ec04c52880efd3470660b5c6b877c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -71485,8 +71632,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -71520,8 +71667,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71561,8 +71708,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -71715,22 +71862,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "AllTagTables",
-              "line": 1143,
-              "endLine": 1148,
+              "line": 1145,
+              "endLine": 1150,
               "sha256": "68a4974c2951c75d1e990ef4329fb24c399ef16824d3bfe76b3cdec20e23096a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeArtifact",
-              "line": 1261,
-              "endLine": 1261,
+              "line": 1263,
+              "endLine": 1263,
               "sha256": "97e54c3534dc5e39796f6f0a0340ab8317d273178f3ddf1f9d4ef3a2d45ec989"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -71764,8 +71911,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "PrepareTypeTargets",
-              "line": 1119,
-              "endLine": 1135,
+              "line": 1121,
+              "endLine": 1137,
               "sha256": "c4e33490f40464ea90fe8bb30b01a16389688b9ce92ed095ecf59bf3c36a74e2"
             },
             {
@@ -71778,8 +71925,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71805,8 +71952,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71843,8 +71990,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -71871,8 +72018,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71898,8 +72045,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -71912,8 +72059,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -71957,15 +72104,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeArtifact",
-              "line": 1261,
-              "endLine": 1261,
+              "line": 1263,
+              "endLine": 1263,
               "sha256": "97e54c3534dc5e39796f6f0a0340ab8317d273178f3ddf1f9d4ef3a2d45ec989"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -71992,8 +72139,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -72019,8 +72166,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -72064,15 +72211,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeArtifact",
-              "line": 1261,
-              "endLine": 1261,
+              "line": 1263,
+              "endLine": 1263,
               "sha256": "97e54c3534dc5e39796f6f0a0340ab8317d273178f3ddf1f9d4ef3a2d45ec989"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
@@ -72099,8 +72246,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -72126,22 +72273,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeObject",
-              "line": 1235,
-              "endLine": 1235,
+              "line": 1237,
+              "endLine": 1237,
               "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "RequiredTechnologyObject",
-              "line": 1102,
-              "endLine": 1103,
+              "line": 1104,
+              "endLine": 1105,
               "sha256": "dd1bad198d1e99cf6d5e3096c24453729ffbf37ed99e9309f261a3fbaada8892"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -72273,8 +72420,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "ChangeFileHash",
-              "line": 1260,
-              "endLine": 1260,
+              "line": 1262,
+              "endLine": 1262,
               "sha256": "9ce515eab92cf5204eee9b98a44a1a83ee48d8a48554c9e82d3c27aca4562a6d"
             },
             {
@@ -72294,15 +72441,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
               "name": "PrepareTypeTargets",
-              "line": 1119,
-              "endLine": 1135,
+              "line": 1121,
+              "endLine": 1137,
               "sha256": "c4e33490f40464ea90fe8bb30b01a16389688b9ce92ed095ecf59bf3c36a74e2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             }
           ]
@@ -72335,8 +72482,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
               "name": "SelectPlc",
-              "line": 562,
-              "endLine": 580,
+              "line": 563,
+              "endLine": 581,
               "sha256": "2778f2301495064c2e34c0d71ca16d63d875f02d36fcfc6fcf3b068c3a937590"
             },
             {
@@ -77040,6 +77187,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaBindings.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticWatchPlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -77474,6 +77622,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaBindings.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticWatchPlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -77939,6 +78088,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaBindings.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticWatchPlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -78395,6 +78545,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaBindings.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticWatchPlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -82154,6 +82305,7 @@
         "src/TiaMcp.Core/Diagnostics/TracePlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
         "src/TiaMcp.Core/DriveProfileWorkflowStore.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
         "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -82397,6 +82549,7 @@
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
         "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
@@ -86802,6 +86955,36 @@
       "qualificationPromoted": false
     },
     {
+      "featureId": "simulation_provision_reconcile",
+      "tools": [
+        "simulation_provision_reconcile"
+      ],
+      "changeKind": null,
+      "sourceDependencies": [
+        "src/TiaMcp.Host/EngineeringTools.cs",
+        "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TiaTools.cs"
+      ],
+      "schemaBindings": [],
+      "schemaReview": "unresolved",
+      "evidenceRefs": [
+        {
+          "id": "local.sim.reconcile.20261024",
+          "profileSha256": "1c7cee721f570a3eb593a39818ea2ba739164da8d246a16b130027327b25130a",
+          "artifacts": [
+            "evidence/local.sim.reconcile.20261024.json"
+          ]
+        }
+      ],
+      "reviewState": "partial",
+      "gaps": [
+        "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
+        "No exact source-to-schema binding established."
+      ],
+      "releaseAccepted": false,
+      "qualificationPromoted": false
+    },
+    {
       "featureId": "simulation_provision_scratch_credential",
       "tools": [
         "simulation_provision_scratch_credential"
@@ -87572,6 +87755,7 @@
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
         "src/TiaMcp.Core/DriveProfileWorkflowStore.cs",
         "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
         "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -87911,6 +88095,7 @@
         "src/TiaMcp.Core/Diagnostics/TracePlanning.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
         "src/TiaMcp.Core/DriveProfileWorkflowStore.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
         "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -88889,6 +89074,7 @@
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
         "src/TiaMcp.Core/DriveProfileWorkflowStore.cs",
         "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
+        "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
         "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
         "src/TiaMcp.Core/HmiComponents/HmiComponentXml.cs",
         "src/TiaMcp.Core/Inventory/InventoryStore.cs",
@@ -90958,6 +91144,11 @@
       "sha256": "805bf5a116fd67619dd06045d5aeb05af37e44426b3897910d09f79efa2f34cd"
     },
     {
+      "path": "evidence/local.sim.reconcile.20261024.json",
+      "state": "observed",
+      "sha256": "fd4e17cf687b3b681602f4f22257afc341639a82065fc67f1d6fd9f238f832a0"
+    },
+    {
       "path": "evidence/local.smoke.20261024.json",
       "state": "observed",
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
@@ -91155,6 +91346,10 @@
     {
       "id": "local.sim.provision.20261024",
       "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913"
+    },
+    {
+      "id": "local.sim.reconcile.20261024",
+      "profileSha256": "1c7cee721f570a3eb593a39818ea2ba739164da8d246a16b130027327b25130a"
     },
     {
       "id": "local.sim.startup.20261024",

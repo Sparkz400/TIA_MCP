@@ -182,7 +182,7 @@ def main(argv=None):
                 report["completed"] = False
         client.close()
         report["hostExitCode"] = client.process.returncode
-        report["toolCalls"] = client.tool_calls
+        report["toolCalls"] = getattr(client, "tool_calls", [])
         persist()
         print(str(report_path), flush=True)
     return 0 if report["completed"] else 1

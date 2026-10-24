@@ -1,0 +1,51 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.sim.reconcile.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T10:35:34+00:00",
+  "source": {
+    "commit": "4db98c34b629f681e7d69cfc6d2657d7a0ba2871",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/reconcile_provision.py on the real outcomeUnknown admission left by a failed provisioning attempt (observer exit check bug): fresh owned TIA V21 session (different Portal process), pre-provision archive hash matched, archive retrieved to a new directory and its location-independent fingerprint (8 native block fingerprints) equal to the current scratch project, all 87 card files equal to the original manifest, discovery observer project empty; the store reconciled all three resources with separate evidence.",
+  "limitations": [
+    "Only the release path ran natively; every refusal reason (project, card, archive, observer, same process, other scope, mutation claimed) is covered by managed tests with a fake worker.",
+    "Runtime credential state inside the simulator storage is not verified; the card manifest and project are.",
+    "The fingerprint excludes generated payload bytes and unexposed vendor data, as EngineeringFingerprint policy 2 documents."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "05091a722117c7fc9b54359e784d2aa5a28b705d0b3cbe678673596a8d5d48aa"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b5fbebc6d89af27e14688f770d440d2bd17e96011c42f07ab3815ea1077b643b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "reconcile.json",
+      "sha256": "40e3a030cc3ff85d048a470a90532ddc08b21e523becbed39eb9271f57bb6862",
+      "bytes": 11670,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "simulation_provision_reconcile"
+      ],
+      "toolsPassed": [
+        "simulation_provision_reconcile",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -73,9 +73,6 @@ The earlier evidence records stay in the catalog as history, uncited.
 ## What stays open
 
 - `deployment.vm_qualification`: needs the VMware guest.
-- One `outcomeUnknown` provisioning admission from a failed attempt is still held
-  (`artifacts/engineering-admissions/9547a9a83cfc42b388fbcab53c1204cb`); trusted
-  reconciliation does not exist yet.
 - Native evidence applies to the recorded binary tree hashes. The Host embeds
   the catalog, so the Host built after this catalog change has a different hash
   from the one that ran; later binaries need their own runs.
