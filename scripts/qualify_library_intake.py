@@ -44,6 +44,7 @@ def run(host, artifacts):
         instance = Client(host.resolve(), 30, ["--artifacts", str(directory),
                           "--worker", str(directory / "worker-intentionally-absent.exe"),
                           "--sim-worker", str(directory / "sim-worker-intentionally-absent.exe")])
+        instance.tool_calls = report.setdefault("toolCalls", [])  # One record across host restarts.
         instance.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},
                          "clientInfo": {"name": "library-intake-qualification", "version": "1"}})
         instance.notify("notifications/initialized")

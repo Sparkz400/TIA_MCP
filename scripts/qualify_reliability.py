@@ -65,15 +65,17 @@ def verify_no_replay(events, token, mutations=1, starts=1):
     require(all(event.get("token") == token for event in events), "Foreign worker evidence")
     require(sum(event["kind"] == "started" for event in events) == starts, "Unexpected worker restart")
     requests = [event for event in events if event["kind"] == "request"]
-    writes = [event for event in requests if event.get("operation") == "change_apply"]
+    # Admitted writes reach the worker as mutation_dispatch; older Hosts sent change_apply directly.
+    writes = [event for event in requests if event.get("operation") in ("change_apply", "mutation_dispatch")]
     require(len(writes) == mutations, "A mutation was missing or replayed")
     require(len({event["id"] for event in requests}) == len(requests), "Duplicate request ID")
 
 
 class ReliabilityClient(Client):
     """Keep asynchronous request IDs explicit so the harness can interrupt its own call."""
-    def __init__(self, host, worker, artifacts, timeout=5, config=None):
+    def __init__(self, host, worker, artifacts, timeout=5, config=None, record=None):
         self.timeout, self.sequence = timeout, 0
+        self.tool_calls = [] if record is None else record
         self.lines, self.errors = queue.Queue(), []
         environment = os.environ.copy()
         if config:
@@ -108,7 +110,10 @@ class ReliabilityClient(Client):
             return response["result"]
 
     def request(self, method, params=None):
-        return self.receive(self.begin(method, params))
+        result = self.receive(self.begin(method, params))
+        if method == "tools/call":
+            self.tool_calls.append({"name": params["name"], "isError": bool(result.get("isError"))})
+        return result
 
     def initialize(self):
         self.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "reliability-qualification", "version": "1"}})
@@ -264,7 +269,7 @@ def semantic_xml(xml):
 def qualify_native(host, worker, run_root, journal_path, block_name):
     """No injected native mutation failures: recovery evidence and observer lifecycle only."""
     journal, archive, journal_artifacts = validated_checkpoint(journal_path)
-    result = {"scope": "native offline owned checkpoint copies", "passed": False, "steps": [], "archiveSha256": journal["recoveryArchiveSha256"]}
+    result = {"scope": "native offline owned checkpoint copies", "passed": False, "steps": [], "archiveSha256": journal["recoveryArchiveSha256"], "toolCalls": []}
     owner = observer = None
     def step(name, value):
         result["steps"].append({"name": name, "result": value})
@@ -272,7 +277,7 @@ def qualify_native(host, worker, run_root, journal_path, block_name):
         print("PASS native " + name, flush=True)
         return value
     try:
-        reader = ReliabilityClient(host, worker, journal_artifacts, timeout=300)
+        reader = ReliabilityClient(host, worker, journal_artifacts, timeout=300, record=result["toolCalls"])
         try:
             reader.initialize()
             status = step("fresh host persisted journal", reader.tool("change_status", {"changeId": journal["changeId"]}))
@@ -284,7 +289,7 @@ def qualify_native(host, worker, run_root, journal_path, block_name):
         native_artifacts = ROOT / "artifacts" / ("rl_" + uuid.uuid4().hex[:8])
         native_artifacts.mkdir()
         result["nativeArtifacts"] = str(native_artifacts)
-        owner = ReliabilityClient(host, worker, native_artifacts, timeout=300)
+        owner = ReliabilityClient(host, worker, native_artifacts, timeout=300, record=result["toolCalls"])
         owner.initialize()
         start = step("start owned instance", owner.tool("tia_start"))
         pid = start["processId"]
@@ -295,7 +300,7 @@ def qualify_native(host, worker, run_root, journal_path, block_name):
         require(project.is_relative_to(native_artifacts) and project != pathlib.Path(journal["projectPath"]).resolve(), "Recovery did not create an isolated copy")
         before = owner.tool("block_read", {"blockName": block_name})
         before_hash = semantic_xml(before["xml"])
-        observer = ReliabilityClient(host, worker, native_artifacts / "observer", timeout=300)
+        observer = ReliabilityClient(host, worker, native_artifacts / "observer", timeout=300, record=result["toolCalls"])
         observer.initialize()
         step("observer attach", observer.tool("tia_attach", {"processId": pid}))
         require(semantic_xml(observer.tool("block_read", {"blockName": block_name})["xml"]) == before_hash, "Observer read differs")
@@ -311,7 +316,7 @@ def qualify_native(host, worker, run_root, journal_path, block_name):
         step("owner preserved after observer host termination", {"processId": pid, "blockSemanticSha256": before_hash})
         step("owner detach", owner.tool("tia_detach"))
         owner.close()
-        owner = ReliabilityClient(host, worker, native_artifacts, timeout=300)
+        owner = ReliabilityClient(host, worker, native_artifacts, timeout=300, record=result["toolCalls"])
         owner.initialize()
         owner.tool("tia_start")
         reopened = step("fresh host checkpoint retrieval", owner.tool("project_retrieve", {"archivePath": str(archive), "expectedSha256": journal["recoveryArchiveSha256"]}))
@@ -378,6 +383,7 @@ def main():
         print(("PASS " if case["passed"] else "FAIL ") + mode, flush=True)
     if args.live:
         report["nativeQualification"] = qualify_native(args.host.resolve(), args.native_worker.resolve(), run_root, args.checkpoint_journal, args.block_name)
+        report["toolCalls"] = report["nativeQualification"]["toolCalls"]
     report["completed"] = all(case["passed"] for case in report["cases"]) and (not args.live or report["nativeQualification"]["passed"])
     report["passedCases"] = sum(case["passed"] for case in report["cases"])
     save()

@@ -43,7 +43,7 @@ This example is illustrative. A real response describes its actual observation a
 
 Fixture results do not make an unrelated CPU or project verified. The pure `CapabilityRules` helper enforces this distinction. A later qualification record must bind to its exact fixture manifest, target and artifacts before contributing evidence.
 
-In the bundled `feature_catalog`, `verified` also requires every artifact of each cited evidence record to be retained in this repository, and `available` requires `verified`. Evidence whose artifacts exist only in the ignored `artifacts/` folder stays cited as history under `unverified`. `scripts/test_contracts.py` enforces both rules; see the [catalog reconciliation](../verification/catalog-reconciliation-20261024.md).
+In the bundled `feature_catalog`, `verified` also requires every artifact of each cited evidence record to be retained in this repository, and `available` requires `verified`. Evidence whose artifacts exist only in the ignored `artifacts/` folder stays cited as history under `unverified`. `scripts/test_contracts.py` enforces both rules and also requires, for `verified`, a passed curated summary under `evidence/` for every cited record in which every bound tool answered without error; see the [catalog reconciliation](../verification/catalog-reconciliation-20261024.md) and [requalification](../verification/catalog-requalification-20261024.md).
 
 ## Observed metadata and limits
 

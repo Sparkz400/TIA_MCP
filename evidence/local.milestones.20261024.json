@@ -1,0 +1,125 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.milestones.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T08:55:26+00:00",
+  "source": {
+    "commit": "eb2937131fff7a6115d7eb6d962057ec3aaef8ed",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/validate_milestones.py --skip-simulation on a new worker-owned TIA V21 scratch project: interface, call graph, change impact, symbol trace, UDT read, per-language block XML export with artifact_read hash checks, fixture sources, prepared/applied/restored source changes with zero-error compile, hardware, technology and engineering reads, detach.",
+  "limitations": [
+    "Engineering phase only; simulation download and runtime behavior were skipped and are not qualified by this record.",
+    "safety_inspect returned UnsupportedCapability on the non-safety scratch CPU; safety is not covered.",
+    "One generated scratch fixture; results are not evidence for arbitrary customer projects, protection states or large-scale completeness."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "dfcd1cb08739ae6208ca48a54f42c268d8635c8d8f9f2e4fe5590d0bdab2b255"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "8c152b4302faf7a80422c88c3d0a850bc5b62a81ea684e89f54661d3e17510a8"
+    }
+  ],
+  "runs": [
+    {
+      "report": "milestones.json",
+      "sha256": "3010d59baee3cc7f93d406cb6a33ac2a8b9c2a25b85d092bcd778184079d0ec0",
+      "bytes": 561211,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "tia_create_scratch",
+        "project_inventory",
+        "software_inspect",
+        "hardware_inspect",
+        "technology_read",
+        "block_interface",
+        "call_graph",
+        "symbol_trace",
+        "change_impact",
+        "prepare UDT fixture",
+        "apply UDT fixture",
+        "type_read",
+        "fixture_sources",
+        "prepare SCL fixture",
+        "apply SCL fixture",
+        "SCL idempotent replay",
+        "block_read",
+        "artifact_read",
+        "fixture_sources",
+        "prepare STL fixture",
+        "apply STL fixture",
+        "STL idempotent replay",
+        "block_read",
+        "artifact_read",
+        "fixture_sources",
+        "prepare LAD fixture",
+        "apply LAD fixture",
+        "LAD idempotent replay",
+        "block_read",
+        "artifact_read",
+        "prepare LAD structured operand edit",
+        "apply LAD structured operand edit",
+        "block_read",
+        "LAD operand edit restore",
+        "fixture_sources",
+        "prepare FBD fixture",
+        "apply FBD fixture",
+        "FBD idempotent replay",
+        "block_read",
+        "artifact_read",
+        "prepare FBD structured operand edit",
+        "apply FBD structured operand edit",
+        "block_read",
+        "FBD operand edit restore",
+        "prepare block rename",
+        "apply block rename",
+        "block_read",
+        "change_restore",
+        "block restored from archive",
+        "prepare unused fixture delete",
+        "apply unused fixture delete",
+        "rejected BlockNotFound",
+        "engineering_read",
+        "prepare offline network address",
+        "apply offline network address",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_interface",
+        "block_read",
+        "call_graph",
+        "change_apply",
+        "change_impact",
+        "change_prepare",
+        "change_restore",
+        "engineering_read",
+        "fixture_sources",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "symbol_trace",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "block_read",
+        "safety_inspect"
+      ]
+    }
+  ]
+}

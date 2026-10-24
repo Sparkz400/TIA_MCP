@@ -1,0 +1,62 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_intake.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T08:59:09+00:00",
+  "source": {
+    "commit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_intake.py through the stdio MCP Host with native workers intentionally absent: chunked upload with host restart and byte-identical retry, incomplete commit rejected, repeated commit, package staging, paged candidate inspection, documents, upload release, durable package status across restart, package release, ZIP traversal rejected.",
+  "limitations": [
+    "Host-only by design: upload and package intake run in the Host and no Siemens worker is involved; this is not native library import, compatibility or compilation evidence.",
+    "Synthetic ZIP fixture; no vendor authenticity claim."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "21030d089231770beaf8d0aac36102e00b6eb6c6d176b13f65a4a02e2af66a65"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "691c1fb0bec7cf1220e65e790c8e0ec82c6d7af0ee1da5d45ccf5d7f9119f1ce",
+      "bytes": 14875,
+      "completed": true,
+      "steps": [
+        "tool discovery without Siemens worker",
+        "restart and byte-identical retry",
+        "incomplete commit rejected",
+        "complete upload hash and repeated commit",
+        "explicit mixed-package candidates and bounded pages",
+        "documentation retained",
+        "release committed upload after independent staging",
+        "durable package status",
+        "explicit package release",
+        "ZIP traversal rejected through MCP"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "artifact_upload_release",
+        "artifact_upload_status",
+        "library_package_inspect",
+        "library_package_release",
+        "library_package_stage",
+        "library_package_status"
+      ],
+      "toolsRejected": [
+        "artifact_upload_commit",
+        "library_package_stage"
+      ]
+    }
+  ]
+}

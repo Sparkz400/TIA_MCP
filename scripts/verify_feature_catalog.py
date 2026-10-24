@@ -67,6 +67,7 @@ def main():
     finally:
         client.close()
         report["hostExitCode"] = client.process.returncode
+        report["toolCalls"] = client.tool_calls
         report["completed"] = report["completed"] and client.process.returncode == 0
         args.report.parent.mkdir(parents=True, exist_ok=True)
         with args.report.open("x", encoding="utf-8") as destination:

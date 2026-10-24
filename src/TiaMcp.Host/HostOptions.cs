@@ -122,7 +122,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     private static string FindRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
-            if (File.Exists(Path.Combine(directory.FullName, "docs", "PLAN.md"))) return directory.FullName;
+            if (File.Exists(Path.Combine(directory.FullName, "TiaMcp.slnx"))) return directory.FullName;
         return AppContext.BaseDirectory;
     }
 }

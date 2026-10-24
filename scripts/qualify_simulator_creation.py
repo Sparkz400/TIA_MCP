@@ -56,6 +56,7 @@ def main():
 
     def close(client):
         client.close()
+        report.setdefault('toolCalls', []).extend(client.tool_calls)
         report.setdefault('hostExits', []).append({'pid': client.process.pid, 'exitCode': client.process.returncode,
             'workerExitDiagnostics': [json.loads(line) for line in client.errors if line.startswith('{"bridgeWorkerExit":')],
             'stderr': redact(client.errors)})
