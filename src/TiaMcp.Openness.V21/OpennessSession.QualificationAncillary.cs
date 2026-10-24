@@ -60,10 +60,13 @@ namespace TiaMcp.Openness.V21
         private static JArray QualificationNativeIdentity(IEngineeringObject value)
         {
             if (value == null) throw new BridgeException("ComponentScopeIncomplete", "VCI mapping has no native engineering identity.");
-            var identity = new JArray(); int depth = 0;
-            for (var current = value; current != null; current = current.Parent)
+            var identity = new JArray(); int depth = 0; var visited = new List<IEngineeringObject>();
+            // The Portal root (or an object reporting itself/an ancestor as Parent) ends
+            // the chain; otherwise VCI groups never reach null on some V21 installs.
+            for (var current = value; current != null && !visited.Any(seen => ReferenceEquals(seen, current) || seen.Equals(current)); current = current is TiaPortal ? null : current.Parent)
             {
                 if (++depth > 64) throw new BridgeException("ComponentScopeIncomplete", "VCI native identity ancestry exceeds its bound.");
+                visited.Add(current);
                 var row = new JObject { ["type"] = current.GetType().FullName };
                 foreach (var info in current.GetAttributeInfos().Where(i => i.Name == "Name" || i.Name == "Number").OrderBy(i => i.Name, StringComparer.Ordinal))
                 {
