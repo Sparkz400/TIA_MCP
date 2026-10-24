@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f9eb5b6505b85e52c8ddb5282de1172ec53511f2c794fd58c65f233ea9488b1",
-      "bytes": 696153
+      "sha256": "2a7dc02324185f5a3307a4d7551d21b08446b99a032c1dce3d8258629ec8303c",
+      "bytes": 699868
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1232,8 +1232,8 @@
     },
     {
       "path": "src/TiaMcp.Core/JournalFileReplacement.cs",
-      "sha256": "e917abd59bac4da0bfef3728eca06834e19817b6828ad4e4207f764adacfc5f9",
-      "bytes": 790
+      "sha256": "2cf8880c1dc9ea79342649e141fdc2726bbfd5eaac99a51b1671d3166280933e",
+      "bytes": 1183
     },
     {
       "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -78924,7 +78924,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering.interruption.rerun.20261024",
+          "profileSha256": "ea12d8f5d97efbaa1de4ba70a3bbb2f515f13ac48f094d500d164c008722530c",
+          "artifacts": [
+            "evidence/local.engineering.interruption.rerun.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -81165,6 +81173,13 @@
             "artifacts/p16r/compile-diagnostics-audit-01.json",
             "artifacts/p16r/scale-browser-01/result.json",
             "artifacts/p16r/scale-browser-02/result.json"
+          ]
+        },
+        {
+          "id": "local.explorer.relationship-scope.20261024",
+          "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
+          "artifacts": [
+            "evidence/local.explorer.relationship-scope.20261024.json"
           ]
         }
       ],
@@ -91308,9 +91323,19 @@
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
     },
     {
+      "path": "evidence/local.engineering.interruption.rerun.20261024.json",
+      "state": "observed",
+      "sha256": "f3fadb6db70a850732fcc70d1275ee6a82eb1d760c0e9715aaf801857443f873"
+    },
+    {
       "path": "evidence/local.explorer.20261024.json",
       "state": "observed",
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
+    },
+    {
+      "path": "evidence/local.explorer.relationship-scope.20261024.json",
+      "state": "observed",
+      "sha256": "febb795362cd9751c16f6862010de30fa105a5288909da2613d5803522e4328d"
     },
     {
       "path": "evidence/local.hardware.20261024.json",
@@ -91427,12 +91452,20 @@
       "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19"
     },
     {
+      "id": "local.engineering.interruption.rerun.20261024",
+      "profileSha256": "ea12d8f5d97efbaa1de4ba70a3bbb2f515f13ac48f094d500d164c008722530c"
+    },
+    {
       "id": "local.explorer.20261024",
       "profileSha256": "f9ef19dfc4c2f2c4064fd439d2b73e20e62f55b52c363c5ccb95a2ad60784525"
     },
     {
       "id": "local.explorer.native-browser.20261008",
       "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3"
+    },
+    {
+      "id": "local.explorer.relationship-scope.20261024",
+      "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd"
     },
     {
       "id": "local.guards.v02",
