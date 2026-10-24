@@ -25,7 +25,17 @@ using Siemens.Engineering.Umac;
 // project open, physical download, runtime or project-script execution exists.
 internal static partial class Program
 {
-    private static string Api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+    private static string Api = InstalledApiDirectory();
+    // Same lookup as the worker: Siemens registers the installed V21 API; C:\Program Files is only the setup default.
+    private static string InstalledApiDirectory()
+    {
+        using (var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64))
+        using (var key = hklm.OpenSubKey(@"SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48"))
+        {
+            var basePath = key?.GetValue("Siemens.Engineering.Base") as string;
+            return string.IsNullOrWhiteSpace(basePath) ? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48" : Path.GetDirectoryName(basePath);
+        }
+    }
     private static string Output;
     private static JObject Report;
     private static bool PositiveFixture;
