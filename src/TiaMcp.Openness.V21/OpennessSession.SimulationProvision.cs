@@ -816,8 +816,8 @@ namespace TiaMcp.Openness.V21
                         try
                         {
                             cleanupCheckpoint("beforeReleaseInterface");
-                            instance.Dispose();
-                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = true });
+                            RetainSimulationInterface(instance);
+                            cleanup.Add(new JObject { ["action"] = "releaseInterface", ["completed"] = true, ["retainedUntilWorkerExit"] = true });
                             cleanupCheckpoint("afterReleaseInterface");
                         }
                         catch (Exception ex)

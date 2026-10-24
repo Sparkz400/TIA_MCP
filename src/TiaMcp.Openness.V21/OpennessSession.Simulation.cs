@@ -161,9 +161,22 @@ namespace TiaMcp.Openness.V21
             finally
             {
                 // Cleanup errors must not hide the primary compile/download result.
-                try { instance?.Dispose(); } // IInstance release does not unregister the CPU.
+                try { RetainSimulationInterface(instance); } // Not disposing does not unregister the CPU either.
                 catch (Exception ex) { Console.Error.WriteLine("Simulation download interface release: " + ex.Message); }
             }
+        }
+
+        // shortcut: PLCSIM's CInstanceNet Dispose/finalizer intermittently raised an uncatchable
+        // AccessViolationException right after a completed download (frozen runtime run, 24 Oct 2026).
+        // Interfaces are held without finalization until worker exit, where the runtime manager shuts
+        // down; revisit if Siemens fixes the wrapper or one worker must create many interfaces.
+        private static readonly List<IInstance> RetainedSimulationInterfaces = new List<IInstance>();
+
+        private static void RetainSimulationInterface(IInstance instance)
+        {
+            if (instance == null) return;
+            lock (RetainedSimulationInterfaces) RetainedSimulationInterfaces.Add(instance);
+            GC.SuppressFinalize(instance);
         }
 
         private void RetainSimulationRuntimeUntilWorkerExit()
@@ -186,7 +199,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("SimulationTargetMismatch", "The exact adapter-owned instance is no longer registered locally.");
             var instance = SimulationRuntimeManager.CreateInterface(id);
             try { VerifySimulationIdentity(instance, marker); return instance; }
-            catch { instance.Dispose(); throw; }
+            catch { RetainSimulationInterface(instance); throw; }
         }
 
         private static void VerifySimulationIdentity(IInstance instance, JObject marker)
