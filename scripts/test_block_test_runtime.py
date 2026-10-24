@@ -55,6 +55,7 @@ class Simulator:
         self.bad_quality = False
         self.running_revision = "a" * 64
         self.download_id = 0
+        self.download_errors = 0
         self.counter_increment = 1
         self.provision_overrides = {}
         self.storage = (run_block_tests.ROOT / "artifacts/block-tests/fake-instance").resolve()
@@ -66,7 +67,7 @@ class Simulator:
         if tool == "sim_create":
             return {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"}, "downloadTicket": "TOP-SECRET-TICKET"}
         if tool == "simulation_download":
-            return {"completed": True, "download": {"errors": 0}, "instanceId": self.download_id,
+            return {"completed": True, "download": {"errors": self.download_errors}, "instanceId": self.download_id,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
                     "reportPath": str(self.storage / "simulation-download.json"), "memoryCardPath": str(self.storage / "SIMATIC_MC")}
         if tool == "simulation_provision_scratch_credential":
@@ -282,12 +283,27 @@ class BackendTests(unittest.TestCase):
         self.assertFalse(any(tool == "sim_write" for tool, _ in self.native.calls))
 
     def test_download_identity_mismatch_releases_id_zero(self):
-        self.native.download_id = 1
-        with self.assertRaisesRegex(RuntimeError, "different simulator"):
-            self.backend.start()
-        with self.assertRaises(RuntimeCleanupUncertain):
-            self.backend.close()
-        self.assertEqual(0, self.native.calls[-1][1]["instanceId"])
+        for invalid in (1, False, 0.0, "0", None):
+            with self.subTest(invalid=invalid):
+                self.setUp()
+                self.native.download_id = invalid
+                with self.assertRaisesRegex(RuntimeError, "different simulator"):
+                    self.backend.start()
+                with self.assertRaises(RuntimeCleanupUncertain):
+                    self.backend.close()
+                self.assertEqual(0, self.native.calls[-1][1]["instanceId"])
+                self.assertFalse(any(tool == "sim_state" for tool, _ in self.native.calls))
+
+    def test_download_error_count_requires_integer_zero(self):
+        for invalid in (False, 0.0, "0", None, -1, 1):
+            with self.subTest(invalid=invalid):
+                self.setUp()
+                self.native.download_errors = invalid
+                with self.assertRaisesRegex(RuntimeError, "did not complete"):
+                    self.backend.start()
+                with self.assertRaises(RuntimeCleanupUncertain):
+                    self.backend.close()
+                self.assertFalse(any(tool == "sim_state" for tool, _ in self.native.calls))
 
     def test_bad_quality_is_not_a_value(self):
         self.backend.start()
@@ -344,6 +360,9 @@ class EvidenceTests(unittest.TestCase):
                   "emptyStartupVerified": True, "originalProgramCardRestored": True, "provisioningStrategy": "owned empty CPU then restore original card",
                   "reportPath": str(storage / "provision.json")}
         self.assertEqual(result, verify_credential_provisioning(result, download))
+        for invalid_id in (False, 0.0):
+            with self.subTest(download_id=invalid_id), self.assertRaises(RuntimeError):
+                verify_credential_provisioning(result, {**download, "instanceId": invalid_id})
         for invalid in ({"completed": False}, {"credentialProvisioned": 1}, {"instanceId": False},
                         {"instanceId": 1}, {"instanceName": "other"}, {"originalProgramRevision": "b" * 64},
                         {"operatingState": "Stop"}, {"protectionDisabled": True}, {"protectionDisabled": 0},
@@ -428,6 +447,22 @@ class EvidenceTests(unittest.TestCase):
                 verify_memory_card({"memoryCardPath": directory, "programRevision": "a" * 64,
                                     "files": [{"path": "../outside", "bytes": 0, "sha256": "b" * 64}]})
 
+    def test_manifest_byte_count_requires_nonnegative_integer(self):
+        with temporary_directory() as directory:
+            root = pathlib.Path(directory)
+            for data in (b"", b"x"):
+                (root / "program.bin").write_bytes(data)
+                valid = [{"path": "program.bin", "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}]
+                valid_revision = hashlib.sha256(json.dumps(valid, separators=(",", ":")).encode()).hexdigest()
+                self.assertTrue(verify_memory_card({"memoryCardPath": str(root), "programRevision": valid_revision,
+                                                   "files": valid})["verifiedBeforePowerOn"])
+                for count in (bool(len(data)), float(len(data)), str(len(data)), None, -1):
+                    with self.subTest(data=data, count=count):
+                        entries = [{"path": "program.bin", "bytes": count, "sha256": hashlib.sha256(data).hexdigest()}]
+                        revision = hashlib.sha256(json.dumps(entries, separators=(",", ":")).encode()).hexdigest()
+                        with self.assertRaisesRegex(ValueError, "byte count"):
+                            verify_memory_card({"memoryCardPath": str(root), "programRevision": revision, "files": entries})
+
 
 class CliTests(unittest.TestCase):
     def test_authored_signal_names_do_not_change_archived_revision(self):
@@ -475,7 +510,7 @@ class CliTests(unittest.TestCase):
 
 class BaselineCliTests(unittest.TestCase):
     def run_baseline(self, root, provision=False, provision_overrides=None, restored_card_error=False,
-                     trust=False, expected_card_verifications=None):
+                     trust=False, expected_card_verifications=None, download_overrides=None, created_overrides=None):
         project = root / "TiaMcpScratch_Test.ap21"
         metadata, journal = root / "credential.json", root / "journal.json"
         for path in (project, metadata, journal):
@@ -484,7 +519,8 @@ class BaselineCliTests(unittest.TestCase):
         events, requests = [], []
         download = {"completed": True, "download": {"errors": 0}, "instanceId": 0,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
-                    "reportPath": str(root / "simulation-download.json"), "memoryCardPath": str(root / "SIMATIC_MC")}
+                    "reportPath": str(root / "simulation-download.json"), "memoryCardPath": str(root / "SIMATIC_MC"),
+                    **(download_overrides or {})}
         class Client:
             process = types.SimpleNamespace(returncode=0)
             def notify(self, *args):
@@ -500,7 +536,7 @@ class BaselineCliTests(unittest.TestCase):
                 if tool == "simulation_discovery_baseline":
                     result = {"baseline": {"classification": "placeholder", "registeredInstanceCount": 0}}
                 elif tool == "sim_create":
-                    result = {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"},
+                    result = {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off", **(created_overrides or {})},
                               "downloadTicket": "PRIVATE-TICKET"}
                 elif tool == "simulation_download":
                     result = download
@@ -570,6 +606,28 @@ class BaselineCliTests(unittest.TestCase):
             self.assertFalse(report["provisionRuntimeCredential"])
             self.assertFalse(report["trustOwnedEmptyCpuCertificate"])
             self.assertNotIn("simulation_provision_scratch_credential", events)
+
+    def test_bad_download_evidence_stops_both_modes_before_power_on(self):
+        for provision in (False, True):
+            for invalid in ({"instanceId": False}, {"instanceId": 0.0}, {"instanceName": "other"},
+                            {"download": {"errors": False}}, {"download": {"errors": 0.0}}, {"completed": 1}):
+                with self.subTest(provision=provision, invalid=invalid), temporary_directory() as directory:
+                    code, report, events, _ = self.run_baseline(pathlib.Path(directory), provision=provision,
+                        download_overrides=invalid, expected_card_verifications=0)
+                    self.assertEqual(1, code)
+                    self.assertFalse(report["completed"])
+                    self.assertNotIn("sim_state", events)
+                    self.assertNotIn("simulation_provision_scratch_credential", events)
+                    self.assertIn("sim_release", events)
+
+    def test_bad_created_identity_is_not_used_for_download_or_cleanup(self):
+        for invalid in ({"id": False}, {"id": 0.0}, {"id": -1}, {"owned": 1}, {"name": ""}):
+            with self.subTest(invalid=invalid), temporary_directory() as directory:
+                code, report, events, _ = self.run_baseline(pathlib.Path(directory), created_overrides=invalid)
+                self.assertEqual(1, code)
+                self.assertFalse(report["completed"])
+                for tool in ("simulation_download", "sim_state", "sim_release"):
+                    self.assertNotIn(tool, events)
 
     def test_tls_first_use_flag_is_recorded_and_passed_only_to_provisioning(self):
         with temporary_directory() as directory:

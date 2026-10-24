@@ -108,6 +108,15 @@ class NativeAudit:
             self.persist()
 
 
+def verify_download(download, instance):
+    errors = download.get("download", {}).get("errors")
+    if download.get("completed") is not True or type(errors) is not int or errors != 0:
+        raise RuntimeError("Memory-card download did not complete successfully.")
+    if (type(download.get("instanceId")) is not int or download["instanceId"] != instance["id"]
+            or download.get("instanceName") != instance["name"]):
+        raise RuntimeError("Downloaded program targets a different simulator.")
+
+
 def verify_memory_card(download):
     """Verify the exact generated image before starting its owned simulator."""
     revision, entries = download.get("programRevision", ""), download.get("files", [])
@@ -120,6 +129,8 @@ def verify_memory_card(download):
     root = requested_root.resolve(strict=True)
     expected = {}
     for entry in entries:
+        if type(entry.get("bytes")) is not int or entry["bytes"] < 0:
+            raise ValueError("Memory-card manifest byte count must be a nonnegative integer.")
         relative = pathlib.PurePosixPath(entry["path"])
         if relative.is_absolute() or ".." in relative.parts or "\\" in entry["path"] or ":" in entry["path"] or entry["path"] in expected:
             raise ValueError("Invalid or duplicated memory-card manifest path.")
@@ -155,7 +166,7 @@ def verify_credential_provisioning(provisioned, download, *, trust_owned_empty_c
     """
     if provisioned.get("completed") is not True or provisioned.get("credentialProvisioned") is not True:
         raise RuntimeError("Runtime credential provisioning did not complete successfully.")
-    if (type(provisioned.get("instanceId")) is not int
+    if (type(provisioned.get("instanceId")) is not int or type(download.get("instanceId")) is not int
             or provisioned["instanceId"] != download.get("instanceId")
             or provisioned.get("instanceName") != download.get("instanceName")):
         raise RuntimeError("Runtime credential provisioning targets a different simulator.")
@@ -303,10 +314,7 @@ class McpRuntimeBackend:
                               "credentialMetadataPath": self.credential_metadata}
         try:
             download = self.native("simulation_download", download_arguments)
-            if download.get("completed") is not True or download.get("download", {}).get("errors") != 0:
-                raise RuntimeError("Memory-card download did not complete successfully.")
-            if download.get("instanceId") != self.instance_id or download.get("instanceName") != instance["name"]:
-                raise RuntimeError("Downloaded program targets a different simulator.")
+            verify_download(download, instance)
             self.evidence["memoryCard"] = self.card_verifier(download)
         except Exception as error:
             self._uncertain("simulation_download_outcome_unverified", "simulation_download", error)

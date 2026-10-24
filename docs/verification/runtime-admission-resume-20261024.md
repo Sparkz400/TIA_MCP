@@ -65,16 +65,31 @@ loaded the V21 worker, returned capabilities and an empty Portal-process list,
 and exited with Host code zero. No Portal was started or project attached.
 Licensing, requested stop, recovery and the full runtime corpus remain unqualified.
 
-## Next reproduced bugs
+## Runtime scalar follow-up
 
 `artifacts/todo-resume-20261024/next-runtime-evidence-findings.json` records two
 additional false acceptances against the actual Python backend/verifier: a download
 with Boolean `instanceId: false` passes as integer zero, and a one-byte card file
 passes a manifest with Boolean `bytes: true` and its matching manifest hash.
 The reproductions use a fake simulator and a temporary local file; no PLC was
-contacted. These require strict integer validation and regression checks in the
-next increment. The default-path environment diagnostic also needs to honor the
-installed-location selection used by the native worker.
+contacted. The follow-up fixes both false acceptances, and extends the checks to
+zero-valued floating-point IDs/error counts and numeric completion flags. Both
+runtime entry points call the same download validator. The standalone CLI now
+checks download identity in both provisioning and ordinary startup modes, and
+refuses malformed creation identities before download or identity-based cleanup.
+Provisioning comparison requires integer identities on both sides. Empty files
+with integer byte count zero remain valid.
+
+The initial scalar regression recorded 25 failing subcases; the additional
+creation/provisioning identity regression recorded seven. The repaired code passes
+all 182 block-test tests with one existing skip (`runtime-final.log`). These are
+focused follow-up checks after the full aggregate at `b090df8`; that aggregate was
+not rerun for the Python-only follow-up. Logs `scalars-before.log`,
+`identity-before.log` and `runtime-final.log` retain the failures and final result.
+All 100 additional safety-qualification/lifecycle and typed-graphical/dependency/
+resolution caller tests pass (`runtime-callers.log`).
+The default-path environment diagnostic remains a separate open issue: it needs
+to honor the installed-location selection used by the native worker.
 
 ## Backlog corrections and next work
 
