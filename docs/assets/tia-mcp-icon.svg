@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+<title id="title">TIA MCP connector mark</title><desc id="desc">Two opposing connectors form a bridge on an acid-yellow square.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#171717"/></marker></defs>
+<rect x="2" y="2" width="252" height="252" fill="#f2f0e8" stroke="#171717" stroke-width="3"/>
+<rect x="6" y="6" width="244" height="244" fill="#dfff00" stroke="#171717" stroke-width="12"/><path d="M48 80h56l48 48-48 48H48v-48h160V80h-56l-48 48 48 48h56v-48" fill="none" stroke="#171717" stroke-width="16" stroke-linejoin="miter"/>
+</svg>
