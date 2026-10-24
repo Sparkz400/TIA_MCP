@@ -75,12 +75,12 @@ $ManagedSuiteSeconds = @{
     'TiaMcp.WebApplications.Tests' = 2.3
 }
 # Checks after the suite loop read suite outputs, so each group runs in shard (index % ShardCount)
-# together with every suite it reads from. Seconds are rough hosted-runner estimates for balancing.
+# together with every suite it reads from. Seconds are the measured check time (CI run 40077726200).
 $ManagedCheckGroups = @(
-    @{seconds=240; suites=@('TiaMcp.PhysicalRuntime.Tests','TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests','TiaMcp.ProjectModel.Tests')},
-    @{seconds=120; suites=@('TiaMcp.Tests','TiaMcp.TestSuite.Tests','TiaMcp.EncoderEvidence.Tests')},
-    @{seconds=240; suites=@('TiaMcp.CompositeEngineering.Tests','TiaMcp.HmiComponents.Tests','TiaMcp.SoftwareUnits.Tests','TiaMcp.Connections.Tests','TiaMcp.DbSnapshots.Tests','TiaMcp.SafetyEvidence.Tests')},
-    @{seconds=240; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')}
+    @{seconds=300; suites=@('TiaMcp.PhysicalRuntime.Tests','TiaMcp.OpcUa.Runtime.Tests','TiaMcp.Diagnostics.Tests','TiaMcp.ProjectModel.Tests')},
+    @{seconds=15; suites=@('TiaMcp.Tests','TiaMcp.TestSuite.Tests','TiaMcp.EncoderEvidence.Tests')},
+    @{seconds=160; suites=@('TiaMcp.CompositeEngineering.Tests','TiaMcp.HmiComponents.Tests','TiaMcp.SoftwareUnits.Tests','TiaMcp.Connections.Tests','TiaMcp.DbSnapshots.Tests','TiaMcp.SafetyEvidence.Tests')},
+    @{seconds=70; suites=@('TiaMcp.DriveProfiles.Tests','TiaMcp.TechnologyProfiles.Tests','TiaMcp.Access.Tests','TiaMcp.PublicCertificates.Tests','TiaMcp.WebApplications.Tests','TiaMcp.Engineering.Tests','TiaMcp.Credentials.Tests')}
 )
 function Invoke-CheckGroup([int]$group, [scriptblock]$checks) {
     if (($group % $ShardCount) -ne $ShardIndex) { return }
