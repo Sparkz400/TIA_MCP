@@ -1707,8 +1707,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "e9df185ef2ab9483a8d783b2a5438a7cdb840715ce61e6083294c205f9485db1",
-      "bytes": 16564
+      "sha256": "866a9b078753e15c8ae338172e28668c676223a64dcf01a1c315cf8588feedb7",
+      "bytes": 16721
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -2347,13 +2347,18 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "8f32618f87f50596fa1f03ab310924ad8ec528ffa45fdadd1fbe74fb1e655cad",
-      "bytes": 24648
+      "sha256": "a52d83b4925da600825623b123fd6be8a116dcc52968c641fb452af91e2cb70d",
+      "bytes": 24879
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
       "sha256": "e7b027ebc2e14f929a3f839798b00e4cb4957c65d60fa256bedb3449a3f216d0",
       "bytes": 17654
+    },
+    {
+      "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationCheckpoint.cs",
+      "sha256": "ff9ca37cdd7871b87bc2f151e4ac505a14cfd08f8b6e22378d8f573ac2042322",
+      "bytes": 3903
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationCredentials.cs",
@@ -2367,8 +2372,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "51711bd75d78afb3b60be9bd58c10e520fe1bba33fb1c8cc0749c952ec371b86",
-      "bytes": 94298
+      "sha256": "c1ad560275ab65af98aac2ab7421c4df15fd655068801a29b4e53cd0ca5d3b2b",
+      "bytes": 94098
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologyConnections.cs",
@@ -49776,8 +49781,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
               "name": "SimulationProvision",
               "line": 27,
-              "endLine": 797,
-              "sha256": "b90c379d331a92933a103ae4f9ac51858283cb8c969f02289b280959606985b7"
+              "endLine": 813,
+              "sha256": "223cf3d7faf5648beb28fc8372184106a8a6dbbeba67d3d34044470e44d2b40c"
             }
           ],
           "reviewState": "static_dispatch_bound",

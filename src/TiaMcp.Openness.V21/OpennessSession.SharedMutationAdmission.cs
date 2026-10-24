@@ -276,6 +276,8 @@ namespace TiaMcp.Openness.V21
                 add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorStorageAndCard");
                 observation["markerSha256"] = SharedMutationHash(marker); observation["plcPath"] = plc.Path;
                 observation["project"] = ProjectInfo(plc.Project);
+                if (operation == "simulation_provision_scratch_credential")
+                    observation["projectCheckpointPath"] = SimulationProvisionCheckpointPath(marker.Value<string>("storagePath"), plc.Project.IsModified);
             }
             else if (operation == "watch_fixture_seed")
             {

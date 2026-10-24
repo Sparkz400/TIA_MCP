@@ -182,6 +182,53 @@ false (`download-bindings.json`). This fixes a prerequisite evidence boundary, n
 trusted provisioning reconciliation. Complete before-state project/storage capture,
 independent after-state verification, discovery and native lifecycle remain open.
 
+## Provisioning recovery checkpoint
+
+Provisioning now requires a saved project and captures a compressed full-project
+archive before protected-card staging or CPU startup. The native admission preflight
+checks the fixed `before-provision.zap21` destination and its staging directory while
+the existing project/storage reservation covers both. It rejects unsaved projects,
+existing output/staging paths and overlong native archive paths before dispatch.
+It never adds an implicit save or retries an archive.
+
+The new `recoveryBaseline` retains the exact native admission scope, original
+project, marker fingerprint, canonical fingerprint of the validated download
+observation, original card-file manifest, and a bounded storage-entry
+metadata inventory taken before this attempt creates its evidence files. The
+archive intent and returned path/size/hash are flushed through the existing durable
+checkpoint stream. Missing/empty/non-plain archives, a newly dirty project, or either
+receipt failure prevent continuation. Existing files and failed partial outputs
+remain retained. The archive is kept in owned storage, which `sim_release` retains.
+
+Storage metadata is not a byte baseline for opaque runtime protection stores; their
+contents are never opened by this capture. `fullStorageBytePreservationVerified`
+and `independentAfterStateVerified` remain false. Neither an archive receipt nor
+the original helper's cleanup claim releases an `outcomeUnknown` admission. Old
+admissions cannot acquire a retroactive before-state baseline through this change.
+
+All 247 managed tests pass, including production checkpoint sequencing with
+synthetic SDK/artifact services and real temporary filesystem collisions. Faults
+before archiving, during archiving, after an empty/dirty result and during durable
+return recording all prevent continuation. The final Host and V21 worker builds
+have zero warnings/errors; the compiled worker lifecycle guard passes. Actual
+read-only MCP catalog verification passes for 336 features and 242 tools with
+native workers deliberately absent. Logs and the catalog report are retained under
+`artifacts/todo-resume-20261024/provision-checkpoint-*`. Source bindings validate with
+all historical evidence rows preserved; 106 historical inputs remain unavailable
+and release acceptance remains false. The final test output is `artifacts/n24ak`,
+the final worker is `artifacts/n24aj`, and the Host is `artifacts/n24ah`.
+The shared native dispatch registry separately verifies eight terminal tickets;
+that read-only preflight starts no native operation and does not qualify lifecycle.
+
+The implementation follows Siemens' V21
+[saved-project archive prerequisite](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-projects-and-project-data/archiving-and-retrieving-a-project).
+Context7 could not run because its executable was unavailable. No new native
+archive, retrieval, simulator startup or project-preservation qualification ran in
+this increment. The next native check must exercise this checkpoint through the
+actual provisioning route and independently retrieve/read back its archive under
+retained process ownership; complete storage reconciliation still needs a provider
+that respects the opaque-content boundary.
+
 ## Remaining work
 
 The reviewed placeholder exclusion is already in public `main` through `54f0237`;

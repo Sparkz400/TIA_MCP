@@ -79,6 +79,24 @@ The MCP initialization handshake includes agent instructions for authentication.
 
 General project/CPU user login still uses the appropriate TIA authentication UI; MCP tools accept no raw credentials. Generated scratch confidential-configuration credentials have a separate opt-in route: `simulation_provision_scratch_credential` validates the existing CurrentUser DPAPI reference and submits it through Siemens' typed secure API only after the exact virtual target is established. This implementation does not prove successful provisioning or runtime execution; the current live blocker is recorded below. Password values are not stored in server instructions, source, client configuration, documentation or reports. Reconnect the MCP client after rebuilding to receive the updated instructions and tool descriptions.
 
+Provisioning requires a saved scratch project. It does not save unsaved edits automatically:
+Siemens requires a saved project for [project archiving](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-projects-and-project-data/archiving-and-retrieving-a-project).
+Preflight reserves the owned storage and checks that both `before-provision.zap21`
+and its native staging directory are absent and within TIA's 143-character staging
+path limit. Before protected-card staging or CPU startup, provisioning writes a
+checkpoint intent, creates a compressed archive without discarding restorable data,
+and durably records its path, size and SHA-256. Archive or receipt failure stops
+further provisioning; existing archives are never overwritten or replayed.
+
+The retained `recoveryBaseline` binds the native admission scope, original project,
+ownership-marker fingerprint, validated generated-card report fingerprint, original
+card-file manifest and a bounded inventory of storage files and directories taken
+before this attempt creates its evidence. Storage inventory includes metadata only;
+opaque runtime protection-store contents are not opened or hashed. The record
+explicitly leaves complete storage-byte preservation and independent after-state
+verification false. Archive creation alone does not establish successful retrieval,
+project preservation, recovery or permission to release an uncertain admission.
+
 ## Licensing
 
 The adapter does not activate a trial or confirm an Automation License Manager dialog. The V8 API's `LicenseStatus` describes current license use; it does not establish that a floating license is available for a powered-off instance. An explicit bounded `PowerOn` call supplies Siemens' documented licensing result. A license error is returned as a prerequisite failure. Trial or Test Suite-only warnings are rejected; an adapter-owned instance is powered off when a returned warning prevents continued operation. No automatic license purchase, install or activation is attempted.

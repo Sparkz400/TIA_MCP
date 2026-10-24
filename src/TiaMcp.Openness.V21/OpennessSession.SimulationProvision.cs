@@ -88,7 +88,19 @@ namespace TiaMcp.Openness.V21
             VerifySimulationProvisionChild(storage, card, true);
             VerifySimulationProvisionChild(storage, stagedCard, false);
             VerifySimulationProvisionChild(storage, emptyCardBackup, false);
+            var recoveryBaseline = new JObject {
+                ["schemaVersion"] = 1, ["project"] = ProjectInfo(plc.Project),
+                ["projectArchivePath"] = SimulationProvisionCheckpointPath(storage, plc.Project.IsModified),
+                ["projectArchive"] = null, ["nativeScope"] = _sharedMutationScope.DeepClone(),
+                ["markerSha256"] = SharedMutationHash(marker),
+                ["generatedCardReportSha256"] = SharedMutationHash(downloaded),
+                ["generatedCardReportHashPolicy"] = "SHA-256 of ordinal-key-sorted compact Newtonsoft JSON; array order preserved",
+                ["storageMetadata"] = SimulationProvisionTreeMetadata(storage),
+                ["originalCardManifest"] = expectedFiles.DeepClone(),
+                ["opaqueStorageContentsRead"] = false, ["fullStorageBytePreservationVerified"] = false,
+                ["independentAfterStateVerified"] = false };
             var report = Envelope();
+            report["recoveryBaseline"] = recoveryBaseline;
             report["origin"] = "TIA Portal V21 Openness / owned PLCSIM Advanced V8 credential provisioning";
             report["route"] = "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
             report["project"] = ProjectInfo(plc.Project);
@@ -161,6 +173,7 @@ namespace TiaMcp.Openness.V21
                         ["storagePath"] = storage, ["originalCardPath"] = card, ["stagedProtectedCardPath"] = stagedCard,
                         ["emptyCardBackupPath"] = emptyCardBackup, ["originalProgramRevision"] = revision,
                         ["originalCardManifest"] = phase == "beforeStageProtectedCard" ? expectedFiles.DeepClone() : null,
+                        ["recoveryBaseline"] = phase == "attemptPrepared" || phase == "beforeProjectArchive" || phase == "afterProjectArchive" ? recoveryBaseline.DeepClone() : null,
                         ["cardMove"] = phase == "cardMove" ? report["cardMoves"]?.Last?.DeepClone() : null,
                         ["tlsVerification"] = phase.StartsWith("tlsVerification", StringComparison.Ordinal) ? report["tlsVerification"]?.DeepClone() : null,
                         ["credentialOpened"] = report["credentialOpened"].DeepClone(),
@@ -207,6 +220,9 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("UnsupportedCapability", "The selected scratch CPU has no OnlineProvider service.");
                     if (provider.State != OnlineState.Offline)
                         throw new BridgeException("OfflineRequired", "The selected scratch CPU must be offline before configuring the explicit PLCSIM connection.");
+                    report["stage"] = "captureRecoveryBaseline";
+                    SimulationProvisionProjectCheckpoint(plc.Project, recoveryBaseline, checkpoint);
+                    VerifySimulationProvisionIdentity(instance, marker, true);
                     // Establish absence before this exact owned CPU is started.
                     // PLCSIM can share Softbus with other simulator products; the
                     // Advanced registration list alone does not exclude them.
@@ -1068,25 +1084,6 @@ namespace TiaMcp.Openness.V21
                     ["notBeforeUtc"] = publicCertificate.NotBefore.ToUniversalTime().ToString("O"),
                     ["notAfterUtc"] = publicCertificate.NotAfter.ToUniversalTime().ToString("O"),
                     ["publicDerBytes"] = publicDer.Length };
-        }
-
-        private static void VerifySimulationProvisionChild(string storage, string path, bool mustExist)
-        {
-            SimulationTicket.VerifyPlainDirectory(storage);
-            string root = Path.GetFullPath(storage).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            string child = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            if (!Directory.Exists(root) || !string.Equals(Path.GetDirectoryName(child), root, StringComparison.OrdinalIgnoreCase))
-                throw new BridgeException("SimulationProvisionStorageScopeInvalid", "Program-card staging is restricted to direct children of the exact owned local storage directory.");
-            var entries = new DirectoryInfo(root).EnumerateFileSystemInfos().Where(entry =>
-                string.Equals(entry.FullName, child, StringComparison.OrdinalIgnoreCase)).Take(2).ToArray();
-            if (mustExist)
-            {
-                if (entries.Length != 1 || !(entries[0] is DirectoryInfo) || (entries[0].Attributes & FileAttributes.ReparsePoint) != 0)
-                    throw new BridgeException("SimulationProvisionStorageScopeInvalid", "The program-card source must be one existing plain directory within owned storage.");
-                SimulationTicket.VerifyPlainDirectory(child);
-            }
-            else if (entries.Length != 0)
-                throw new BridgeException("SimulationProvisionStorageCollision", "A staging or restoration destination already exists. Existing files and directories are never overwritten.");
         }
 
         private static void VerifySimulationProvisionTree(string path)

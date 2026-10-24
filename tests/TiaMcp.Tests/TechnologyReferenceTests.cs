@@ -197,6 +197,9 @@ namespace Siemens.Engineering
 {
     internal sealed class Project
     {
+        internal bool IsModified;
+        internal Action<DirectoryInfo, string, ProjectArchivationMode>? ArchiveAction;
+        internal void Archive(DirectoryInfo directory, string name, ProjectArchivationMode mode) => ArchiveAction!(directory, name, mode);
         internal string Name = "Fixture";
         internal IEnumerable<HW.Device> Devices = [];
         internal HW.DeviceUserGroup UngroupedDevicesGroup = new();
