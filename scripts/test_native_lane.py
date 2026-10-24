@@ -2,6 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import os
+import subprocess
 import sys
 
 from native_lane import acquire, release, run
@@ -28,6 +30,17 @@ class NativeLaneTests(unittest.TestCase):
             self.assertEqual(0, code)
             self.assertFalse(lock.exists())
             self.assertEqual(3, run("lane-a", [sys.executable, "-c", "import sys; sys.exit(3)"], lock=lock))
+            self.assertFalse(lock.exists())
+
+
+    def test_cli_run_executes_the_command(self):
+        with tempfile.TemporaryDirectory() as directory:
+            lock = Path(directory, "native-lane.lock")
+            script = Path(__file__).with_name("native_lane.py")
+            done = subprocess.run([sys.executable, str(script), "run", "--owner", "probe", "--", sys.executable, "-c", "print('ran')"],
+                                  capture_output=True, text=True, env={**os.environ, "TIA_MCP_NATIVE_LANE_LOCK": str(lock)})
+            self.assertEqual(0, done.returncode, done.stderr)
+            self.assertIn("ran", done.stdout)
             self.assertFalse(lock.exists())
 
 
