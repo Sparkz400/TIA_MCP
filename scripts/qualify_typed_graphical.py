@@ -29,7 +29,8 @@ from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRu
 
 
 class Audit(NativeAudit):
-    ALLOWED_TOOLS = NativeAudit.ALLOWED_TOOLS | {"change_restore", "engineering_read", "project_open", "project_inventory", "project_retrieve", "software_inspect", "artifact_read", "tia_capabilities", "type_read", "tag_table_read"}
+    # The owned session's audit drops NativeAudit's optional tools, so runtime provisioning is listed explicitly.
+    ALLOWED_TOOLS = NativeAudit.ALLOWED_TOOLS | NativeAudit.OPTIONAL_TOOLS | {"change_restore", "engineering_read", "project_open", "project_inventory", "project_retrieve", "software_inspect", "artifact_read", "tia_capabilities", "type_read", "tag_table_read"}
 
 
 def native_hash(xml):
