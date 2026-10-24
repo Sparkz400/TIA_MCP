@@ -117,9 +117,14 @@ def verify_owned_instance(instance):
 
 
 def verify_download(download, instance):
-    errors = download.get("download", {}).get("errors")
-    if download.get("completed") is not True or type(errors) is not int or errors != 0:
+    from compilation_evidence import require_successful_result
+    if not isinstance(download, dict) or download.get("completed") is not True or "failure" in download:
         raise RuntimeError("Memory-card download did not complete successfully.")
+    try:
+        for field in ("compilation", "download"):
+            require_successful_result(download.get(field), error_count_field="errors", truncated_field="truncated")
+    except RuntimeError as error:
+        raise RuntimeError("Memory-card download did not complete with successful, complete diagnostics.") from error
     if (type(download.get("instanceId")) is not int or download["instanceId"] != instance["id"]
             or download.get("instanceName") != instance["name"]):
         raise RuntimeError("Downloaded program targets a different simulator.")

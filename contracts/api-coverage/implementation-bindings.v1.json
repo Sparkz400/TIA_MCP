@@ -2352,8 +2352,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
-      "sha256": "8db86f2fd5f53016371c9d524d4e857f7ec047d34c9fd8103e53ed5279d04664",
-      "bytes": 17595
+      "sha256": "e7b027ebc2e14f929a3f839798b00e4cb4957c65d60fa256bedb3449a3f216d0",
+      "bytes": 17654
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationCredentials.cs",
@@ -2367,8 +2367,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "7e178e9ed729cd0c347c8ae85150d1c2c6cadfa59f56422bd1737384b401d2e9",
-      "bytes": 94442
+      "sha256": "51711bd75d78afb3b60be9bd58c10e520fe1bba33fb1c8cc0749c952ec371b86",
+      "bytes": 94298
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologyConnections.cs",
@@ -2534,6 +2534,11 @@
       "path": "src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs",
       "sha256": "9a9c5c7bed377d3b09d5a7ad11042fc9de6c27933742198b1651183b88bd26f3",
       "bytes": 3565
+    },
+    {
+      "path": "src/TiaMcp.Openness.V21/SimulationDownloadEvidenceRules.cs",
+      "sha256": "f26d77d3c55d4594a91f4818b74a93cfbc0261867368e16c276ecf1c1699452d",
+      "bytes": 1039
     },
     {
       "path": "src/TiaMcp.Openness.V21/TechnologyBlockMembership.cs",
@@ -49688,7 +49693,7 @@
               "name": "SimulationDownload",
               "line": 23,
               "endLine": 167,
-              "sha256": "8aaf22d2448ae099f4ed5e5f6eae455899a7147de73f24dfaf6717ffb8e834fe"
+              "sha256": "d9212c07d190a8bce5a2d2621a8c435eb1dc635348131b6c162c31ed41675f8a"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -49771,8 +49776,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
               "name": "SimulationProvision",
               "line": 27,
-              "endLine": 798,
-              "sha256": "2c7c533bc17c4148380907974aa999b229fb1e681578d9554a8d5d3f8a6b82b6"
+              "endLine": 797,
+              "sha256": "b90c379d331a92933a103ae4f9ac51858283cb8c969f02289b280959606985b7"
             }
           ],
           "reviewState": "static_dispatch_bound",

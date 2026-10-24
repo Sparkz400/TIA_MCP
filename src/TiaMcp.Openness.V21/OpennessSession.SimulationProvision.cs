@@ -63,8 +63,7 @@ namespace TiaMcp.Openness.V21
             if (File.Exists(provisionClaimPath) || Directory.Exists(provisionClaimPath))
                 throw new BridgeException("SimulationProvisionAlreadyAttempted", "This owned instance already has a credential-provisioning claim. A fresh owned instance and generated card are required; automatic credential retries are not allowed.");
             var downloaded = ReadSimulationCredentialJson(Path.Combine(storage, "simulation-download.json"), 16 * 1024 * 1024);
-            if (downloaded.Value<bool?>("completed") != true || downloaded.Value<int?>("instanceId") != marker.Value<int?>("instanceId") ||
-                downloaded.Value<string>("instanceName") != marker.Value<string>("instanceName") ||
+            if (!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(downloaded, marker) ||
                 downloaded.Value<string>("plcPath") != plc.Path ||
                 downloaded["project"]?.Value<string>("name") != plc.Project.Name ||
                 !SameSimulationPath(downloaded["project"]?.Value<string>("path"), plc.Project.Path.FullName) ||

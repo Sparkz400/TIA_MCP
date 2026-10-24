@@ -93,6 +93,48 @@ Check("retained exception evidence never becomes compiler success", () => {
     var evidence = Aggregate(Target()); evidence["error"] = "native failure"; Assert(!CompilationEvidenceRules.IsSuccessful(evidence));
     Assert(!CompilationEvidenceRules.IsSuccessful(null)); Assert(!CompilationEvidenceRules.IsSuccessfulTarget(null));
 });
+JObject DownloadResult() => new JObject { ["state"] = "Success", ["errors"] = 0, ["truncated"] = false,
+    ["messages"] = new JArray(new JObject { ["state"] = "Information", ["errors"] = 0 }) };
+JObject Download() => new JObject { ["completed"] = true, ["instanceId"] = 0, ["instanceName"] = "owned",
+    ["compilation"] = DownloadResult(), ["download"] = DownloadResult() };
+var marker = new JObject { ["instanceId"] = 0, ["instanceName"] = "owned" };
+Check("provisioning accepts complete download evidence for the exact zero-ID instance", () => {
+    foreach (string state in new[] { "Success", "Information", "Warning" }) {
+        var report = Download(); report["download"]["state"] = state; var before = report.DeepClone();
+        Assert(SimulationDownloadEvidenceRules.IsSuccessfulForInstance(report, marker));
+        Assert(JToken.DeepEquals(before, report));
+    }
+});
+Check("provisioning refuses completion and identity coercions", () => {
+    foreach (JToken value in new JToken[] { new JValue(1), new JValue("true"), new JValue(false), JValue.CreateNull() }) {
+        var report = Download(); report["completed"] = value;
+        Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(report, marker));
+    }
+    foreach (JToken value in new JToken[] { new JValue(false), new JValue(0.0), new JValue("0"), new JValue(-1), new JValue(1), JValue.CreateNull() }) {
+        var report = Download(); report["instanceId"] = value;
+        Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(report, marker));
+    }
+    foreach (string field in new[] { "completed", "instanceId", "instanceName" }) {
+        var report = Download(); report.Remove(field); Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(report, marker));
+    }
+    var wrongName = Download(); wrongName["instanceName"] = "other"; Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(wrongName, marker));
+});
+Check("provisioning refuses missing failed truncated and contradictory diagnostics", () => {
+    foreach (string field in new[] { "compilation", "download" }) {
+        foreach (JToken value in new JToken[] { null, JValue.CreateNull(), new JArray(), new JObject(),
+            new JObject { ["errors"] = 0 }, new JObject(DownloadResult()) { ["state"] = "Error" },
+            new JObject(DownloadResult()) { ["state"] = "Unknown" }, new JObject(DownloadResult()) { ["truncated"] = true },
+            new JObject(DownloadResult()) { ["truncated"] = "false" }, new JObject(DownloadResult()) { ["errors"] = false },
+            new JObject(DownloadResult()) { ["errors"] = 0.0 }, new JObject(DownloadResult()) { ["errors"] = 1 },
+            new JObject(DownloadResult()) { ["messages"] = new JArray(new JObject { ["state"] = "Error" }) },
+            new JObject(DownloadResult()) { ["messages"] = new JArray(new JObject { ["state"] = "Information", ["children"] = new JArray(new JObject { ["state"] = "Error" }) }) } }) {
+            var report = Download(); if (value == null) report.Remove(field); else report[field] = value;
+            Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(report, marker));
+        }
+    }
+    var failedReport = Download(); failedReport["failure"] = JValue.CreateNull();
+    Assert(!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(failedReport, marker));
+});
 if (args.Length == 1 && failed == 0)
 {
     var flat = Target(); flat.Remove("target");

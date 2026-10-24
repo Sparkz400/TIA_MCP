@@ -67,7 +67,8 @@ class Simulator:
         if tool == "sim_create":
             return {"instance": {"id": 0, "name": "owned", "owned": True, "operatingState": "Off"}, "downloadTicket": "TOP-SECRET-TICKET"}
         if tool == "simulation_download":
-            return {"completed": True, "download": {"errors": self.download_errors}, "instanceId": self.download_id,
+            return {"completed": True, "download": {"state": "Success", "errors": self.download_errors, "truncated": False, "messages": []},
+                    "compilation": {"state": "Success", "errors": 0, "truncated": False, "messages": []}, "instanceId": self.download_id,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
                     "reportPath": str(self.storage / "simulation-download.json"), "memoryCardPath": str(self.storage / "SIMATIC_MC")}
         if tool == "simulation_provision_scratch_credential":
@@ -517,7 +518,8 @@ class BaselineCliTests(unittest.TestCase):
             path.write_text("fixture", encoding="utf-8")
         report_path = root / "report.json"
         events, requests = [], []
-        download = {"completed": True, "download": {"errors": 0}, "instanceId": 0,
+        download = {"completed": True, "download": {"state": "Success", "errors": 0, "truncated": False, "messages": []},
+                    "compilation": {"state": "Success", "errors": 0, "truncated": False, "messages": []}, "instanceId": 0,
                     "instanceName": "owned", "programRevision": "a" * 64, "files": [],
                     "reportPath": str(root / "simulation-download.json"), "memoryCardPath": str(root / "SIMATIC_MC"),
                     **(download_overrides or {})}
@@ -628,6 +630,32 @@ class BaselineCliTests(unittest.TestCase):
                 self.assertFalse(report["completed"])
                 for tool in ("simulation_download", "sim_state", "sim_release"):
                     self.assertNotIn(tool, events)
+
+    def test_incomplete_download_diagnostics_stop_both_modes_before_power_on(self):
+        clean = {"state": "Success", "errors": 0, "truncated": False, "messages": []}
+        defects = [None, {}, {"errors": 0}, {**clean, "state": "Error"}, {**clean, "state": "Unknown"},
+                   {**clean, "truncated": True}, {**clean, "truncated": "false"}, {**clean, "messages": None},
+                   {**clean, "messages": [{"state": "Error"}]},
+                   {**clean, "messages": [{"state": "Information", "children": [{"state": "Error"}]}]}]
+        for provision in (False, True):
+            for field in ("compilation", "download"):
+                for value in defects:
+                    with self.subTest(provision=provision, field=field, value=value), temporary_directory() as directory:
+                        code, report, events, _ = self.run_baseline(pathlib.Path(directory), provision=provision,
+                            download_overrides={field: value}, expected_card_verifications=0)
+                        self.assertEqual(1, code)
+                        self.assertFalse(report["completed"])
+                        self.assertNotIn("sim_state", events)
+                        self.assertNotIn("simulation_provision_scratch_credential", events)
+
+    def test_complete_download_diagnostics_preserve_success_information_and_warning(self):
+        for state in ("Success", "Information", "Warning"):
+            with self.subTest(state=state), temporary_directory() as directory:
+                result = {"state": state, "errors": 0, "truncated": False, "messages": [{"state": state}]}
+                code, report, _, _ = self.run_baseline(pathlib.Path(directory),
+                    download_overrides={"download": result, "compilation": result})
+                self.assertEqual(0, code)
+                self.assertTrue(report["completed"])
 
     def test_tls_first_use_flag_is_recorded_and_passed_only_to_provisioning(self):
         with temporary_directory() as directory:

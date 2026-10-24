@@ -7,26 +7,30 @@ STATES = frozenset({'Success', 'Information', 'Warning'})
 BASELINE_POLICY = 'checkpointed-plc-baseline-v1'
 
 
+def require_successful_result(result, *, error_count_field='errorCount', truncated_field='messagesTruncated'):
+    require(isinstance(result, dict) and isinstance(result.get('state'), str) and result['state'] in STATES
+            and type(result.get(error_count_field)) is int and result[error_count_field] == 0
+            and 'error' not in result and result.get(truncated_field) is False,
+            'Native results require successful state and complete explicit diagnostics.')
+    def messages(rows, depth=0):
+        require(depth <= 64 and isinstance(rows, list), 'Complete native message arrays are required.')
+        for row in rows:
+            require(isinstance(row, dict) and isinstance(row.get('state'), str) and row['state'] in STATES,
+                    'Every native message requires a known non-error state.')
+            if 'children' in row:
+                messages(row['children'], depth + 1)
+    messages(result.get('messages'))
+
+
 def require_clean_compile(receipt, *, expected_targets=None):
     require(isinstance(receipt, dict) and type(receipt.get('errorCount')) is int and receipt['errorCount'] == 0
             and 'error' not in receipt and isinstance(receipt.get('targets'), list) and receipt['targets'],
             'Complete native compile targets and an explicit zero error count are required.')
 
-    def messages(rows, depth=0):
-        require(depth <= 64 and isinstance(rows, list), 'Complete compiler message arrays are required.')
-        for row in rows:
-            require(isinstance(row, dict) and isinstance(row.get('state'), str) and row['state'] in STATES,
-                    'Every compiler message requires a known non-error state.')
-            if 'children' in row:
-                messages(row['children'], depth + 1)
-
     for target in receipt['targets']:
-        require(isinstance(target, dict) and isinstance(target.get('target'), str) and target['target'].strip()
-                and isinstance(target.get('state'), str) and target['state'] in STATES
-                and type(target.get('errorCount')) is int and target['errorCount'] == 0
-                and 'error' not in target and target.get('messagesTruncated') is False,
-                'Named native targets require successful state and complete explicit diagnostics.')
-        messages(target.get('messages'))
+        require(isinstance(target, dict) and isinstance(target.get('target'), str) and target['target'].strip(),
+                'Named native targets are required.')
+        require_successful_result(target)
 
     device_scope = 'targetIdentityPolicy' in receipt or 'requiredTargets' in receipt or any('targetPath' in row for row in receipt['targets'])
     if device_scope:

@@ -3,5 +3,6 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CompilationEvidenceRules.cs" Link="CompilationEvidenceRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/SimulationDownloadEvidenceRules.cs" Link="SimulationDownloadEvidenceRules.cs" />
   </ItemGroup>
 </Project>

@@ -130,8 +130,8 @@ namespace TiaMcp.Openness.V21
                 SimulationDownloadMessages(download.Messages, messages, messageBudget, 0);
                 report["download"] = new JObject { ["state"] = download.State.ToString(), ["errors"] = download.ErrorCount,
                     ["warnings"] = download.WarningCount, ["messages"] = messages, ["truncated"] = messageBudget.Truncated };
-                if (download.ErrorCount != 0 || download.State == DownloadResultState.Error)
-                    throw new BridgeException("SimulationDownloadFailed", "TIA reported errors while generating the simulated memory card.", report);
+                if (!CompilationEvidenceRules.IsSuccessfulTarget((JObject)report["download"], "errors", "truncated"))
+                    throw new BridgeException("SimulationDownloadFailed", "TIA reported errors or incomplete diagnostic evidence while generating the simulated memory card.", report);
                 VerifySimulationIdentity(instance, marker);
                 var files = SimulationCardFiles(card);
                 if (files.Count == 0) throw new BridgeException("EmptySimulationMemoryCard", "TIA returned without producing memory-card files.");

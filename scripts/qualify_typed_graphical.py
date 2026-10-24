@@ -128,6 +128,7 @@ def run_case(case, args, output):
             pathlib.Path(__file__).with_name("typed_graphical_native_expectations.py").resolve(),
             pathlib.Path(__file__).with_name("typed_graphical_runtime_preservation.py").resolve(),
             pathlib.Path(__file__).with_name("block_test_runtime.py").resolve(),
+            pathlib.Path(__file__).with_name("compilation_evidence.py").resolve(),
             pathlib.Path(__file__).with_name("block_test_executor.py").resolve(),
             pathlib.Path(__file__).with_name("block_test_program.py").resolve(),
             ROOT / "fixtures/typed-graphical/extended_behavior.py",

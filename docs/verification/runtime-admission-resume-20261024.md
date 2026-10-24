@@ -135,6 +135,53 @@ baseline and fresh independent project/storage observations before reconciliatio
 Existing watch/component captures cover bounded fixtures, not a generic whole
 project. No old reservation is released and no native operation is replayed.
 
+## Generated-card evidence admission
+
+The native provisioning preflight previously converted JSON completion and instance
+ID values to Boolean/integer types and accepted the report without checking its
+compilation or download diagnostics. The card producer also accepted a zero-error
+download summary with truncated diagnostics. Both Python runtime entry points
+checked the error count but not diagnostic completeness.
+
+The producer now uses the existing strict diagnostic evaluator. Provisioning
+requires an actual Boolean completion, integer instance identity, exact owned
+name, and complete successful compilation and download diagnostics before card
+staging or CPU startup. The runtime backend and standalone validator share the
+same Python result checks as the compiler validator. Unknown/Error states,
+truncation, missing arrays and nested Error messages refuse. Complete Success,
+Information and warning-only results remain eligible. Typed qualification records
+also pin the newly consumed diagnostic helper. No diagnostic is rewritten and no
+historical report is promoted.
+
+The original native preflight predicate, extracted unchanged into the shared
+helper, fails both new regression groups (`download-evidence-before.log`). The
+Python regression records 36 failing subcases before the repair
+(`download-runtime-before.log`): incomplete reports reach card verification instead
+of stopping before startup. After repair, all 14 managed evidence groups pass on
+both .NET 10 and .NET Framework 4.8; all 184 block-test tests pass with one existing
+skip, and all 14 compiler-evidence tests pass. The V21 worker builds with zero
+warnings/errors and its compiled lifecycle guard passes. Logs are retained under
+`artifacts/todo-resume-20261024/` with `download-` prefixes.
+
+The broader Python regression also passes all 1,944 tests with one existing skip
+(`download-python-all.log`). This is the Python suite, not a repeat of the complete
+managed/Host/package aggregate. All 77 typed-graphical caller tests also pass after
+the recorded-helper update (`download-typed-callers.log`).
+
+Context7 lookup failed because its executable was unavailable. The installed V21
+`Siemens.Engineering.Base.xml`, members `DownloadResultState.Success`,
+`.Information`, `.Warning` and `.Error`, confirms the result states used here.
+The initial attempt to override the portable test project's framework failed at
+restore; a separate retained framework test project then built and ran the exact
+same production helpers and assertions successfully. Neither helper run loads
+Siemens or starts a PLC.
+
+The refreshed implementation bindings validate, preserving all historical evidence
+rows; 106 historical inputs remain unavailable locally and release acceptance is
+false (`download-bindings.json`). This fixes a prerequisite evidence boundary, not
+trusted provisioning reconciliation. Complete before-state project/storage capture,
+independent after-state verification, discovery and native lifecycle remain open.
+
 ## Remaining work
 
 The reviewed placeholder exclusion is already in public `main` through `54f0237`;
