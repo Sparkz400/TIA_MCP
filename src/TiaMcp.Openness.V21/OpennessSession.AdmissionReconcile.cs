@@ -60,9 +60,10 @@ namespace TiaMcp.Openness.V21
 
         private void AdmissionReconcileChange(AdmissionReconcileCheck check, string operation)
         {
-            var journalRow = check.Row("legacyJournalCheckpointOutput");
-            if (journalRow == null || Path.GetFileName(journalRow.Value<string>("path")).StartsWith("change-lib-", StringComparison.Ordinal))
-            { check.HoldAll("Library change reconciliation is not implemented; the legacy journal must be inspected."); return; }
+            var journalRow = check.Row("legacyJournalCheckpointOutput") ?? check.Row("legacyRecoveryJournal");
+            if (journalRow == null) { check.HoldAll("The admission has no change journal resource."); return; }
+            if (Path.GetFileName(journalRow.Value<string>("path")).StartsWith("change-lib-", StringComparison.Ordinal))
+            { AdmissionReconcileLibraryChange(check, operation, journalRow); return; }
             string directory = journalRow.Value<string>("path"), journalPath = Path.Combine(directory, "journal.json");
             if (!File.Exists(journalPath) || new FileInfo(journalPath).Length > 8 * 1024 * 1024) { check.HoldAll("The change journal is missing or too large."); return; }
             var journal = JObject.Parse(File.ReadAllText(journalPath));
@@ -220,6 +221,12 @@ namespace TiaMcp.Openness.V21
             { _session = session; _rows = rows; _retrieveRoot = retrieveRoot; AdmittedAt = admittedAt; }
 
             internal JObject Row(string effect) => _rows.OfType<JObject>().SingleOrDefault(r => r.Value<string>("effect") == effect);
+            internal JObject[] Rows(string effect) => _rows.OfType<JObject>().Where(r => r.Value<string>("effect") == effect).ToArray();
+            internal string NextRetrieveDirectory()
+            {
+                string target = Path.Combine(_retrieveRoot, (_retrievals++).ToString(CultureInfo.InvariantCulture));
+                Directory.CreateDirectory(target); return target;
+            }
             internal void Prove(JObject row, string disposition, string basis) { row["disposition"] = disposition; row["basis"] = basis; }
             internal void Hold(JObject row, string reason) { row["disposition"] = null; ((JArray)row["reasons"]).Add(reason); }
             internal void HoldAll(string reason) { foreach (JObject row in _rows) Hold(row, reason); }
@@ -227,11 +234,13 @@ namespace TiaMcp.Openness.V21
 
             internal void NotWrittenSince(JObject row, string basis)
             {
+                // A directory counts by its newest file; a missing path or a later write holds.
                 string path = row.Value<string>("path");
-                if (!File.Exists(path)) { Hold(row, "The file is missing."); return; }
-                var written = File.GetLastWriteTimeUtc(path);
+                var files = File.Exists(path) ? new[] { path } : Directory.Exists(path) ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Take(100001).ToArray() : new string[0];
+                if (files.Length == 0 || files.Length > 100000) { Hold(row, "The file or directory is missing, empty or too large to inspect."); return; }
+                var written = files.Max(File.GetLastWriteTimeUtc);
                 Evidence(row, "lastWriteUtc", written.ToString("O"));
-                if (written < AdmittedAt) Prove(row, "unchanged", basis); else Hold(row, "The file was written after admission.");
+                if (written < AdmittedAt) Prove(row, "unchanged", basis); else Hold(row, "A file was written after admission.");
             }
 
             internal void NotSavedSince(JObject row, string basis)
@@ -272,10 +281,9 @@ namespace TiaMcp.Openness.V21
             /// <summary>Retrieves an archive into a new reconcile directory and returns its location-independent fingerprint.</summary>
             internal string ArchiveFingerprint(JObject row, string archive)
             {
-                string target = Path.Combine(_retrieveRoot, (_retrievals++).ToString(CultureInfo.InvariantCulture));
                 try
                 {
-                    Directory.CreateDirectory(target);
+                    string target = NextRetrieveDirectory();
                     var copy = _session._portal.Projects.Retrieve(new FileInfo(archive), new DirectoryInfo(target));
                     try { string value = _session.EngineeringFingerprint(new EngineeringChange { Kind = "admission_reconcile" }, copy, true); Evidence(row, "archiveFingerprint", value); return value; }
                     finally { copy.Close(); }
@@ -283,15 +291,21 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) { Hold(row, "The archive could not be retrieved for comparison: " + error.Message); return null; }
             }
 
-            /// <summary>A new destination is unchanged when absent or empty; otherwise it must hold exactly one project proven complete.</summary>
-            internal void Destination(JObject row, Func<string> reference, string basis, Func<Project, bool> complete = null)
+            /// <summary>A new destination is unchanged when absent or empty (an intent record aside); otherwise it must hold exactly one project, or library, proven complete.</summary>
+            internal void Destination(JObject row, Func<string> reference, string basis, Func<Project, bool> complete = null, Func<string, bool> library = null)
             {
                 string root = row.Value<string>("path");
                 if (!Directory.Exists(root) && !File.Exists(root)) { Prove(row, "unchanged", "The new destination was never created."); return; }
-                if (Directory.Exists(root) && !Directory.EnumerateFileSystemEntries(root, "*", SearchOption.AllDirectories).Any())
-                { Prove(row, "unchanged", "The new destination exists but is empty; no content was created."); return; }
-                var projects = Directory.Exists(root) ? Directory.GetFiles(root, "*.ap21", SearchOption.AllDirectories) : new string[0];
-                if (projects.Length != 1) { Hold(row, "The destination holds partial content without exactly one project."); return; }
+                if (Directory.Exists(root) && !Directory.EnumerateFileSystemEntries(root, "*", SearchOption.AllDirectories)
+                    .Any(entry => !string.Equals(entry, Path.Combine(root, "recovery-intent.json"), StringComparison.OrdinalIgnoreCase)))
+                { Prove(row, "unchanged", "The new destination holds no content; no project or library was created."); return; }
+                var projects = Directory.Exists(root) ? Directory.GetFiles(root, library != null ? "*.al21" : "*.ap21", SearchOption.AllDirectories) : new string[0];
+                if (projects.Length != 1) { Hold(row, "The destination holds partial content without exactly one project or library."); return; }
+                if (library != null)
+                {
+                    if (library(projects[0])) Prove(row, "verifiedApplied", basis); else if (!((JArray)row["reasons"]).Any()) Hold(row, "The destination library differs from its checkpoint.");
+                    return;
+                }
                 if (complete != null)
                 {
                     bool proven = false;
