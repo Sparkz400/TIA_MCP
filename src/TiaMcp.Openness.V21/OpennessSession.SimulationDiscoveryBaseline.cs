@@ -69,7 +69,8 @@ namespace TiaMcp.Openness.V21
                 return classification != null && same;
             }, (attempt, ok, consecutive, elapsed) => { }, () => clock.ElapsedMilliseconds, delay => System.Threading.Thread.Sleep(delay));
             if (!stable)
-                throw new BridgeException("SimulationDiscoveryBaselineUnavailable", "Two consecutive identical snapshots showing nothing or only one all-zero Runtime Manager entry were not observed. No placeholder is accepted.");
+                throw new BridgeException("SimulationDiscoveryBaselineUnavailable", "Two consecutive identical snapshots showing nothing or only one all-zero Runtime Manager entry were not observed. No placeholder is accepted.",
+                    new JObject { ["observations"] = observations });
             if (!SimulationRuntimeManagerIdentity().Equals(manager))
                 throw new BridgeException("SimulationRuntimeManagerChanged", "The PLCSIM Advanced Runtime Manager process changed during the discovery baseline.");
             var evidence = new JObject {

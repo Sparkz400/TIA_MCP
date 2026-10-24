@@ -298,10 +298,10 @@ class Processes:
                        timeout_seconds=45, clock=time.monotonic):
         """Keep original handles and caller's store window until root cleanup/exit."""
         live_path = self.folder / "cleanup-live.json"
-        seen = set(); announced = False; deadline = None; deadline_recorded = False
+        seen = set(); announced = False; start = None; deadline_recorded = False
         while True:
             try:
-                if deadline is None: deadline = clock() + timeout_seconds
+                if start is None: start = now = clock()
                 if expected_native is not None:
                     if self.capture_incomplete: missing_capture()
                     try: self.collect()
@@ -310,9 +310,21 @@ class Processes:
                         missing_capture()
                     if not self.capture_complete(expected_native, expected_worker):
                         missing_capture()
-                if self.all_terminal(): return
-                if clock() >= deadline and not deadline_recorded:
-                    self.errors.append("Exact terminal deadline exceeded; late exit is cleanup only")
+                if self.all_terminal():
+                    # Exits not yet seen happened after the previous poll.
+                    for entry in list(self.entries.values()):
+                        entry.setdefault("terminalDeadlineSeconds", terminal_deadline_seconds(entry, timeout_seconds))
+                        entry.setdefault("observedExitSeconds", round(now - start, 1))
+                    return
+                now = clock()
+                for entry in list(self.entries.values()):
+                    entry.setdefault("terminalDeadlineSeconds", terminal_deadline_seconds(entry, timeout_seconds))
+                    if "observedExitSeconds" not in entry and entry["handle"].api.wait(entry["handle"]._handle, 0) == 0:
+                        entry["observedExitSeconds"] = round(now - start, 1)
+                late = [e for e in self.entries.values() if "observedExitSeconds" not in e and now - start >= e["terminalDeadlineSeconds"]]
+                if late and not deadline_recorded:
+                    self.errors.append("Exact terminal deadline exceeded; late exit is cleanup only: " +
+                                       ", ".join(sorted({e["identity"]["name"] for e in late})))
                     deadline_recorded = True
                 if not announced:
                     live = {"reason": reason, "anchor": self.anchor, "coordinator": identity(psutil.Process(os.getpid())),
@@ -427,6 +439,17 @@ class Processes:
                  "normalLifecyclePassed": not errors and not explicit_native_dispose and not self.forced, "projectLockReleaseVerified": False}
         save(self.folder / "process-exits.json", value)
         return value
+
+
+# Measured on this PC on 24 October 2026: in 16 headless runs the FileStorage server
+# exited 300.0-301.7 s after the terminal wait began (a fixed idle shutdown). It gets
+# that measured time plus a 60 s margin; every other owned process keeps the caller's deadline.
+FILE_STORAGE_SERVER = "Siemens.Automation.ObjectFrame.FileStorage.Server.exe"
+FILE_STORAGE_TERMINAL_SECONDS = 360
+
+
+def terminal_deadline_seconds(entry, default_seconds):
+    return max(default_seconds, FILE_STORAGE_TERMINAL_SECONDS) if entry["identity"]["name"] == FILE_STORAGE_SERVER else default_seconds
 
 
 class HostSession:

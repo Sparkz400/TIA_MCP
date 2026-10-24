@@ -460,6 +460,26 @@ class ForceCoordinatorTests(unittest.TestCase):
         self.assertTrue(any("deadline exceeded" in e for e in tracker.errors))
         self.assertFalse(tracker.finish()["completed"])
 
+    def test_file_storage_server_has_its_own_measured_deadline(self):
+        for times, portal_alive, late in (([0, 301], False, None), ([0, 361], False, force.FILE_STORAGE_SERVER),
+                                          ([0, 46], True, "Siemens.Automation.Portal.exe")):
+            with self.subTest(times=times, portal_alive=portal_alive):
+                tracker = self.cleanup_tracker()
+                tracker.entries[100]["handle"].api.wait.return_value = 0
+                tracker.entries[101]["handle"].api.wait.return_value = 258 if portal_alive else 0
+                storage = Mock(); storage.api.wait.return_value = 258
+                tracker.entries[102] = {"role": "native", "ancestry": [], "handle": storage,
+                                        "identity": {"pid": 102, "created": 1700000000, "name": force.FILE_STORAGE_SERVER}}
+                with (patch.object(tracker, "all_terminal", side_effect=[False, True]), patch.object(force.time, "sleep"),
+                      patch.object(force, "identity", return_value={"pid": 999})):
+                    tracker.await_terminal("synthetic natural exit", timeout_seconds=45, clock=Mock(side_effect=times))
+                errors = [e for e in tracker.errors if "deadline exceeded" in e]
+                self.assertEqual(bool(errors), late is not None)
+                if late: self.assertTrue(errors[0].endswith(late))
+                self.assertEqual(tracker.entries[102]["terminalDeadlineSeconds"], force.FILE_STORAGE_TERMINAL_SECONDS)
+                self.assertEqual(tracker.entries[101]["terminalDeadlineSeconds"], 45)
+                self.assertEqual(tracker.entries[102]["observedExitSeconds"], times[-1])
+
     def test_helper_launch_receipt_mismatch_holds_before_original_handle_release(self):
         run = object.__new__(force.Coordinator); run.evidence = []; run.folder = self.root
         run.args = SimpleNamespace(timeout=30, ui_timeout_minutes=1)

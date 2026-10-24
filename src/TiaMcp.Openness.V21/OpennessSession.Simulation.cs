@@ -161,9 +161,38 @@ namespace TiaMcp.Openness.V21
             finally
             {
                 // Cleanup errors must not hide the primary compile/download result.
-                try { instance?.Dispose(); } // IInstance release does not unregister the CPU.
+                try { RetainSimulationInterface(instance); } // Not disposing does not unregister the CPU either.
                 catch (Exception ex) { Console.Error.WriteLine("Simulation download interface release: " + ex.Message); }
             }
+        }
+
+        // PLCSIM's CInstanceNet Dispose once raised an AccessViolationException right after a completed
+        // download, killing the worker (frozen runtime run, 24 Oct 2026). Holding interfaces until worker
+        // exit kept the instance's Softbus endpoint visible after unregistration, which blocked the next
+        // case's discovery baseline. So interfaces are held (without finalization) only until this worker
+        // next powers the instance off, released there before any unregistration, and at worker exit.
+        private static readonly List<IInstance> RetainedSimulationInterfaces = new List<IInstance>();
+
+        private static void RetainSimulationInterface(IInstance instance)
+        {
+            if (instance == null) return;
+            lock (RetainedSimulationInterfaces) RetainedSimulationInterfaces.Add(instance);
+            GC.SuppressFinalize(instance);
+        }
+
+        /// <summary>Disposes every held interface; an access violation is reported, not fatal.</summary>
+        [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions, System.Security.SecurityCritical]
+        private static JArray ReleaseRetainedSimulationInterfaces()
+        {
+            var receipts = new JArray();
+            IInstance[] held;
+            lock (RetainedSimulationInterfaces) { held = RetainedSimulationInterfaces.ToArray(); RetainedSimulationInterfaces.Clear(); }
+            foreach (var instance in held)
+            {
+                try { instance.Dispose(); receipts.Add(new JObject { ["released"] = true }); }
+                catch (Exception ex) { receipts.Add(new JObject { ["released"] = false, ["exceptionType"] = ex.GetType().FullName }); }
+            }
+            return receipts;
         }
 
         private void RetainSimulationRuntimeUntilWorkerExit()
@@ -176,6 +205,7 @@ namespace TiaMcp.Openness.V21
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private static void ShutdownSimulationRuntime()
         {
+            ReleaseRetainedSimulationInterfaces();
             if (SimulationRuntimeManager.IsInitialized) SimulationRuntimeManager.Shutdown();
         }
 
@@ -186,7 +216,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("SimulationTargetMismatch", "The exact adapter-owned instance is no longer registered locally.");
             var instance = SimulationRuntimeManager.CreateInterface(id);
             try { VerifySimulationIdentity(instance, marker); return instance; }
-            catch { instance.Dispose(); throw; }
+            catch { RetainSimulationInterface(instance); throw; }
         }
 
         private static void VerifySimulationIdentity(IInstance instance, JObject marker)

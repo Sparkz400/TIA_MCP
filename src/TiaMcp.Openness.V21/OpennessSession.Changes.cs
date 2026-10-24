@@ -931,11 +931,13 @@ namespace TiaMcp.Openness.V21
             return blocks.FirstOrDefault();
         }
 
-        private string EngineeringFingerprint(EngineeringChange change, Project project)
+        // locationIndependent omits only the project location and save state, to compare a retrieved archive copy with its original.
+        private string EngineeringFingerprint(EngineeringChange change, Project project, bool locationIndependent = false)
         {
             change.FingerprintCoverage = null;
             var snapshot = new JObject { ["fingerprintPolicyVersion"] = 2, ["projectPath"] = project.Path.FullName, ["lastModified"] = project.LastModified.ToString("O"), ["isModified"] = project.IsModified,
                 ["simulationDuringBlockCompilationEnabled"] = project.GetService<PlcSimulationSettingsProvider>()?.IsSimulationDuringBlockCompilationEnabled };
+            if (locationIndependent) { snapshot.Remove("projectPath"); snapshot.Remove("lastModified"); snapshot.Remove("isModified"); }
             var hardware = new JArray();
             var software = new JArray();
             var safetyStates = new JArray();

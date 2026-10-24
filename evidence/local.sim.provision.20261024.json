@@ -1,0 +1,83 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.sim.provision.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T10:11:03+00:00",
+  "source": {
+    "commit": "ed3584e3b34c0542f056f71fa47a7017e6cb2741",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/validate_simulation.py --provision-runtime-credential --trust-owned-empty-cpu-certificate on the saved scratch project from a fresh validate_milestones.py run: owned TIA V21 start, project_open, discovery baseline, owned CPU1511 creation, simulation_download to a generated protected card, generated-state save, runtime credential provisioning with identity reads from a fresh discovery-only observer Portal (endpoint 192.168.0.1 in the first sample; observer project closed, Portal disposed, process exit 0 verified), card restored, power-on, RUN, tag listing, read/write and a stimulus scenario whose assertions all passed, owned release and detach.",
+  "limitations": [
+    "One scratch fixture and one simple stimulus scenario; this is not the 65-case runtime suite.",
+    "Project preservation after provisioning is not independently verified, so simulation_provision_scratch_credential stays unverified (AC-preserve).",
+    "First-use TLS trust was granted under the explicit owned-empty-CPU policy for this attempt only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a1e4f8da302793a0ae95d2a67164cd9700f3e082283e880d0c65a4b1f84eb889"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f356e4b8be51385cd7cce7c3fe119af765613db9ab171e37cb089619b6bdfe23"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "c4e48318d17b3b053d1f40406da4d06b4ed5b72337bc3f8898fbce81fdab5d8c"
+    }
+  ],
+  "runs": [
+    {
+      "report": "provision2.json",
+      "sha256": "05a7e9ba275ba8dfda65ce009d4c4287b44180daa3f5b0466030d7ece44fb117",
+      "bytes": 302460,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_open",
+        "sim_status",
+        "simulation_discovery_baseline",
+        "sim_create",
+        "simulation_download",
+        "change_prepare",
+        "change_apply",
+        "simulation_provision_scratch_credential",
+        "sim_state",
+        "sim_state",
+        "sim_tags",
+        "sim_read",
+        "sim_write",
+        "sim_read",
+        "sim_test"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_status",
+        "sim_tags",
+        "sim_test",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

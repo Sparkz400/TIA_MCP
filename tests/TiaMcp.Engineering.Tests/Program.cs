@@ -64,5 +64,6 @@ ProductionRecoveryChecks.Run();
 await WatchInterruptionMatrixChecks.Run();
 await WatchExpandedEditChecks.Run();
 await MutationAdmissionChecks.Run();
+await ProvisionReconciliationChecks.Run();
 await ProductionAdapterChecks.Run();
 await WatchAuthoringChecks.Run();

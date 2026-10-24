@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.3",
+  "catalogVersion": "0.4.6",
   "targetTiaVersions": [
     21
   ],
@@ -1259,6 +1259,60 @@
       "limitations": [
         "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
         "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only; failure-boundary modes use the test-double worker, not Siemens."
+      ]
+    },
+    {
+      "id": "local.sim.provision.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ed3584e3b34c0542f056f71fa47a7017e6cb2741",
+        "passedScope": "scripts/validate_simulation.py --provision-runtime-credential --trust-owned-empty-cpu-certificate on the saved scratch project from a fresh validate_milestones.py run: owned TIA V21 start, project_open, discovery baseline, owned CPU1511 creation, simulation_download to a generated protected card, generated-state save, runtime credential provisioning with identity reads from a fresh discovery-only observer Portal (endpoint 192.168.0.1 in the first sample; observer project closed, Portal disposed, process exit 0 verified), card restored, power-on, RUN, tag listing, read/write and a stimulus scenario whose assertions all passed, owned release and detach."
+      },
+      "artifacts": [
+        "evidence/local.sim.provision.20261024.json"
+      ],
+      "limitations": [
+        "One scratch fixture and one simple stimulus scenario; this is not the 65-case runtime suite.",
+        "Project preservation after provisioning is not independently verified, so simulation_provision_scratch_credential stays unverified (AC-preserve).",
+        "First-use TLS trust was granted under the explicit owned-empty-CPU policy for this attempt only."
+      ]
+    },
+    {
+      "id": "local.sim.reconcile.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4db98c34b629f681e7d69cfc6d2657d7a0ba2871",
+        "passedScope": "scripts/reconcile_provision.py on the real outcomeUnknown admission left by a failed provisioning attempt (observer exit check bug): fresh owned TIA V21 session (different Portal process), pre-provision archive hash matched, archive retrieved to a new directory and its location-independent fingerprint (8 native block fingerprints) equal to the current scratch project, all 87 card files equal to the original manifest, discovery observer project empty; the store reconciled all three resources with separate evidence."
+      },
+      "artifacts": [
+        "evidence/local.sim.reconcile.20261024.json"
+      ],
+      "limitations": [
+        "Only the release path ran natively; every refusal reason (project, card, archive, observer, same process, other scope, mutation claimed) is covered by managed tests with a fake worker.",
+        "Runtime credential state inside the simulator storage is not verified; the card manifest and project are.",
+        "The fingerprint excludes generated payload bytes and unexposed vendor data, as EngineeringFingerprint policy 2 documents."
+      ]
+    },
+    {
+      "id": "local.runtime.frozen.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7531ed12a18285c7df0035d47943aa675b975f0a",
+        "passedScope": "Complete frozen runtime corpus, attempt 04 (scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate): 9 families, 65 cases, 358 steps, 478 assertions, all passed in one run with no retries, each case on a fresh Host, owned TIA session, reopened qualified scratch project and freshly created owned CPU1511, with download, credential provisioning through the discovery observer, restored protected card, RUN and independently authored stimulus/assertion sequences. An independent audit (artifacts/audit-frozen-20261024-04) recomputed all 478 verdicts from observations and confirmed coverage, isolation, card restoration, cleanup with exit code 0 everywhere and one binary manifest."
+      },
+      "artifacts": [
+        "evidence/local.runtime.frozen.20261024.json"
+      ],
+      "limitations": [
+        "Earlier attempts 01-03 failed (observer exit wait, PLCSIM interface access violation, interface lifetime blocking discovery); their fixes are in this build, and those attempts are not part of this record.",
+        "Device discovery always showed one all-zero placeholder, excluded under the reviewed placeholder rule; certificate trust is the authorized first-use pin, not independent CA verification; timing covers host-observed windows only, no scan synchronization.",
+        "PLCSIM on this PC with the generated scratch fixtures only; not physical PLCs, other CPUs or untested instruction profiles."
       ]
     }
   ],
@@ -2551,16 +2605,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.download.v02"
+          "local.sim.provision.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -2621,6 +2674,50 @@
       ]
     },
     {
+      "featureId": "simulation_provision_reconcile",
+      "domain": "simulation",
+      "title": "Release a failed provisioning admission on fresh native evidence",
+      "mcpTools": [
+        "simulation_provision_reconcile"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Projects.Retrieve/Open and block FingerprintProvider; managed admission store reconciliation."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Only outcomeUnknown simulation_provision_scratch_credential admissions with the storage, scratch project and optional discovery observer scope.",
+          "Releases only if the current project's location-independent fingerprint equals its retrieved pre-provision archive, the card manifest equals the original and the observer project is empty; otherwise the reservation stays held.",
+          "Does not verify runtime credential state inside the simulator storage, and never powers, connects, provisions, saves or replays."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.reconcile.20261024"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an empty worker-owned TIA instance and the retained provisioning report, archive and card."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Empty worker-owned TIA instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "simulation_discovery_baseline",
       "domain": "simulation",
       "title": "Record PLCSIM discovery before owned instance registration",
@@ -2645,8 +2742,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -2856,8 +2955,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -2897,8 +2998,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -2937,8 +3040,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",

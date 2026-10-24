@@ -1,0 +1,78 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.runtime.frozen.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T15:34:46+00:00",
+  "source": {
+    "commit": "7531ed12a18285c7df0035d47943aa675b975f0a",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Complete frozen runtime corpus, attempt 04 (scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate): 9 families, 65 cases, 358 steps, 478 assertions, all passed in one run with no retries, each case on a fresh Host, owned TIA session, reopened qualified scratch project and freshly created owned CPU1511, with download, credential provisioning through the discovery observer, restored protected card, RUN and independently authored stimulus/assertion sequences. An independent audit (artifacts/audit-frozen-20261024-04) recomputed all 478 verdicts from observations and confirmed coverage, isolation, card restoration, cleanup with exit code 0 everywhere and one binary manifest.",
+  "limitations": [
+    "Earlier attempts 01-03 failed (observer exit wait, PLCSIM interface access violation, interface lifetime blocking discovery); their fixes are in this build, and those attempts are not part of this record.",
+    "Device discovery always showed one all-zero placeholder, excluded under the reviewed placeholder rule; certificate trust is the authorized first-use pin, not independent CA verification; timing covers host-observed windows only, no scan synchronization.",
+    "PLCSIM on this PC with the generated scratch fixtures only; not physical PLCs, other CPUs or untested instruction profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b90c53907c072432f61f379dd6b38190d28cefc380e2858fb4a5c439f19ae01b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "972f751d291e546111217dedf2d7debe5cc435ad517455f49a0ad55ce8f27076"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "d2f5576dae9c6ba61b415e706ed7e0640258582b85643289c79d603bf8c15111"
+    }
+  ],
+  "runs": [
+    {
+      "report": "frozen-04-report.json",
+      "sha256": "8dc8fd7aed964ac255a83c98c44ee2f3f9663f4c3e5b03b9897cc1b14c9a04ab",
+      "bytes": 218373,
+      "completed": true,
+      "steps": [
+        "runtime-arithmetic: passed",
+        "runtime-arrays-udts: passed",
+        "runtime-boolean: passed",
+        "runtime-branches: passed",
+        "runtime-counters: passed",
+        "runtime-edges: passed",
+        "runtime-fb-instances: passed",
+        "runtime-latches: passed",
+        "runtime-timers: passed"
+      ],
+      "toolsPassed": [
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
