@@ -777,8 +777,8 @@
     },
     {
       "path": "scripts/api_coverage_bindings.py",
-      "sha256": "ea43b63310935820dd79d9c0c1e51748dbfdeab7fc2ba949024424c8438be79e",
-      "bytes": 23848
+      "sha256": "cc279275534abef560d80cc7dabe1d56b5ddf1c3b96585482b9da0a6e31d6051",
+      "bytes": 24402
     },
     {
       "path": "scripts/public_api_metadata/MetadataInspector.cs",
@@ -797,8 +797,8 @@
     },
     {
       "path": "scripts/test_api_coverage_bindings.py",
-      "sha256": "65c651128c0333cc49a6265a88c80dfc90a28b061d0d990505d0046034968ccb",
-      "bytes": 11839
+      "sha256": "034ce8d541f285630aef88d1bbfe2c89c77b8a5903c93753c1443e6f124348c4",
+      "bytes": 12860
     },
     {
       "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -1892,8 +1892,8 @@
     },
     {
       "path": "src/TiaMcp.Host/TiaMcp.Host.csproj",
-      "sha256": "77981624da90fddb86614ee28e9f5fd5a31c1135710ab4a92e46ecb899a9b22b",
-      "bytes": 1065
+      "sha256": "7b0f5b0c35b8e0bd72974a96368c1516f1445a3046c2e2f440a1db30be04b373",
+      "bytes": 1053
     },
     {
       "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -1992,8 +1992,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/TiaMcp.OpcUa.Runtime.csproj",
-      "sha256": "4821ac9d2b6b0332d71f360231069d4b21bb918602762a22f1d1af314b7e82dd",
-      "bytes": 382
+      "sha256": "991b71d8b34245761d204411df782075e7f485318cee91312bd1c610923a9e21",
+      "bytes": 371
     },
     {
       "path": "src/TiaMcp.OpcUa/OpcUaDependencyAnalysis.cs",
@@ -2552,8 +2552,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TiaMcp.Openness.V21.csproj",
-      "sha256": "09363fc187a3799bcda0c78e5f02843838f851352fd371015d06a182dd56362d",
-      "bytes": 4876
+      "sha256": "30f766410d02fd0bdc6f8abaa251b5ff6dcf1366d4bf13d33ce4642f9ab98609",
+      "bytes": 4870
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
@@ -2642,8 +2642,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj",
-      "sha256": "096e58f8cf0d75ca72cadc59c7d0cc6cdf715f9a6d4fda4be3de547b15f7ba52",
-      "bytes": 1616
+      "sha256": "90db5ef4365cc781827d60a8792080d3c2608df656e51459078541888fa0a799",
+      "bytes": 1610
     },
     {
       "path": "src/TiaMcp.TestSuite.V21/StylePrerequisiteProbe.cs",
@@ -2687,8 +2687,8 @@
     },
     {
       "path": "src/TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj",
-      "sha256": "bbefc32d6ba336750140abb615d2daca1c94693db856004dfdc1899bd02a6580",
-      "bytes": 1219
+      "sha256": "e9752ac95e922e51b10e876e1c07a74fa72782261200915ca840a5209227cbf4",
+      "bytes": 1213
     },
     {
       "path": "src/TiaMcp.Translations/BoundedOpcPackage.cs",

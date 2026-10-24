@@ -60,6 +60,17 @@ class OpennessSession {
     def test_source_change_stales(self):
         x=self.collect(); self.put('src/TiaMcp.Openness.V21/Other.cs','class Other { private object Helper() => 2; }')
         with self.assertRaisesRegex(ValueError,'Stale'): b.validate(x,self.root)
+    def test_package_version_bump_does_not_stale_but_other_project_edits_do(self):
+        project='src/TiaMcp.Host/TiaMcp.Host.csproj'
+        self.put(project,'<Project><ItemGroup><PackageReference Include="A" Version="1.0.0" /></ItemGroup></Project>')
+        x=self.collect()
+        self.put(project,'<Project><ItemGroup><PackageReference Include="A" Version="1.10.2-rc.1" /></ItemGroup></Project>')
+        b.validate(x,self.root)
+        for changed in ('<Project><ItemGroup><PackageReference Include="B" Version="1.0.0" /></ItemGroup></Project>',
+                        '<Project><ItemGroup><PackageReference Include="A" Version="1.0.0" /><PackageReference Include="C" Version="1.0.0" /></ItemGroup></Project>',
+                        '<Project><PropertyGroup><Nullable>enable</Nullable></PropertyGroup><ItemGroup><PackageReference Include="A" Version="1.0.0" /></ItemGroup></Project>'):
+            self.put(project,changed)
+            with self.assertRaisesRegex(ValueError,'Stale'): b.validate(x,self.root)
     def test_crlf_source_refused_before_binding_but_evidence_bytes_preserved(self):
         evidence=self.root/'artifacts/proof.json'; evidence.parent.mkdir(parents=True,exist_ok=True)
         raw=b'{\r\n"outcome":1\r\n}\r\n'; evidence.write_bytes(raw)

@@ -121,10 +121,19 @@ def case_rows(method):
         found.append((ts[i+1][1],ts[i:end]))
     return found
 
+PACKAGE_VERSION=re.compile(rb'(<PackageReference\b[^>]*?\bVersion=")[^"]*(")')
+
+def source_bytes(path,data):
+    # Dependency bumps change only PackageReference versions; they must not stale implementation bindings.
+    return PACKAGE_VERSION.sub(rb'\1\2',data) if path.endswith(('.csproj','.props')) else data
+
 def collect(repo):
     # Reuse the inventory's bounded file reader, path guard, hashing and catalog semantics.
     source_rows,texts=inventory.source_inventory(repo)
     source_rows=[r for r in source_rows if r['path']!=REGISTRY]
+    for r in source_rows:
+        if r['path'].endswith(('.csproj','.props')):
+            data=source_bytes(r['path'],inventory.read_bytes(inventory.within(repo,r['path']))); r['sha256']=digest(data); r['bytes']=len(data)
     catalog=inventory.json_read(repo/CATALOG); features=catalog['features']
     ids=[f['featureId'] for f in features]
     if len(ids)!=len(set(ids)): raise ValueError('Duplicate feature')
@@ -274,7 +283,7 @@ def validate(binding, repo=None, *, allow_missing_evidence=False):
             if s['path'] not in sources or not s['path'].endswith('.schema.json') or s['source'] not in sources: raise ValueError('Unknown schema/source reference')
     unavailable=[]
     if repo is not None:
-        stale=[path for path,h in sources.items() if not inventory.within(repo,path).is_file() or digest(inventory.read_bytes(inventory.within(repo,path)))!=h]
+        stale=[path for path,h in sources.items() if not inventory.within(repo,path).is_file() or digest(source_bytes(path,inventory.read_bytes(inventory.within(repo,path))))!=h]
         if stale: raise ValueError('Stale source bindings: '+','.join(stale))
         actual=collect(repo)
         if allow_missing_evidence:
