@@ -88,6 +88,7 @@ def body(h):
         return {"upgraded": True, "libraryId": library["libraryId"], "complete": items["complete"], "versions": len(versions),
                 "committed": sum(x["state"] == "Committed" for x in versions),
                 "masterCopies": sum(x.get("kind") == "masterCopy" for x in items["items"]),
+                "unavailable": [(x["kind"], x.get("name"), x["reason"]) for x in items["items"] if x.get("unavailable")],
                 "identities": sorted((x["typeName"], x["version"], x["versionGuid"]) for x in versions)}
 
     def required_upgrade(name, path):
@@ -125,7 +126,7 @@ def body(h):
     readonly_outcome = h.stage("upgrade read-only directory .al16", lambda: upgrade(v16))
     require(readonly_outcome["upgraded"] and readonly_outcome["committed"] == readonly_outcome["versions"] > 0, "Read-only directory upgrade failed")
     h.tool("library_close", {"libraryId": readonly_outcome["libraryId"]})
-    h.report["upgrades"] = {k: {x: v.get(x) for x in ("upgraded", "versions", "committed", "masterCopies", "error")} for k, v in results.items()}
+    h.report["upgrades"] = {k: {x: v.get(x) for x in ("upgraded", "versions", "committed", "masterCopies", "unavailable", "error")} for k, v in results.items()}
 
 
 if __name__ == "__main__":

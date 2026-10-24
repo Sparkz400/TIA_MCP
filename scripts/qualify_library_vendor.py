@@ -95,6 +95,7 @@ def body(h):
                     "types": sum(x.get("kind") == "type" for x in items["items"]), "versions": len(versions),
                     "committed": sum(x["state"] == "Committed" for x in versions),
                     "masterCopies": sorted(x["name"] for x in items["items"] if x.get("kind") == "masterCopy"),
+                    "unavailable": [(x["kind"], x.get("name"), x["reason"]) for x in items["items"] if x.get("unavailable")],
                     "versionIdentities": sorted((x["typeName"], x["version"], x["versionGuid"]) for x in versions)}
         outcome = h.stage(("upgrade " if required else "upgrade (observed) ") + name, upgrade)
         upgraded[name] = outcome
@@ -102,7 +103,7 @@ def body(h):
             require(outcome["upgraded"] and outcome["complete"] and outcome["versions"] > 0 and outcome["committed"] == outcome["versions"],
                     "PLC library upgrade or readback is incomplete")
     plc = upgraded["Open Library V19 PLC.zal19"]
-    h.report["dmcUpgrades"] = {k: {x: v.get(x) for x in ("upgraded", "types", "versions", "committed", "error")} for k, v in upgraded.items()}
+    h.report["dmcUpgrades"] = {k: {x: v.get(x) for x in ("upgraded", "types", "versions", "committed", "unavailable", "error")} for k, v in upgraded.items()}
     archive = h.archive(plc["library"]["libraryId"])
     h.stage("close dmc upgrade session", lambda: h.tool("tia_detach"))
 

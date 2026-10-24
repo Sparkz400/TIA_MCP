@@ -36,12 +36,14 @@ def owned_child(h, executable):
     return matches[0]
 
 
-def last_event(journal):
+def in_stage(journal, stage):
+    """The stage has dispatched and not finished; later sub-stage events may already follow it."""
     try:
         events = json.loads(journal.read_text(encoding="utf-8")).get("events", [])
     except (OSError, ValueError):
         return None  # Mid-replacement; poll again.
-    return events[-1] if events else None
+    states = [e.get("state") for e in events if e.get("stage") == stage]
+    return events[-1] if "dispatching" in states and not ({"completed", "failed"} & set(states)) else None
 
 
 def interrupted_apply(h, kind, payload, stage):
@@ -66,8 +68,8 @@ def interrupted_apply(h, kind, payload, stage):
         thread.start()
         deadline = time.monotonic() + h.args.timeout
         while time.monotonic() < deadline and thread.is_alive():
-            event = last_event(journal)
-            if event and event.get("stage") == stage and event.get("state") == "dispatching":
+            event = in_stage(journal, stage)
+            if event:
                 worker.kill()
                 dispatch["killedAtEvent"] = event
                 break
