@@ -29,6 +29,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
                 "watch_reconcile_recovery" => Element(await ReconcileRecovery(args, cancellationToken)),
                 "watch_reconcile_interrupted" => Element(await ReconcileInterrupted(args, cancellationToken)),
                 "engineering_operation_status" => ReadEngineeringStatus(Text(args, "operationId")),
+                "simulation_provision_reconcile" => Element(await ReconcileProvision(args, cancellationToken)),
                 "qualification_watch_fixture_seed" when allowUnqualifiedDocumentEdits => await ForwardAdmitted("watch_fixture_seed", arguments, cancellationToken),
                 "qualification_watch_authoring_source_negative" when allowUnqualifiedDocumentEdits && allowComponentQualification => await ForwardAdmitted("watch_authoring_source_negative", arguments, cancellationToken),
                 "qualification_watch_authoring_source_reconcile" when allowUnqualifiedDocumentEdits && allowComponentQualification => Element(await ReconcileSourceNegative(args, cancellationToken)),

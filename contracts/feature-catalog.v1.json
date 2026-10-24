@@ -2638,6 +2638,48 @@
       ]
     },
     {
+      "featureId": "simulation_provision_reconcile",
+      "domain": "simulation",
+      "title": "Release a failed provisioning admission on fresh native evidence",
+      "mcpTools": [
+        "simulation_provision_reconcile"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Projects.Retrieve/Open and block FingerprintProvider; managed admission store reconciliation."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Only outcomeUnknown simulation_provision_scratch_credential admissions with the storage, scratch project and optional discovery observer scope.",
+          "Releases only if the current project's location-independent fingerprint equals its retrieved pre-provision archive, the card manifest equals the original and the observer project is empty; otherwise the reservation stays held.",
+          "Does not verify runtime credential state inside the simulator storage, and never powers, connects, provisions, saves or replays."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an empty worker-owned TIA instance and the retained provisioning report, archive and card."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Empty worker-owned TIA instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "simulation_discovery_baseline",
       "domain": "simulation",
       "title": "Record PLCSIM discovery before owned instance registration",
