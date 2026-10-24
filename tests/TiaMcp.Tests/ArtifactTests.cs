@@ -9,37 +9,63 @@ internal static partial class Program
     private static Task JournalReplacementRetry()
     {
         var transient = new IOException("old file still open", unchecked((int)0x80070497));
-        int calls = 0, delays = 0;
-        JournalFileReplacement.Replace(() => { if (++calls < 3) throw transient; },
-            milliseconds => { Check.Equal(10, milliseconds); delays++; });
+        int calls = 0;
+        var delays = new List<int>();
+        JournalFileReplacement.Replace(() => { if (++calls < 3) throw transient; }, delays.Add);
         Check.Equal(3, calls);
-        Check.Equal(2, delays);
+        Check.Equal("10,20", string.Join(",", delays));
 
-        foreach (var failure in new Exception[] { transient,
+        // A reader without delete sharing makes File.Replace fail with a sharing or lock violation before anything moves.
+        var sharing = new IOException("sharing", unchecked((int)0x80070020));
+        var locked = new IOException("lock", unchecked((int)0x80070021));
+        foreach (var retried in new[] { sharing, locked })
+        {
+            calls = 0; delays.Clear();
+            JournalFileReplacement.Replace(() => { if (++calls < 5) throw retried; }, delays.Add);
+            Check.Equal(5, calls);
+            Check.Equal("10,20,30,40", string.Join(",", delays));
+        }
+
+        foreach (var failure in new Exception[] { transient, sharing, locked,
             new IOException("rename failed", unchecked((int)0x80070498)),
             new IOException("partial replacement", unchecked((int)0x80070499)),
-            new IOException("sharing", unchecked((int)0x80070020)),
-            new IOException("lock", unchecked((int)0x80070021)),
             new UnauthorizedAccessException(), new InvalidOperationException() })
         {
-            calls = delays = 0;
+            calls = 0; delays.Clear();
             Exception? caught = null;
-            try { JournalFileReplacement.Replace(() => { calls++; throw failure; }, _ => delays++); }
+            try { JournalFileReplacement.Replace(() => { calls++; throw failure; }, delays.Add); }
             catch (Exception error) { caught = error; }
             Check.Equal(true, ReferenceEquals(failure, caught));
-            Check.Equal(ReferenceEquals(failure, transient) ? 10 : 1, calls);
-            Check.Equal(ReferenceEquals(failure, transient) ? 9 : 0, delays);
+            bool retryable = failure is IOException io && (io.HResult == unchecked((int)0x80070497) || io.HResult == unchecked((int)0x80070020) || io.HResult == unchecked((int)0x80070021));
+            Check.Equal(retryable ? 20 : 1, calls);
+            Check.Equal(retryable ? 1450 : 0, delays.Sum());
         }
 
         calls = 0;
         var interrupted = new OperationCanceledException();
         try
         {
-            JournalFileReplacement.Replace(() => { calls++; throw transient; }, _ => throw interrupted);
+            JournalFileReplacement.Replace(() => { calls++; throw sharing; }, _ => throw interrupted);
             throw new Exception("Interrupted delay must propagate.");
         }
         catch (OperationCanceledException error) { Check.Equal(true, ReferenceEquals(interrupted, error)); }
         Check.Equal(1, calls);
+
+        // Real file: a reader holding the journal without delete sharing for a moment no longer fails the replacement.
+        var root = Path.Combine(Path.GetTempPath(), "tia-journal-share-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            string journal = Path.Combine(root, "journal.json"), next = journal + ".new";
+            File.WriteAllText(journal, "old"); File.WriteAllText(next, "new");
+            var reader = new FileStream(journal, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var release = Task.Delay(150).ContinueWith(_ => reader.Dispose());
+            JournalFileReplacement.Replace(next, journal);
+            release.Wait();
+            Check.Equal("new", File.ReadAllText(journal));
+            Check.Equal(false, File.Exists(next));
+        }
+        finally { Directory.Delete(root, true); }
         return Task.CompletedTask;
     }
 

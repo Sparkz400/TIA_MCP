@@ -177,7 +177,7 @@ internal static partial class Program
             ("Artifact transfer is bounded and hashes the complete immutable read", ArtifactTransfer),
             ("Artifact transfer rejects traversal, siblings and invalid ranges", ArtifactBoundaries),
             ("Artifact journal replacement preserves complete reads and truthful missing-path errors", ArtifactJournalReplacement),
-            ("Journal replacement retries only unchanged-name failures within a finite bound", JournalReplacementRetry),
+            ("Journal replacement retries unchanged-name, sharing and lock failures within a finite bound", JournalReplacementRetry),
             ("Framing preserves UTF-8 across individual-byte reads", FramingUnicode),
             ("Framing preserves unread LF and CRLF frames", FramingMultiple),
             ("Framing spans the internal 8 KiB buffer", FramingLarge),
