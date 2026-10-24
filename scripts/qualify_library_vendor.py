@@ -134,49 +134,23 @@ def body(h):
         text = pal.read(member).decode("utf-8-sig")
         objects.append({**pal_object(text), "member": member, "text": text})
     require(len(objects) == 55 and {o["engineering"] for o in objects} == {"V16"}, "PAL inventory differs from the receipt")
-    skipped = {"OB00001_IntINrmMainProgram": "OB 1 collides with the owned scratch Main; replacing it would discard the fixture program.",
-               "Default tag table": "Importing would override the scratch PLC's default tag table."}
-    imported = []
-    for o in sorted(objects, key=lambda o: (ORDER.index(o["element"]), o["name"])):
-        if o["name"] in skipped:
-            continue
-        kind, field = KIND_BY_ELEMENT.get(o["element"], ("block_import_xml", "expectedBlockNames"))
-        prepared = h.prepare(kind, {"scopePath": plc_path, "xml": o["text"], field: [o["name"]]})
-        h.report["mutations"].append({"kind": kind, "changeId": prepared["changeId"], "object": o["name"], "state": "dispatching"})
-        args = {**h.apply_args(prepared), "compile": False, "save": False}
-        h.stage("import " + o["name"], lambda a=args: h.tool("change_apply", a))
-        h.report["mutations"][-1]["state"] = "applied"
-        imported.append(o)
-    h.report["palSkipped"] = skipped
+    # V21 refuses SimaticML whose Engineering version is V16; one document proves the refusal and that nothing was imported.
+    first = sorted(objects, key=lambda o: (ORDER.index(o["element"]), o["name"]))[0]
+    kind, field = KIND_BY_ELEMENT.get(first["element"], ("block_import_xml", "expectedBlockNames"))
+    before = h.tool("project_inventory", {"maxItems": 2000})
+    prepared = h.prepare(kind, {"scopePath": plc_path, "xml": first["text"], field: [first["name"]]})
 
-    def compile_once():
-        prepared = h.tool("change_prepare", {"kind": "plc_compile", "plcPath": plc_path, "payload": {}})
-        result = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
-        content = result.get("structuredContent") or {}
-        compile_result = content.get("compile") or (content.get("error", {}).get("details") or {}).get("compile") or {}
-        return {"succeeded": not result.get("isError"), "error": content.get("error", {}).get("code"), "compile": compile_result}
-    compiled = h.stage("compile imported PAL once (outcome recorded)", compile_once)
-    h.report["palCompile"] = {"succeeded": compiled["succeeded"], "errorCount": compiled["compile"].get("errorCount")}
-
-    def readback():
-        inventory = h.tool("project_inventory", {"maxItems": 2000})
-        blocks = {b["name"]: b for b in inventory["blocks"] if b["plcPath"] == plc_path}
-        types = {t["name"] for t in inventory.get("types", [])}
-        missing, differing = [], []
-        for o in imported:
-            if o["element"] == "SW.Types.PlcStruct":
-                if o["name"] not in types:
-                    missing.append(o["name"])
-            elif o["element"].startswith("SW.Blocks."):
-                block = blocks.get(o["name"])
-                if block is None:
-                    missing.append(o["name"])
-                elif str(block["number"]) != o["number"] or block["programmingLanguage"] != o["language"]:
-                    differing.append({"name": o["name"], "expected": [o["number"], o["language"]],
-                                      "observed": [block["number"], block["programmingLanguage"]]})
-        require(not missing and not differing, "PAL readback differs: missing %s, differing %s" % (missing, differing))
-        return {"objects": len(imported), "blocks": sum(o["element"].startswith("SW.Blocks.") for o in imported)}
-    h.stage("PAL names, numbers and languages read back", readback)
+    def refused_import():
+        error = h.call_error("change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+        require("engineering version 'V16'" in (error.get("message") or "") and "not supported" in error.get("message", ""),
+                "V16 import was not refused for its Engineering version: %s" % error.get("message"))
+        after = h.tool("project_inventory", {"maxItems": 2000})
+        require(before.get("types") == after.get("types") and before.get("blocks") == after.get("blocks"), "A refused PAL import changed the PLC")
+        return {"object": first["name"], "error": error}
+    h.report["palImport"] = h.stage("V21 refuses PAL's V16 SimaticML (" + first["name"] + ")", refused_import)
+    h.stage("close pal session", lambda: h.tool("tia_detach"))
+    h.owned_portal("pal reconciliation")
+    h.reconcile_admission("reconcile the refused import's admission in a fresh session")
 
 
 if __name__ == "__main__":
@@ -194,5 +168,5 @@ if __name__ == "__main__":
     Harness(args, "vq_", "Vendor distributions: PAL V16 XML import and DMC V19 library upgrade into V21", [
         "DMC HMI variants are upgraded and recorded only; HMI behavior belongs to lane D.",
         "DMC prerequisites (system/clock memory bytes, 'Open Library' tag table master copy) are not applied, so only a dependency-free data type is instantiated.",
-        "PAL folders are not recreated; OB 1 and the default tag table are not imported (recorded with reasons). PAL compile is recorded, not required.",
+        "PAL is a V16 VCI export; TIA V21 refuses V16 SimaticML, so PAL native import needs an intermediate V17-V20 installation that is not on this PC.",
         "Vendor executables (DMC toolbox) are never run."], [args.receipts, args.pal_zip, args.dmc_zip]).run(body)

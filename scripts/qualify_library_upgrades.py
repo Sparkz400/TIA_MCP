@@ -70,9 +70,10 @@ def body(h):
                     archives[PurePosixPath(member).name] = extract(package, member, h.directory / "inputs" / PurePosixPath(member).stem.replace(" ", "_") / PurePosixPath(member).name)
     require(sorted(archives) == sorted(REQUIRED + OBSERVED), "Expected DMC archives are missing")
 
-    h.owned_portal("upgrades")
-
     def upgrade(path, expected_files=None):
+        # TIA caps proxy instances per session (500000); every upgrade gets a fresh owned portal.
+        h.tool("tia_detach")
+        h.owned_portal("upgrade " + path.stem)
         before = tree(path.parent) if path.suffix.lower().startswith(".al") else sha256(path.read_bytes())
         payload = {"schemaVersion": 1, "path": str(path), "expectedSha256": sha256(path.read_bytes())}
         prepared = h.tool("change_prepare", {"kind": "library_upgrade", "payload": payload})

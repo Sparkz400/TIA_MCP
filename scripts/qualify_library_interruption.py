@@ -161,7 +161,8 @@ def body(h):
     def no_checkpoint():
         error = h.call_error("change_restore", {"changeId": second["changeId"], "previewHash": second["previewHash"]})
         require(error.get("code") == "CheckpointInvalid", "Restore without a checkpoint was not refused: %s" % error)
-        journal = error.get("details") or h.tool("change_status", {"changeId": second["changeId"]})["journal"]
+        details = error.get("details") or {}
+        journal = details if "events" in details else h.tool("change_status", {"changeId": second["changeId"]})["journal"]
         stages = [e["stage"] for e in journal["events"]]
         require("native_mutation" not in stages and not journal["checkpoints"], "Journal does not prove the mutation was never dispatched")
         return {"error": error, "stages": stages}
