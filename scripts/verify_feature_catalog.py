@@ -48,12 +48,10 @@ def main():
         assert backlog["features"] and all(not row["mcpTools"] for row in backlog["features"])
         report["steps"].append({"name": "unimplemented backlog has no callable bindings", "count": len(backlog["features"])})
         startup = client.tool("feature_catalog", {"featureId": "sim_state"})
-        assert startup["features"][0]["qualification"]["status"] == "unverified"
+        assert startup["features"][0]["qualification"]["status"] == "verified"
         evidence = {row['id']: row for row in startup['evidence']}
-        assert evidence['local.sim.startup.v02']['status'] == 'failed'
-        assert evidence['local.sim.startup.20261024']['status'] == 'passed'
-        assert evidence['local.sim.startup.20261024']['profile']['actions'] == ['powerOn', 'powerOff']
-        report["steps"].append({"name": "scoped empty startup success and historical failure do not qualify all CPU controls"})
+        assert evidence['local.sim.state.20261024']['status'] == 'passed'
+        report["steps"].append({"name": "sim_state is verified by the record that exercised all four actions"})
         for arguments, code in [({"featureId": "invented"}, "FeatureNotFound"), ({"maxItems": 0}, "InvalidRequest")]:
             response = client.request("tools/call", {"name": "feature_catalog", "arguments": arguments})
             assert response.get("isError")

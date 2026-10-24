@@ -7,6 +7,7 @@ compares the entire prepared/native XML, including IDs and all other attributes.
 import copy
 import hashlib
 import json
+import re
 from xml.dom import minidom, Node
 
 from run_conformance import safe_xml, structural_xml, native_document
@@ -19,6 +20,29 @@ def local(element):
 
 def signature(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+EMPTY_TEXT_CULTURE = re.compile(r"(<MultilingualTextItem\s[^>]*>\s*<AttributeList>\s*<Culture>)([^<]+)(</Culture>\s*<Text\s*/>)")
+TEXT_CULTURE = re.compile(r"<Culture>([^<]+)</Culture>")
+
+
+def project_culture(xml):
+    """The single culture of a block exported from the target project."""
+    cultures = set(TEXT_CULTURE.findall(xml))
+    if len(cultures) != 1:
+        raise ValueError("Exactly one observed project culture is required: " + ", ".join(sorted(cultures)))
+    return cultures.pop()
+
+
+def adapt_reference_culture(xml, culture):
+    """Move a fixture's empty-text items to the target project's culture; any text stays exact.
+
+    Returns the adapted XML and the number of retargeted items.
+    """
+    adapted, count = EMPTY_TEXT_CULTURE.subn(lambda m: m.group(1) + culture + m.group(3), xml)
+    if set(TEXT_CULTURE.findall(adapted)) - {culture}:
+        raise ValueError("Reference text in another culture cannot be adapted without changing its content.")
+    return adapted, count
 
 
 def adapt_reference_bindings(xml, bindings):

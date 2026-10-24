@@ -133,6 +133,7 @@ namespace TiaMcp.Openness.V21
                             throw new BridgeException("InstanceCreationRouteUnsupported", "The captured global IEC storage namespace differs from the selected exact namespace.");
                         attrs.Element("Name").Value = name; attrs.Element("Number").Value = number.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         if (context.Route == "standard") attrs.Element("AutoNumber").Value = "false";
+                        UseProjectCultures(dbXml, capture.Plc.Project);
                         string file = Path.Combine(change.Directory, "new-instance-" + key + ".xml");
                         File.WriteAllText(file, dbXml.ToString(SaveOptions.DisableFormatting), new System.Text.UTF8Encoding(true));
                         creation["artifact"] = ChangeArtifact(file); creation["instanceOfName"] = storageProfile.GlobalInstanceType;
@@ -144,6 +145,7 @@ namespace TiaMcp.Openness.V21
                         var callee = capture.Block(calleePath); RequireUniqueDeclaredFb(capture, dataType, calleePath);
                         creation["instanceOfName"] = QualifiedName(callee.Item);
                         var dbXml = PrepareTypedFbInstanceDocument(capture, name, number, callee);
+                        UseProjectCultures(dbXml, capture.Plc.Project);
                         string file = Path.Combine(change.Directory, "new-instance-" + key + ".xml");
                         string xml = change.CapturedStorageQualification != null
                             ? TypedGraphicalCapturedStorageTemplate.SerializePreparedDocument(dbXml)

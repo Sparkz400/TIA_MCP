@@ -1314,6 +1314,23 @@
         "Device discovery always showed one all-zero placeholder, excluded under the reviewed placeholder rule; certificate trust is the authorized first-use pin, not independent CA verification; timing covers host-observed windows only, no scan synchronization.",
         "PLCSIM on this PC with the generated scratch fixtures only; not physical PLCs, other CPUs or untested instruction profiles."
       ]
+    },
+    {
+      "id": "local.sim.state.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e7497e5426a11cc4e526fefe6a5be1a10ec25c8d",
+        "passedScope": "scripts/validate_milestones.py with simulation and --trust-owned-empty-cpu-certificate on a new owned TIA V21 scratch project: full engineering phase, discovery baseline, owned CPU1511, download, generated-state save, runtime credential provisioning, power-on (STOP), run (RUN), stimulus test passed, then sim_state stop (STOP) and powerOff (OFF), with OFF confirmed independently by a fresh sim_select through a new interface, owned release and detach."
+      },
+      "artifacts": [
+        "evidence/local.sim.state.20261024.json"
+      ],
+      "limitations": [
+        "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
+        "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
+      ]
     }
   ],
   "features": [
@@ -2953,10 +2970,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.startup.v02",
-          "local.sim.startup.20261024"
+          "local.sim.state.20261024"
         ]
       },
       "availability": {

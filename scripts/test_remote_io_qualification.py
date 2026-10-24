@@ -38,6 +38,11 @@ class ServerRelocationTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     server_relocation(rows, self.expected)
 
+    def test_english_generated_server_name_accepted(self):
+        for row in (self.rows[1], self.expected[0]):
+            row.update(name='Server module_1', attributes={'Name': 'Server module_1'})
+        self.assertEqual('/remote/server', server_relocation(self.rows, self.expected)['hardwarePath'])
+
     def test_duplicate_hardware_identity_rejected(self):
         with self.assertRaisesRegex(AssertionError, 'duplicate hardware'):
             server_relocation([*self.rows, copy.deepcopy(self.rows[1])], self.expected)

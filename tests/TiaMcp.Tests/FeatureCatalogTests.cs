@@ -24,11 +24,10 @@ internal static partial class Program
             Check.Equal("unverified", feature.GetProperty("qualification").GetProperty("status").GetString());
         }
         var startup = JsonSerializer.SerializeToElement(catalog.Query(featureId: "sim_state"));
-        Check.Equal("unverified", startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("status").GetString());
+        // sim_state is verified only by a record that exercised all four actions (powerOn, run, stop, powerOff).
+        Check.Equal("verified", startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("status").GetString());
         var startupEvidence = startup.GetProperty("evidence").EnumerateArray().ToDictionary(e => e.GetProperty("id").GetString()!);
-        Check.Equal("failed", startupEvidence["local.sim.startup.v02"].GetProperty("status").GetString());
-        Check.Equal("passed", startupEvidence["local.sim.startup.20261024"].GetProperty("status").GetString());
-        Check.Equal("powerOn,powerOff", string.Join(",", startupEvidence["local.sim.startup.20261024"].GetProperty("profile").GetProperty("actions").EnumerateArray().Select(a => a.GetString())));
+        Check.Equal("passed", startupEvidence["local.sim.state.20261024"].GetProperty("status").GetString());
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(maxItems: 0); return Task.CompletedTask; });
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(implementationStatus: "perfect"); return Task.CompletedTask; });
         await Check.BridgeError("FeatureNotFound", () => { catalog.Query(featureId: "unknown"); return Task.CompletedTask; });

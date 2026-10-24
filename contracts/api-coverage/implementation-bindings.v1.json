@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "1ce636b1515d63288084b73bbbfddcb542ec5e4c640be576cbb1245e604e8e97",
-      "bytes": 695169
+      "sha256": "3f9eb5b6505b85e52c8ddb5282de1172ec53511f2c794fd58c65f233ea9488b1",
+      "bytes": 696153
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1547,8 +1547,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.Admission.cs",
-      "sha256": "4cecba409fe4f1278ada3bb20d2c5162cf7677ac3a91cd8dc54f5e36fb82c96d",
-      "bytes": 6649
+      "sha256": "4038fc56132b9e31b3a8a4718c47716e6a03f0a0174c457185990cece7546aae",
+      "bytes": 7285
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.AdmissionReconcile.cs",
@@ -2477,13 +2477,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
-      "sha256": "a62af86cfb9f967f4d084780c166ffc9d5fb16ecb1872b35c9920ddcd04a19a8",
-      "bytes": 31274
+      "sha256": "ed22f382d35eec5bfafaf7218b7b5cee03eaabd564840a10d67bae54b631c173",
+      "bytes": 31715
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
-      "sha256": "521c5919da3f8a4ec720099733975c15a2f3a67f531634fdaea3f58af462716e",
-      "bytes": 34974
+      "sha256": "61f6bfe40d4d6a9bad2d3997be17dd51823c84596cb87199edba6d136f1dc997",
+      "bytes": 35118
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -2602,8 +2602,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
-      "sha256": "82f0ac7f5021ec6ab2e1ea1e59fe6467299d4f9290b329186af36e72bc35c62f",
-      "bytes": 48914
+      "sha256": "4bfa0c770d586cae019d2c83501ba8c3c1c21549c5ee6264d4914d784c0f30c6",
+      "bytes": 50136
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs",
@@ -68472,8 +68472,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "PrepareTypedGraphical",
               "line": 62,
-              "endLine": 130,
-              "sha256": "073a480faab5ec437c78df95614a909ba0ee514d84a4926e49f92b7cd7a79ee5"
+              "endLine": 131,
+              "sha256": "994a3a8113f0afafe2b3a4cd94bef1197f8c24dee2441a69934819eb676f3246"
             }
           ]
         },
@@ -68491,8 +68491,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 318,
-              "endLine": 336,
+              "line": 320,
+              "endLine": 338,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             }
           ]
@@ -69284,8 +69284,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 199,
-              "endLine": 209,
+              "line": 204,
+              "endLine": 214,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -69432,8 +69432,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "PrepareTypedGraphical",
               "line": 62,
-              "endLine": 130,
-              "sha256": "073a480faab5ec437c78df95614a909ba0ee514d84a4926e49f92b7cd7a79ee5"
+              "endLine": 131,
+              "sha256": "994a3a8113f0afafe2b3a4cd94bef1197f8c24dee2441a69934819eb676f3246"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -69563,8 +69563,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 318,
-              "endLine": 336,
+              "line": 320,
+              "endLine": 338,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             },
             {
@@ -71483,8 +71483,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 199,
-              "endLine": 209,
+              "line": 204,
+              "endLine": 214,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -72047,8 +72047,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 199,
-              "endLine": 209,
+              "line": 204,
+              "endLine": 214,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -72275,8 +72275,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 199,
-              "endLine": 209,
+              "line": 204,
+              "endLine": 214,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -72382,8 +72382,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 199,
-              "endLine": 209,
+              "line": 204,
+              "endLine": 214,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -86949,21 +86949,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.sim.startup.v02",
-          "profileSha256": "b386c47d89bce8ce0c521bfb28ed5c5beade9733d60a536af21fa01dc33baf10",
+          "id": "local.sim.state.20261024",
+          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
           "artifacts": [
-            "artifacts/simulator-startup-validation.json"
-          ]
-        },
-        {
-          "id": "local.sim.startup.20261024",
-          "profileSha256": "46b4ddeb54d904eb1307e20db7aae39a6a9da71bfd440b36d92dd2dac8dd1cf1",
-          "artifacts": [
-            "artifacts/p24-simstate04/request.json",
-            "artifacts/p24-simstate04/startup.json",
-            "artifacts/p24-simstate04/result.json",
-            "artifacts/p24-simstate04/owned-job-terminal.json",
-            "docs/verification/simulator-startup-20261024.md"
+            "evidence/local.sim.state.20261024.json"
           ]
         }
       ],
@@ -91301,7 +91290,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "1567bc9af2ed68dc1b9015a18af8338eeba10ada68943c7048543c731b47d628"
+      "sha256": "9dd1e7fc99b1daf84c3a9400b5b5a13a7879cc29c1fa22c6185e0dadc33352af"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -91372,6 +91361,11 @@
       "path": "evidence/local.sim.reconcile.20261024.json",
       "state": "observed",
       "sha256": "fd4e17cf687b3b681602f4f22257afc341639a82065fc67f1d6fd9f238f832a0"
+    },
+    {
+      "path": "evidence/local.sim.state.20261024.json",
+      "state": "observed",
+      "sha256": "adbf2ad4b7b84c01b8aca8368f906486949a9b26c9c5b37e31c3a4334c166a2f"
     },
     {
       "path": "evidence/local.smoke.20261024.json",
@@ -91587,6 +91581,10 @@
     {
       "id": "local.sim.startup.v02",
       "profileSha256": "b386c47d89bce8ce0c521bfb28ed5c5beade9733d60a536af21fa01dc33baf10"
+    },
+    {
+      "id": "local.sim.state.20261024",
+      "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff"
     },
     {
       "id": "local.smoke.20261024",

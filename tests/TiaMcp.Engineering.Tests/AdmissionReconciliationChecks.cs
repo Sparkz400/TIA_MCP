@@ -101,7 +101,7 @@ internal static class AdmissionReconciliationChecks
         public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
         {
             Calls.Add(operation);
-            if (operation == "mutation_dispatch") throw new BridgeOperationException("WorkerDisconnected", "Synthetic interrupted apply", null);
+            if (operation == "mutation_dispatch") throw new BridgeException("WorkerDisconnected", "Synthetic interrupted apply");
             if (operation == "engineering_admission_reconcile_verify") Requests.Add(JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json)!.AsObject());
             object value = operation switch {
                 "mutation_begin" => new { leaseToken = "synthetic-lease", scope },
