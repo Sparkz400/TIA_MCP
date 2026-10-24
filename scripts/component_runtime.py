@@ -13,7 +13,8 @@ from pathlib import Path
 import traceback
 import uuid
 
-from block_test_runtime import utc_now
+from block_test_runtime import (save_generated_scratch_project, utc_now, verify_credential_provisioning, verify_download,
+                                verify_memory_card, verify_owned_instance)
 from qualification_owned_scratch import assert_snapshot, require, snapshot
 from run_block_tests import save_json
 from smoke_mcp import Client
@@ -42,15 +43,18 @@ OB_ORACLE_FAILURE = "OB1 must contain exactly one call to the installed FC."
 
 
 def continued_inputs(previous_path, inputs):
-    """Only an earlier OB-oracle failure before any simulator call may continue, from its retained post-OB snapshot."""
+    """Continue only from a retained post-OB snapshot: after the corrected OB-oracle failure before any
+    simulator call, or after a verified OB call whose owned simulator stopped at the missing CPU password."""
     path = Path(previous_path).resolve()
     raw = path.read_bytes(); previous = json.loads(raw.decode("utf-8"))
-    require(previous.get("kind") == "plc_component_runtime" and previous.get("status") == "failed"
-            and previous.get("failure") == OB_ORACLE_FAILURE and previous.get("installedProjectVerified") is True
-            and previous.get("obCallVerified") is False and previous.get("runtimeVerified") is False
-            and previous["installationReport"]["sha256"] == inputs["sha256"] and previous["obCall"]["state"] == "applied"
-            and not any(call["tool"].startswith("sim_") or call["tool"] == "simulation_download" for call in previous["calls"]),
-            "Continuation requires the exact earlier OB-oracle failure before any simulator call.")
+    sim_calls = [call for call in previous.get("calls", []) if call["tool"].startswith("sim") or call["tool"] == "simulation_download"]
+    oracle = previous.get("failure") == OB_ORACLE_FAILURE and previous.get("obCallVerified") is False and not sim_calls
+    password = (previous.get("obCallVerified") is True and "SimulationConfigurationPasswordRequired" in (previous.get("failure") or "")
+                and previous.get("cleanup", {}).get("release", {}).get("unregistered") is True)
+    require(previous.get("kind") == "plc_component_runtime" and previous.get("status") == "failed" and (oracle or password)
+            and previous.get("installedProjectVerified") is True and previous.get("runtimeVerified") is False
+            and previous["installationReport"]["sha256"] == inputs["sha256"] and previous["obCall"]["state"] == "applied",
+            "Continuation requires an accepted earlier runtime failure with its retained post-OB snapshot.")
     expected = json.loads((path.parent / "ob-call" / "manifest.json").read_text(encoding="utf-8"))
     return {"path": str(path), "sha256": hashlib.sha256(raw).hexdigest(), "expected": expected}
 
@@ -147,10 +151,20 @@ class ComponentRuntime:
             if not self.continued: assert_snapshot(before, after, except_paths=[mains[0]["path"]])
             verify_ob_call(Path(after["objects"]["block:" + mains[0]["path"]]["file"]).read_text(encoding="utf-8-sig"), self.fixture)
             self.report["obCallVerified"] = True; self.persist()
+            # Same owned-instance, card and credential provisioning sequence as the frozen runtime corpus.
+            self.report["discoveryBaseline"] = self.call("simulation_discovery_baseline", {})["baseline"]
             created = self.call("sim_create", {"cpuType": "CPU1511", "creationId": uuid.uuid4().hex})
-            require(created["instance"].get("owned") is True and created["instance"].get("operatingState") == "Off", "A fresh owned OFF instance is required.")
-            self.instance = created["instance"]["id"]
-            self.call("simulation_download", {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": self.inputs["credential"]})
+            instance = verify_owned_instance(created["instance"])
+            require(instance.get("operatingState") == "Off", "A fresh owned OFF instance is required.")
+            self.instance = instance["id"]
+            ticket = {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": self.inputs["credential"]}
+            download = self.call("simulation_download", ticket)
+            verify_download(download, instance)
+            self.report["memoryCard"] = verify_memory_card(download)
+            self.report["generatedProjectSave"] = save_generated_scratch_project(self.call, download)
+            provisioned = self.call("simulation_provision_scratch_credential", {**ticket, "trustOwnedEmptyCpuCertificate": True})
+            self.report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download, trust_owned_empty_cpu_certificate=True)
+            self.report["restoredMemoryCard"] = verify_memory_card(download)
             self.call("sim_state", {"instanceId": self.instance, "action": "powerOn", "timeoutMs": 60000})
             running = self.call("sim_state", {"instanceId": self.instance, "action": "run", "timeoutMs": 30000})
             require(running.get("instance", {}).get("operatingState") == "Run", "Simulator did not enter RUN.")
