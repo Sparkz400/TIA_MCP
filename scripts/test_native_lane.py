@@ -2,7 +2,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from native_lane import acquire, release
+import sys
+
+from native_lane import acquire, release, run
 
 
 class NativeLaneTests(unittest.TestCase):
@@ -16,6 +18,16 @@ class NativeLaneTests(unittest.TestCase):
                 release("not-the-token", lock=lock)
             release(token, lock=lock)
             release(acquire("lane-b", lock=lock), lock=lock)
+            self.assertFalse(lock.exists())
+
+
+    def test_run_holds_the_lock_only_for_the_command_and_returns_its_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            lock = Path(directory, "native-lane.lock")
+            code = run("lane-a", [sys.executable, "-c", f"import pathlib,sys; sys.exit(0 if pathlib.Path(r'{lock}').exists() else 9)"], lock=lock)
+            self.assertEqual(0, code)
+            self.assertFalse(lock.exists())
+            self.assertEqual(3, run("lane-a", [sys.executable, "-c", "import sys; sys.exit(3)"], lock=lock))
             self.assertFalse(lock.exists())
 
 
