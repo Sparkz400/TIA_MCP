@@ -620,10 +620,10 @@ class ComponentRun:
         self.report["windowOriginalFresh"] = original_fresh; self.persist()
         reopened = snapshot(self.call, self.output / "reopened-install")
         assert_snapshot(after, reopened)
-        if self.args.reuse_source_report:
-            instance = "block:" + select(after["inventory"]["blocks"], self.manifest["instance"], plc)["path"]
-            self.report["exactStorageFreshReopen"] = verify_exact_storage_reopen(after, reopened, instance)
-            self.persist()
+        # Both source modes install through the captured storage profile.
+        instance = "block:" + select(after["inventory"]["blocks"], self.manifest["instance"], plc)["path"]
+        self.report["exactStorageFreshReopen"] = verify_exact_storage_reopen(after, reopened, instance)
+        self.persist()
         native_versions = original_fresh["componentWindow"]["observation"]["componentVersions"]
         require({(v["typeGuid"], v["versionGuid"]) for v in native_versions} == {(v["typeGuid"], v["versionGuid"]) for v in released.values()} and
                 all(v["exists"] is True and v["state"] == "Committed" and v["doNotUse"] is False and len(v["objectPaths"]) == 1 for v in native_versions),
