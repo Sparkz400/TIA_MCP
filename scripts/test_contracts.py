@@ -5,6 +5,8 @@ These checks complement JSON Schema documents; they are not a general JSON Schem
 import json
 import pathlib
 import re
+import shutil
+import tempfile
 import unittest
 
 from generate_conformance import build_manifest, load_specifications, validate_manifest
@@ -18,14 +20,27 @@ def claim_errors(features, evidence, root=ROOT):
     def retained(artifact):
         # Ignored output trees are never part of a published checkout.
         return not artifact.startswith(("artifacts/", "output/")) and (root / artifact).is_file()
+
+    def summaries(proof):
+        # Curated summaries (scripts/curate_evidence.py) are the committed form of native evidence.
+        rows = [json.loads((root / a).read_text(encoding="utf-8")) for a in evidence[proof]["artifacts"]
+                if a.startswith("evidence/") and retained(a)]
+        return [r for r in rows if r.get("schema") == "tia-mcp.evidence-summary.v1" and r.get("evidenceId") == proof
+                and r.get("outcome") == "passed" and r.get("runs") and all(run["completed"] for run in r["runs"])]
     errors = []
     for identifier, feature in features.items():
         status = feature["qualification"]["status"]
         if status == "verified":
-            missing = [a for proof in feature["qualification"]["evidenceIds"]
-                       for a in evidence[proof]["artifacts"] if not retained(a)]
+            proofs = feature["qualification"]["evidenceIds"]
+            missing = [a for proof in proofs for a in evidence[proof]["artifacts"] if not retained(a)]
             if missing:
                 errors.append(f"{identifier}: verified without retained artifacts {missing}")
+            passed = [summaries(proof) for proof in proofs]
+            if not all(passed):
+                errors.append(f"{identifier}: verified without a passed evidence summary for every cited record")
+            exercised = {tool for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
+            if set(feature["mcpTools"]) - exercised:
+                errors.append(f"{identifier}: verified tools not exercised {sorted(set(feature['mcpTools']) - exercised)}")
         if feature["availability"]["status"] == "available" and status != "verified":
             errors.append(f"{identifier}: available without verified qualification")
     return errors
@@ -109,22 +124,40 @@ def check_contracts():
 
 class ClaimErrorTests(unittest.TestCase):
     def setUp(self):
-        self.evidence = {"kept": {"artifacts": ["docs/README.md"]},
-                         "ignored": {"artifacts": ["docs/README.md", "artifacts/run.json"]},
-                         "absent": {"artifacts": ["docs/not-present.md"]}}
+        self.root = pathlib.Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.root)
+        (self.root / "evidence").mkdir()
+        (self.root / "docs").mkdir()
+        (self.root / "docs/note.md").write_text("note", encoding="utf-8")
+        for name, outcome in (("kept", "passed"), ("failing", "failed")):
+            (self.root / f"evidence/{name}.json").write_text(json.dumps({
+                "schema": "tia-mcp.evidence-summary.v1", "evidenceId": name, "outcome": outcome,
+                "runs": [{"completed": outcome == "passed", "toolsPassed": ["block_read"]}]}), encoding="utf-8")
+        self.evidence = {"kept": {"artifacts": ["evidence/kept.json"]},
+                         "failing": {"artifacts": ["evidence/failing.json"]},
+                         "prose": {"artifacts": ["docs/note.md"]},
+                         "ignored": {"artifacts": ["evidence/kept.json", "artifacts/run.json"]},
+                         "absent": {"artifacts": ["evidence/not-present.json"]}}
 
-    def feature(self, status, proofs, availability="conditional"):
-        return {"x": {"qualification": {"status": status, "evidenceIds": proofs}, "availability": {"status": availability}}}
+    def feature(self, status, proofs, availability="conditional", tools=("block_read",)):
+        return {"x": {"mcpTools": list(tools), "qualification": {"status": status, "evidenceIds": proofs},
+                      "availability": {"status": availability}}}
 
-    def test_verified_needs_every_cited_artifact_retained(self):
-        self.assertEqual(claim_errors(self.feature("verified", ["kept"]), self.evidence), [])
-        for proof in ("ignored", "absent"):
+    def errors(self, *arguments, **options):
+        return claim_errors(self.feature(*arguments, **options), self.evidence, self.root)
+
+    def test_verified_needs_a_passed_summary_for_every_cited_record(self):
+        self.assertEqual(self.errors("verified", ["kept"]), [])
+        for proof in ("ignored", "absent", "prose", "failing"):
             with self.subTest(proof=proof):
-                self.assertEqual(len(claim_errors(self.feature("verified", ["kept", proof]), self.evidence)), 1)
+                self.assertTrue(self.errors("verified", ["kept", proof]))
+
+    def test_verified_tools_must_be_exercised(self):
+        self.assertEqual(len(self.errors("verified", ["kept"], tools=("block_read", "xref_query"))), 1)
 
     def test_unverified_may_keep_historical_evidence_but_not_claim_available(self):
-        self.assertEqual(claim_errors(self.feature("unverified", ["ignored"]), self.evidence), [])
-        self.assertEqual(len(claim_errors(self.feature("unverified", [], "available"), self.evidence)), 1)
+        self.assertEqual(self.errors("unverified", ["ignored"]), [])
+        self.assertEqual(len(self.errors("unverified", [], "available")), 1)
 
     def test_bundled_catalog(self):
         check_contracts()

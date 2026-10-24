@@ -16,6 +16,7 @@ class Client:
         self.sequence = 0
         self.lines = queue.Queue()
         self.errors = []
+        self.tool_calls = []  # Curated evidence records which tools answered without error.
         self.process = subprocess.Popen(
             command if command is not None else [str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])],
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -53,6 +54,8 @@ class Client:
                 continue
             if "error" in response:
                 raise RuntimeError(response["error"])
+            if method == "tools/call":
+                self.tool_calls.append({"name": params["name"], "isError": bool(response["result"].get("isError"))})
             return response["result"]
 
     def tool(self, name, arguments=None):
@@ -91,7 +94,8 @@ class Client:
             if isinstance(value, dict) and isinstance(value.get("bridgeWorkerExit"), dict):
                 receipts.append(value["bridgeWorkerExit"])
         return {"hostExitCode": self.process.returncode, "forcedHostStop": forced,
-                "workerExits": receipts, "stderrEofObserved": not self.error_reader.is_alive()}
+                "workerExits": receipts, "stderrEofObserved": not self.error_reader.is_alive(),
+                "toolCalls": self.tool_calls}
 
 
 def main():
@@ -163,6 +167,7 @@ def main():
         client.close()
         report["hostExitCode"] = client.process.returncode
         report["hostLogs"] = client.errors
+        report["toolCalls"] = client.tool_calls
         destination = args.report or ROOT / "artifacts" / ("smoke-" + time.strftime("%Y%m%d-%H%M%S") + ".json")
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")

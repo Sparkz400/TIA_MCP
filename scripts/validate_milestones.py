@@ -217,6 +217,7 @@ END_ORGANIZATION_BLOCK
         client.close()
         report["hostExitCode"] = client.process.returncode
         report["stderrTail"] = client.errors[-20:]
+        report["toolCalls"] = client.tool_calls
         persist()
     return 0 if report["completed"] else 1
 
