@@ -24,8 +24,10 @@ namespace TiaMcp.Openness.V21
             bool unrecorded = Directory.GetFiles(directory, "*.za?21").Any(f => !recorded.Contains(Path.GetFullPath(f)));
             if (checkpoints.All(valid) && !unrecorded) check.Prove(journalRow, "verifiedApplied", "Library journal is readable and bound to its change; every recorded checkpoint archive matches its hash.");
             else check.Hold(journalRow, "A checkpoint archive is missing, changed or unrecorded in the library journal.");
+            // A global library resource is admitted as its directory; its checkpoint names the .al21 file somewhere below it.
             Func<string, JObject> checkpointFor = original => checkpoints.FirstOrDefault(c => SameSimulationPath(c.Value<string>("originalPath"), original) ||
-                c.Value<string>("kind") == "library" && SameSimulationPath(Path.GetDirectoryName(c.Value<string>("originalPath") ?? ""), original));
+                c.Value<string>("kind") == "library" && c.Value<string>("originalPath") != null &&
+                Path.GetFullPath(c.Value<string>("originalPath")).StartsWith(Path.GetFullPath(original).TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase));
 
             if (operation == "change_apply")
             {
