@@ -28,11 +28,17 @@ namespace TiaMcp.Openness.V21
                 string simulatorApiDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "Siemens", "PLCSIMADV", "API", "8.0");
                 string discoveryProbe = null;
                 bool startupDiscoveryProbe = false;
+                bool visibleDiscoveryProbe = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     if (args[i] == "--pipe" && i + 1 < args.Length) pipe = args[++i];
-                    else if (args[i] == "--plcsim-discovery-probe" && i + 1 < args.Length) discoveryProbe = args[++i];
-                    else if (args[i] == "--plcsim-startup-discovery-probe" && i + 1 < args.Length) { discoveryProbe = args[++i]; startupDiscoveryProbe = true; }
+                    else if ((args[i] == "--plcsim-discovery-probe" || args[i] == "--plcsim-startup-discovery-probe" || args[i] == "--plcsim-ui-discovery-probe") && i + 1 < args.Length)
+                    {
+                        if (discoveryProbe != null) throw new ArgumentException("Only one discovery probe mode is allowed.");
+                        visibleDiscoveryProbe = args[i] == "--plcsim-ui-discovery-probe";
+                        startupDiscoveryProbe = visibleDiscoveryProbe || args[i] == "--plcsim-startup-discovery-probe";
+                        discoveryProbe = args[++i];
+                    }
                     else if (args[i] == "--api-dir" && i + 1 < args.Length) apiDirectory = args[++i];
                     else if (args[i] == "--sim-api-dir" && i + 1 < args.Length) simulatorApiDirectory = args[++i];
                     else if (args[i] == "--component-qualification") componentQualification = true;
@@ -44,6 +50,8 @@ namespace TiaMcp.Openness.V21
                     else throw new ArgumentException("Usage: TiaMcp.Openness.V21.exe --pipe NAME [--api-dir DIR]");
                 }
                 if (string.IsNullOrWhiteSpace(pipe) && discoveryProbe == null) throw new ArgumentException("--pipe is required.");
+                if (discoveryProbe != null && (pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification))
+                    throw new ArgumentException("Discovery probes cannot be combined with a pipe or another qualification mode.");
                 apiDirectory = Path.GetFullPath(apiDirectory);
                 string basePath = Path.Combine(apiDirectory, "Siemens.Engineering.Base.dll");
                 if (!File.Exists(basePath)) throw new FileNotFoundException("Installed TIA V21 Openness Base assembly not found.", basePath);
@@ -51,7 +59,7 @@ namespace TiaMcp.Openness.V21
                     throw new InvalidOperationException("Only the TIA V21 API is supported by this worker.");
                 simulatorApiDirectory = Path.GetFullPath(simulatorApiDirectory);
                 AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) => ResolveSiemens(eventArgs, apiDirectory, simulatorApiDirectory);
-                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe);
+                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe, visibleDiscoveryProbe);
                 if (testSuiteScopeProbe && componentQualification) throw new ArgumentException("Separate qualification modes required.");
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
@@ -93,7 +101,7 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int RunDiscoveryProbe(string outputDirectory, bool startCpu) => PlcsimDiscoveryProbe.Run(outputDirectory, startCpu);
+        private static int RunDiscoveryProbe(string outputDirectory, bool startCpu, bool visible) => PlcsimDiscoveryProbe.Run(outputDirectory, startCpu, visible);
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]

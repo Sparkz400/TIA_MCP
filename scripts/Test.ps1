@@ -91,6 +91,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Explorer model/client checks failed.' }
     dotnet "tests/TiaMcp.Tests/bin/$Configuration/net10.0/TiaMcp.Tests.dll" --verify-worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
     if ($LASTEXITCODE -ne 0) { throw 'Worker lifecycle regression check failed.' }
+    python -B (Join-Path $PSScriptRoot 'verify_worker_probe_arguments.py') --worker "src/TiaMcp.Openness.V21/bin/$Configuration/net48/TiaMcp.Openness.V21.exe"
+    if ($LASTEXITCODE -ne 0) { throw 'Worker discovery probe argument checks failed.' }
     & "tests/TiaMcp.WatchAdapter.Boundary.Tests/bin/$Configuration/net48/TiaMcp.WatchAdapter.Boundary.Tests.exe"
     if ($LASTEXITCODE -ne 0) { throw 'Production watch worker boundary checks failed.' }
     & "tests/TiaMcp.TestSuite.Worker.Tests/bin/$Configuration/net48/TiaMcp.TestSuite.Worker.Tests.exe"

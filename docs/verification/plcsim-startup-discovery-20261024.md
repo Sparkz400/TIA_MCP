@@ -93,6 +93,48 @@ policy"; both are retained rather than bypassing that rejection.
 
 ## Next investigation
 
+### Visible Portal comparison and diagnostic mode admission
+
+`artifacts/p24-ui/` records the explicit visible probe using the `n24w` worker.
+It creates its own project and OFF CPU; three pre-runtime and three initialized
+runtime observations reproduce the absent-route to zero-address-placeholder
+transition through both providers. It then fails during the owned-OFF
+observation with Siemens `NonRecoverableException`, before power-on. The owned
+registration is removed in cleanup. The visible project was inspected through
+Computer Use, including switching from portal view to project view, but no
+successful UI accessible-device comparison was obtained. The generic exception
+does not identify its cause or establish that UI interaction caused it.
+
+The worker exits 1; the main Portal, its SearchReplace background Portal and
+their crash detectors exit `0xFFFFFFFF`. The diagnostic-report child exits zero,
+but its command-line-referenced stack and undo files are no longer present at
+inspection. The storage helper exits naturally with code zero about five minutes
+after the worker. All ten captured handles and all twelve original job members
+are terminal; no forced termination was used. The overall attempt remains failed
+for the native exception, abnormal exits and missed normal 45-second deadline.
+The exact receipt is `p24-ui/result.json`; natural drain does not promote it to
+normal lifecycle acceptance or prove project reopen.
+
+`--plcsim-ui-discovery-probe <directory>` is the explicit diagnostic UI variant;
+the existing two modes remain headless. It has the same singleton ownership,
+Softbus, output-preservation and cleanup checks. Its UI/native behavior remains
+unqualified after this failed attempt. The mode is not used by ordinary MCP
+startup and does not change production provisioning or target selection.
+
+Review exposed a separate argument-admission defect: multiple diagnostic flags
+could overwrite the output path while retaining the startup flag, and a probe
+could silently override a bridge pipe or qualification mode. The final parser
+refuses these combinations before loading the Siemens API or creating output.
+`scripts/verify_worker_probe_arguments.py` reproduces the prior parser failure
+using a deliberately absent API directory, then passes 33 ordered/duplicate/mixed
+cases against `n24x`. The check is included in `scripts/Test.ps1`. The final
+worker builds without warnings/errors and passes the compiled lifecycle guard;
+the test runner parses successfully. These checks do not start TIA.
+
+The visible native observation used `n24w`, before this argument-only correction.
+Its request and coordinator remain pinned under `p24-ui/`; logs and the failing
+negative control are retained in `artifacts/todo-resume-20261024/`.
+
 ### Provider comparison and natural helper exit
 
 The subsequent `artifacts/p24-provider/` probe uses the `n24s` Release worker

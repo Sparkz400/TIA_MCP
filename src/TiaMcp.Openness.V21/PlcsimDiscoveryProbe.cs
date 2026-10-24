@@ -19,12 +19,13 @@ namespace TiaMcp.Openness.V21
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory, bool startCpu = false)
+        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false)
         {
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
             result["emptyStartupRequested"] = startCpu;
+            result["portalMode"] = visible ? "WithUserInterface" : "WithoutUserInterface";
             Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
@@ -34,7 +35,7 @@ namespace TiaMcp.Openness.V21
             try
             {
                 File.WriteAllText(Path.Combine(root.FullName, "start-intent.json"), new JObject { ["startedAtUtc"] = Now() }.ToString());
-                using (var portal = new TiaPortal(TiaPortalMode.WithoutUserInterface))
+                using (var portal = new TiaPortal(visible ? TiaPortalMode.WithUserInterface : TiaPortalMode.WithoutUserInterface))
                 {
                     result["processId"] = PortalProcesses.CurrentId(portal);
                     File.WriteAllText(Path.Combine(root.FullName, "start-return.json"), new JObject { ["processId"] = result["processId"] }.ToString());
