@@ -15,9 +15,11 @@ def main():
     parser.add_argument("--admission-id", required=True)
     parser.add_argument("--host", type=pathlib.Path, default=ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=pathlib.Path)
+    parser.add_argument("--artifacts", type=pathlib.Path, help="The Host artifact root that holds the admission.")
     parser.add_argument("--report", type=pathlib.Path, required=True)
     args = parser.parse_args()
-    client = Client(args.host.resolve(), 600, ["--worker", str(args.worker.resolve())] if args.worker else [])
+    client = Client(args.host.resolve(), 600, [part for option, path in (("--worker", args.worker), ("--artifacts", args.artifacts)) if path
+                                               for part in (option, str(path.resolve()))])
     report = {"admissionId": args.admission_id, "steps": [], "completed": False}
     started = False
     try:
