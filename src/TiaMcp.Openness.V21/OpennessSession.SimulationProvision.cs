@@ -160,6 +160,10 @@ namespace TiaMcp.Openness.V21
             bool stagingAttempted = false;
             bool ownedOffVerified = false;
             int tlsCallbackCount = 0;
+            SimulationDiscoveryObserver observer = null;
+            string observerDirectory = SimulationDiscoveryObserverDirectory(args);
+            report["discoveryObserverDirectory"] = observerDirectory;
+            report["discoveryObserver"] = null;
             // CreateNew prevents accidentally replacing earlier evidence, including
             // when a previous attempt failed after native runtime changes.
             using (var checkpointStream = new FileStream(checkpointPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read, 4096, FileOptions.WriteThrough))
@@ -315,6 +319,16 @@ namespace TiaMcp.Openness.V21
                     if (instance.OperatingState != EOperatingState.Stop)
                         throw new BridgeException("SimulationProvisionStopRequired", "Credential recovery requires the owned virtual CPU to be in STOP.");
                     report["emptyStartupVerified"] = true;
+                    // This Portal's PLCSIM discovery stays stale after owned startup; identity
+                    // reads use a fresh observer Portal while route and connection stay here.
+                    report["stage"] = "startDiscoveryObserver";
+                    checkpoint("beforeDiscoveryObserverStart");
+                    observer = SimulationDiscoveryObserver.Start(observerDirectory, _processId);
+                    report["discoveryObserver"] = observer.Evidence.DeepClone();
+                    checkpoint("afterDiscoveryObserverStart");
+                    VerifySimulationProvisionIdentity(instance, marker, false);
+                    if (instance.OperatingState != EOperatingState.Stop)
+                        throw new BridgeException("SimulationProvisionStopRequired", "The owned virtual CPU left STOP while starting the discovery observer.");
                     // Siemens V21 "Supporting secure S7 communication TLS" says
                     // PLCSIM is absent from PcInterfaces while it is not running.
                     // Acquire the connection inventory only after this exact owned
@@ -342,7 +356,7 @@ namespace TiaMcp.Openness.V21
                         // Siemens documents this operation for Softbus; it ignores
                         // the subnet/gateway and remanence flag in that mode.
                         const string documentedStartupAddress = "192.168.0.1";
-                        var observedBefore = pc.GetAccessibleDevices().Take(65).ToArray();
+                        var observedBefore = observer.Read(65);
                         var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
                         report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
                             ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
@@ -354,7 +368,7 @@ namespace TiaMcp.Openness.V21
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
                         string bootstrapAddress = before[0].Address;
                         report["postStartupDiscovery"]["causalTargetVerified"] = true;
-                        report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint; exact IInstance address assignment and readback; fresh exact discovery match.";
+                        report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
                         var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
                         report["addressBootstrap"] = new JObject {
                             ["purpose"] = "Align the exact owned virtual CPU with its newly observed default Softbus endpoint after verified absent-to-present startup; no physical or shared adapter configuration.",
@@ -417,7 +431,7 @@ namespace TiaMcp.Openness.V21
                             report["connectionInventory"] = SimulationProvisionConnectionInventory(configuration);
                             throw new BridgeException("SimulationProvisionRouteUnavailable", "The exact PLCSIM (1) route disappeared during read-only address discovery.");
                         }
-                        var observedAccessible = pc.GetAccessibleDevices().Take(65).ToArray();
+                        var observedAccessible = observer.Read(65);
                         accessible = WithoutSimulationPlaceholder(observedAccessible, AcceptedSimulationPlaceholder(discoveryBaseline), observedAccessible.Length > 64);
                         var visible = new JArray(observedAccessible.Take(64).Select(device => new JObject {
                             ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries }));
@@ -590,7 +604,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed before credential submission.");
-                    var read = pc.GetAccessibleDevices().Take(3).ToArray();
+                    var read = observer.Read(3);
                     var rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before credential submission.");
@@ -618,7 +632,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed while establishing the scratch connection.");
-                    read = pc.GetAccessibleDevices().Take(3).ToArray();
+                    read = observer.Read(3);
                     rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact unique PLCSIM endpoint changed while establishing the scratch connection.");
@@ -674,6 +688,23 @@ namespace TiaMcp.Openness.V21
                 }
                 finally
                 {
+                    if (observer != null)
+                    {
+                        try
+                        {
+                            var stopped = observer.Stop();
+                            cleanup.Add(stopped);
+                            report["discoveryObserver"]["stopped"] = stopped.DeepClone();
+                            if (stopped.Value<bool>("completed") != true && failure == null)
+                                failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal did not close its project and exit.");
+                        }
+                        catch (Exception ex)
+                        {
+                            cleanup.Add(new JObject { ["action"] = "stopDiscoveryObserver", ["completed"] = false, ["exceptionType"] = ex.GetType().FullName });
+                            if (failure == null) failure = new BridgeException("SimulationProvisionCleanupFailed", "The discovery observer Portal could not be stopped.");
+                        }
+                        observer = null;
+                    }
                     if (provider != null && explicitRouteApplied)
                     {
                         try

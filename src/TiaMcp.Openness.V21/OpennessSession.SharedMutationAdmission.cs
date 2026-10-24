@@ -112,6 +112,9 @@ namespace TiaMcp.Openness.V21
             SharedMutationPlannedDestination("libraryRecovery:" + resource.Value<string>("originalPath"),
                 () => Path.Combine(artifactDirectory, "lr_" + Guid.NewGuid().ToString("N").Substring(0, 10)));
 
+        private string SimulationDiscoveryObserverDirectory(JObject args) => SharedMutationPlannedDestination("discoveryObserver",
+            () => Path.Combine(SharedMutationArtifactDirectory(args), "do_" + Guid.NewGuid().ToString("N").Substring(0, 8)));
+
         private static string SharedMutationArtifactDirectory(JObject args)
         {
             string path = args.Value<string>("artifactDirectory");
@@ -277,7 +280,12 @@ namespace TiaMcp.Openness.V21
                 observation["markerSha256"] = SharedMutationHash(marker); observation["plcPath"] = plc.Path;
                 observation["project"] = ProjectInfo(plc.Project);
                 if (operation == "simulation_provision_scratch_credential")
+                {
                     observation["projectCheckpointPath"] = SimulationProvisionCheckpointPath(marker.Value<string>("storagePath"), plc.Project.IsModified);
+                    string observer = SimulationDiscoveryObserverDirectory(args);
+                    SimulationDiscoveryObserver.VerifyDestination(observer);
+                    absent("project", "discoveryObserverProject", observer);
+                }
             }
             else if (operation == "watch_fixture_seed")
             {
