@@ -497,6 +497,9 @@ class ComponentRun:
     def author(self):
         self.session.start()
         self.call("tia_create_scratch", {"cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"})
+        # Installed library blocks are not editable, so PLCSIM can run them only if
+        # the source was compiled with simulation support before release.
+        self.apply("project_simulation_enable", {"enabled": True})
         plc = complete_inventory(self.call)["plcPath"]
         library = self.call("library_open", {"request": {"kind": "project"}})["libraryId"]
         documents = self.native / "documents"
