@@ -88,10 +88,26 @@ not rerun for the Python-only follow-up. Logs `scalars-before.log`,
 `identity-before.log` and `runtime-final.log` retain the failures and final result.
 All 100 additional safety-qualification/lifecycle and typed-graphical/dependency/
 resolution caller tests pass (`runtime-callers.log`).
-The default-path environment diagnostic remains a separate open issue: it needs
-to honor the installed-location selection used by the native worker.
+The default-path environment diagnostic was still open at this checkpoint;
+the follow-up below repairs its installed-location selection.
 
-## Backlog corrections and next work
+## Installed API path follow-up
+
+The diagnostic now follows the native worker's V21 installation lookup: an explicit
+`-TiaApiDirectory` wins without reading registration, otherwise the Siemens Base
+assembly registration in the 64-bit registry selects its parent directory. A missing
+registration uses the setup default; a denied lookup is unavailable, not absence.
+The 29 diagnostic tests pass under PowerShell 7 and Windows PowerShell 5.1
+(`environment-path-tests.json` and `environment-path-tests-ps51.json` in the same
+evidence directory). Tests cover explicit/registered/default precedence, refusal to
+fall back after denied access, and supplied-evidence isolation from the machine probe.
+
+The fresh `environment-path-probe.json` resolves
+`D:\Arbeit\Siemens\Portal V21\PublicAPI\V21\net48` without an override.
+`environment-default-fixed.json` reports all required simulation-profile prerequisite
+metadata present. No Siemens worker, project or CPU was started by these checks.
+
+## Remaining work
 
 The reviewed placeholder exclusion is already in public `main` through `54f0237`;
 public snapshot publication and green hosted CI are recorded in the existing

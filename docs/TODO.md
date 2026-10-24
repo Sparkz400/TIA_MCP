@@ -6,7 +6,6 @@ are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.
 
 ## Resume and integration
 
-- [ ] Align environment diagnostics with the worker's installed TIA API path selection. The default-path doctor reported missing files although the registered installation and `TiaApiDirectory` override point to the usable D: installation. Preserve explicit path precedence and supplied-evidence isolation.
 - [ ] Finalize independent review of the two vendor intake receipts, licenses and prerequisites; qualify applicable native import/upgrade, readback and preservation. Vendor evidence (`artifacts/vendor-library-intake-20261023/`).
 - [ ] Reconcile the feature catalog, support matrix and embedded catalog with exact current source, binary and evidence profiles. Keep implementation, offline validation and native qualification separate.
 

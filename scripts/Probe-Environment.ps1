@@ -25,7 +25,35 @@ $programFiles64 = $env:ProgramW6432
 if ([string]::IsNullOrWhiteSpace($programFiles64)) { $programFiles64 = $env:ProgramFiles }
 $programFiles32 = ${env:ProgramFiles(x86)}
 if ([string]::IsNullOrWhiteSpace($programFiles32)) { $programFiles32 = $env:ProgramFiles }
-if (-not $TiaApiDirectory) { $TiaApiDirectory = Join-Path $programFiles64 'Siemens\Automation\Portal V21\PublicAPI\V21\net48' }
+function Get-RegisteredTiaApiDirectory {
+    $hklm = $null
+    $key = $null
+    try {
+        $hklm = [Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine, [Microsoft.Win32.RegistryView]::Registry64)
+        $key = $hklm.OpenSubKey('SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48')
+        if ($null -ne $key) {
+            $basePath = $key.GetValue('Siemens.Engineering.Base')
+            if ($basePath -is [string] -and -not [string]::IsNullOrWhiteSpace($basePath)) {
+                return [IO.Path]::GetDirectoryName($basePath)
+            }
+        }
+    }
+    finally {
+        if ($null -ne $key) { $key.Dispose() }
+        if ($null -ne $hklm) { $hklm.Dispose() }
+    }
+}
+
+function Get-TiaApiDirectory {
+    param([string]$ExplicitDirectory, [string]$DefaultDirectory)
+    if ($ExplicitDirectory) { return $ExplicitDirectory }
+    # Match the native worker; a denied registry read must not imply a missing installation.
+    $registeredDirectory = Get-RegisteredTiaApiDirectory
+    if ($registeredDirectory) { return $registeredDirectory }
+    return $DefaultDirectory
+}
+
+$TiaApiDirectory = Get-TiaApiDirectory $TiaApiDirectory (Join-Path $programFiles64 'Siemens\Automation\Portal V21\PublicAPI\V21\net48')
 if (-not $FrameworkReferenceDirectory) { $FrameworkReferenceDirectory = Join-Path $programFiles32 'Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8' }
 if (-not $StandardSimulatorDirectory) { $StandardSimulatorDirectory = Join-Path $programFiles64 'Siemens\Automation\PLCSIM_V21' }
 if (-not $AdvancedSimulatorDirectory) { $AdvancedSimulatorDirectory = Join-Path $programFiles32 'Siemens\Automation\PLCSIMADV' }
@@ -214,7 +242,7 @@ $report = [ordered]@{
         mode = 'metadata-only'
         powershellVersion = $PSVersionTable.PSVersion.ToString()
         is64BitProcess = [Environment]::Is64BitProcess
-        searchScope = 'Known installation paths only; use directory parameters for non-default installations.'
+        searchScope = 'Explicit directory parameters, the registered V21 Openness API location (64-bit registry), then known setup defaults; no recursive search.'
         runtimeInitializationAttempted = $false
         licenseStatus = 'unverified'
     }

@@ -77,6 +77,44 @@ function Run-Test {
 }
 
 try {
+    $tokens = $null
+    $parseErrors = $null
+    $probeAst = [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'Probe-Environment.ps1'), [ref]$tokens, [ref]$parseErrors)
+    if ($parseErrors.Count) { throw 'Probe script did not parse.' }
+    $resolver = @($probeAst.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-TiaApiDirectory' }, $true))
+    if ($resolver.Count -ne 1) { throw 'Expected one production TIA API directory resolver.' }
+    . ([scriptblock]::Create($resolver[0].Extent.Text))
+
+    Run-Test 'Explicit TIA API directory wins without reading registry' {
+        function Get-RegisteredTiaApiDirectory { throw 'Registry must not be read.' }
+        $actual = Get-TiaApiDirectory 'D:\explicit\net48' 'C:\default\net48'
+        if ($actual -ne 'D:\explicit\net48') { throw 'Explicit directory was ignored.' }
+    }
+    Run-Test 'Registered TIA API directory wins over setup default' {
+        function Get-RegisteredTiaApiDirectory { return 'D:\registered\net48' }
+        $actual = Get-TiaApiDirectory '' 'C:\default\net48'
+        if ($actual -ne 'D:\registered\net48') { throw 'Registered directory was ignored.' }
+    }
+    Run-Test 'Absent TIA API registration uses setup default' {
+        function Get-RegisteredTiaApiDirectory { return $null }
+        $actual = Get-TiaApiDirectory '' 'C:\default\net48'
+        if ($actual -ne 'C:\default\net48') { throw 'Setup default was not used.' }
+    }
+    Run-Test 'Denied TIA API registration does not fall back to a missing path' {
+        function Get-RegisteredTiaApiDirectory { throw [UnauthorizedAccessException]::new('Registry denied.') }
+        $rejected = $false
+        try { Get-TiaApiDirectory '' 'C:\default\net48' | Out-Null }
+        catch [UnauthorizedAccessException] { $rejected = $true }
+        if (-not $rejected) { throw 'Registry failure silently selected a fallback.' }
+    }
+    Run-Test 'Supplied evidence never invokes the local probe' {
+        $isolatedDoctor = Join-Path $testDirectory 'Test-TiaMcpEnvironment.ps1'
+        [IO.File]::Copy($doctor, $isolatedDoctor)
+        [IO.File]::WriteAllText((Join-Path $testDirectory 'Probe-Environment.ps1'), "throw 'Probe must not run in supplied-evidence mode.'")
+        [IO.File]::WriteAllText($fixturePath, ((New-Evidence) | ConvertTo-Json -Depth 20))
+        $report = (& $isolatedDoctor -EvidencePath $fixturePath) | ConvertFrom-Json
+        if ($report.mode -ne 'supplied-evidence' -or $report.selectedPrerequisites.status -ne 'present') { throw 'Evidence mode probed the machine or lost supplied evidence.' }
+    }
     Run-Test 'Metadata present never becomes runtime or license qualification' {
         $report = Run-Evidence (New-Evidence)
         if ($report.selectedPrerequisites.status -ne 'present' -or $report.capabilities.simulation.qualification -ne 'unverified') { throw 'Qualification leaked from installation metadata.' }
@@ -206,9 +244,12 @@ try {
     }
     Run-Test 'Supplied evidence cannot trigger installation path probes' {
         [IO.File]::WriteAllText($fixturePath, ((New-Evidence) | ConvertTo-Json -Depth 20))
-        $rejected = $false
-        try { & $doctor -EvidencePath $fixturePath -DotnetRoot 'C:\should-not-be-probed' | Out-Null } catch { $rejected = $true }
-        if (-not $rejected) { throw 'Evidence and probe overrides accepted together.' }
+        foreach ($name in @('BundlePath','DotnetRoot','TiaApiDirectory','AdvancedSimulatorDirectory','AdvancedRuntimeDirectory')) {
+            $overrides = @{$name='C:\should-not-be-probed'}
+            $rejected = $false
+            try { & $doctor -EvidencePath $fixturePath @overrides | Out-Null } catch { $rejected = $true }
+            if (-not $rejected) { throw "Evidence and $name accepted together." }
+        }
     }
     Run-Test 'Partial evidence produces unknown rather than success' {
         $report = Run-Evidence ([pscustomobject]@{schemaVersion=1;host=[pscustomobject]@{};probe=[pscustomobject]@{}})
@@ -226,7 +267,7 @@ try {
 }
 finally {
     # Remove only the exact files created by this run; no recursive deletion.
-    foreach ($name in @('evidence.json','saved.json')) {
+    foreach ($name in @('evidence.json','saved.json','Test-TiaMcpEnvironment.ps1','Probe-Environment.ps1')) {
         $path = Join-Path $testDirectory $name
         if ([IO.File]::Exists($path)) { [IO.File]::Delete($path) }
     }

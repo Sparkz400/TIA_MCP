@@ -10,7 +10,7 @@ The script writes a single JSON document to stdout. `-OutputPath` optionally sav
 
 By default, required prerequisites cover the host and offline engineering. `-RequireSimulation` also includes the simulation prerequisites in the selected result. Simulation always has a separate report, so missing PLCSIM Advanced does not prevent an offline-only installation from passing metadata checks.
 
-For non-default installations, use `-DotnetRoot`, `-TiaApiDirectory`, `-AdvancedSimulatorDirectory` and `-AdvancedRuntimeDirectory`. These select diagnostic search paths; they do not change the launcher's configuration. `AdvancedRuntimeDirectory` is the product's Common Files runtime root containing `API\8.0`, not the API-version directory itself. Default search locations are the known local install paths used by `Probe-Environment.ps1`; this is not a recursive disk search or complete installed-product inventory.
+For non-default installations, use `-DotnetRoot`, `-TiaApiDirectory`, `-AdvancedSimulatorDirectory` and `-AdvancedRuntimeDirectory`. These select diagnostic search paths; they do not change the launcher's configuration. Without an explicit `-TiaApiDirectory`, the probe uses Siemens' registered V21 API location in the 64-bit registry, matching the native worker. Only an absent/empty registration falls back to the setup default; an unreadable registration leaves the probe unavailable. `AdvancedRuntimeDirectory` is the product's Common Files runtime root containing `API\8.0`, not the API-version directory itself. Other default search locations are the known local install paths used by `Probe-Environment.ps1`; this is not a recursive disk search or complete installed-product inventory.
 
 ## What the report checks
 
@@ -67,7 +67,7 @@ The test suite generates supplied evidence, so it runs without TIA, PLCSIM or .N
 
 `Test-EnvironmentDiagnostics.ps1` contains complete fixtures. Evidence mode bypasses all environment probing, is labeled `supplied-evidence`, and rejects installation path overrides. It does not authenticate evidence or certify that a fixture describes the current machine. Missing evidence fields remain unavailable; supplied evidence must not be substituted for destination qualification.
 
-The 24 tests cover missing runtimes, stable/preview/major/patch selection, wrong architectures and API versions, unreadable/truncated metadata, restricted tokens, optional simulation, incomplete package evidence, output limits and deterministic mode isolation. Test cleanup deletes only its exact temporary JSON files and empty test directory.
+The 29 tests cover installation-path precedence and denied registration, missing runtimes, stable/preview/major/patch selection, wrong architectures and API versions, unreadable/truncated metadata, restricted tokens, optional simulation, incomplete package evidence, output limits and deterministic mode isolation. Path-selection tests load the production resolver with a synthetic registry reader; evidence-mode tests use a probe that refuses execution. No machine registry is changed. Test cleanup deletes only its exact temporary files and empty test directory.
 
 Local reports recorded on 8 October 2026:
 
