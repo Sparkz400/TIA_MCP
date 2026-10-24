@@ -173,3 +173,104 @@ TCP/IP adapter configuration: [Local communication](https://docs.tia.siemens.clo
 The installed V21 Base XML reference confirms `GetAccessibleDevices` returns
 accessible-device descriptors but supplies no convergence guarantee. Context7's
 CLI failed to launch in three attempts; no Context7 documentation was retrieved.
+
+### UI search refresh comparison
+
+`artifacts/p24-ui2/` uses the unchanged `n24al` worker in its explicit visible
+diagnostic mode, with a new project, sole owned empty CPU and retained process
+job. Unlike the earlier visible attempt, no UI input occurs before the
+coordinator confirms the owned CPU is in STOP. The coordinator pins its sources
+and every adjacent worker file. No credential, program download, RUN command,
+network configuration or uncertain-admission release is involved.
+
+The read-only UI sequence opens Project view, expands **Online access / PLCSIM
+[PN/IE]**, then double-clicks **Update accessible devices**. The captured TIA
+information pane records the search start at `2026-10-24 04:50:57 +02:00`.
+`ui-accessible-device.png` shows the resulting `S7-1500 CPU:192.168.0.1` node.
+The separate `ui-observation.json` timestamp is the later evidence-save time,
+not the action time.
+
+Both API providers produce 52 placeholder samples, two empty samples during
+the search, then seven endpoint samples. The first endpoint appears at
+`02:51:00.5785102Z` for the PLC provider and `02:51:00.8757137Z` for the project
+provider. The PLC provider's first endpoint lacks a device-series value; its
+next sample includes `S7-1500 CPU`. All endpoint samples carry address
+`192.168.0.1` and MAC `FF-FF-C0-A8-00-01`; the exact owned instance remains STOP
+with that address and Softbus throughout the 61-sample observation. The
+independent `discovery-assessment.json` validates those counts and binds the
+native report and UI evidence by hash. OFF and unregister then succeed, and
+both routes disappear in all three post-unregister samples.
+
+This establishes a usable local Softbus route in this run and a discovery
+transition following the scoped UI refresh. It suggests cached discovery data;
+it does not establish that repeated `GetAccessibleDevices()` calls themselves
+perform a new search, guarantee freshness, or qualify headless provisioning.
+No production target-selection guard or timeout was relaxed.
+
+The installed V8 manual (`A5E37039512-AK`, 11/2025, page 23) explicitly includes
+CPU 1511-1 PN firmware through V4.1. It therefore does not justify downgrading
+the selected V4.1 CPU to address this failure. Pages 41 and 59 describe the local
+Softbus route. Source hash and selected page extracts are retained in
+`artifacts/todo-resume-20261024/plcsim-installed-manual-review.json`; the public
+[Siemens manual](https://support.industry.siemens.com/cs/attachments/109997788/s7-plcsim_advanced_function_manual_en-US_en-US.pdf)
+identifies the same edition.
+
+A fresh metadata-only inventory of the installed public V21 API covers 15
+assemblies, 2,455 types and 32,286 members. The concrete
+`ConfigurationPcInterface` exposes `GetAccessibleDevices()` without a refresh
+parameter; no separate discovery refresh member was found in the inventory.
+`discovery-public-api-metadata.json` and its log are retained beside the manual
+review. This does not rule out runtime self-description or another documented
+workflow. The next investigation is a supported refresh operation, including
+its isolation and freshness evidence, rather than another unchanged timeout
+probe.
+
+The official V21 [accessible-device API documentation](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-the-data-of-a-plc-device/functions-for-accessing-plc-service/accessing-configuration-accessible-devices)
+describes a snapshot from one selected interface and the four returned fields;
+its example supplies no explicit refresh argument. This describes the API
+contract, not a proven explanation of the observed UI/API transition.
+
+The comparison's worker exits zero after closing the project and disconnecting.
+Its visible Portal remains open, so the exact original UI window is closed with
+Alt+F4 after the UI confirms `Project closed`. The storage helper subsequently
+exits naturally. All 13 job members are terminal and all 11 retained handles
+signal; one background crash detector exits `0xFFFFFFFF`, while the other ten
+retained exits are zero. The overall coordinator therefore remains failed for
+the normal deadline overrun and nonzero exit. Source/worker hashes are unchanged;
+no OS process termination is requested. UI close intent/return receipts and the
+closed-project screenshot remain alongside the original result.
+
+The visible diagnostic had used attachment disposal without the existing
+`OwnedQualificationPortal` process owner. It now reuses that owner exclusively
+for the new visible Portal it constructs. Headless diagnostics retain their
+previous connection lifetime; discovery and user-attached Portal descriptors
+remain disposal-free. The result records completion of explicit owned SDK
+process disposal separately from connection disposal. The `n24am` worker builds
+without warnings/errors, passes the compiled lifecycle boundary guard and all
+33 diagnostic argument-refusal checks. Source bindings validate while preserving
+all 117 historical evidence rows, including 106 unavailable local inputs.
+
+`artifacts/p24-ui3/` exercises that rebuilt worker with no UI input. All 61
+paired samples over 63,037 ms retain the placeholder while the exact empty CPU
+is STOP at `192.168.0.1`. OFF, unregister, project close and explicit owned SDK
+process disposal complete successfully. Both Portal processes exit without a
+UI close action. `probe-assessment.json` checks the full observation sequence
+and preserves the native-report hash. This confirms the visible diagnostic's
+closure fix and provides a no-search comparison; it does not qualify automatic
+discovery. The remaining file-storage helper again exceeds the normal deadline.
+
+The rebuilt attempt's final job has 13 total members and zero active members;
+all ten retained handles signal and close. Nine retained exit codes are zero;
+the background Portal crash detector returns `0xFFFFFFFF` again. The storage
+helper exits naturally about five minutes after the worker. This remains failed
+lifecycle evidence, even though explicit owned SDK closure fixes the lingering
+visible Portal. No OS termination command or UI input is used in this run.
+Source and binary pins remain unchanged. The final locked registry scan validates
+all 14 local dispatch tickets as terminal. The independent
+`discovery-ui-lifecycle-assessment.json` records both attempts' exit codes and
+failed lifecycle outcomes; `discovery-ui-native-guard.json` retains the scan.
+
+Only the primary `main` checkout exists; no task branch or unused worktree was
+created. Unique native reports, UI captures, worker builds and manual/API evidence
+are retained. No full offline aggregate was rerun for this diagnostic lifetime
+change, and no runtime or release acceptance is inferred.

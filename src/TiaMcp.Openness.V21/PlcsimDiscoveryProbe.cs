@@ -35,8 +35,10 @@ namespace TiaMcp.Openness.V21
             try
             {
                 File.WriteAllText(Path.Combine(root.FullName, "start-intent.json"), new JObject { ["startedAtUtc"] = Now() }.ToString());
-                using (var portal = new TiaPortal(visible ? TiaPortalMode.WithUserInterface : TiaPortalMode.WithoutUserInterface))
+                using (var ownedVisiblePortal = visible ? new OwnedQualificationPortal() : null)
+                using (var headlessPortal = visible ? null : new TiaPortal(TiaPortalMode.WithoutUserInterface))
                 {
+                    var portal = ownedVisiblePortal?.Connection ?? headlessPortal;
                     result["processId"] = PortalProcesses.CurrentId(portal);
                     File.WriteAllText(Path.Combine(root.FullName, "start-return.json"), new JObject { ["processId"] = result["processId"] }.ToString());
                     var projectDirectory = Path.Combine(root.FullName, "project");
@@ -120,6 +122,7 @@ namespace TiaMcp.Openness.V21
                     project.Close();
                 }
                 result["ownedPortalConnectionDisposed"] = true;
+                result["explicitOwnedSdkProcessDisposeCompleted"] = visible;
                 result["completed"] = true;
             }
             catch (Exception error)
