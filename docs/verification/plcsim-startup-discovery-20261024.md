@@ -339,3 +339,64 @@ termination. Source and worker pins remain unchanged. The normal deadline
 still fails because the storage helper exits late. The final guard assessment
 was read under the registry lock after the coordinator exited; these cleanup
 results do not release any earlier uncertain provisioning reservation.
+
+## Offline route selection and project reload
+
+The explicit `--plcsim-configured-discovery-probe` mode retains the pre-start
+observations and the 61 paired startup samples. After the fresh-provider
+comparison, it selects only the sole named target interface exposed by the
+scratch CPU's PN/IE / PLCSIM (1) route. It requires that exact owned simulator
+to remain the sole registered instance in STOP on Softbus, and requires the
+scratch connection to remain offline before and after configuration. It never
+calls GoOnline or downloads, supplies credentials, or changes network settings.
+
+Siemens documents `ApplyConfiguration` as selecting connection parameters before
+the separate online step; it overwrites the session's previous connection
+selection. This is confined to the new scratch project. The installed V21 SDK
+also exposes the target-interface overload. Context7's launcher failed again,
+so the reference used was Siemens' official [connection parameters documentation](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-the-data-of-a-plc-device/functions-for-accessing-plc-service/accessing-parameters-of-an-online-connection).
+
+`artifacts/p24-configured/`, using worker `n24ap`, applies the exact enumerated
+`1 X1` target successfully while remaining Offline. All three subsequent paired
+observations still return the placeholder. Its independent assessment checks
+159 device observations, including twelve absent-route observations before API
+initialization and after unregister. The first audit assertion incorrectly
+expected a placeholder in those absent-route phases; the assessment records
+that correction. The native result itself is unchanged.
+
+OFF, unregister and connection disposal succeed. All ten process-job members
+are terminal; all eight retained handles exit zero and close without automatic
+termination. The normal storage-helper deadline remains failed. Source and
+worker pins are unchanged, and a final locked registry scan finds seventeen
+terminal job tickets. Earlier uncertain provisioning reservations remain held.
+
+The final `n24aq` diagnostic adds a distinct observation after saving, closing
+and reopening the same scratch project. It checks the saved path, single-device
+identity, unmodified state, fresh providers and offline connection before
+sampling again. Both workers build without warnings or errors and pass the
+compiled lifecycle guard and all 65 mixed/duplicate-mode refusal checks. The
+previous worker fails the new-mode negative control without Siemens loading.
+Source bindings validate with all 117 historical evidence rows retained;
+106 unavailable historical inputs remain explicit.
+
+`artifacts/p24-reload/` uses that final worker. The route is again applied
+successfully while offline. Saving, closing and reopening the exact scratch
+project all return successfully, with the same path, one named device and no
+unsaved changes. All three paired samples after reopening still contain only
+the placeholder. The independent assessment checks all 165 device observations
+and the saved/closed/reopened receipts, and binds the unchanged native report.
+The owned CPU is subsequently powered OFF and unregistered.
+
+These experiments rule out route selection and project reload as sufficient
+refresh mechanisms in the observed Portal session. They do not qualify full
+project preservation, production provisioning or runtime behavior. A fresh
+Portal-session comparison retaining the pre-start isolation evidence remains
+the next useful lifetime experiment; no production check has been removed.
+
+The reload comparison's original process job subsequently drains naturally:
+ten total members, zero active members, and all eight retained handles closed
+with exit code zero. No automatic termination occurs. Source and worker pins
+match, and the final locked registry scan finds eighteen terminal tickets.
+Its only process-proof error is the exceeded original terminal deadline; late
+exit is cleanup evidence only. Both comparison fixtures and their binaries are
+retained as unique evidence. No extra branch or worktree was created.

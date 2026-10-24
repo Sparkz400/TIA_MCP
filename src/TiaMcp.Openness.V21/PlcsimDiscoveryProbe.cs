@@ -20,15 +20,17 @@ namespace TiaMcp.Openness.V21
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false)
+        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false, bool configureRoute = false)
         {
             if (lateDiscovery && !startCpu) throw new ArgumentException("Late discovery requires the explicit empty startup probe.");
+            if (configureRoute && (!startCpu || lateDiscovery || visible)) throw new ArgumentException("Configured discovery requires headless startup with the pre-start baseline.");
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
             result["emptyStartupRequested"] = startCpu;
             result["portalMode"] = visible ? "WithUserInterface" : "WithoutUserInterface";
             result["preStartDiscoverySkipped"] = lateDiscovery;
+            result["routeConfigurationRequested"] = configureRoute;
             Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
@@ -122,6 +124,49 @@ namespace TiaMcp.Openness.V21
                             result["downloadProviderFirstObservation"] = ObserveConfiguration(download.Configuration);
                             states.Add(Observe("C3-after-first-download-provider-query", provider, projectDiscovery));
                             checkpoint();
+                            if (configureRoute)
+                            {
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                var configuration = provider.Configuration;
+                                var pc = configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
+                                var targets = pc?.TargetInterfaces.Take(2).ToArray();
+                                if (provider.State != OnlineState.Offline || targets == null || targets.Length != 1 || string.IsNullOrWhiteSpace(targets[0].Name))
+                                    throw new InvalidOperationException("One named PLCSIM target interface and an offline scratch connection are required.");
+                                result["routeConfiguration"] = new JObject { ["targetInterface"] = targets[0].Name,
+                                    ["onlineStateBefore"] = provider.State.ToString(), ["applyAttempted"] = true };
+                                checkpoint();
+                                var applied = configuration.ApplyConfiguration(targets[0]);
+                                result["routeConfiguration"]["applied"] = applied;
+                                result["routeConfiguration"]["onlineStateAfter"] = provider.State.ToString();
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                if (!applied || provider.State != OnlineState.Offline)
+                                    throw new InvalidOperationException("Scratch route configuration failed or changed the offline state.");
+                                states.Add(Observe("C4-after-route-configuration", provider, projectDiscovery));
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                checkpoint();
+                                project.Save();
+                                if (project.IsModified) throw new InvalidOperationException("Scratch project did not reach saved state.");
+                                var savedPath = project.Path;
+                                var deviceName = device.Name;
+                                result["projectReload"] = new JObject { ["path"] = savedPath.FullName, ["saved"] = true, ["closeAttempted"] = true };
+                                checkpoint();
+                                project.Close();
+                                result["projectReload"]["closed"] = true;
+                                checkpoint();
+                                project = portal.Projects.Open(savedPath);
+                                if (project.Path.FullName != savedPath.FullName || project.IsModified || project.Devices.Count != 1 || project.Devices.Single().Name != deviceName)
+                                    throw new InvalidOperationException("Reopened scratch project identity or saved state changed.");
+                                device = project.Devices.Single();
+                                provider = AllItems(device.DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
+                                projectDiscovery = project.GetService<StationUploadProvider>();
+                                if (projectDiscovery == null || provider.State != OnlineState.Offline)
+                                    throw new InvalidOperationException("Reopened scratch discovery services are unavailable or online.");
+                                result["projectReload"]["reopened"] = true;
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                states.Add(Observe("C5-after-project-reload", provider, projectDiscovery));
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                checkpoint();
+                            }
                             owned.PowerOff(60000);
                             VerifySoleOwned(owned, ownedName, EOperatingState.Off);
                             result["ownedPowerOffVerified"] = true;
