@@ -115,7 +115,8 @@ jobs:
   package:
     name: Portable package and relocation
     runs-on: windows-latest
-    timeout-minutes: 20
+    # Hosted runs take 17-20 minutes; 20 cancelled successful-looking runs at the limit.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v6
