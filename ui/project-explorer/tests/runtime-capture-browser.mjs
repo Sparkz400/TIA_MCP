@@ -109,6 +109,20 @@ export async function runtimeCaptureBrowser(page,root,output,check,shot){
   const alarmSaved=path.join(output,'alarm-capture-roundtrip.json');await (await alarmDownload).saveAs(alarmSaved);
   assert.equal(await fs.readFile(alarmSaved,'utf8'),JSON.stringify(alarmInjected));
   check('Alarm capture keeps selected and unselected bindings distinct, rejects promoted claims without replacing the view, and escapes original supplied evidence');
+  const sinkText=await page.evaluate(h=>{
+    // Bypass the loaders: numeric fields must stay escaped at the sink even if validation ever loosens.
+    const texts=[],capture=structuredClone(projectExplorer.runtimeCapture.doc),row=capture.rows[0];
+    capture.rows=[{...row,sequence:h},{...row,sequence:1,kind:'gap',selectionId:null,readResultJson:null,errorCode:null,skippedPolls:h}];
+    projectExplorer.runtimeCapture={doc:capture,text:'',filter:'',page:0};projectExplorer.renderRuntimeCapture();texts.push(document.querySelector('.runtime-panel').innerText);
+    const ua={schemaVersion:'diagnostic-ua-observation.v1',acquisitionMode:'polling',limits:'',experimentId:'e',bindingId:'b',snapshotRef:'s',unselectedSignalIds:[],events:{},hypotheses:[],binding:{},
+      signals:[{signalId:'s1',observationCount:h,goodValues:h,uncertain:h,bad:h}],captureSource:{recordedProgress:{state:'ended',terminalReason:null},uncommittedDataUnknown:false,plan:{},rows:[{sequence:h,elapsedMilliseconds:0,kind:'read'}]}};
+    projectExplorer.runtimeCapture={doc:ua,text:'',filter:'',page:0};projectExplorer.renderRuntimeCapture();texts.push(document.querySelector('.runtime-panel').innerText);
+    return texts;
+  },'<img src=x onerror=alert(1)>');
+  assert.equal(await page.locator('.runtime-panel img').count(),0);
+  assert.match(sinkText[0],/<img src=x onerror=alert\(1\)>\t/);assert.match(sinkText[0],/Skipped <img src=x onerror=alert\(1\)> scheduled polls/);
+  assert.match(sinkText[1],/s1 · <img src=x onerror=alert\(1\)> observations · <img src=x onerror=alert\(1\)> good/);
+  check('Capture and UA observation views escape row sequences, gap counts and signal counts at the HTML sink');
   await page.getByRole('button',{name:'Back to project',exact:true}).click();assert.equal(await page.locator('.workspace').isVisible(),true);
   await page.setViewportSize({width:1440,height:1000});
 }

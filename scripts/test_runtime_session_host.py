@@ -116,7 +116,7 @@ def main():
             return accepted
     def start_server(name='server',keep_alive=False):
         srv=http.server.ThreadingHTTPServer(('127.0.0.1',0),KeepAliveHandler if keep_alive else Handler)
-        context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);context.load_cert_chain(str(tls/(name+'.crt')),str(tls/(name+'.key')))
+        context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);context.minimum_version=ssl.TLSVersion.TLSv1_2;context.load_cert_chain(str(tls/(name+'.crt')),str(tls/(name+'.key')))
         srv.socket=context.wrap_socket(srv.socket,server_side=True)
         threading.Thread(target=srv.serve_forever,daemon=True).start();return srv
     def client(artifact_root=None):
@@ -146,6 +146,7 @@ def main():
     def abandon(c,attempt):return call(c,'disconnect',dict(attemptId=attempt,acknowledgeUnknown=True))
     try:
         server=start_server();endpoint='https://127.0.0.1:'+str(server.server_port);c=client()
+        check(server.socket.context.minimum_version==ssl.TLSVersion.TLSv1_2,'Loopback TLS fixture refuses protocols below TLS 1.2')
         tools=c.request('tools/list')['tools'];check(len([t for t in tools if t['name'].startswith('runtime_web_')])==6,'Six runtime tools registered')
         alias_root=out/'owner-alias';(alias_root/'runtime-web').mkdir(parents=True)
         marker=out/'owner-target.txt';marker.write_text('retained-owner-marker')
@@ -277,7 +278,7 @@ def main():
         before=len(state['calls'])
         server.socket.context.load_cert_chain(str(tls/'rotated.crt'),str(tls/'rotated.key'))
         try:
-            probe_context=ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT);probe_context.check_hostname=False;probe_context.verify_mode=ssl.CERT_NONE
+            probe_context=ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT);probe_context.minimum_version=ssl.TLSVersion.TLSv1_2;probe_context.check_hostname=False;probe_context.verify_mode=ssl.CERT_NONE
             with socket.create_connection(('127.0.0.1',server.server_port),timeout=5) as plain:
                 with probe_context.wrap_socket(plain,server_hostname='localhost') as peer:
                     observed_pin=hashlib.sha256(peer.getpeercert(binary_form=True)).hexdigest()
