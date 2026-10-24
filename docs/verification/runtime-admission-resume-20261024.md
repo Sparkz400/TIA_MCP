@@ -107,6 +107,34 @@ The fresh `environment-path-probe.json` resolves
 `environment-default-fixed.json` reports all required simulation-profile prerequisite
 metadata present. No Siemens worker, project or CPU was started by these checks.
 
+## Durable native failure identity
+
+After Host restart, the admission previously retained the exception type but lost
+the native error code and original report identity. `failure.json` now also retains
+`nativeErrorCode` and `nativeDetailsSha256`. The fingerprint is SHA-256 of the
+existing `CanonicalJson` UTF-8 encoding of `{"details": <original native details>}`:
+object keys sort ordinally, arrays retain order and numeric representations are
+preserved. Absent details have a null fingerprint; explicit JSON null has the
+fingerprint of `{"details":null}`. Host-added `mutationAdmission` is excluded.
+The record stores neither the native error message nor raw details or tickets.
+
+The regression fails against the previous implementation at the missing retained
+error code (`admission-failure-before.log`). The fixed Release engineering suite
+passes, including 64 admission checks (`admission-failure-final.log` under
+`artifacts/todo-resume-20261024/`). Object, string, explicit null and absent details
+are covered, with fingerprints independently calculated from known JSON bytes,
+reopened durable records, no raw diagnostic retention and continued resource
+conflict refusal. The build has zero warnings/errors. Current source bindings
+validate with all historical evidence rows preserved; 106 historical inputs remain
+unavailable in this checkout and release acceptance remains false
+(`admission-failure-bindings.json`). No full aggregate or native run was repeated.
+
+This supplies a report identity for later independent comparison; it does not
+establish that cleanup succeeded. Provisioning still needs a complete before-state
+baseline and fresh independent project/storage observations before reconciliation.
+Existing watch/component captures cover bounded fixtures, not a generic whole
+project. No old reservation is released and no native operation is replayed.
+
 ## Remaining work
 
 The reviewed placeholder exclusion is already in public `main` through `54f0237`;

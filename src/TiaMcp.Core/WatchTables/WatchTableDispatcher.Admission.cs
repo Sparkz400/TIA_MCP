@@ -63,8 +63,13 @@ public sealed partial class WatchTableDispatcher
                     if (current.State == "dispatchIntent")
                     {
                         string directory = PackageStorage.Under(root, "mutation-responses/" + record.Id); Directory.CreateDirectory(directory);
+                        var nativeDetails = (error as BridgeOperationException)?.Details;
+                        // Bind a later independent report check without persisting raw diagnostic text or credentials.
+                        string? nativeDetailsHash = nativeDetails is null ? null : CanonicalJson.Sha256(new JsonObject {
+                            ["details"] = JsonNode.Parse(nativeDetails.Value.GetRawText()) });
                         var proof = Save(directory, "failure.json", new { type = error.GetType().FullName, automaticReplay = false,
-                            nativeOutcome = "unknown", admissionId = record.Id });
+                            nativeOutcome = "unknown", admissionId = record.Id,
+                            nativeErrorCode = (error as BridgeException)?.Code, nativeDetailsSha256 = nativeDetailsHash });
                         admissions.Unknown(record.Id, current.Revision, proof);
                     }
                 }

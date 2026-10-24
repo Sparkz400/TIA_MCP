@@ -1537,8 +1537,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.Admission.cs",
-      "sha256": "cb28ad0a33454371ccc0f4ad99ca56c3504a9fdfb264e6d150f80763596467a4",
-      "bytes": 6102
+      "sha256": "4cecba409fe4f1278ada3bb20d2c5162cf7677ac3a91cd8dc54f5e36fb82c96d",
+      "bytes": 6649
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.Authoring.cs",

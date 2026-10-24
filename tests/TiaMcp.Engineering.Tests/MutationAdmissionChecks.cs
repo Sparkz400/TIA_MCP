@@ -132,17 +132,17 @@ internal static class MutationAdmissionChecks
         catch (BridgeException error) when (error.Code == "ArtifactRootMismatch") { passed++; }
         Check(outsideNative.Calls.Count == 0, "Outside artifact root is refused before any native scope call");
         foreach (JsonElement? nativeDetails in new JsonElement?[] {
-            JsonSerializer.SerializeToElement(new { stage = "discoverExactRuntimeAddress", originalProgramCardRestored = true }),
-            JsonSerializer.SerializeToElement("retained native detail"), null })
+            JsonSerializer.SerializeToElement(new { stage = "discoverExactRuntimeAddress", originalProgramCardRestored = true, downloadTicket = "private-ticket-sentinel" }),
+            JsonSerializer.SerializeToElement("retained native detail"), JsonSerializer.SerializeToElement<object?>(null), null })
         {
             var provisionNative = new AdmissionNative(Scope(Path.Combine(dispatcherRoot, Guid.NewGuid() + ".ap21")) with {
                 Operation = "simulation_provision_scratch_credential" }) {
-                DispatchError = new BridgeOperationException("SimulationProvisionTargetAmbiguous", "Original provisioning failure", nativeDetails) };
+                DispatchError = new BridgeOperationException("SimulationProvisionTargetAmbiguous", "Original provisioning failure: private-message-sentinel", nativeDetails) };
             var provisionDispatcher = new WatchTableDispatcher(provisionNative, dispatcherRoot);
             try { await provisionDispatcher.CallAsync("simulation_provision_scratch_credential", new { }); throw new Exception("Expected provisioning failure"); }
             catch (BridgeOperationException error)
             {
-                Check(error.Code == "SimulationProvisionTargetAmbiguous" && error.Message == "Original provisioning failure", "Admission diagnostics preserve native error identity");
+                Check(error.Code == "SimulationProvisionTargetAmbiguous" && error.Message == "Original provisioning failure: private-message-sentinel", "Admission diagnostics preserve native error identity");
                 var details = error.Details!.Value;
                 var admission = details.GetProperty("mutationAdmission");
                 string id = admission.GetProperty("admissionId").GetString()!;
@@ -151,10 +151,22 @@ internal static class MutationAdmissionChecks
                 var retained = await provisionDispatcher.CallAsync("engineering_operation_status", new { operationId = id });
                 Check(retained.GetProperty("state").GetString() == "outcomeUnknown" &&
                     retained.GetProperty("scope").GetProperty("operation").GetString() == "simulation_provision_scratch_credential", "Reported admission identifies the actual durable failed provisioning");
+                var reopened = new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id);
+                string failureText = File.ReadAllText(Path.Combine(dispatcherRoot, reopened.Response!.RelativePath));
+                var failure = JsonNode.Parse(failureText)!.AsObject();
+                Check(failure["nativeErrorCode"]?.GetValue<string>() == "SimulationProvisionTargetAmbiguous", "Retained failure preserves the native error code across Host restart");
+                string? expectedDetailsHash = nativeDetails?.ValueKind switch {
+                    JsonValueKind.Object => "3952f1313583c3ebda7b7a9787fd5a57d85eeb6625a98fc501991585548ff9e6",
+                    JsonValueKind.String => "127ce1cc043b48dadbf2e51c6129d4e2f9fd9791354307d4c974a8ff5115d511",
+                    JsonValueKind.Null => "6b4e98e14b161756a369417681401d993ac9fdd04374ad2da30575a933a218bd",
+                    _ => null };
+                Check(failure["nativeDetailsSha256"]?.GetValue<string>() == expectedDetailsHash, "Retained fingerprint binds exact native details and distinguishes absent from JSON null");
+                Check(!failureText.Contains("private-ticket-sentinel") && !failureText.Contains("private-message-sentinel") &&
+                    !failureText.Contains("retained native detail"), "Durable failure excludes raw native diagnostic text and ticket material");
                 Check(provisionNative.Calls.SequenceEqual(["mutation_begin", "mutation_dispatch", "mutation_end"]), "Status inspection performs no native replay");
                 if (nativeDetails?.ValueKind == JsonValueKind.Object)
                     Check(details.GetProperty("stage").GetString() == "discoverExactRuntimeAddress" && details.GetProperty("originalProgramCardRestored").GetBoolean(), "Native object details retain their existing shape");
-                else if (nativeDetails is not null)
+                else if (nativeDetails?.ValueKind == JsonValueKind.String)
                     Check(details.GetProperty("nativeDetails").GetString() == "retained native detail", "Non-object native details are retained");
                 Reject(() => new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(provisionNative.Scope, new('a', 64)), "ResourceBusy");
             }
