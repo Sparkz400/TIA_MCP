@@ -43,7 +43,6 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 ## Release acceptance
 
 - [ ] Requalify the last two features demoted on 24 October: `simulation_download` (power-on timed out after download) and `deployment.vm_qualification` (needs the VMware guest). The other 34 are verified with committed evidence; see [requalification](verification/catalog-requalification-20261024.md).
-- [ ] Update the `qualify_reliability.py` test-double worker for `mutation_begin`; ten fake failure-boundary modes fail against the current Host.
 - [ ] Freeze the advertised V21 operation/profile/target matrix and bind each cell to applicable engineering, preservation, persistence, recovery and runtime evidence with exact lineage.
 - [ ] Qualify native interruption/transport loss and uncertain-outcome reconciliation for every advertised recoverable mutation, including multi-resource recovery and no replay.
 - [ ] Complete missing feature-specific remote/VM transfer, interrupted upload/reconnect and machine-prerequisite checks. Do not repeat accepted general VM evidence without a new reason.

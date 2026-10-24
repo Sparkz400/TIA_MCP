@@ -2,9 +2,9 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.reliability.20261024",
   "outcome": "passed",
-  "recordedAtUtc": "2026-10-24T09:02:42+00:00",
+  "recordedAtUtc": "2026-10-24T09:52:50+00:00",
   "source": {
-    "commit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
+    "commit": "6fcc20e7002193bc132089206f9b8a49e0523a2d",
     "dirty": false
   },
   "environment": {
@@ -12,29 +12,33 @@
     "os": "Windows-11-10.0.26300-SP0",
     "tiaVersion": 21
   },
-  "scope": "scripts/qualify_reliability.py --live --modes early-exit with a checkpoint journal from local.milestones.20261024: fresh Host reads the persisted change journal (change_status), owned TIA V21 start, wrong archive hash rejected, hash-verified checkpoint retrieval into a new owned project, read-only observer attach and detach on the owner's process, owner session status preserved after observer detach and observer Host exit, block XML unchanged, second retrieval from a fresh Host into a new directory.",
+  "scope": "scripts/qualify_reliability.py --live with all eleven fake-worker failure-boundary modes and a checkpoint journal from local.milestones.20261024: fresh Host reads the persisted change journal (change_status), owned TIA V21 start, wrong archive hash rejected, hash-verified checkpoint retrieval into a new owned project, read-only observer attach and detach on the owner's process, owner session status preserved after observer detach and observer Host exit, block XML unchanged, second retrieval from a fresh Host into a new directory.",
   "limitations": [
-    "Only the early-exit fake-worker mode ran; the other ten failure-boundary modes fail against the current Host because the fake worker predates mutation_begin, and are not part of this record.",
     "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
-    "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only."
+    "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only; failure-boundary modes use the test-double worker, not Siemens."
   ],
   "binaries": [
     {
       "name": "net10.0-windows",
       "files": 26,
-      "sha256": "21030d089231770beaf8d0aac36102e00b6eb6c6d176b13f65a4a02e2af66a65"
+      "sha256": "61a28505b9176515e50f0518508462de3a299c061b3bc6f8e7a495998aa20314"
     },
     {
       "name": "net48",
       "files": 6,
-      "sha256": "0dfcc5a9b5552593d1eb0e92a032f1a3b6dd489c6fee423c914f7f9f0be2c60f"
+      "sha256": "68e87e2feddbb6728a7b07c515276b333710b7c90604f1a37e25da9ccf1c2b3c"
+    },
+    {
+      "name": "net10.0-windows",
+      "files": 5,
+      "sha256": "0e4701ee0aef013b3d7b67cddf102a6ee95971eec0c9d8e779cbc3820c2bc1c5"
     }
   ],
   "runs": [
     {
       "report": "reliability.json",
-      "sha256": "9d4ea5f09b5b1c5e299cf145cda27f9d6cd7dae6d5043c3e7c187ac1e7407512",
-      "bytes": 47575,
+      "sha256": "0c03c3342def735e877aad91660fff672f988d72ffdf97a95f473ff13f86e6f1",
+      "bytes": 78588,
       "completed": true,
       "steps": [],
       "toolsPassed": [

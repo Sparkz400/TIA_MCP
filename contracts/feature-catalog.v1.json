@@ -1178,24 +1178,6 @@
       ]
     },
     {
-      "id": "local.reliability.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "4a5ca1580bba4c6250e224b6c0c3b91aa7c0c9cd",
-        "passedScope": "scripts/qualify_reliability.py --live --modes early-exit with a checkpoint journal from local.milestones.20261024: fresh Host reads the persisted change journal (change_status), owned TIA V21 start, wrong archive hash rejected, hash-verified checkpoint retrieval into a new owned project, read-only observer attach and detach on the owner's process, owner session status preserved after observer detach and observer Host exit, block XML unchanged, second retrieval from a fresh Host into a new directory."
-      },
-      "artifacts": [
-        "evidence/local.reliability.20261024.json"
-      ],
-      "limitations": [
-        "Only the early-exit fake-worker mode ran; the other ten failure-boundary modes fail against the current Host because the fake worker predates mutation_begin, and are not part of this record.",
-        "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
-        "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only."
-      ]
-    },
-    {
       "id": "local.sim.creation.20261024",
       "status": "passed",
       "profile": {
@@ -1260,6 +1242,23 @@
       ],
       "limitations": [
         "Reopens one saved repository scratch project; customer projects, upgrades from older TIA versions, protected or multiuser projects are not covered."
+      ]
+    },
+    {
+      "id": "local.reliability.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "6fcc20e7002193bc132089206f9b8a49e0523a2d",
+        "passedScope": "scripts/qualify_reliability.py --live with all eleven fake-worker failure-boundary modes and a checkpoint journal from local.milestones.20261024: fresh Host reads the persisted change journal (change_status), owned TIA V21 start, wrong archive hash rejected, hash-verified checkpoint retrieval into a new owned project, read-only observer attach and detach on the owner's process, owner session status preserved after observer detach and observer Host exit, block XML unchanged, second retrieval from a fresh Host into a new directory."
+      },
+      "artifacts": [
+        "evidence/local.reliability.20261024.json"
+      ],
+      "limitations": [
+        "Attachment is to an owned headless Portal started by this run, not to a user-started Portal with UI.",
+        "One scratch checkpoint; recovery is checked by block XML hash for TiaMcp_IsEnabled only; failure-boundary modes use the test-double worker, not Siemens."
       ]
     }
   ],

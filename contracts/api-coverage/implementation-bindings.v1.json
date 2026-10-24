@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "e117d5b91b49f7bf54abf0a10dc231002374f970e3559d74ad75a90f40942d1c",
-      "bytes": 686972
+      "sha256": "2053b05eadc38e782bdde2cd16fa1e710aa8ef43db89eb049eb0d104721d5058",
+      "bytes": 686865
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -81586,7 +81586,7 @@
       "evidenceRefs": [
         {
           "id": "local.reliability.20261024",
-          "profileSha256": "b669c2aa6264e1b3cd5e1adcf641491ebe6b27ca32a0ea4f8628cc1501487683",
+          "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9",
           "artifacts": [
             "evidence/local.reliability.20261024.json"
           ]
@@ -88050,7 +88050,7 @@
       "evidenceRefs": [
         {
           "id": "local.reliability.20261024",
-          "profileSha256": "b669c2aa6264e1b3cd5e1adcf641491ebe6b27ca32a0ea4f8628cc1501487683",
+          "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9",
           "artifacts": [
             "evidence/local.reliability.20261024.json"
           ]
@@ -88202,7 +88202,7 @@
       "evidenceRefs": [
         {
           "id": "local.reliability.20261024",
-          "profileSha256": "b669c2aa6264e1b3cd5e1adcf641491ebe6b27ca32a0ea4f8628cc1501487683",
+          "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9",
           "artifacts": [
             "evidence/local.reliability.20261024.json"
           ]
@@ -90930,7 +90930,7 @@
     {
       "path": "evidence/local.reliability.20261024.json",
       "state": "observed",
-      "sha256": "ebb6dec3a83b5c1f0514d19f7cf49b26678bbff6d5b799349b90f71dff60775a"
+      "sha256": "fcec66b5d014bb2356bed9a04e8de4bd49d1a1e28940f1714994eac289932706"
     },
     {
       "path": "evidence/local.reopen.20261024.json",
@@ -91112,7 +91112,7 @@
     },
     {
       "id": "local.reliability.20261024",
-      "profileSha256": "b669c2aa6264e1b3cd5e1adcf641491ebe6b27ca32a0ea4f8628cc1501487683"
+      "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9"
     },
     {
       "id": "local.reopen.20261024",

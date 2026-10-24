@@ -40,7 +40,7 @@ client) record tool calls, and the runners below copy them into their reports.
 | `local.milestones.20261024` | `validate_milestones.py --skip-simulation` | `block_interface`, `call_graph`, `change_impact`, `symbol_trace`, `fixture_sources`, `artifact_read`, `type_read`, `block_read` |
 | `local.hardware.20261024` | `smoke_hardware_to.py --skip-technology` | `tag_table_read`, `hardware_catalog_search`, `type_read` |
 | `local.reopen.20261024` | `smoke_hardware_to.py --project` (saved hardware scratch) | `project_open` |
-| `local.reliability.20261024` | `qualify_reliability.py --live --modes early-exit` | `tia_attach`, `tia_session_status`, `project_retrieve` |
+| `local.reliability.20261024` | `qualify_reliability.py --live` (all eleven fake-worker modes) | `tia_attach`, `tia_session_status`, `project_retrieve` |
 | `local.reviews.20261024` | `qualify_project_reviews.py` | `project_snapshot_compare`, `project_snapshot_search`, `project_health_report` |
 | `local.explorer.20261024` | `qualify_project_explorer.py` | `project_model_release` |
 | `local.sim.creation.20261024` | `qualify_simulator_creation.py` | `sim_status`, `sim_create`, `sim_release`, `sim_creation_status` |
@@ -63,15 +63,16 @@ The earlier evidence records stay in the catalog as history, uncited.
 - `validate_milestones.py` and `smoke_hardware_to.py` accept `--worker` and
   `--artifacts`. `qualify_project_reviews.py` adds its own `rv_<id>` folder, so its
   artifact root must stay short (`artifacts/v` here).
+- The `qualify_reliability.py` test-double worker predated the Host's
+  `mutation_begin`/`mutation_dispatch`/`mutation_end` admission, so ten of its
+  eleven failure-boundary modes failed. It now returns a bounded workspace scope
+  and runs the admitted write on dispatch; the harness counts dispatches as
+  native writes. All eleven pass, alongside the native part.
 
 ## What stays open
 
 - `simulation_download`: rerun once power-on after download is reliable (see the
   runtime lifecycle work); `deployment.vm_qualification`: needs the VMware guest.
-- The ten other fake-worker modes of `qualify_reliability.py` (`eof`,
-  `partial-frame`, `wrong-id` and the rest) fail against the current Host: the
-  test-double worker never answers `mutation_begin`. They are failure-boundary
-  checks, not part of `local.reliability.20261024`, and need the double updated.
 - Native evidence applies to the recorded binary tree hashes. The Host embeds
   the catalog, so the Host built after this catalog change has a different hash
   from the one that ran; later binaries need their own runs.
