@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.0",
+  "catalogVersion": "0.4.1",
   "targetTiaVersions": [
     21
   ],
@@ -1051,6 +1051,45 @@
         "Complete global relationship coverage remains unqualified at the existing provider traversal bound; authored-edge acceptance and complete metadata coverage are separate gates.",
         "Generated source logic is sampled at first/middle/last function per batch; no all-function payload or runtime proof is claimed.",
         "Native evidence applies to the exact frozen build. Browser evidence applies to separately recorded current renderer hashes, not actual desktop MCP Apps host rendering."
+      ]
+    },
+    {
+      "id": "local.sim.startup.20261024",
+      "status": "passed",
+      "profile": {
+        "simulatorVersion": 8,
+        "operation": "Fresh empty CPU lifecycle through actual MCP",
+        "cpuType": "CPU1511",
+        "networkMode": "Softbus",
+        "actions": [
+          "powerOn",
+          "powerOff"
+        ],
+        "observedStates": [
+          "Off",
+          "Stop",
+          "Off"
+        ],
+        "programDownloaded": false,
+        "binarySha256": {
+          "TiaMcp.Core.dll": "81263001004b9daf8a8881bbdd5ca282b57ca7d9cf01d5c089923971c031debd",
+          "TiaMcp.Host.dll": "ebddf2ab88d437449a02d305faaa6e1f749a39aff744f1b5aab9897b186e6960",
+          "TiaMcp.Simulator.V8.exe": "b437f5aff4660279775224ba9688382d255b9dcd504ee8b624bc8c3eb89fe52b"
+        },
+        "harnessSha256": "0fb9c1ca394e005c8af0c3a62c3d65e7a971d8f23ea973754a52ae75f18e9992",
+        "resultSha256": "7675016ef79859510879128c2b52b69c9c706bc59a9309c43514ba59c331770f"
+      },
+      "artifacts": [
+        "artifacts/p24-simstate04/request.json",
+        "artifacts/p24-simstate04/startup.json",
+        "artifacts/p24-simstate04/result.json",
+        "artifacts/p24-simstate04/owned-job-terminal.json",
+        "docs/verification/simulator-startup-20261024.md"
+      ],
+      "limitations": [
+        "One fresh empty local CPU only; no TIA project, discovery, download, RUN, program I/O or requested-stop qualification.",
+        "Exact retained n24 binaries; current catalog metadata is embedded separately and is not part of this native run.",
+        "Original non-breakaway job and captured handles exited normally; no brokered/alternate-parent or individual ephemeral-process guarantee."
       ]
     }
   ],
@@ -2613,15 +2652,17 @@
         ]
       },
       "qualification": {
-        "status": "failed",
+        "status": "unverified",
         "evidenceIds": [
-          "local.sim.startup.v02"
+          "local.sim.startup.v02",
+          "local.sim.startup.20261024"
         ]
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Local PLCSIM Advanced V8 returns ErrorLoadingDll (-21), including an empty instance."
+          "Fresh empty local Softbus CPU powerOn/powerOff passed on 24 October with the retained binary profile; the earlier loader failure remains historical evidence.",
+          "Target availability, downloaded-program RUN/stop behavior and complete lifecycle/recovery still require qualification."
         ]
       },
       "prerequisites": [

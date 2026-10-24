@@ -108,6 +108,14 @@ class NativeAudit:
             self.persist()
 
 
+def verify_owned_instance(instance):
+    if (not isinstance(instance, dict) or instance.get("owned") is not True
+            or type(instance.get("id")) is not int or instance["id"] < 0
+            or not isinstance(instance.get("name"), str) or not instance["name"].strip()):
+        raise RuntimeError("Simulator did not return a verified owned identity.")
+    return instance
+
+
 def verify_download(download, instance):
     errors = download.get("download", {}).get("errors")
     if download.get("completed") is not True or type(errors) is not int or errors != 0:
@@ -297,10 +305,7 @@ class McpRuntimeBackend:
         self.evidence["creationId"] = uuid.uuid4().hex
         try:
             created = self.native("sim_create", {"cpuType": "CPU1511", "creationId": self.evidence["creationId"]})
-            instance = created["instance"]
-            if (instance.get("owned") is not True or type(instance.get("id")) is not int or instance["id"] < 0
-                    or not isinstance(instance.get("name"), str) or not instance["name"]):
-                raise RuntimeError("Simulator creation did not return a verified owned identity.")
+            instance = verify_owned_instance(created["instance"])
             self.instance_id = instance["id"]  # ID zero is valid and must still be cleaned up.
             self.instance = instance
             self.identity_verified = True

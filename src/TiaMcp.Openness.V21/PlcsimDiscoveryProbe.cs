@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.Connection;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.Online;
+using Siemens.Engineering.Upload;
 using Siemens.Simatic.Simulation.Runtime;
 
 namespace TiaMcp.Openness.V21
@@ -45,14 +47,16 @@ namespace TiaMcp.Openness.V21
                         .ThenBy(e => e.ArticleNumber, StringComparer.Ordinal).First();
                     var device = project.Devices.CreateWithItem(cpu.TypeIdentifier, "ProbePLC", "ProbeStation");
                     var provider = AllItems(device.DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
+                    var projectDiscovery = project.GetService<StationUploadProvider>();
+                    if (projectDiscovery == null) throw new InvalidOperationException("Project discovery service is unavailable.");
                     result["cpu"] = cpu.TypeIdentifier;
 
-                    states.Add(Observe("A-nothing-touched", provider));
+                    states.Add(Observe("A-nothing-touched", provider, projectDiscovery));
                     runtimeInitializationAttempted = true;
                     result["runtimeVersion"] = SimulationRuntimeManager.Version.ToString("X8"); // initializes the PLCSIM Advanced API
                     result["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString();
                     var preexisting = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo.Select(i => new JObject { ["id"] = i.ID, ["name"] = i.Name }));
-                    var stateB = Observe("B-runtime-initialized", provider);
+                    var stateB = Observe("B-runtime-initialized", provider, projectDiscovery);
                     stateB["registeredInstances"] = preexisting;
                     states.Add(stateB);
 
@@ -66,7 +70,7 @@ namespace TiaMcp.Openness.V21
                         owned = SimulationRuntimeManager.RegisterInstance(ECPUType.CPU1511, ownedName);
                         owned.StoragePath = Directory.CreateDirectory(Path.Combine(root.FullName, "sim", ownedName)).FullName;
                         result["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName, ["storagePath"] = owned.StoragePath };
-                        var stateC = Observe("C-owned-off-softbus-instance", provider);
+                        var stateC = Observe("C-owned-off-softbus-instance", provider, projectDiscovery);
                         stateC["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName,
                             ["operatingState"] = owned.OperatingState.ToString(), ["communicationInterface"] = owned.CommunicationInterface.ToString() };
                         states.Add(stateC);
@@ -91,7 +95,7 @@ namespace TiaMcp.Openness.V21
                             {
                                 if (i > 0) Thread.Sleep(1000);
                                 VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
-                                var sample = Observe("startup", provider, 1);
+                                var sample = Observe("startup", provider, projectDiscovery, 1);
                                 sample["elapsedMs"] = clock.ElapsedMilliseconds;
                                 sample["controllerAddresses"] = new JArray(owned.ControllerIP ?? new string[0]);
                                 sample["controllerName"] = owned.ControllerName;
@@ -110,7 +114,7 @@ namespace TiaMcp.Openness.V21
                         // Self-check: the probe must leave no registration behind.
                         result["ownedInstanceUnregistered"] = !SimulationRuntimeManager.RegisteredInstanceInfo.Any(i => i.Name == ownedName);
                         if (!result.Value<bool>("ownedInstanceUnregistered")) throw new InvalidOperationException("Owned probe instance is still registered.");
-                        states.Add(Observe("D-after-unregister", provider));
+                        states.Add(Observe("D-after-unregister", provider, projectDiscovery));
                     }
                     project.Close();
                 }
@@ -163,28 +167,43 @@ namespace TiaMcp.Openness.V21
                 throw new InvalidOperationException("Owned simulator registration identity changed; no cleanup mutation attempted.");
         }
 
-        private static JObject Observe(string label, OnlineProvider provider, int count = SnapshotsPerState)
+        private static JObject Observe(string label, OnlineProvider provider, StationUploadProvider projectDiscovery, int count = SnapshotsPerState)
         {
             var state = new JObject { ["state"] = label, ["simulatorProcesses"] = SimulatorProcesses(), ["snapshots"] = new JArray() };
             for (int i = 0; i < count; i++)
             {
                 if (i > 0) Thread.Sleep(1000);
-                var mode = provider.Configuration.Modes.Find("PN/IE");
-                var pc = mode?.PcInterfaces.Find("PLCSIM", 1);
-                var devices = pc?.GetAccessibleDevices().Take(65).ToArray();
-                ((JArray)state["snapshots"]).Add(new JObject {
-                    ["observedAtUtc"] = Now(),
-                    ["pnIeInterfaces"] = mode == null ? null : new JArray(mode.PcInterfaces.Select(p => p.Name + " (" + p.Number + ")")),
-                    ["plcsimRoute"] = pc != null,
-                    ["devices"] = devices == null ? null : new JArray(devices.Select(d => new JObject {
-                        ["name"] = d.Name, ["address"] = d.Address, ["macAddress"] = d.MACAddress, ["deviceSeries"] = d.DeviceSeries })) });
+                var sample = ObserveConfiguration(provider.Configuration);
+                sample["stationUploadProvider"] = ObserveConfiguration(projectDiscovery.Configuration);
+                ((JArray)state["snapshots"]).Add(sample);
             }
             return state;
         }
 
-        private static JArray SimulatorProcesses() => new JArray(Process.GetProcesses()
-            .Where(p => p.ProcessName.IndexOf("sim", StringComparison.OrdinalIgnoreCase) >= 0 || p.ProcessName.IndexOf("Simulation", StringComparison.OrdinalIgnoreCase) >= 0)
-            .Select(p => p.ProcessName + " (" + p.Id + ")").OrderBy(n => n, StringComparer.Ordinal));
+        private static JObject ObserveConfiguration(ConnectionConfiguration configuration)
+        {
+            var mode = configuration.Modes.Find("PN/IE");
+            var pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+            var devices = pc?.GetAccessibleDevices().Take(65).ToArray();
+            return new JObject {
+                ["observedAtUtc"] = Now(),
+                ["pnIeInterfaces"] = mode == null ? null : new JArray(mode.PcInterfaces.Select(p => p.Name + " (" + p.Number + ")")),
+                ["plcsimRoute"] = pc != null,
+                ["configuredAddresses"] = pc == null ? null : new JArray(pc.Addresses.Select(a => a.Name)),
+                ["targetInterfaces"] = pc == null ? null : new JArray(pc.TargetInterfaces.Select(t => t.Name)),
+                ["truncated"] = devices != null && devices.Length > 64,
+                ["devices"] = devices == null ? null : new JArray(devices.Select(d => new JObject {
+                    ["name"] = d.Name, ["address"] = d.Address, ["macAddress"] = d.MACAddress, ["deviceSeries"] = d.DeviceSeries })) };
+        }
+
+        private static JArray SimulatorProcesses()
+        {
+            var processes = Process.GetProcesses();
+            try { return new JArray(processes
+                .Where(p => p.ProcessName.IndexOf("sim", StringComparison.OrdinalIgnoreCase) >= 0 || p.ProcessName.IndexOf("Simulation", StringComparison.OrdinalIgnoreCase) >= 0)
+                .Select(p => p.ProcessName + " (" + p.Id + ")").OrderBy(n => n, StringComparer.Ordinal)); }
+            finally { foreach (var process in processes) process.Dispose(); }
+        }
 
         private static System.Collections.Generic.IEnumerable<DeviceItem> AllItems(DeviceItemComposition items) =>
             items.SelectMany(i => new[] { i }.Concat(AllItems(i.DeviceItems)));

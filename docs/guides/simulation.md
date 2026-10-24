@@ -4,6 +4,13 @@ The [reusable block-testing system](block-testing.md) composes this adapter with
 
 The simulator runs in a separate x64 .NET Framework 4.8 worker. Its public API comes from the locally installed PLCSIM Advanced V8 installation; Siemens binaries are not distributed with this repository. Standard PLCSIM V21 is detected by the environment probe but is not this runtime adapter's public API target.
 
+On 24 October, a fresh empty CPU passed the actual MCP power-on to STOP,
+power-off, unregistration and normal process-exit sequence with pinned binaries.
+The [scoped startup record](../verification/simulator-startup-20261024.md) does
+not qualify downloaded-program RUN or TIA discovery: both tested TIA discovery
+providers still returned only the placeholder on this PC. Historical protected
+baseline results below apply to their retained binaries and fixtures.
+
 Start the MCP host with its normal TIA worker and the optional simulator worker path:
 
 ```powershell

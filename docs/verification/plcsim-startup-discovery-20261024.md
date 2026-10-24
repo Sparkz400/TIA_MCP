@@ -93,6 +93,34 @@ policy"; both are retained rather than bypassing that rejection.
 
 ## Next investigation
 
+### Provider comparison and natural helper exit
+
+The subsequent `artifacts/p24-provider/` probe uses the `n24s` Release worker
+and compares `OnlineProvider.Configuration` with the project's
+`StationUploadProvider.Configuration`. Both return only the same placeholder in
+all 61 paired observations over 63,322 ms while the sole owned CPU is in STOP
+at `192.168.0.1`. Both configured-address collections are empty; only the PLC
+provider exposes target interface `1 X1`. Changing the discovery provider alone
+does not resolve this PC's missing endpoint. No station upload is performed.
+
+The native observation and owned CPU cleanup pass. The storage helper exits
+naturally with code zero about five minutes after the worker, just beyond the
+coordinator's explicit 300-second diagnostic deadline. All eight captured process
+handles exit zero and the job has ten total members, zero active. No forced
+cleanup occurs in this comparison. The overall attempt remains **failed** for
+the missed deadline; this single observation is not a guaranteed shutdown bound
+or proof of native reopen. It does not relax the normal 45-second lifecycle gate.
+The monitor correctly records `explicitNativeProcessDisposeInvoked: false`.
+
+The comparison worker builds without warnings/errors and passes its compiled
+lifecycle guard. Process enumeration now disposes each temporary process wrapper.
+Its configuration comparison uses the documented public read-only discovery
+collections; the production route and exact-target guard remain unchanged.
+
+Separately, the [actual MCP empty-CPU lifecycle](simulator-startup-20261024.md)
+passes without starting TIA. That success does not resolve TIA discovery or the
+storage-helper lifecycle above.
+
 Investigate Siemens discovery semantics and the local Softbus route independently
 of a timeout increase. Keep exact target matching and uncertain-outcome admission
 in place. Independently qualify normal project/worker/file-storage shutdown and

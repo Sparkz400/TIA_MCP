@@ -5,7 +5,7 @@ import json
 import pathlib
 
 from smoke_mcp import Client, ROOT
-from block_test_runtime import verify_credential_provisioning, verify_download, verify_memory_card
+from block_test_runtime import verify_credential_provisioning, verify_download, verify_memory_card, verify_owned_instance
 
 
 def artifact_path(value, suffix=None):
@@ -113,10 +113,7 @@ def main(argv=None):
         if args.provision_runtime_credential:
             report["discoveryBaseline"] = call("simulation_discovery_baseline")["baseline"]
         created = call("sim_create", {"cpuType": "CPU1511"})
-        instance = created["instance"]
-        if (type(instance.get("id")) is not int or instance["id"] < 0 or instance.get("owned") is not True
-                or not isinstance(instance.get("name"), str) or not instance["name"].strip()):
-            raise RuntimeError("Fresh simulator creation did not establish an exact owned identity.")
+        instance = verify_owned_instance(created["instance"])
         instance_id = instance["id"]
         if instance.get("operatingState") != "Off":
             raise RuntimeError("A fresh owned OFF simulator is required.")

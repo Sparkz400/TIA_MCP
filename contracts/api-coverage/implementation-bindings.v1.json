@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b71229b2e00efca73970320dfba6a58176c6763287d117ae4bbd7744201d3e3a",
-      "bytes": 675450
+      "sha256": "0baa96cd72b29ee7f763bb7e589b3a7996666aad3870a104986c64244847bdf8",
+      "bytes": 677421
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2497,8 +2497,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcsimDiscoveryProbe.cs",
-      "sha256": "94840fe176d04dfe9b955c1d566b8acb1111f22a6dd9af5ee754263e845d803e",
-      "bytes": 12702
+      "sha256": "10d6623b884e86640b6b4cdf8230d369b85d156b8ca8e25b2896511076713e62",
+      "bytes": 13862
     },
     {
       "path": "src/TiaMcp.Openness.V21/PortalProcesses.cs",
@@ -86722,6 +86722,17 @@
           "artifacts": [
             "artifacts/simulator-startup-validation.json"
           ]
+        },
+        {
+          "id": "local.sim.startup.20261024",
+          "profileSha256": "46b4ddeb54d904eb1307e20db7aae39a6a9da71bfd440b36d92dd2dac8dd1cf1",
+          "artifacts": [
+            "artifacts/p24-simstate04/request.json",
+            "artifacts/p24-simstate04/startup.json",
+            "artifacts/p24-simstate04/result.json",
+            "artifacts/p24-simstate04/owned-job-terminal.json",
+            "docs/verification/simulator-startup-20261024.md"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -90725,6 +90736,26 @@
       "sha256": "887bad2632a317f7d8c4c4d4e9d3e8e2a40dd37e370caf6bd990f950c3e51b5b"
     },
     {
+      "path": "artifacts/p24-simstate04/owned-job-terminal.json",
+      "state": "observed",
+      "sha256": "afae83912ad132e1c1a3148385eeb93e086be78c71b0a7f9e2a3aadcda9978d7"
+    },
+    {
+      "path": "artifacts/p24-simstate04/request.json",
+      "state": "observed",
+      "sha256": "c5039132870dca243520be0ddb76b97c5df1bf91fbdc9e0a68fb311705a9b78c"
+    },
+    {
+      "path": "artifacts/p24-simstate04/result.json",
+      "state": "observed",
+      "sha256": "7675016ef79859510879128c2b52b69c9c706bc59a9309c43514ba59c331770f"
+    },
+    {
+      "path": "artifacts/p24-simstate04/startup.json",
+      "state": "observed",
+      "sha256": "c4c55f7ded72392150203750439e01bf84ede7c5e69a3f8ef1e9e8b86b63854b"
+    },
+    {
       "path": "artifacts/package-smoke.json",
       "state": "observed",
       "sha256": "86079fc9cffc284359b39a958d988b65928e2b4d01de2d08e05d6648f294b957"
@@ -91005,6 +91036,11 @@
       "sha256": "1567bc9af2ed68dc1b9015a18af8338eeba10ada68943c7048543c731b47d628"
     },
     {
+      "path": "docs/verification/simulator-startup-20261024.md",
+      "state": "observed",
+      "sha256": "6a80e81046c1d74aaa4df27b85eebe2d29f864020dc3be3fc22b5022fb3ccf46"
+    },
+    {
       "path": "docs/verification/typed-lad-fbd-qualification.md",
       "state": "observed",
       "sha256": "be7e6990feda1ca32a5bb1e9db34c272cc00b259cffa8ab60746af4665753886"
@@ -91162,6 +91198,10 @@
     {
       "id": "local.sim.download.v02",
       "profileSha256": "2e94a2cf11a15e127003f7af2c6c472a0f8e08cd75fffb8ea41fe3af8e76535b"
+    },
+    {
+      "id": "local.sim.startup.20261024",
+      "profileSha256": "46b4ddeb54d904eb1307e20db7aae39a6a9da71bfd440b36d92dd2dac8dd1cf1"
     },
     {
       "id": "local.sim.startup.v02",
