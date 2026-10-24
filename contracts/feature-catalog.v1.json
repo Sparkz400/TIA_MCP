@@ -1228,6 +1228,39 @@
         "One scratch project with two SCL marker revisions; the network subnet check (--check-network) was not run.",
         "Review content is checked for the planted markers and stable comparison, not for completeness on large projects."
       ]
+    },
+    {
+      "id": "local.explorer.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "483c1a2541c772f5492a7f58a79bebecdbce4c7c",
+        "passedScope": "scripts/qualify_project_explorer.py on a new owned TIA V21 scratch project: group and source changes, project index capture and query, project model capture, children, search, details, relationships, verify and export, exact selection checked against independent block_read and hardware_inspect, viewer endpoint refuses mutation, snapshot release with later reads rejected, detach invalidates selection."
+      },
+      "artifacts": [
+        "evidence/local.explorer.20261024.json"
+      ],
+      "limitations": [
+        "Default small profile only; no generated medium/large function counts, second PLC, typed LAD/FBD previews or HMI content.",
+        "No browser UI run; the MCP model routes only."
+      ]
+    },
+    {
+      "id": "local.reopen.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "483c1a2541c772f5492a7f58a79bebecdbce4c7c",
+        "passedScope": "scripts/smoke_hardware_to.py --project --skip-hardware --skip-technology: owned TIA V21 start, project_open of the saved scratch project from local.hardware.20261024, then UDT and tag table XML read and prepared roundtrips with readback on the reopened project, detach."
+      },
+      "artifacts": [
+        "evidence/local.reopen.20261024.json"
+      ],
+      "limitations": [
+        "Reopens one saved repository scratch project; customer projects, upgrades from older TIA versions, protected or multiuser projects are not covered."
+      ]
     }
   ],
   "features": [
@@ -1547,20 +1580,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.sim.download.v02",
-          "local.units.v03",
-          "local.layers.safety-requalified.20261008",
-          "local.layers.graphical-reopen.20261008",
-          "local.layers.calls-reopen.20261008"
+          "local.reopen.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -7632,16 +7660,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008"
+          "local.explorer.20261024"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires authorized TIA V21 session and available native services; portable exports are independent of TIA.",
-          "Cited evidence passed on its recorded profile, but its artifacts are not retained in this repository; qualification stays unverified until they are."
+          "Requires authorized TIA V21 session and available native services; portable exports are independent of TIA."
         ]
       },
       "prerequisites": [

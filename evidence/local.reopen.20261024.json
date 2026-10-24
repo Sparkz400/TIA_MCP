@@ -1,0 +1,69 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.reopen.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T09:05:44+00:00",
+  "source": {
+    "commit": "483c1a2541c772f5492a7f58a79bebecdbce4c7c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/smoke_hardware_to.py --project --skip-hardware --skip-technology: owned TIA V21 start, project_open of the saved scratch project from local.hardware.20261024, then UDT and tag table XML read and prepared roundtrips with readback on the reopened project, detach.",
+  "limitations": [
+    "Reopens one saved repository scratch project; customer projects, upgrades from older TIA versions, protected or multiuser projects are not covered."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "21030d089231770beaf8d0aac36102e00b6eb6c6d176b13f65a4a02e2af66a65"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "0dfcc5a9b5552593d1eb0e92a032f1a3b6dd489c6fee423c914f7f9f0be2c60f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "reopen.json",
+      "sha256": "f5790af39f2dffdc520916bcae80dc674275be77c4094be2863af60faabca8b8",
+      "bytes": 147429,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_open",
+        "prepare UDT for XML roundtrip",
+        "apply UDT for XML roundtrip",
+        "type_read",
+        "artifact_read",
+        "prepare UDT XML roundtrip",
+        "apply UDT XML roundtrip",
+        "verify UDT XML roundtrip",
+        "software_inspect",
+        "tag_table_read",
+        "artifact_read",
+        "prepare native tag table XML roundtrip",
+        "apply native tag table XML roundtrip",
+        "verify native tag table XML roundtrip",
+        "tia_detach"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.explorer.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T09:05:09+00:00",
+  "source": {
+    "commit": "483c1a2541c772f5492a7f58a79bebecdbce4c7c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_project_explorer.py on a new owned TIA V21 scratch project: group and source changes, project index capture and query, project model capture, children, search, details, relationships, verify and export, exact selection checked against independent block_read and hardware_inspect, viewer endpoint refuses mutation, snapshot release with later reads rejected, detach invalidates selection.",
+  "limitations": [
+    "Default small profile only; no generated medium/large function counts, second PLC, typed LAD/FBD previews or HMI content.",
+    "No browser UI run; the MCP model routes only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "21030d089231770beaf8d0aac36102e00b6eb6c6d176b13f65a4a02e2af66a65"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "0dfcc5a9b5552593d1eb0e92a032f1a3b6dd489c6fee423c914f7f9f0be2c60f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "explorer.json",
+      "sha256": "0fd08b7a7581be7808d8971e12cac51dde231c212de60dd913d96a0b172525b2",
+      "bytes": 788937,
+      "completed": true,
+      "steps": [
+        "new tools are read-only and available",
+        "unnegotiated clients receive no app UI metadata",
+        "tia_start",
+        "tia_create_scratch",
+        "project_inventory",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "tia_session_status",
+        "change_prepare",
+        "change_apply",
+        "project_index",
+        "capture",
+        "search",
+        "search",
+        "search",
+        "search",
+        "search",
+        "all children have captured parents",
+        "native and virtual identities stay separate",
+        "native empty groups and exact ancestry",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "children",
+        "all native child pages exact without duplication",
+        "project_index",
+        "explorer reads preserve legacy project_index snapshot",
+        "details",
+        "block_read",
+        "exact selected path survives independent native inspection",
+        "relationships",
+        "independent authored calls, instance direction and unresolved member reads/writes match",
+        "details",
+        "hardware_inspect",
+        "hardware details agree with independent native position/address evidence",
+        "relationships",
+        "hardware reverse query is bounded and preserves configured-I/O ownership uncertainty",
+        "verify",
+        "metadata verification explicitly excludes content",
+        "export",
+        "export",
+        "session mismatch cannot resolve selection",
+        "capture",
+        "bounded capture reports partial coverage",
+        "release",
+        "released snapshot cannot be read",
+        "viewer endpoint rejects mutation action",
+        "tia_detach",
+        "disconnect invalidates exact selection"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_index",
+        "project_inventory",
+        "project_model_capture",
+        "project_model_children",
+        "project_model_details",
+        "project_model_export",
+        "project_model_relationships",
+        "project_model_release",
+        "project_model_search",
+        "project_model_verify",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_model"
+      ]
+    }
+  ]
+}
