@@ -93,7 +93,7 @@ class Scenario:
         self.report = {"scenario": name, "artifactRoot": str(self.root), "steps": [], "passed": False, "toolCalls": []}
 
     def client(self):
-        return ReliabilityClient(self.host, self.worker, self.root, timeout=1200, record=self.report["toolCalls"])
+        return ReliabilityClient(self.host, self.worker, self.root, timeout=900, record=self.report["toolCalls"])
 
     def step(self, name, value):
         self.report["steps"].append({"name": name, "result": value})
@@ -267,7 +267,7 @@ class Scenario:
 def reconcile_existing(host, worker, artifacts, admission_id):
     """Reconcile an admission another run left held, e.g. a download whose worker crashed after completion."""
     report = {"scenario": "existing-" + admission_id, "artifactRoot": str(artifacts), "steps": [], "passed": False, "toolCalls": []}
-    client = ReliabilityClient(host, worker, artifacts, timeout=1200, record=report["toolCalls"])
+    client = ReliabilityClient(host, worker, artifacts, timeout=900, record=report["toolCalls"])
     try:
         client.initialize()
         report["steps"].append({"name": "tia_start", "result": client.tool("tia_start")})
