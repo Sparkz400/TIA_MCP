@@ -75,7 +75,7 @@ def body(h):
         h.stage("published exact " + version["typeName"], lambda v=version: require(
             [identity(x) for x in h.versions(global_library, v["typeName"])] == [identity(v)], "Publication readback differs") or identity(v))
     master_payload = {"schemaVersion": 1, "destinationLibraryId": global_library, "target": {"plcPath": plc},
-                      "object": {"objectPath": blocks["TiaMcp_IsEnabled"]}}
+                      "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}}
     h.apply("library_create_master_copy", master_payload)
     h.refuse("refuse duplicate master copy", "library_create_master_copy", master_payload, "LibraryConflict")
     masters = [x for x in h.query(global_library)["items"] if x.get("kind") == "masterCopy"]

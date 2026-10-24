@@ -127,6 +127,28 @@ class Harness:
             return error
         return self.stage(label, check)
 
+    def unresolved_admissions(self):
+        """Shared mutation admissions of this run still owning resources (dispatchIntent or outcomeUnknown)."""
+        rows = []
+        for folder in sorted((self.directory / "engineering-admissions").glob("[0-9a-f]*")):
+            latest = sorted(folder.glob("*.json"))[-1]
+            record = json.loads(latest.read_text(encoding="utf-8"))
+            if record.get("state") in ("dispatchIntent", "outcomeUnknown"):
+                rows.append(record["id"])
+        return rows
+
+    def reconcile_admission(self, label, admission_id=None):
+        """Release a failed or interrupted mutation's admission through its fresh-session native verification."""
+        def check():
+            unresolved = self.unresolved_admissions()
+            target = admission_id or (unresolved[0] if len(unresolved) == 1 else None)
+            require(target in unresolved, "Expected exactly one unresolved admission to reconcile: %s" % unresolved)
+            result = self.tool("engineering_admission_reconcile", {"admissionId": target})
+            require(result.get("released") is True and result.get("automaticReplay") is False,
+                    "Admission was held: %s" % result.get("reasons"))
+            return result
+        return self.stage(label, check)
+
     def owned_portal(self, label):
         self.stage("start owned TIA " + label, lambda: self.tool("tia_start"))
         status = self.tool("tia_session_status")

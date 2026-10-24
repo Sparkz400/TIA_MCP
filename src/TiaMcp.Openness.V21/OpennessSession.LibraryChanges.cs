@@ -998,9 +998,7 @@ namespace TiaMcp.Openness.V21
                     change.Journal["upgradeSourceSnapshot"] = new JObject { ["path"] = snapshotPath, ["sha256"] = expected, ["hashScope"] = change.Preview["upgradeSourceHashScope"], ["originalSourcePath"] = path, ["owned"] = true, ["workingDirectory"] = directory };
                     LibraryJournal(change, "upgrade_source_snapshot", "completed");
                     LibraryJournal(change, "native_upgrade", "dispatching");
-                    GlobalLibrary library = archive
-                        ? _portal.GlobalLibraries.RetrieveWithUpgrade(new FileInfo(snapshotPath), new DirectoryInfo(directory), OpenMode.ReadWrite)
-                        : _portal.GlobalLibraries.OpenWithUpgrade(new FileInfo(Path.Combine(directory, Path.GetFileName(path))));
+                    GlobalLibrary library = UpgradeLibrary(archive, snapshotPath, directory, Path.GetFileName(path), result);
                     var entry = RegisterLibrary(library, null, library, true, true); entry.Directory = directory; entry.SourcePath = snapshotPath; entry.SourceHash = expected; entry.OriginalSourcePath = path;
                     change.Destination = entry; result["library"] = LibraryView(entry); result["sourceSnapshotOwned"] = true;
                     LibraryJournal(change, "native_upgrade", "completed"); break;

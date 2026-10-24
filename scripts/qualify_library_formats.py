@@ -144,7 +144,7 @@ def body(h):
     def mixed_package():
         staged = h.tool("library_package_stage", {"hostPath": str(mixed)})
         candidates = h.tool("library_package_inspect", {"packageId": staged["packageId"]})["items"]
-        top = lambda c: c["relativePath"].removeprefix("content/").split("/")[0]  # Staging roots the package at content/.
+        top = lambda c: next(p for p in c["relativePath"].split("/") if p in ("archive", "directory", "lone", "source"))  # Staged paths carry a managed prefix.
         observed = sorted((c["kind"], c.get("completeness"), top(c)) for c in candidates)
         require(observed == sorted([("globalLibraryArchive", "nativeVerificationRequired", "archive"),
                                     ("globalLibraryDirectory", "nativeVerificationRequired", "directory"),

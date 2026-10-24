@@ -11,8 +11,9 @@ namespace TiaMcp.Openness.V21
     {
         /// <summary>
         /// A same-name PLC object is reused only as an installed exact dependency: one native link to the
-        /// identical type and version GUID, and a native comparison with every property identical. A name
-        /// match alone, a different GUID, a different version or any non-identical property is a conflict.
+        /// identical type and version GUID, and identical native version metadata (Siemens' comparison does not cover
+        /// content; committed versions are immutable). A name match alone, a different GUID or version, or any other
+        /// differing metadata is a conflict.
         /// </summary>
         private JObject ProveInstalledLibraryDependency(LibraryChange change, PlcSelection plc, JToken node, LibraryTypeVersion source)
         {
@@ -25,12 +26,15 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("LibraryConflict", "The same-name PLC object is not exactly one native use of the requested dependency version: " + name);
             var properties = installed.CompareTo(source).Properties.Take(201).ToList();
             if (properties.Count > 200) throw new BridgeException("DependencyUnresolved", "Native dependency comparison exceeded 200 properties: " + name);
-            var different = properties.Where(x => x.DetailCompareStatus != DetailCompareStatus.ObjectsIdentical).ToList();
-            if (different.Count != 0)
-                throw new BridgeException("DependencyConflict", "The installed dependency has the requested identity but native content is not proven identical: " + name,
+            // Siemens compares version metadata only. The default flag is library-local and the original library is never compared.
+            var different = properties.Where(x => x.DetailCompareStatus != DetailCompareStatus.ObjectsIdentical && x.Description != "Is Default Version"
+                && !(x.DetailCompareStatus == DetailCompareStatus.NotCompared && x.Description == "Original Library")).ToList();
+            if (different.Count != 0 || !properties.Any(x => x.Description == "GUID of version object" && x.DetailCompareStatus == DetailCompareStatus.ObjectsIdentical))
+                throw new BridgeException("DependencyConflict", "The installed dependency has the requested identity but its native version metadata is not identical: " + name,
                     new JObject { ["typeName"] = name, ["versionGuid"] = source.Guid.ToString("D"), ["properties"] = new JArray(different.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString() })) });
             return new JObject { ["typeName"] = name, ["typeGuid"] = source.TypeObject.Guid.ToString("D"), ["versionGuid"] = source.Guid.ToString("D"), ["version"] = source.VersionNumber.ToString(),
-                ["object"] = LibraryObjectDescription(uses[0].LibraryTypeInstance), ["comparedProperties"] = properties.Count, ["proof"] = "Exact installed type/version GUID, one native link and all native comparison properties identical." };
+                ["object"] = LibraryObjectDescription(uses[0].LibraryTypeInstance), ["comparedProperties"] = properties.Count, ["properties"] = new JArray(properties.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString() })),
+                ["proof"] = "Exact installed type/version GUID, one native link and identical native version metadata (default flag and uncompared original library excluded). Content is not compared; committed versions are immutable natively." };
         }
 
         private static void VerifyReusedLibraryDependencies(LibraryChange change, PlcSelection plc)

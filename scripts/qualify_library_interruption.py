@@ -97,7 +97,8 @@ def reconcile(h, prepared):
 
     def no_replay():
         error = h.call_error("change_apply", h.apply_args(prepared))
-        require(error.get("code") == "OutcomeUnknown", "Replay was not refused: %s" % error)
+        # Shared admission refuses first (ResourceBusy); the library journal refuses otherwise (OutcomeUnknown).
+        require(error.get("code") in ("ResourceBusy", "OutcomeUnknown"), "Replay was not refused: %s" % error)
         return error
     h.stage("fresh host refuses replay", no_replay)
 
@@ -105,6 +106,7 @@ def reconcile(h, prepared):
 def reconcile_and_recover(h, prepared, verify):
     reconcile(h, prepared)
     h.owned_portal("recovery " + prepared["changeId"][-6:])
+    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
     restored = h.stage("restore every checkpointed resource", lambda: h.tool("change_restore", {
         "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
     require(restored["state"] == "restored_to_new_locations" and restored.get("originalsPreserved") is True, "Restore incomplete")
@@ -126,9 +128,9 @@ def body(h):
     blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
     library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
     h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": plc},
-            "object": {"objectPath": blocks["TiaMcp_IsEnabled"]}})
+            "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}})
     first = interrupted_apply(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library,
-                              "target": {"plcPath": plc}, "object": {"objectPath": blocks["TiaMcp_EnableGate"]}}, "compile")
+                              "target": {"plcPath": plc}, "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate"]}}, "compile")
 
     def verify_multi(resources):
         require(sorted(r["kind"] for r in resources) == ["library", "project"], "Expected one project and one library resource")
@@ -158,6 +160,7 @@ def body(h):
         require("native_mutation" not in stages and not journal["checkpoints"], "Journal does not prove the mutation was never dispatched")
         return {"error": error, "stages": stages}
     h.owned_portal("checkpoint recovery")
+    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
     h.stage("refuse restore without a completed checkpoint", no_checkpoint)
 
     def original_unchanged():

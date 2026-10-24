@@ -156,6 +156,8 @@ def body(h):
 
     # Recovery: the checkpoint and the unsaved original both keep the exact 1.1.0 link.
     h.owned_portal("recovery")
+    h.reconcile_admission("reconcile the failed update's admission in a fresh session",
+                          ((h.report["breakingUpdate"]["error"].get("details") or {}).get("mutationAdmission") or {}).get("admissionId"))
     restored = h.stage("restore breaking-update checkpoint", lambda: h.tool("change_restore", {"changeId": failed["changeId"], "previewHash": failed["previewHash"]}))
     require(restored["state"] == "restored_to_new_locations" and restored.get("originalsPreserved") is True, "Checkpoint was not restored")
     recovered = h.project_library()
