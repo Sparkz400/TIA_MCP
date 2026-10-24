@@ -148,9 +148,12 @@ def body(h):
         require(before.get("types") == after.get("types") and before.get("blocks") == after.get("blocks"), "A refused PAL import changed the PLC")
         return {"object": first["name"], "error": error}
     h.report["palImport"] = h.stage("V21 refuses PAL's V16 SimaticML (" + first["name"] + ")", refused_import)
-    h.stage("close pal session", lambda: h.tool("tia_detach"))
-    h.owned_portal("pal reconciliation")
-    h.reconcile_admission("reconcile the refused import's admission in a fresh session")
+    # The engineering route may finish its own admission; only an unresolved one needs a fresh-session reconciliation.
+    h.report["palUnresolvedAdmissions"] = h.unresolved_admissions()
+    if h.report["palUnresolvedAdmissions"]:
+        h.stage("close pal session", lambda: h.tool("tia_detach"))
+        h.owned_portal("pal reconciliation")
+        h.reconcile_admission("reconcile the refused import's admission in a fresh session")
 
 
 if __name__ == "__main__":
