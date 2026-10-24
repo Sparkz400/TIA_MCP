@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.5",
+  "catalogVersion": "0.4.6",
   "targetTiaVersions": [
     21
   ],
@@ -1295,6 +1295,24 @@
         "Only the release path ran natively; every refusal reason (project, card, archive, observer, same process, other scope, mutation claimed) is covered by managed tests with a fake worker.",
         "Runtime credential state inside the simulator storage is not verified; the card manifest and project are.",
         "The fingerprint excludes generated payload bytes and unexposed vendor data, as EngineeringFingerprint policy 2 documents."
+      ]
+    },
+    {
+      "id": "local.runtime.frozen.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7531ed12a18285c7df0035d47943aa675b975f0a",
+        "passedScope": "Complete frozen runtime corpus, attempt 04 (scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate): 9 families, 65 cases, 358 steps, 478 assertions, all passed in one run with no retries, each case on a fresh Host, owned TIA session, reopened qualified scratch project and freshly created owned CPU1511, with download, credential provisioning through the discovery observer, restored protected card, RUN and independently authored stimulus/assertion sequences. An independent audit (artifacts/audit-frozen-20261024-04) recomputed all 478 verdicts from observations and confirmed coverage, isolation, card restoration, cleanup with exit code 0 everywhere and one binary manifest."
+      },
+      "artifacts": [
+        "evidence/local.runtime.frozen.20261024.json"
+      ],
+      "limitations": [
+        "Earlier attempts 01-03 failed (observer exit wait, PLCSIM interface access violation, interface lifetime blocking discovery); their fixes are in this build, and those attempts are not part of this record.",
+        "Device discovery always showed one all-zero placeholder, excluded under the reviewed placeholder rule; certificate trust is the authorized first-use pin, not independent CA verification; timing covers host-observed windows only, no scan synchronization.",
+        "PLCSIM on this PC with the generated scratch fixtures only; not physical PLCs, other CPUs or untested instruction profiles."
       ]
     }
   ],
@@ -2724,8 +2742,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -2935,8 +2955,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -2976,8 +2998,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3016,8 +3040,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.frozen.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",

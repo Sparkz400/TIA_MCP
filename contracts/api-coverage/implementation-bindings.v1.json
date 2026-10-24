@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f5573f3371a4aa1794587fa6c71464a1642efa35e377bf6b14db0df8b0bc2055",
-      "bytes": 691191
+      "sha256": "b28f9987fbe2e30c42f84dea2cdf82a75c4a952152d56fcf0f95c72f97674448",
+      "bytes": 693103
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2362,8 +2362,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
-      "sha256": "e7b027ebc2e14f929a3f839798b00e4cb4957c65d60fa256bedb3449a3f216d0",
-      "bytes": 17654
+      "sha256": "84785dfa9a725ab8f0026bc8199ac15b4b655185ef530e69461e0e98190b2d86",
+      "bytes": 19493
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationCheckpoint.cs",
@@ -2377,13 +2377,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationDiscoveryBaseline.cs",
-      "sha256": "1427695305a8390a52a78d47bb4c68e708abc02f3be962b9d9ec70921514d919",
-      "bytes": 11064
+      "sha256": "72ae46e613b486f17495647a8bee6c00276c8191eabda1cd66f30c9cd59cbcbe",
+      "bytes": 11133
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "efd66f3453a90d0413b3b74d240bf555621a7666dacafb70acb1e0c06b3fc9b4",
-      "bytes": 96265
+      "sha256": "b5302798093485b8fc834e863f1b49b2c1ddf9d525f1ca50c57899740e4d0269",
+      "bytes": 96802
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvisionReconcile.cs",
@@ -2557,8 +2557,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationDiscoveryObserver.cs",
-      "sha256": "48c43ae7786d778ea083f628102f0f3dbf27ac6515eec00381ad3202bb2f5c9f",
-      "bytes": 6288
+      "sha256": "22746bf9c254831c0679cc0f178aa3a22d596df15ed2565c2fae8ae4087f081c",
+      "bytes": 6723
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationDownloadEvidenceRules.cs",
@@ -49675,8 +49675,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationDiscoveryBaseline.cs",
               "name": "SimulationDiscoveryBaselineOperation",
               "line": 36,
-              "endLine": 90,
-              "sha256": "0b3954039683ecef0ddfcb751b33fd6d207bbfd48db59d675362b6e472231e2b"
+              "endLine": 91,
+              "sha256": "d4e78d661042d9754041e51e0fa0b48ce60801c483c73543b0cb99b6ea4e5636"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -49760,7 +49760,7 @@
               "name": "SimulationDownload",
               "line": 23,
               "endLine": 167,
-              "sha256": "d9212c07d190a8bce5a2d2621a8c435eb1dc635348131b6c162c31ed41675f8a"
+              "sha256": "8223536d3ef07c2735a48ceeeed01749c8da3b2693ee630d42c826b7d3679180"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -49912,8 +49912,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
               "name": "SimulationProvision",
               "line": 27,
-              "endLine": 844,
-              "sha256": "73404f2b967b1714ed1c0a54ce92accf206e0286aa552d1ac5f4d081bfed54b9"
+              "endLine": 848,
+              "sha256": "0cb2fd8f9e628c509b207681486bdeb73e5f4abacfa5d4ee91b33bec9393d1a4"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -86680,7 +86680,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.frozen.20261024",
+          "profileSha256": "aa6aa5242d8454189d607934302553fb3e77ac0443f5d28e1cf673c2b8d036a8",
+          "artifacts": [
+            "evidence/local.runtime.frozen.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -86825,7 +86833,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.frozen.20261024",
+          "profileSha256": "aa6aa5242d8454189d607934302553fb3e77ac0443f5d28e1cf673c2b8d036a8",
+          "artifacts": [
+            "evidence/local.runtime.frozen.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -86889,7 +86905,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.frozen.20261024",
+          "profileSha256": "aa6aa5242d8454189d607934302553fb3e77ac0443f5d28e1cf673c2b8d036a8",
+          "artifacts": [
+            "evidence/local.runtime.frozen.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -86913,7 +86937,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.frozen.20261024",
+          "profileSha256": "aa6aa5242d8454189d607934302553fb3e77ac0443f5d28e1cf673c2b8d036a8",
+          "artifacts": [
+            "evidence/local.runtime.frozen.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91134,6 +91166,11 @@
       "sha256": "d62a359b0463abcdf2ce2b3a54b4ba492368c6b900ac8842fbaac3610c637cc0"
     },
     {
+      "path": "evidence/local.runtime.frozen.20261024.json",
+      "state": "observed",
+      "sha256": "182e81481a87391ca88805f6a81f139751881240bd7505e03cfb2dd5f3f699ba"
+    },
+    {
       "path": "evidence/local.sim.creation.20261024.json",
       "state": "observed",
       "sha256": "878e9514d47bb2616a92b6b188c0308fb86a92f8839e8be59a3df840bd434c6f"
@@ -91326,6 +91363,10 @@
     {
       "id": "local.reviews.20261024",
       "profileSha256": "c86c85871f443223a9aea4a868db995ae482f6341168ae39fc0382099dc2ad1d"
+    },
+    {
+      "id": "local.runtime.frozen.20261024",
+      "profileSha256": "aa6aa5242d8454189d607934302553fb3e77ac0443f5d28e1cf673c2b8d036a8"
     },
     {
       "id": "local.safety.v02",
