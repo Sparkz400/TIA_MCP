@@ -26,9 +26,11 @@ def main():
     parser.add_argument("--cpu-type-identifier", default="OrderNumber:6ES7 511-1AL03-0AB0/V4.1", help="Exact installed CPU type for a new owned scratch.")
     parser.add_argument("--technology-profile", type=pathlib.Path, action="append", default=[], help="Opt-in axis/encoder JSON fixture with explicit CPU, type, version and parameter dependencies.")
     parser.add_argument("--project", type=pathlib.Path, help="Reopen only an isolated TiaMcpScratch .ap21 under repository artifacts.")
+    parser.add_argument("--artifacts", type=pathlib.Path, help="Short artifact directory; keeps scratch paths within the native limit.")
     args = parser.parse_args()
     technology_profiles = load_profiles(args.technology_profile)
-    client = Client(args.host.resolve(), 300, ["--worker", str(args.worker.resolve())] if args.worker else None)
+    client = Client(args.host.resolve(), 300, [part for option, path in (("--worker", args.worker), ("--artifacts", args.artifacts)) if path
+                                               for part in (option, str(path.resolve()))])
     report = {"steps": [], "failures": [], "limitations": [], "completed": False,
               "scope": "New worker-owned offline scratch project only; no physical PLC operations"}
     started = False
@@ -177,6 +179,7 @@ def main():
                 report["detachFailure"] = str(error)
         client.close()
         report["hostExitCode"] = client.process.returncode
+        report["toolCalls"] = client.tool_calls
         report["hostLogs"] = client.errors
         persist()
         print("Report: " + str(args.report), flush=True)
