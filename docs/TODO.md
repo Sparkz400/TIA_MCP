@@ -42,6 +42,7 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 
 ## Release acceptance
 
+- [ ] Requalify the features demoted to `unverified` on 24 October: this repository is the only source of truth, so rerun each qualification and commit curated evidence (result summaries, hashes and lineage, not raw native dumps) in a tracked location the catalog claim check can read. Decide that location and format first. [Catalog reconciliation](verification/catalog-reconciliation-20261024.md).
 - [ ] Freeze the advertised V21 operation/profile/target matrix and bind each cell to applicable engineering, preservation, persistence, recovery and runtime evidence with exact lineage.
 - [ ] Qualify native interruption/transport loss and uncertain-outcome reconciliation for every advertised recoverable mutation, including multi-resource recovery and no replay.
 - [ ] Complete missing feature-specific remote/VM transfer, interrupted upload/reconnect and machine-prerequisite checks. Do not repeat accepted general VM evidence without a new reason.
