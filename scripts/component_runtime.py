@@ -109,6 +109,11 @@ class ComponentRuntime:
             before = snapshot(self.call, self.output / "installed")
             assert_snapshot(self.inputs["reopened"], before)
             self.report["installedProjectVerified"] = True; self.persist()
+            # PLCSIM download requires simulation-capable compilation; its own reviewed setting change.
+            self.report["simulationEnable"] = self.apply("project_simulation_enable", {"enabled": True})
+            before = snapshot(self.call, self.output / "simulation-enabled")
+            self.report["simulationEnableKeptInstalledXml"] = all(row["payloadSha256"] == self.inputs["reopened"]["objects"][key]["payloadSha256"]
+                for key, row in before["objects"].items() if key in self.inputs["reopened"]["objects"])
             # Separate operation: the installation never called its FC from an OB.
             self.report["obCall"] = self.apply("source_upsert", {"language": "SCL", "source": ob_call_source(self.fixture), "expectedBlockNames": ["Main"]})
             after = snapshot(self.call, self.output / "ob-call")
