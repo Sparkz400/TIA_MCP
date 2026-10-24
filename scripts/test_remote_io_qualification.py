@@ -107,6 +107,16 @@ class ScopedLifecycleTests(unittest.TestCase):
                 with self.assertRaisesRegex(AssertionError, 'incomplete'):
                     channel_gate(rows, 'configured-module-lifecycle')
 
+    def test_smoothing_uses_reviewed_levels_only(self):
+        rows = self.observations()
+        rows[0]['channels'][0]['attributes'].append({'name': 'Smoothing', 'accessMode': 'ReadWrite', 'value': 0, 'readAccessKnown': True, 'readable': True,
+            'valueCaptured': True, 'valueComplete': True, 'valueStatus': 'captured',
+            'nativeEnumValues': [{'name': 'Value64x', 'value': 9}, {'name': 'None', 'value': 0}, {'name': 'Medium', 'value': 2}, {'name': 'Weak', 'value': 1}]})
+        choice, _ = channel_gate(rows, 'full')
+        self.assertEqual(('Smoothing', 1), (choice[2]['name'], choice[3]))
+        rows[0]['channels'][0]['attributes'][-1]['nativeEnumValues'] = [{'name': 'Value64x', 'value': 9}, {'name': 'None', 'value': 0}]
+        self.assertIsNone(channel_gate(rows, 'full')[0])
+
     def test_eligible_reviewed_channel_requires_full_scope_and_distinct_value(self):
         rows = self.observations(); rows[0]['channels'][0]['attributes'][0]['accessMode'] = 'ReadWrite'
         choice, evidence = channel_gate(rows, 'full')

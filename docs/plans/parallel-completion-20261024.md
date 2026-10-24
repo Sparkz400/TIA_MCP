@@ -60,7 +60,7 @@ Commits, PRs and merges are automatic checkpoints.
 
 Lane 0's runtime leftovers:
 - requested stop during a runtime batch, with no next-case admission;
-- the all-zero placeholder entry;
+- ~~the all-zero placeholder entry~~ (identified: [PLCSIM Softbus endpoint](../verification/plcsim-placeholder-identity-20261024.md));
 - the post-RUN card `.info` inventory with full project/card preservation;
 - `sim_state` `stop`/`powerOff` coverage.
 

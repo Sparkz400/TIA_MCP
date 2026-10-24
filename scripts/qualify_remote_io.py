@@ -17,7 +17,9 @@ from run_block_tests import detach_owned, save_json
 from smoke_mcp import Client
 
 
-CHANNEL_ATTRIBUTES = {'ChannelActivation', 'MeasuringType', 'MeasuringRange', 'InputDelay', 'SubstituteValue', 'DigitalInputDelay'}
+CHANNEL_ATTRIBUTES = {'ChannelActivation', 'MeasuringType', 'MeasuringRange', 'InputDelay', 'SubstituteValue', 'DigitalInputDelay', 'Smoothing'}
+# Reviewed value domain in preference order: the ET 200SP analog smoothing levels, not every member of the shared V21 enum.
+REVIEWED_SYMBOLS = {'Smoothing': ('Weak', 'Medium', 'Strong', 'None')}
 HARDWARE_ATTRIBUTES = CHANNEL_ATTRIBUTES | {'Name', 'Author', 'Comment', 'InformationText', 'PlantDesignation', 'LocationIdentifier', 'AdditionalInformation'}
 NETWORK_ATTRIBUTES = {'Address', 'SubnetMask', 'RouterAddress', 'UseRouter', 'UseIpProtocol', 'IpProtocolSelection', 'PnDeviceName', 'PnDeviceNameAutoGeneration', 'PnDeviceNameSetDirectly', 'DhcpClientId'}
 QUALIFICATION_SCOPES = ('full', 'configured-module-lifecycle')
@@ -42,7 +44,11 @@ def channel_gate(subtree, scope):
                         or attribute.get('valueStatus') != 'captured' or attribute.get('metadataUnavailable')):
                     continue
                 before = attribute.get('value')
-                alternatives = [not before] if type(before) is bool else [entry['value'] for entry in attribute.get('nativeEnumValues', []) if entry['value'] != before]
+                entries = attribute.get('nativeEnumValues', [])
+                reviewed = REVIEWED_SYMBOLS.get(attribute['name'])
+                if reviewed:
+                    entries = sorted((entry for entry in entries if entry.get('name') in reviewed), key=lambda entry: reviewed.index(entry['name']))
+                alternatives = [not before] if type(before) is bool else [entry['value'] for entry in entries if entry['value'] != before]
                 if alternatives:
                     choice = (row, channel, attribute, alternatives[0])
                     break

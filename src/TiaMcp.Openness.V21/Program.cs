@@ -32,6 +32,7 @@ namespace TiaMcp.Openness.V21
                 bool lateDiscoveryProbe = false;
                 bool configuredDiscoveryProbe = false;
                 bool freshPortalDiscoveryProbe = false;
+                string placeholderIdentityProbe = null;
                 bool staleConnectProbe = false;
                 for (int i = 0; i < args.Length; i++)
                 {
@@ -47,6 +48,7 @@ namespace TiaMcp.Openness.V21
                         startupDiscoveryProbe = visibleDiscoveryProbe || lateDiscoveryProbe || configuredDiscoveryProbe || args[i] == "--plcsim-startup-discovery-probe";
                         discoveryProbe = args[++i];
                     }
+                    else if (args[i] == "--plcsim-placeholder-identity-probe" && i + 1 < args.Length && placeholderIdentityProbe == null) placeholderIdentityProbe = args[++i];
                     else if (args[i] == "--api-dir" && i + 1 < args.Length) apiDirectory = args[++i];
                     else if (args[i] == "--sim-api-dir" && i + 1 < args.Length) simulatorApiDirectory = args[++i];
                     else if (args[i] == "--component-qualification") componentQualification = true;
@@ -57,7 +59,9 @@ namespace TiaMcp.Openness.V21
 #endif
                     else throw new ArgumentException("Usage: TiaMcp.Openness.V21.exe --pipe NAME [--api-dir DIR]");
                 }
-                if (string.IsNullOrWhiteSpace(pipe) && discoveryProbe == null) throw new ArgumentException("--pipe is required.");
+                if (placeholderIdentityProbe != null && (discoveryProbe != null || pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification))
+                    throw new ArgumentException("The placeholder identity probe runs alone.");
+                if (string.IsNullOrWhiteSpace(pipe) && discoveryProbe == null && placeholderIdentityProbe == null) throw new ArgumentException("--pipe is required.");
                 if (discoveryProbe != null && (pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification))
                     throw new ArgumentException("Discovery probes cannot be combined with a pipe or another qualification mode.");
                 apiDirectory = Path.GetFullPath(apiDirectory);
@@ -67,6 +71,7 @@ namespace TiaMcp.Openness.V21
                     throw new InvalidOperationException("Only the TIA V21 API is supported by this worker.");
                 simulatorApiDirectory = Path.GetFullPath(simulatorApiDirectory);
                 AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) => ResolveSiemens(eventArgs, apiDirectory, simulatorApiDirectory);
+                if (placeholderIdentityProbe != null) return PlcsimPlaceholderIdentityProbe.Run(placeholderIdentityProbe);
                 if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe, visibleDiscoveryProbe, lateDiscoveryProbe, configuredDiscoveryProbe, freshPortalDiscoveryProbe, staleConnectProbe);
                 if (testSuiteScopeProbe && componentQualification) throw new ArgumentException("Separate qualification modes required.");
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
