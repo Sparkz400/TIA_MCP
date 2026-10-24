@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f9eb5b6505b85e52c8ddb5282de1172ec53511f2c794fd58c65f233ea9488b1",
-      "bytes": 696153
+      "sha256": "07e89502d02caf57e7a7d2bf6549feaaba48ace18af57c123b82fb074eb8fb31",
+      "bytes": 698044
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -81166,6 +81166,13 @@
             "artifacts/p16r/scale-browser-01/result.json",
             "artifacts/p16r/scale-browser-02/result.json"
           ]
+        },
+        {
+          "id": "local.explorer.relationship-scope.20261024",
+          "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
+          "artifacts": [
+            "evidence/local.explorer.relationship-scope.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -91313,6 +91320,11 @@
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
     },
     {
+      "path": "evidence/local.explorer.relationship-scope.20261024.json",
+      "state": "observed",
+      "sha256": "febb795362cd9751c16f6862010de30fa105a5288909da2613d5803522e4328d"
+    },
+    {
       "path": "evidence/local.hardware.20261024.json",
       "state": "observed",
       "sha256": "e0b51d539feaafddb8ccbdf0bb2ba9d8d590af0ce408d150cc72ea777209d02a"
@@ -91433,6 +91445,10 @@
     {
       "id": "local.explorer.native-browser.20261008",
       "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3"
+    },
+    {
+      "id": "local.explorer.relationship-scope.20261024",
+      "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd"
     },
     {
       "id": "local.guards.v02",

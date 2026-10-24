@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.7",
+  "catalogVersion": "0.4.8",
   "targetTiaVersions": [
     21
   ],
@@ -1330,6 +1330,24 @@
       "limitations": [
         "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
         "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
+      ]
+    },
+    {
+      "id": "local.explorer.relationship-scope.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "53a3807aeaa6ee7c25ca56a124982204cc396263",
+        "passedScope": "scripts/qualify_project_explorer.py default profile on a new owned TIA V21 scratch project (73 captured nodes): relationship graph from TiaMcp_EnableGate matches exactly the 7 resolved and 8 unresolved member edges authored from the fixed scratch SCL source; a depth-5/500-node/1,000-edge traversal returns all 21 retained native edges with relationshipScope complete, no stop reasons and every endpoint owned by the four fixture blocks; a 3-edge budget visibly truncates (stopReasons depth+edges). Native performance: cold capture 187 ms, warm 136 ms, details 255/372 ms, relationships 149-541 ms, cached MCP search p95 16 ms; relationship payloads 27.6-99.6 KB, JSON export 134,840 bytes, HTML 286,877 bytes; resident memory TIA Portal 2.62 GB, Host 127 MB, worker 98 MB, unchanged by warm recapture."
+      },
+      "artifacts": [
+        "evidence/local.explorer.relationship-scope.20261024.json"
+      ],
+      "limitations": [
+        "One small fixed fixture with four blocks; no generated large programs, second PLC, HMI or library relationships, configured-I/O positives or protected/indirect references; whole-project relationship completeness remains notEstablished by contract.",
+        "Single-session measurements on one machine; not a contention-independent latency or memory guarantee. Worker memory sums descendants of the Host process, which include the owned TIA process.",
+        "Relationship completeness is proven only within the declared provider scope and budgets on the fixed scratch fixture; projectCompleteness stays notEstablished."
       ]
     }
   ],
@@ -7486,7 +7504,8 @@
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
           "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.relationship-scope.20261024"
         ]
       },
       "availability": {
