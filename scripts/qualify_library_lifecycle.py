@@ -102,6 +102,15 @@ def body(h):
     source = h.open_archive(archive)
     h.apply("library_instantiate", h.selected(source, [second], target={"plcPath": consumer}))
     h.stage("consumer uses exact 1.1.0", lambda: h.verify_use(h.project_library(), second, 1))
+
+    def numbering():
+        rows = [b for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == consumer]
+        gate = next(b for b in rows if b["name"] == FB)
+        same_kind = [b for b in rows if b["kind"] == gate["kind"]]
+        require(len(same_kind) > 1 and len({b["number"] for b in same_kind}) == len(same_kind),
+                "Instantiation beside an existing %s left a duplicate block number" % gate["kind"])
+        return {b["name"]: b["number"] for b in same_kind}
+    h.stage("instantiated FB number does not collide", numbering)
     h.tool("library_close", {"libraryId": source})
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
