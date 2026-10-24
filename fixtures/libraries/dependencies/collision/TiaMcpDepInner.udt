@@ -1,0 +1,7 @@
+TYPE "TiaMcpDepInner"
+VERSION : 0.1
+STRUCT
+    Value : DInt;
+    Marker : Bool;
+END_STRUCT;
+END_TYPE

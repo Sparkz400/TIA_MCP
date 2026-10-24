@@ -1,0 +1,22 @@
+DATA_BLOCK "TiaMcpDepParent_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcpDepParent"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpDepParent_DB2"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcpDepParent"
+BEGIN
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK "Main"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+    "TiaMcp_EnableGate_DB"(Enable := TRUE);
+    "TiaMcpDepParent_DB"();
+    "TiaMcpDepParent_DB2"();
+END_ORGANIZATION_BLOCK

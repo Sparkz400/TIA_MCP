@@ -1,0 +1,7 @@
+TYPE "TiaMcpDepOuter"
+VERSION : 0.1
+STRUCT
+    Inner : "TiaMcpDepInner";
+    Items : Array[0..2] of "TiaMcpDepInner";
+END_STRUCT;
+END_TYPE
