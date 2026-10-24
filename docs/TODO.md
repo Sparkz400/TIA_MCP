@@ -7,7 +7,6 @@ are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.
 ## Resume and integration
 
 - [ ] Finalize independent review of the two vendor intake receipts, licenses and prerequisites; qualify applicable native import/upgrade, readback and preservation. Vendor evidence (`artifacts/vendor-library-intake-20261023/`).
-- [ ] Finish reconciling the feature catalog, support matrix and embedded catalog with exact current source, binary and evidence profiles. The empty-CPU `sim_state` profile is reconciled in the [24 October startup evidence](verification/simulator-startup-20261024.md); broader operation qualification remains open. Keep implementation, offline validation and native qualification separate.
 
 ## Native admission and runtime
 
