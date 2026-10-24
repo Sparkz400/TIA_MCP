@@ -44,18 +44,26 @@ OB_ORACLE_FAILURE = "OB1 must contain exactly one call to the installed FC."
 
 def continued_inputs(previous_path, inputs):
     """Continue only from a retained post-OB snapshot: after the corrected OB-oracle failure before any
-    simulator call, or after a verified OB call whose owned simulator stopped at the missing CPU password."""
+    simulator call, or after a verified OB call whose one failed call was a simulator tool and whose owned
+    instance was unregistered. A continued run is accepted only through its own validated chain."""
     path = Path(previous_path).resolve()
     raw = path.read_bytes(); previous = json.loads(raw.decode("utf-8"))
+    if previous.get("continuedFrom"):
+        chain = continued_inputs(previous["continuedFrom"]["path"], inputs)
+        require(chain["sha256"] == previous["continuedFrom"]["sha256"], "Continuation chain report changed.")
+        previous = {**previous, "installedProjectVerified": True, "obCall": {"state": "applied"}}
     sim_calls = [call for call in previous.get("calls", []) if call["tool"].startswith("sim") or call["tool"] == "simulation_download"]
     oracle = previous.get("failure") == OB_ORACLE_FAILURE and previous.get("obCallVerified") is False and not sim_calls
-    password = (previous.get("obCallVerified") is True and "SimulationConfigurationPasswordRequired" in (previous.get("failure") or "")
-                and previous.get("cleanup", {}).get("release", {}).get("unregistered") is True)
-    require(previous.get("kind") == "plc_component_runtime" and previous.get("status") == "failed" and (oracle or password)
+    failed_tools = [call["tool"] for call in previous.get("calls", []) if call.get("status") == "failed"]
+    simulator = (previous.get("obCallVerified") is True and len(failed_tools) == 1
+                 and (failed_tools[0].startswith("sim") or failed_tools[0] == "simulation_download")
+                 and previous.get("cleanup", {}).get("release", {}).get("unregistered") is True)
+    require(previous.get("kind") == "plc_component_runtime" and previous.get("status") == "failed" and (oracle or simulator)
             and previous.get("installedProjectVerified") is True and previous.get("runtimeVerified") is False
             and previous["installationReport"]["sha256"] == inputs["sha256"] and previous["obCall"]["state"] == "applied",
             "Continuation requires an accepted earlier runtime failure with its retained post-OB snapshot.")
-    expected = json.loads((path.parent / "ob-call" / "manifest.json").read_text(encoding="utf-8"))
+    folder = path.parent / ("continued" if (path.parent / "continued").is_dir() else "ob-call")
+    expected = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     return {"path": str(path), "sha256": hashlib.sha256(raw).hexdigest(), "expected": expected}
 
 
@@ -169,6 +177,15 @@ class ComponentRuntime:
             running = self.call("sim_state", {"instanceId": self.instance, "action": "run", "timeoutMs": 30000})
             require(running.get("instance", {}).get("operatingState") == "Run", "Simulator did not enter RUN.")
             steps, signals = scenario(self.fixture)
+            # sim_tags loads the instance tag list (else NotUpToDate); bind each mapped tag to one native symbol.
+            tags = self.call("sim_tags", {"instanceId": self.instance, "maxItems": 2000})["tags"]
+            native = {}
+            for signal in signals:
+                found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == signal["symbol"]]
+                require(len(found) == 1, "Mapped tag is missing or ambiguous in the simulator: " + signal["symbol"])
+                native[signal["symbol"]] = found[0]
+            for row in [*signals, *(item for step in steps for item in step["writes"] + step["assertions"])]:
+                row["symbol"] = native[row["symbol"]]
             behavior = self.call("sim_test", {"instanceId": self.instance, "signals": signals, "intervalMs": 100, "steps": steps})
             require(behavior.get("passed") is True, "Component runtime scenario failed.")
             self.report["runtimeVerified"] = True
