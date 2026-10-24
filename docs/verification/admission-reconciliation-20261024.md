@@ -93,6 +93,24 @@ Findings from the native runs:
   (`…\created\LaneELib\LaneELib.al21`) sits below its admitted directory and was not
   matched. It now is.
 
+## Boundaries, cancellation and completed recovery
+
+A second batch covered the remaining §9 boundaries
+(`evidence/local.engineering.boundaries.20261024.json`, passed).
+
+| Scenario | Outcome |
+| --- | --- |
+| MCP cancellation while applying | The next call got `BridgeFaulted`, and the worker finished its call and exited with its TIA. Reconciliation from a fresh Host **released** it: project `verifiedApplied`. |
+| Concurrent change: a second Host attached to the same TIA applies between prepare and apply | `StaleRevision` before any admission; the preview stays prepared and unclaimed |
+| Stale preview in the same Host after another apply | `StaleRevision`; nothing claimed or admitted |
+| Owned TIA gone while idle, then apply | Refused (`EngineeringError`: TIA disposed) before any admission; a fresh session shows the project unchanged |
+| `library_open` killed after its receipt | **Held**: source unchanged, working copy partial |
+| Completed two-checkpoint library recovery, then fresh reopen | The recovered project keeps its fixture block. The recovered library has no master copies (its pre-change checkpoint), while the original keeps the applied `TiaMcp_IsEnabled`. |
+
+Journal replacement now also retries sharing and lock violations, bounded at about
+1.5 s (PR #28). An external reader without delete sharing no longer fails a running
+mutation.
+
 ## Limits
 
 - Interruption means process termination of the worker and its owned TIA, or of the
@@ -104,5 +122,7 @@ Findings from the native runs:
 - Fingerprints exclude generated payload bytes and unexposed vendor data. Library
   revisions cover structure, type versions and master copies, not unexposed object
   document content.
-- `library_open`, held library apply outputs, and partial destinations were not
-  natively interrupted beyond the cases above.
+- Protected (know-how) content is not covered natively: no protected fixture exists,
+  and creating one needs a protection password and new fixture code.
+- Fresh reopen after recovery compares fixture blocks and library master copies, not
+  full object content.
