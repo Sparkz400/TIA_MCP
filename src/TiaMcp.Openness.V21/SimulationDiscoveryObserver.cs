@@ -45,6 +45,8 @@ namespace TiaMcp.Openness.V21
                 int id = PortalProcesses.CurrentId(portal);
                 // Retain the exact handle at once so exit is checked on this process, never a reused PID.
                 process = Process.GetProcessById(id);
+                // .NET Framework keeps a by-ID process handle only once Handle is read; without it the exit wait fails after exit.
+                _ = process.Handle;
                 if (id == provisioningProcessId || process.HasExited)
                     throw new BridgeException("SimulationDiscoveryObserverUnavailable", "The discovery observer did not start as a distinct live Portal process.");
                 var evidence = new JObject { ["processId"] = id, ["startedAtUtc"] = process.StartTime.ToUniversalTime().ToString("O"),
@@ -97,6 +99,7 @@ namespace TiaMcp.Openness.V21
                 receipt["processExitVerified"] = exited;
                 if (exited) receipt["exitCode"] = _process.ExitCode;
             }
+            catch (Exception ex) { receipt["processExitVerified"] = false; receipt["processWaitExceptionType"] = ex.GetType().FullName; }
             finally { _process.Dispose(); }
             receipt["completed"] = receipt.Value<bool?>("projectClosed") == true && receipt.Value<bool?>("portalDisposed") == true &&
                 receipt.Value<bool>("processExitVerified");
