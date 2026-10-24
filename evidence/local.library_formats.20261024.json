@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_formats.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T21:52:41+00:00",
+  "source": {
+    "commit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_formats.py on build 4687b82: read-only .zal21 archive and read-only .al21 directory each open as writable owned working copies, accept a persisted folder change and leave the source bytes and read-only state unchanged; an exclusively locked source is refused without registration or change; newer .zal22 is refused for open (LibraryUpgradeRequired) and upgrade (LibraryVersionUnsupported); a corrupt .zal21 and a lone .al21 marker are refused; a mixed ZIP (archive, complete directory, lone marker, loose SCL, README) classifies four candidates correctly and both complete library candidates open natively. All 12 retained observations validate.",
+  "limitations": [
+    "Inputs are libraries created in the run; V14-V20 upgrades are separate evidence.",
+    "The locked source is simulated by an exclusive Windows handle, not a second TIA instance; its refusal surfaces as a generic EngineeringError."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "c5d4268a1a17f3d738e0d8b8a150635641e6b0cf59122a09d060e5b666ea5af1"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "3ce812bd5afa3fe0ddaa502ecb0c50f3d078f52919739095a58100e2ffbcc587"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "577519ab68b3a0ec676d9ee5b03361a1daf3758cf4250b3d903e0795cbb5cb30",
+      "bytes": 81103,
+      "completed": true,
+      "steps": [
+        "start owned TIA formats",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_archive",
+        "apply library_archive",
+        "read-only archive yields a writable working copy",
+        "prepare library_organize",
+        "apply library_organize",
+        "read-only directory yields a writable working copy",
+        "prepare library_organize",
+        "apply library_organize",
+        "refuse an exclusively locked source",
+        "refuse opening a newer .zal22",
+        "refuse upgrading a newer .zal22",
+        "refuse a corrupt .zal21",
+        "refuse a lone .al21 marker",
+        "mixed package classification and native open"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "library_open"
+      ]
+    }
+  ]
+}
