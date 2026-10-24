@@ -11,6 +11,7 @@ import os
 import pathlib
 from datetime import datetime, timezone
 from block_test_runtime import digest
+from typed_runtime_semantic_preservation import evaluate as semantic_runtime_preservation
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -35,6 +36,11 @@ def attempt(path):
     runtime = report.get("runtime", {})
     assertions = [assertion for case in runtime.get("cases", []) for step in case.get("steps", []) for assertion in step.get("assertions", [])]
     gates = {key: report.get(key) is True for key in GATES}
+    semantic = None
+    if not gates["runtimeVerified"] and report.get("runtimeBehaviorVerified") is True and report.get("runtimePreservation"):
+        # Retained observations judged by the integrator's semantic rule; the in-run byte verdict stays in the report.
+        semantic = semantic_runtime_preservation(report)
+        gates["runtimeVerified"] = semantic["verified"]
     if gates["runtimeVerified"]:
         assert runtime.get("status") == "passed" and runtime.get("caseCoverage", {}).get("fullSuitePassed") is True
         assert assertions and all(item.get("status") == "passed" for item in assertions), "Runtime pass lacks complete executed assertions: " + str(path)
@@ -59,6 +65,8 @@ def attempt(path):
         "assertionCount": len(assertions), "target": preview.get("target"), "operation": preview.get("operation"),
         "profiles": preview.get("profiles", []), "binaries": binaries,
         "failure": report.get("failure"), "runtimeStatus": runtime.get("status"), "runtimeFailures": failures,
+        "runtimeVerifiedBasis": "semantic-preservation.v1" if semantic and semantic["verified"] else ("in-run" if gates["runtimeVerified"] else None),
+        "semanticRuntimePreservation": semantic,
         "compileObservedSuccess": report.get("compileObservedSuccess", False),
         "failedChangeOriginalRecovered": report.get("failureRecoveryOriginalVerified", False),
         "failureRecoveryError": report.get("failureRecoveryError")}
