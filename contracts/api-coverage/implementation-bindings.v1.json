@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f9eb5b6505b85e52c8ddb5282de1172ec53511f2c794fd58c65f233ea9488b1",
-      "bytes": 696153
+      "sha256": "9a8b6084a189eea8b53a016a34764b518fde68646578136a43aafc28d1a876e9",
+      "bytes": 697977
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -78924,7 +78924,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering.interruption.rerun.20261024",
+          "profileSha256": "ea12d8f5d97efbaa1de4ba70a3bbb2f515f13ac48f094d500d164c008722530c",
+          "artifacts": [
+            "evidence/local.engineering.interruption.rerun.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91308,6 +91316,11 @@
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
     },
     {
+      "path": "evidence/local.engineering.interruption.rerun.20261024.json",
+      "state": "observed",
+      "sha256": "f3fadb6db70a850732fcc70d1275ee6a82eb1d760c0e9715aaf801857443f873"
+    },
+    {
       "path": "evidence/local.explorer.20261024.json",
       "state": "observed",
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
@@ -91425,6 +91438,10 @@
     {
       "id": "local.conformance.v03",
       "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19"
+    },
+    {
+      "id": "local.engineering.interruption.rerun.20261024",
+      "profileSha256": "ea12d8f5d97efbaa1de4ba70a3bbb2f515f13ac48f094d500d164c008722530c"
     },
     {
       "id": "local.explorer.20261024",

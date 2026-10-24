@@ -1331,6 +1331,23 @@
         "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
         "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
       ]
+    },
+    {
+      "id": "local.engineering.interruption.rerun.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5e3b79931e914da8d48aa6e78fbca4ac58d5cae7",
+        "passedScope": "Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched."
+      },
+      "artifacts": [
+        "evidence/local.engineering.interruption.rerun.20261024.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
+        "Library revision covers library structure, type versions and master copies, not unexposed object document content."
+      ]
     }
   ],
   "features": [
@@ -2754,12 +2771,15 @@
           "Supports dispatchIntent and outcomeUnknown admissions of simulation_download, change_apply, change_restore (engineering and library), scratch_create, project_retrieve and library_open; provisioning delegates to simulation_provision_reconcile.",
           "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
           "Engineering kinds whose fingerprint needs prepared in-memory targets (HMI, attribute, technology) can only be proven unchanged against their checkpoint; library apply outputs and partial destinations stay held.",
-          "Never replays, saves, powers or downloads."
+          "Never replays, saves, powers or downloads.",
+          "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering.interruption.rerun.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
