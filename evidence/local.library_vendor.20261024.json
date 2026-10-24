@@ -1,0 +1,83 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_vendor.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T23:25:51+00:00",
+  "source": {
+    "commit": "d6c06ab73aea443b13c1a3fc9b6723599758b99e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_vendor.py on build 48d4e38 with receipt-verified downloads: PracticalSeries PAL (practicalseries/PS2001-pal-software at e46b222, 582,837 bytes, MIT) and DMC Siemens Open Library 19.0 (124,287,921 bytes, MIT). Both stage against their receipts and classify (PAL: 55 SimaticML sources; DMC: five V19 global-library archives plus documentation and a nested Windows toolbox that is never run). All five DMC V19 archives (PLC 277, Comfort 334, Professional 332, Unified 343 and full 455 versions) upgrade into V21 on owned copies with every version committed and 22 elements of products absent from this installation listed as unavailable; the upgraded PLC library re-archives, reopens with identical identities, and the dependency-free data type mb_station_block_udt instantiates into a fresh project with an exact native link. TIA V21 refuses PAL's SimaticML ('The engineering version V16 ... is not supported') without changing the PLC.",
+  "limitations": [
+    "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC; only intake, licence and the V21 refusal are qualified.",
+    "DMC prerequisites (CPU system/clock memory bytes, 'Open Library' tag-table master copy) are outside current MCP routes; complete DMC PLC block compilation is not claimed.",
+    "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "7c7200854fc0412e7104b92eb21d76683f80d7ef5c5b0f50a5c4b2930ba816d3"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "fd16872c8e9c6d176fb2ba9c360dd734593ffc1ac420960473dcee222d5cc72f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "195b13f62c6227b65e98c4143c6ddfa68dac55458c5f71fe515b0787aa2c2438",
+      "bytes": 580855,
+      "completed": true,
+      "steps": [
+        "stage and classify pal",
+        "stage and classify dmc",
+        "start owned TIA dmc upgrade",
+        "upgrade (observed) Open Library V19 Comfort.zal19",
+        "upgrade Open Library V19 PLC.zal19",
+        "upgrade (observed) Open Library V19 Professional.zal19",
+        "upgrade (observed) Open Library V19 Unified.zal19",
+        "upgrade (observed) Open Library V19.zal19",
+        "prepare library_archive",
+        "apply library_archive",
+        "close dmc upgrade session",
+        "start owned TIA dmc consumer",
+        "create owned scratch dmc consumer",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "dmc type exact link in consumer",
+        "close dmc consumer session",
+        "start owned TIA pal",
+        "create owned scratch pal",
+        "prepare plc_type_import_xml",
+        "V21 refuses PAL's V16 SimaticML (UT00801_St_ConstAiRawData)"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_package_status",
+        "library_query",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

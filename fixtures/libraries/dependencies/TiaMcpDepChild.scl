@@ -1,0 +1,12 @@
+FUNCTION_BLOCK "TiaMcpDepChild"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Data : "TiaMcpDepOuter";
+END_VAR
+VAR_OUTPUT
+    Sum : Int;
+END_VAR
+BEGIN
+    #Sum := #Data.Inner.Value + #Data.Items[0].Value;
+END_FUNCTION_BLOCK

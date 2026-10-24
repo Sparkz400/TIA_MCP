@@ -74,7 +74,7 @@ namespace TiaMcp.Openness.V21
                 if (args["packageId"] != null && expectedFiles == null) throw new BridgeException("PackageInvalid", "A staged native directory requires its original companion-file manifest.");
                 if (expectedFiles != null) VerifyLibraryExpectedFiles(snapshot, expectedFiles);
                 if (System.IO.Directory.GetFiles(snapshot, "*", SearchOption.AllDirectories).Length < 2) throw new BridgeException("PackageInvalid", "A lone .al21 marker is not a complete native library directory. Supply the companion files or native archive.");
-                LibraryCopyDirectory(snapshot, directory);
+                LibraryCopyWorkingDirectory(snapshot, directory);
                 library = _portal.GlobalLibraries.Open(new FileInfo(Path.Combine(directory, Path.GetFileName(path))), writable ? OpenMode.ReadWrite : OpenMode.ReadOnly);
             }
             var entry = RegisterLibrary(library, null, library, true, writable);
@@ -334,16 +334,36 @@ namespace TiaMcp.Openness.V21
             foreach (var item in WalkLibraryTypes(library.Native.TypeFolder, "/types", budget, 0))
             {
                 var type = item.Value;
+                if (!CaptureAvailable(rows, "type", "path", item.Key, () => type.Name, () => {
                 rows.Add(new JObject { ["kind"] = "type", ["path"] = item.Key, ["name"] = type.Name, ["typeGuid"] = type.Guid.ToString("D"), ["engineeringType"] = type.GetType().FullName, ["doNotUse"] = type.DoNotUse, ["setForUpdate"] = type.SetForUpdate, ["status"] = type.Status.ToString(),
                     ["documentExportAvailable"] = library.Project != null,
                     ["supportedExportFormats"] = library.Project != null ? new JArray(type.GetSupportedExportFormats()) : null,
                     ["documentExportLimitation"] = library.Project == null ? "The native document-export API is available only for project-library types. Copy this type into a project library before exporting documents." : null });
                 foreach (var version in type.Versions) { if (!budget.Take()) break; var info = LibraryVersionInfo(version); info["path"] = item.Key + "/versions/" + version.Guid.ToString("D"); rows.Add(info); }
+                })) continue;
             }
             foreach (var item in WalkLibraryMasters(library.Native.MasterCopyFolder, "/masterCopies", budget, 0))
+                CaptureAvailable(rows, "masterCopy", "masterCopyPath", item.Key, () => item.Value.Name, () =>
                 rows.Add(new JObject { ["kind"] = "masterCopy", ["masterCopyPath"] = item.Key, ["name"] = item.Value.Name, ["author"] = item.Value.Author, ["creationDate"] = item.Value.CreationDate,
-                    ["contents"] = new JArray(item.Value.ContentDescriptions.Take(201).Select(x => new JObject { ["name"] = x.ContentName, ["type"] = x.ContentType.ToString() })) });
+                    ["contents"] = new JArray(item.Value.ContentDescriptions.Take(201).Select(x => new JObject { ["name"] = x.ContentName, ["type"] = x.ContentType.ToString() })) }));
             return new JArray(rows.OrderBy(x => x.Value<string>("path") ?? x.Value<string>("masterCopyPath"), StringComparer.Ordinal));
+        }
+
+        /// <summary>
+        /// Upgraded vendor libraries can hold objects of products absent from this installation; TIA then fails to load
+        /// their type ("Could not load type 'Dummy'"). Such an element stays in the metadata as an explicit unavailable row.
+        /// </summary>
+        private static bool CaptureAvailable(JArray rows, string kind, string pathKey, string path, Func<string> name, Action capture)
+        {
+            int before = rows.Count;
+            try { capture(); return true; }
+            catch (Exception error) when (!(error is BridgeException))
+            {
+                while (rows.Count > before) rows.RemoveAt(rows.Count - 1);
+                string readable; try { readable = name(); } catch (Exception) { readable = null; }
+                rows.Add(new JObject { ["kind"] = kind, [pathKey] = path, ["name"] = readable, ["unavailable"] = true, ["reason"] = error.Message });
+                return false;
+            }
         }
 
         private static void CaptureLibraryFolders(LibraryTypeFolder folder, string path, JArray rows, ScanBudget budget, int depth)
@@ -410,6 +430,14 @@ namespace TiaMcp.Openness.V21
                 }
             }
             return ChangeHash(new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal)).ToString(Formatting.None));
+        }
+
+        // A read-only source must still yield a writable owned working copy; the snapshot keeps its attributes.
+        private static void LibraryCopyWorkingDirectory(string snapshot, string directory)
+        {
+            LibraryCopyDirectory(snapshot, directory);
+            foreach (string file in System.IO.Directory.GetFiles(directory, "*", SearchOption.AllDirectories))
+                File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
         }
 
         private static void LibraryCopyDirectory(string source, string destination)

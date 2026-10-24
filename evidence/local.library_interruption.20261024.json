@@ -1,0 +1,87 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_interruption.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T23:09:30+00:00",
+  "source": {
+    "commit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_interruption.py on build 48d4e38: (1) a multi-resource library_create_master_copy (project checkpoint plus writable global library) has its worker killed while compiling; a fresh host reports outcome_unknown from the durable journal, a fresh owned session refuses replay, the shared admission is reconciled in that fresh session, and change_restore retrieves both resources into new locations: the recovered library holds only the pre-change master copy and the project holds its blocks; a repeated restore is an idempotent readback. (2) library_create_type has its worker killed while archiving its checkpoint; after reconciliation restore is refused because no checkpoint completed, the journal proves the native mutation never dispatched, and the saved original reopens without the type.",
+  "limitations": [
+    "Two interruption points (compile and checkpoint archive); kills during native mutation and save are not exercised.",
+    "The original project and library after the compile-stage kill are left for inspection; only recovered copies are verified."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "7c7200854fc0412e7104b92eb21d76683f80d7ef5c5b0f50a5c4b2930ba816d3"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "fd16872c8e9c6d176fb2ba9c360dd734593ffc1ac420960473dcee222d5cc72f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "81973dbae796a469e37b02e058ddd7fba674dd43ab84d2969dca567e52bf83b1",
+      "bytes": 148520,
+      "completed": true,
+      "steps": [
+        "start owned TIA multi-resource",
+        "create owned scratch multi-resource",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_create_master_copy",
+        "apply library_create_master_copy",
+        "prepare library_create_master_copy",
+        "kill worker during library_create_master_copy compile",
+        "fresh host reconciles unknown outcome",
+        "start owned TIA recovery f867cd",
+        "fresh session refuses replay",
+        "reconcile the interrupted admission in a fresh session",
+        "restore every checkpointed resource",
+        "verify recovered pre-change state",
+        "repeat restore is read back, not replayed",
+        "close recovery session",
+        "start owned TIA checkpoint",
+        "create owned scratch checkpoint",
+        "prepare library_create_type",
+        "kill worker during library_create_type checkpoint_project_archive",
+        "fresh host reconciles unknown outcome",
+        "start owned TIA checkpoint recovery",
+        "fresh session refuses replay",
+        "reconcile the interrupted admission in a fresh session",
+        "refuse restore without a completed checkpoint",
+        "reopen the saved original after the killed portal"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_admission_reconcile",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_restore"
+      ]
+    }
+  ]
+}

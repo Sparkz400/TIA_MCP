@@ -1,0 +1,79 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_project_state.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T21:52:41+00:00",
+  "source": {
+    "commit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts\\qualify_library_project_state.py on build 4bb2e8f (frozen D;C:\\Program Files\\Git\\lcq\\b4); a failed source change leaves an inconsistent block in the unsaved consumer project; library_instantiate is then refused at preparation (FingerprintUnavailable naming the inherited block) before any checkpoint, compile or save, and the project inventory is unchanged.",
+  "limitations": [
+    "The unsaved erroneous block comes from a failed source change; arbitrary unsaved user edits are not reproduced.",
+    "Protected (know-how) objects are not exercised: no MCP route applies protection."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "90abe8fccaf41079dd3ff205226e8af87657b6e3fea0d737d6baba4e615401e0"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "d000023d016b9dfa375bd00edf5bd72657cc1e18738731831fd3b95a89de4b6f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "b09427cf14041325ea27703b5e527b554857aa09a2c7bccc6dd92040e440daca",
+      "bytes": 173155,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "create an inherited compiler error",
+        "open staged archive",
+        "refuse instantiate into a project with an inherited compiler error"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+TYPE "TiaMcpDepOuter"
+VERSION : 0.1
+STRUCT
+    Local : Bool;
+END_STRUCT;
+END_TYPE

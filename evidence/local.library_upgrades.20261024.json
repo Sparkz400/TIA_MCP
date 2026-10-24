@@ -1,0 +1,94 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_upgrades.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T23:09:30+00:00",
+  "source": {
+    "commit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_upgrades.py on build 48d4e38 (frozen D:/lcq/b7) with the receipt-verified DMC Siemens Open Library V14 SP1-V18 downloads: each release ZIP stages and classifies its mixed contents; PLC archives V14 SP1 (S7-300, 244 versions), V15 (257), V16 (257), V17 (317) and V18 (317) upgrade into V21 on owned copies, read back complete with every version committed, re-archive and reopen with identical native version identities, and leave their source bytes unchanged; HMI-bearing V14 SP1, V18 Comfort, Professional and Unified archives upgrade with 12-22 elements of products absent from this installation reported as unavailable; a complete V17 companion directory and a read-only V16 directory also upgrade from owned copies. V21 completes and saves each conversion, then the native return throws 'Could not load type Dummy'; the saved V21 library is opened only when its conversion log records success, and the native error is recorded.",
+  "limitations": [
+    "No V20 library exists; V19 is covered by the vendor evidence.",
+    "Content behavior of HMI elements and of unavailable elements is not exercised (lane D owns HMI).",
+    "Upgrade identity is checked within V21 (upgrade vs reopened archive); the older-format content cannot be read without the older TIA version."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "7c7200854fc0412e7104b92eb21d76683f80d7ef5c5b0f50a5c4b2930ba816d3"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "fd16872c8e9c6d176fb2ba9c360dd734593ffc1ac420960473dcee222d5cc72f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "bd6dde89573677a2f436691823d94f5567ab01d505980f1e9e5b349ca9e898f4",
+      "bytes": 363295,
+      "completed": true,
+      "steps": [
+        "stage and classify mixed package dmc-v14",
+        "stage and classify mixed package dmc-v15",
+        "stage and classify mixed package dmc-v16",
+        "stage and classify mixed package dmc-v17",
+        "stage and classify mixed package dmc-v18",
+        "upgrade Open Library V14 SP1 (S7-300).zal14",
+        "start owned TIA upgrade Open Library V14 SP1 (S7-300)",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V15 PLC.zal15",
+        "start owned TIA upgrade Open Library V15 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V16 PLC.zal16",
+        "start owned TIA upgrade Open Library V16 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V17 PLC.zal17",
+        "start owned TIA upgrade Open Library V17 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade Open Library V18 PLC.zal18",
+        "start owned TIA upgrade Open Library V18 PLC",
+        "prepare library_archive",
+        "apply library_archive",
+        "upgrade (observed) Open Library V14 SP1.zal14",
+        "start owned TIA upgrade Open Library V14 SP1",
+        "upgrade (observed) Open Library V18 Comfort.zal18",
+        "start owned TIA upgrade Open Library V18 Comfort",
+        "upgrade (observed) Open Library V18 Professional.zal18",
+        "start owned TIA upgrade Open Library V18 Professional",
+        "upgrade (observed) Open Library V18 Unified.zal18",
+        "start owned TIA upgrade Open Library V18 Unified",
+        "upgrade companion directory .al17",
+        "start owned TIA upgrade Open Library V17 PLC",
+        "upgrade read-only directory .al16",
+        "start owned TIA upgrade Open Library V16 PLC"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
