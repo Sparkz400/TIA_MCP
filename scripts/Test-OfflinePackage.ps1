@@ -1,4 +1,6 @@
-param([string]$BundlePath, [string]$OutputDirectory)
+# -Quick keeps package build, licence metadata, strict and relocated verification and the packaged
+# MCP/ZIP smoke; it skips the packaged workflow stages that CI runs in full on main and nightly.
+param([string]$BundlePath, [string]$OutputDirectory, [switch]$Quick)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 if (-not $OutputDirectory) { $OutputDirectory = Join-Path $repoRoot ('artifacts/offline-package/' + [Guid]::NewGuid().ToString('N')) }
@@ -33,6 +35,8 @@ try {
         if ($LASTEXITCODE -ne 0) { throw ('Portable smoke failed: ' + $label) }
         $result.steps += $label + ' packaged MCP and exact ZIP verification'
     }
+    $result.mode = if ($Quick) { 'quick' } else { 'full' }
+    if ($Quick) { $result.steps += 'packaged workflow stages skipped (quick mode)' } else {
     $packagedHost = Join-Path $relocated 'host/TiaMcp.Host.exe'
     $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
     try {
@@ -254,6 +258,7 @@ try {
     python -B (Join-Path $PSScriptRoot 'qualify_diagnostic_ua_binding.py') --host $packagedHost --server (Join-Path $output 'opcua-runtime-build/bin/TiaMcp.OpcUa.Runtime.Tests/release/TiaMcp.OpcUa.Runtime.Tests.dll') --samples $samples --output (Join-Path $output 'diagnostic-ua-binding-mcp')
     if ($LASTEXITCODE -ne 0) { throw 'Relocated prebound UA diagnostic intent workflow failed.' }
     $result.steps += 'prebound UA intent, retained observations, adverse quality/sequence evidence, readable exports and restart packaged workflow'
+    }
 
 
     & (Join-Path $PSScriptRoot 'Verify-TiaMcpBundle.ps1') -BundlePath $relocated -Strict | Out-Host
