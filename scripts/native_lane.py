@@ -3,10 +3,16 @@
     python scripts/native_lane.py acquire --owner lane-a   # waits, prints the token
     python scripts/native_lane.py release --token <token>
     python scripts/native_lane.py status
+    python scripts/native_lane.py run --owner lane-a -- python scripts/run_block_tests.py ...   # preferred
+
+`run` holds the lock for exactly the child process and always releases it; a failed or
+interrupted acquire never starts the command.
 """
 import argparse
 import json
 import os
+import subprocess
+import sys
 import time
 import uuid
 from datetime import datetime, timezone
@@ -36,13 +42,26 @@ def release(token, lock=LOCK):
     lock.unlink()
 
 
+def run(owner, command, lock=LOCK):
+    token = acquire(owner, lock=lock)
+    try:
+        return subprocess.run(command).returncode
+    finally:
+        release(token, lock=lock)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     a = sub.add_parser("acquire"); a.add_argument("--owner", required=True); a.add_argument("--timeout-seconds", type=float)
     r = sub.add_parser("release"); r.add_argument("--token", required=True)
     sub.add_parser("status")
+    x = sub.add_parser("run"); x.add_argument("--owner", required=True); x.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
+    if args.command == "run":
+        command = args.command[1:] if args.command[:1] == ["--"] else args.command
+        if not command: parser.error("run needs a command after --")
+        sys.exit(run(args.owner, command))
     if args.command == "acquire":
         print(acquire(args.owner, timeout_seconds=args.timeout_seconds))
     elif args.command == "release":
