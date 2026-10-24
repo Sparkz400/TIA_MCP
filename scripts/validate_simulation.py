@@ -157,6 +157,13 @@ def main(argv=None):
         expected_assertions = sum(len(step["assertions"]) for step in steps)
         assert tested["passed"] and tested["completed"] and len(tested["assertions"]) == expected_assertions
         assert all(assertion["passed"] for assertion in tested["assertions"]), tested["assertions"]
+        stopped = call("sim_state", {"instanceId": instance_id, "action": "stop", "timeoutMs": 30000})
+        if stopped["instance"]["operatingState"] != "Stop": raise RuntimeError("sim_state stop did not reach STOP")
+        off = call("sim_state", {"instanceId": instance_id, "action": "powerOff", "timeoutMs": 60000})
+        if off["instance"]["operatingState"] != "Off": raise RuntimeError("sim_state powerOff did not reach OFF")
+        # Independent observation through the registry, not the state call's own echo.
+        row = [i for i in call("sim_status")["instances"] if i["id"] == instance_id]
+        if len(row) != 1 or row[0].get("operatingState") != "Off": raise RuntimeError("sim_status does not show the instance OFF")
         report["simulationVerified"] = True
         report["simulationReportPath"] = tested["reportPath"]
         report["completed"] = True

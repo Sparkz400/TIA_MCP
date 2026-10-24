@@ -567,7 +567,10 @@ class BaselineCliTests(unittest.TestCase):
                               "emptyStartupVerified": True, "originalProgramCardRestored": True, "provisioningStrategy": "owned empty CPU then restore original card",
                               "reportPath": str(root / "provision.json"), **(provision_overrides or {})}
                 elif tool == "sim_state":
-                    result = {"instance": {"operatingState": "Run"}}
+                    self.state = {"powerOn": "Stop", "run": "Run", "stop": "Stop", "powerOff": "Off"}[arguments["action"]]
+                    result = {"instance": {"operatingState": self.state}}
+                elif tool == "sim_status":
+                    result = {"instances": [{"id": 0, "operatingState": getattr(self, "state", "Off")}]}
                 elif tool == "sim_tags":
                     result = {"tags": [{"symbol": "TiaMcp_TestIO." + member}
                                        for member in ("Enable", "Active", "AnalogIn", "AnalogOut")]}
