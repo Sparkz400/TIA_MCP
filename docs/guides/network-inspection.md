@@ -106,6 +106,45 @@ expose `InputDelay` as native read-only, and no channel or `ParameterSettings`
 mutation occurred. The full sixth attempt remains failed and unchanged; the
 seventh result qualifies only the explicit configured-module lifecycle profile.
 
+## 24 October requalification on current main
+
+Two scenarios ran once each on the current bridge (owned scratch projects, English TIA UI):
+
+| Evidence | Profile | Result |
+| --- | --- | --- |
+| [`local.remote-io.lifecycle.20261024`](../../evidence/local.remote-io.lifecycle.20261024.json) | `--scope configured-module-lifecycle --module di`, IM 155-6 PN ST V6.4 + DI 8x24VDC ST | All nine lifecycle gates passed. The DI's `InputDelay` stays native read-only; no channel write. |
+| [`local.remote-io.full-route.20261024`](../../evidence/local.remote-io.full-route.20261024.json) | `--scope full --module ai`, IM 155-6 PN ST V6.4 + AI 4xU/I 2-wire ST V2.0 | All ten gates passed, including `Smoothing` None→Weak on analog input channel 0; `channelWriteQualified` and `fullRemoteIoRouteQualified` are true. |
+
+Each step uses a full two-device compile, complete diagnostics and strict configured
+preservation. The disconnect produced an actual native `CompileFailed`, and its
+checkpoint was restored in the same worker session. This is also the first native
+exercise of the shared admission rule that a structured worker failure is a returned
+outcome.
+
+Two findings preceded these runs:
+
+- **Generated server-module name.** TIA names the generated server module in its UI
+  language (`Server module_1` in English, `Servermodul_1` in German). The qualifier now
+  declares the localized name, chosen from the observed interface name, before the
+  assignment. The bridge contract was already name-agnostic.
+- **Writable channel settings on the AI module.** The ET 200SP AI channels expose
+  `Smoothing`, `OperatingType`, `OperatingRange` and `InterferenceFrequencySuppression`
+  as native ReadWrite. The original guessed names `MeasuringType` and `MeasuringRange`
+  do not exist on this module. Only `Smoothing` was added to the reviewed channel
+  allowlist: it is a documented V21 enum (`Siemens.Engineering.HW.Smoothing`) with no
+  address or wiring effect. The qualifier restricts it to the ET 200SP levels
+  None/Weak/Medium/Strong rather than every member of the shared enum.
+
+**Qualified topology.** This is one CPU 1511-1 PN controller assigning connector 0 of
+one ET 200SP IM 155-6 PN ST V6.4 with one DI or AI module, plus the explicit
+generated-server companion. The following stay outside the advertised route, each
+needing its own scope and evidence:
+
+- other module families and other companion layouts;
+- shared devices and multi-controller assignments;
+- cross-rack moves;
+- channel settings other than `Smoothing`.
+
 ## Preservation manifest identity checks
 
 Configured hardware preservation comparison now refuses absent manifests/payloads,
