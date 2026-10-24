@@ -65,7 +65,8 @@ def verify_no_replay(events, token, mutations=1, starts=1):
     require(all(event.get("token") == token for event in events), "Foreign worker evidence")
     require(sum(event["kind"] == "started" for event in events) == starts, "Unexpected worker restart")
     requests = [event for event in events if event["kind"] == "request"]
-    writes = [event for event in requests if event.get("operation") == "change_apply"]
+    # Admitted writes reach the worker as mutation_dispatch; older Hosts sent change_apply directly.
+    writes = [event for event in requests if event.get("operation") in ("change_apply", "mutation_dispatch")]
     require(len(writes) == mutations, "A mutation was missing or replayed")
     require(len({event["id"] for event in requests}) == len(requests), "Duplicate request ID")
 

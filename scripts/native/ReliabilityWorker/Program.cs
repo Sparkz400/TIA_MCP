@@ -1,4 +1,5 @@
 using System.IO.Pipes;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -36,6 +37,9 @@ using var pipe = new NamedPipeClientStream(".", args[pipeIndex + 1], PipeDirecti
 using var lifetime = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 using var writeGate = new SemaphoreSlim(1, 1);
 var handlers = new List<Task>();
+// The Host admits every mutation as begin/dispatch/end; dispatch replays the admitted request.
+string? admittedOperation = null; JsonElement admittedArguments = default;
+static string Sha256(string text) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text))).ToLowerInvariant();
 async Task Send(string text)
 {
     await writeGate.WaitAsync(lifetime.Token);
@@ -52,6 +56,24 @@ async Task Handle(JsonElement request)
     var id = request.GetProperty("id").GetString()!;
     var arguments = request.GetProperty("arguments");
     object result = new { testDouble = true, operation };
+    if (operation == "mutation_begin")
+    {
+        admittedOperation = arguments.GetProperty("operation").GetString()!;
+        admittedArguments = arguments.GetProperty("arguments").Clone();
+        var requestHash = Sha256(admittedArguments.GetRawText());
+        result = new
+        {
+            leaseToken = Sha256(token + id), nativeDispatched = false, nativeQualified = false,
+            scope = new
+            {
+                operation = admittedOperation, requestSha256 = requestHash, scopeSha256 = Sha256(admittedOperation + requestHash + directory),
+                sessionEpoch = token, adapterSha256 = Sha256("test-double"), processId = Environment.ProcessId, observationSha256 = requestHash,
+                resources = new[] { new { kind = "workspace", path = directory, effect = "testDoubleJournal" } }
+            }
+        };
+    }
+    else if (operation == "mutation_end") { admittedOperation = null; result = new { released = true, testDouble = true }; }
+    else if (operation == "mutation_dispatch") { operation = admittedOperation!; arguments = admittedArguments; }
     if (operation == "change_apply")
     {
         // Durable side effect intentionally precedes the response. This demonstrates
