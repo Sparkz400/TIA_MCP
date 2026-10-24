@@ -89,7 +89,7 @@ def body(h):
     h.apply("library_publish", h.selected(library, [second], destinationLibraryId=global_library))
     h.apply("library_set_default", h.selected(global_library, [second]))
     h.refuse("refuse deleting a non-default global-library version", "library_delete", h.selected(global_library, [fb]),
-             "DependencyUnresolved", project=False)
+             "DependencyUnresolved")
     deletion = h.apply("library_delete", {"schemaVersion": 1, "source": h.source_ref(global_library),
                        "selection": [{"masterCopyPath": masters[0]["masterCopyPath"]}]})
     require(not [x for x in h.query(global_library)["items"] if x.get("kind") == "masterCopy"], "Master copy deletion readback differs")
