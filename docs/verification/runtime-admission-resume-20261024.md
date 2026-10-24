@@ -272,13 +272,13 @@ return `0xffffffff`; both storage helpers exit naturally after their terminal
 deadlines. Host and bridge workers exit with code zero. Normal native lifecycle
 remains failed.
 
-Independent archive retrieval is attempted through a fresh coordinator window
+The first independent archive retrieval is attempted through a fresh coordinator window
 with the original storage included in its reservation scan. That scan refuses the
 overlapping `outcomeUnknown` admission before starting a Host, worker or TIA.
 `artifacts/p24cr/window-close.json` retains the refusal and successful lock closure.
 No retrieval occurs, the reservation is not bypassed, and no archive-restoration or
-full project-preservation claim is made. A trusted checkpoint-read recovery route
-is required before independent native retrieval/readback can proceed.
+full project-preservation claim is made for that attempt. The verified copy route
+below subsequently supplies the missing checkpoint-read admission.
 
 Both Python runtime callers now use the existing explicit compile-only operation
 between verified card generation and provisioning. Preparation must identify the
@@ -304,6 +304,67 @@ native guard scan verifies ten terminal tickets; no TIA/bridge/file-storage proc
 from these attempts remains running. Only the primary `main` checkout exists, so
 there is no task branch or worktree to remove. Unique native evidence and the
 unresolved project/storage admission remain retained.
+
+## Verified checkpoint-copy retrieval
+
+`ProvisioningCheckpointRead` adds a narrow exception for native qualification
+coordinators. The default store scan continues to refuse every unresolved overlap.
+The exception requires the original locked store, an unreconciled failed
+provisioning admission, its hash-chained records, its durable failure fingerprint,
+the original native report and ordered archive checkpoint, unchanged producer
+binary bytes, and the corresponding terminal job in the shared dispatch registry.
+The original source request must own that exact scratch project/storage. Missing,
+changed, live, foreign or broader evidence refuses before native dispatch.
+
+The exception covers only the exact `before-provision.zap21` input declared as a
+checkpoint read. It cannot authorize opening the original project, writing its
+storage, or overlapping another pending operation. Windows read handles deny
+write/delete sharing for both the original archive and its separately declared,
+new copy. The copy is created only after the complete reservation scan, with
+durable intent/return records, exact byte/hash comparison and no overwrite. TIA
+receives the copy in fresh recovery storage. The original reservation remains
+`outcomeUnknown`; read admission is not reconciliation. Metadata is bounded at
+8 MiB, the checkpoint stream at 4,096 records, and the archive at 2 GiB. Larger or
+different profiles require separate implementation and qualification.
+
+Actual MCP runs `artifacts/p24cr2` and `artifacts/p24cr3` retrieve this checkpoint in
+fresh owned TIA sessions and export all four fixed source-fixture blocks. Independent
+checks compare their complete XML payloads to the original exports, excluding only
+DocumentInfo provenance and serializer indentation. All four match. The original
+archive and recovery copy match SHA-256
+`995103e567f2e4ecac88702a63a554361c9e5f60b06c02ec178bf9ec8dd23f06` and 395,884 bytes.
+This proves archive usability and these bounded block readbacks; it does not prove
+preservation of every project object or opaque simulator-storage byte.
+
+The first retrieval exposes a response metadata defect: `project_retrieve` labels
+the binary archive as `application/xml`. Its archive response now uses
+`application/octet-stream`, matching the provisioning checkpoint. The final reader
+worker is `artifacts/n24al`; the Host remains `artifacts/n24ah`. The final native run
+verifies the corrected media type and repeats the same four payload comparisons.
+Historical `n24aj` producer/reader evidence remains unchanged.
+
+The new policy passes eleven focused tests, including real Windows sharing checks,
+changed fingerprint/scope/checkpoint/adapter refusals, invalid journal chains,
+pending-job and additional-reservation refusal, exact copy destinations and source
+preservation checks. All 27 existing coordinator tests pass and the full Python
+suite passes 1,963 tests with one skip. The rebuilt V21 worker has zero warnings or
+errors and passes the compiled lifecycle guard without loading Siemens assemblies.
+Source bindings validate with every historical evidence row preserved; 106 inputs
+remain unavailable and release acceptance remains false. Logs and independent
+verifiers are retained under `artifacts/todo-resume-20261024/checkpoint-read-*` and
+`verify_checkpoint_retrieval*.py`.
+
+The original admission `f52861eccea147ce96158249e7a16759` is not released or changed.
+No provisioning retry, original-project write, credential submission, RUN request,
+opaque-store content read or physical PLC operation occurs in these retrieval runs.
+Both retrievals' nine retained processes all exit with code zero without forced
+termination, but each file-storage helper exceeds the terminal deadline. Final
+independent verification at `artifacts/p24cr3/independent-verification.json` confirms
+the original checkpoint/admission evidence is unchanged and all read handles close.
+The final shared guard scan verifies twelve terminal tickets. No TIA, bridge or
+file-storage process from these attempts remains running. Only the primary `main`
+checkout exists; unique recovery evidence remains retained. Native lifecycle
+acceptance and complete project/storage reconciliation remain open.
 
 ## Remaining work
 

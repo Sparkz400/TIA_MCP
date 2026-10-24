@@ -117,8 +117,11 @@ def verify_recovery_gate(path, host, worker):
             "cases": checked, "nativeInvoked": False, "automaticReplay": False}
 
 
-def scan_store(root, keys):
+def scan_store(root, keys, checkpoint_read=None):
     """Read only while caller holds this root's exact store.lock handle."""
+    if checkpoint_read is not None:
+        from provisioning_checkpoint_read import ProvisioningCheckpointRead
+        require(type(checkpoint_read) is ProvisioningCheckpointRead, 'Exact checkpoint read policy required')
     observations = []
     for folder_name, width in (("engineering-operations", 6), ("engineering-admissions", 8)):
         folder = root / folder_name
@@ -172,8 +175,13 @@ def scan_store(root, keys):
             else:
                 require(state in {"dispatchIntent", "outcomeUnknown", "returned", "reconciled"}, "Unknown mutation admission state")
                 pending = state in {"dispatchIntent", "outcomeUnknown"}; owned = previous["resourceKeys"]
-            require(not pending or not any(overlaps(a, b) for a in owned for b in keys), "Unresolved overlapping project/workspace reservation: " + str(directory))
+            conflicting = pending and any(overlaps(a, b) for a in owned for b in keys)
+            checkpoint_allowed = bool(conflicting and checkpoint_read is not None
+                                      and checkpoint_read.permits(root, directory, previous, owned, keys))
+            require(not conflicting or checkpoint_allowed, "Unresolved overlapping project/workspace reservation: " + str(directory))
             observations.append({"store": folder_name, "id": directory.name, "state": state, "pending": pending, "latest": ref(files[-1]), "resourceKeys": owned, "hashChainVerified": True})
+            if checkpoint_allowed:
+                observations[-1]["checkpointReadOnly"] = True
     return observations
 
 
@@ -192,6 +200,11 @@ class WindowsFiles:
         if handle == self.c.c_void_p(-1).value: raise OSError(self.c.get_last_error(), "Shared store lock unavailable: " + str(path))
         return handle
 
+    def read_only(self, path):
+        handle = self.k.CreateFileW(str(path), 0x80000000, 1, None, 3, 0x80, None)
+        if handle == self.c.c_void_p(-1).value: raise OSError(self.c.get_last_error(), "Immutable checkpoint read unavailable: " + str(path))
+        return handle
+
     def close(self, handle): return bool(self.k.CloseHandle(handle))
 
 
@@ -202,7 +215,7 @@ class StoreExclusiveWindow:
     mutation intents and outcome/reconciliation. This is not production adapter
     qualification, nor permission to relabel a mutation as read-only.
     """
-    def __init__(self, roots, project_path, receipt_prefix, *, mode, resources, effects, _api=None, _guard_root=None, _guard_owner=None, isolation=None):
+    def __init__(self, roots, project_path, receipt_prefix, *, mode, resources, effects, _api=None, _guard_root=None, _guard_owner=None, isolation=None, checkpoint_read=None):
         require(mode in {"readOnlyProbe", "isolatedQualificationMutation"} and isinstance(effects, str) and effects.strip(), "Explicit coordinator mode/effects required")
         self.roots = sorted((safe_path(r) for r in roots), key=lambda p: str(p).upper())
         require(self.roots and len(self.roots) <= 16 and len(set(str(p).upper() for p in self.roots)) == len(self.roots), "Unique bounded canonical store roots required")
@@ -212,6 +225,11 @@ class StoreExclusiveWindow:
         self.prefix, self.api, self.handles = Path(receipt_prefix), _api, []
         self.guard_root = safe_path(native_dispatch_guard.DEFAULT_ROOT if _guard_root is None else _guard_root)
         self.guard_owner, self.entered = _guard_owner, False
+        self.checkpoint_read = checkpoint_read
+        if checkpoint_read is not None:
+            from provisioning_checkpoint_read import ProvisioningCheckpointRead
+            require(type(checkpoint_read) is ProvisioningCheckpointRead and mode == 'isolatedQualificationMutation'
+                    and _guard_owner is None and isolation is None, 'Checkpoint recovery requires its exact read policy and original isolated window')
         self.isolation = isolation
         if isolation is not None:
             from native_dispatch_isolation import RebootIsolation
@@ -252,7 +270,10 @@ class StoreExclusiveWindow:
                 safe_path(directory)
                 path = directory / "store.lock"; safe_path(path)
                 self.handles.append((path, self.api.lock(path)))
-            self.evidence["stores"] = [{"root": str(root), "observations": scan_store(root, self.keys)} for root in self.roots]
+            if self.checkpoint_read is not None:
+                self.evidence['checkpointRead'] = self.checkpoint_read.acquire(self)
+            self.evidence["stores"] = [{"root": str(root), "observations": scan_store(root, self.keys, self.checkpoint_read)} for root in self.roots]
+            require(self.checkpoint_read is None or self.checkpoint_read.admitted, 'Checkpoint read did not match its original pending admission')
             self.evidence.update(acquiredAtUtc=utc(), coordinatorPid=os.getpid(), sameHandlesHeldThroughDispatch=True,
                                  lockFiles=[str(p) for p, _ in self.handles], journalsModified=False)
             save(str(self.prefix) + "-intent.json", self.evidence)
@@ -264,17 +285,24 @@ class StoreExclusiveWindow:
     def _release(self, error=None):
         require(self.guard_dependents == 0, "Native guard owner cannot release while a batched window is held")
         self.entered = False
+        checkpoint_error = None
+        if self.checkpoint_read is not None:
+            try: self.checkpoint_read.release()
+            except Exception as caught: checkpoint_error = caught
         closed = []
         for path, handle in reversed(self.handles): closed.append({"path": str(path), "closed": self.api.close(handle)})
         self.handles = []
         result = {"kind": "held-coordinator-store-window-close", "releasedAtUtc": utc(), "locks": closed,
                   "allClosed": all(item["closed"] for item in closed), "journalsModified": False, "automaticReplay": False,
                   "bodyFailure": None if error is None else type(error).__name__ + ": " + str(error)}
+        if self.checkpoint_read is not None:
+            result['checkpointRead'] = self.checkpoint_read.close_receipt
         save(str(self.prefix) + "-close.json", result)
         require(result["allClosed"], "A retained store-lock handle did not close")
         if self.guard_borrowed:
             self.guard_owner.guard_dependents -= 1
             self.guard_borrowed = False
+        if checkpoint_error is not None: raise checkpoint_error
 
     def __exit__(self, kind, error, trace): self._release(error)
 

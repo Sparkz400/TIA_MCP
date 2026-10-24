@@ -67,6 +67,14 @@ does not resolve an uncertain project save. A case permits this save only for it
 own downloaded project/PLC, once, with all checkpoint/compile/save flags enabled.
 This does not add implicit saving to the provisioning tool or non-provisioning runs.
 
+Failed provisioning keeps its project/storage admission reserved. Recovery
+qualification can read a checkpoint only after verifying its durable failure,
+archive record and original terminal process job under the coordinator locks.
+The reader holds the original archive read-only and creates a separately verified
+copy for retrieval into a fresh TIA project. This permits recovery evidence
+collection; it does not permit writing the reserved source or release an uncertain
+admission. Complete project/storage preservation still needs independent proof.
+
 The additional `--trust-owned-empty-cpu-certificate` flag requires provisioning and explicit authorization for first-use trust on each fresh owned empty CPU. It is false by default and is recorded in the index, suite and instance evidence. Each attempt pins its first observed certificate and rejects any subsequent change; fresh instances have different fingerprints. The backend requires the exact attempt pin, one untruncated certificate, valid dates, revalidated ownership, and a recorded `Trusted` decision before normal startup. `certificateIdentityIndependentlyVerified` remains false: caller-authorized first-use trust does not establish CA authentication. The user authorized this scoped trust for the baseline and corpus. Attempt fifteen first passed the protected baseline, and attempt seventeen reconfirmed it with the current evidence snapshot (`artifacts/runtime-proof-20261008/evidence-snapshot-20261008T113602982412Z.json`) and binary manifest (`artifacts/runtime-proof-20261008/provisioned-17-binaries.json`). Nine-family runtime qualification remains incomplete.
 
 ## Execution and timing

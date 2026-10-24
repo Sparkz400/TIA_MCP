@@ -2312,8 +2312,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
-      "sha256": "aed6652383dba3b0c5d03ef22daf5fdb791b9b4c3e29a6f49ea9508ff9d53014",
-      "bytes": 4224
+      "sha256": "d194e2c24fd49130f9ad41930394a516c6ea63bced80e62b0735e45cafa626c8",
+      "bytes": 4288
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.QualificationAncillary.cs",
@@ -29534,8 +29534,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
               "name": "ProjectOpen",
-              "line": 48,
-              "endLine": 64,
+              "line": 49,
+              "endLine": 65,
               "sha256": "78cf5eed6a3e8988bb893a6f483554fc8624e4222e834d5790c60a8df6b6d33f"
             }
           ],
@@ -29620,8 +29620,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
               "name": "ProjectRetrieve",
               "line": 10,
-              "endLine": 46,
-              "sha256": "0528b18296d48ed0a83c088e4ff7c1878decb8f8f117d61a2d227c9c67e4ce26"
+              "endLine": 47,
+              "sha256": "52c5ac7bea944afcbd07c12eb85d5277f8e136ed3967ee9afc2d45490f462f06"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -69783,8 +69783,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
               "name": "ProjectPathIsAbsolute",
-              "line": 66,
-              "endLine": 69,
+              "line": 67,
+              "endLine": 70,
               "sha256": "bfaabac0aed6a3accc70378ed245d9c39bc680ccf624f511116d691f9bad3a7b"
             },
             {
@@ -70829,8 +70829,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
               "name": "ProjectPathIsAbsolute",
-              "line": 66,
-              "endLine": 69,
+              "line": 67,
+              "endLine": 70,
               "sha256": "bfaabac0aed6a3accc70378ed245d9c39bc680ccf624f511116d691f9bad3a7b"
             },
             {

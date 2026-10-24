@@ -20,6 +20,7 @@ namespace TiaMcp.Openness.V21
             var file = new FileInfo(Path.GetFullPath(path));
             if (!file.Exists) throw new BridgeException("ArchiveNotFound", "The selected archive does not exist.");
             var artifact = FileArtifact(file);
+            artifact["mediaType"] = "application/octet-stream";
             if (!string.Equals(expected, artifact.Value<string>("sha256"), StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("CheckpointInvalid", "The archive content does not match the expected hash.");
             string directory = SharedMutationPlannedDestination("projectRetrieve", () => Path.Combine(ArtifactDirectory(args), "r_" + Guid.NewGuid().ToString("N").Substring(0, 12)));
