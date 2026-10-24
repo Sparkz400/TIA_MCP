@@ -12,7 +12,9 @@ namespace TiaMcp.Openness.V21
 {
     // Diagnostic: does the all-zero PLCSIM discovery entry follow the Runtime Manager's own lifetime?
     // Each phase reads discovery from a fresh owned Portal (discovery is cached per Portal process).
-    // Requires zero registered instances; never creates, starts or changes a simulated CPU.
+    // Phases e/f separate Portal timing (Portal already open when the manager starts) from
+    // project content (an offline CPU). Requires zero registered instances; never registers,
+    // starts or changes a simulated CPU.
     internal static class PlcsimPlaceholderIdentityProbe
     {
         private const string ManagerProcess = "Siemens.Simatic.Simulation.Runtime.Manager";
@@ -21,7 +23,7 @@ namespace TiaMcp.Openness.V21
         {
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
-            var result = new JObject { ["schemaVersion"] = "plcsim-placeholder-identity.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["phases"] = new JArray() };
+            var result = new JObject { ["schemaVersion"] = "plcsim-placeholder-identity.v2", ["startedAtUtc"] = Now(), ["completed"] = false, ["phases"] = new JArray() };
             Action save = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var phases = (JArray)result["phases"];
             try
@@ -31,12 +33,20 @@ namespace TiaMcp.Openness.V21
                     throw new InvalidOperationException("Registered PLCSIM instances exist; the probe needs zero.");
                 phases.Add(Observe(root, "b-initialized-zero-instances")); save();
                 SimulationRuntimeManager.Shutdown();
-                var clock = Stopwatch.StartNew();
-                while (Managers().Length != 0 && clock.ElapsedMilliseconds < 180000) Thread.Sleep(1000);
+                WaitForManagerExit();
                 phases.Add(Observe(root, "c-after-shutdown")); save();
                 if (SimulationRuntimeManager.RegisteredInstanceInfo.Length != 0)
                     throw new InvalidOperationException("Registered PLCSIM instances appeared after reinitialization.");
                 phases.Add(Observe(root, "d-reinitialized-zero-instances")); save();
+                SimulationRuntimeManager.Shutdown();
+                WaitForManagerExit();
+                phases.Add(Observe(root, "e-portal-open-before-initialization", project =>
+                {
+                    if (SimulationRuntimeManager.RegisteredInstanceInfo.Length != 0)
+                        throw new InvalidOperationException("Registered PLCSIM instances appeared during phase e.");
+                })); save();
+                phases.Add(Observe(root, "f-fresh-portal-offline-cpu", project =>
+                    project.Devices.CreateWithItem("OrderNumber:6ES7 511-1AL03-0AB0/V4.1", "ProbePLC", "ProbeStation"))); save();
                 SimulationRuntimeManager.Shutdown();
                 result["completed"] = true;
             }
@@ -46,7 +56,14 @@ namespace TiaMcp.Openness.V21
             return result.Value<bool>("completed") ? 0 : 1;
         }
 
-        private static JObject Observe(DirectoryInfo root, string label)
+        private static void WaitForManagerExit()
+        {
+            var clock = Stopwatch.StartNew();
+            while (Managers().Length != 0 && clock.ElapsedMilliseconds < 180000) Thread.Sleep(1000);
+        }
+
+        // beforeRead runs after the empty project exists and before the three snapshots.
+        private static JObject Observe(DirectoryInfo root, string label, Action<Project> beforeRead = null)
         {
             var phase = new JObject { ["label"] = label, ["observedAtUtc"] = Now(), ["managers"] = ManagerIdentities(), ["snapshots"] = new JArray() };
             string directory = Path.Combine(root.FullName, label);
@@ -57,6 +74,7 @@ namespace TiaMcp.Openness.V21
                 var project = portal.Projects.Create(new DirectoryInfo(directory), "P");
                 var discovery = project.GetService<StationUploadProvider>()
                     ?? throw new InvalidOperationException("The empty project has no discovery service.");
+                if (beforeRead != null) { beforeRead(project); phase["managersBeforeRead"] = ManagerIdentities(); }
                 for (int i = 0; i < 3; i++)
                 {
                     if (i > 0) Thread.Sleep(1000);
