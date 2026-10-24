@@ -31,7 +31,8 @@ VAR_OUTPUT
     Rejected : Bool;
 END_VAR
 VAR
-    Counter : "Tgp_CTU_{language}";
+    // COUNTER is a reserved SCL data type keyword, so the instance has a distinct name.
+    CtuInstance : "Tgp_CTU_{language}";
 END_VAR
 VAR_TEMP
     Index : Int;
@@ -40,15 +41,15 @@ BEGIN
     #Rejected := (#Edges < 0) OR (#Edges > 512);
     IF NOT #Rejected THEN
         IF #Reset OR (#Edges = 0) THEN
-            #Counter(Enable := FALSE, Down := FALSE, Reset := #Reset,
+            #CtuInstance(Enable := FALSE, Down := FALSE, Reset := #Reset,
                      Load := FALSE, Preset := 32767,
                      Done => #Done, Count => #Count);
         ELSE
             FOR #Index := 1 TO #Edges DO
-                #Counter(Enable := FALSE, Down := FALSE, Reset := FALSE,
+                #CtuInstance(Enable := FALSE, Down := FALSE, Reset := FALSE,
                          Load := FALSE, Preset := 32767,
                          Done => #Done, Count => #Count);
-                #Counter(Enable := TRUE, Down := FALSE, Reset := FALSE,
+                #CtuInstance(Enable := TRUE, Down := FALSE, Reset := FALSE,
                          Load := FALSE, Preset := 32767,
                          Done => #Done, Count => #Count);
             END_FOR;

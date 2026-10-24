@@ -26,6 +26,7 @@ from qualify_deployment import McpClient, load_configuration
 from typed_graphical_owned_session import TypedOwnedSession
 from engineering_preservation import PAYLOAD_HASH_POLICY, native_payload_hash
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend
+from typed_runtime_semantic_preservation import evaluate as semantic_runtime_preservation
 
 
 class Audit(NativeAudit):
@@ -127,6 +128,7 @@ def run_case(case, args, output):
             pathlib.Path(__file__).with_name("qualification_owned_scratch.py").resolve(),
             pathlib.Path(__file__).with_name("engineering_preservation.py").resolve(),
             pathlib.Path(__file__).with_name("typed_graphical_native_expectations.py").resolve(),
+            pathlib.Path(__file__).with_name("typed_runtime_semantic_preservation.py").resolve(),
             pathlib.Path(__file__).with_name("typed_graphical_runtime_preservation.py").resolve(),
             pathlib.Path(__file__).with_name("block_test_runtime.py").resolve(),
             pathlib.Path(__file__).with_name("compilation_evidence.py").resolve(),
@@ -388,8 +390,10 @@ def run_case(case, args, output):
             report["cleanupFailure"] = "Configured launcher did not complete a clean shutdown; remote process cleanup remains unverified."
         if runtime_preservation is not None:
             try:
-                preserved = runtime_preservation.after_cleanup(report.get("ownedCleanupVerified") is True and not report.get("cleanupFailure"))
-                report["runtimeVerified"] = bool(report.get("runtimeBehaviorVerified") and preserved
+                runtime_preservation.after_cleanup(report.get("ownedCleanupVerified") is True and not report.get("cleanupFailure"))
+                # The byte-level observations stay recorded; the accepted verdict is semantic (integrator rule, 24 Oct 2026).
+                report["semanticRuntimePreservation"] = semantic_runtime_preservation(report)
+                report["runtimeVerified"] = bool(report.get("runtimeBehaviorVerified") and report["semanticRuntimePreservation"]["verified"]
                     and report.get("ownedCleanupVerified") and not report.get("cleanupFailure"))
                 if not report["runtimeVerified"]:
                     report["status"] = "blocked"
