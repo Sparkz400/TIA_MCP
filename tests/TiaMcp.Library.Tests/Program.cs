@@ -436,6 +436,9 @@ Test("expired uploads can be released directly", work =>
 Test("CLI native disabling preserves normal defaults and refuses qualification modes", work =>
 {
     Equal(false, HostOptions.Parse([]).NoNativeWorkers);
+    // A source build resolves its workers and artifacts from the checkout root, not from bin/.
+    Equal(true, File.Exists(Path.Combine(Path.GetDirectoryName(HostOptions.Parse([]).ArtifactsDirectory)!, "TiaMcp.slnx")));
+    Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe")));
     Equal(true, HostOptions.Parse(["--no-native-workers", "--worker", Path.Combine(work, "worker.exe")]).NoNativeWorkers);
     foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
     {
