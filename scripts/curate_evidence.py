@@ -34,7 +34,7 @@ def run(path):
     calls = report.get("toolCalls", [])
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
             "completed": report.get("completed") is True,
-            "steps": [step["name"] for step in report.get("steps", [])],
+            "steps": [step.get("name") or step.get("tool") for step in report.get("steps", [])],
             "toolsPassed": sorted({c["name"] for c in calls if not c["isError"]}),
             "toolsRejected": sorted({c["name"] for c in calls if c["isError"]})}
 

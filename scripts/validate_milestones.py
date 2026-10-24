@@ -19,8 +19,12 @@ def main():
     parser.add_argument("--project", type=pathlib.Path, help="Reopen an existing isolated TiaMcpScratch project under this repo's artifacts.")
     parser.add_argument("--credential-metadata", type=pathlib.Path, help="Generated scratch CPU credential metadata, required for simulation when reopening a saved project.")
     parser.add_argument("--credential-journal", type=pathlib.Path, action="append", default=[], help="Repeat for each prior recovery journal when reopening a recovered project.")
+    parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker executable.")
+    parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker executable.")
     args = parser.parse_args()
-    client = Client(ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe", 300)
+    extra_arguments = [part for option, path in (("--worker", args.worker), ("--sim-worker", args.sim_worker)) if path
+                       for part in (option, str(path.resolve()))]
+    client = Client(ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe", 300, extra_arguments)
     report = {"steps": [], "failures": [], "limitations": [], "completed": False, "simulationVerified": False}
     sim_id = None
     credential_metadata = str(artifact_path(args.credential_metadata, ".json")) if args.credential_metadata else None
