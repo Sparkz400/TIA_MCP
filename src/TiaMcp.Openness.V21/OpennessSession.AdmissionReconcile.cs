@@ -134,8 +134,9 @@ namespace TiaMcp.Openness.V21
             {
                 var report = ReadSimulationCredentialJson(reportPath, 16 * 1024 * 1024);
                 var files = Directory.Exists(card) ? SimulationCardFiles(card) : new JArray();
-                DateTime completedAt;
-                bool bound = DateTime.TryParse(report.Value<string>("completedAtUtc"), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out completedAt) && completedAt >= check.AdmittedAt;
+                // JObject.Parse already turns the ISO text into a Date token.
+                var completedAt = report["completedAtUtc"]?.Type == JTokenType.Date ? report.Value<DateTime>("completedAtUtc").ToUniversalTime() : (DateTime?)null;
+                bool bound = completedAt >= check.AdmittedAt;
                 bool complete = report.Value<bool?>("completed") == true && files.Count > 0 && JToken.DeepEquals(files, report["files"]) &&
                     SimulationProvisionManifestHash(files) == report.Value<string>("programRevision");
                 bool sameProject = SameSimulationPath(report["project"]?.Value<string>("path"), projectRow.Value<string>("path"));
@@ -250,10 +251,14 @@ namespace TiaMcp.Openness.V21
                     var project = _session._portal.Projects.Open(new FileInfo(path));
                     try
                     {
-                        // Unspecified is read as UTC: a local time then only looks later, which holds rather than releases.
-                        var modified = project.LastModified.Kind == DateTimeKind.Local ? project.LastModified.ToUniversalTime() : DateTime.SpecifyKind(project.LastModified, DateTimeKind.Utc);
+                        // The API does not document the kind. Unspecified takes the later of its UTC and local readings,
+                        // so an ambiguous save time can only hold, never release.
+                        var raw = project.LastModified;
+                        var modified = raw.Kind == DateTimeKind.Local ? raw.ToUniversalTime() : raw.Kind == DateTimeKind.Utc ? raw
+                            : new DateTime(Math.Max(DateTime.SpecifyKind(raw, DateTimeKind.Utc).Ticks, DateTime.SpecifyKind(raw, DateTimeKind.Local).ToUniversalTime().Ticks), DateTimeKind.Utc);
                         var neutral = new EngineeringChange { Kind = "admission_reconcile" };
-                        var observed = new JObject { ["path"] = project.Path.FullName, ["lastModifiedUtc"] = modified.ToString("O"), ["isModifiedAfterOpen"] = project.IsModified,
+                        var observed = new JObject { ["path"] = project.Path.FullName, ["lastModifiedUtc"] = modified.ToString("O"),
+                            ["lastModifiedRaw"] = raw.ToString("O"), ["lastModifiedKind"] = raw.Kind.ToString(), ["isModifiedAfterOpen"] = project.IsModified,
                             ["fingerprint"] = _session.EngineeringFingerprint(neutral, project, true), ["fingerprintCoverage"] = neutral.FingerprintCoverage };
                         if (outcome != null) observed["outcomeFingerprint"] = outcome(project);
                         Evidence(row, "project", observed);
