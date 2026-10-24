@@ -8,6 +8,16 @@ to offline **TIA Portal V21** projects, with simulation through **PLCSIM Advance
 A .NET 10 host connects to isolated .NET Framework 4.8 workers. Siemens assemblies
 are loaded from your installed products and are not redistributed.
 
+> **Status and safety:** pre-1.0 and under active development. Offline tooling is
+> validated in CI; live TIA Portal and PLCSIM runtime qualification is incomplete
+> (see [Current status](docs/STATUS.md)). Use it only with offline projects, copies,
+> scratch projects and simulators you own, never with production PLCs or plants.
+> Provided "as is", without warranty, under the [Apache License 2.0](LICENSE).
+>
+> Siemens, TIA Portal, SIMATIC, STEP 7, WinCC and PLCSIM are trademarks of Siemens AG.
+> This project is independent and not affiliated with, endorsed or supported by Siemens.
+> OPC UA is a trademark of the OPC Foundation.
+
 [Documentation](docs/README.md) · [Current status](docs/STATUS.md) ·
 [Remaining work](docs/TODO.md) · [Contributing](CONTRIBUTING.md)
 

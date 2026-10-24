@@ -10,6 +10,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # 2.x is a breaking OPC UA SDK line; vendored notices and pinned dependency tests need a planned upgrade.
+      - dependency-name: "OPCFoundation.*"
+        update-types: ["version-update:semver-major"]
     groups:
       nuget-minor-patch:
         patterns: ['*']
