@@ -46,6 +46,13 @@ public sealed class EngineeringMutationAdmissionStore
     public EngineeringMutationAdmission Read(string id)
     { using var held = PackageStorage.Lock(lockPath); return ReadUnderLock(artifacts, id); }
 
+    /// <summary>When the dispatch intent was committed: no admitted write can predate it.</summary>
+    public DateTimeOffset AdmittedAt(string id)
+    {
+        using var held = PackageStorage.Lock(lockPath); _ = ReadUnderLock(artifacts, id);
+        return PackageStorage.Load<EngineeringMutationAdmission>(PackageStorage.Under(directory, id + "/00000000.json")).RecordedAt;
+    }
+
     public EngineeringMutationAdmission Returned(string id, int revision, EngineeringArtifactReference response) =>
         Change(id, revision, current => {
             State(current, "dispatchIntent"); VerifyArtifact(artifacts, response);

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="title desc">
+  <title id="title">TIA MCP — Inspect. Preview. Change. Verify.</title>
+  <desc id="desc">Brutalist industrial banner: oversized black typography, an off-white engineering grid, acid-yellow workflow panels, and a hard-edged schematic connecting an MCP client to an offline PLC project.</desc>
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#171717" stroke-opacity=".12"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="400" fill="#f2f0e8"/>
+  <rect width="1280" height="44" fill="#171717"/>
+  <rect x="820" y="44" width="460" height="288" fill="url(#grid)"/>
+  <rect y="332" width="1280" height="68" fill="#dfff00"/>
+  <g fill="#171717" font-family="Arial, Helvetica, sans-serif">
+    <g font-family="Consolas, 'Courier New', monospace" font-size="16" letter-spacing="1">
+      <text x="32" y="28" fill="#f2f0e8">TIA PORTAL / MODEL CONTEXT PROTOCOL</text>
+      <text x="1248" y="28" fill="#dfff00" text-anchor="end">OPEN SOURCE ↗</text>
+    </g>
+    <text x="26" y="210" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="154" font-weight="900" letter-spacing="-8">TIA MCP</text>
+    <text x="36" y="263" font-size="24" font-weight="700">MCP tooling for offline TIA Portal projects.</text>
+    <text x="36" y="302" font-family="Consolas, 'Courier New', monospace" font-size="16">TIA PORTAL V21 / PLCSIM ADVANCED V8</text>
+    <g font-family="Consolas, 'Courier New', monospace" font-size="13" font-weight="700">
+      <text x="850" y="79">01 / CLIENT</text>
+      <text x="1058" y="79">02 / PROJECT</text>
+    </g>
+    <rect x="858" y="120" width="112" height="114"/>
+    <rect x="1066" y="110" width="178" height="134"/>
+    <g stroke="#171717" stroke-width="3">
+      <rect x="850" y="112" width="112" height="114" fill="#f2f0e8"/>
+      <path d="M850 137h112" fill="none"/>
+      <rect x="1058" y="102" width="178" height="134" fill="#f2f0e8"/>
+      <path d="M1058 122h178M1058 216h178" fill="none"/>
+      <rect x="1069" y="133" width="49" height="72" fill="#dfff00"/>
+      <rect x="1128" y="133" width="41" height="72" fill="none"/>
+      <rect x="1179" y="133" width="45" height="72" fill="none"/>
+    </g>
+    <g fill="none" stroke="#171717" stroke-width="4">
+      <path d="m874 159 13 13-13 13m24 0h18"/>
+      <path d="M970 156h74m-12-9 12 9-12 9M1044 198h-64m12-9-12 9 12 9"/>
+      <path d="M1137 145h23m-23 11h23m-23 11h23m-23 11h23m-23 11h23M1188 145h27m-27 11h27m-27 11h27m-27 11h27m-27 11h27" stroke-width="2"/>
+    </g>
+    <g font-family="Consolas, 'Courier New', monospace" font-weight="700" text-anchor="middle">
+      <text x="1093" y="175" font-size="16">CPU</text>
+      <text x="1010" y="183" font-size="13">MCP</text>
+    </g>
+    <rect x="850" y="268" width="386" height="34"/>
+    <text x="1043" y="290" fill="#f2f0e8" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="14" letter-spacing="1.5">OFFLINE ENGINEERING</text>
+    <g font-family="Consolas, 'Courier New', monospace" font-size="14">
+      <text x="25" y="373">01</text>
+      <text x="345" y="373">02</text>
+      <text x="665" y="373">03</text>
+      <text x="985" y="373">04</text>
+    </g>
+    <g font-size="28" font-weight="900" letter-spacing="-.5">
+      <text x="68" y="377">INSPECT.</text>
+      <text x="388" y="377">PREVIEW.</text>
+      <text x="708" y="377">CHANGE.</text>
+      <text x="1028" y="377">VERIFY.</text>
+    </g>
+  </g>
+  <g fill="none" stroke="#171717" stroke-width="4">
+    <rect x="2" y="2" width="1276" height="396"/>
+    <path d="M820 44V332M0 332H1280M320 332V400M640 332V400M960 332V400"/>
+  </g>
+</svg>

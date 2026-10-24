@@ -1,5 +1,10 @@
 # Documentation
 
+[System architecture](guides/architecture.md) ·
+[Prepared-change workflow](guides/engineering-workflows.md) ·
+[Capability boundaries](../README.md#what-it-supports) ·
+[Visual assets](assets/README.md)
+
 **AutomationML / CAx document review - 16 October 2026:** Six offline MCP tools inspect CAEX 2.15/3.0 against pinned XSDs, retain exact originals, compare declared identities and report conservative hierarchy/link/class-consumer effects. The [workflow](reference/automationml-workflow.md), [remaining native plan](plans/expansion-plans/automationml-cax.md) and [verification record](verification/automationml-workflow-20261016.md) separate document evidence from native importability. The full baseline passes 30 managed suites, 1,280 Python tests (one skip) and 24 Explorer checks. Final source passes 77 targeted checks, 69 actual MCP checks, Python and portable package/relocation checks; the verification record separates the exact sources. Prior inventory-export commit `c2a6bb2` passes hosted runs `38940028093` and `38940028137`. D05/C02 and the full offline queue remain open.
 
 **Inventory export fidelity — 16 October 2026:** XLSX preserves escape-looking text, CR/LF, control characters and Unicode; failed exports clean up only their own files. The [frozen evidence](verification/inventory-export-20261016.md) passes 29 managed suites, 1,277 Python tests (one unavailable-evidence skip), 24 Explorer checks and all portable MCP workflows. Independent readers compare all six export pairs; Excel 16.0 build 20430 verifies 30,022 name cells and warnings while preserving another controlled workbook and exiting cleanly. Native Siemens, other-format and visual acceptance remain separate.

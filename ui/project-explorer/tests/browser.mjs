@@ -45,6 +45,33 @@ try {
   await page.goto(pathToFileURL(viewer).href); await page.locator('.project-name').waitFor();
   await runtimeCaptureBrowser(page,root,output,check,shot);
   assert.equal(await page.locator('script[src]').count(), 0); assert.match(await page.locator('.notice').innerText(), /Offline/); check('Self-contained offline viewer starts with zero network requests');
+  for (const theme of ['light', 'dark']) {
+    if (await page.evaluate(() => document.documentElement.dataset.theme) !== theme) await page.getByRole('button', { name: 'Toggle color theme' }).click();
+    const contrast = await page.evaluate(() => {
+      const css = getComputedStyle(document.documentElement);
+      const luminance = name => {
+        const hex = css.getPropertyValue('--' + name).trim().slice(1);
+        const rgb = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+        return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
+      };
+      return [['ink', 'panel', 4.5], ['muted', 'panel2', 4.5], ['accent', 'accent-bg', 4.5], ['warn', 'warn-bg', 4.5], ['danger', 'danger-bg', 4.5], ['focus', 'panel', 3]].map(([fg, bg, minimum]) => {
+        const a = luminance(fg), b = luminance(bg);
+        return { fg, bg, minimum, ratio: (Math.max(a, b) + .05) / (Math.min(a, b) + .05) };
+      });
+    });
+    for (const pair of contrast) assert.ok(pair.ratio >= pair.minimum, `${theme}: ${pair.fg}/${pair.bg} contrast ${pair.ratio}`);
+    await page.getByRole('searchbox', { name: 'Search project' }).focus();
+    await page.keyboard.press('Tab');
+    assert.ok(await page.evaluate(() => document.activeElement.matches(':focus-visible') && parseFloat(getComputedStyle(document.activeElement).outlineWidth) >= 3));
+  }
+  await page.getByRole('button', { name: 'Toggle color theme' }).click();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  assert.equal(await page.evaluate(() => {
+    const probe = document.createElement('div'); probe.className = 'loading'; document.body.append(probe);
+    const animation = getComputedStyle(probe).animationName; probe.remove(); return animation;
+  }), 'none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  check('Both themes retain readable text/status contrast, visible keyboard focus and reduced-motion support');
   await page.getByRole('searchbox', { name: 'Search project' }).fill('MotorControl'); await page.waitForFunction(() => document.querySelectorAll('.tree-row').length === 2);
   await page.locator('[data-node="motor-a"]').click(); await page.waitForFunction(() => projectExplorer.details?.reference?.nodeId === 'motor-a'); const a = await page.evaluate(() => ProjectExplorerModel.reference(projectExplorer.snapshot, projectExplorer.nodes.get(projectExplorer.selected)));
   await page.locator('[data-node="motor-b"]').click(); await page.waitForFunction(() => projectExplorer.details?.reference?.nodeId === 'motor-b'); const b = await page.evaluate(() => ProjectExplorerModel.reference(projectExplorer.snapshot, projectExplorer.nodes.get(projectExplorer.selected))); assert.notEqual(a.objectPath, b.objectPath); check('Duplicate display names preserve distinct exact native references');
@@ -99,6 +126,12 @@ try {
   await page.getByRole('tab', { name: 'Details', exact: true }).click(); await shot('fixture-details-light-1440');
   await page.setViewportSize({width:1024,height:800}); await page.getByRole('button', { name: 'Toggle color theme' }).click(); await shot('fixture-details-dark-1024'); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true); check('1024px dark desktop layout has no page overflow');
   await page.setViewportSize({width:760,height:1000}); await shot('fixture-responsive-760'); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true); check('760px stacked layout has no page overflow');
+  await page.setViewportSize({width:390,height:844});
+  assert.ok(await page.evaluate(() => {
+    const heading = document.querySelector('.selection-title h2');
+    return document.documentElement.scrollWidth <= innerWidth && heading.getBoundingClientRect().height <= parseFloat(getComputedStyle(heading).lineHeight) * 2;
+  }), 'Phone layout must keep the selected object title readable beside its actions');
+  await shot('fixture-responsive-390'); check('390px phone layout keeps the object title readable without page overflow');
   await page.evaluate(async () => { const doc = structuredClone(projectExplorer.snapshot); doc.expiresAtUtc='2020-01-01T00:00:00Z'; await projectExplorer.load(doc,new ProjectExplorerClient.OfflineTransport(doc)); }); assert.match(await page.locator('.notice').innerText(),/expired/); check('Expired historical snapshot is visibly stale');
   // Delayed old details must not overwrite a new selection; transport failure is visible.
   await page.evaluate(async () => { const original=projectExplorer.client.transport.invoke.bind(projectExplorer.client.transport); projectExplorer.client.transport.invoke=async (action,args)=>{ if(action==='details'&&args.reference.nodeId==='motor-a') await new Promise(r=>setTimeout(r,100)); return original(action,args); }; const first=projectExplorer.select('motor-a'); await projectExplorer.select('motor-b'); await first; }); assert.equal(await page.evaluate(()=>projectExplorer.details.reference.nodeId),'motor-b'); check('Delayed old detail result cannot overwrite newer exact selection');

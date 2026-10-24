@@ -243,14 +243,16 @@ def block_pending_profiles(native_profiles, report_profiles, after_index, failur
 
 
 def native_section_entries(native, section, family):
-    keys = ({"connections": ("Connections",), "tags": ("TagFolder",), "screens": ("ScreenFolder",),
+    # Classic screen inspection spans every screen role; older reports lack the added sections.
+    keys = ({"connections": ("Connections",), "tags": ("TagFolder",),
+             "screens": ("ScreenFolder", "ScreenTemplateFolder", "ScreenPopupFolder", "ScreenSlideinFolder", "ScreenGlobalElements", "ScreenOverview"),
              "scripts": ("VBScriptFolder",), "resources": ("TextLists", "GraphicLists")} if family == "classic" else
             {"connections": ("Connections",), "tags": ("Tags", "TagTables"), "screens": ("Screens",),
              "scripts": ("Scripts",), "resources": ("HmiTextLists", "HmiGraphicLists"), "alarms": ("DiscreteAlarms", "AnalogAlarms")})
     if section not in keys:
         return None
     allowed = {"connections": {"Connection", "HmiConnection"}, "tags": {"Tag", "TagTable", "HmiTag", "HmiTagTable"},
-               "screens": {"Screen", "HmiScreen"}, "scripts": {"VBScript", "HmiScriptModule"},
+               "screens": {"Screen", "HmiScreen", "ScreenTemplate", "ScreenPopup", "ScreenSlidein", "ScreenGlobalElements", "ScreenOverview"}, "scripts": {"VBScript", "HmiScriptModule"},
                "resources": {"TextList", "GraphicList", "HmiTextList", "HmiGraphicList"}, "alarms": {"HmiDiscreteAlarm", "HmiAnalogAlarm"}}
     def descend(value):
         if isinstance(value, list):
@@ -262,7 +264,7 @@ def native_section_entries(native, section, family):
                 yield value
             for key, child in value.items():
                 if key not in {"attributes", "export", "exportError"}: yield from descend(child)
-    entries = [item for key in keys[section] for item in descend(native["sections"][key])]
+    entries = [item for key in keys[section] for item in descend(native["sections"].get(key))]
     if family == "unified" and section == "tags":
         # HmiSoftware.Tags is the flattened view of TagTables.Tags. Remove
         # only a proved alias with the exact native table scope AND equal
