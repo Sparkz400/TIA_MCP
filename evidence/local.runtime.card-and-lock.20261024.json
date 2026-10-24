@@ -1,0 +1,41 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.runtime.card-and-lock.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T18:40:42+00:00",
+  "source": {
+    "commit": "402e38ed45aac7360593a53aec288e7245d4a09b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Offline analysis of the frozen runtime corpus (artifacts/block-tests/frozen-20261024-04 and its 65 retained simulator storages): every post-RUN memory card differs from its original manifest by one identical pattern (5 RData retain files, OMSSTORE hierarchy generation rotation with 3 new and 1 removed object files, CONSISTENCY_1 updated), no .info file on any card; every case opened the same saved scratch project with project_open in a fresh owned TIA process after the previous case's verified TIA, worker and Host exit, 65 of 65 without a lock error.",
+  "limitations": [
+    "Analysis of recorded evidence and retained files on this PC; the VM's earlier post-RUN .info observation is not reproduced here and stays open on the VM.",
+    "Card changes after RUN are PLCSIM runtime state (retentive data and object store rotation) and are recorded, not compared, under the semantic preservation rule."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "f465399cae69b67de6bbfd0e8f0b2c22fa779878b270e6027789fba2a6a2250e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "card-lock-report.json",
+      "sha256": "9767a88322b17bb82c45accced524cd9405ce4889a98bf435c090616d54882b5",
+      "bytes": 986,
+      "completed": true,
+      "steps": [
+        "post-RUN card inventory, one identical change pattern across all cards",
+        "project_open of the saved project in a fresh TIA process for every case"
+      ],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}
