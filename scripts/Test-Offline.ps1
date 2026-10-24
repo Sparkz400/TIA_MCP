@@ -1,8 +1,12 @@
 param(
     [ValidateSet('Debug','Release')][string]$Configuration = 'Release',
     [string]$OutputDirectory,
-    [ValidateSet('All','Python','Managed')][string]$Suite = 'All'
+    [ValidateSet('All','Python','Managed')][string]$Suite = 'All',
+    # CI splits the managed suites across parallel runners; the default runs every suite.
+    [ValidateRange(1, 16)][int]$ShardCount = 1,
+    [ValidateRange(0, 15)][int]$ShardIndex = 0
 )
+if ($ShardIndex -ge $ShardCount) { throw 'ShardIndex must be below ShardCount.' }
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 if (-not $OutputDirectory) {
@@ -22,6 +26,20 @@ New-Item -ItemType Directory -Path $output -Force | Out-Null
 $buildOutput = Join-Path $output 'dotnet'
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
+# Measured hosted-runner seconds per managed suite; suites missing here count as 60 s.
+$ManagedSuiteSeconds = @{}
+# Deterministic longest-first split, so every suite runs in exactly one shard.
+function Select-ManagedShard([string[]]$names, [int]$count, [int]$index) {
+    if ($count -eq 1) { return $names }
+    $weight = { param($n) if ($ManagedSuiteSeconds.ContainsKey($n)) { [double]$ManagedSuiteSeconds[$n] } else { 60.0 } }
+    $loads = [double[]]::new($count); $assigned = @{}
+    foreach ($name in ($names | Sort-Object @{Expression={ & $weight $_ }; Descending=$true}, @{Expression={ $_ }})) {
+        $target = 0
+        for ($i = 1; $i -lt $count; $i++) { if ($loads[$i] -lt $loads[$target]) { $target = $i } }
+        $loads[$target] += & $weight $name; $assigned[$name] = $target
+    }
+    return @($names | Where-Object { $assigned[$_] -eq $index })
+}
 $result = @{schemaVersion=1;status='running';suite=$Suite;startedAtUtc=[DateTime]::UtcNow.ToString('O');nativeQualification=$false;managedSuites=@()}
 Push-Location $repoRoot
 try {
@@ -71,6 +89,9 @@ try {
         'TiaMcp.CompilationEvidence.Tests', 'TiaMcp.EncoderEvidence.Tests'
     )
     if ($Suite -in @('All','Managed')) {
+        $suites = @(Select-ManagedShard $suites $ShardCount $ShardIndex)
+        $result.managedShard = @{index=$ShardIndex;count=$ShardCount;suites=$suites}
+        $result.managedSuiteSeconds = [ordered]@{}
         dotnet build src/TiaMcp.OpcUa.Cli/TiaMcp.OpcUa.Cli.csproj --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'OPC UA CLI build failed.' }
         $gitExecutable = (Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
@@ -84,6 +105,7 @@ try {
         dotnet build $solution --configuration $Configuration --artifacts-path $buildOutput
         if ($LASTEXITCODE -ne 0) { throw 'Managed suite build failed.' }
         foreach ($managedSuite in $suites) {
+            $suiteClock = [Diagnostics.Stopwatch]::StartNew()
             if ($managedSuite -eq 'TiaMcp.PhysicalRuntime.Tests') {
                 dotnet run --no-build --project "tests/$managedSuite/$managedSuite.csproj" --configuration $Configuration --artifacts-path $buildOutput -- (Join-Path $output 'physical-runtime-results.json')
             } elseif ($managedSuite -eq 'TiaMcp.OpcUa.Runtime.Tests') {
@@ -153,6 +175,7 @@ try {
             }
             if ($LASTEXITCODE -ne 0) { throw "Managed offline tests failed: $managedSuite" }
             $result.managedSuites += $managedSuite
+            $result.managedSuiteSeconds[$managedSuite] = [math]::Round($suiteClock.Elapsed.TotalSeconds, 1)
         }
         if ($Suite -eq 'All') {
             $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
