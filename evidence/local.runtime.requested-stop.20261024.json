@@ -1,0 +1,67 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.runtime.requested-stop.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T18:39:06+00:00",
+  "source": {
+    "commit": "402e38ed45aac7360593a53aec288e7245d4a09b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/run_block_tests.py --live --provision-runtime-credential --fixture runtime-boolean --stop-file: stop requested at 18:37:34 UTC while case 2 (truth-1) ran; the runner observed it at 18:38:28 after truth-1 finished. truth-0 and truth-1 passed with complete cleanup (instance unregistered, Host and both workers exited 0, exits verified, nothing forced); no further case was admitted; truth-2..truth-7 are recorded as unattempted; the suite ends blocked with statusReason stopped_by_request and no uncertain runtime state.",
+  "limitations": [
+    "Cooperative stop between cases only; no native cancellation of an operation in flight, by design.",
+    "Project-lock release after normal TIA shutdown is not part of this record."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "09ddd61ac25b494121b8eb6256135f0f8964518524a7ff6d8c2244abf51dbcba"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6ce1b56624dada7255c6db99f10e2ec321c7b2d905e1ec6420ef294208835dea"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "f465399cae69b67de6bbfd0e8f0b2c22fa779878b270e6027789fba2a6a2250e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "stop-report.json",
+      "sha256": "a497cc086b5899a74ed3c99ac2a631ecd02da6e52e21311e3b62ca7dbf1ae82f",
+      "bytes": 3448,
+      "completed": true,
+      "steps": [
+        "truth-0: passed",
+        "truth-1: passed"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
