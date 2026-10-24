@@ -20,7 +20,7 @@ from block_test_runtime import NativeAudit, NativeToolError, canonical, digest, 
 from run_block_tests import apply_change, binary_manifest, save_json
 from run_conformance import native_document, structural_xml
 from smoke_mcp import Client, ROOT
-from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion
+from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion, adapt_reference_culture, project_culture
 from typed_graphical_transport import artifact_bytes
 from qualify_deployment import McpClient, load_configuration
 from typed_graphical_owned_session import TypedOwnedSession
@@ -182,10 +182,15 @@ def run_case(case, args, output):
         reference = ROOT / case["referenceXml"]
         reference_xml = reference.read_bytes().decode("utf-8-sig")
         report["independentReference"] = {"path": str(reference), "payloadSha256": native_hash(reference_xml)}
+        # Fixtures were captured in a de-DE project; only empty text items follow the observed project culture.
+        culture = project_culture(call("block_read", {"blockName": "Main"})["xml"])
+        reference_xml, retargeted = adapt_reference_culture(reference_xml, culture)
+        report["referenceCultureAdaptation"] = {"projectCulture": culture, "referenceItems": retargeted, "dependencyItems": 0}
         for dependency in case.get("dependencySources", []):
             apply_change(call, "source_upsert", {**route, **dependency})
         for dependency in case.get("dependencyXmls", []):
-            xml = (ROOT / dependency["path"]).read_bytes().decode("utf-8-sig")
+            xml, retargeted = adapt_reference_culture((ROOT / dependency["path"]).read_bytes().decode("utf-8-sig"), culture)
+            report["referenceCultureAdaptation"]["dependencyItems"] += retargeted
             apply_change(call, "block_import_xml", {**route, "xml": xml, "expectedBlockNames": dependency["names"]})
         apply_change(call, "block_import_xml", {**route, "xml": reference_xml, "expectedBlockNames": [case["blockName"]]})
         for specification in case.get("runtimeSources", []):

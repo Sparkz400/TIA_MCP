@@ -81,6 +81,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("LanguageConversionNotSupported", "Typed edits must retain the selected block's language.");
             PrepareBlockTargets(change, plc, false, !create, (JArray)preview["effects"]);
             var original = create ? PrepareTypedCreationDocument(model, change, plc) : EngineeringSources.ReadXml(File.ReadAllText(change.Backups[0]["artifact"].Value<string>("path")));
+            if (create) UseProjectCultures(original, plc.Project);
             string callerPath = block?.Path ?? ObjectIdentity.ObjectPath(change.GroupPath, name, change.Namespace);
             var capture = new TypedResolutionCapture(this, plc, change, callerPath, original);
             var context = capture.Resolve(model);
@@ -160,6 +161,10 @@ namespace TiaMcp.Openness.V21
             }
             throw new BridgeException("CreationProfileUnavailable", "No captured native creation template covers the exact requested declarations: " + last?.Message);
         }
+
+        // Existing blocks keep their own texts; only captured templates are retargeted.
+        private static void UseProjectCultures(XDocument document, Project project) => TypedGraphical.RetargetTemplateCultures(document,
+            project.LanguageSettings.ActiveLanguages.Select(l => l.Culture.Name).ToList(), project.LanguageSettings.EditingLanguage.Culture.Name);
 
         private static string TypedCpuIdentifier(PlcSelection plc)
         {
