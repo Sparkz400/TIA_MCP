@@ -202,6 +202,44 @@
       "type": "object",
       "description": "Retained operation-specific observation; native meaning is outside this envelope contract."
     },
+    "versionFromDocuments": {
+      "type": "object",
+      "required": ["typeGuid", "baseVersionGuid", "createOptions", "scope"],
+      "properties": {
+        "typeGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+        "baseVersionGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+        "createOptions": {"const": "None"},
+        "scope": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "reusedDependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["typeName", "typeGuid", "versionGuid", "version", "object", "comparedProperties", "properties", "proof"],
+        "properties": {
+          "typeName": {"type": "string", "minLength": 1},
+          "typeGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+          "versionGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+          "version": {"type": "string", "minLength": 1},
+          "object": {"type": "object"},
+          "comparedProperties": {"type": "integer", "minimum": 1},
+          "properties": {"type": "array", "items": {"type": "object"}},
+          "proof": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      },
+      "description": "Installed exact dependencies reused instead of instantiated; each carries its native identity and metadata comparison."
+    },
+    "createdNames": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "targetNamesBefore": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
     "applySupported": {
       "const": false
     },
