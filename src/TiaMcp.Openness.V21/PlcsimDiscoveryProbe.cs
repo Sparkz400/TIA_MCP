@@ -11,25 +11,34 @@ using Siemens.Simatic.Simulation.Runtime;
 
 namespace TiaMcp.Openness.V21
 {
-    // Diagnostic: what does PN/IE / PLCSIM discovery return before, with, and after one owned OFF
-    // Softbus instance? Never touches existing instances, network mode or existing projects.
+    // Diagnostic of one owned Softbus instance; empty startup is opt-in.
+    // Never touches existing instances, network mode or existing projects.
     internal static class PlcsimDiscoveryProbe
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory)
+        internal static int Run(string outputDirectory, bool startCpu = false)
         {
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
+            result["emptyStartupRequested"] = startCpu;
+            Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
             string ownedName = "TiaMcpProbe_" + Guid.NewGuid().ToString("N");
+            bool powerOnAttempted = false;
+            bool runtimeInitializationAttempted = false;
             try
             {
+                File.WriteAllText(Path.Combine(root.FullName, "start-intent.json"), new JObject { ["startedAtUtc"] = Now() }.ToString());
                 using (var portal = new TiaPortal(TiaPortalMode.WithoutUserInterface))
                 {
-                    var project = portal.Projects.Create(new DirectoryInfo(Path.Combine(root.FullName, "project")), "PlcsimProbe");
+                    result["processId"] = PortalProcesses.CurrentId(portal);
+                    File.WriteAllText(Path.Combine(root.FullName, "start-return.json"), new JObject { ["processId"] = result["processId"] }.ToString());
+                    var projectDirectory = Path.Combine(root.FullName, "project");
+                    Directory.CreateDirectory(projectDirectory);
+                    var project = portal.Projects.Create(new DirectoryInfo(projectDirectory), "PlcsimProbe");
                     var cpu = portal.HardwareCatalog.Find("1511-1")
                         .Where(e => string.Equals(e.TypeName, "CPU 1511-1 PN", StringComparison.OrdinalIgnoreCase))
                         .OrderByDescending(e => Version.TryParse(e.Version.TrimStart('V'), out var v) ? v : new Version(0, 0))
@@ -39,6 +48,7 @@ namespace TiaMcp.Openness.V21
                     result["cpu"] = cpu.TypeIdentifier;
 
                     states.Add(Observe("A-nothing-touched", provider));
+                    runtimeInitializationAttempted = true;
                     result["runtimeVersion"] = SimulationRuntimeManager.Version.ToString("X8"); // initializes the PLCSIM Advanced API
                     result["networkMode"] = SimulationRuntimeManager.NetworkMode.ToString();
                     var preexisting = new JArray(SimulationRuntimeManager.RegisteredInstanceInfo.Select(i => new JObject { ["id"] = i.ID, ["name"] = i.Name }));
@@ -47,15 +57,54 @@ namespace TiaMcp.Openness.V21
                     states.Add(stateB);
 
                     if (preexisting.Count > 0 || SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
+                    {
                         result["stateCSkipped"] = "Existing registrations or non-Softbus network mode; nothing foreign is touched or changed.";
+                        if (startCpu) throw new InvalidOperationException("Empty startup probe requires zero registrations and existing Softbus mode.");
+                    }
                     else
                     {
                         owned = SimulationRuntimeManager.RegisterInstance(ECPUType.CPU1511, ownedName);
                         owned.StoragePath = Directory.CreateDirectory(Path.Combine(root.FullName, "sim", ownedName)).FullName;
+                        result["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName, ["storagePath"] = owned.StoragePath };
                         var stateC = Observe("C-owned-off-softbus-instance", provider);
                         stateC["ownedInstance"] = new JObject { ["id"] = owned.ID, ["name"] = ownedName,
                             ["operatingState"] = owned.OperatingState.ToString(), ["communicationInterface"] = owned.CommunicationInterface.ToString() };
                         states.Add(stateC);
+                        if (startCpu)
+                        {
+                            VerifySoleOwned(owned, ownedName, EOperatingState.Off);
+                            ERuntimeErrorCode? license = null;
+                            try { license = owned.LicenseStatus; } catch { }
+                            if (license == ERuntimeErrorCode.WarningTrialModeActive || license == ERuntimeErrorCode.WarningRunningOnTiaPortalTestSuite)
+                                throw new InvalidOperationException("Full license required; no trial activation attempted.");
+                            powerOnAttempted = true;
+                            result["stage"] = "beforeEmptyPowerOn"; checkpoint();
+                            var status = owned.PowerOn(60000);
+                            result["powerOnRuntimeCode"] = status.ToString();
+                            if (status != ERuntimeErrorCode.OK) throw new InvalidOperationException("Empty startup did not return OK.");
+                            VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                            result["stage"] = "observeEmptyStartup";
+                            var startup = new JObject { ["state"] = "C2-owned-empty-stop-softbus-instance", ["snapshots"] = new JArray() };
+                            states.Add(startup);
+                            var clock = Stopwatch.StartNew();
+                            for (int i = 0; i < 61; i++)
+                            {
+                                if (i > 0) Thread.Sleep(1000);
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                var sample = Observe("startup", provider, 1);
+                                sample["elapsedMs"] = clock.ElapsedMilliseconds;
+                                sample["controllerAddresses"] = new JArray(owned.ControllerIP ?? new string[0]);
+                                sample["controllerName"] = owned.ControllerName;
+                                sample["communicationInterface"] = owned.CommunicationInterface.ToString();
+                                ((JArray)startup["snapshots"]).Add(sample);
+                                VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                checkpoint();
+                            }
+                            owned.PowerOff(60000);
+                            VerifySoleOwned(owned, ownedName, EOperatingState.Off);
+                            result["ownedPowerOffVerified"] = true;
+                            powerOnAttempted = false;
+                        }
                         owned.UnregisterInstance();
                         owned = null;
                         // Self-check: the probe must leave no registration behind.
@@ -65,6 +114,7 @@ namespace TiaMcp.Openness.V21
                     }
                     project.Close();
                 }
+                result["ownedPortalConnectionDisposed"] = true;
                 result["completed"] = true;
             }
             catch (Exception error)
@@ -75,20 +125,48 @@ namespace TiaMcp.Openness.V21
             {
                 if (owned != null)
                 {
-                    try { owned.UnregisterInstance(); result["ownedInstanceUnregisteredInCleanup"] = true; }
-                    catch (Exception error) { result["ownedCleanupFailure"] = error.GetType().FullName + ": " + error.Message; }
+                    try
+                    {
+                        VerifyOwned(owned, ownedName);
+                        if (powerOnAttempted)
+                        {
+                            owned.PowerOff(60000);
+                            if (owned.OperatingState != EOperatingState.Off) throw new InvalidOperationException("Owned instance did not reach OFF during cleanup.");
+                            result["ownedPowerOffVerified"] = true;
+                        }
+                        VerifyOwned(owned, ownedName);
+                        owned.UnregisterInstance();
+                        result["ownedInstanceUnregisteredInCleanup"] = !SimulationRuntimeManager.RegisteredInstanceInfo.Any(i => i.Name == ownedName);
+                        if (!result.Value<bool>("ownedInstanceUnregisteredInCleanup")) throw new InvalidOperationException("Owned registration remains after cleanup.");
+                    }
+                    catch (Exception error) { result["completed"] = false; result["ownedCleanupFailure"] = error.GetType().FullName + ": " + error.Message; }
                 }
-                if (SimulationRuntimeManager.IsInitialized) SimulationRuntimeManager.Shutdown();
+                if (runtimeInitializationAttempted) SimulationRuntimeManager.Shutdown();
                 result["completedAtUtc"] = Now();
                 File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             }
             return result.Value<bool>("completed") ? 0 : 1;
         }
 
-        private static JObject Observe(string label, OnlineProvider provider)
+        private static void VerifySoleOwned(IInstance instance, string name, EOperatingState expected)
+        {
+            VerifyOwned(instance, name);
+            var registered = SimulationRuntimeManager.RegisteredInstanceInfo;
+            if (registered.Length != 1 || registered[0].ID != instance.ID || registered[0].Name != name ||
+                instance.OperatingState != expected || SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
+                throw new InvalidOperationException("The sole owned simulator identity, state or Softbus mode changed.");
+        }
+
+        private static void VerifyOwned(IInstance instance, string name)
+        {
+            if (SimulationRuntimeManager.RegisteredInstanceInfo.Count(i => i.ID == instance.ID && i.Name == name) != 1)
+                throw new InvalidOperationException("Owned simulator registration identity changed; no cleanup mutation attempted.");
+        }
+
+        private static JObject Observe(string label, OnlineProvider provider, int count = SnapshotsPerState)
         {
             var state = new JObject { ["state"] = label, ["simulatorProcesses"] = SimulatorProcesses(), ["snapshots"] = new JArray() };
-            for (int i = 0; i < SnapshotsPerState; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (i > 0) Thread.Sleep(1000);
                 var mode = provider.Configuration.Modes.Find("PN/IE");

@@ -27,10 +27,12 @@ namespace TiaMcp.Openness.V21
                 string apiDirectory = InstalledApiDirectory();
                 string simulatorApiDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "Siemens", "PLCSIMADV", "API", "8.0");
                 string discoveryProbe = null;
+                bool startupDiscoveryProbe = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     if (args[i] == "--pipe" && i + 1 < args.Length) pipe = args[++i];
                     else if (args[i] == "--plcsim-discovery-probe" && i + 1 < args.Length) discoveryProbe = args[++i];
+                    else if (args[i] == "--plcsim-startup-discovery-probe" && i + 1 < args.Length) { discoveryProbe = args[++i]; startupDiscoveryProbe = true; }
                     else if (args[i] == "--api-dir" && i + 1 < args.Length) apiDirectory = args[++i];
                     else if (args[i] == "--sim-api-dir" && i + 1 < args.Length) simulatorApiDirectory = args[++i];
                     else if (args[i] == "--component-qualification") componentQualification = true;
@@ -49,7 +51,7 @@ namespace TiaMcp.Openness.V21
                     throw new InvalidOperationException("Only the TIA V21 API is supported by this worker.");
                 simulatorApiDirectory = Path.GetFullPath(simulatorApiDirectory);
                 AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) => ResolveSiemens(eventArgs, apiDirectory, simulatorApiDirectory);
-                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe);
+                if (discoveryProbe != null) return RunDiscoveryProbe(discoveryProbe, startupDiscoveryProbe);
                 if (testSuiteScopeProbe && componentQualification) throw new ArgumentException("Separate qualification modes required.");
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
@@ -91,7 +93,7 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int RunDiscoveryProbe(string outputDirectory) => PlcsimDiscoveryProbe.Run(outputDirectory);
+        private static int RunDiscoveryProbe(string outputDirectory, bool startCpu) => PlcsimDiscoveryProbe.Run(outputDirectory, startCpu);
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]
