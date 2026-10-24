@@ -1,5 +1,7 @@
 # Offline engineering changes
 
+![Prepare, preview, checkpoint, apply and verify. Checkpointing saves current project edits; uncertain outcomes require explicit recovery.](../assets/engineering-workflow.svg)
+
 The V21 worker implements prepared changes for standard blocks, data types, tag tables, selected hardware and network configuration, technology objects, and a separate safety-block XML import path. These are offline engineering operations. They do not download, force values, change a CPU state, or accept passwords. Runtime and simulator tools are separate.
 
 The installed Siemens API, CPU, firmware, options, project state, protection and licenses still determine whether an individual operation succeeds. A supported code path is not evidence that every hardware catalog item, technology object or safety configuration has been qualified. Native integration results are saved under `artifacts/`.

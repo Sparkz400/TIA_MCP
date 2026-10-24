@@ -1,5 +1,7 @@
 # TIA MCP
 
+![TIA MCP — Inspect. Preview. Change. Verify. MCP tooling for offline TIA Portal projects.](docs/assets/tia-mcp-banner.svg)
+
 [![Python and .NET validation](https://github.com/Sparkz400/TIA_MCP/actions/workflows/offline.yml/badge.svg?branch=main)](https://github.com/Sparkz400/TIA_MCP/actions/workflows/offline.yml)
 [![Explorer validation](https://github.com/Sparkz400/TIA_MCP/actions/workflows/playwright.yml/badge.svg?branch=main)](https://github.com/Sparkz400/TIA_MCP/actions/workflows/playwright.yml)
 
@@ -20,6 +22,20 @@ are loaded from your installed products and are not redistributed.
 
 [Documentation](docs/README.md) · [Current status](docs/STATUS.md) ·
 [Remaining work](docs/TODO.md) · [Contributing](CONTRIBUTING.md)
+
+## Explore a project
+
+Browse project objects, follow block relationships and inspect the evidence behind
+each connection in the [Project Explorer](docs/guides/project-explorer.md).
+
+[![Project Explorer showing MotorControl relationships in the offline packaging-line sample project.](docs/assets/project-explorer.png)](docs/assets/project-explorer.png)
+
+*Actual Explorer UI with synthetic sample data. This offline snapshot is not a
+live TIA Portal session or evidence of native runtime qualification.*
+
+[Architecture](docs/guides/architecture.md) ·
+[Engineering workflow](docs/guides/engineering-workflows.md) ·
+[Visual assets](docs/assets/README.md)
 
 ## Prerequisites
 
@@ -132,6 +148,8 @@ prepare → preview → checkpoint → apply → verify workflow, and
 [deployment](docs/guides/deployment.md) for packaging, launch options and SSH access.
 
 ## What it supports
+
+![Capability boundaries: portable document workflows, engineering with installed Siemens products, and feature-specific qualification.](docs/assets/capabilities.svg)
 
 - **Inspection and tracing:** project inventory, blocks, types, tags, references,
   call graphs and change-impact queries.
