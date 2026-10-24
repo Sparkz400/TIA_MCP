@@ -424,15 +424,24 @@ namespace TiaMcp.Openness.V21
             var selectedNames = change.Versions.Select(x => x.TypeObject.Name).Concat(change.Masters.SelectMany(x => x.ContentDescriptions.Select(y => y.ContentName))).ToList();
             if (selectedNames.Distinct(StringComparer.OrdinalIgnoreCase).Count() != selectedNames.Count) throw new BridgeException("LibraryConflict", "Selected roots have conflicting names in the target composition.");
             var closure = (JArray)change.Preview["dependencies"];
+            var reused = new JArray(); var created = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var version in change.Versions)
             {
                 if (!(version is CodeBlockLibraryTypeVersion) && !(version is PlcTypeLibraryTypeVersion)) throw new BridgeException("TargetIncompatible", "Only eligible PLC code-block and PLC-data-type versions are accepted by this destination.");
                 foreach (var node in ((JArray)closure.First(x => x.Value<string>("rootVersionGuid") == version.Guid.ToString("D"))["versions"]))
                 {
                     string name = node.Value<string>("typeName");
-                    if (names.Contains(name)) throw new BridgeException("LibraryConflict", "An existing PLC object shares a selected/dependency name: " + name + ". Use explicit library_update_project for existing uses.");
+                    bool root = node.Value<string>("versionGuid") == version.Guid.ToString("D");
+                    if (!names.Contains(name)) { created.Add(name); continue; }
+                    if (root) throw new BridgeException("LibraryConflict", "An existing PLC object shares a selected name: " + name + ". Use explicit library_update_project for existing uses.");
+                    if (reused.Any(x => x.Value<string>("versionGuid") == node.Value<string>("versionGuid"))) continue;
+                    var dependency = change.Source.Native.FindVersion(Guid.Parse(node.Value<string>("versionGuid"))) ?? throw new BridgeException("DependencyUnresolved", "A previewed dependency version is absent from the source library: " + name);
+                    reused.Add(ProveInstalledLibraryDependency(change, plc, node, dependency));
                 }
             }
+            change.Preview["reusedDependencies"] = reused;
+            change.Preview["createdNames"] = new JArray(created.OrderBy(x => x, StringComparer.Ordinal));
+            change.Preview["targetNamesBefore"] = new JArray(names.OrderBy(x => x, StringComparer.Ordinal));
             foreach (var master in change.Masters)
             {
                 var descriptions = master.ContentDescriptions.ToList();
@@ -1027,6 +1036,12 @@ namespace TiaMcp.Openness.V21
                         if (!uses.Any(x => x.LibraryTypeInstance.Equals(created))) throw new BridgeException("VersionSelectionUnsupported", "Native result does not carry the exact requested version link.");
                         rows.Add(new JObject { ["object"] = LibraryObjectDescription(created), ["version"] = LibraryVersionInfo(installed), ["linkVerified"] = true });
                         LibraryJournal(change, "instantiate_" + version.Guid, "completed");
+                    }
+                    if (change.Masters.Count == 0)
+                    {
+                        VerifyReusedLibraryDependencies(change, plc); var after = new ScanBudget(50000);
+                        VerifyInstantiatedNames(change, ScopeBlocks(scope, after).Select(x => x.Item.Name).Concat(ScopeTypes(scope, after).Select(x => x.Item.Name)).ToList());
+                        if (after.Truncated) throw new BridgeException("DependencyUnresolved", "Post-instantiation inventory exceeded its completeness budget.");
                     }
                     foreach (var master in change.Masters)
                     {
