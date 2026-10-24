@@ -38,6 +38,23 @@ def installed_inputs(report_path):
             "reopened": reopened}
 
 
+OB_ORACLE_FAILURE = "OB1 must contain exactly one call to the installed FC."
+
+
+def continued_inputs(previous_path, inputs):
+    """Only an earlier OB-oracle failure before any simulator call may continue, from its retained post-OB snapshot."""
+    path = Path(previous_path).resolve()
+    raw = path.read_bytes(); previous = json.loads(raw.decode("utf-8"))
+    require(previous.get("kind") == "plc_component_runtime" and previous.get("status") == "failed"
+            and previous.get("failure") == OB_ORACLE_FAILURE and previous.get("installedProjectVerified") is True
+            and previous.get("obCallVerified") is False and previous.get("runtimeVerified") is False
+            and previous["installationReport"]["sha256"] == inputs["sha256"] and previous["obCall"]["state"] == "applied"
+            and not any(call["tool"].startswith("sim_") or call["tool"] == "simulation_download" for call in previous["calls"]),
+            "Continuation requires the exact earlier OB-oracle failure before any simulator call.")
+    expected = json.loads((path.parent / "ob-call" / "manifest.json").read_text(encoding="utf-8"))
+    return {"path": str(path), "sha256": hashlib.sha256(raw).hexdigest(), "expected": expected}
+
+
 def ob_call_source(fixture):
     return "\n".join(['ORGANIZATION_BLOCK "Main"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
                       "BEGIN", '    "' + fixture["caller"] + '"();', "END_ORGANIZATION_BLOCK", ""])
@@ -50,8 +67,9 @@ def verify_ob_call(xml, fixture):
     require(len(blocks) == 1 and blocks[0].tag == "SW.Blocks.OB" and blocks[0].findtext("AttributeList/Number") == "1",
             "OB call target is not exactly OB1.")
     calls = [node for node in document.iter() if local(node) == "CallInfo"]
-    require(len(calls) == 1 and calls[0].get("Name") == fixture["caller"] and calls[0].get("BlockType") == "FC",
-            "OB1 must contain exactly one call to the installed FC.")
+    # SCL names the callee in Instance/Component; graphical CallInfo carries Name.
+    names = [[c.get("Name") for c in call.iter() if local(c) == "Component"] or [call.get("Name")] for call in calls]
+    require(len(calls) == 1 and names[0] == [fixture["caller"]] and calls[0].get("BlockType") == "FC", OB_ORACLE_FAILURE)
 
 
 def scenario(fixture):
@@ -73,6 +91,8 @@ class ComponentRuntime:
             "calls": [], "installedProjectVerified": False, "obCallVerified": False, "runtimeVerified": False,
             "productionApplySupported": False, "automaticReplayAllowed": False}
         self.client = self.instance = None
+        self.continued = continued_inputs(args.continue_from, self.inputs) if args.continue_from else None
+        if self.continued: self.report["continuedFrom"] = {"path": self.continued["path"], "sha256": self.continued["sha256"]}
         self.persist()
 
     def persist(self):
@@ -106,20 +126,25 @@ class ComponentRuntime:
             require(started.get("ownsPortalProcess") is True and started.get("projects") == [], "A fresh owned empty Portal is required.")
             opened = self.call("project_open", {"path": self.inputs["project"]})
             require(opened.get("opened") is True and opened.get("project", {}).get("path") == self.inputs["project"], "Installed project did not open exactly.")
-            before = snapshot(self.call, self.output / "installed")
-            assert_snapshot(self.inputs["reopened"], before)
-            self.report["installedProjectVerified"] = True; self.persist()
-            # PLCSIM download requires simulation-capable compilation; its own reviewed setting change.
-            self.report["simulationEnable"] = self.apply("project_simulation_enable", {"enabled": True})
-            before = snapshot(self.call, self.output / "simulation-enabled")
-            self.report["simulationEnableKeptInstalledXml"] = all(row["payloadSha256"] == self.inputs["reopened"]["objects"][key]["payloadSha256"]
-                for key, row in before["objects"].items() if key in self.inputs["reopened"]["objects"])
-            # Separate operation: the installation never called its FC from an OB.
-            self.report["obCall"] = self.apply("source_upsert", {"language": "SCL", "source": ob_call_source(self.fixture), "expectedBlockNames": ["Main"]})
-            after = snapshot(self.call, self.output / "ob-call")
+            if self.continued:
+                # The saved project already holds the earlier run's reviewed OB call; prove exact identity.
+                after = snapshot(self.call, self.output / "continued")
+                assert_snapshot(self.continued["expected"], after)
+            else:
+                before = snapshot(self.call, self.output / "installed")
+                assert_snapshot(self.inputs["reopened"], before)
+                self.report["installedProjectVerified"] = True; self.persist()
+                # PLCSIM download requires simulation-capable compilation; its own reviewed setting change.
+                self.report["simulationEnable"] = self.apply("project_simulation_enable", {"enabled": True})
+                before = snapshot(self.call, self.output / "simulation-enabled")
+                self.report["simulationEnableKeptInstalledXml"] = all(row["payloadSha256"] == self.inputs["reopened"]["objects"][key]["payloadSha256"]
+                    for key, row in before["objects"].items() if key in self.inputs["reopened"]["objects"])
+                # Separate operation: the installation never called its FC from an OB.
+                self.report["obCall"] = self.apply("source_upsert", {"language": "SCL", "source": ob_call_source(self.fixture), "expectedBlockNames": ["Main"]})
+                after = snapshot(self.call, self.output / "ob-call")
             mains = [row for row in after["inventory"]["blocks"] if row["name"] == "Main"]
             require(len(mains) == 1, "Exact OB1 Main is ambiguous.")
-            assert_snapshot(before, after, except_paths=[mains[0]["path"]])
+            if not self.continued: assert_snapshot(before, after, except_paths=[mains[0]["path"]])
             verify_ob_call(Path(after["objects"]["block:" + mains[0]["path"]]["file"]).read_text(encoding="utf-8-sig"), self.fixture)
             self.report["obCallVerified"] = True; self.persist()
             created = self.call("sim_create", {"cpuType": "CPU1511", "creationId": uuid.uuid4().hex})
@@ -157,6 +182,7 @@ def main():
     parser.add_argument("--sim-worker", type=Path, required=True)
     parser.add_argument("--install-report", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--continue-from", type=Path, help="Earlier runtime report that failed only at the corrected OB-call oracle.")
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()

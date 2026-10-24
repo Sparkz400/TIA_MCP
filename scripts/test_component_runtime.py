@@ -43,6 +43,17 @@ class ComponentRuntimeTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 verify_ob_call(bad, FIXTURE)
 
+    def test_native_scl_ob_call_oracle(self):
+        ns = "http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4"
+        scl = lambda callee, kind: (f'<Document><SW.Blocks.OB ID="0"><AttributeList><Number>1</Number></AttributeList><ObjectList>'
+            f'<SW.Blocks.CompileUnit ID="3"><AttributeList><NetworkSource><StructuredText xmlns="{ns}"><Access Scope="Call" UId="23">'
+            f'<CallInfo UId="24" BlockType="{kind}"><Instance Scope="GlobalVariable" UId="26"><Component Name="{callee}" UId="25" />'
+            '</Instance></CallInfo></Access></StructuredText></NetworkSource></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.OB></Document>')
+        verify_ob_call(scl("TiaMcpComponentCaller", "FC"), FIXTURE)
+        for bad in (scl("Other", "FC"), scl("TiaMcpComponentCaller", "FB")):
+            with self.assertRaises(RuntimeError):
+                verify_ob_call(bad, FIXTURE)
+
     def test_scenario_observes_both_edges_on_mapped_tags(self):
         steps, signals = scenario(FIXTURE)
         self.assertEqual([s["symbol"] for s in signals], ["ComponentEnable", "ComponentActive"])
