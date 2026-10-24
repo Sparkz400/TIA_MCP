@@ -13,6 +13,8 @@ import ctypes
 from ctypes import wintypes
 import hashlib
 import json
+import msvcrt
+import os
 import pathlib
 import subprocess
 import time
@@ -69,10 +71,21 @@ def wait_until(predicate, description, timeout, interval=0.02):
 
 
 def read_json(path):
+    """Read with full sharing: a plain open blocks the worker's File.Replace of its journal (seen natively)."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    handle = kernel.CreateFileW(str(path), 0x80000000, 0x7, None, 3, 0, None)  # GENERIC_READ, share read/write/delete, OPEN_EXISTING
+    if handle in (None, wintypes.HANDLE(-1).value):
+        return None
     try:
-        return json.loads(path.read_text(encoding="utf-8-sig"))
+        with os.fdopen(msvcrt.open_osfhandle(handle, os.O_RDONLY), "rb") as stream:
+            handle = None
+            return json.loads(stream.read().decode("utf-8-sig"))
     except (OSError, ValueError):
         return None
+    finally:
+        if handle is not None:
+            kernel.CloseHandle(handle)
 
 
 def admissions(root, operation):
