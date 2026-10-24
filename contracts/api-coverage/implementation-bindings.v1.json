@@ -2502,8 +2502,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcsimDiscoveryProbe.cs",
-      "sha256": "1f177aae86d19b9ad52618dc2b500e4414b2823fcd5a0c3795391fdd528ee9e3",
-      "bytes": 28490
+      "sha256": "cf55c3c4a376e4a7cce5f12354d25cef952c0bbff9caeac3b032576ca918fdd6",
+      "bytes": 34223
     },
     {
       "path": "src/TiaMcp.Openness.V21/PortalProcesses.cs",
@@ -2512,8 +2512,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/Program.cs",
-      "sha256": "f4929f9a7abd69bf4a059aec77be4d3b370f333e28df4797361edd01b184dcdf",
-      "bytes": 12669
+      "sha256": "b9dadb7b6f89afe23a791abec2b6cb096729a11242d49f7ceedd5a89be43c901",
+      "bytes": 12922
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectIndexStore.cs",

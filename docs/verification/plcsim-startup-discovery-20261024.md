@@ -510,3 +510,52 @@ comparison roots and worker builds remain retained as unique evidence. The
 final source bindings validate with all 117 historical rows preserved and
 106 unavailable historical inputs still explicit. No extra worktree or branch
 was created, and no production qualification profile was promoted.
+
+## Original Portal connection while its discovery is stale
+
+The integration above assumes the original Portal can still connect over its
+sole PLCSIM route although its own discovery shows only the placeholder. The
+`--plcsim-stale-connect-probe` mode tests exactly that. It runs the
+independent-empty-project flow, then closes the discovery project and disposes
+the second Portal without the saved-project comparison, so the original scratch
+project stays open throughout. In the original Portal it re-applies the sole
+target interface, attaches an `OnlineLegitimation` handler that answers any TLS
+challenge `NonTrusted` and supplies nothing for any other challenge, calls
+`GoOnline` once, always calls `GoOffline` if needed and removes the handler.
+The probe has no credential at all.
+
+Worker `n24au` (`TiaMcp.Openness.V21.exe` SHA-256
+`0c71eac49dd2742b9984af4a4757a184023ba6dbe75f8f9a8ece0e31c6d5704c`) builds with
+no warnings or errors, passes the compiled lifecycle guard and all 105
+argument-refusal checks; `n24at` fails the new-mode check as negative control.
+The run in `artifacts/p24-stale-connect/` (worker result SHA-256
+`6ac39cff9530b393310c169f482da411f9fc6afffee5e153088442a2d1e74bf7`, coordinator
+result `0502fc6c3a29453f9dace1ae26fd24a24f814564830fe43ae376d364639a79f5`) used
+`artifacts/todo-resume-20261024/run_stale_connect_probe.py`, derived from the
+fixed empty-discovery runner.
+
+- The fresh Portal's empty project showed `192.168.0.1` / `S7-1500 CPU` in all
+  three samples while the original project stayed open; the second Portal's
+  handle receipt was verified.
+- Immediately before and after the attempt, the original Portal's discovery
+  showed only the all-zero placeholder.
+- `ApplyConfiguration("1 X1")` returned true with the connection Offline.
+  `GoOnline` raised exactly one `TlsVerificationConfiguration` callback (initial
+  selection `NonVerified`), was answered `NonTrusted`, and failed after 997 ms
+  with "Connection to device cannot be established. The device is not trusted.
+  Please check the certificate." The state stayed Offline and the handler was
+  removed.
+- The CPU stayed STOP around every step, was powered OFF and unregistered, and
+  both Portal connections were disposed; worker exit 0.
+
+So the original Portal's route reaches the owned CPU's TLS handshake despite its
+stale discovery: the failure is the deliberate trust refusal, not a route or
+discovery error. This supports the planned integration (fresh observer for
+identity, original route for connection). It does not qualify provisioning:
+trust, credential submission and every identity check remain to be integrated.
+
+The process job is terminal (12 members, 0 active, none limit-terminated). All
+ten retained handles exited 0 without forced termination; the coordinator again
+records only "Exact terminal deadline exceeded; late exit is cleanup only" for
+the file-storage helper, so `normalLifecyclePassed` stays false. The guard
+ticket has its terminal receipt, and source pins and worker files are unchanged.

@@ -9,6 +9,7 @@ using Siemens.Engineering.Connection;
 using Siemens.Engineering.Download;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.Online;
+using Siemens.Engineering.Online.Configurations;
 using Siemens.Engineering.Upload;
 using Siemens.Simatic.Simulation.Runtime;
 
@@ -20,11 +21,12 @@ namespace TiaMcp.Openness.V21
     {
         private const int SnapshotsPerState = 3;
 
-        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false, bool configureRoute = false, bool freshPortal = false)
+        internal static int Run(string outputDirectory, bool startCpu = false, bool visible = false, bool lateDiscovery = false, bool configureRoute = false, bool freshPortal = false, bool staleConnect = false)
         {
             if (lateDiscovery && !startCpu) throw new ArgumentException("Late discovery requires the explicit empty startup probe.");
             if (configureRoute && (!startCpu || lateDiscovery || visible)) throw new ArgumentException("Configured discovery requires headless startup with the pre-start baseline.");
             if (freshPortal && !configureRoute) throw new ArgumentException("Fresh Portal comparison requires the configured discovery baseline.");
+            if (staleConnect && !freshPortal) throw new ArgumentException("Stale-connect comparison requires the fresh Portal endpoint confirmation.");
             var root = Directory.CreateDirectory(Path.GetFullPath(outputDirectory));
             if (root.EnumerateFileSystemInfos().Any()) throw new InvalidOperationException("The probe output directory must be new or empty.");
             var result = new JObject { ["schemaVersion"] = "plcsim-discovery-probe.v1", ["startedAtUtc"] = Now(), ["completed"] = false, ["states"] = new JArray() };
@@ -33,6 +35,7 @@ namespace TiaMcp.Openness.V21
             result["preStartDiscoverySkipped"] = lateDiscovery;
             result["routeConfigurationRequested"] = configureRoute;
             result["freshPortalRequested"] = freshPortal;
+            result["staleConnectRequested"] = staleConnect;
             Action checkpoint = () => File.WriteAllText(Path.Combine(root.FullName, "result.json"), result.ToString());
             var states = (JArray)result["states"];
             IInstance owned = null;
@@ -205,6 +208,10 @@ namespace TiaMcp.Openness.V21
                                         }
                                         discoveryProject.Close();
                                         result["emptyProjectDiscovery"]["closed"] = true;
+                                        checkpoint();
+                                        // Stale-connect keeps the original project open and only needs the endpoint confirmation.
+                                        if (!staleConnect)
+                                        {
                                         project.Close();
                                         var comparisonProject = OpenProbeProject(comparisonPortal, savedPath, deviceName);
                                         var comparisonProvider = AllItems(comparisonProject.Devices.Single().DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
@@ -216,8 +223,25 @@ namespace TiaMcp.Openness.V21
                                         if (comparisonProject.IsModified) throw new InvalidOperationException("Fresh Portal observation modified the scratch project.");
                                         comparisonProject.Close();
                                         checkpoint();
+                                        }
                                     }
                                     result["comparisonPortalConnectionDisposed"] = true;
+                                    if (staleConnect)
+                                    {
+                                        VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                        if (project.Path.FullName != savedPath.FullName || project.IsModified || provider.State != OnlineState.Offline)
+                                            throw new InvalidOperationException("Original scratch project changed or went online before the stale-connect attempt.");
+                                        states.Add(Observe("C8-original-portal-before-connect", provider, projectDiscovery));
+                                        checkpoint();
+                                        var staleConnectEvidence = new JObject();
+                                        result["staleConnect"] = staleConnectEvidence;
+                                        ConnectWithRejectingHandler(provider, staleConnectEvidence, () => VerifySoleOwned(owned, ownedName, EOperatingState.Stop), checkpoint);
+                                        states.Add(Observe("C9-original-portal-after-connect", provider, projectDiscovery));
+                                        VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
+                                        checkpoint();
+                                    }
+                                    else
+                                    {
                                     project = OpenProbeProject(portal, savedPath, deviceName);
                                     provider = AllItems(project.Devices.Single().DeviceItems).Select(i => i.GetService<OnlineProvider>()).First(p => p != null);
                                     projectDiscovery = project.GetService<StationUploadProvider>();
@@ -227,6 +251,7 @@ namespace TiaMcp.Openness.V21
                                     states.Add(Observe("C7-original-portal-after-comparison", provider, projectDiscovery));
                                     VerifySoleOwned(owned, ownedName, EOperatingState.Stop);
                                     checkpoint();
+                                    }
                                 }
                             }
                             owned.PowerOff(60000);
@@ -338,6 +363,62 @@ namespace TiaMcp.Openness.V21
                 ((JArray)state["snapshots"]).Add(sample);
             }
             return state;
+        }
+
+        // GoOnline from the original Portal while its own discovery is stale. Every authentication challenge is
+        // refused: TLS answers NonTrusted and nothing else is supplied. This probe has no credential at all.
+        private static void ConnectWithRejectingHandler(OnlineProvider provider, JObject evidence, Action verifyOwnedStop, Action checkpoint)
+        {
+            var callbacks = new JArray();
+            evidence["credentialAvailable"] = false;
+            evidence["callbacks"] = callbacks;
+            var configuration = provider.Configuration;
+            var pc = configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
+            var targets = pc?.TargetInterfaces.Take(2).ToArray();
+            if (provider.State != OnlineState.Offline || targets == null || targets.Length != 1 || string.IsNullOrWhiteSpace(targets[0].Name))
+                throw new InvalidOperationException("One named PLCSIM target interface and an offline scratch connection are required.");
+            evidence["targetInterface"] = targets[0].Name;
+            evidence["applied"] = configuration.ApplyConfiguration(targets[0]);
+            if (!evidence.Value<bool>("applied") || provider.State != OnlineState.Offline)
+                throw new InvalidOperationException("Route configuration failed or changed the offline state.");
+            OnlineConfigurationDelegate reject = request =>
+            {
+                var row = new JObject { ["type"] = request?.GetType().Name ?? "unknown", ["atUtc"] = Now() };
+                if (request is TlsVerificationConfiguration tls)
+                {
+                    try { row["initialSelection"] = tls.CurrentSelection.ToString(); }
+                    catch (Exception ex) { row["initialSelectionExceptionType"] = ex.GetType().FullName; }
+                    tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
+                    row["appliedDecision"] = "NonTrusted";
+                }
+                else row["appliedDecision"] = "noneSupplied";
+                callbacks.Add(row);
+            };
+            configuration.OnlineLegitimation += reject;
+            var clock = Stopwatch.StartNew();
+            try
+            {
+                verifyOwnedStop();
+                evidence["onlineStateBefore"] = provider.State.ToString();
+                evidence["goOnlineAttempted"] = true;
+                checkpoint();
+                try { evidence["goOnlineReturned"] = provider.GoOnline().ToString(); }
+                catch (Exception error) { evidence["goOnlineException"] = new JObject { ["type"] = error.GetType().FullName, ["hresult"] = error.HResult, ["message"] = error.Message }; }
+                evidence["elapsedMs"] = clock.ElapsedMilliseconds;
+                evidence["onlineStateAfter"] = provider.State.ToString();
+                verifyOwnedStop();
+            }
+            finally
+            {
+                try { if (provider.State != OnlineState.Offline) provider.GoOffline(); }
+                catch (Exception error) { evidence["goOfflineException"] = error.GetType().FullName; }
+                evidence["finalOnlineState"] = provider.State.ToString();
+                try { configuration.OnlineLegitimation -= reject; evidence["handlerRemoved"] = true; }
+                catch (Exception error) { evidence["handlerRemovalException"] = error.GetType().FullName; }
+                evidence["callbackCount"] = callbacks.Count;
+                checkpoint();
+            }
+            if (provider.State != OnlineState.Offline) throw new InvalidOperationException("The scratch connection did not return Offline.");
         }
 
         private static JObject ObserveConfiguration(ConnectionConfiguration configuration)
