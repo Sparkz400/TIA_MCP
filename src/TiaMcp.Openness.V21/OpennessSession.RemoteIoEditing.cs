@@ -13,7 +13,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private static readonly HashSet<string> ChannelWriteAttributes = new HashSet<string>(new[]
-        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay" }, StringComparer.Ordinal);
+        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing" }, StringComparer.Ordinal);
 
         private static JArray InspectChannelEngineeringAttributes(Channel channel, ScanBudget budget, JArray warnings, string path)
         {
