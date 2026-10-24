@@ -21,8 +21,9 @@ def main():
     parser.add_argument("--credential-journal", type=pathlib.Path, action="append", default=[], help="Repeat for each prior recovery journal when reopening a recovered project.")
     parser.add_argument("--worker", type=pathlib.Path, help="Explicit engineering worker executable.")
     parser.add_argument("--sim-worker", type=pathlib.Path, help="Explicit simulator worker executable.")
+    parser.add_argument("--artifacts", type=pathlib.Path, help="Short artifact directory under this repo's artifacts; keeps scratch paths within the native limit.")
     args = parser.parse_args()
-    extra_arguments = [part for option, path in (("--worker", args.worker), ("--sim-worker", args.sim_worker)) if path
+    extra_arguments = [part for option, path in (("--worker", args.worker), ("--sim-worker", args.sim_worker), ("--artifacts", args.artifacts)) if path
                        for part in (option, str(path.resolve()))]
     client = Client(ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe", 300, extra_arguments)
     report = {"steps": [], "failures": [], "limitations": [], "completed": False, "simulationVerified": False}
