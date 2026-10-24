@@ -1,5 +1,7 @@
 # Current status
 
+**FileStorage exit qualified — 24 October 2026:** The FileStorage server gets its measured 360 s terminal deadline (it idles out after about 300 s) and exited naturally within it in three owned runs; other processes keep 45 s. [Evidence](verification/file-storage-exit-20261024.md).
+
 **PLCSIM provisioning unblocked — 24 October 2026:** Credential provisioning reads discovery through a fresh discovery-only observer Portal and passed end to end (download, provisioning, RUN, stimulus assertions). `simulation_download` is verified. A failed provisioning admission is released only after a fresh TIA session matches the project to its pre-provision archive and the card manifest to the original ([reconciliation](verification/provision-reconciliation-20261024.md)); catalog `0.4.5`. [Evidence](verification/plcsim-startup-discovery-20261024.md#production-integration).
 
 **Catalog requalified — 24 October 2026:** Catalog `0.4.3` verifies 34 of the 36 demoted features again from TIA V21 runs on this PC, each backed by a committed summary under `evidence/`. `simulation_download` (power-on timeout after download) and `deployment.vm_qualification` (no VM here) stay unverified. [Evidence](verification/catalog-requalification-20261024.md).

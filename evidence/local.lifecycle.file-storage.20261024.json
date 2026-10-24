@@ -1,0 +1,56 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.lifecycle.file-storage.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T11:28:12+00:00",
+  "source": {
+    "commit": "1f96daf275867a8ab5e6c4f2ca4e42df3b21c5da",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_file_storage_exit.py three times: owned headless TIA V21 Portal with a new scratch project in an owned process job (--plcsim-discovery-probe, no CPU started), original handles retained, nothing terminated. The FileStorage server exited naturally at 301.4, 301.5 and 301.4 s against its measured 360 s deadline; every other process exited within 1.9 s against 45 s; normal lifecycle passed each time.",
+  "limitations": [
+    "Covers natural exit after a headless probe only; requested native stop during work, project-lock release and a full runtime batch are not covered.",
+    "The 360 s deadline is measured on this PC (16 retained runs plus these three); other machines or TIA updates need their own measurements."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "68fd0131f6540fd650b8b1d55f86bfa12af8dc03220568f878d1c176b815bf71"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "1b020cafc8e858b13d7b7be36a1f740e5fc9d013c9c013c27f70b97d6e504ce7",
+      "bytes": 18123,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "result.json",
+      "sha256": "9dcd61942708aa3fbb4fae0d9e4f442d36c62241b6ed6457308a8d67db65c0bd",
+      "bytes": 18128,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "result.json",
+      "sha256": "a9242574cc90ea110a6323518f261bf9cde933a62efc787152bc1b1d919a2060",
+      "bytes": 18126,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}
