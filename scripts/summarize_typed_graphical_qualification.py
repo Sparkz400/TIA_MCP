@@ -95,6 +95,18 @@ def summarize(runs):
         "cells": cells, "attempts": records}
 
 
+def curation_report(ledger):
+    """One report in the shape scripts/curate_evidence.py reads: completed only when every selected cell passed all five gates."""
+    calls = []
+    for record in ledger["attempts"]:
+        report = json.loads((ROOT / record["report"]).read_bytes())
+        calls.extend({"name": call["tool"], "isError": call["status"] != "passed"} for call in report.get("calls", []))
+    cells = ledger["cells"]
+    return {"completed": bool(cells) and all(cell["allFiveGates"] for cell in cells),
+            "steps": [{"name": cell["fixtureId"] + ": " + ("passed" if cell["allFiveGates"] else "failed")} for cell in cells],
+            "toolCalls": calls, "ledgerCounts": ledger["counts"]}
+
+
 def markdown(ledger, markdown_path=None):
     markdown_path = pathlib.Path(markdown_path or ROOT / "docs/verification/typed-lad-fbd-qualification.md").resolve()
     counts = ledger["counts"]
@@ -115,8 +127,11 @@ if __name__ == "__main__":
     parser.add_argument("--run", action="append", required=True, type=pathlib.Path)
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "fixtures/typed-graphical/qualification.v1.json")
     parser.add_argument("--markdown", type=pathlib.Path, default=ROOT / "docs/verification/typed-lad-fbd-qualification.md")
+    parser.add_argument("--curation-report", type=pathlib.Path, help="Also write the aggregated report for scripts/curate_evidence.py.")
     args = parser.parse_args()
     ledger = summarize(args.run)
+    if args.curation_report:
+        args.curation_report.write_text(json.dumps(curation_report(ledger), indent=2) + "\n", encoding="utf-8")
     args.output.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     args.markdown.write_text(markdown(ledger, args.markdown), encoding="utf-8")
     print(json.dumps(ledger["counts"]))

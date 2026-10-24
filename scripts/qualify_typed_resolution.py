@@ -22,6 +22,7 @@ from run_conformance import native_document, safe_xml, structural_xml
 from smoke_mcp import ROOT
 from typed_graphical_resolution_cases import MANIFEST, bind_case
 from typed_graphical_transport import artifact_bytes
+from typed_graphical_native_expectations import adapt_reference_culture, project_culture
 from engineering_preservation import PAYLOAD_HASH_POLICY, native_payload
 
 STANDARD = ("tag-exact-owner", "tag-wrong-table", "db-first-owner", "db-second-owner", "db-wrong-kind", "db-missing-member", "db-wrong-type")
@@ -333,6 +334,14 @@ class ResolutionRun:
         return data.decode("utf-8-sig")
 
     def apply(self, kind, payload):
+        if kind == "block_import_xml":
+            # Fixtures were captured in a de-DE project; only empty text items follow the observed project culture.
+            if getattr(self, "culture", None) is None:
+                self.culture = project_culture(self.session.call("block_read", {"blockName": "Main"})["xml"])
+            xml, retargeted = adapt_reference_culture(payload["xml"], self.culture)
+            self.report.setdefault("cultureAdaptations", []).append({"projectCulture": self.culture, "itemsRetargeted": retargeted,
+                "expectedBlockNames": payload.get("expectedBlockNames")})
+            payload = {**payload, "xml": xml}
         prepared = self.session.call("change_prepare", {"kind": kind, "payload": payload})
         self.pending_mutation = prepared
         row = {"kind": kind, "prepared": prepared, "applyDispatched": True}
