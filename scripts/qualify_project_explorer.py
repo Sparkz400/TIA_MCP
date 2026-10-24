@@ -317,6 +317,7 @@ def qualify(args):
             except Exception as error:
                 report["cleanupNote"] = str(error)
             client.close()
+            report["toolCalls"] = getattr(client, "tool_calls", [])
         report["finishedAtUtc"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         save()
     return 0 if report["completed"] else 1
