@@ -2,7 +2,7 @@
 
 Completed exact fixture attempts only. Historical binary lineages remain explicit; this ledger does not certify the current release, remote hosts, unexecuted assertions or broader instruction/type/route combinations.
 
-Generated 2026-10-24T20:20:13.067366+00:00. 34 of 34 executed cells have all four native gates; 34 have all five gates including runtime. Failed and superseded attempts remain in the JSON ledger.
+Generated 2026-10-24T21:07:33.141258+00:00. 38 of 38 executed cells have all four native gates; 38 have all five gates including runtime. Failed and superseded attempts remain in the JSON ledger.
 
 E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/reopen; B = independent simulator assertions. A dash means that gate was not passed in the selected attempt.
 
@@ -14,6 +14,8 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 | `typed-ctd-lad` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/a2/typed-ctd-lad/typed-ctd-lad/result.json>) |
 | `typed-ctu-fbd` | pass | pass | pass | pass | pass | 11 | [report](<../../artifacts/a2/typed-ctu-fbd/typed-ctu-fbd/result.json>) |
 | `typed-ctu-lad` | pass | pass | pass | pass | pass | 11 | [report](<../../artifacts/a2/typed-ctu-lad/typed-ctu-lad/result.json>) |
+| `typed-ctu-upper-limit-fbd` | pass | pass | pass | pass | pass | 201 | [report](<../../artifacts/a6/typed-ctu-upper-limit-fbd/typed-ctu-upper-limit-fbd/result.json>) |
+| `typed-ctu-upper-limit-lad` | pass | pass | pass | pass | pass | 201 | [report](<../../artifacts/a6/typed-ctu-upper-limit-lad/typed-ctu-upper-limit-lad/result.json>) |
 | `typed-ctud-fbd` | pass | pass | pass | pass | pass | 29 | [report](<../../artifacts/a2/typed-ctud-fbd/typed-ctud-fbd/result.json>) |
 | `typed-ctud-lad` | pass | pass | pass | pass | pass | 29 | [report](<../../artifacts/a2/typed-ctud-lad/typed-ctud-lad/result.json>) |
 | `typed-eq-fbd` | pass | pass | pass | pass | pass | 25 | [report](<../../artifacts/a2/typed-eq-fbd/typed-eq-fbd/result.json>) |
@@ -34,6 +36,8 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 | `typed-lt-lad` | pass | pass | pass | pass | pass | 25 | [report](<../../artifacts/a2/typed-lt-lad/typed-lt-lad/result.json>) |
 | `typed-ne-fbd` | pass | pass | pass | pass | pass | 25 | [report](<../../artifacts/a2/typed-ne-fbd/typed-ne-fbd/result.json>) |
 | `typed-ne-lad` | pass | pass | pass | pass | pass | 25 | [report](<../../artifacts/a2/typed-ne-lad/typed-ne-lad/result.json>) |
+| `typed-numeric-fb-fbd` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/a6/typed-numeric-fb-fbd/typed-numeric-fb-fbd/result.json>) |
+| `typed-numeric-fb-lad` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/a6/typed-numeric-fb-lad/typed-numeric-fb-lad/result.json>) |
 | `typed-numeric-fc-fbd` | pass | pass | pass | pass | pass | 9 | [report](<../../artifacts/a3/typed-numeric-fc-fbd/typed-numeric-fc-fbd/result.json>) |
 | `typed-numeric-fc-lad` | pass | pass | pass | pass | pass | 9 | [report](<../../artifacts/a3/typed-numeric-fc-lad/typed-numeric-fc-lad/result.json>) |
 | `typed-tof-fbd` | pass | pass | pass | pass | pass | 9 | [report](<../../artifacts/a2/typed-tof-fbd/typed-tof-fbd/result.json>) |

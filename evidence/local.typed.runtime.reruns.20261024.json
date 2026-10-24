@@ -1,0 +1,78 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.runtime.reruns.20261024",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-24T21:07:24+00:00",
+  "source": {
+    "commit": "55c1ccccd1e1edefa188009b4f054120ae5834d9",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate on fresh owned TIA V21 scratch projects (CPU 1511-1 PN V4.1) and owned PLCSIM Advanced V8 instances: numeric FB with two independent instances (left/right state, in-out and output flow) and CTU signed Int upper saturation at 32767 with the 32768th attempted edge and reset, LAD and FBD. All four passed import/compile, complete XML with untouched peers, save/reopen, checkpoint recovery and every runtime assertion (434 total), with the in-run semantic runtime preservation verdict.",
+  "limitations": [
+    "Reruns after the shared-harness elementary IN_OUT fix (#30) and the CTU driver keyword fix (#31); complements local.typed.runtime.20261024 on a later build.",
+    "Standard route only; host application-call timing, not exact scan timing; the CTU driver pulses the typed FB at most 512 edges per call."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3e569ac034b1e4cebb30ec19bbb1048639eabb2db13ae17a75ff7e87c6b166a2"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d526db0b5d54750edb9f7b585db21caf1180e56aab78ecff1541e9ce8cf3485f"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "e8f3d6e3bd8c4ea8b8797a28ec2f2386939995164b4d6969ac42bb1912d9ba17"
+    }
+  ],
+  "runs": [
+    {
+      "report": "typed-runtime-reruns-20261024.json",
+      "sha256": "b303dc693b67a8a05a3ddeb39d2b0b89a2b6d6901e96fcb3e34465b33dca5471",
+      "bytes": 100782,
+      "completed": true,
+      "steps": [
+        "typed-ctu-upper-limit-fbd: passed",
+        "typed-ctu-upper-limit-lad: passed",
+        "typed-numeric-fb-fbd: passed",
+        "typed-numeric-fb-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
