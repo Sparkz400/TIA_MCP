@@ -4,6 +4,27 @@
 
 See the [consolidated TODO](../TODO.md) for the current work order. This page retains detailed acceptance criteria and dated progress.
 
+## Lane A — 24 October 2026
+
+The raw artifacts behind the 8–13 October evidence (`artifacts/tq*`, `p16t`, `p17t`,
+the software-unit baseline archive and the reference packet inputs) are no longer on
+this PC. Their ledger rows stay historical; new evidence comes from current runners.
+
+- TIA's GUI language here is now `en-US`, so new scratch projects lack `de-DE`. Captured
+  creation/instance templates carried empty `de-DE` text items and failed to import.
+  The worker now retargets empty-text template items to the project's editing language and
+  refuses text in an inactive culture. The qualifiers adapt fixture references the same way
+  and record it.
+- The typed qualifier now admits the runtime provisioning tools and takes `--artifacts`.
+- Canary `typed-boolean-lad` on the current build passed import/compile, complete XML,
+  save/reopen and checkpoint recovery, and all 8 runtime assertions. Its final verdict is
+  still `blocked`: the runtime-preservation guard requires byte-identical card and project
+  files, but provisioning saves the project and RUN writes retain data to the card. The
+  rule for that is open with the integrator.
+- Existing-caller insertion: export object `ID`s are document-local and sequential, so any
+  inserted network renumbers the later block-title IDs. Strict preservation of those IDs is
+  unattainable by construction; relaxing it is a user decision.
+
 ## Resumed continuation — 13 October 2026
 
 The independent c02 audit passed its two prerequisite and eight TON-route inputs,
