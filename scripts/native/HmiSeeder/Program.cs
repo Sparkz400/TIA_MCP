@@ -25,7 +25,17 @@ using Siemens.Engineering.Umac;
 // project open, physical download, runtime or project-script execution exists.
 internal static partial class Program
 {
-    private static string Api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+    private static string Api = InstalledApiDirectory();
+    // Same lookup as the worker: Siemens registers the installed V21 API; C:\Program Files is only the setup default.
+    private static string InstalledApiDirectory()
+    {
+        using (var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64))
+        using (var key = hklm.OpenSubKey(@"SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48"))
+        {
+            var basePath = key?.GetValue("Siemens.Engineering.Base") as string;
+            return string.IsNullOrWhiteSpace(basePath) ? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48" : Path.GetDirectoryName(basePath);
+        }
+    }
     private static string Output;
     private static JObject Report;
     private static bool PositiveFixture;
@@ -195,7 +205,8 @@ internal static partial class Program
         if (!sw.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified."))
         {
             result["status"] = "native-defaults-plus-documented-self-description";
-            foreach (string compositionPath in new[] { "ScreenFolder.Screens", "TagFolder.TagTables" })
+            // Repeating Overview_A across roles checks that the adapter keeps role paths distinct.
+            foreach (string compositionPath in new[] { "ScreenFolder.Screens", "ScreenTemplateFolder.ScreenTemplates", "ScreenPopupFolder.ScreenPopups", "TagFolder.TagTables" })
             {
                 var step = new JObject { ["composition"] = compositionPath }; ((JArray)result["steps"]).Add(step);
                 try
@@ -224,6 +235,20 @@ internal static partial class Program
                     step["input"] = file; step["inputSha256"] = Hash(file);
                     object composition = Get(Get(sw, "ScreenFolder"), "Screens");
                     object imported = composition.GetType().GetMethod("Import", new[] { typeof(FileInfo), typeof(ImportOptions) }).Invoke(composition, new object[] { new FileInfo(file), ImportOptions.None });
+                    step["nativeImportAccepted"] = true;
+                }
+                catch (Exception ex) { step["error"] = Error(ex); }
+            }
+            foreach (var role in new[] { new[] { "ScreenTemplateFolder", "ScreenTemplates", "Hmi.Screen.ScreenTemplate", "" }, new[] { "ScreenPopupFolder", "ScreenPopups", "Hmi.Screen.ScreenPopup", "<Width>320</Width><Height>240</Height>" } })
+            {
+                var step = new JObject { ["authoredScreenInput"] = "Overview_A", ["role"] = role[0] }; ((JArray)result["steps"]).Add(step);
+                try
+                {
+                    string file = Path.Combine(directory, "input_" + sw.Name + "_" + role[1] + ".xml");
+                    File.WriteAllText(file, "<?xml version=\"1.0\" encoding=\"utf-8\"?><Document><Engineering version=\"V21\"/><" + role[2] + " ID=\"0\"><AttributeList><Name>Overview_A</Name>" + role[3] + "</AttributeList><ObjectList><Hmi.Screen.ScreenLayer ID=\"1\" CompositionName=\"Layers\"><AttributeList><Name>Qualification</Name><Index>0</Index></AttributeList><ObjectList><Hmi.Screen.Rectangle ID=\"2\" CompositionName=\"ScreenItems\"><AttributeList><ObjectName>RepeatedItem</ObjectName><Left>10</Left><Top>20</Top><Width>80</Width><Height>40</Height></AttributeList></Hmi.Screen.Rectangle></ObjectList></Hmi.Screen.ScreenLayer></ObjectList></" + role[2] + "></Document>");
+                    step["input"] = file; step["inputSha256"] = Hash(file);
+                    object composition = Get(Get(sw, role[0]), role[1]);
+                    composition.GetType().GetMethod("Import", new[] { typeof(FileInfo), typeof(ImportOptions) }).Invoke(composition, new object[] { new FileInfo(file), ImportOptions.None });
                     step["nativeImportAccepted"] = true;
                 }
                 catch (Exception ex) { step["error"] = Error(ex); }
@@ -767,12 +792,14 @@ internal static partial class Program
     private static JObject Inspect(Software sw, string directory, string stage)
     {
         var result = new JObject { ["name"] = sw.Name, ["type"] = sw.GetType().FullName, ["attributes"] = Attributes(sw), ["sections"] = new JObject() };
-        string[] classic = { "Connections", "ScreenFolder", "ScreenPopupFolder", "ScreenSlideinFolder", "ScreenTemplateFolder", "TagFolder", "VBScriptFolder", "TextLists", "GraphicLists" };
+        string[] classic = { "Connections", "ScreenFolder", "ScreenPopupFolder", "ScreenSlideinFolder", "ScreenTemplateFolder", "ScreenGlobalElements", "ScreenOverview", "TagFolder", "VBScriptFolder", "TextLists", "GraphicLists" };
         string[] unified = { "Connections", "Tags", "TagTables", "Screens", "ScreenGroups", "DiscreteAlarms", "AnalogAlarms", "Scripts", "HmiTextLists", "HmiGraphicLists" };
         int budget = 2000;
         foreach (string section in sw.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.") ? unified : classic)
         {
-            try { ((JObject)result["sections"])[section] = Walk(Get(sw, section), directory, stage + "_" + sw.Name + "_" + section, 0, ref budget); }
+            // A present getter returning null is an absent singleton (e.g. no global screen), not an error.
+            try { var info = PublicProperty(sw, section) ?? throw new InvalidOperationException("Unavailable property: " + section);
+                ((JObject)result["sections"])[section] = Walk(info.GetValue(sw), directory, stage + "_" + sw.Name + "_" + section, 0, ref budget); }
             catch (Exception ex) { ((JObject)result["sections"])[section] = new JObject { ["error"] = Error(ex) }; }
         }
         if (TextListFixture && sw.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.")) result["textListEvidence"] = ExportTextLists(sw, directory, stage);
@@ -793,7 +820,7 @@ internal static partial class Program
             try { export.Invoke(value, new object[] { new FileInfo(file), ExportOptions.WithDefaults }); row["export"] = new JObject { ["path"] = file, ["sha256"] = Hash(file) }; }
             catch (Exception ex) { row["exportError"] = Error(ex); }
         }
-        foreach (string property in new[] { "Screens", "ScreenItems", "Folders", "TagTables", "Tags", "VBScripts", "Dynamizations", "ValueConverter", "EventHandlers", "PropertyEventHandlers", "Script" })
+        foreach (string property in new[] { "Screens", "ScreenTemplates", "ScreenPopups", "ScreenSlideins", "ScreenItems", "Folders", "TagTables", "Tags", "VBScripts", "Dynamizations", "ValueConverter", "EventHandlers", "PropertyEventHandlers", "Script" })
             if (value.GetType().GetProperty(property) != null)
                 try { row[property] = Walk(Get(value, property), directory, path + "_" + property, depth + 1, ref budget); }
                 catch (Exception ex) { row[property] = new JObject { ["error"] = Error(ex) }; }
