@@ -56,10 +56,10 @@ def main():
     a = sub.add_parser("acquire"); a.add_argument("--owner", required=True); a.add_argument("--timeout-seconds", type=float)
     r = sub.add_parser("release"); r.add_argument("--token", required=True)
     sub.add_parser("status")
-    x = sub.add_parser("run"); x.add_argument("--owner", required=True); x.add_argument("command", nargs=argparse.REMAINDER)
+    x = sub.add_parser("run"); x.add_argument("--owner", required=True); x.add_argument("argv", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     if args.command == "run":
-        command = args.command[1:] if args.command[:1] == ["--"] else args.command
+        command = args.argv[1:] if args.argv[:1] == ["--"] else args.argv
         if not command: parser.error("run needs a command after --")
         sys.exit(run(args.owner, command))
     if args.command == "acquire":
