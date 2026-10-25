@@ -56,7 +56,11 @@ def qualify(call, check, reference, root, output, label, exact_value=True):
         check(signals[2]["bad"] > 0 and signals[2]["goodValues"] == 0, "Bad quality never becomes a usable value")
         check(signals[3]["uncertain"] > 0 and signals[3]["goodValues"] == 0, "Uncertain quality remains explicit")
         check(signals[4]["missingSourceTimestamps"] > 0 and signals[4]["missingServerTimestamps"] > 0, "Missing timestamps remain explicit")
-        check(signals[5]["unsupported"] > 0 and signals[5]["goodValues"] == 0, "Unsupported array remains explicit")
+        array = signals[5]["firstObservation"]["value"]
+        check(signals[5]["unsupported"] == 0 and signals[5]["goodValues"] > 0 and
+              array["encoding"] == "array" and array["builtInType"] == "Int32" and
+              array["value"] == dict(dimensions=[3], elementEncoding="decimalInteger", elements=["1", "2", "3"]),
+              "Array observation retains exact type, dimensions and elements without a behavioral verdict")
     check(document["signals"][1]["savedDatatype"] == "UInt" and not document["datatypeMatchVerified"], "Datatype mismatch cannot become authority")
     output.mkdir(parents=True, exist_ok=True)
     (output / (label + "-observation.json")).write_bytes(original)

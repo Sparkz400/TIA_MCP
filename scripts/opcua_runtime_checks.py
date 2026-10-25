@@ -7,7 +7,7 @@ import copy
 import datetime as dt
 import json
 from pathlib import Path
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 
 ALLOWED = {"GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse",
            "BrowseNext", "Continuation", "CloseSession"}
@@ -46,9 +46,22 @@ def verify_values(packet):
     require(items["bad"]["statusCode"] == "0x808c0000" and items["bad"]["quality"] == "Bad" and items["bad"]["value"] is None, "bad value suppression")
     require(items["uncertain"]["statusCode"] == "0x40920000" and items["uncertain"]["quality"] == "Uncertain" and items["uncertain"]["value"] == "42", "uncertain not upgraded")
     require(items["missingTimes"]["sourceTimestamp"] is None and items["missingTimes"]["serverTimestamp"] is None, "missing timestamps remain missing")
-    require(items["array"]["outcome"] == "unsupported" and items["array"]["value"] is None and items["array"]["valueRank"] == 1 and items["array"]["arrayDimensions"] == [3], "array metadata without fabricated values")
+    require(items["array"]["outcome"] == "value" and items["array"]["encoding"] == "array" and items["array"]["value"] == dict(dimensions=[3], elementEncoding="decimalInteger", elements=["1", "2", "3"]) and items["array"]["valueRank"] == 1 and items["array"]["arrayDimensions"] == [3], "array exact values and metadata")
+    for name, dimensions, encoding, elements in [
+        ("uint64Array", [3], "decimalInteger", ["0", "9007199254740993", "18446744073709551615"]),
+        ("int64Matrix", [2, 3], "decimalInteger", ["-9223372036854775808", "-1", "0", "9223372036854775807", "2", "3"]),
+        ("emptyArray", [0], "decimalInteger", []),
+        ("stringArray", [4], "string", ["Größe <tag>", None, "", '\"\n']),
+        ("byteStrings", [3], "base64", ["AP8=", None, ""]),
+        ("doubleMatrix", [2, 2], "roundTripDouble", ["0.125", "-2.5", "3", "4"]),
+    ]:
+        if name in items:
+            item = items[name]
+            require(item["outcome"] == "value" and item["encoding"] == "array" and
+                    item["value"] == dict(dimensions=dimensions, elementEncoding=encoding, elements=elements),
+                    "exact array dimensions, element order and values: " + name)
     require(items["structure"]["outcome"] == "unsupported" and items["structure"]["value"] is None, "structure unsupported")
-    require(items["byteArray"]["outcome"] == "unsupported" and items["byteArray"]["value"] is None, "byte array unsupported")
+    require(items["byteArray"]["encoding"] == "array" and items["byteArray"]["value"] == dict(dimensions=[3], elementEncoding="decimalInteger", elements=["1", "2", "3"]), "byte array retained")
     require(items["byteString"]["outcome"] == "value" and items["byteString"]["value"] == "AQID", "scalar byte string retained")
     require(isinstance(items["minimumDate"]["value"], str), "minimum scalar date not null")
     require(items["denied"]["quality"] == "Bad" and items["denied"]["value"] is None, "partial access refusal")
@@ -85,7 +98,7 @@ def controls(packet, audit):
     for name, mutate in mutations:
         altered = copy.deepcopy(packet); mutate(altered)
         try: verify_values(altered)
-        except (ValueError, KeyError, TypeError): rejected.append(name)
+        except (ValueError, KeyError, TypeError, ValidationError): rejected.append(name)
         else: raise ValueError("mutation accepted: " + name)
     for name, altered in [
         ("writeService", audit + [dict(operation="Write", at=audit[-1]["at"])]),
@@ -93,7 +106,7 @@ def controls(packet, audit):
         ("activationOrder", [audit[0], audit[2], audit[1], *audit[3:]]),
     ]:
         try: verify_audit(altered, healthy=True)
-        except (ValueError, KeyError, TypeError): rejected.append(name)
+        except (ValueError, KeyError, TypeError, ValidationError): rejected.append(name)
         else: raise ValueError("mutation accepted: " + name)
     return rejected
 

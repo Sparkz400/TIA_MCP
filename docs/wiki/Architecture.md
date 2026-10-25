@@ -4,6 +4,7 @@
 
 - **MCP client** talks to the Host over stdio.
 - **Host** (`TiaMcp.Host`, .NET 10, Windows) serves the MCP tools, portable document workflows and saved project reviews.
+- **OPC UA client** supports bounded read-only scalar, array and matrix acquisition without TIA. See the [runtime workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md) for representations, limits and qualification boundaries.
 - **Native workers** (.NET Framework 4.8) run each Siemens call in an isolated process:
   - `TiaMcp.Openness.V21` for TIA Portal V21
   - `TiaMcp.Simulator.V8` for PLCSIM Advanced V8

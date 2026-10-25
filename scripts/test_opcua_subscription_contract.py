@@ -29,7 +29,7 @@ class SubscriptionContractTests(unittest.TestCase):
 
     def test_existing_scalar_contract_is_retained_exactly(self):
         old = json.loads((ROOT / 'contracts/opcua-runtime.v1.schema.json').read_text(encoding='utf-8'))
-        for name in ('node','selection','value'):
+        for name in ('node','selection','value','arrayValue'):
             self.assertEqual(old['$defs'][name], SCHEMA['$defs'][name])
         self.assertEqual(old['$defs']['status'], SCHEMA['$defs']['sessionStatus'])
 
@@ -41,6 +41,16 @@ class SubscriptionContractTests(unittest.TestCase):
         validator('request').validate(request)
         validator('normalizedRequest').validate(request)
         self.assertFalse(validator('normalizedRequest').is_valid(self.request))
+
+    def test_array_wire_envelope_bounds_and_unknown_fields(self):
+        value = {'dimensions': [2, 3], 'elementEncoding': 'decimalInteger',
+                 'elements': ['-9223372036854775808', '-1', '0', '1', '2', '9223372036854775807']}
+        validator('arrayValue').validate(value)
+        validator('arrayValue').validate({**value, 'dimensions': [0, 3], 'elements': []})
+        for changed in ({'dimensions': [4097]}, {'dimensions': [1] * 33}, {'elements': [None] * 4097},
+                        {'elementEncoding': 'guessed'}, {'unexpected': True}, {'elements': [[1]]}):
+            with self.subTest(changed=next(iter(changed))):
+                self.assertFalse(validator('arrayValue').is_valid({**value, **changed}))
 
     def test_out_of_profile_values_refuse(self):
         cases = {'publishingIntervalMilliseconds':[99,1001,100.5], 'samplingIntervalMilliseconds':[-1,60001],

@@ -51,7 +51,24 @@ internal sealed partial class FixtureServer : StandardServer
         ["array"] = (DataTypeIds.Int32, new int[] { 1, 2, 3 }), ["denied"] = (DataTypeIds.Int32, 44),
         ["byteArray"] = (DataTypeIds.Byte, new byte[] { 1, 2, 3 }), ["byteString"] = (DataTypeIds.ByteString, new byte[] { 1, 2, 3 }),
         ["minimumDate"] = (DataTypeIds.DateTime, DateTime.MinValue),
-        ["structure"] = (DataTypeIds.Argument, new ExtensionObject(new Argument { Name = "synthetic" }))
+        ["structure"] = (DataTypeIds.Argument, new ExtensionObject(new Argument { Name = "synthetic" })),
+        ["uint64Array"] = (DataTypeIds.UInt64, new ulong[] { 0, 9007199254740993, ulong.MaxValue }),
+        ["int64Matrix"] = (DataTypeIds.Int64, new Matrix(new long[] { long.MinValue, -1, 0, long.MaxValue, 2, 3 }, BuiltInType.Int64, 2, 3)),
+        ["boolArray"] = (DataTypeIds.Boolean, new[] { true, false }),
+        ["stringArray"] = (DataTypeIds.String, new string?[] { "Größe <tag>", null, "", "\"\n" }),
+        ["byteStrings"] = (DataTypeIds.ByteString, new byte[]?[] { new byte[] { 0, 255 }, null, Array.Empty<byte>() }),
+        ["emptyArray"] = (DataTypeIds.Int32, Array.Empty<int>()),
+        ["nullArray"] = (DataTypeIds.Int32, null!),
+        ["emptyMatrix"] = (DataTypeIds.Int32, new Matrix(Array.Empty<int>(), BuiltInType.Int32, 0, 3)),
+        ["floatArray"] = (DataTypeIds.Float, new[] { 0.125f, -0.0f }),
+        ["doubleMatrix"] = (DataTypeIds.Double, new Matrix(new[] { 0.125d, -2.5, 3.0, 4.0 }, BuiltInType.Double, 2, 2)),
+        ["dateArray"] = (DataTypeIds.DateTime, new[] { SourceTime }),
+        ["guidArray"] = (DataTypeIds.Guid, new[] { new Uuid("01234567-89ab-cdef-0123-456789abcdef") }),
+        ["badArray"] = (DataTypeIds.Int32, new[] { 7 }),
+        ["uncertainArray"] = (DataTypeIds.Int32, new[] { 42 }),
+        ["nonfiniteArray"] = (DataTypeIds.Double, new[] { 1.0, double.NaN }),
+        ["expandedArray"] = (DataTypeIds.String, Enumerable.Repeat(new string('<', 16384), 16).ToArray()),
+        ["limitArray"] = (DataTypeIds.Int32, Enumerable.Range(0, 4096).ToArray())
     };
 
     internal async Task StartFixture(int port, string directory, string mode = "normal")
@@ -170,11 +187,17 @@ internal sealed partial class FixtureServer : StandardServer
                 result.Results[i].Value = new[] { Opc.Ua.Namespaces.OpcUa, Application, "urn:changed:namespace" };
             if (Mode == "changedStart" && request.NodeId == VariableIds.Server_ServerStatus_StartTime)
                 result.Results[i].Value = DateTime.UtcNow.AddDays(-5);
+            if (Mode == "arrayShapeMismatch" && request.NodeId.Identifier as string == "int64Matrix" && request.AttributeId == Attributes.ArrayDimensions)
+                result.Results[i].Value = new uint[] { 1, 3 };
             if (request.NodeId.NamespaceIndex <= 1 || request.AttributeId != Attributes.Value) continue;
             string name = Convert.ToString(request.NodeId.Identifier)!;
             if (!Values.ContainsKey(name)) continue;
             var value = result.Results[i];
             if (name == "byteArray") value.WrappedValue = new Variant(new byte[] { 1, 2, 3 }, new TypeInfo(BuiltInType.Byte, ValueRanks.OneDimension));
+            if (name == "nullArray") value.WrappedValue = new Variant(null, new TypeInfo(BuiltInType.Int32, ValueRanks.OneDimension));
+            if (Mode == "secretEcho" && name == "stringArray") value.Value = new[] { "prefix fixture-only-secret suffix" };
+            if (name == "badArray") value.StatusCode = StatusCodes.BadSensorFailure;
+            if (name == "uncertainArray") value.StatusCode = StatusCodes.UncertainInitialValue;
             if (Mode == "secretEcho" && name == "text") value.Value = "prefix fixture-only-secret suffix";
             value.SourceTimestamp = name == "missingTimes" ? DateTime.MinValue : SourceTime;
             value.ServerTimestamp = name == "missingTimes" ? DateTime.MinValue : ServerTime;
@@ -212,11 +235,14 @@ internal sealed partial class FixtureServer : StandardServer
             refs.Add(new NodeStateReference(ReferenceTypeIds.Organizes, false, folder.NodeId));
             foreach (var pair in Values)
             {
+                var shape = pair.Value.Value is Matrix matrix ? matrix.Dimensions :
+                    pair.Value.Value is Array a && (pair.Value.Type != DataTypeIds.ByteString || a is byte[][]) ? new[] { a.Length } : null;
+                if (pair.Key == "nullArray") shape = [0];
                 var variable = new BaseDataVariableState(folder) { NodeId = new NodeId(pair.Key, NamespaceIndex),
                     BrowseName = new QualifiedName(pair.Key, NamespaceIndex), DisplayName = pair.Key,
                     TypeDefinitionId = VariableTypeIds.BaseDataVariableType, ReferenceTypeId = ReferenceTypeIds.Organizes,
-                    DataType = pair.Value.Type, ValueRank = pair.Value.Value is Array && pair.Value.Type != DataTypeIds.ByteString ? ValueRanks.OneDimension : ValueRanks.Scalar,
-                    ArrayDimensions = pair.Value.Value is Array a && pair.Value.Type != DataTypeIds.ByteString ? new ReadOnlyList<uint>(new[] { (uint)a.Length }) : null,
+                    DataType = pair.Value.Type, ValueRank = shape?.Length ?? ValueRanks.Scalar,
+                    ArrayDimensions = shape is null ? null : new ReadOnlyList<uint>(shape.Select(d => (uint)d).ToArray()),
                     Value = pair.Value.Value, AccessLevel = AccessLevels.CurrentRead, UserAccessLevel = AccessLevels.CurrentRead,
                     StatusCode = StatusCodes.Good, Timestamp = SourceTime };
                 folder.AddChild(variable);
