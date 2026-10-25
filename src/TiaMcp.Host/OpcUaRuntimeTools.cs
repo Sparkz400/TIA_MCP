@@ -40,7 +40,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     public Task<CallToolResult> Browse(string attemptId, OpcUaRuntimeNode node, CancellationToken cancellationToken, int maximum = 256) =>
         Run(async () => await sessions.Store.Browse(attemptId, node, maximum, cancellationToken));
     [McpServerTool(Name = "runtime_ua_read", ReadOnly = true, Destructive = false, OpenWorld = true)]
-    [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity. Returns exact scalar type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays/structures are explicitly unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
+    [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity. Returns exact scalar or bounded array/matrix type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays retain observed row-major dimensions and up to 4096 exact elements; structures remain unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
     public Task<CallToolResult> Read(string attemptId, OpcUaRuntimeNode[] nodes, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Read(attemptId, nodes, cancellationToken));
     [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false)]

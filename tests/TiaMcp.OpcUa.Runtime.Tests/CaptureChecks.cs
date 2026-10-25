@@ -51,7 +51,7 @@ internal static class CaptureChecks
             check(items[6].GetProperty("quality").GetString()=="Uncertain" && items[6].GetProperty("statusCode").GetString()=="0x40920000","UA capture uncertain status remains exact");
             check(items[7].GetProperty("sourceTimestamp").ValueKind==JsonValueKind.Null && items[7].GetProperty("serverTimestamp").ValueKind==JsonValueKind.Null,"UA capture missing clocks remain null");
             check(items[0].GetProperty("sourcePicoseconds").GetInt32()==12 && items[0].GetProperty("serverPicoseconds").GetInt32()==34,"UA capture picoseconds preserved");
-            check(items[8].GetProperty("outcome").GetString()=="unsupported","UA capture unsupported array visible");
+            check(items[8].GetProperty("encoding").GetString()=="array","UA capture array retained");
             string reference=status.GetProperty("snapshotRef").GetString()!;
             var exported=Json(await captures.Export(reference,"csv",default));
             foreach(var artifact in exported.GetProperty("artifacts").EnumerateArray())

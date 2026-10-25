@@ -38,7 +38,7 @@ internal static class SubscriptionChecks
             check(values["uncertain"].Quality=="Uncertain" && values["uncertain"].StatusCode=="0x40920000","Subscription preserves uncertain raw status");
             check(values["int64"].SourceTimestamp==new DateTimeOffset(FixtureServer.SourceTime) && values["int64"].ServerTimestamp==new DateTimeOffset(FixtureServer.ServerTime) && values["int64"].SourcePicoseconds==12 && values["int64"].ServerPicoseconds==34,"Subscription preserves original timestamps and picoseconds");
             check(values["missingTimes"].SourceTimestamp is null && values["missingTimes"].ServerTimestamp is null,"Subscription absent clocks remain null");
-            check(values["array"].Outcome=="unsupported" && values["byteArray"].Outcome=="unsupported" && values["byteString"].Outcome=="value","Subscription unsupported forms and ByteString distinction");
+            check(values["array"].Encoding=="array" && values["byteArray"].Encoding=="array" && values["byteString"].Outcome=="value","Subscription arrays and ByteString distinction");
             check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="notificationLimit" && status.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean(),"Notification bound and confirmed remote deletion retained");
             var actual=events.Where(x=>x.Kind=="publish").ToArray();
             check(actual.Select(x=>x.SequenceNumber).SequenceEqual(Enumerable.Range(1,14).Select(x=>(uint?)x)),"Original actual Publish sequence numbers");

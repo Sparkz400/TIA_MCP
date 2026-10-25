@@ -42,7 +42,7 @@ def main():
     source_paths = [
         "scripts/qualify_opcua_runtime.py", "scripts/opcua_runtime_checks.py", "scripts/smoke_mcp.py",
         "contracts/opcua-runtime.v1.schema.json", "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
+        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.cs",
     ]
@@ -115,6 +115,7 @@ def main():
         call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected), code="UaEndpointSessionUnresolved")
         names = ["int64", "uint64", "double", "bool", "text", "bad", "uncertain", "missingTimes", "array",
                  "denied", "structure", "byteArray", "byteString", "minimumDate"]
+        names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         values = call(c, "read", dict(attemptId=attempt, nodes=nodes)); write(out / "values.json", values)
         verify_values(values); check(True, "Independent exact value/type/quality/time oracle")
