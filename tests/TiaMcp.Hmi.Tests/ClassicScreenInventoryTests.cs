@@ -36,6 +36,8 @@ internal static class ClassicScreenInventoryTests
         check((string)duplicateScopes[0]!["status"] == "unavailable" && (int)duplicateScopes[0]!["observed"] == 1 && duplicate.Rows.Count == 6, "Duplicate native locators retain the first observation and invalidate uniqueness.");
         var iterator = new BrokenSequence(new Node("First")); var partial = new Fixture(); partial.Root("ScreenFolder").Values["Screens"] = iterator; var partialScopes = partial.Capture();
         check(iterator.Disposed && (string)partialScopes[0]!["status"] == "unavailable" && partial.Rows.Count == 6, "Enumerator failure preserves earlier rows, disposes the iterator and continues other roots.");
+        var slideins = new Fixture(); slideins.Root("ScreenSlideinFolder").Values.Remove("Folders"); var slideinScopes = slideins.Capture();
+        check((string)slideinScopes[3]!["status"] == "complete" && slideins.Errors.Count == 0, "The slide-in system folder is never asked for an unsupported Folders composition.");
         var nullComposition = new Fixture(); nullComposition.Root("ScreenFolder").Values["Screens"] = null; var nullScopes = nullComposition.Capture();
         check((string)nullScopes[0]!["status"] == "unavailable", "Unavailable composition never becomes an observed empty list.");
         var cycle = new Fixture(); var self = cycle.Root("ScreenFolder"); self.Values["Screens"] = Array.Empty<Node>(); self.Values["Folders"] = new[] { self }; var cycleScopes = cycle.Capture(depth: 2);
