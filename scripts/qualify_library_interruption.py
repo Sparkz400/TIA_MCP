@@ -88,8 +88,9 @@ def interrupted_apply(h, kind, payload, stage):
     return prepared
 
 
-def reconcile(h, prepared, label):
-    """Fresh host: durable unknown outcome, then in a fresh owned portal no replay and admission reconciliation."""
+def reconcile(h, prepared, label, held_reason=None):
+    """Fresh host: durable unknown outcome, then in a fresh owned portal no replay and admission reconciliation.
+    With held_reason, the fresh observation must refuse release for that reason and restore must stay blocked."""
     restart_host(h)
 
     def status():
@@ -106,6 +107,18 @@ def reconcile(h, prepared, label):
         require(error.get("code") in ("ResourceBusy", "OutcomeUnknown"), "Replay was not refused: %s" % error)
         return error
     h.stage("fresh session refuses replay", no_replay)
+    if held_reason:
+        def held():
+            unresolved = h.unresolved_admissions()
+            require(len(unresolved) == 1, "Expected one unresolved admission: %s" % unresolved)
+            result = h.tool("engineering_admission_reconcile", {"admissionId": unresolved[0]})
+            require(result.get("released") is False and any(held_reason in r for r in result.get("reasons", [])),
+                    "Admission was not held for %r: %s" % (held_reason, result.get("reasons")))
+            error = h.call_error("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+            require(error.get("code") == "ResourceBusy", "Restore was not blocked by the held admission: %s" % error)
+            return {"reasons": result["reasons"], "restoreRefusal": error}
+        h.stage("partially saved outcome stays held; restore blocked", held)
+        return
     h.reconcile_admission("reconcile the interrupted admission in a fresh session")
     if h.tool("tia_session_status").get("projects"):  # Restore needs an empty owned instance.
         h.stage("close verification session", lambda: h.tool("tia_detach"))
@@ -149,7 +162,12 @@ def body(h):
             inventory = {b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
             require({"Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate"} <= inventory, "Recovered project lacks its blocks")
             return {"masterCopies": names, "blocks": sorted(inventory)}
-        reconcile_and_recover(h, interrupted, verify_multi)
+        if stage == "save_project":
+            # The global library was saved before the kill, so its outcome is known to differ from the checkpoint.
+            reconcile(h, interrupted, "recovery " + stage, held_reason="differs from its pre-transaction checkpoint")
+            h.stage("close held session", lambda: h.tool("tia_detach"))
+        else:
+            reconcile_and_recover(h, interrupted, verify_multi)
 
     # Project-only: type authoring killed while archiving its checkpoint, before any native mutation.
     plc = h.owned_scratch("checkpoint")
@@ -191,6 +209,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "iq_", "V21 library transaction interruption: worker kill, fresh-host reconciliation, no replay, multi-resource recovery", [
-        "Four interruption points: native mutation, compile, and project save after the global library was saved (multi-resource), and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened). The global-library save itself is too short to interrupt reliably.",
+        "Four interruption points: native mutation and compile (both resources restored), project save after the global library was saved (reconciliation holds the changed library and restore stays blocked for a human decision), and checkpoint archive before any mutation (the saved original is reopened). The global-library save itself is too short to interrupt reliably.",
         "After the compile-stage kill the original project and library are left for inspection; only recovered copies are verified.",
         "Host-side shared admission behaviour is observed, not changed (lane E owns it)."], []).run(body)
