@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import time
 
 from library_native_harness import Harness, require
 
@@ -87,7 +88,19 @@ def body(h):
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
     h.owned_portal("reopen")
-    h.stage("reopen consumer", lambda: h.tool("project_open", {"path": project_path}))
+    def reopen():
+        # The seeder's extra Openness attachment can hold TIA's project lock briefly; TIA states a 2-minute release delay.
+        attempts = []
+        for _ in range(13):
+            result = h.client.request("tools/call", {"name": "project_open", "arguments": {"path": project_path}})
+            if not result.get("isError"):
+                return {"attempts": attempts, "opened": result.get("structuredContent")}
+            message = ((result.get("structuredContent") or {}).get("error") or {}).get("message", "")
+            require("already been opened" in message, "Reopen failed for another reason: %s" % message)
+            attempts.append(time.strftime("%H:%M:%S"))
+            time.sleep(15)
+        raise AssertionError("The project lock was not released within three minutes")
+    h.stage("reopen consumer", reopen)
     h.stage("reopened: unit use intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
 
 
