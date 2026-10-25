@@ -96,3 +96,10 @@ After the .NET 10 installer succeeded, managed CI encountered the same unavailab
 floating redirect for .NET 8.0.427. Its auxiliary SDK is now pinned to the
 published 8.0.426; official release metadata and its downloadable Windows archive
 were also checked. All validation jobs remain enabled.
+
+A subsequent managed shard failed in the unchanged UA session MCP qualification,
+whose detailed `result.json` was missing from the CI upload patterns. The same
+qualification passed locally (124 checks, `session-host/result.json`). CI now
+retains MCP `result.json` beside `verification.json` so a repeated failure has its
+original diagnostic evidence. No cause is inferred from that unobserved detail;
+the failed run is preserved under `ci-managed-0`.

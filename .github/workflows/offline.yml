@@ -149,6 +149,7 @@ jobs:
             artifacts/offline-validation/*/*-schema.json
             artifacts/offline-validation/*/*-mcp.json
             artifacts/offline-validation/*/*-mcp/verification.json
+            artifacts/offline-validation/*/*-mcp/result.json
             artifacts/offline-validation/*/credentials/recovery/verification.json
             artifacts/offline-validation/*/credentials/operations/verification.json
             artifacts/offline-validation/*/credentials/verification.json
@@ -218,6 +219,7 @@ jobs:
             artifacts/offline-package/*/technology-profiles/verification.json
             artifacts/offline-package/*/technology-profiles/encoders-v4/**
             artifacts/offline-package/*/*-mcp/verification.json
+            artifacts/offline-package/*/*-mcp/result.json
             artifacts/offline-package/*/credentials/recovery/verification.json
             artifacts/offline-package/*/credentials/operations/verification.json
             artifacts/offline-package/*/credentials/verification.json
