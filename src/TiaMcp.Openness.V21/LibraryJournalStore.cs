@@ -25,7 +25,10 @@ namespace TiaMcp.Openness.V21
         internal static JObject Read(string path, string expectedId)
         {
             if (!File.Exists(path) || new FileInfo(path).Length > 8 * 1024 * 1024) throw new InvalidDataException("Library journal is absent or oversized.");
-            var result = JObject.Parse(File.ReadAllText(path));
+            // Keep native timestamps as written; date parsing reserializes them and breaks the preview hash.
+            JObject result;
+            using (var reader = new JsonTextReader(new StringReader(File.ReadAllText(path))) { DateParseHandling = DateParseHandling.None, MaxDepth = 128 })
+                result = JObject.Load(reader);
             if (result.Value<string>("changeId") != expectedId || result["preview"] == null || Hash(result["preview"].ToString(Formatting.None)) != result.Value<string>("previewHash"))
                 throw new InvalidDataException("Library journal identity or preview hash is invalid.");
             return result;

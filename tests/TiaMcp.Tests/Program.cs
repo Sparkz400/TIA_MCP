@@ -150,6 +150,7 @@ internal static partial class Program
             ("Library journals atomically preserve records and reject tampering", LibraryJournalStoreTests.AtomicRecordsAndTamper),
             ("Library durable claims forbid mutation replay", LibraryJournalStoreTests.DurableClaimNoReplay),
             ("Library recovery intent and outcome survive restart", LibraryJournalStoreTests.RecoveryOutcomeSurvivesRestart),
+            ("Library journals keep native timestamps and their preview hash", LibraryJournalStoreTests.NativeTimestampKeepsPreviewHash),
             ("Project model preserves independent native/virtual hierarchy and exact selection", ProjectModelTests.HierarchyAndExactSelection),
             ("Project model cursors bind filters, lifetime and session", ProjectModelTests.CursorLifetimeAndSession),
             ("Project model rejects malformed ancestry and budgets", ProjectModelTests.InvalidAncestryAndBudgets),
