@@ -163,8 +163,11 @@ def assert_independent_topology(reference_xml, prepared_xml, network_id):
 
 
 def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_id):
-    """Strict additive-network contract; never normalize pre-existing IDs.
+    """Additive-network contract; the only accepted ID change is V21's renumbering.
 
+    Per the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md),
+    existing IDs after the insertion point may rise by exactly the inserted ID count,
+    keeping their order; undoing that shift must recover the original exactly.
     Storage/declaration mutation needs its own independently captured effect
     contract. This checks network-only insertion into an existing caller.
     """
@@ -194,8 +197,11 @@ def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_i
         added_ids = [int(node.getAttribute("ID"), 16) for node in [inserted, *inserted.getElementsByTagName("*")] if node.hasAttribute("ID")]
     except ValueError as error:
         raise AssertionError("Native object IDs must be hexadecimal identities.") from error
-    if len(before_ids) != len(set(before_ids)) or len(after_ids) != len(set(after_ids)) or set(before_ids) & set(added_ids):
+    if len(before_ids) != len(set(before_ids)) or len(after_ids) != len(set(after_ids)):
         raise AssertionError("Insertion reuses or aliases an existing native object ID.")
+    start, count = (added_ids[0] if added_ids else 0), len(added_ids)
+    if added_ids != list(range(start, start + count)):
+        raise AssertionError("Inserted object IDs are not one consecutive range.")
     elements = children(objects)
     if after_id is None:
         if any(node.tagName == "SW.Blocks.CompileUnit" for node in children(original_objects)) or elements[-1] is not inserted:
@@ -210,5 +216,10 @@ def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_i
         if previous is not anchors[0]:
             raise AssertionError("Insertion crossed a retained opaque comment or processing instruction at the selected boundary.")
     objects.removeChild(inserted)
+    following = [node for node in after.getElementsByTagName("*") if node.hasAttribute("ID") and int(node.getAttribute("ID"), 16) >= start]
+    for node in following:  # Undo the one accepted shift; any other ID change stays in the exact comparison below.
+        node.setAttribute("ID", format(int(node.getAttribute("ID"), 16) - count, "X"))
+    if following and int(following[0].getAttribute("ID"), 16) != start:
+        raise AssertionError("Inserted IDs do not take the place of the first following existing ID.")
     if native_payload(before.toxml()) != native_payload(after.toxml()):
         raise AssertionError("Existing caller XML changed outside the one inserted network, including native IDs, comments, declarations or opaque content.")

@@ -2627,8 +2627,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
-      "sha256": "4bfa0c770d586cae019d2c83501ba8c3c1c21549c5ee6264d4914d784c0f30c6",
-      "bytes": 50136
+      "sha256": "5063307027d67b4945254b0b40d62880c41363c941d1f4b9ac02b853e44c8956",
+      "bytes": 53323
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs",
@@ -2637,8 +2637,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.cs",
-      "sha256": "e932bf38b4cd00b88ebea2ae356c6655fd622deeb4786c1079f65214f39e9dfe",
-      "bytes": 14389
+      "sha256": "54edb75536715527b6b723277d729658f6d8cebf246d60e573b22d787a4ae0a4",
+      "bytes": 14555
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalCapturedStorageTemplate.cs",
@@ -92120,7 +92120,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "9dd1e7fc99b1daf84c3a9400b5b5a13a7879cc29c1fa22c6185e0dadc33352af"
+      "sha256": "c0ac6f9648c5bf41a1aeb9fde649ad76ac806ff080c1629e14ec364a290fc770"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
