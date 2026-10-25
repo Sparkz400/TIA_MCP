@@ -1,4 +1,4 @@
-"""Qualify library consumption in a software unit (namespace preset) beside the PLC root, and the unit-aware cleanup refusal."""
+"""Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule and the unit-aware cleanup refusal."""
 from __future__ import annotations
 
 import argparse
@@ -55,39 +55,37 @@ def body(h):
     h.report["unitScope"] = units[0]
 
     source = h.open_archive(generation_one)
-    for scope in (None, unit):
-        target = {"plcPath": plc, **({"scopePath": scope} if scope else {})}
-        for version in (udt, fb):
-            h.apply("library_instantiate", h.selected(source, [version], target=target))
+    in_unit = {"plcPath": plc, "scopePath": unit}
+    for version in (udt, fb):
+        h.apply("library_instantiate", h.selected(source, [version], target=in_unit))
 
     def placement():
         software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
-        rows = {key: [x for x in software[key] if x["path"].rsplit("/", 1)[-1] in (FB, UDT)] for key in ("blocks", "types")}
-        in_unit = [x["path"] for key in rows for x in rows[key] if x.get("scopePath") == unit]
-        in_root = [x["path"] for key in rows for x in rows[key] if x.get("scopePath") == plc]
-        require(len(in_unit) == 2 and len(in_root) == 2, "Expected the FB and UDT once in the root and once in the unit: %s" % rows)
-        return {"unit": in_unit, "root": in_root, "unitNamespaced": all("/namespaces/" + UNIT + "/" in p for p in in_unit)}
-    h.report["placement"] = h.stage("FB and UDT exist in root and unit", placement)
+        rows = [x for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in (FB, UDT)]
+        in_scope = [x["path"] for x in rows if x.get("scopePath") == unit]
+        require(len(in_scope) == 2 and len(rows) == 2, "Expected the FB and UDT exactly once, in the unit: %s" % rows)
+        return {"unit": in_scope, "unitNamespaced": all("/namespaces/" + UNIT + "/" in p for p in in_scope)}
+    h.report["placement"] = h.stage("FB and UDT exist once, in the unit", placement)
     consumer = h.project_library()
-    h.stage("one FB 1.0.0 type serves both scopes", lambda: h.verify_use(consumer, fb, 2))
-    h.refuse("refuse a second UDT copy in the unit", "library_instantiate",
-             h.selected(source, [udt], target={"plcPath": plc, "scopePath": unit}), "LibraryConflict", UDT)
+    h.stage("FB 1.0.0 used once (in the unit)", lambda: h.verify_use(consumer, fb, 1))
+    # TIA allows one instance of a library type per device; a second scope is refused before any write.
+    h.refuse("refuse the FB in the PLC root while the unit holds it", "library_instantiate",
+             h.selected(source, [fb], target={"plcPath": plc}), "LibraryConflict", "per device")
+    h.refuse("refuse a second UDT copy in the unit", "library_instantiate", h.selected(source, [udt], target=in_unit), "LibraryConflict")
     h.tool("library_close", {"libraryId": source})
 
-    # The root use is OB-reachable; the unit use is not, so a PLC-wide native update is refused before any write.
-    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": (documents / "ConsumerReferences.scl").read_text(),
-            "expectedBlockNames": [FB + "_DB", UDT + "_DB", "Main"]})
+    # Unit uses have no OB-rooted reference here, so a PLC-wide native update is refused before any write.
     source = h.open_archive(generation_two)
-    h.refuse("refuse an update while a unit use has no OB-rooted reference", "library_update_project",
+    h.refuse("refuse an update while unit uses have no OB-rooted reference", "library_update_project",
              h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}), "LibraryUpdateCleanupRisk")
-    h.stage("both scopes stay at 1.0.0", lambda: h.verify_use(consumer, fb, 2) and h.verify_use(consumer, second, 0))
+    h.stage("the unit stays at 1.0.0", lambda: h.verify_use(consumer, fb, 1) and h.verify_use(consumer, second, 0))
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
     h.owned_portal("reopen")
     h.stage("reopen consumer", lambda: h.tool("project_open", {"path": project_path}))
-    h.stage("reopened: root and unit uses intact", lambda: h.verify_use(h.project_library(), fb, 2) and placement())
+    h.stage("reopened: unit use intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
 
 
 if __name__ == "__main__":
