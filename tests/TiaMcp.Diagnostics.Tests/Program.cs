@@ -6,6 +6,7 @@ using TiaMcp.Core.Diagnostics;
 using TiaMcp.Core.Engineering;
 
 var tests = new (string, Action)[] {
+    ("UA before/after comparisons preserve exact windows, mappings and original evidence", UaComparisonChecks.Run),
     ("UA diagnostic observations preserve complete prebound prefixes without promoting evidence", UaObservationChecks.Run),
     ("Prebound UA observations retain exact experiment and session intent without online authority", UaBindingChecks.Run),
     ("Versioned measurement quality and timing retain incomplete original evidence", QualityMeasurementChecks.Run),
@@ -71,6 +72,7 @@ if (failures == 0 && args.Length == 1)
     automaticRequest["autoSignals"] = JsonNode.Parse("""{"seeds":[{"scope":"LocalVariable","components":["RunCmd"],"reason":"Command dependencies"}],"maxDepth":4}""");
     var automaticPlan = automatic.Planner.Plan(automaticRequest);
     var samples = new JsonObject {
+        ["uaComparisonFixture"] = UaComparisonChecks.Samples!.DeepClone(),
         ["uaBindingFixture"] = UaBindingChecks.Samples!.DeepClone(),
         ["uaObservationFixture"] = UaObservationChecks.Samples!.DeepClone(),
         ["qualityMeasurementFixture"] = QualityMeasurementChecks.Samples!.DeepClone(),

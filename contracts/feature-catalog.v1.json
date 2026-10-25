@@ -17082,9 +17082,50 @@
       ]
     },
     {
+      "featureId": "diagnostic_ua_compare",
+      "domain": "diagnostics",
+      "title": "Before and after retained UA capture comparison",
+      "mcpTools": [
+        "diagnostic_ua_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host-owned offline artifact service only; this does not assert a native PLC trace API."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Explicit one-to-one mappings and inclusive Host receipt-time windows compare exact retained prefixes, Good scalar statistics and original event type/source/severity counts. Both chains and full-prefix gaps are revalidated. No implicit signal join, interpolation, array scalarization, unit conversion or behavioral verdict.",
+          "Offline evidence composition only. No online program/address/datatype association, synchronized sampling, behavioral assertion or physical qualification. Original sources are required; unbound captures cannot be associated retroactively."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Offline host artifacts and exact source/plan identities are required; current native target availability is unknown."
+        ]
+      },
+      "prerequisites": [
+        "Saved project-review.v1 artifacts for planning; immutable diagnostic artifacts for downstream tools",
+        "Native operations require a separately supported route, authorization/admission and target qualification"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "diagnostic_ua_report_export",
       "domain": "diagnostics",
-      "title": "Readable retained UA observation exports",
+      "title": "Readable retained UA observation and comparison exports",
       "mcpTools": [
         "diagnostic_ua_report_export"
       ],
@@ -17098,7 +17139,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Revalidates original capture, binding and experiment before exact JSON or inert Markdown/HTML export; Explorer independently checks retained bytes and counts.",
+          "Revalidates original captures, bindings and experiments before exact JSON or inert Markdown/HTML observation/comparison export; Explorer independently checks retained bytes, windows, mappings and counts.",
           "Offline evidence composition only. No online program/address/datatype association, synchronized sampling, behavioral assertion or physical qualification. Original sources are required; unbound captures cannot be associated retroactively."
         ]
       },

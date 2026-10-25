@@ -1,0 +1,761 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "beforeSnapshotRef",
+    "afterSnapshotRef",
+    "request",
+    "clockBasis",
+    "before",
+    "after",
+    "sourceChanged",
+    "identicalPrefix",
+    "sameCapture",
+    "signals",
+    "beforeWindow",
+    "afterWindow",
+    "beforeEvents",
+    "afterEvents",
+    "sameEventSelection",
+    "eventGroups",
+    "verdict",
+    "resampled",
+    "sourceEvidenceRevalidated",
+    "limits",
+    "atomicAcrossSignals",
+    "scanSynchronized",
+    "programMatchVerified",
+    "addressMatchVerified",
+    "datatypeMatchVerified",
+    "sourceAuthenticityVerified",
+    "physicalQualified",
+    "clockSynchronizationVerified",
+    "assertionsAdmitted",
+    "causationProven",
+    "bugFixProven",
+    "nativeQualification",
+    "nativeAccessAttempted",
+    "sourceCompletenessVerified"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "diagnostic-ua-comparison.v1"
+    },
+    "beforeSnapshotRef": {
+      "type": "string",
+      "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "afterSnapshotRef": {
+      "type": "string",
+      "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "request": {
+      "$ref": "#/$defs/request"
+    },
+    "clockBasis": {
+      "const": "hostElapsedSeconds"
+    },
+    "before": {
+      "$ref": "diagnostic-ua-observation.v1.schema.json"
+    },
+    "after": {
+      "$ref": "diagnostic-ua-observation.v1.schema.json"
+    },
+    "sourceChanged": {
+      "type": "boolean"
+    },
+    "identicalPrefix": {
+      "type": "boolean"
+    },
+    "sameCapture": {
+      "type": "boolean"
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "beforeSignalId",
+          "afterSignalId",
+          "beforeMapping",
+          "afterMapping",
+          "sameNode",
+          "sameStorage",
+          "before",
+          "after"
+        ],
+        "properties": {
+          "beforeSignalId": {
+            "type": "string"
+          },
+          "afterSignalId": {
+            "type": "string"
+          },
+          "beforeMapping": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "signalId",
+              "node",
+              "unit",
+              "reason",
+              "declaration"
+            ],
+            "properties": {
+              "signalId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "node": {
+                "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "declaration": {
+                "type": "object"
+              }
+            }
+          },
+          "afterMapping": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "signalId",
+              "node",
+              "unit",
+              "reason",
+              "declaration"
+            ],
+            "properties": {
+              "signalId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "node": {
+                "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "declaration": {
+                "type": "object"
+              }
+            }
+          },
+          "sameNode": {
+            "type": "boolean"
+          },
+          "sameStorage": {
+            "type": "boolean"
+          },
+          "before": {
+            "$ref": "#/$defs/series"
+          },
+          "after": {
+            "$ref": "#/$defs/series"
+          }
+        }
+      },
+      "maxItems": 64,
+      "minItems": 1
+    },
+    "beforeWindow": {
+      "$ref": "#/$defs/window"
+    },
+    "afterWindow": {
+      "$ref": "#/$defs/window"
+    },
+    "beforeEvents": {
+      "$ref": "#/$defs/events"
+    },
+    "afterEvents": {
+      "$ref": "#/$defs/events"
+    },
+    "sameEventSelection": {
+      "type": "boolean"
+    },
+    "eventGroups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fields",
+          "beforeCount",
+          "afterCount",
+          "countDifference"
+        ],
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/eventField"
+            },
+            "maxItems": 4,
+            "minItems": 4
+          },
+          "beforeCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "afterCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "countDifference": {
+            "type": "integer"
+          }
+        }
+      },
+      "maxItems": 10000,
+      "minItems": 0
+    },
+    "verdict": {
+      "const": "unresolved"
+    },
+    "resampled": {
+      "const": false
+    },
+    "sourceEvidenceRevalidated": {
+      "const": true
+    },
+    "limits": {
+      "type": "string"
+    },
+    "atomicAcrossSignals": {
+      "const": false
+    },
+    "scanSynchronized": {
+      "const": false
+    },
+    "programMatchVerified": {
+      "const": false
+    },
+    "addressMatchVerified": {
+      "const": false
+    },
+    "datatypeMatchVerified": {
+      "const": false
+    },
+    "sourceAuthenticityVerified": {
+      "const": false
+    },
+    "physicalQualified": {
+      "const": false
+    },
+    "clockSynchronizationVerified": {
+      "const": false
+    },
+    "assertionsAdmitted": {
+      "const": false
+    },
+    "causationProven": {
+      "const": false
+    },
+    "bugFixProven": {
+      "const": false
+    },
+    "nativeQualification": {
+      "const": false
+    },
+    "nativeAccessAttempted": {
+      "const": false
+    },
+    "sourceCompletenessVerified": {
+      "const": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/diagnostic-ua-comparison.v1.schema.json",
+  "title": "Exact retained UA before and after comparison",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "beforeAnchorSeconds",
+        "afterAnchorSeconds",
+        "windowStartSeconds",
+        "windowEndSeconds",
+        "signalMap"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "beforeAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000,
+          "multipleOf": 0.001
+        },
+        "afterAnchorSeconds": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000,
+          "multipleOf": 0.001
+        },
+        "windowStartSeconds": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000,
+          "multipleOf": 0.001
+        },
+        "windowEndSeconds": {
+          "type": "number",
+          "minimum": -1000000,
+          "maximum": 1000000,
+          "multipleOf": 0.001
+        },
+        "signalMap": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "before",
+              "after"
+            ],
+            "properties": {
+              "before": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "after": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            }
+          },
+          "maxItems": 64,
+          "minItems": 1
+        },
+        "allowChangedSource": {
+          "type": "boolean"
+        }
+      }
+    },
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observations",
+        "hostReadErrors",
+        "goodValues",
+        "uncertain",
+        "bad",
+        "nullValues",
+        "unsupported",
+        "metadataErrors",
+        "nonScalarValues",
+        "trueValues",
+        "falseValues",
+        "numericNotRepresentable",
+        "selectedRowSequences",
+        "numericRanges",
+        "firstObservation",
+        "lastObservation"
+      ],
+      "properties": {
+        "observations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hostReadErrors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goodValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uncertain": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bad": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nullValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupported": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "metadataErrors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nonScalarValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trueValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "falseValues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "numericNotRepresentable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectedRowSequences": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "maxItems": 10000,
+          "minItems": 0
+        },
+        "numericRanges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "count",
+              "minimum",
+              "maximum"
+            ],
+            "properties": {
+              "type": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "builtInType",
+                  "dataType",
+                  "encoding"
+                ],
+                "properties": {
+                  "builtInType": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "dataType": {
+                    "anyOf": [
+                      {
+                        "$ref": "opcua-runtime.v1.schema.json#/$defs/node"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "encoding": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minimum": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "maximum": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "maxItems": 10000,
+          "minItems": 0
+        },
+        "firstObservation": {
+          "anyOf": [
+            {
+              "$ref": "opcua-runtime.v1.schema.json#/$defs/value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lastObservation": {
+          "anyOf": [
+            {
+              "$ref": "opcua-runtime.v1.schema.json#/$defs/value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selectedRowSequences",
+        "excludedRows",
+        "firstSelectedElapsedMilliseconds",
+        "lastSelectedElapsedMilliseconds",
+        "recordedRowsSpanRequestedWindow",
+        "fullPrefixEvidence",
+        "recordedProgress",
+        "uncommittedDataUnknown",
+        "completenessVerified"
+      ],
+      "properties": {
+        "selectedRowSequences": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "maxItems": 10000,
+          "minItems": 0
+        },
+        "excludedRows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "firstSelectedElapsedMilliseconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "lastSelectedElapsedMilliseconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "recordedRowsSpanRequestedWindow": {
+          "type": "boolean"
+        },
+        "fullPrefixEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gapRows",
+            "duplicateMessages",
+            "keepalives",
+            "failureEvents",
+            "overflowNotifications"
+          ],
+          "properties": {
+            "gapRows": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "duplicateMessages": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "keepalives": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failureEvents": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "overflowNotifications": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "recordedProgress": {
+          "type": "object"
+        },
+        "uncommittedDataUnknown": {
+          "type": "boolean"
+        },
+        "completenessVerified": {
+          "const": false
+        }
+      }
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection",
+        "monitoringRequested",
+        "notifications",
+        "duplicateNotifications",
+        "repeatedEventIds",
+        "overflowNotifications",
+        "groups"
+      ],
+      "properties": {
+        "selection": {
+          "anyOf": [
+            {
+              "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/eventSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "monitoringRequested": {
+          "type": "boolean"
+        },
+        "notifications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicateNotifications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repeatedEventIds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overflowNotifications": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "fields",
+              "count"
+            ],
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "opcua-runtime-subscription.v1.schema.json#/$defs/eventField"
+                },
+                "maxItems": 4,
+                "minItems": 4
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "maxItems": 10000,
+          "minItems": 0
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "beforeSnapshotRef",
+        "afterSnapshotRef",
+        "request"
+      ],
+      "properties": {
+        "beforeSnapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "afterSnapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "artifact",
+        "schemaVersion",
+        "beforeSnapshotRef",
+        "afterSnapshotRef",
+        "sourceEvidenceRevalidated",
+        "limits"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "artifact": {
+          "$ref": "diagnostic-report-export.v1.schema.json#/$defs/artifact"
+        },
+        "schemaVersion": {
+          "const": "diagnostic-ua-comparison.v1"
+        },
+        "beforeSnapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "afterSnapshotRef": {
+          "type": "string",
+          "pattern": "^(capture|ua-subscription):[a-f0-9]{32}:(0|[1-9][0-9]*):[a-f0-9]{64}(?![\\s\\S])"
+        },
+        "sourceEvidenceRevalidated": {
+          "const": true
+        },
+        "limits": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-tool-contracts": {
+    "diagnostic_ua_compare": {
+      "input": {
+        "$ref": "#/$defs/input"
+      },
+      "output": {
+        "$ref": "#/$defs/receipt"
+      }
+    }
+  }
+}

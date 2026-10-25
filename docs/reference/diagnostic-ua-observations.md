@@ -37,6 +37,10 @@ association, simultaneous PLC samples, synchronized clocks, physical qualificati
 and source authentication are not established. A retained first/last observation
 does not prove continuous state, a transition time, a causal relation or a fix.
 
+For explicitly mapped before/after windows over two retained captures, use
+[UA capture comparison](diagnostic-ua-comparison.md). Both original reports and
+their full-prefix uncertainty remain in the comparison.
+
 ## Exports and Explorer
 
 Call `diagnostic_ua_report_export` with an exact report ID and format:
