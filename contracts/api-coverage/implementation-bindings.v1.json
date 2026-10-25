@@ -91028,7 +91028,7 @@
     {
       "path": "artifacts/feature-catalog-live.json",
       "state": "observed",
-      "sha256": "45270e9fcbbab5ef9078ade3ea274e5703de1a7545bb8d6e91fbe4dcc292b3f5"
+      "sha256": "97e758b142ea3f7fe980c8830bbbcd79295cceaccd9ab44e2b90415d322aa089"
     },
     {
       "path": "artifacts/hardware-families-expanded.json",
