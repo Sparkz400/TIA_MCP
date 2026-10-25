@@ -107,6 +107,667 @@
       "namespace": "TiaMcp_UnitA"
     },
     {
+      "fixtureId": "typed-unit-ne-lad",
+      "family": "ne",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Ne_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Ne_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-lt-lad",
+      "family": "lt",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Lt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Lt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-le-lad",
+      "family": "le",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Le_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Le_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-gt-lad",
+      "family": "gt",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Gt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Gt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-ge-lad",
+      "family": "ge",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Ge_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Ge_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_TON_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_TON_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
       "fixtureId": "typed-unit-eq-fbd",
       "family": "eq",
       "language": "FBD",
@@ -190,6 +851,578 @@
           ]
         },
         "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-ne-fbd",
+      "family": "ne",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Ne_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Ne_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-lt-fbd",
+      "family": "lt",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Lt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Lt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-le-fbd",
+      "family": "le",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Le_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Le_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-gt-fbd",
+      "family": "gt",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Gt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Gt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-ge-fbd",
+      "family": "ge",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_Ge_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_Ge_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_TON_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_TON_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
       },
       "engineeringOnly": true,
       "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
@@ -1776,6 +3009,3545 @@
           "expectedCount": 1
         }
       ]
+    },
+    {
+      "fixtureId": "typed-unit-existingglobal-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_TON_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_TON_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpUnit_GlobalTimer"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpUnit_GlobalTimer.xml",
+          "names": [
+            "TgpUnit_GlobalTimer"
+          ]
+        }
+      ],
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-unit-existingglobal-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpUnit_TON_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpUnit_TON_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpUnit_GlobalTimer"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpUnit_GlobalTimer.xml",
+          "names": [
+            "TgpUnit_GlobalTimer"
+          ]
+        }
+      ],
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "fixtureId": "typed-namespace-eq-lad",
+      "family": "eq",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Eq_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Eq_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ne-lad",
+      "family": "ne",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Ne_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Ne_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-lt-lad",
+      "family": "lt",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Lt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Lt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-le-lad",
+      "family": "le",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Le_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Le_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-gt-lad",
+      "family": "gt",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Gt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Gt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ge-lad",
+      "family": "ge",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Ge_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Ge_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_TON_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_TON_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-eq-fbd",
+      "family": "eq",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Eq_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Eq_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ne-fbd",
+      "family": "ne",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Ne_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Ne_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-lt-fbd",
+      "family": "lt",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Lt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Lt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-le-fbd",
+      "family": "le",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Le_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Le_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-gt-fbd",
+      "family": "gt",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Gt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Gt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ge-fbd",
+      "family": "ge",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_Ge_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_Ge_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Int"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_TON_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_TON_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fc-lad",
+      "family": "numeric-fc",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFC_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFC_LAD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFC.xml",
+          "names": [
+            "TgpNamespace_NumericFC"
+          ]
+        }
+      ],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-lad",
+      "family": "numeric-fb",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_LAD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "existingMulti",
+            "components": [
+              "Child"
+            ]
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-lad-global",
+      "family": "numeric-fb",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_LAD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        },
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml",
+          "names": [
+            "TgpNamespace_NumericFB_DB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpNamespace_NumericFB_DB"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-lad-createmulti",
+      "family": "numeric-fb",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_LAD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "createMulti",
+            "name": "FreshNumeric_Namespace_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "FreshNumeric_Namespace_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-lad-createglobal",
+      "family": "numeric-fb",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_LAD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        },
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml",
+          "names": [
+            "TgpNamespace_NumericFB_DB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "createGlobal",
+            "name": "FreshNumeric_Namespace_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "TiaMcp_UnitA.Alternate.TgpNamespace_NumericFB_DB"
+          ],
+          "toComponents": [
+            "TiaMcp_UnitA.Alternate.FreshNumeric_Namespace_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fc-fbd",
+      "family": "numeric-fc",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFC_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFC_FBD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFC.xml",
+          "names": [
+            "TgpNamespace_NumericFC"
+          ]
+        }
+      ],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-fbd",
+      "family": "numeric-fb",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_FBD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "existingMulti",
+            "components": [
+              "Child"
+            ]
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-fbd-global",
+      "family": "numeric-fb",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_FBD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        },
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml",
+          "names": [
+            "TgpNamespace_NumericFB_DB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpNamespace_NumericFB_DB"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-fbd-createmulti",
+      "family": "numeric-fb",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_FBD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "createMulti",
+            "name": "FreshNumeric_Namespace_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "FreshNumeric_Namespace_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-numeric-fb-fbd-createglobal",
+      "family": "numeric-fb",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_NumericFB_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_FBD.xml",
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
+          "names": [
+            "TgpNamespace_NumericFB"
+          ]
+        },
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml",
+          "names": [
+            "TgpNamespace_NumericFB_DB"
+          ]
+        }
+      ],
+      "interfaceDependencies": [
+        "TgpNamespace_NumericFB"
+      ],
+      "runtimeInstances": [
+        "left",
+        "right"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TgpNamespace_NumericFB",
+              "instance": "child"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Delta",
+              "scope": "local",
+              "components": [
+                "Delta"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "Total",
+              "scope": "local",
+              "components": [
+                "Total"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "$Delta",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Delta"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Reset"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Total"
+              },
+              "to": {
+                "node": "$Total",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "child",
+            "kind": "createGlobal",
+            "name": "FreshNumeric_Namespace_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "GlobalVariable",
+          "toScope": "GlobalVariable",
+          "fromComponents": [
+            "TiaMcp_UnitA.Alternate.TgpNamespace_NumericFB_DB"
+          ],
+          "toComponents": [
+            "TiaMcp_UnitA.Alternate.FreshNumeric_Namespace_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-existingglobal-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_TON_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_TON_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpNamespace_GlobalTimer"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml",
+          "names": [
+            "TgpNamespace_GlobalTimer"
+          ]
+        }
+      ],
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "fixtureId": "typed-namespace-existingglobal-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpNamespace_TON_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpNamespace_TON_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:TgpNamespace_GlobalTimer"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml",
+          "names": [
+            "TgpNamespace_GlobalTimer"
+          ]
+        }
+      ],
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate"
     }
   ]
 }
