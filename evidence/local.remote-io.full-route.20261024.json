@@ -233,8 +233,22 @@
         "change_prepare",
         "tia_detach"
       ],
-      "toolsPassed": [],
-      "toolsRejected": []
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "project_open",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
     }
   ]
 }

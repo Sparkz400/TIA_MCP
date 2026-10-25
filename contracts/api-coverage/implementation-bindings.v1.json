@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "2a7dc02324185f5a3307a4d7551d21b08446b99a032c1dce3d8258629ec8303c",
-      "bytes": 699868
+      "sha256": "cabb50b21291c5c2b185e95c29baf6fc3495f447adf2e52f0f949c164c12a45d",
+      "bytes": 734925
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -74545,6 +74545,20 @@
             "artifacts/p16t/advanced-final-harness/manifest.json",
             "fixtures/typed-graphical/route-advanced-cases.v1.json"
           ]
+        },
+        {
+          "id": "local.typed.runtime.20261024",
+          "profileSha256": "8d96808c13e0dbdcfd5be2d56cbb3fba83807e0b657a46cd5a594bd6c01b6baf",
+          "artifacts": [
+            "evidence/local.typed.runtime.20261024.json"
+          ]
+        },
+        {
+          "id": "local.typed.runtime.reruns.20261024",
+          "profileSha256": "5f5b40cd450da0dae2e4233c7a8a2be1571baeed9b9c7871af755f46c9552d33",
+          "artifacts": [
+            "evidence/local.typed.runtime.reruns.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -74725,6 +74739,13 @@
           "artifacts": [
             "artifacts/hardware-families-expanded.json"
           ]
+        },
+        {
+          "id": "local.remote-io.full-route.20261024",
+          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -74795,7 +74816,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.remote-io.full-route.20261024",
+          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -74862,7 +74891,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.remote-io.full-route.20261024",
+          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.20261024.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.lifecycle.20261024",
+          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "artifacts": [
+            "evidence/local.remote-io.lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -74899,6 +74943,13 @@
           "artifacts": [
             "artifacts/hardware-to-smoke-first.json",
             "artifacts/hardware-to-smoke-final.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.full-route.20261024",
+          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.20261024.json"
           ]
         }
       ],
@@ -74972,6 +75023,27 @@
           "artifacts": [
             "artifacts/lq/nl_1d1cda41/qualification.json"
           ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -75003,7 +75075,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75039,6 +75133,27 @@
           "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
           "artifacts": [
             "artifacts/lq/nl_1d1cda41/qualification.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
           ]
         }
       ],
@@ -75078,6 +75193,48 @@
           "artifacts": [
             "artifacts/lq/nl_1d1cda41/qualification.json"
           ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.20261024",
+          "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
+          "artifacts": [
+            "evidence/local.library_interruption.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_scopes.20261025",
+          "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
+          "artifacts": [
+            "evidence/local.library_scopes.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.20261025",
+          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
+          "artifacts": [
+            "evidence/local.library_interruption.20261025.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -75109,7 +75266,36 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.20261024",
+          "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
+          "artifacts": [
+            "evidence/local.library_interruption.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75138,7 +75324,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75170,7 +75378,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75203,7 +75433,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75244,6 +75496,48 @@
           "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
           "artifacts": [
             "artifacts/lq/nl_1d1cda41/qualification.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_scopes.20261025",
+          "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
+          "artifacts": [
+            "evidence/local.library_scopes.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.20261025",
+          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
+          "artifacts": [
+            "evidence/local.library_interruption.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_dmc_prerequisites.20261025",
+          "profileSha256": "06ed522c979c39ff447c2f8b46dc37b7be620cda412f7357248834bdd4c4f01c",
+          "artifacts": [
+            "evidence/local.library_dmc_prerequisites.20261025.json"
           ]
         }
       ],
@@ -75309,7 +75603,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75339,7 +75655,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75372,7 +75710,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75435,7 +75795,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75468,7 +75850,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75498,7 +75902,43 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.20261024",
+          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_scopes.20261025",
+          "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
+          "artifacts": [
+            "evidence/local.library_scopes.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.20261025",
+          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
+          "artifacts": [
+            "evidence/local.library_interruption.20261025.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75530,7 +75970,29 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_upgrades.20261024",
+          "profileSha256": "46eb962b6f9293d9a6ed44830f7f50d04fd34e35a9b30e2a45dde74dd5e4bee8",
+          "artifacts": [
+            "evidence/local.library_upgrades.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_vendor.20261025",
+          "profileSha256": "5002f76421863eb910bb5c57f369e322d13a9903a97a2d1fd90c9188abf2ce95",
+          "artifacts": [
+            "evidence/local.library_vendor.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.20261025",
+          "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df",
+          "artifacts": [
+            "evidence/local.library_formats.20261025.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -75599,7 +76061,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.remote-io.full-route.20261024",
+          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.20261024.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.lifecycle.20261024",
+          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "artifacts": [
+            "evidence/local.remote-io.lifecycle.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -79104,6 +79581,13 @@
           "artifacts": [
             "evidence/local.engineering.interruption.rerun.20261024.json"
           ]
+        },
+        {
+          "id": "local.engineering.boundaries.20261024",
+          "profileSha256": "5f0a51764ed3de1e4823aefdd8b57a5f97fac1aaee04193a1f7fdb92d4a066a8",
+          "artifacts": [
+            "evidence/local.engineering.boundaries.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -80051,7 +80535,22 @@
       "sourceDependencies": [],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.20261024",
+          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
+          "artifacts": [
+            "evidence/local.library_dependencies.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -80099,7 +80598,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_formats.20261024",
+          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
+          "artifacts": [
+            "evidence/local.library_formats.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -80193,7 +80707,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_formats.20261024",
+          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
+          "artifacts": [
+            "evidence/local.library_formats.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -80249,6 +80778,20 @@
           "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
           "artifacts": [
             "artifacts/lq/nl_1d1cda41/qualification.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.20261025",
+          "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df",
+          "artifacts": [
+            "evidence/local.library_formats.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
           ]
         }
       ],
@@ -80312,6 +80855,20 @@
           "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f",
           "artifacts": [
             "evidence/local.library_intake.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_vendor.20261025",
+          "profileSha256": "5002f76421863eb910bb5c57f369e322d13a9903a97a2d1fd90c9188abf2ce95",
+          "artifacts": [
+            "evidence/local.library_vendor.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_upgrades.20261024",
+          "profileSha256": "46eb962b6f9293d9a6ed44830f7f50d04fd34e35a9b30e2a45dde74dd5e4bee8",
+          "artifacts": [
+            "evidence/local.library_upgrades.20261024.json"
           ]
         }
       ],
@@ -80428,6 +80985,20 @@
           "artifacts": [
             "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
           ]
+        },
+        {
+          "id": "local.library_vendor.20261025",
+          "profileSha256": "5002f76421863eb910bb5c57f369e322d13a9903a97a2d1fd90c9188abf2ce95",
+          "artifacts": [
+            "evidence/local.library_vendor.20261025.json"
+          ]
+        },
+        {
+          "id": "local.library_upgrades.20261024",
+          "profileSha256": "46eb962b6f9293d9a6ed44830f7f50d04fd34e35a9b30e2a45dde74dd5e4bee8",
+          "artifacts": [
+            "evidence/local.library_upgrades.20261024.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -80540,7 +81111,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_formats.20261024",
+          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
+          "artifacts": [
+            "evidence/local.library_formats.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261024",
+          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
+          "artifacts": [
+            "evidence/local.library_releases.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -82508,7 +83094,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_component.install.20261024",
+          "profileSha256": "d381c20eb0984dc0e69b6babde96c5c387b35e1ec9fc9fa81693d78fe94008a6",
+          "artifacts": [
+            "evidence/local.plc_component.install.20261024.json"
+          ]
+        },
+        {
+          "id": "local.plc_component.runtime.20261024",
+          "profileSha256": "0c407f78a48be9a949ddf594c27603606eaa4584db929314c81c5773a0e6aabb",
+          "artifacts": [
+            "evidence/local.plc_component.runtime.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91028,7 +91629,7 @@
     {
       "path": "artifacts/feature-catalog-live.json",
       "state": "observed",
-      "sha256": "45270e9fcbbab5ef9078ade3ea274e5703de1a7545bb8d6e91fbe4dcc292b3f5"
+      "sha256": "97e758b142ea3f7fe980c8830bbbcd79295cceaccd9ab44e2b90415d322aa089"
     },
     {
       "path": "artifacts/hardware-families-expanded.json",
@@ -91496,6 +92097,11 @@
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
     },
     {
+      "path": "evidence/local.engineering.boundaries.20261024.json",
+      "state": "observed",
+      "sha256": "e60d7f475d39d2530b20c832bce812c5fa7a9a2a94cdbabac6ded0f6b1eefad8"
+    },
+    {
       "path": "evidence/local.engineering.interruption.rerun.20261024.json",
       "state": "observed",
       "sha256": "f3fadb6db70a850732fcc70d1275ee6a82eb1d760c0e9715aaf801857443f873"
@@ -91516,9 +92122,74 @@
       "sha256": "e0b51d539feaafddb8ccbdf0bb2ba9d8d590af0ce408d150cc72ea777209d02a"
     },
     {
+      "path": "evidence/local.library_dependencies.20261024.json",
+      "state": "observed",
+      "sha256": "e083d70b8b7a6cc94638d7699383904fbcc82d80fc9d91e5940c9f22befc9c3a"
+    },
+    {
+      "path": "evidence/local.library_dmc_prerequisites.20261025.json",
+      "state": "observed",
+      "sha256": "1b09902746c201cdc91588bd0733b0e39bd1cb5be9f6b59b4aeefea6f1ece45b"
+    },
+    {
+      "path": "evidence/local.library_formats.20261024.json",
+      "state": "observed",
+      "sha256": "163f066ec2c6f20b940a144dfdd7e63eeceeac1d40f95ffb14bac67ff42ee0c8"
+    },
+    {
+      "path": "evidence/local.library_formats.20261025.json",
+      "state": "observed",
+      "sha256": "a30428a82d8cd2c36b26f48ac58bee26a3de94a3d42b2363720acc3784989e21"
+    },
+    {
       "path": "evidence/local.library_intake.20261024.json",
       "state": "observed",
       "sha256": "90c46e1cba75cb9806b021e87ade9470975c0b0110cf9753a2f3bb3b6cde95e4"
+    },
+    {
+      "path": "evidence/local.library_interruption.20261024.json",
+      "state": "observed",
+      "sha256": "295087b4c48bb3044f00a8c284bdde24a37dded9c6f2b6ea399999e34adbaf17"
+    },
+    {
+      "path": "evidence/local.library_interruption.20261025.json",
+      "state": "observed",
+      "sha256": "7998131a28895c7f2c6f97504743f4ab2c8f2e0f7947ae3c9c583b8bf80d51f6"
+    },
+    {
+      "path": "evidence/local.library_lifecycle.20261024.json",
+      "state": "observed",
+      "sha256": "24024e999a51c83d9f26a841acf2aee68638172a5ea5d2d9fb5fe82f2f31c61d"
+    },
+    {
+      "path": "evidence/local.library_project_state.20261024.json",
+      "state": "observed",
+      "sha256": "38d55c13d4e1d7761edfcddc6c75dc1bccc3297e29f0b4e41926955e68534a83"
+    },
+    {
+      "path": "evidence/local.library_releases.20261024.json",
+      "state": "observed",
+      "sha256": "f0204c1b2ddc9372f53bd7721c7be7014a2342cc78f6276c97d93c3136d7b7e6"
+    },
+    {
+      "path": "evidence/local.library_scopes.20261025.json",
+      "state": "observed",
+      "sha256": "945ff2c877ee8518994152a1fb036a302ede85101559c04cf9c01f1e4367003f"
+    },
+    {
+      "path": "evidence/local.library_upgrades.20261024.json",
+      "state": "observed",
+      "sha256": "ecd545d47d3358ed5e4e9562a64dccb1786ba3f0ffdf6036ff6742acee8134ba"
+    },
+    {
+      "path": "evidence/local.library_vendor.20261024.json",
+      "state": "observed",
+      "sha256": "6c0db01443d9cc77720c3fd483d9cf218f478cdc06457af2a70b5a27b4fd5756"
+    },
+    {
+      "path": "evidence/local.library_vendor.20261025.json",
+      "state": "observed",
+      "sha256": "eecc463102f04f151099ceef43c2a5d2dc0528b84e027556df19c12e85be3ee3"
     },
     {
       "path": "evidence/local.milestones.20261024.json",
@@ -91526,9 +92197,29 @@
       "sha256": "16cdd557fbd90bc4eea5ddea5931961daa238e42047c7cc8845abd4a34690d34"
     },
     {
+      "path": "evidence/local.plc_component.install.20261024.json",
+      "state": "observed",
+      "sha256": "3654669852bab08a630e373de084b456f19657e66553d2c825fe2001fca40d2b"
+    },
+    {
+      "path": "evidence/local.plc_component.runtime.20261024.json",
+      "state": "observed",
+      "sha256": "1cfae83a61d3ee9524b60d5e1fc43c213f8ac79c22181b7055827467ce2dd2ef"
+    },
+    {
       "path": "evidence/local.reliability.20261024.json",
       "state": "observed",
       "sha256": "fcec66b5d014bb2356bed9a04e8de4bd49d1a1e28940f1714994eac289932706"
+    },
+    {
+      "path": "evidence/local.remote-io.full-route.20261024.json",
+      "state": "observed",
+      "sha256": "de1947bace7937abc638b350261db48e839de30635494cecdf7a8c95e37c8ba7"
+    },
+    {
+      "path": "evidence/local.remote-io.lifecycle.20261024.json",
+      "state": "observed",
+      "sha256": "bb785f44010c13da98761f6f2bfa02f6a95b644983544bedf74ced64f3828afb"
     },
     {
       "path": "evidence/local.reopen.20261024.json",
@@ -91569,6 +92260,16 @@
       "path": "evidence/local.smoke.20261024.json",
       "state": "observed",
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
+    },
+    {
+      "path": "evidence/local.typed.runtime.20261024.json",
+      "state": "observed",
+      "sha256": "2a95c9953d3c88857f862d1e0d21cea64e84694403b8b1278f1501f98d9baf99"
+    },
+    {
+      "path": "evidence/local.typed.runtime.reruns.20261024.json",
+      "state": "observed",
+      "sha256": "3431938646f70bf798985dda6465c07b46b77a77a36adeb68f7f148ff1b5466d"
     },
     {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
@@ -91623,6 +92324,10 @@
     {
       "id": "local.conformance.v03",
       "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19"
+    },
+    {
+      "id": "local.engineering.boundaries.20261024",
+      "profileSha256": "5f0a51764ed3de1e4823aefdd8b57a5f97fac1aaee04193a1f7fdb92d4a066a8"
     },
     {
       "id": "local.engineering.interruption.rerun.20261024",
@@ -91713,6 +92418,22 @@
       "profileSha256": "c875ccbae6d69db70bb5b6479b0c22e82d18aee4e99d388e9726e1f0eb3c2233"
     },
     {
+      "id": "local.library_dependencies.20261024",
+      "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5"
+    },
+    {
+      "id": "local.library_dmc_prerequisites.20261025",
+      "profileSha256": "06ed522c979c39ff447c2f8b46dc37b7be620cda412f7357248834bdd4c4f01c"
+    },
+    {
+      "id": "local.library_formats.20261024",
+      "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb"
+    },
+    {
+      "id": "local.library_formats.20261025",
+      "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df"
+    },
+    {
       "id": "local.library_intake.20261008",
       "profileSha256": "edabc31cbf979b49c27bae9826289ff128d63ab70005adf68b18f822505601ee"
     },
@@ -91721,8 +92442,44 @@
       "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f"
     },
     {
+      "id": "local.library_interruption.20261024",
+      "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618"
+    },
+    {
+      "id": "local.library_interruption.20261025",
+      "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071"
+    },
+    {
+      "id": "local.library_lifecycle.20261024",
+      "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b"
+    },
+    {
       "id": "local.library_plc_master.20261008",
       "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4"
+    },
+    {
+      "id": "local.library_project_state.20261024",
+      "profileSha256": "ef3539e1ac03b5f6123898cae2a7efc8c85db0e65c82b3f55ef9f8c78bcf0e14"
+    },
+    {
+      "id": "local.library_releases.20261024",
+      "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa"
+    },
+    {
+      "id": "local.library_scopes.20261025",
+      "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3"
+    },
+    {
+      "id": "local.library_upgrades.20261024",
+      "profileSha256": "46eb962b6f9293d9a6ed44830f7f50d04fd34e35a9b30e2a45dde74dd5e4bee8"
+    },
+    {
+      "id": "local.library_vendor.20261024",
+      "profileSha256": "7e974a06d52abb9bb09a2937570e2d9dc737514b534d5c1b7f6fb1fc970e18a2"
+    },
+    {
+      "id": "local.library_vendor.20261025",
+      "profileSha256": "5002f76421863eb910bb5c57f369e322d13a9903a97a2d1fd90c9188abf2ce95"
     },
     {
       "id": "local.milestones.20261024",
@@ -91737,8 +92494,24 @@
       "profileSha256": "f7a9999ae8b75bf5e2fea8d7654f4af11bcfa57e9ab008212ef90590a7cb1587"
     },
     {
+      "id": "local.plc_component.install.20261024",
+      "profileSha256": "d381c20eb0984dc0e69b6babde96c5c387b35e1ec9fc9fa81693d78fe94008a6"
+    },
+    {
+      "id": "local.plc_component.runtime.20261024",
+      "profileSha256": "0c407f78a48be9a949ddf594c27603606eaa4584db929314c81c5773a0e6aabb"
+    },
+    {
       "id": "local.reliability.20261024",
       "profileSha256": "47ed9fac4b7f8ab8d48188665b6263e2e59444a6bcc9c01000177c55df9b36e9"
+    },
+    {
+      "id": "local.remote-io.full-route.20261024",
+      "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3"
+    },
+    {
+      "id": "local.remote-io.lifecycle.20261024",
+      "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8"
     },
     {
       "id": "local.reopen.20261024",
@@ -91795,6 +92568,14 @@
     {
       "id": "local.smoke.20261024",
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
+    },
+    {
+      "id": "local.typed.runtime.20261024",
+      "profileSha256": "8d96808c13e0dbdcfd5be2d56cbb3fba83807e0b657a46cd5a594bd6c01b6baf"
+    },
+    {
+      "id": "local.typed.runtime.reruns.20261024",
+      "profileSha256": "5f5b40cd450da0dae2e4233c7a8a2be1571baeed9b9c7871af755f46c9552d33"
     },
     {
       "id": "local.unit-recovery.v03",
