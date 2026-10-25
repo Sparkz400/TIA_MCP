@@ -2242,8 +2242,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CapturedStorage.cs",
-      "sha256": "83d54d79045628d1f47ec83585d1f5957287b4bbe9624dac3bf86ad7533d0bfe",
-      "bytes": 24158
+      "sha256": "708b97fca5a363ee98a1f5aa5971d2b05dc0f0654f4708a6552a8b7927e49586",
+      "bytes": 24512
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -2572,8 +2572,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentCallerInsertion.cs",
-      "sha256": "a8f454fe44340f5f1c1b31ade039432deaed24cde780cbb3ee57e6585082abda",
-      "bytes": 4454
+      "sha256": "818850ad00f38d29f43edf9f36d43ac0d60d5245f99b50c8bfba717d3795e9c7",
+      "bytes": 4684
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentContentContract.cs",
@@ -2582,8 +2582,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs",
-      "sha256": "491beced418c3f5155f2db2bc647abfdb4a89d67976df697f094759c9a07f0d6",
-      "bytes": 32179
+      "sha256": "4ecf4b5d5f3a7843a0f3acd98ce5434aa719fa6e1296bce00dd7ed2ab202d0c8",
+      "bytes": 32452
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",

@@ -26,7 +26,8 @@ internal static class CallerInsertionTests
             new XElement("AttributeList", new XElement("ProgrammingLanguage", "FBD")),
             new XElement("ObjectList", Enumerable.Range(1, 4).Select(i => new XElement("MultilingualText", new XAttribute("ID", (start + i).ToString("X"))))));
         foreach (var a in following) a.Value = (Convert.ToInt32(a.Value, 16) + (shiftOverride == 0 ? 5 : shiftOverride)).ToString("X");
-        target.AddAfterSelf(unit);
+        // A whitespace-preserved export indents the new unit like its neighbours.
+        if (target.NextNode is XText indent && string.IsNullOrWhiteSpace(indent.Value)) target.AddAfterSelf(new XText(indent.Value), unit); else target.AddAfterSelf(unit);
         return installed;
     }
 
@@ -47,6 +48,11 @@ internal static class CallerInsertionTests
             Equal(true, proof.Value<bool>("verified")); Equal("8", proof.Value<string>("insertedNetworkId")); Equal(5, proof.Value<int>("insertedObjectIds"));
             Equal("8->D,9->E", string.Join(",", proof["shiftedObjectIds"].Values<string>()));
             Equal(null, PlcComponentCallerInsertion.ShiftBlocker(original));
+        });
+        test("whitespace-preserved native export accepts the shift and still rejects a changed indent", () => {
+            var preserved = EngineeringSources.ReadXml(Original);
+            Equal("8", PlcComponentCallerInsertion.Verify(preserved, Insert(preserved), "3").Value<string>("insertedNetworkId"));
+            var changed = Insert(preserved); ((XText)changed.Descendants("MultilingualText").Last().PreviousNode).Value += " "; Rejects(preserved, changed);
         });
         test("terminal insertion without following IDs needs no shift", () => {
             var terminal = new XDocument(original); terminal.Descendants("MultilingualText").Last().Remove();

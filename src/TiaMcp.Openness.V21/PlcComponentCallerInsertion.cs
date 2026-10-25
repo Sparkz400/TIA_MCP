@@ -44,6 +44,8 @@ namespace TiaMcp.Openness.V21
                 shifts.Add(before + "->" + attribute.Value); attribute.Value = before;
             }
             string insertedId = (string)inserted.Attribute("ID");
+            // Native exports are read with whitespace preserved; the inserted network brings its own indentation.
+            if (inserted.PreviousNode is XText indent && string.IsNullOrWhiteSpace(indent.Value)) indent.Remove();
             inserted.Remove();
             if (!XNode.DeepEquals(original.Root, copy.Root) || original.Declaration?.ToString() != copy.Declaration?.ToString())
                 Fail("Reversing the one following-ID shift does not recover the complete original caller.");
