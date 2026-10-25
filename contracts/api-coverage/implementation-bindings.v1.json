@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "70e5427f7e4f6c1f41c2f890fcfbc5041cb5b153f05643eb0cef3ee47603daea",
-      "bytes": 746107
+      "sha256": "2480be4153ecad5d032b71ef768b9412cf5b2633be1e12675d094023c4c06467",
+      "bytes": 747458
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -75623,6 +75623,13 @@
           "artifacts": [
             "evidence/local.typed.routes.engineering.20261025.json"
           ]
+        },
+        {
+          "id": "local.typed.route-capture.20261025",
+          "profileSha256": "91cf403536fbc12eb962404ed1cee4978dd2ed83c57ab80915674cb9724363f9",
+          "artifacts": [
+            "evidence/local.typed.route-capture.20261025.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -93500,6 +93507,11 @@
       "sha256": "359cde14b99c2a224a41887a80e42bae892536abbdc55bd5986ea6bf1184f66c"
     },
     {
+      "path": "evidence/local.typed.route-capture.20261025.json",
+      "state": "observed",
+      "sha256": "658e34890a34f90e286ea5328b99a503514188ab02cabbf37b0f096c6c901bf4"
+    },
+    {
       "path": "evidence/local.typed.routes.engineering.20261025.json",
       "state": "observed",
       "sha256": "0915c51fc0bff85c435a27fe5560b9f4a81934656a3b7d951016b42aac5cd3b4"
@@ -93835,6 +93847,10 @@
     {
       "id": "local.typed.resolution.20261025",
       "profileSha256": "a116f110a6b257a65cd0f1adddceed310f3885f31713e489a56e5f1f693caf2c"
+    },
+    {
+      "id": "local.typed.route-capture.20261025",
+      "profileSha256": "91cf403536fbc12eb962404ed1cee4978dd2ed83c57ab80915674cb9724363f9"
     },
     {
       "id": "local.typed.routes.engineering.20261025",
