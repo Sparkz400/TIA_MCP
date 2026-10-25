@@ -91,3 +91,8 @@ The exact published Windows SDK URL was independently reachable. The local SDK
 selection policy and application sources are unchanged. This workflow-only repair
 requires new checks on the resulting PR head; the earlier installer failures are
 retained as failures.
+
+After the .NET 10 installer succeeded, managed CI encountered the same unavailable
+floating redirect for .NET 8.0.427. Its auxiliary SDK is now pinned to the
+published 8.0.426; official release metadata and its downloadable Windows archive
+were also checked. All validation jobs remain enabled.
