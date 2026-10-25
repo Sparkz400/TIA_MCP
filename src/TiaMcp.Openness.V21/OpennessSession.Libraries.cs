@@ -44,7 +44,7 @@ namespace TiaMcp.Openness.V21
             if (extension != ".al21" && extension != ".zal21")
                 throw new BridgeException("LibraryUpgradeRequired", "Read-only opening accepts V21 .al21/.zal21. Use a prepared library_upgrade operation for an older native library; newer versions cannot be down-converted.");
             string expected = ChangeText(args, "expectedSha256", 64);
-            if (!string.Equals(ChangeFileHash(path), expected, StringComparison.OrdinalIgnoreCase)) throw new BridgeException("PackageChanged", "Library input hash differs from the supplied SHA-256.");
+            if (!string.Equals(LibrarySourceHash(path), expected, StringComparison.OrdinalIgnoreCase)) throw new BridgeException("PackageChanged", "Library input hash differs from the supplied SHA-256.");
             string root = SharedMutationPlannedDestination("libraryOpen", () => Path.Combine(ArtifactDirectory(args), "l_" + Guid.NewGuid().ToString("N").Substring(0, 12)));
             string directory = Path.Combine(root, "work"), snapshot = Path.Combine(root, "source");
             Directory.CreateDirectory(directory); Directory.CreateDirectory(snapshot);

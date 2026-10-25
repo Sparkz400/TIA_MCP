@@ -1,0 +1,65 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_dmc_prerequisites.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T09:47:10+00:00",
+  "source": {
+    "commit": "36331cbdfdb548824f4bfdf1e211f45bc6929fd1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_dmc_prerequisites.py on build 041b0d8 (frozen D:/lcq/b8): the upgraded, re-archived DMC Siemens Open Library V19 PLC library retained by the vendor run (hash-verified) opens in an owned scratch session; its 'Open Library' tag-table master copy instantiates into the PLC tags through library_instantiate destinationComposition=tagTables, exists exactly once afterwards, and a second copy is refused (LibraryConflict) without changing blocks, types or tag tables. All retained observations validate.",
+  "limitations": [
+    "CPU system and clock memory bytes, DMC's other documented prerequisite, are outside the reviewed hardware write allowlist; DMC FB compilation is not claimed.",
+    "The input is the vendor run's upgraded archive; the upgrade itself is vendor evidence."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "e70dd4d2410c23f8bea924b6a716707b75691eeef5761ed51eda1159a3891244"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "1d1c9876852556b6eac2c1f1b456d5d3b4e06c52428d380f4e8898ca74955dc2"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "e092da8e689bfe2727965c6eb3b02ae3711d837c812774d55f7e67a59ea12cac",
+      "bytes": 57305,
+      "completed": true,
+      "steps": [
+        "start owned TIA dmc prerequisites",
+        "create owned scratch dmc prerequisites",
+        "open upgraded DMC library",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "DMC tag table exists in PLC tags",
+        "refuse a second copy of the same tag table"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

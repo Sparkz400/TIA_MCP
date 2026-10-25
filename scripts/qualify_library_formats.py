@@ -102,6 +102,9 @@ def body(h):
     def locked_open():
         with ExclusiveLock(locked):
             error = h.call_error("library_open", {"request": {"path": str(locked), "expectedSha256": expected}})
+        # The shared admission scope hashes the source before the library adapter; either refusal names the lock.
+        require(error.get("code") == "SourceLocked" or "being used by another process" in (error.get("message") or ""),
+                "Locked source was not refused for its lock: %s" % error)
         require(len(h.tool("library_list")["libraries"]) == libraries_before, "A locked source was registered")
         require(tree(locked_directory) == before, "The locked source changed")
         return error

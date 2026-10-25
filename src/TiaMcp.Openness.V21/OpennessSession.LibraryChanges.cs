@@ -195,7 +195,7 @@ namespace TiaMcp.Openness.V21
                 {
                     RequireLibraryHandleCapacity(1);
                     string path = ChangeText(payload, "path", 4096), hash = ChangeText(payload, "expectedSha256", 64).ToLowerInvariant();
-                    if (!ProjectPathIsAbsolute(path) || !File.Exists(path) || ChangeFileHash(path) != hash) throw new BridgeException("PackageChanged", "Upgrade input is absent or does not match expectedSha256.");
+                    if (!ProjectPathIsAbsolute(path) || !File.Exists(path) || LibrarySourceHash(path) != hash) throw new BridgeException("PackageChanged", "Upgrade input is absent or does not match expectedSha256.");
                     if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) throw new BridgeException("PackageInvalid", "A linked native upgrade input is not accepted.");
                     if (!System.Text.RegularExpressions.Regex.IsMatch(Path.GetExtension(path), "^\\.(z?al)(1[4-9]|20)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                         throw new BridgeException("LibraryVersionUnsupported", "Upgrade requires a native V14..V20 library/archive. Vendor compatibility is checked on a separate working copy.");
@@ -441,8 +441,16 @@ namespace TiaMcp.Openness.V21
                 var descriptions = master.ContentDescriptions.ToList();
                 if (descriptions.Count != 1) throw new BridgeException("TargetIncompatible", "This PLC adapter requires one master-copy root. Composite/group roots need a qualified dedicated destination adapter.");
                 string composition = change.Payload.Value<string>("destinationComposition");
-                if (composition != "blocks" && composition != "types") throw new BridgeException("InvalidRequest", "Master copy destinationComposition must explicitly be blocks or types.");
-                if (names.Contains(descriptions[0].ContentName)) throw new BridgeException("LibraryConflict", "Master-copy destination name already exists.");
+                if (composition != "blocks" && composition != "types" && composition != "tagTables") throw new BridgeException("InvalidRequest", "Master copy destinationComposition must explicitly be blocks, types or tagTables.");
+                if (composition == "tagTables")
+                {
+                    if (scope.Tags == null) throw new BridgeException("TargetIncompatible", "The selected scope has no tag-table group.");
+                    var tableBudget = new ScanBudget(50000);
+                    var tables = TagTables(scope.Tags, scope.Path, tableBudget).Select(x => x.Item.Name).ToList();
+                    if (tableBudget.Truncated) throw new BridgeException("DependencyUnresolved", "Target tag-table inventory exceeded its completeness budget.");
+                    if (tables.Contains(descriptions[0].ContentName, StringComparer.OrdinalIgnoreCase)) throw new BridgeException("LibraryConflict", "A tag table with the master-copy name already exists.");
+                }
+                else if (names.Contains(descriptions[0].ContentName)) throw new BridgeException("LibraryConflict", "Master-copy destination name already exists.");
             }
             change.Preview["targetScope"] = scope.Path;
             change.Preview["compileTarget"] = plc.Path;
@@ -1038,7 +1046,10 @@ namespace TiaMcp.Openness.V21
                     foreach (var master in change.Masters)
                     {
                         LibraryJournal(change, "instantiate_master_" + master.Name, "dispatching");
-                        object created = payload.Value<string>("destinationComposition") == "blocks" ? (object)scope.Blocks.Blocks.CreateFrom(master, MasterCopyMode.ThrowIfExists) : scope.Types.Types.CreateFrom(master, MasterCopyMode.ThrowIfExists);
+                        string composition = payload.Value<string>("destinationComposition");
+                        object created = composition == "blocks" ? (object)scope.Blocks.Blocks.CreateFrom(master, MasterCopyMode.ThrowIfExists)
+                            : composition == "tagTables" ? (object)scope.Tags.TagTables.CreateFrom(master, MasterCopyMode.ThrowIfExists)
+                            : scope.Types.Types.CreateFrom(master, MasterCopyMode.ThrowIfExists);
                         rows.Add(LibraryObjectDescription(created)); LibraryJournal(change, "instantiate_master_" + master.Name, "completed");
                     }
                     break;

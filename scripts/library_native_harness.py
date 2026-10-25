@@ -113,17 +113,24 @@ class Harness:
         require(result.get("isError") is True, name + " unexpectedly succeeded")
         return (result.get("structuredContent") or {}).get("error") or {}
 
+    def inventory(self):
+        """Blocks, PLC data types and tag tables of every PLC (project_inventory lists blocks only)."""
+        plcs = [p["path"] for p in self.tool("project_inventory", {"maxItems": 1000})["plcs"]]
+        result = {}
+        for plc in plcs:
+            software = self.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
+            result[plc] = {key: sorted((x["path"], x.get("number")) for x in software.get(key, [])) for key in ("blocks", "types", "tagTables")}
+        return result
+
     def refuse(self, label, kind, payload, code, text=None, project=True):
-        """A refused preparation must change nothing in the selected PLC inventory."""
+        """A refused preparation must change no block, type or tag table of any PLC."""
         def check():
-            inventory = (lambda: self.tool("project_inventory", {"maxItems": 1000})) if project else dict
+            inventory = self.inventory if project else dict
             before = inventory()
             error = self.call_error("change_prepare", {"kind": kind, "payload": payload})
             require(error.get("code") == code, "Expected %s, observed %s: %s" % (code, error.get("code"), error.get("message")))
             require(text is None or text in (error.get("message") or ""), "Refusal message lacks " + str(text))
-            after = inventory()
-            for key in ("blocks", "types"):
-                require(before.get(key) == after.get(key), "Refused preparation changed the native inventory")
+            require(before == inventory(), "Refused preparation changed the native inventory")
             return error
         return self.stage(label, check)
 

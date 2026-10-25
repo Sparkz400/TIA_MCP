@@ -42,12 +42,14 @@ def in_stage(journal, stage):
         events = json.loads(journal.read_text(encoding="utf-8")).get("events", [])
     except (OSError, ValueError):
         return None  # Mid-replacement; poll again.
-    states = [e.get("state") for e in events if e.get("stage") == stage]
+    # A stage ending in "_" names a per-resource family such as "save_library-<id>".
+    states = [e.get("state") for e in events if e.get("stage") == stage or stage.endswith("_") and str(e.get("stage", "")).startswith(stage)]
     return events[-1] if "dispatching" in states and not ({"completed", "failed"} & set(states)) else None
 
 
 def interrupted_apply(h, kind, payload, stage):
     prepared = h.prepare(kind, payload)
+    earlier = set(h.unresolved_admissions())
     journal = h.directory / "changes" / ("change-" + prepared["changeId"]) / "journal.json"
     portal = psutil.Process(h.tool("tia_session_status")["processId"])
     worker = owned_child(h, h.args.worker)
@@ -73,7 +75,7 @@ def interrupted_apply(h, kind, payload, stage):
                 worker.kill()
                 dispatch["killedAtEvent"] = event
                 break
-            time.sleep(0.02)
+            time.sleep(0.005)
         require("killedAtEvent" in dispatch, "The transaction ended before stage %s dispatched: %s" % (stage, response))
         thread.join(120)
         require(not thread.is_alive(), "change_apply did not return after the worker was killed")
@@ -81,14 +83,18 @@ def interrupted_apply(h, kind, payload, stage):
         require("Portal" in portal.name(), "Owned portal process identity changed")
         portal.kill()
         portal.wait(60)
-        dispatch.update(state="interrupted", response=response, portalKilled=portal.pid)
+        owned = [a for a in h.unresolved_admissions() if a not in earlier]
+        require(len(owned) == 1, "The interrupted change must own exactly one new unresolved admission: %s" % owned)
+        prepared["admissionId"] = owned[0]
+        dispatch.update(state="interrupted", response=response, portalKilled=portal.pid, admissionId=owned[0])
         return {"killedAtEvent": dispatch["killedAtEvent"], "response": response}
     h.stage("kill worker during %s %s" % (kind, stage), kill)
     return prepared
 
 
-def reconcile(h, prepared, label):
-    """Fresh host: durable unknown outcome, then in a fresh owned portal no replay and admission reconciliation."""
+def reconcile(h, prepared, label, held_reason=None):
+    """Fresh host: durable unknown outcome, then in a fresh owned portal no replay and admission reconciliation.
+    With held_reason, the fresh observation must refuse release for that reason and restore must stay blocked."""
     restart_host(h)
 
     def status():
@@ -105,7 +111,17 @@ def reconcile(h, prepared, label):
         require(error.get("code") in ("ResourceBusy", "OutcomeUnknown"), "Replay was not refused: %s" % error)
         return error
     h.stage("fresh session refuses replay", no_replay)
-    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
+    if held_reason:
+        def held():
+            result = h.tool("engineering_admission_reconcile", {"admissionId": prepared["admissionId"]})
+            require(result.get("released") is False and any(held_reason in r for r in result.get("reasons", [])),
+                    "Admission was not held for %r: %s" % (held_reason, result.get("reasons")))
+            error = h.call_error("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+            require(error.get("code") == "ResourceBusy", "Restore was not blocked by the held admission: %s" % error)
+            return {"reasons": result["reasons"], "restoreRefusal": error}
+        h.stage("partially saved outcome stays held; restore blocked", held)
+        return
+    h.reconcile_admission("reconcile the interrupted admission in a fresh session", prepared["admissionId"])
     if h.tool("tia_session_status").get("projects"):  # Restore needs an empty owned instance.
         h.stage("close verification session", lambda: h.tool("tia_detach"))
         h.owned_portal(label + " (empty)")
@@ -129,24 +145,31 @@ def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
 
-    # Multi-resource: a project checkpoint plus a writable global library, killed while compiling.
-    plc = h.owned_scratch("multi-resource")
-    blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
-    library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
-    h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": plc},
-            "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}})
-    first = interrupted_apply(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library,
-                              "target": {"plcPath": plc}, "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate"]}}, "compile")
+    # Multi-resource: a project checkpoint plus a writable global library, killed during the native mutation,
+    # while compiling, and while saving the project after the global library was already saved.
+    for stage in ("native_mutation", "compile", "save_project"):
+        plc = h.owned_scratch("multi-resource " + stage)
+        blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
+        library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
+        h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": plc},
+                "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}})
+        interrupted = interrupted_apply(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library,
+                                        "target": {"plcPath": plc}, "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate"]}}, stage)
 
-    def verify_multi(resources):
-        require(sorted(r["kind"] for r in resources) == ["library", "project"], "Expected one project and one library resource")
-        recovered = next(r for r in resources if r["kind"] == "library")["library"]["libraryId"]
-        names = [x["name"] for x in h.query(recovered)["items"] if x.get("kind") == "masterCopy"]
-        require(names == ["TiaMcp_IsEnabled"], "Recovered library is not the pre-change state: %s" % names)
-        inventory = {b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
-        require({"Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate"} <= inventory, "Recovered project lacks its blocks")
-        return {"masterCopies": names, "blocks": sorted(inventory)}
-    reconcile_and_recover(h, first, verify_multi)
+        def verify_multi(resources):
+            require(sorted(r["kind"] for r in resources) == ["library", "project"], "Expected one project and one library resource")
+            recovered = next(r for r in resources if r["kind"] == "library")["library"]["libraryId"]
+            names = [x["name"] for x in h.query(recovered)["items"] if x.get("kind") == "masterCopy"]
+            require(names == ["TiaMcp_IsEnabled"], "Recovered library is not the pre-change state: %s" % names)
+            inventory = {b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+            require({"Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate"} <= inventory, "Recovered project lacks its blocks")
+            return {"masterCopies": names, "blocks": sorted(inventory)}
+        if stage == "save_project":
+            # The global library was saved before the kill, so its outcome is known to differ from the checkpoint.
+            reconcile(h, interrupted, "recovery " + stage, held_reason="differs from its pre-transaction checkpoint")
+            h.stage("close held session", lambda: h.tool("tia_detach"))
+        else:
+            reconcile_and_recover(h, interrupted, verify_multi)
 
     # Project-only: type authoring killed while archiving its checkpoint, before any native mutation.
     plc = h.owned_scratch("checkpoint")
@@ -170,8 +193,8 @@ def body(h):
 
     def original_unchanged():
         h.tool("project_open", {"path": scratch_path})
-        types = [t["name"] for t in h.tool("project_inventory", {"maxItems": 1000}).get("types", [])]
-        require("TiaMcpLibraryState" not in types, "The saved original contains the never-dispatched type")
+        types = [path for plc_inventory in h.inventory().values() for path, _ in plc_inventory["types"]]
+        require(not any(path.endswith("/TiaMcpLibraryState") for path in types), "The saved original contains the never-dispatched type")
         library_types = [x["name"] for x in h.query(h.project_library())["items"] if x.get("kind") == "type"]
         require(not library_types, "The saved original project library is not empty: %s" % library_types)
         return {"plcTypes": types, "libraryTypes": library_types}
@@ -188,6 +211,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "iq_", "V21 library transaction interruption: worker kill, fresh-host reconciliation, no replay, multi-resource recovery", [
-        "Two interruption points: compile after a multi-resource mutation, and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened). Other stages are not exercised.",
+        "Four interruption points: native mutation and compile (both resources restored), project save after the global library was saved (reconciliation holds the changed library and restore stays blocked for a human decision), and checkpoint archive before any mutation (the saved original is reopened). The global-library save itself is too short to interrupt reliably.",
         "After the compile-stage kill the original project and library are left for inspection; only recovered copies are verified.",
         "Host-side shared admission behaviour is observed, not changed (lane E owns it)."], []).run(body)

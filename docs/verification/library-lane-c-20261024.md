@@ -69,3 +69,23 @@ are outside current MCP routes, so complete DMC PLC compilation is not claimed. 
 
 Multiple PLCs and software units, namespaces, protected/know-how objects, runtime behavior, a V20 library, kills during native
 mutation or save, and PAL native import.
+
+## Follow-up slice — 25 October 2026
+
+Build 041b0d8 (frozen `D:\lcq\b8`):
+
+| Evidence | Runner | Result |
+| --- | --- | --- |
+| `local.library_scopes.20261025` | `qualify_library_scopes.py` | 63/63 steps |
+| `local.library_interruption.20261025` | `qualify_library_interruption.py` | 55/55 steps |
+| `local.library_dmc_prerequisites.20261025` | `qualify_library_dmc_prerequisites.py` | 7/7 steps |
+| `local.library_formats.20261025` | `qualify_library_formats.py` | 17/17 steps |
+| `local.library_vendor.20261025` | `qualify_library_vendor.py` | 22/22 steps |
+
+- **Two PLCs.** A second PLC (added with scratch security, since a new S7-1500 needs its confidential-data password before it compiles) consumes the same types. An update scoped to one PLC leaves the other at its version with every native block export unchanged.
+- **Interruption at four points.** Kills during the native mutation and during compile restore both resources. A kill during the project save, after the global library was already saved, is held by reconciliation ("The global library differs from its pre-transaction checkpoint") and restore stays blocked for a human decision. The checkpoint-archive kill reopens the untouched original.
+- **DMC tag table.** `library_instantiate` accepts `destinationComposition=tagTables`; DMC's "Open Library" tag-table master copy instantiates once and a duplicate is refused.
+- **Locked sources.** The library adapter refuses a locked source as `SourceLocked`; for `library_open` the shared admission scope hashes the source first, so the refusal surfaces there as an `IOException` naming the locked file.
+- **Inventory checks.** `project_inventory` lists blocks only; refusal and recovery checks now also compare PLC data types and tag tables through `software_inspect`. The vendor and formats runs were repeated under this check.
+
+Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory.
