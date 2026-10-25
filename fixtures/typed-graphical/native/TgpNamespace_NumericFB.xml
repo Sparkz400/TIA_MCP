@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V21" />
+  <DocumentInfo>
+    <Created>2026-10-25T14:59:47.3606804Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V21 Update 3</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Test Suite Advanced</DisplayName>
+        <DisplayVersion>V21 Update 1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V21 Update 1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, G200, G210, G210C, G210X, G220, S200, S210, S220, Innomotics MVD</DisplayName>
+        <DisplayVersion>V21 Update 1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V21 Update 1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V21 Update 3</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Tech WebApplication</DisplayName>
+        <DisplayVersion>V21</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Basic/Comfort/Advanced</DisplayName>
+        <DisplayVersion>V21 Update 3</DisplayVersion>
+      </Product>
+      <Product>
+        <DisplayName>WinCC Professional</DisplayName>
+        <DisplayVersion>V21 Update 3</DisplayVersion>
+      </Product>
+      <Product>
+        <DisplayName>WinCC Unified</DisplayName>
+        <DisplayVersion>V21 Update 3</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FB ID="0">
+    <AttributeList>
+      <Access>Unpublished</Access>
+      <AutoNumber>true</AutoNumber>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface>
+        <Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+          <Section Name="Input">
+            <Member Name="Enable" Datatype="Bool" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+            </Member>
+            <Member Name="Delta" Datatype="Int" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+            </Member>
+            <Member Name="Reset" Datatype="Bool" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+            </Member>
+          </Section>
+          <Section Name="Output">
+            <Member Name="Total" Datatype="Int" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+            </Member>
+          </Section>
+          <Section Name="InOut">
+            <Member Name="Accumulator" Datatype="Int" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+            </Member>
+          </Section>
+          <Section Name="Static">
+            <Member Name="State" Datatype="Int" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute>
+              </AttributeList>
+            </Member>
+          </Section>
+          <Section Name="Temp" />
+          <Section Name="Constant" />
+        </Sections>
+      </Interface>
+      <IsIECCheckEnabled>false</IsIECCheckEnabled>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>TgpNamespace_NumericFB</Name>
+      <Namespace>TiaMcp_UnitA.Alternate</Namespace>
+      <Number>2</Number>
+      <ProgrammingLanguage>SCL</ProgrammingLanguage>
+      <SetENOAutomatically>false</SetENOAutomatically>
+      <UDABlockProperties />
+      <UDAEnableTagReadback>false</UDAEnableTagReadback>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource>
+            <StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">
+              <NewLine Num="1" UId="21" />
+              <Blank Num="1" UId="22" />
+              <Token Text="IF" UId="23" />
+              <Blank Num="1" UId="24" />
+              <Access Scope="LocalVariable" UId="25">
+                <Symbol UId="26">
+                  <Component Name="Reset" UId="27" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="28" />
+              <Token Text="THEN" UId="29" />
+              <NewLine Num="1" UId="30" />
+              <Blank Num="2" UId="31" />
+              <Access Scope="LocalVariable" UId="32">
+                <Symbol UId="33">
+                  <Component Name="State" UId="34" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="35" />
+              <Token Text=":=" UId="36" />
+              <Blank Num="1" UId="37" />
+              <Access Scope="LiteralConstant" UId="38">
+                <Constant UId="39">
+                  <ConstantValue UId="41">0</ConstantValue>
+                </Constant>
+              </Access>
+              <Token Text=";" UId="42" />
+              <NewLine Num="1" UId="43" />
+              <Blank Num="1" UId="44" />
+              <Token Text="ELSIF" UId="45" />
+              <Blank Num="1" UId="46" />
+              <Access Scope="LocalVariable" UId="47">
+                <Symbol UId="48">
+                  <Component Name="Enable" UId="49" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="50" />
+              <Token Text="THEN" UId="51" />
+              <NewLine Num="1" UId="52" />
+              <Blank Num="2" UId="53" />
+              <Access Scope="LocalVariable" UId="54">
+                <Symbol UId="55">
+                  <Component Name="State" UId="56" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="57" />
+              <Token Text=":=" UId="58" />
+              <Blank Num="1" UId="59" />
+              <Access Scope="LocalVariable" UId="60">
+                <Symbol UId="61">
+                  <Component Name="State" UId="62" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="63" />
+              <Token Text="+" UId="64" />
+              <Blank Num="1" UId="65" />
+              <Access Scope="LocalVariable" UId="66">
+                <Symbol UId="67">
+                  <Component Name="Delta" UId="68" />
+                </Symbol>
+              </Access>
+              <Token Text=";" UId="69" />
+              <NewLine Num="1" UId="70" />
+              <Blank Num="2" UId="71" />
+              <Access Scope="LocalVariable" UId="72">
+                <Symbol UId="73">
+                  <Component Name="Accumulator" UId="74" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="75" />
+              <Token Text=":=" UId="76" />
+              <Blank Num="1" UId="77" />
+              <Access Scope="LocalVariable" UId="78">
+                <Symbol UId="79">
+                  <Component Name="Accumulator" UId="80" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="81" />
+              <Token Text="+" UId="82" />
+              <Blank Num="1" UId="83" />
+              <Access Scope="LocalVariable" UId="84">
+                <Symbol UId="85">
+                  <Component Name="Delta" UId="86" />
+                </Symbol>
+              </Access>
+              <Token Text=";" UId="87" />
+              <NewLine Num="1" UId="88" />
+              <Blank Num="1" UId="89" />
+              <Token Text="END_IF" UId="90" />
+              <Token Text=";" UId="91" />
+              <NewLine Num="1" UId="92" />
+              <Blank Num="1" UId="93" />
+              <Access Scope="LocalVariable" UId="94">
+                <Symbol UId="95">
+                  <Component Name="Total" UId="96" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="97" />
+              <Token Text=":=" UId="98" />
+              <Blank Num="1" UId="99" />
+              <Access Scope="LocalVariable" UId="100">
+                <Symbol UId="101">
+                  <Component Name="State" UId="102" />
+                </Symbol>
+              </Access>
+              <Blank Num="1" UId="103" />
+              <Token Text="+" UId="104" />
+              <Blank Num="1" UId="105" />
+              <Access Scope="LocalVariable" UId="106">
+                <Symbol UId="107">
+                  <Component Name="Accumulator" UId="108" />
+                </Symbol>
+              </Access>
+              <Token Text=";" UId="109" />
+              <NewLine Num="1" UId="110" />
+            </StructuredText>
+          </NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="4" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="5" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="6" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="8" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="9" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-US</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FB>
+</Document>
