@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8740be6334f698501c2bc3920e96cdc34325277268dd6a41e1031e190595add3",
-      "bytes": 743156
+      "sha256": "70e5427f7e4f6c1f41c2f890fcfbc5041cb5b153f05643eb0cef3ee47603daea",
+      "bytes": 746107
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -74585,6 +74585,20 @@
           "artifacts": [
             "evidence/local.typed.native-boundaries.20261025.json"
           ]
+        },
+        {
+          "id": "local.typed.insertion.20261025",
+          "profileSha256": "95b724bcd19db5af052c39e09f106f12d446d2c6de7afcec6f2f8cbd43d4bdd4",
+          "artifacts": [
+            "evidence/local.typed.insertion.20261025.json"
+          ]
+        },
+        {
+          "id": "local.typed.routes.engineering.20261025",
+          "profileSha256": "9d1d047be2574b9222baee35b55e426a8693855a1324aad8f37a6cfd0c711147",
+          "artifacts": [
+            "evidence/local.typed.routes.engineering.20261025.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -92323,6 +92337,11 @@
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
     },
     {
+      "path": "evidence/local.typed.insertion.20261025.json",
+      "state": "observed",
+      "sha256": "84e0c9b32b102424e013be03e0abc1db93d1ad1ceacbbeb1ff42a43da89543e2"
+    },
+    {
       "path": "evidence/local.typed.native-boundaries.20261025.json",
       "state": "observed",
       "sha256": "61b959b398e29ed2afdaf17eaec62ca03b92c0cff9b2ecdb51a79d26f71d3ded"
@@ -92331,6 +92350,11 @@
       "path": "evidence/local.typed.resolution.20261025.json",
       "state": "observed",
       "sha256": "359cde14b99c2a224a41887a80e42bae892536abbdc55bd5986ea6bf1184f66c"
+    },
+    {
+      "path": "evidence/local.typed.routes.engineering.20261025.json",
+      "state": "observed",
+      "sha256": "0915c51fc0bff85c435a27fe5560b9f4a81934656a3b7d951016b42aac5cd3b4"
     },
     {
       "path": "evidence/local.typed.runtime.20261024.json",
@@ -92653,12 +92677,20 @@
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
     },
     {
+      "id": "local.typed.insertion.20261025",
+      "profileSha256": "95b724bcd19db5af052c39e09f106f12d446d2c6de7afcec6f2f8cbd43d4bdd4"
+    },
+    {
       "id": "local.typed.native-boundaries.20261025",
       "profileSha256": "4579c5fd40007722a643ec63a65d918884cf28a742fc1d0da8b5d4660ce6189a"
     },
     {
       "id": "local.typed.resolution.20261025",
       "profileSha256": "a116f110a6b257a65cd0f1adddceed310f3885f31713e489a56e5f1f693caf2c"
+    },
+    {
+      "id": "local.typed.routes.engineering.20261025",
+      "profileSha256": "9d1d047be2574b9222baee35b55e426a8693855a1324aad8f37a6cfd0c711147"
     },
     {
       "id": "local.typed.runtime.20261024",
