@@ -81,3 +81,13 @@ selection boundaries. Its process identity and terminal descendants are retained
 in `package-source-review-interruption.json`; it is not a passing package run.
 Final source checks explicitly preserve null localized text and normalize an
 explicit `events: null` to the existing signal-only request.
+
+The first PR run failed all Windows jobs during SDK installation, before build:
+`setup-dotnet` resolved the global `latestFeature` policy to 10.0.403 and its SDK
+URL returned HTTP 409. CI now installs explicit SDK 10.0.402, the version used by
+the local build and listed in Microsoft's current
+[10.0 release metadata](https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json).
+The exact published Windows SDK URL was independently reachable. The local SDK
+selection policy and application sources are unchanged. This workflow-only repair
+requires new checks on the resulting PR head; the earlier installer failures are
+retained as failures.
