@@ -17,7 +17,9 @@ suppressed. Declared dimensions remain separate from observed shape.
 The real Host MCP checks pass for sessions/reads (66), polling (161) and
 subscriptions (341), including complete artifact transfer, CSV/JSON preservation,
 restart retrieval and no acquisition replay. The 26 OPC UA Python tests, contract
-coverage check and 46 offline diagnostic groups also pass. Check counts that include
+coverage check and 46 offline diagnostic groups also pass. The real Host diagnostic
+workflow passes 930 checks, including exact array observations, report exports,
+restart retention and unchanged unresolved behavioral verdicts. Check counts that include
 retained files can vary with the fixture run; receipts retain the exact counts.
 
 Original local receipts and artifacts are retained outside the task checkout at

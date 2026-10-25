@@ -24,7 +24,8 @@
     "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs": "0945bc28dfa2d76efea632798d8ec72c38b417c36c7f6bf3b268384d83372ac5",
     "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionChecks.cs": "011483f2c8aa2df2c5cd46d794eb7afe9d4236c03ce13312071638ae7b093332",
     "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs": "34561b8a8b1d6228f1fec5a856267239c8e63de5ca67e1af1d13a71c522e042e",
-    "tests/TiaMcp.OpcUa.Runtime.Tests/ArrayValueChecks.cs": "52960998ca40a52ad564b98d4b21786c043650f4b65d16d2e875f9de87281994"
+    "tests/TiaMcp.OpcUa.Runtime.Tests/ArrayValueChecks.cs": "52960998ca40a52ad564b98d4b21786c043650f4b65d16d2e875f9de87281994",
+    "scripts/qualify_diagnostic_ua_observation.py": "7aeca3fb039c29c1e6b60bff148abb832a6fc08c7e2fcc91a1787b8da060341f"
   },
   "validation": {
     "runtimeChecks": 600,
@@ -33,7 +34,8 @@
     "mcpSubscriptionChecks": 341,
     "pythonOpcUaTests": 26,
     "offlineDiagnosticGroups": 46,
-    "contractCoverage": "264 MCP tools; 56 mutation kinds; 338 features"
+    "contractCoverage": "264 MCP tools; 56 mutation kinds; 338 features",
+    "preboundDiagnosticMcpChecks": 930
   },
   "nativeStarted": false,
   "physicalQualified": false,
