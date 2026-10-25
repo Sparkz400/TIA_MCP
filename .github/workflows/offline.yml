@@ -89,10 +89,10 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
       - uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.426' # Published SDK; avoid unavailable floating redirects.
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
@@ -149,6 +149,7 @@ jobs:
             artifacts/offline-validation/*/*-schema.json
             artifacts/offline-validation/*/*-mcp.json
             artifacts/offline-validation/*/*-mcp/verification.json
+            artifacts/offline-validation/*/*-mcp/result.json
             artifacts/offline-validation/*/credentials/recovery/verification.json
             artifacts/offline-validation/*/credentials/operations/verification.json
             artifacts/offline-validation/*/credentials/verification.json
@@ -173,7 +174,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
       - uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
@@ -218,6 +219,7 @@ jobs:
             artifacts/offline-package/*/technology-profiles/verification.json
             artifacts/offline-package/*/technology-profiles/encoders-v4/**
             artifacts/offline-package/*/*-mcp/verification.json
+            artifacts/offline-package/*/*-mcp/result.json
             artifacts/offline-package/*/credentials/recovery/verification.json
             artifacts/offline-package/*/credentials/operations/verification.json
             artifacts/offline-package/*/credentials/verification.json
@@ -243,7 +245,7 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
       - uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

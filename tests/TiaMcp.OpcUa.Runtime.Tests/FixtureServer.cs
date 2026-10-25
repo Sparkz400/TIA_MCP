@@ -126,8 +126,9 @@ internal sealed partial class FixtureServer : StandardServer
             throw new InvalidOperationException("Fixture did not bind exclusively to loopback.");
         }
     }
+    private FixtureNodes? fixtureNodes;
     protected override MasterNodeManager CreateMasterNodeManager(IServerInternal server, ApplicationConfiguration configuration) =>
-        new(server, configuration, null, new FixtureNodes(server, configuration));
+        new(server, configuration, null, fixtureNodes=new FixtureNodes(server, configuration));
     protected override void OnServerStarted(IServerInternal server)
     {
         base.OnServerStarted(server);
@@ -261,12 +262,12 @@ internal sealed partial class FixtureServer : StandardServer
         await StopAsync(); Dispose(); Certificate.Dispose(); AdvertisedCertificate?.Dispose();
     }
     internal async Task RestartFixture() {await StopAsync();await StartAsync(fixtureConfiguration!);}
-    private sealed class FixtureNodes(IServerInternal server, ApplicationConfiguration configuration)
+    private sealed partial class FixtureNodes(IServerInternal server, ApplicationConfiguration configuration)
         : CustomNodeManager2(server, configuration, Namespace)
     {
         public override void CreateAddressSpace(IDictionary<NodeId, IList<IReference>> external)
         {
-            var folder = new FolderState(null) { NodeId = new NodeId("fixture", NamespaceIndex), BrowseName = new QualifiedName("fixture", NamespaceIndex),
+            var folder = eventSource = new FolderState(null) { EventNotifier=EventNotifiers.SubscribeToEvents, NodeId = new NodeId("fixture", NamespaceIndex), BrowseName = new QualifiedName("fixture", NamespaceIndex),
                 DisplayName = "Synthetic qualification", TypeDefinitionId = ObjectTypeIds.FolderType, ReferenceTypeId = ReferenceTypeIds.Organizes };
             folder.AddReference(ReferenceTypeIds.Organizes, true, ObjectIds.ObjectsFolder);
             if (!external.TryGetValue(ObjectIds.ObjectsFolder, out var refs)) external[ObjectIds.ObjectsFolder] = refs = new List<IReference>();
@@ -286,6 +287,7 @@ internal sealed partial class FixtureServer : StandardServer
                 folder.AddChild(variable);
             }
             AddPredefinedNode(SystemContext, folder);
+            AddRootNotifier(folder);
         }
     }
 }

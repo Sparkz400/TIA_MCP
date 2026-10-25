@@ -164,6 +164,8 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
         Heading(2, "Selected signals and observed quality");
         Paragraph("Counts overlap: quality, outcome and missing timestamps describe separate dimensions. First and last observations are recorded endpoints only; no continuous state is inferred.");
         foreach (var signal in report["signals"]!.AsArray()) { Heading(3, D.Text(signal, "signalId")); Code(signal!.ToJsonString(BridgeProtocol.Json)); }
+        if (report["captureSource"]!["plan"]?["request"]?["events"] is not null)
+            Line(DiagnosticUaTimeline.Render(report["captureSource"]!["rows"]!.AsArray(),html));
         Heading(2, "Timing, gaps and cleanup"); Code(report["captureSource"]!["recordedProgress"]!.ToJsonString(BridgeProtocol.Json)); Code(report["events"]!.ToJsonString(BridgeProtocol.Json));
         Paragraph("Only the selected committed prefix is retained. A running prefix does not establish final termination or remote cleanup. Source/server timestamps and client elapsed times are separate clocks.");
         Heading(2, "Unresolved hypotheses"); Code(report["hypotheses"]!.ToJsonString(BridgeProtocol.Json));

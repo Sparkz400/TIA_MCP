@@ -343,7 +343,7 @@
             "$ref": "#/$defs/node"
           },
           "maxItems": 64,
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true
         },
         "publishingIntervalMilliseconds": {
@@ -408,13 +408,65 @@
           "maximum": 3,
           "default": 0,
           "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
+        },
+        "events": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/eventSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
         "attemptId",
         "nodes"
       ],
-      "description": "Runtime additionally requires lifetimeCount >= 3 * keepAliveCount and canonical distinct node identities."
+      "description": "Runtime additionally requires lifetimeCount >= 3 * keepAliveCount and canonical distinct node identities.",
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "nodes": {
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "required": [
+                "events"
+              ],
+              "properties": {
+                "events": {
+                  "type": "object"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "required": [
+              "diagnosticBindingId"
+            ],
+            "properties": {
+              "diagnosticBindingId": {
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nodes": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
     },
     "normalizedRequest": {
       "type": "object",
@@ -430,7 +482,7 @@
             "$ref": "#/$defs/node"
           },
           "maxItems": 64,
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true
         },
         "publishingIntervalMilliseconds": {
@@ -495,6 +547,9 @@
           "maximum": 3,
           "default": 0,
           "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
+        },
+        "events": {
+          "$ref": "#/$defs/eventSelection"
         }
       },
       "required": [
@@ -510,6 +565,48 @@
         "maximumNotifications",
         "maximumBytes",
         "maximumRepublish"
+      ],
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "nodes": {
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "required": [
+                "events"
+              ],
+              "properties": {
+                "events": {
+                  "type": "object"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "if": {
+            "required": [
+              "diagnosticBindingId"
+            ],
+            "properties": {
+              "diagnosticBindingId": {
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nodes": {
+                "minItems": 1
+              }
+            }
+          }
+        }
       ]
     },
     "plan": {
@@ -636,7 +733,10 @@
             "$ref": "#/$defs/monitoredItem"
           },
           "maxItems": 64,
-          "minItems": 1
+          "minItems": 0
+        },
+        "eventItem": {
+          "$ref": "#/$defs/eventItem"
         }
       },
       "required": [
@@ -645,6 +745,24 @@
         "revisedLifetimeCount",
         "revisedKeepAliveCount",
         "items"
+      ],
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "properties": {
+                "items": {
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "required": [
+                "eventItem"
+              ]
+            }
+          ]
+        }
       ]
     },
     "notification": {
@@ -884,6 +1002,14 @@
         },
         "reconnect": {
           "$ref": "#/$defs/reconnectEvent"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventNotification"
+          },
+          "maxItems": 1,
+          "minItems": 0
         }
       },
       "required": [
@@ -1344,6 +1470,62 @@
               "required": [
                 "reconnect"
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "not": {
+                  "enum": [
+                    "publish",
+                    "republish"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "events"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "keepAlive": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "events": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "events"
+            ],
+            "properties": {
+              "events": {
+                "minItems": 1
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "notifications": {
+                "maxItems": 0
+              }
             }
           }
         }
@@ -1824,7 +2006,9 @@
         "format": {
           "enum": [
             "json",
-            "csv"
+            "csv",
+            "html",
+            "markdown"
           ]
         }
       },
@@ -1956,6 +2140,196 @@
             }
           }
         }
+      ]
+    },
+    "eventSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notifier": {
+          "$ref": "#/$defs/node"
+        },
+        "minimumSeverity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000,
+          "default": 0
+        }
+      },
+      "required": [
+        "notifier"
+      ]
+    },
+    "eventItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clientHandle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "notifier": {
+          "$ref": "#/$defs/node"
+        },
+        "statusCode": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{8}$"
+        },
+        "monitoredItemId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "revisedSamplingInterval": {
+          "type": "number",
+          "minimum": 0
+        },
+        "revisedQueueSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "selectClauseResults": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^0x[0-9a-f]{8}$"
+              },
+              "maxItems": 8,
+              "minItems": 8
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "eventNotifier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 255
+        }
+      },
+      "required": [
+        "clientHandle",
+        "notifier",
+        "statusCode",
+        "monitoredItemId",
+        "revisedSamplingInterval",
+        "revisedQueueSize",
+        "selectClauseResults",
+        "eventNotifier"
+      ]
+    },
+    "eventField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "EventId",
+            "EventType",
+            "SourceNode",
+            "SourceName",
+            "Time",
+            "ReceiveTime",
+            "Message",
+            "Severity"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "value",
+            "null",
+            "status"
+          ]
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locale": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "statusCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^0x[0-9a-f]{8}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "text",
+        "node",
+        "locale",
+        "statusCode"
+      ]
+    },
+    "eventNotification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clientHandle": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "monitoredItemId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "overflow": {
+          "type": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventField"
+          },
+          "maxItems": 8,
+          "minItems": 8
+        }
+      },
+      "required": [
+        "clientHandle",
+        "monitoredItemId",
+        "overflow",
+        "fields"
       ]
     }
   },

@@ -30,7 +30,8 @@ if (args.Length == 4 && args[0] == "--crash-client")
     Environment.Exit(73); // Intentional process exit without session close; parent retains the original process handle.
 }
 bool serve = args.Length == 3 && args[0] == "--serve" && args[1] == "--output";
-if (!serve && (args.Length != 2 || args[0] != "--output")) throw new ArgumentException("Use --output fresh-directory or --serve --output fresh-directory");
+bool eventsOnly = args.Length==3 && args[0]=="--events-only" && args[1]=="--output";
+if (!serve && !eventsOnly && (args.Length != 2 || args[0] != "--output")) throw new ArgumentException("Use --output fresh-directory or --serve --output fresh-directory");
 string output = Path.GetFullPath(args[^1]);
 if (Directory.Exists(output)) throw new IOException("Output must be fresh.");
 Directory.CreateDirectory(output);
@@ -80,15 +81,19 @@ try
             if (op == "trustClient") server.TrustedClientSha256 = command.RootElement.GetProperty("sha256").GetString();
             if (op == "failValueReads") server.FailValueReads = command.RootElement.GetProperty("value").GetInt32();
             if (op == "dropPublishResponses") server.DropPublishResponses = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "emitEvent") server.EmitEvent(command.RootElement.GetProperty("number").GetInt32(),command.RootElement.GetProperty("severity").GetUInt16());
             Save("server-live", new { sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() });
             Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray(), clientCertificates = server.ClientCertificateChecks.ToArray() }, BridgeProtocol.Json));
             Console.Out.Flush();
         }
         passed = true;
     }
+    else if(eventsOnly) {await EventChecks.Run(server,output,Check);passed=true;}
     else
     {
         SubscriptionInputChecks.Run(Check);
+        await EventChecks.Run(server,output,Check);
+        Save("event-server-audit",server.Audit.ToArray());server.Audit.Clear();
         var reconnectServer=await Start("reconnect");
         await ReconnectChecks.Run(reconnectServer,output,Check);
         Save("reconnect-server-audit",reconnectServer.Audit.ToArray());
@@ -295,6 +300,7 @@ try
         }
         var allowed = new HashSet<string> { "GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse", "BrowseNext", "Continuation", "CloseSession", "CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions", "SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish" };
         allowed.UnionWith(["PublishEntered","PublishCompleted","FixtureTransportReadFailure","FixtureLostPublishResponse"]);
+        allowed.UnionWith(["FixtureEventEmitted","FixtureEventFilter"]);
         foreach (var audit in servers.SelectMany(s => s.Audit))
             Check(allowed.Contains(JsonSerializer.SerializeToElement(audit).GetProperty("operation").GetString()!), "Wire operation allowed");
         passed = true;
