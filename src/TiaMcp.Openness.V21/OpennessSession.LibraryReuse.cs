@@ -37,6 +37,21 @@ namespace TiaMcp.Openness.V21
                 ["proof"] = "Exact installed type/version GUID, one native link and identical native version metadata (default flag and uncompared original library excluded). Content is not compared; committed versions are immutable natively." };
         }
 
+        // TIA allows one instance of a library type per device: an instance in another scope (root or software unit)
+        // makes CreateFrom fail after the checkpoint, so it is refused in the preview.
+        private void RequireNoInstanceInOtherScope(LibraryChange change, PlcSelection plc, SoftwareScope scope, JToken node)
+        {
+            var installed = change.Project.ProjectLibrary.FindType(Guid.Parse(node.Value<string>("typeGuid")));
+            if (installed == null) return;
+            var budget = new ScanBudget(50000);
+            var local = ScopeBlocks(scope, budget).Select(x => (object)x.Item).Concat(ScopeTypes(scope, budget).Select(x => (object)x.Item)).ToList();
+            if (budget.Truncated) throw new BridgeException("DependencyUnresolved", "Target scope inventory exceeded its completeness budget.");
+            foreach (var version in installed.Versions)
+                foreach (var use in version.FindInstances(plc.Software))
+                    if (!local.Any(x => x.Equals(use.LibraryTypeInstance)))
+                        throw new BridgeException("LibraryConflict", "TIA allows one instance of library type " + node.Value<string>("typeName") + " per device; it is already instantiated in another software scope of this PLC.");
+        }
+
         private static void VerifyReusedLibraryDependencies(LibraryChange change, PlcSelection plc)
         {
             foreach (var reused in change.Preview["reusedDependencies"] as JArray ?? new JArray())
