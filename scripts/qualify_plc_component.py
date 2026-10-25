@@ -368,12 +368,18 @@ def review_typed_effects(preview, manifest, read_artifact, expected_instance_num
     require(isinstance(effects, list) and all(isinstance(e, dict) for e in effects), 'Typed effects must be explicit objects.')
     mutations = [effect for effect in effects if 'action' in effect]
     standalone = manifest.get('callerMode') == 'createStandaloneFc'
-    wanted_actions = ['create', 'createInstanceDB'] if standalone else ['createInstanceDB']
+    wanted_actions = ['create', 'createInstanceDB'] if standalone else ['graphical_typed_edit', 'createInstanceDB']
     require(sorted(effect['action'] for effect in mutations) == sorted(wanted_actions),
             'Typed effects contain missing, duplicate or unknown mutation actions.')
     if standalone:
         creation = next(effect for effect in mutations if effect['action'] == 'create')
         require(creation == {'action': 'create', 'blockName': manifest['caller']}, 'Fresh caller creation effect differs.')
+    else:
+        edit = next(effect for effect in mutations if effect['action'] == 'graphical_typed_edit')
+        block = edit.get('existingBlock') or {}
+        require(set(edit) == {'action', 'existingBlock'} and block.get('name') == manifest['caller'] and block.get('kind') == 'FC'
+                and block.get('programmingLanguage') == manifest['language'] and block.get('isKnowHowProtected') is False
+                and block.get('path') == typed['blockPath'], 'Existing caller edit effect differs.')
     instance = next(effect for effect in mutations if effect['action'] == 'createInstanceDB')
     require(set(instance) == {'action', 'artifact', 'autoNumber', 'calleePath', 'instanceOfName', 'name', 'number', 'path', 'startValueImpact'}
             and instance['instanceOfName'] == manifest['root'] and instance['path'].endswith('/' + manifest['instance']),
