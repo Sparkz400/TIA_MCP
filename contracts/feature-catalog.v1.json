@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.11",
+  "catalogVersion": "0.4.12",
   "targetTiaVersions": [
     21
   ],
@@ -1837,6 +1837,23 @@
       "limitations": [
         "Engineering only: no scoped runtime assertions; the runtime harness cannot yet call a software-unit DUT from the root Main OB.",
         "Baseline archive rebuilt 25 October 2026 (artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21, sha256 39cea56a...); the 13 October archive is no longer on this PC."
+      ]
+    },
+    {
+      "id": "local.typed.route-capture.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "f267de5bc0d1bafb8a79367d5d527777e66d0fc1",
+        "passedScope": "scripts/capture_typed_routes_owned.py: 41 independently authored native reference inputs (3 prerequisites in route-capture-prerequisites.v1.json: TgpUnit_GlobalTimer SCL storage and the TgpNamespace_TemplateFB_LAD/FBD native exports; then all 38 inputs of route-capture-packet.v1.json) imported one at a time into one owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...). Each input compiled clean, saved, added exactly its declared blocks (48 in total) and left every existing native object's XML unchanged; the final saved snapshot matched a fresh-process reopen; both owned TIA lifetimes cleaned up with Host exit 0."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-capture.20261025.json"
+      ],
+      "limitations": [
+        "Native reference capture only: no typed builder, profile activation, changed-state recovery or runtime is established.",
+        "The 80 pending route cells and inactive profile candidates still need extraction, review and builder qualification."
       ]
     }
   ],
@@ -8767,7 +8784,8 @@
           "local.typed.resolution.20261025",
           "local.typed.native-boundaries.20261025",
           "local.typed.insertion.20261025",
-          "local.typed.routes.engineering.20261025"
+          "local.typed.routes.engineering.20261025",
+          "local.typed.route-capture.20261025"
         ]
       },
       "availability": {
@@ -17064,9 +17082,50 @@
       ]
     },
     {
+      "featureId": "diagnostic_ua_compare",
+      "domain": "diagnostics",
+      "title": "Before and after retained UA capture comparison",
+      "mcpTools": [
+        "diagnostic_ua_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host-owned offline artifact service only; this does not assert a native PLC trace API."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Explicit one-to-one mappings and inclusive Host receipt-time windows compare exact retained prefixes, Good scalar statistics and original event type/source/severity counts. Both chains and full-prefix gaps are revalidated. No implicit signal join, interpolation, array scalarization, unit conversion or behavioral verdict.",
+          "Offline evidence composition only. No online program/address/datatype association, synchronized sampling, behavioral assertion or physical qualification. Original sources are required; unbound captures cannot be associated retroactively."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Offline host artifacts and exact source/plan identities are required; current native target availability is unknown."
+        ]
+      },
+      "prerequisites": [
+        "Saved project-review.v1 artifacts for planning; immutable diagnostic artifacts for downstream tools",
+        "Native operations require a separately supported route, authorization/admission and target qualification"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "diagnostic_ua_report_export",
       "domain": "diagnostics",
-      "title": "Readable retained UA observation exports",
+      "title": "Readable retained UA observation and comparison exports",
       "mcpTools": [
         "diagnostic_ua_report_export"
       ],
@@ -17080,7 +17139,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Revalidates original capture, binding and experiment before exact JSON or inert Markdown/HTML export; Explorer independently checks retained bytes and counts.",
+          "Revalidates original captures, bindings and experiments before exact JSON or inert Markdown/HTML observation/comparison export; Explorer independently checks retained bytes, windows, mappings and counts.",
           "Offline evidence composition only. No online program/address/datatype association, synchronized sampling, behavioral assertion or physical qualification. Original sources are required; unbound captures cannot be associated retroactively."
         ]
       },

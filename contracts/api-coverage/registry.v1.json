@@ -2912,6 +2912,14 @@
       ]
     },
     {
+      "featureId": "diagnostic_ua_compare",
+      "obligations": [
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
       "featureId": "diagnostic_ua_report_export",
       "obligations": [
         "D16",

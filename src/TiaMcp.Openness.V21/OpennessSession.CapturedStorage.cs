@@ -35,10 +35,9 @@ namespace TiaMcp.Openness.V21
             // source is bound only by complete installed FB/UDT content equality.
             bool exactArchive = plan.Source.SourceHash == CapturedStorageArchiveHash;
             var names = (plan.Preview["integrationPlan"]?["versions"] as JArray)?.Select(v => v.Value<string>("typeName")) ?? Enumerable.Empty<string>();
-            if (!exactArchive && (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(plan.Payload) || !names.Contains(TypedGraphicalCapturedStorageTemplate.FbName))) return null;
+            // The profile fixes the global instance DB only; the FBD FC caller may be new or existing (checked at typed binding).
+            if (!exactArchive && !names.Contains(TypedGraphicalCapturedStorageTemplate.FbName)) return null;
             RequireComponentScratch(plan.Project);
-            if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(plan.Payload))
-                throw new BridgeException("CapturedStorageProfileUnavailable", "Exact captured storage qualification requires a new standalone FC caller.");
             string catalog = TypedCatalogPath();
             if (catalog == null) throw new BridgeException("CapturedStorageProfileUnavailable", "Trusted captured-storage profile is not deployed.");
             string file = Path.Combine(Path.GetDirectoryName(catalog), "component04-storage-profile.json");
@@ -126,13 +125,17 @@ namespace TiaMcp.Openness.V21
                 PlcLibraryIntegrationPlanner.CallerPath(plan.Payload) != ObjectIdentity.ObjectPath(change.GroupPath, change.BlockNames.Single(), change.Namespace))
                 throw new BridgeException("CapturedStorageProfileUnavailable", "Exact new caller and standard PLC scope must match the current plan.");
             var model = change.Payload["model"] as JObject ?? change.Payload;
-            if (model.Value<string>("operation") != "createBlock" || model.Value<string>("language") != "FBD" || model["creation"]?.Value<string>("blockType") != "FC")
-                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new FBD FC is eligible for qualification for this stored profile.");
+            bool standalone = PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(plan.Payload);
+            bool eligible = standalone ? model.Value<string>("operation") == "createBlock" && model["creation"]?.Value<string>("blockType") == "FC" : model.Value<string>("operation") == "insertNetwork";
+            if (!eligible || model.Value<string>("language") != "FBD")
+                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new or existing FBD FC caller is eligible for qualification for this stored profile.");
             var scan = new ScanBudget(50000); var blocks = ScopeBlocks(scope, scan).ToArray(); var types = ScopeTypes(scope, scan).ToArray();
             if (scan.Truncated) throw new BridgeException("TraversalLimit", "Exact captured storage requires complete native scope inventory.");
             if (blocks.Count(b => string.Equals(b.Item.Name, TypedGraphicalCapturedStorageTemplate.FbName, StringComparison.OrdinalIgnoreCase)) != 1 ||
                 types.Count(t => string.Equals(t.Item.Name, TypedGraphicalCapturedStorageTemplate.TypeName, StringComparison.OrdinalIgnoreCase)) != 1)
                 throw new BridgeException("StaleDeclaration", "Captured FB/UDT names must be unambiguous across the complete standard scope.");
+            if (!standalone && !(blocks.SingleOrDefault(b => b.Path == PlcLibraryIntegrationPlanner.CallerPath(plan.Payload))?.Item is FC))
+                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new or existing FBD FC caller is eligible for qualification for this stored profile.");
             var paths = new Dictionary<IEngineeringObject, string>();
             foreach (var b in blocks) paths[b.Item] = b.Path;
             foreach (var t in types) paths[t.Item] = t.Path;

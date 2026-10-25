@@ -365,7 +365,9 @@ namespace TiaMcp.Openness.V21
         private static JObject ReadChecked(string path)
         {
             if (!File.Exists(path) || new FileInfo(path).Length > 8 * 1024 * 1024) Fail("ComponentJournalInvalid", "Journal is missing or exceeds 8 MiB.");
-            var envelope = JObject.Parse(File.ReadAllText(path)); var record = envelope["record"] as JObject;
+            // Keep date-looking strings verbatim: a reparsed DateTime reserializes "...8245720Z" as "...824572Z" and breaks the hash.
+            JObject envelope; using (var reader = new JsonTextReader(new StringReader(File.ReadAllText(path))) { DateParseHandling = DateParseHandling.None }) envelope = JObject.Load(reader);
+            var record = envelope["record"] as JObject;
             if (record == null || envelope.Value<string>("sha256") != LibraryJournalStore.Hash(record.ToString(Formatting.None)) || record.Value<int?>("schemaVersion") != 1 || record["contract"] == null || record.Value<string>("contractSha256") != LibraryJournalStore.Hash(record["contract"].ToString(Formatting.None))) Fail("ComponentJournalInvalid", "Journal or immutable contract hash does not match.");
             return record;
         }

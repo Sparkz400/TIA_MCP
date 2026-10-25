@@ -129,6 +129,33 @@ class ComponentFixtureTests(unittest.TestCase):
             return (ROOT / 'fixtures/libraries/component-review' / filename).read_bytes()
         return review_step(value, [], self.spec, read, expected_number)
 
+    def existing_typed_review(self):
+        # Shape observed natively in b02: the existing caller's edit replaces the create effect, plus lane A's shift effect.
+        value = self.retained_typed_review(); preview = value['review']['preview']; typed = preview['typed']
+        typed['operation'] = 'insertNetwork'
+        preview['effects'][0] = {'action': 'graphical_typed_edit', 'existingBlock': {'isConsistent': True, 'isKnowHowProtected': False, 'kind': 'FC',
+            'name': self.spec['caller'], 'number': 3, 'path': typed['blockPath'], 'plcPath': preview['payload']['scopePath'], 'programmingLanguage': 'FBD'}}
+        preview['effects'][2].update(kind='insertNetwork', description='Native FBD network insertNetwork; compilation and complete readback required.')
+        preview['effects'].append({'kind': 'followingObjectIdShift', 'identity': typed['networkId'], 'sourceSha256': None,
+            'description': 'V21 renumbers the 2 existing object IDs after the inserted network by +5 (8->D, 9->E); everything else is preserved exactly.'})
+        return value
+
+    def test_existing_caller_typed_review_requires_exact_edit_and_one_shift(self):
+        spec = self.spec; self.spec = dict(spec, callerMode='existing')
+        try:
+            value = self.existing_typed_review(); self.assertIs(value['review'], self.review_retained(value))
+            for mode, pattern in (('protected', 'edit effect'), ('otherBlock', 'edit effect'), ('noShift', 'following-ID shift'), ('twoShifts', 'following-ID shift')):
+                with self.subTest(mode=mode):
+                    value = self.existing_typed_review(); effects = value['review']['preview']['effects']
+                    if mode == 'protected': effects[0]['existingBlock']['isKnowHowProtected'] = True
+                    elif mode == 'otherBlock': effects[0]['existingBlock']['name'] = 'Other'
+                    elif mode == 'noShift': effects.pop()
+                    else: effects.append(copy.deepcopy(effects[-1]))
+                    with self.assertRaisesRegex(RuntimeError, pattern):
+                        self.review_retained(value)
+        finally:
+            self.spec = spec
+
     def test_typed_review_rejects_unknown_missing_and_duplicate_mutations(self):
         for mode in ('unknown', 'missing', 'duplicate', 'extraField'):
             with self.subTest(mode=mode):
