@@ -26,7 +26,7 @@ internal static class ObservationFixtures
                 f.Payload["integration"]["mappings"][1]["direction"] = "InOut";
             }
             if (profile == "existing-blocked")
-                f.Caller.Root.Element("SW.Blocks.OB").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9")));
+                f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9")));
             f.Payload["source"] = new JObject { ["libraryId"] = "library-" + new string('a', 32), ["revision"] = new string('b', 64) };
             var root = (JObject)f.Versions[0];
             root["kind"] = "version"; root["version"] = "1.0.0"; root["isDefault"] = true; root["setForUpdate"] = true;

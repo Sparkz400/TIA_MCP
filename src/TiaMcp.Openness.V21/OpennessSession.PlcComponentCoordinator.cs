@@ -180,6 +180,13 @@ namespace TiaMcp.Openness.V21
                     {
                         var prepared = typedPreparation["preview"];
                         CompareArtifact((JObject)prepared["typed"]["nativeArtifact"], callerFile);
+                        if (!standalone)
+                        {
+                            var original = (JObject)contract["plan"]["callerArtifact"];
+                            result["callerInsertion"] = PlcComponentCallerInsertion.Verify(
+                                EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(original, original.Value<string>("sha256"))),
+                                EngineeringSources.ReadXml(File.ReadAllText(callerFile)), payload["integration"]["caller"].Value<string>("insertAfterNetworkId"));
+                        }
                         var effects = ((JArray)prepared["effects"]).Where(e => e.Value<string>("action") == "createInstanceDB").ToArray();
                         if (effects.Length != 1) throw new BridgeException("ComponentReadbackMismatch", "Expected exactly one prepared instance creation.");
                         var effect = effects[0];

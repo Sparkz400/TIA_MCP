@@ -9,6 +9,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import traceback
 import uuid
@@ -330,12 +331,30 @@ def verify_preserved_installation(before, after, caller, added):
                 "Caller snapshot has missing, empty or duplicate native object IDs.")
         return found
 
-    old_ids = {node.getAttribute("ID") for node in units(old)}
-    inserted = [node for node in units(new) if node.getAttribute("ID") not in old_ids]
-    require(len(inserted) == 1, "Caller must gain exactly one network with distinct native identity.")
-    inserted[0].parentNode.removeChild(inserted[0])
-    require(native_payload(old.toxml()) == native_payload(new.toxml()),
-            "Caller content outside the inserted network changed.")
+    old_count, new_count = len(units(old)), len(units(new))
+    require(new_count == old_count + 1, "Caller must gain exactly one network with distinct native identity.")
+    expected = native_payload(old.toxml())
+
+    def restores(index):
+        # Scope decision 2026-10-25: V21 shifts every following object ID by the
+        # inserted network's ID count. Reverse exactly that shift, nothing else.
+        candidate = new.cloneNode(True)
+        unit = units(candidate)[index]
+        inside = [unit, *unit.getElementsByTagName("*")]
+        count = sum(node.hasAttribute("ID") for node in inside)
+        nodes = list(candidate.getElementsByTagName("*"))
+        for node in nodes[nodes.index(unit) + len(inside):]:
+            if node.hasAttribute("ID"):
+                value = node.getAttribute("ID")
+                if not re.fullmatch(r"0|[1-9A-F][0-9A-F]{0,6}", value) or int(value, 16) < count:
+                    return False
+                node.setAttribute("ID", format(int(value, 16) - count, "X"))
+        unit.parentNode.removeChild(unit)
+        return native_payload(candidate.toxml()) == expected
+
+    # Two candidates can restore only when they are equal up to that shift.
+    require(any(restores(index) for index in range(new_count)),
+            "Caller content outside the inserted network changed beyond the accepted following-ID shift.")
 
 
 def first_available_db_number(blocks):
@@ -404,6 +423,11 @@ def review_typed_effects(preview, manifest, read_artifact, expected_instance_num
     expected += [{'kind': 'operandDependency', 'identity': row['identity'], 'sourceSha256': row['declarationHash'],
                   'description': row['scope'] + ' ' + row['dataType'] + ' operand.'} for row in operands]
     metadata = [effect for effect in effects if 'action' not in effect]
+    if not standalone:
+        # Lane A's typed route reports V21's following-ID renumbering as its own effect; it must name the inserted network.
+        shifts = [effect for effect in metadata if effect.get('kind') == 'followingObjectIdShift']
+        require(len(shifts) == 1 and shifts[0].get('identity') == typed['networkId'], 'Typed insertion must report exactly one following-ID shift.')
+        metadata.remove(shifts[0])
     normalize = lambda rows: sorted(json.dumps(row, sort_keys=True) for row in rows)
     require(normalize(metadata) == normalize(expected), 'Typed metadata effects contain missing, duplicate, unknown or changed dependencies.')
 
@@ -436,6 +460,9 @@ class ComponentRun:
     def __init__(self, args):
         require(args.run_native, "Explicit --run-native is required.")
         self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text())
+        if getattr(args, "caller_mode", None) == "existing":
+            # The same caller source exists before import; the component call is inserted after its network.
+            self.manifest["callerMode"] = "existing"
         policy = artifact_policy(args.artifacts, args.artifact_policy_root or ROOT / "artifacts")
         self.output = args.output.resolve()
         self.output.mkdir(parents=True, exist_ok=False)
@@ -552,6 +579,10 @@ class ComponentRun:
         peer_source = peer_source.replace(self.manifest["caller"], self.manifest["unrelatedCaller"])
         self.apply("source_upsert", {"language": "SIMATIC_SD", "source": peer_source,
             "expectedBlockNames": [self.manifest["unrelatedCaller"]]})
+        existing = self.manifest["callerMode"] == "existing"
+        if existing:
+            caller_source = (self.native / "documents" / (self.manifest["caller"] + ".s7dcl")).read_text(encoding="utf-8-sig")
+            self.apply("source_upsert", {"language": "SIMATIC_SD", "source": caller_source, "expectedBlockNames": [self.manifest["caller"]]})
         inventory = complete_inventory(self.call)
         plc = inventory["plcPath"]
         empty = empty_tag_template(inventory, plc)
@@ -567,9 +598,18 @@ class ComponentRun:
         self.apply("tag_table_import_xml", {"xml": ET.tostring(tags, encoding="unicode"), "expectedTableNames": [self.manifest["table"]]})
         baseline = snapshot(self.call, self.output / "before-import")
         caller = plc + "/blocks/" + self.manifest["caller"]
-        require(not [b for b in baseline["inventory"]["blocks"] if b["name"].lower() == self.manifest["caller"].lower()],
-                "Standalone caller must be absent from the initial checkpoint.")
-        self.report["callerInitialState"] = {"mode": "createStandaloneFc", "path": caller, "exists": False, "calledFromOb": False}
+        if existing:
+            require(select(baseline["inventory"]["blocks"], self.manifest["caller"], plc)["path"] == caller, "Existing caller must be in the initial checkpoint.")
+            network, following = terminal_network(Path(baseline["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest["language"])
+            self.report["callerInitialState"] = {"mode": "existing", "path": caller, "exists": True, "calledFromOb": False,
+                "insertAfterNetworkId": network, "followingObjectIds": following}
+            caller_recipe = {"mode": "existing", "blockPath": caller, "insertAfterNetworkId": network}
+        else:
+            require(not [b for b in baseline["inventory"]["blocks"] if b["name"].lower() == self.manifest["caller"].lower()],
+                    "Standalone caller must be absent from the initial checkpoint.")
+            self.report["callerInitialState"] = {"mode": "createStandaloneFc", "path": caller, "exists": False, "calledFromOb": False}
+            caller_recipe = {"mode": "createStandaloneFc", "name": self.manifest["caller"], "language": self.manifest["language"],
+                             "numberPolicy": "firstAvailable"}
         table = select(baseline["inventory"]["tagTables"], self.manifest["table"], plc)
         mappings = [{"parameter": signal["parameter"], "direction": signal["direction"], "dataType": signal["dataType"],
             "tagPath": select(table["tags"], signal["name"])["path"]} for signal in self.manifest["signals"]]
@@ -577,13 +617,12 @@ class ComponentRun:
             "selection": [released[self.manifest["root"]]], "target": {"projectName": scratch["project"]["name"], "plcPath": plc},
             "integration": {"dependencyPins": [released[self.manifest["dependency"]]],
                 "instanceDb": {"name": self.manifest["instance"], "numberPolicy": "firstAvailable"},
-                "caller": {"mode": "createStandaloneFc", "name": self.manifest["caller"], "language": self.manifest["language"],
-                           "numberPolicy": "firstAvailable"}, "mappings": mappings}}
+                "caller": caller_recipe, "mappings": mappings}}
         prepared = self.call("change_prepare", {"kind": "library_integrate", "payload": payload})
         self.report["plan"] = prepared; self.persist()
         plan = prepared["preview"]["integrationPlan"]
-        require(not plan["blockers"] and plan["caller"]["initiallyAbsent"] is True and plan["caller"]["blockPath"] == caller,
-                "Standalone caller plan differs: " + canonical(plan["blockers"]))
+        require(not plan["blockers"] and plan["caller"]["initiallyAbsent"] is (not existing) and plan["caller"]["blockPath"] == caller,
+                "Caller plan differs: " + canonical(plan["blockers"]))
         # No native mutation has been dispatched by planning. This exact plan is
         # reviewed separately from each real prepared stage below.
         verify_dependency_graph(plan["versions"], self.manifest)
@@ -610,11 +649,17 @@ class ComponentRun:
         installed = drive_component(self.call, initial, review, self.retain)
         self.report["installed"] = installed; self.persist()
         after = snapshot(self.call, self.output / "after-install")
-        added = ["block:" + select(after["inventory"]["blocks"], name, plc)["path"] for name in (self.manifest["root"], self.manifest["instance"], self.manifest["caller"])]
+        added = ["block:" + select(after["inventory"]["blocks"], name, plc)["path"]
+                 for name in (self.manifest["root"], self.manifest["instance"]) + (() if existing else (self.manifest["caller"],))]
         added.append("type:" + select(after["inventory"]["types"], self.manifest["dependency"], plc)["path"])
         verify_preserved_installation(baseline, after, caller, added)
         verify_component_call(Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest)
-        verify_standalone_caller(Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest)
+        if existing:
+            proof = installed["record"]["installationEvidence"]["callerInsertion"]
+            require(proof["verified"] is True and proof["insertAfterNetworkId"] == network, "Native caller insertion proof differs.")
+            self.report["callerInsertion"] = proof
+        else:
+            verify_standalone_caller(Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest)
         self.report["preservationVerified"] = True; self.persist()
         self.call("library_close", {"libraryId": library})
         path = self.session.current_project
@@ -759,6 +804,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
+    parser.add_argument("--caller-mode", choices=("createStandaloneFc", "existing"), default="createStandaloneFc",
+                        help="existing: insert the component call into a pre-existing caller FC (insertion-ID scope decision 2026-10-25).")
     source_mode = parser.add_mutually_exclusive_group()
     source_mode.add_argument("--recover-from-report", type=Path, help="Explicit separate first-checkpoint recovery from one failed report; never resumes installation.")
     source_mode.add_argument("--reuse-source-report", type=Path, help="Reuse only native04's exact committed archive in a new consumer; never author/reopen/resume the old attempt.")

@@ -153,12 +153,16 @@ namespace TiaMcp.Openness.V21
             var caller = callerRows[0]; language = caller.Value<string>("language");
             if (caller.Value<bool?>("protected") != false || !string.IsNullOrEmpty(caller.Value<string>("namespace")) || (language != "LAD" && language != "FBD")) Fail("UnsupportedIntegrationCaller", "Caller must be an unprotected standard LAD/FBD block with an empty namespace.");
             var nativeCallers = callerExport.Root?.Elements().Where(e => e.Name.LocalName is "SW.Blocks.OB" or "SW.Blocks.FB" or "SW.Blocks.FC").ToArray();
+            // shortcut: OB callers stay refused until OB insertion is separately qualified.
+            if (nativeCallers?.Length == 1 && nativeCallers[0].Name.LocalName == "SW.Blocks.OB") Fail("UnsupportedIntegrationCaller", "OB insertion is not qualified; select an FC or FB caller.");
             if (nativeCallers == null || nativeCallers.Length != 1 || nativeCallers[0].Element("AttributeList")?.Element("Name")?.Value != caller.Value<string>("name") || nativeCallers[0].Element("AttributeList")?.Element("ProgrammingLanguage")?.Value != language)
                 Fail("IntegrationCallerMismatch", "Caller XML does not match the independently resolved native block.");
             var networks = callerExport.Descendants("SW.Blocks.CompileUnit").Where(e => (string)e.Attribute("ID") == networkId).ToArray();
             if (networks.Length != 1 || networks[0].Element("AttributeList")?.Element("ProgrammingLanguage")?.Value != language) Fail("NetworkNotFound", "Exact native caller network is missing or has a different language.");
             bool terminal = !callerExport.Descendants().Any(e => XNode.DocumentOrderComparer.Compare(e, networks[0]) > 0 && !e.Ancestors().Contains(networks[0]) && e.Attribute("ID") != null);
-            if (!terminal) blockers.Add(new JObject { ["code"] = "NativeIdPreservationUnsupported", ["message"] = "Selected insertion has following native object IDs. The existing typed insertion route refuses this boundary; select a supported terminal boundary or a separate caller." });
+            // Following IDs shift by the inserted count (scope decision 2026-10-25); only an unpredictable shift blocks.
+            string shiftBlocker = terminal ? null : PlcComponentCallerInsertion.ShiftBlocker(callerExport);
+            if (shiftBlocker != null) blockers.Add(new JObject { ["code"] = "NativeIdPreservationUnsupported", ["message"] = shiftBlocker + " Select a terminal boundary or a separate caller." });
             }
 
             var operands = new JArray(); var connections = new JArray(); var observedMappings = new JArray(); var writers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
