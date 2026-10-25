@@ -126,6 +126,45 @@ def semantic_snapshot(value):
     return value
 
 
+# TIA keeps Classic screen names unique within each of these collections, so only their
+# enumeration order is ignored (observed A/B -> B/A after reopen). IDs and content stay significant.
+NAME_KEYED_SCREENS = {"Screens", "ScreenTemplates", "ScreenPopups"}
+
+
+def export_digest(export):
+    try:
+        data = Path(export["path"]).read_bytes()
+    except (OSError, KeyError, TypeError):
+        return {"unavailable": True}
+    require(hashlib.sha256(data).hexdigest() == export.get("sha256"), "Independent native export changed after capture")
+    try:
+        return hashlib.sha256(native_payload(data).encode("utf-8")).hexdigest()
+    except Exception:
+        return hashlib.sha256(data).hexdigest()
+
+
+def lifecycle_snapshot(value):
+    """Scalar readbacks plus export content; Classic screen collections compared by unique name."""
+    if isinstance(value, list):
+        return [lifecycle_snapshot(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    result = {}
+    for key, item in value.items():
+        if key == "remainingBudget":
+            continue
+        if key == "export":
+            result[key] = export_digest(item)
+            continue
+        item = lifecycle_snapshot(item)
+        if key in NAME_KEYED_SCREENS and isinstance(item, list):
+            names = [entry.get("attributes", {}).get("Name") if isinstance(entry, dict) else None for entry in item]
+            if all(isinstance(name, str) for name in names) and len(set(names)) == len(names):
+                item = sorted(item, key=lambda entry: entry["attributes"]["Name"])
+        result[key] = item
+    return result
+
+
 def validate_fixture(profile, report_path):
     require(profile.get("profile") in PROFILES, "Unknown native profile")
     require(profile.get("selectedTarget", {}).get("typeIdentifier"), "Native catalog identity required")
@@ -213,8 +252,10 @@ def import_native_evidence(profile):
         gates["cleanBaselineCompile"] = gate("unverified", "A separately labelled positive fixture without deliberate invalid references is required")
     for flag, key, observed in (("reopenVerified", "saveReopen", "nativeReopened"), ("archiveRetrievalVerified", "archiveRecovery", "nativeRecovered")):
         if profile.get(flag):
-            equal = semantic_snapshot(profile.get("nativeBefore")) == semantic_snapshot(profile.get(observed))
-            gates[key] = gate("passed" if equal else "failed", "Independent scalar baseline comparison after native lifecycle; not whole-content preservation", baselineEqual=equal)
+            equal = lifecycle_snapshot(profile.get("nativeBefore")) == lifecycle_snapshot(profile.get(observed))
+            ordered = semantic_snapshot(profile.get("nativeBefore")) == semantic_snapshot(profile.get(observed))
+            gates[key] = gate("passed" if equal else "failed", "Independent scalar and export-content comparison after native lifecycle; Classic screens matched by unique name, only the exporter timestamp removed; not whole-content preservation",
+                              baselineEqual=equal, enumerationOrderEqual=ordered)
     gates["visualInspection"] = gate("unverified", "No representative native screen appearance assessment is attached to this fixture report. A separate native UI attempt must be completed; no renderer or scripts executed.")
     return gates
 
@@ -240,6 +281,36 @@ def block_pending_profiles(native_profiles, report_profiles, after_index, failur
         for name, value in list(result["gates"].items()):
             if value["status"] == "unverified":
                 result["gates"][name] = gate("blocked", "Shared worker is faulted or startup outcome is unknown; no further fixture calls or write replays were dispatched", sourceFailure=copy.deepcopy(failure))
+
+
+CLASSIC_SCREEN_ROOTS = {"Hmi.Screen.Screen", "Hmi.Screen.ScreenTemplate", "Hmi.Screen.ScreenPopup",
+                        "Hmi.Screen.ScreenSlidein", "Hmi.Screen.ScreenGlobalElements", "Hmi.Screen.ScreenOverview"}
+
+
+def native_screen_name(row):
+    # Classic slide-ins have no Name; the adapter names them by their native SlideinType.
+    attrs = row.get("attributes", {})
+    return attrs.get("Name") if attrs.get("Name") is not None else attrs.get("SlideinType")
+
+
+CLASSIC_ROLE_SEGMENTS = {"screens": "Screen", "screenTemplates": "ScreenTemplate", "screenPopups": "ScreenPopup",
+                         "screenSlideins": "ScreenSlidein", "screenGlobalElements": "ScreenGlobalElements", "screenOverview": "ScreenOverview"}
+
+
+def classic_screen_type(object_path):
+    """Captured reports before screenNativeType: the adapter's role path segment fixes the native type."""
+    segments = object_path.split("/")
+    for segment in reversed(segments):
+        if segment in CLASSIC_ROLE_SEGMENTS:
+            return "Siemens.Engineering.Hmi.Screen." + CLASSIC_ROLE_SEGMENTS[segment]
+    return None
+
+
+def native_screen_for(native, family, screen_type, name):
+    matches = [row for row in native_section_entries(native, "screens", family)
+               if native_screen_name(row) == name and (screen_type is None or row.get("nativeType") == screen_type)]
+    require(len(matches) == 1, "Independent native screen is missing or ambiguous: " + str(name))
+    return matches[0]
 
 
 def native_section_entries(native, section, family):
@@ -298,7 +369,7 @@ def compare_section(native, section, family, observed):
         return {"status": "unsupported", "reason": "Classic alarm composition is not exposed by installed public API"}
     require(status == "complete", "Section cannot pass inspection accuracy with " + status + " coverage: " + section)
     def identity(row, native_row=False):
-        return (row.get("nativeType"), row.get("attributes", {}).get("Name") if native_row else row.get("name"))
+        return (row.get("nativeType"), (native_screen_name(row) if section == "screens" else row.get("attributes", {}).get("Name")) if native_row else row.get("name"))
     require(Counter(identity(row, True) for row in expected) == Counter(identity(row) for row in observed["items"]),
             "Independent native type/name inventory differs for " + section)
     # Match each native row to a distinct observation. An existential check can
@@ -383,7 +454,7 @@ def compare_screen_items(native_screen, family, observed):
         root = ET.fromstring(source.read_bytes())
         expected = []
         for item in root.iter():
-            if not item.tag.startswith("Hmi.Screen.") or item.tag == "Hmi.Screen.Screen":
+            if not item.tag.startswith("Hmi.Screen.") or item.tag in CLASSIC_SCREEN_ROOTS:
                 continue
             attrs = item.find("AttributeList")
             if attrs is None:
@@ -747,7 +818,7 @@ def reassess_captured(native, captured):
             try:
                 if inspection["section"] == "items":
                     evidence["screen"] = inspection["screen"]
-                    screen = next(p for p in native_section_entries(owner, "screens", family) if p["attributes"]["Name"] == inspection["screen"]["name"])
+                    screen = native_screen_for(owner, family, inspection.get("screenNativeType") or (classic_screen_type(inspection["screen"]["objectPath"]) if family == "classic" else None), inspection["screen"]["name"])
                     evidence["comparison"] = compare_screen_items(screen, family, inspection["result"])
                 else:
                     evidence["comparison"] = compare_section(owner, inspection["section"], family, inspection["result"])
@@ -959,10 +1030,10 @@ def qualify_bridge(args, native, report, persist):
                         if section == "screens":
                             for screen in observed["items"]:
                                 items = inspect_all(client, {"section": "items", "target": target["identity"], "screenPath": screen["identity"]["objectPath"]})
-                                item_entry = {"target": target["identity"], "section": "items", "screen": screen["identity"], "result": items}
+                                item_entry = {"target": target["identity"], "section": "items", "screen": screen["identity"], "screenNativeType": screen["nativeType"], "result": items}
                                 inspections.append(item_entry)
-                                native_screen = next(row for row in native_section_entries(native_target, "screens", expected_family) if row["attributes"]["Name"] == screen["name"])
                                 try:
+                                    native_screen = native_screen_for(native_target, expected_family, screen["nativeType"], screen["name"])
                                     item_entry["comparison"] = compare_screen_items(native_screen, expected_family, items)
                                 except Exception as error:
                                     item_entry["comparison"] = {"status": "failed", "reason": str(error)}

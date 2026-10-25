@@ -401,6 +401,40 @@ class ComponentFixtureTests(unittest.TestCase):
                         verify_preserved_installation(snapshot('before', raw), snapshot('after', after), '/caller', [])
                         self.assertEqual(raw, source.read_bytes())
 
+    def test_existing_caller_accepts_only_the_v21_following_id_shift(self):
+        import hashlib
+        from xml.dom import minidom
+        raw = (ROOT / 'fixtures/typed-graphical/native/Tgp_TemplateFC_FBD.xml').read_bytes()
+
+        def insert(shift=None, keep_first=False):
+            document = minidom.parseString(raw)
+            unit = document.getElementsByTagName('SW.Blocks.CompileUnit')[0]
+            nodes = list(document.getElementsByTagName('*'))
+            inside = [unit, *unit.getElementsByTagName('*')]
+            following = [node for node in nodes[nodes.index(unit) + len(inside):] if node.hasAttribute('ID')]
+            self.assertTrue(following, 'fixture must have IDs after its network')
+            clone = unit.cloneNode(deep=True)
+            ids = [node for node in [clone, *clone.getElementsByTagName('*')] if node.hasAttribute('ID')]
+            start = int(following[0].getAttribute('ID'), 16)
+            for offset, node in enumerate(ids): node.setAttribute('ID', format(start + offset, 'X'))
+            for node in following[1 if keep_first else 0:]:
+                node.setAttribute('ID', format(int(node.getAttribute('ID'), 16) + (shift or len(ids)), 'X'))
+            unit.parentNode.insertBefore(clone, unit.nextSibling)
+            return document.toxml(encoding=document.encoding or 'utf-8', standalone=document.standalone)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            def snapshot(name, data):
+                path = directory / (name + '.xml'); path.write_bytes(data)
+                return {'objects': {'block:/caller': {'path': '/caller', 'file': str(path), 'bytes': len(data),
+                    'sha256': hashlib.sha256(data).hexdigest(), 'payloadSha256': name}}}
+            before = snapshot('before', raw)
+            accepted = insert()
+            verify_preserved_installation(before, snapshot('accepted', accepted), '/caller', [])
+            for label, data in (('wrong shift', insert(shift=1)), ('unshifted ID', insert(keep_first=True))):
+                with self.subTest(label=label), self.assertRaises(RuntimeError):
+                    verify_preserved_installation(before, snapshot(label.replace(' ', '-'), data), '/caller', [])
+
     def test_full_caller_preservation_rejects_unrelated_changes(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary)

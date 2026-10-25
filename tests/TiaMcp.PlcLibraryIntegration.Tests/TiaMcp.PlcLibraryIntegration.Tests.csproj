@@ -5,6 +5,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcLibraryIntegrationPlanner.cs" Link="PlcLibraryIntegrationPlanner.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs" Link="LibraryDependencyCapture.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs" Link="PlcComponentCoordinator.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/PlcComponentCallerInsertion.cs" Link="PlcComponentCallerInsertion.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CompilationEvidenceRules.cs" Link="CompilationEvidenceRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcComponentContentContract.cs" Link="PlcComponentContentContract.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs" Link="PlcComponentQualificationGate.cs" />

@@ -361,10 +361,24 @@ internal static class TypedGraphicalTests
             var native = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", "Tgp_Boolean_" + language + ".xml")));
             string unchanged = native.ToString(SaveOptions.DisableFormatting);
             var model = BooleanModel(language); model.InsertAfterNetworkId = "3";
-            var error = await Check.ThrowsAsync<EngineeringBridgeException>(() => { TypedGraphical.Build(native, model, Context()); return Task.CompletedTask; });
-            Check.Equal("NativeIdPreservationUnsupported", error.Code);
-            Check.Equal(true, error.Message.Contains("8->", StringComparison.Ordinal));
+            // Observed V21 export: the inserted network takes IDs 8..C and the block title 8/9 becomes D/E.
+            // The session derives the envelope from the caller's own compile unit with its texts cleared.
+            var envelope = new XElement(native.Descendants("SW.Blocks.CompileUnit").First());
+            foreach (var text in envelope.Descendants("Text")) text.Value = "";
+            var context = Context(); context.NetworkTemplateXml = envelope.ToString(SaveOptions.DisableFormatting);
+            var inserted = TypedGraphical.Build(native, model, context);
             Check.Equal(unchanged, native.ToString(SaveOptions.DisableFormatting));
+            Check.Equal("8", inserted.NetworkId);
+            var unit = inserted.Document.Descendants("SW.Blocks.CompileUnit").Single(u => u.Attribute("ID")?.Value == "8");
+            Check.Equal("8,9,A,B,C", string.Join(",", unit.DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
+            Check.Equal(true, inserted.Effects.Any(e => e.Kind == "followingObjectIdShift" && e.Description.Contains("8->D", StringComparison.Ordinal)));
+            var restored = new XDocument(inserted.Document);
+            restored.Descendants("SW.Blocks.CompileUnit").Single(u => u.Attribute("ID")?.Value == "8").Remove();
+            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 0xD)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            Check.Equal(unchanged, restored.ToString(SaveOptions.DisableFormatting));
+            var gapped = new XDocument(native); gapped.Descendants().Attributes("ID").Last().Value = "F";
+            var error = await Check.ThrowsAsync<EngineeringBridgeException>(() => { TypedGraphical.Build(gapped, model, context); return Task.CompletedTask; });
+            Check.Equal("NativeIdPreservationUnsupported", error.Code);
         }
     }
 

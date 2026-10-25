@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.9",
+  "catalogVersion": "0.4.10",
   "targetTiaVersions": [
     21
   ],
@@ -1718,6 +1718,92 @@
         "Protected/know-how content is not covered: no protected fixture exists and creating one needs a protection password and new fixture code.",
         "Fresh reopen after recovery compares fixture blocks and library master copies, not full object content."
       ]
+    },
+    {
+      "id": "local.library_units.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "95cb81ad4bc67482bf12493b3c6e478dae5bd4f1",
+        "passedScope": "scripts/qualify_library_units.py on build a74211b (frozen D:/lcq/b9) with the registered scripts/native/LibraryUnitSeeder fixture tool: a software unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit is seeded into an owned scratch PLC; FB and UDT 1.0.0 instantiate into the unit (exactly once, unit scope; TIA does not apply the unit's namespace preset to the library instances); instantiating the FB in the PLC root as well is refused before any write because TIA allows one instance of a library type per device; a second UDT copy in the unit is refused; a PLC-wide update is refused (LibraryUpdateCleanupRisk) because the unit use has no OB-rooted reference, and no newer version is copied; a fresh reopen keeps the unit use. All retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_units.20261025.json"
+      ],
+      "limitations": [
+        "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
+        "The unit is created by a fixture tool, not by an MCP route."
+      ]
+    },
+    {
+      "id": "local.library_dependencies.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b90742e04be053597e91b41e680d8870d942fc70",
+        "passedScope": "Rerun of scripts/qualify_library_dependencies.py on build a74211b (frozen D:/lcq/b9), which adds the one-instance-per-device preview refusal and full block/type/tag-table refusal checks: nested UDT (member and array) <- FB <- FB closure against the authored graph before and after a removed reference; publishing the root carries its closure; installed exact dependency reused in the same scope; exact no-op update; refusals before mutation for a non-default older version, a reference removed by update, a downgrade below a newer project default, a same-name different-GUID and a same-name unlinked dependency; fresh reopen keeps links and default."
+      },
+      "artifacts": [
+        "evidence/local.library_dependencies.20261025.json"
+      ],
+      "limitations": [
+        "One PLC root scope; the software-unit and multi-PLC cases are separate evidence.",
+        "Siemens' version comparison covers metadata only; divergent content under an identical version GUID is not constructible through the public API."
+      ]
+    },
+    {
+      "id": "local.typed.resolution.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b83202792c33f7152525ad156794920cff471022",
+        "passedScope": "scripts/qualify_typed_resolution.py on fresh owned TIA V21 scratch projects, LAD and FBD each: standard phase (exact tag-table owner, wrong table, first/second DB owner, wrong kind, missing member, wrong type), namespace phase with UnitSeeder software units (nested UDT resolved through the declaring namespace with fully qualified references, wrong type, missing member) and stale phase (duplicate-tag setup guard, stale tag address and stale DB ambiguity with deliberate-change recovery). Positive cases passed apply/compile, complete native preservation, reopen and checkpoint recovery; negative cases returned their exact diagnostic with the complete original XML unchanged."
+      },
+      "artifacts": [
+        "evidence/local.typed.resolution.20261025.json"
+      ],
+      "limitations": [
+        "Typed operand resolution only; scoped runtime behavior is not covered.",
+        "Unqualified nested-namespace references and duplicate PLC tag names are rejected by TIA itself; see local.typed.native-boundaries.20261025."
+      ]
+    },
+    {
+      "id": "local.typed.native-boundaries.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b83202792c33f7152525ad156794920cff471022",
+        "passedScope": "Native V21 boundary observations on fresh owned scratch projects, LAD and FBD each. Duplicate tag: ResolutionSeeder creating a second PLC tag named Ready in another table is refused by Openness (PlcTagComposition.Create: an object that already exists); the table addition compiles clean and all pre-existing XML is unchanged. Unqualified nested namespace: importing TiaMcp_UnitA.Alternate.Tgp_ResolutionOuter with an unqualified Tgp_ResolutionInner member is refused by TIA (data type is unknown); the change was recovered with the original XML verified."
+      },
+      "artifacts": [
+        "evidence/local.typed.native-boundaries.20261025.json"
+      ],
+      "limitations": [
+        "These record native platform rejections, not typed ambiguity or propagation passes; the typed resolver's guards for these cases remain defensive."
+      ]
+    },
+    {
+      "id": "local.hmi.bridge.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "f685914e2cfb3c3654aac299f7dbdd75e0c4b60d",
+        "passedScope": "Production-bridge archive retrieval (project_retrieve), read-only hmi_inspect/hmi_references/hmi_capabilities and project_model Explorer integration on fresh independent seeder fixtures (two HMI owners each, protected CPUs with project users) for Classic TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, Unified MTP700 Comfort and Unified PC RT: retrieval, inspection accuracy over all six Classic screen roles, duplicate names, wrong-family/stale-target rejection, bounded inspection, save/reopen and archive-recovery equality (Classic screens matched by unique name, exports compared with only DocumentInfo/Created removed), and for Unified the integrated connection, PLC/DB declaration and screen-tag-PLC chains, scripts and alarms; owned Portal, host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.bridge.20261025.json"
+      ],
+      "limitations": [
+        "Native HMI compile fails on every profile: Classic has no configured start screen and Unified lacks the encrypted-transfer password; both need native editor work.",
+        "Classic PLC declaration mapping fails: the integrated connections exist in hardware but HmiTarget.Connections is empty and positive Classic fixtures carry no PLC-bound tags (no native-accepted Classic binding grammar).",
+        "WinCC RT Professional is in the catalog, but the PC rack's CanPlugNew refuses its application item in every slot, so no RT Professional fixture exists.",
+        "No production HMI write, interrupted write, runtime or native visual acceptance is covered."
+      ]
     }
   ],
   "features": [
@@ -2081,7 +2167,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.reliability.20261024"
+          "local.reliability.20261024",
+          "local.hmi.bridge.20261025"
         ]
       },
       "availability": {
@@ -4155,7 +4242,8 @@
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03",
-          "local.layers.units-expanded.20261008"
+          "local.layers.units-expanded.20261008",
+          "local.typed.resolution.20261025"
         ]
       },
       "availability": {
@@ -7116,7 +7204,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025). Software units and namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -7136,7 +7224,9 @@
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
-          "local.library_dmc_prerequisites.20261025"
+          "local.library_dmc_prerequisites.20261025",
+          "local.library_units.20261025",
+          "local.library_dependencies.20261025"
         ]
       },
       "availability": {
@@ -7178,7 +7268,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025). Software units and namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -7195,7 +7285,9 @@
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025"
+          "local.library_interruption.20261025",
+          "local.library_units.20261025",
+          "local.library_dependencies.20261025"
         ]
       },
       "availability": {
@@ -8435,6 +8527,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
           "Independent per-device/runtime native qualification is recorded separately in docs/verification/hmi-qualification.md.",
           "Classic alarm composition is unavailable; Classic items use retained native XML. Script bodies are read only on explicit source inspection and are never executed.",
           "Unknown/protected/missing targets and per-section bounds remain explicit; metadata is not a complete content fingerprint.",
@@ -8443,9 +8536,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "hmi.readonly.unified-comfort.20261012"
+          "local.hmi.bridge.20261025"
         ]
       },
       "availability": {
@@ -8481,15 +8574,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
           "Exact native object endpoints or native foreign-key semantics are required. Same names do not prove PLC ownership or declaration binding.",
           "Dynamic scripts, unsupported XML binding shapes, incomplete member mappings and missing native cross-reference providers remain unresolved.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "hmi.readonly.unified-comfort.20261012"
+          "local.hmi.bridge.20261025"
         ]
       },
       "availability": {
@@ -8525,15 +8619,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
           "Assembly/version evidence, bridge implementation, native qualification and current target availability are independent facts.",
           "Assembly presence does not establish a WinCC engineering license; target access/protection is operation-specific.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "hmi.readonly.unified-comfort.20261012"
+          "local.hmi.bridge.20261025"
         ]
       },
       "availability": {
@@ -8634,7 +8729,9 @@
           "typed.builders.checkpoint.20261008",
           "typed.builders.advanced-unit.20261012",
           "local.typed.runtime.20261024",
-          "local.typed.runtime.reruns.20261024"
+          "local.typed.runtime.reruns.20261024",
+          "local.typed.resolution.20261025",
+          "local.typed.native-boundaries.20261025"
         ]
       },
       "availability": {

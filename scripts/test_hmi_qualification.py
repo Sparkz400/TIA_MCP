@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import uuid
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -637,6 +638,38 @@ class HmiQualificationTests(unittest.TestCase):
         for key in ("ScreenGlobalElements", "ScreenOverview"):
             del native["sections"][key]
         self.assertEqual(len(native_section_entries(native, "screens", "classic")), 4)
+
+    def test_lifecycle_snapshot_ignores_only_unique_classic_screen_order_and_export_timestamp(self):
+        from qualify_hmi import lifecycle_snapshot
+        with tempfile.TemporaryDirectory() as directory:
+            def export(name, created, body="<Hmi.Screen.Screen ID='0'/>"):
+                path = Path(directory) / name
+                path.write_text("<Document><DocumentInfo><Created>" + created + "</Created></DocumentInfo>" + body + "</Document>", encoding="utf-8")
+                return {"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            def screen(name, created, body="<Hmi.Screen.Screen ID='0'/>"):
+                return {"nativeType": "Screen", "attributes": {"Name": name}, "export": export(uuid.uuid4().hex + ".xml", created, body)}
+            before = {"Screens": [screen("A", "2026-10-25T11:00:00Z"), screen("B", "2026-10-25T11:00:00Z")]}
+            after = {"Screens": [screen("B", "2026-10-25T11:05:00Z"), screen("A", "2026-10-25T11:05:00Z")]}
+            self.assertEqual(lifecycle_snapshot(before), lifecycle_snapshot(after))
+            changed = {"Screens": [screen("B", "2026-10-25T11:05:00Z"), screen("A", "2026-10-25T11:05:00Z", "<Hmi.Screen.Screen ID='1'/>")]}
+            self.assertNotEqual(lifecycle_snapshot(before), lifecycle_snapshot(changed))
+            duplicate = {"Screens": [screen("A", "2026-10-25T11:00:00Z"), screen("A", "2026-10-25T11:00:00Z")]}
+            reordered = {"Screens": list(reversed(duplicate["Screens"]))}
+            reordered["Screens"][0]["attributes"]["Extra"] = 1
+            self.assertNotEqual(lifecycle_snapshot(duplicate), lifecycle_snapshot(reordered))
+            self.assertNotEqual(lifecycle_snapshot({"Tags": [{"attributes": {"Name": "A"}}, {"attributes": {"Name": "B"}}]}),
+                                lifecycle_snapshot({"Tags": [{"attributes": {"Name": "B"}}, {"attributes": {"Name": "A"}}]}))
+
+    def test_classic_screen_lookup_uses_role_type_and_slidein_type(self):
+        from qualify_hmi import classic_screen_type, native_screen_for
+        native = {"sections": {"ScreenFolder": {"Screens": [{"nativeType": "Siemens.Engineering.Hmi.Screen.Screen", "attributes": {"Name": "Overview_A"}}]},
+                               "ScreenTemplateFolder": {"ScreenTemplates": [{"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenTemplate", "attributes": {"Name": "Overview_A"}}]},
+                               "ScreenSlideinFolder": {"ScreenSlideins": [{"nativeType": "Siemens.Engineering.Hmi.Screen.ScreenSlidein", "attributes": {"SlideinType": "Top"}}]}}}
+        template = classic_screen_type("/p/devices/D/items/H/hmi/H/screenTemplates/Overview_A")
+        self.assertEqual(native_screen_for(native, "classic", template, "Overview_A")["nativeType"], template)
+        self.assertEqual(native_screen_for(native, "classic", None, "Top")["attributes"]["SlideinType"], "Top")
+        with self.assertRaisesRegex(AssertionError, "ambiguous"):
+            native_screen_for(native, "classic", None, "Overview_A")
 
     def test_item_geometry_must_match_precisely(self):
         native = {"ScreenItems": [{"nativeType": "Rectangle", "attributes": {"Name": "A", "Left": 31, "Width": 120}}]}

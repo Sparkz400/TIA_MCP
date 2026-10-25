@@ -177,6 +177,11 @@ namespace TiaMcp.Openness.V21
                 ["automaticRewiringAllowed"] = false };
         }
 
+        // Every Classic screen role exports as its own owner element; only its contents are items.
+        private static readonly HashSet<string> ClassicScreenRoots = new HashSet<string>(StringComparer.Ordinal) {
+            "Hmi.Screen.Screen", "Hmi.Screen.ScreenTemplate", "Hmi.Screen.ScreenPopup", "Hmi.Screen.ScreenSlidein",
+            "Hmi.Screen.ScreenGlobalElements", "Hmi.Screen.ScreenOverview" };
+
         internal static IEnumerable<JObject> ClassicItems(XDocument document, string screenPath, string exportHash, Func<bool> take)
         {
             // Only named native HMI screen payload objects are materialized; unknown XML is retained in the artifact.
@@ -184,7 +189,7 @@ namespace TiaMcp.Openness.V21
             {
                 if (!take()) yield break;
                 string nativeType = element.Name.LocalName;
-                if (!nativeType.StartsWith("Hmi.Screen.", StringComparison.Ordinal) || nativeType == "Hmi.Screen.Screen") continue;
+                if (!nativeType.StartsWith("Hmi.Screen.", StringComparison.Ordinal) || ClassicScreenRoots.Contains(nativeType)) continue;
                 var attributes = element.Elements().FirstOrDefault(e => e.Name.LocalName == "AttributeList");
                 string name = attributes?.Elements().FirstOrDefault(e => e.Name.LocalName == "ObjectName")?.Value
                     ?? attributes?.Elements().FirstOrDefault(e => e.Name.LocalName == "Name")?.Value;
@@ -194,7 +199,7 @@ namespace TiaMcp.Openness.V21
                 var propertyPreview = attributes.Elements().Where(e => !e.HasElements).Take(129).ToList();
                 foreach (var property in propertyPreview.Take(128))
                     properties[property.Name.LocalName] = property.Value.Length <= 8192 ? property.Value : property.Value.Substring(0, 8192);
-                string parentId = element.Ancestors().FirstOrDefault(e => e.Name.LocalName.StartsWith("Hmi.Screen.", StringComparison.Ordinal) && e.Name.LocalName != "Hmi.Screen.Screen" && e.Attribute("ID") != null)?.Attribute("ID")?.Value;
+                string parentId = element.Ancestors().FirstOrDefault(e => e.Name.LocalName.StartsWith("Hmi.Screen.", StringComparison.Ordinal) && !ClassicScreenRoots.Contains(e.Name.LocalName) && e.Attribute("ID") != null)?.Attribute("ID")?.Value;
                 bool structural = nativeType == "Hmi.Screen.ScreenLayer";
                 var payloads = ClassicOwnedPayloads(element, take).Where(e => !e.HasElements &&
                     e.AncestorsAndSelf().TakeWhile(a => a != element).Take(64).Any(a => new[] { "Tag", "Connection", "Script", "Type", "Screen", "Navigation", "Event", "LinkList" }.Any(token => a.Name.LocalName.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0)))

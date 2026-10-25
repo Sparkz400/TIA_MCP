@@ -34,7 +34,8 @@ The [main TODO](../TODO.md) sets priorities; the [release ledger](release-obliga
 
 ## P2 — vendor packages, compatibility and delivery
 
-- [ ] Finalize independent vendor-intake evidence and license/prerequisite review, then qualify applicable native import/upgrade/readback for retained PracticalSeries PLC and DMC PLC/HMI distributions. Inputs and receipts (`artifacts/vendor-library-intake-20261023/`). Intake metadata does not establish native compatibility.
+- [x] Independently review vendor receipts, licenses and prerequisites. All seven retained PAL/DMC ZIPs, recorded license hashes and inner-archive hashes match. The [independent review](../verification/vendor-intake-review-20261025.md) records version-specific notices, older setup guides and the separate toolbox dependency boundary; it does not qualify additional native behavior.
+- [ ] Qualify DMC's remaining prerequisite: system and clock memory bytes on every CPU. They are outside the reviewed hardware write allowlist, so DMC FB compilation is not claimed.
 - [ ] Qualify V14–V20 upgrades into V21 on owned copies, unsupported/newer formats, complete native directories, mixed example/source packages, locked/read-only sources and preservation.
 - [ ] Test missing feature-specific remote/VM transfer and interrupted upload/reconnect with the final bundle, Unicode/space paths and machine prerequisites.
 - [ ] Measure native 10,000-element traversal, checkpoint cost, combined 100-component behavior and representative large vendor byte volumes. Managed measurements do not close native gates. [Measurement boundaries](../verification/library-scale-20261023.md).

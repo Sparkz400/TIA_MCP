@@ -40,6 +40,7 @@ internal static partial class Program
     private static JObject Report;
     private static bool PositiveFixture;
     private static bool TextListFixture;
+    private static string CurrentProfile;
     private static readonly string[] TextListInputNames = { "QualificationTextLists.hmi.yml", "QualificationTextLists.TextLibrary.hmi.yml" };
     [STAThread]
     private static int Main(string[] args)
@@ -104,6 +105,7 @@ internal static partial class Program
             foreach (var profile in profiles)
             {
                 if (requested != null && !requested.Contains(profile[0])) continue;
+                CurrentProfile = profile[0];
                 var row = new JObject { ["profile"] = profile[0], ["catalogFilter"] = profile[1], ["status"] = "unverified",
                     ["fixtureMode"] = mode, ["deliberateInvalidReferences"] = !PositiveFixture,
                     ["resourceFixture"] = TextListFixture ? "documented-bilingual-text-list" : "none",
@@ -149,6 +151,15 @@ internal static partial class Program
                         }
                     }
                     Persist();
+                    // RT Professional (run h2/s2): the PC station was created without its HMI application item.
+                    // Ask the native rack directly so its refusal or error becomes the recorded prerequisite.
+                    if (software.Count != 2)
+                    {
+                        row["applicationPlug"] = new JArray(new[] { first, second }.Select((device, index) => PlugHmiApplication(device, selected.TypeIdentifier, index + 1)));
+                        software = new[] { first, second }.SelectMany(device => Items(device.DeviceItems)).Select(item => item.GetService<SoftwareContainer>()?.Software)
+                            .Where(sw => sw != null && (sw.GetType().FullName.StartsWith("Siemens.Engineering.Hmi.") || sw.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified."))).ToList();
+                        Persist();
+                    }
                     if (software.Count != 2) { row["status"] = "blocked"; row["reason"] = "Hardware created but two HMI software objects are inaccessible; inspect softwareNull/softwareError for installation/license evidence."; continue; }
                     row["softwareTypes"] = new JArray(software.Select(sw => sw.GetType().FullName));
                     row["fixtureAuthoring"] = new JArray(software.Select(sw => Seed(sw, directory)));
@@ -199,6 +210,25 @@ internal static partial class Program
         return ((JArray)Report["profiles"]).OfType<JObject>().Any(row => row.Value<string>("status") == "failed") ? 1 : ((JArray)Report["profiles"]).OfType<JObject>().Any(row => row.Value<string>("status") == "blocked") ? 2 : 0;
     }
 
+    private static JObject PlugHmiApplication(Device device, string typeIdentifier, int index)
+    {
+        var evidence = new JObject { ["device"] = device.Name, ["typeIdentifier"] = typeIdentifier, ["attempts"] = new JArray(), ["status"] = "no-slot-accepted" };
+        foreach (HardwareObject owner in new[] { (HardwareObject)device }.Concat(Items(device.DeviceItems)))
+            for (int slot = 1; slot <= 32; slot++)
+            {
+                var attempt = new JObject { ["owner"] = owner.Name, ["slot"] = slot };
+                try
+                {
+                    if (!owner.CanPlugNew(typeIdentifier, "HMI_RT_" + index, slot)) continue;
+                    ((JArray)evidence["attempts"]).Add(attempt); attempt["canPlugNew"] = true;
+                    var created = owner.PlugNew(typeIdentifier, "HMI_RT_" + index, slot);
+                    attempt["createdName"] = created.Name; evidence["status"] = "plugged"; return evidence;
+                }
+                catch (Exception ex) { attempt["error"] = Error(ex); ((JArray)evidence["attempts"]).Add(attempt); evidence["status"] = "native-error"; return evidence; }
+            }
+        return evidence;
+    }
+
     private static JObject Seed(Software sw, string directory)
     {
         var result = new JObject { ["software"] = sw.Name, ["steps"] = new JArray() };
@@ -242,6 +272,8 @@ internal static partial class Program
             foreach (var role in new[] { new[] { "ScreenTemplateFolder", "ScreenTemplates", "Hmi.Screen.ScreenTemplate", "" }, new[] { "ScreenPopupFolder", "ScreenPopups", "Hmi.Screen.ScreenPopup", "<Width>320</Width><Height>240</Height>" } })
             {
                 var step = new JObject { ["authoredScreenInput"] = "Overview_A", ["role"] = role[0] }; ((JArray)result["steps"]).Add(step);
+                // Run h2/s1 (25 Oct 2026): this popup import terminated the native Portal on KTP700 Basic PN, so it is not authored there.
+                if (CurrentProfile == "classic-basic" && role[0] == "ScreenPopupFolder") { step["status"] = "notAuthored"; step["reason"] = "Popup import terminated the native Portal on this Basic panel profile"; continue; }
                 try
                 {
                     string file = Path.Combine(directory, "input_" + sw.Name + "_" + role[1] + ".xml");

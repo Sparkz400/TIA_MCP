@@ -254,7 +254,7 @@ def run_case(case, args, output):
         if payload["model"]["operation"] == "insertNetwork":
             assert all(instance["kind"] in {"existingGlobal", "existingMulti"} for instance in payload.get("instances", [])), "Insertion plus storage changes requires a separately captured composite preservation contract."
             assert_existing_caller_insertion(target["xml"], expected_xml, prepared["preview"]["typed"]["networkId"], payload["model"].get("insertAfterNetworkId"))
-            report["insertionPreservationContract"] = "network-only-strict-additive-v1"
+            report["insertionPreservationContract"] = "network-only-additive-following-id-shift-v2"
         oracle = adapt_reference_bindings(reference_xml, case.get("referenceBindings", []))
         assert_independent_topology(oracle, expected_xml, prepared["preview"]["typed"]["networkId"])
         report["independentNativeTopologyVerified"] = True

@@ -232,17 +232,20 @@ controller was modified.
   separately; it is **not** a successful `change_restore` qualification. Do not
   weaken the stale guard or merge these different recovery claims.
 
-### 5. Resolve the strict insertion acceptance constraint
+### 5. Existing-caller insertion
 
-- [ ] Find and independently qualify a native insertion shape that preserves
-  unrelated document IDs in both languages. Current normal block envelopes cause
-  TIA to renumber existing title IDs after insertion. Native compilation passed,
-  full preservation failed, and the original was recovered.
-- [ ] Keep `NativeIdPreservationUnsupported` for these envelopes. Terminal insertion
-  without following object IDs is pure-supported but has no qualified native
-  fixture. Do not remove comments/titles or normalize away ID differences. If native
-  export makes the requested constraint impossible, leave this acceptance criterion
-  explicitly unmet; changing that requirement needs a user decision.
+- [x] User scope decision, 25 October 2026 ([decision](insertion-id-renumbering-decision-20261025.md)):
+  the document-local IDs V21 renumbers after an inserted network count as preserved,
+  provided they rise by exactly the inserted ID count and everything else stays exact.
+- [x] The builder predicts that renumbering (the inserted unit takes the IDs of the
+  objects after it; those shift by its count) and still refuses documents whose IDs
+  are not consecutive. The qualifier accepts only that exact shift.
+- [x] Native acceptance in both languages: `typed-insert-lad` and `typed-insert-fbd`
+  passed all four engineering gates ([evidence](../verification/typed-lad-fbd-insertion-20261025.md),
+  `evidence/local.typed.insertion.20261025.json`).
+- [ ] First-network insertion into a network-free caller still refuses (native placement
+  relative to the block title is unobserved); insertion combined with storage creation
+  needs its own composite effect contract.
 
 ### 6. Complete remote deployment and release reporting
 

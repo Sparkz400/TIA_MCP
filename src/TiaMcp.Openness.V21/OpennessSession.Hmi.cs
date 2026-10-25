@@ -380,8 +380,8 @@ namespace TiaMcp.Openness.V21
                     capture.ClassicScreenScopes = scan.ClassicScreenScopes;
                     var selectedScreen = scan.Entries.SingleOrDefault(e => e.Identity.Value<string>("objectPath") == screenPath);
                     if (selectedScreen == null) throw new BridgeException("ObjectNotFound", "The exact Classic screen was not found.");
-                    var screen = selectedScreen.Native as Siemens.Engineering.Hmi.Screen.Screen;
-                    if (screen == null || selectedScreen.Row.Value<string>("screenRole") != "regular")
+                    var export = HmiClassicScreenExport(selectedScreen.Native);
+                    if (export == null)
                     {
                         if (includeScreenOwner)
                         {
@@ -392,11 +392,11 @@ namespace TiaMcp.Openness.V21
                             ["reason"] = "This Classic screen role is inventoried; its item/binding XML grammar is not qualified. Select the screens section for exact native scalar metadata." });
                         return;
                     }
-                    var file = NewInspectionArtifact(args, "hmi-screen"); screen.Export(file, ExportOptions.WithDefaults);
+                    var file = NewInspectionArtifact(args, "hmi-screen"); export(file);
                     var artifact = FileArtifact(file); capture.Artifacts.Add(artifact);
                     if (includeScreenOwner)
                     {
-                        var owner = HmiAdd(project, target, capture, screen, screenPath, screenPath.Substring(0, screenPath.LastIndexOf('/')), "hmiScreen", screen.Name);
+                        var owner = HmiAdd(project, target, capture, selectedScreen.Native, screenPath, selectedScreen.Row.Value<string>("parentPath"), "hmiScreen", selectedScreen.Row.Value<string>("name"), screenRole: selectedScreen.Row.Value<string>("screenRole"));
                         if (owner == null) return;
                         HmiAttachMetadata(owner, "behaviorCoverage", new JObject { ["status"] = "unresolved", ["sourceArtifact"] = artifact.DeepClone(),
                             ["reason"] = "Classic screen behavior XML is retained in the native export. No qualified event/script/navigation XML parser is available." }, capture);
@@ -438,7 +438,8 @@ namespace TiaMcp.Openness.V21
                     default: throw new InvalidOperationException("Unknown Classic screen scope.");
                 }
             }, (owner, collection) => (IEnumerable)((IEngineeringObject)owner).GetComposition(collection),
-                native => HmiSafeAttribute((IEngineeringObject)native, "Name"),
+                // Slide-ins have no Name; their native SlideinType (Top, Bottom, ...) is unique within the HMI.
+                native => native is Siemens.Engineering.Hmi.Screen.ScreenSlidein slidein ? slidein.SlideinType.ToString() : HmiSafeAttribute((IEngineeringObject)native, "Name"),
                 () => !capture.Budget.Truncated && capture.Budget.Take(),
                 (native, path, parent, role, name) => {
                     return HmiAdd(project, target, capture, (IEngineeringObject)native, path, parent, "hmiScreen", name,
@@ -450,6 +451,21 @@ namespace TiaMcp.Openness.V21
                 }, selectedPath: selectedPath);
             if (capture.ClassicScreenScopes.Any(s => s.Value<string>("status") == "truncated"))
             { capture.Budget.Truncated = true; capture.CandidateScopesComplete = false; }
+        }
+
+        // Every Classic screen role has its own public Export with the same SimaticML item grammar.
+        private static Action<FileInfo> HmiClassicScreenExport(object native)
+        {
+            switch (native)
+            {
+                case Siemens.Engineering.Hmi.Screen.Screen screen: return file => screen.Export(file, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Screen.ScreenTemplate template: return file => template.Export(file, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Screen.ScreenPopup popup: return file => popup.Export(file, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Screen.ScreenSlidein slidein: return file => slidein.Export(file, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Screen.ScreenGlobalElements global: return file => global.Export(file, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Screen.ScreenOverview overview: return file => overview.Export(file, ExportOptions.WithDefaults);
+                default: return null;
+            }
         }
 
         private void HmiClassicFolder(Project project, HmiDiscoveredTarget target, IEngineeringObject folder, string path, string collection, string kind, HmiCapture capture, int depth = 0)

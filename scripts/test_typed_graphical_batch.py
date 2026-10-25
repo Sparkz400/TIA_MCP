@@ -305,6 +305,24 @@ class InsertionContractTests(unittest.TestCase):
                     with self.assertRaises(AssertionError):
                         assert_existing_caller_insertion(before, ET.tostring(after, encoding="unicode"), inserted.get("ID"), anchor)
 
+    def native_shift(self, language, delta=None):
+        """V21 export shape: the inserted unit takes IDs 8..C and the block title 8/9 moves to D/E."""
+        before, after, objects, inserted, anchor = self.fixture(language)
+        ids = [node for node in inserted.iter() if node.get("ID") is not None]
+        for index, node in enumerate(ids):
+            node.set("ID", format(8 + index, "X"))
+        title = next(node for node in objects if node.get("CompositionName") == "Title")
+        for node in (node for node in title.iter() if node.get("ID") is not None):
+            node.set("ID", format(int(node.get("ID"), 16) + (len(ids) if delta is None else delta), "X"))
+        return before, ET.tostring(after, encoding="unicode"), inserted.get("ID"), anchor
+
+    def test_exact_following_id_shift_is_accepted_and_any_other_shift_fails(self):
+        for language in ("LAD", "FBD"):
+            assert_existing_caller_insertion(*self.native_shift(language))
+            for delta in (4, 6):
+                with self.subTest(language=language, delta=delta), self.assertRaises(AssertionError):
+                    assert_existing_caller_insertion(*self.native_shift(language, delta))
+
     def test_numeric_alias_wrong_placement_and_second_addition_fail(self):
         for kind in ("alias", "placement", "extra"):
             before, after, objects, inserted, anchor = self.fixture("LAD")

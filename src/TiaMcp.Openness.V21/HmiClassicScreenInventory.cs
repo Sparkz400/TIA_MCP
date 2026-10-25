@@ -10,15 +10,16 @@ namespace TiaMcp.Openness.V21
     {
         private sealed class Scope
         {
-            internal string Property, Segment, Collection, Role;
-            internal Scope(string property, string segment, string collection, string role)
-            { Property = property; Segment = segment; Collection = collection; Role = role; }
+            internal string Property, Segment, Collection, Role; internal bool Folders;
+            internal Scope(string property, string segment, string collection, string role, bool folders = true)
+            { Property = property; Segment = segment; Collection = collection; Role = role; Folders = folders; }
         }
         private static readonly Scope[] Scopes = {
             new Scope("ScreenFolder", "screens", "Screens", "regular"),
             new Scope("ScreenTemplateFolder", "screenTemplates", "ScreenTemplates", "template"),
             new Scope("ScreenPopupFolder", "screenPopups", "ScreenPopups", "popup"),
-            new Scope("ScreenSlideinFolder", "screenSlideins", "ScreenSlideins", "slideIn"),
+            // The native slide-in system folder has a fixed set of slide-ins and no Folders composition.
+            new Scope("ScreenSlideinFolder", "screenSlideins", "ScreenSlideins", "slideIn", folders: false),
             new Scope("ScreenGlobalElements", "screenGlobalElements", null, "globalElements"),
             new Scope("ScreenOverview", "screenOverview", null, "overview")
         };
@@ -103,7 +104,7 @@ namespace TiaMcp.Openness.V21
                         if (child == null) { Failed(at, new InvalidOperationException("Native screen name is missing or unreadable.")); return; }
                         Emit(item, child, at, nativeName);
                     });
-                    Each(folder, "Folders", at, child => {
+                    if (spec.Folders) Each(folder, "Folders", at, child => {
                         string nativeName = Name(child, at);
                         string childPath = HmiInspectionRules.NamedChildPath(at + "/folders", nativeName);
                         if (childPath == null) { Failed(at, new InvalidOperationException("Native screen folder name is missing or unreadable.")); return; }

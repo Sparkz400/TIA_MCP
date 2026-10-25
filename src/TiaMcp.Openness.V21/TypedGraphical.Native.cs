@@ -120,6 +120,36 @@ namespace TiaMcp.Openness.V21
             }
         }
 
+        /// <summary>V21 numbers export object IDs consecutively in document order, so an inserted network takes the IDs of the
+        /// objects after it and those shift up by its own count; that exact shift counts as preserved (scope decision of
+        /// 25 October 2026, docs/plans/insertion-id-renumbering-decision-20261025.md). Returns the inserted network's ID.</summary>
+        private static string ShiftFollowingIdsForInsertion(XDocument document, XElement target, XElement insertedUnit, NativeIds ids, List<TypedGraphicalEffect> effects)
+        {
+            var following = document.Descendants().Where(e => XNode.DocumentOrderComparer.Compare(e, target) > 0 && !e.Ancestors().Contains(target)).Attributes("ID").ToArray();
+            if (following.Length == 0) return (string)insertedUnit.Attribute("ID");
+            var existing = document.Descendants().Attributes("ID").Select(a => ParseObjectId(a.Value)).ToArray();
+            var inserted = insertedUnit.DescendantsAndSelf().Attributes("ID").ToArray();
+            if (existing.Any(value => value < 0) || existing.Where((value, index) => value != existing[0] + index).Any() || existing[existing.Length - 1] > int.MaxValue - inserted.Length)
+                Fail("NativeIdPreservationUnsupported", "Existing object IDs are not consecutive in document order, so V21's renumbering after the inserted network cannot be predicted exactly. Insertion was rejected before apply.");
+            int start = ParseObjectId(following[0].Value);
+            var remap = new Dictionary<string, string>(StringComparer.Ordinal);
+            for (int index = 0; index < inserted.Length; index++) { remap[inserted[index].Value] = (start + index).ToString("X", CultureInfo.InvariantCulture); inserted[index].Value = remap[inserted[index].Value]; }
+            var shifted = following.Select(a => { string old = a.Value; a.Value = (ParseObjectId(old) + inserted.Length).ToString("X", CultureInfo.InvariantCulture); return old + "->" + a.Value; }).ToArray();
+            foreach (var key in ids.Mapping.Keys.Where(k => k.StartsWith("object:", StringComparison.Ordinal)).ToArray())
+            { string value; if (remap.TryGetValue(ids.Mapping[key], out value)) ids.Mapping[key] = value; }
+            effects.Add(new TypedGraphicalEffect { Kind = "followingObjectIdShift", Identity = (string)insertedUnit.Attribute("ID"),
+                Description = "V21 renumbers the " + following.Length.ToString(CultureInfo.InvariantCulture) + " existing object IDs after the inserted network by +" + inserted.Length.ToString(CultureInfo.InvariantCulture)
+                    + " (" + string.Join(", ", shifted.Take(24)) + (shifted.Length > 24 ? ", ..." : "") + "); everything else is preserved exactly." });
+            return (string)insertedUnit.Attribute("ID");
+        }
+
+        private static int ParseObjectId(string value)
+        {
+            int parsed;
+            return value.Length > 0 && value.All(c => c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f')
+                && int.TryParse(value, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out parsed) && parsed >= 0 ? parsed : -1;
+        }
+
         private static void RequireInsertionIdPreservation(XDocument document, XElement block, XElement target, XElement insertedUnit)
         {
             var following = target == null
