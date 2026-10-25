@@ -131,8 +131,8 @@ def body(h):
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
 
     # Multi-resource: a project checkpoint plus a writable global library, killed during the native mutation,
-    # while compiling, and while saving the global library.
-    for stage in ("native_mutation", "compile", "save_library-"):
+    # while compiling, and while saving the project after the global library was already saved.
+    for stage in ("native_mutation", "compile", "save_project"):
         plc = h.owned_scratch("multi-resource " + stage)
         blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
         library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
@@ -191,6 +191,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "iq_", "V21 library transaction interruption: worker kill, fresh-host reconciliation, no replay, multi-resource recovery", [
-        "Four interruption points: native mutation, compile and global-library save of a multi-resource change, and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened).",
+        "Four interruption points: native mutation, compile, and project save after the global library was saved (multi-resource), and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened). The global-library save itself is too short to interrupt reliably.",
         "After the compile-stage kill the original project and library are left for inspection; only recovered copies are verified.",
         "Host-side shared admission behaviour is observed, not changed (lane E owns it)."], []).run(body)

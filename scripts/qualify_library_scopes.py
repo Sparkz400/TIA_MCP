@@ -40,7 +40,8 @@ def body(h):
     created = h.stage("create owned scratch consumer", lambda: h.tool("tia_create_scratch"))
     require(created.get("completed") is True and created["compile"]["errorCount"] == 0, "Scratch compile failed")
     first_plc = h.tool("project_inventory", {"maxItems": 1000})["plcs"][0]["path"]
-    h.apply("hardware_add", {"typeIdentifier": created["selectedCpu"]["typeIdentifier"], "deviceName": "ScratchStation2", "itemName": "ScratchPLC2"})
+    h.apply("hardware_add", {"typeIdentifier": created["selectedCpu"]["typeIdentifier"], "deviceName": "ScratchStation2", "itemName": "ScratchPLC2",
+            "configureScratchSecurity": True})  # A new S7-1500 needs its confidential-data password before it compiles.
     plcs = [p["path"] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"]]
     require(len(plcs) == 2 and first_plc in plcs, "Expected the scratch PLC and one added PLC")
     second_plc = next(p for p in plcs if p != first_plc)
