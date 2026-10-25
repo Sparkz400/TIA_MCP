@@ -45,7 +45,7 @@ internal static class UaComparisonChecks
                             i == 0 ? "boolean" : floating ? "roundTripDouble" : cycle == 2 ? "null" : "decimalInteger",
                             i == 0 ? !after : floating ? cycle == 0 ? "1E+100" : cycle == 1 ? "1E-100" : "1.25" : cycle == 2 ? null : cycle == 0 ? "18446744073709551615" : after ? "0" : "9007199254740993", null)]), BridgeProtocol.Json);
                     string? error = cycle == 2 && i == 0 ? "UaTimeout" : null;
-                    writer.Append(new(writer.Rows, "read", OpcUaCaptureContracts.SelectionId(nodes[i]), cycle, cycle * 100, cycle * 100 + i + 1, time, error is null ? read : null, error, 0));
+                    writer.Append(new(writer.Rows, "read", OpcUaCaptureContracts.SelectionId(nodes[i]), cycle, cycle * 100, cycle * 100 + i + 1 + (id == '9' && i == 1 ? 0.0001 : 0), time, error is null ? read : null, error, 0));
                 }
             writer.Append(new(writer.Rows, "gap", null, 3, 300, 500, time, null, null, 2)); writer.Finish("stopped", 501);
             return writer.Reference;
@@ -60,6 +60,13 @@ internal static class UaComparisonChecks
         Check(doc["beforeWindow"]!["fullPrefixEvidence"]!["gapRows"]!.GetValue<int>() == 1 && doc["beforeWindow"]!["selectedRowSequences"]!.AsArray().Count == 4);
         Check(!doc["beforeEvents"]!["monitoringRequested"]!.GetValue<bool>() && !doc["identicalPrefix"]!.GetValue<bool>() && !doc["sameCapture"]!.GetValue<bool>());
         Check(doc["verdict"]!.GetValue<string>() == "unresolved" && !doc["clockSynchronizationVerified"]!.GetValue<bool>());
+        var alignedRequest = request.DeepClone().AsObject(); alignedRequest["beforeAnchorSeconds"] = 0.001m; alignedRequest["afterAnchorSeconds"] = 0.101m;
+        alignedRequest["windowStartSeconds"] = 0; alignedRequest["windowEndSeconds"] = 0.001m;
+        var aligned = store.Read(Id(comparisons.Compare(before, after, alignedRequest)));
+        Check(JsonNode.DeepEquals(aligned["beforeWindow"]!["selectedRowSequences"],new JsonArray(0,1)) && JsonNode.DeepEquals(aligned["afterWindow"]!["selectedRowSequences"],new JsonArray(2,3)));
+        string fractionalCapture = Capture('9',binding,false);
+        var fractional = store.Read(Id(comparisons.Compare(fractionalCapture, after, alignedRequest)));
+        Check(JsonNode.DeepEquals(fractional["beforeWindow"]!["selectedRowSequences"],new JsonArray(0)) && fractional["signals"]![1]!["before"]!["observations"]!.GetValue<int>()==0);
         var wide = request.DeepClone().AsObject(); wide["windowEndSeconds"] = 1;
         var wider = store.Read(Id(comparisons.Compare(before, after, wide)));
         Check(wider["signals"]![0]!["before"]!["hostReadErrors"]!.GetValue<int>() == 1 && wider["signals"]![1]!["after"]!["nullValues"]!.GetValue<int>() == 1);
@@ -118,7 +125,7 @@ internal static class UaComparisonChecks
         Reject("ProgramRevisionMismatch", () => comparisons.Compare(before, changedSource, request));
         var admitted = request.DeepClone().AsObject(); admitted["allowChangedSource"] = true;
         Check(store.Read(Id(comparisons.Compare(before, changedSource, admitted)))["sourceChanged"]!.GetValue<bool>());
-        Samples = new JsonObject { ["authority"] = "syntheticManagedProducer", ["observed"] = doc, ["empty"] = blank, ["numericLimits"] = floatingDoc };
+        Samples = new JsonObject { ["authority"] = "syntheticManagedProducer", ["observed"] = doc, ["empty"] = blank, ["numericLimits"] = floatingDoc, ["aligned"] = aligned, ["fractional"] = fractional };
         Console.WriteLine($"PASS UA comparison: {checks} exact window, mapping, quality, evidence and refusal checks.");
     }
 }
