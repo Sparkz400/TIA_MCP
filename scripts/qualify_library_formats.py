@@ -102,6 +102,7 @@ def body(h):
     def locked_open():
         with ExclusiveLock(locked):
             error = h.call_error("library_open", {"request": {"path": str(locked), "expectedSha256": expected}})
+        require(error.get("code") == "SourceLocked", "Locked source was not refused as SourceLocked: %s" % error)
         require(len(h.tool("library_list")["libraries"]) == libraries_before, "A locked source was registered")
         require(tree(locked_directory) == before, "The locked source changed")
         return error
