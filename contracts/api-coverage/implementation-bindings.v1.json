@@ -92355,7 +92355,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "2a83bfb649a116c188b66d517db425dc8b1eed67d1f43ead9646f90bf1f1c43c"
+      "sha256": "853fd1043dde4943a1fa7b0c68bf9186cc24e6ea456efd4aae3090085d30bccb"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",
