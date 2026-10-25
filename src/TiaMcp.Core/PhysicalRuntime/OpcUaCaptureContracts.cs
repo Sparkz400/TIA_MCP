@@ -68,11 +68,51 @@ public static class OpcUaCaptureContracts
         if (item.Outcome != "value") Require(nullValue && item.Encoding is null && item.ErrorCode is not null);
         else
         {
-            Require(item.Quality != "Bad" && item.DataType is not null && item.ValueRank is < 0 && item.ErrorCode is null &&
-                item.Encoding is "null" or "boolean" or "decimalInteger" or "roundTripFloat" or "roundTripDouble" or "string" or "utcDateTime" or "guid" or "base64");
-            ValidateScalar(item, nullValue);
+            Require(item.Quality != "Bad" && item.DataType is not null && item.ValueRank is not null && item.ErrorCode is null);
+            if (item.Encoding == "array") ValidateArray(item);
+            else
+            {
+                Require((item.ValueRank is < 0 || item.Encoding == "null") && item.Encoding is "null" or "boolean" or "decimalInteger" or "roundTripFloat" or "roundTripDouble" or "string" or "utcDateTime" or "guid" or "base64");
+                ValidateScalar(item, nullValue);
+            }
         }
         if (item.Quality == "Bad") Require(item.Outcome == "itemError");
+    }
+    public static string? ScalarEncoding(string? type) => type switch {
+        "Boolean" => "boolean",
+        "SByte" or "Byte" or "Int16" or "UInt16" or "Int32" or "UInt32" or "Int64" or "UInt64" => "decimalInteger",
+        "Float" => "roundTripFloat", "Double" => "roundTripDouble", "String" => "string",
+        "DateTime" => "utcDateTime", "Guid" => "guid", "ByteString" => "base64", _ => null };
+    public static bool ArrayShapeMatches(int? rank, uint[]? declared, int[]? dimensions, int? count)
+    {
+        if (rank is null or < -3 or -1 or > 32 || declared is { Length: > 32 }) return false;
+        if (dimensions is null) return count is null;
+        if (dimensions.Length is < 1 or > 32 || count is null or < 0 or > 4096 ||
+            dimensions.Any(d => d is < 0 or > 4096) || rank > 0 && rank != dimensions.Length ||
+            rank == -3 && dimensions.Length != 1) return false;
+        if (declared is { Length: > 0 } && (declared.Length != dimensions.Length ||
+            declared.Where((d, i) => d != 0 && dimensions[i] > d).Any())) return false;
+        long product = dimensions.Contains(0) ? 0 : 1;
+        if (product != 0) foreach (int d in dimensions) { product *= d; if (product > 4096) return false; }
+        return product == count;
+    }
+    private static void ValidateArray(OpcUaRuntimeValue item)
+    {
+        Require(item.Value is JsonElement { ValueKind: JsonValueKind.Object });
+        var json = (JsonElement)item.Value!;
+        OpcUaRuntimeArray? array;
+        try { array = json.Deserialize<OpcUaRuntimeArray>(new JsonSerializerOptions(BridgeProtocol.Json) {
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true }); }
+        catch (JsonException) { throw new BridgeException("UaCaptureInvalid", "Invalid retained UA array."); }
+        Require(array is not null && JsonElement.DeepEquals(json, JsonSerializer.SerializeToElement(array, BridgeProtocol.Json)) &&
+            ScalarEncoding(item.BuiltInType) is { } encoding && array.ElementEncoding == encoding &&
+            ArrayShapeMatches(item.ValueRank, item.ArrayDimensions, array.Dimensions, array.Elements?.Length));
+        foreach (var element in array.Elements ?? [])
+        {
+            bool isNull = element is null || element is JsonElement { ValueKind: JsonValueKind.Null };
+            Require(!isNull || item.BuiltInType is "String" or "ByteString");
+            ValidateScalar(item with { Encoding = isNull ? "null" : array.ElementEncoding, Value = element }, isNull);
+        }
     }
     private static void ValidateScalar(OpcUaRuntimeValue item, bool nullValue)
     {

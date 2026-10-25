@@ -141,6 +141,16 @@ try {
   const scripts = (await Promise.all(['model.js','client.js'].map(n=>fs.readFile(path.join(directory,'..',n),'utf8')))).join('\n');
   const hostPage = path.join(output,'mcp-host-fixture.html');
   await fs.writeFile(hostPage,hostFixture(scripts,fixture()));
+  const compactHost = path.join(output,'mcp-compact-host-fixture.html');
+  await fs.writeFile(compactHost,hostFixture(scripts,fixture()).replace('height:100vh','height:300px').replace('<script>','<script>window.resizeApp=true;'));
+  await page.setViewportSize({width:460,height:1000}); await page.goto(pathToFileURL(compactHost).href);
+  await page.waitForFunction(()=>sizes.length>0 && document.getElementById('app').getBoundingClientRect().height>500);
+  const compactFrame=page.frameLocator('#app');
+  await compactFrame.getByRole('searchbox').fill('MotorControl'); await compactFrame.locator('[data-node="motor-a"]').click();
+  await compactFrame.getByRole('button',{name:'Send selection ↗'}).waitFor();
+  assert.ok(await compactFrame.locator('body').evaluate(body=>body.scrollWidth<=document.documentElement.clientWidth));
+  await shot('mcp-compact-host-resized');
+  check('Compact MCP host grows from 300px to fit content and supports search and exact selection without horizontal overflow');
   await page.setViewportSize({width:1440,height:1000}); await page.goto(pathToFileURL(hostPage).href); const frame=page.frameLocator('#app');await frame.locator('.project-name').waitFor();await frame.getByRole('searchbox').fill('MotorControl');await frame.locator('[data-node="motor-a"]').waitFor();await frame.locator('[data-node="motor-a"]').click();await frame.getByRole('button',{name:'Send selection ↗'}).click();await page.waitForFunction(()=>selections.length===1);const protocol=await page.evaluate(()=>({requests,selections}));assert.ok(protocol.requests.every(r=>r.name==='project_model'&&r.arguments.request));assert.ok(protocol.requests.some(r=>r.arguments.request.action==='verify'&&r.arguments.request.reference.objectPath===a.objectPath));assert.match(protocol.selections[0].content[0].text,/block:PLC_A\/Blocks\/MotorControl/);check('MCP App handshake, real host request envelope, lazy children, search, exact verify and explicit agent selection work through parent protocol');
   await frame.getByRole('tab',{name:'Relationships',exact:true}).click();await frame.locator('.edge-row').first().waitFor();
   for(const [direction,native,count] of [['outgoing','out',2],['incoming','in',1]]){await frame.locator('#relation-direction').selectOption(direction);await page.waitForFunction(([native,count])=>requests.some(r=>r.name==='project_model'&&r.arguments.request.action==='relationships'&&r.arguments.request.direction===native)&&document.getElementById('app').contentDocument.querySelectorAll('.edge-row').length===count,[native,count]);assert.equal(await frame.locator('.edge-row').count(),count);assert.equal(await page.evaluate(()=>requests.filter(r=>r.name==='project_model'&&r.arguments.request.action==='relationships').at(-1).arguments.request.direction),native);}

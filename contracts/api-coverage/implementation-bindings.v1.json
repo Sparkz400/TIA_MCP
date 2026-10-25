@@ -277,8 +277,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8740be6334f698501c2bc3920e96cdc34325277268dd6a41e1031e190595add3",
-      "bytes": 743156
+      "sha256": "70e5427f7e4f6c1f41c2f890fcfbc5041cb5b153f05643eb0cef3ee47603daea",
+      "bytes": 746107
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -432,18 +432,18 @@
     },
     {
       "path": "contracts/opcua-runtime-capture.v1.schema.json",
-      "sha256": "a7d9878bcf905abb2178e16fc8e0fe30256884bd7cc54aaf287e286f14b9dea7",
-      "bytes": 16097
+      "sha256": "aa2aca768ee9af72d65af1d65fac483d702ff7497c9103cd02d2c5de64a33c33",
+      "bytes": 17965
     },
     {
       "path": "contracts/opcua-runtime-subscription.v1.schema.json",
-      "sha256": "9916c38a3af6ac6e1d2b11edfd562c78a56c04b58b16b52314e7ec5a574bfd6a",
-      "bytes": 41415
+      "sha256": "8fde0d9f8692c5b4b6e3404d1b4199fc9807f42971faa73a13fac7e818efe1e0",
+      "bytes": 43283
     },
     {
       "path": "contracts/opcua-runtime.v1.schema.json",
-      "sha256": "e856c337b7e979faae0509e2d023f0b396263ca835e9c3f2ccd20023139f8a73",
-      "bytes": 4582
+      "sha256": "57e66b2a2a1845738ceb0600da84d914f100a989bb2f3236fd8d04fba6d1207d",
+      "bytes": 5404
     },
     {
       "path": "contracts/physical-runtime.v1.schema.json",
@@ -1262,13 +1262,13 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/OpcUaCaptureContracts.cs",
-      "sha256": "73aea4aa23a71389e00de63d4c3f12aa116b5bf70197173b11e92387f0d0cf7c",
-      "bytes": 10080
+      "sha256": "096d4caa38880e674cd8db2baef06f049de33bd7e1030a5b99c6464c765b4fb0",
+      "bytes": 12827
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-      "sha256": "ed594c19acaf3b722d7d6f7971f4c291cf6e3b0240c65c41f0c8b0c7338bb4be",
-      "bytes": 2085
+      "sha256": "aab966c9f4ec922c29dfee6f449af6497924b67108efce685dd2c9139f7ee060",
+      "bytes": 2298
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureAnalysis.cs",
@@ -1777,8 +1777,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
-      "sha256": "bd5d7344ec697c4e0666707a49b3330136ebadf29f33d36801d3cabd3551b9d1",
-      "bytes": 11733
+      "sha256": "7312d7a706e75115a43a4f838bd99fb4ccb54f024bc8cd0f4ec05bb903f28611",
+      "bytes": 11817
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
@@ -1981,14 +1981,19 @@
       "bytes": 10008
     },
     {
+      "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs",
+      "sha256": "34561b8a8b1d6228f1fec5a856267239c8e63de5ca67e1af1d13a71c522e042e",
+      "bytes": 2178
+    },
+    {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Subscriptions.cs",
       "sha256": "45434e8f49e1b1a9c649fb0e4ade8f18453c325f8b0a862a36ab49f6dcac2b4a",
       "bytes": 6690
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
-      "sha256": "340ee97eb1a33c52d6a49c24d9d9df52297a86ba8c1b93e123b5eb08cee37443",
-      "bytes": 20653
+      "sha256": "2952cd9c50513509e316ea348b8688a0b92365b80faa7edcc184873fc4a8b004",
+      "bytes": 20915
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
@@ -2002,8 +2007,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs",
-      "sha256": "90d67746d96f06ea569b859f78cb099ddbe3fe9d7278f5234a2f24fcd044081d",
-      "bytes": 10799
+      "sha256": "f5af7e50d8d73654bfb91bd490cd20f3848070d7479facd0ee059492f235e13b",
+      "bytes": 10798
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionStore.cs",
@@ -74585,6 +74590,20 @@
           "artifacts": [
             "evidence/local.typed.native-boundaries.20261025.json"
           ]
+        },
+        {
+          "id": "local.typed.insertion.20261025",
+          "profileSha256": "95b724bcd19db5af052c39e09f106f12d446d2c6de7afcec6f2f8cbd43d4bdd4",
+          "artifacts": [
+            "evidence/local.typed.insertion.20261025.json"
+          ]
+        },
+        {
+          "id": "local.typed.routes.engineering.20261025",
+          "profileSha256": "9d1d047be2574b9222baee35b55e426a8693855a1324aad8f37a6cfd0c711147",
+          "artifacts": [
+            "evidence/local.typed.routes.engineering.20261025.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -92323,6 +92342,11 @@
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
     },
     {
+      "path": "evidence/local.typed.insertion.20261025.json",
+      "state": "observed",
+      "sha256": "84e0c9b32b102424e013be03e0abc1db93d1ad1ceacbbeb1ff42a43da89543e2"
+    },
+    {
       "path": "evidence/local.typed.native-boundaries.20261025.json",
       "state": "observed",
       "sha256": "61b959b398e29ed2afdaf17eaec62ca03b92c0cff9b2ecdb51a79d26f71d3ded"
@@ -92331,6 +92355,11 @@
       "path": "evidence/local.typed.resolution.20261025.json",
       "state": "observed",
       "sha256": "359cde14b99c2a224a41887a80e42bae892536abbdc55bd5986ea6bf1184f66c"
+    },
+    {
+      "path": "evidence/local.typed.routes.engineering.20261025.json",
+      "state": "observed",
+      "sha256": "0915c51fc0bff85c435a27fe5560b9f4a81934656a3b7d951016b42aac5cd3b4"
     },
     {
       "path": "evidence/local.typed.runtime.20261024.json",
@@ -92653,12 +92682,20 @@
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
     },
     {
+      "id": "local.typed.insertion.20261025",
+      "profileSha256": "95b724bcd19db5af052c39e09f106f12d446d2c6de7afcec6f2f8cbd43d4bdd4"
+    },
+    {
       "id": "local.typed.native-boundaries.20261025",
       "profileSha256": "4579c5fd40007722a643ec63a65d918884cf28a742fc1d0da8b5d4660ce6189a"
     },
     {
       "id": "local.typed.resolution.20261025",
       "profileSha256": "a116f110a6b257a65cd0f1adddceed310f3885f31713e489a56e5f1f693caf2c"
+    },
+    {
+      "id": "local.typed.routes.engineering.20261025",
+      "profileSha256": "9d1d047be2574b9222baee35b55e426a8693855a1324aad8f37a6cfd0c711147"
     },
     {
       "id": "local.typed.runtime.20261024",

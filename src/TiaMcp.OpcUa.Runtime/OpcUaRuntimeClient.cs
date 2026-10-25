@@ -165,12 +165,15 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
             var typeNode = StatusCode.IsGood(type.StatusCode) && type.Value is NodeId dataType ? External(dataType) : null;
             int? valueRank = StatusCode.IsGood(rank.StatusCode) && rank.Value is int r ? r : null;
             var builtIn = value.WrappedValue.TypeInfo?.BuiltInType.ToString();
-            (string? encoding, object? data, string? unsupported) = valueRank is >= 0 || value.WrappedValue.TypeInfo?.ValueRank is >= 0
-                ? (null, null, "UaArrayUnsupported") : Scalar(value.Value);
+            var declaredDimensions = StatusCode.IsGood(dimensions.StatusCode) ? dimensions.Value as uint[] : null;
+            bool array = value.WrappedValue.TypeInfo?.ValueRank is >= 0 || value.Value is Matrix;
+            (string? encoding, object? data, string? unsupported) = array
+                ? ArrayValue(value.WrappedValue, valueRank, declaredDimensions) : Scalar(value.Value);
+            if (!array && valueRank is >= 0 && value.Value is not null) (encoding, data, unsupported) = (null, null, "UaArrayShapeMismatch");
             string outcome = quality == "Bad" ? "itemError" : typeNode is null || valueRank is null ? "metadataError" :
                 unsupported is not null ? "unsupported" : "value";
             return new(node, outcome, builtIn, typeNode, valueRank,
-                StatusCode.IsGood(dimensions.StatusCode) ? dimensions.Value as uint[] : null,
+                declaredDimensions,
                 $"0x{value.StatusCode.Code:x8}", quality, Time(value.SourceTimestamp), Time(value.ServerTimestamp),
                 value.SourcePicoseconds, value.ServerPicoseconds, outcome == "value" ? encoding : null,
                 outcome == "value" ? data : null, outcome == "value" ? null : unsupported ?? (outcome == "itemError" ? "UaItemBad" : "UaMetadataUnavailable"));

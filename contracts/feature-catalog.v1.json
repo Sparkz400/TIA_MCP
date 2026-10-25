@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.10",
+  "catalogVersion": "0.4.11",
   "targetTiaVersions": [
     21
   ],
@@ -1803,6 +1803,40 @@
         "Classic PLC declaration mapping fails: the integrated connections exist in hardware but HmiTarget.Connections is empty and positive Classic fixtures carry no PLC-bound tags (no native-accepted Classic binding grammar).",
         "WinCC RT Professional is in the catalog, but the PC rack's CanPlugNew refuses its application item in every slot, so no RT Professional fixture exists.",
         "No production HMI write, interrupted write, runtime or native visual acceptance is covered."
+      ]
+    },
+    {
+      "id": "local.typed.insertion.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "17a36ff3935051aae63885533e8e1941540803fc",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-lad and typed-insert-fbd on fresh owned TIA V21 scratch projects: a typed Boolean network inserted after the first network of an existing native caller (Tgp_Boolean_LAD/FBD). The builder predicted V21's renumbering (inserted unit IDs 8..C; block title IDs 8->D, 9->E). Each case passed import/compile, complete prepared XML equal to the native readback, the independent insertion contract (only following IDs shifted by exactly the inserted count; removing the unit and undoing the shift recovers the original caller exactly), untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.insertion.20261025.json"
+      ],
+      "limitations": [
+        "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
+        "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
+      ]
+    },
+    {
+      "id": "local.typed.routes.engineering.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "097ec8ee5a2559597371592a07ac52b411e23c12",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, 24 software-unit and alternate-namespace route cases from a SHA-bound baseline archive (fresh UnitSeeder seed of TiaMcp_UnitA/TiaMcp_UnitB with the TiaMcp_UnitA.Alternate namespace, retrieved into a new owned project per case): Boolean network replacement and FC/FB block creation in both routes, unit Int equality, numeric FC and FB calls with local, existing global, created multi and created global instance storage, LAD and FBD. Every case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.routes.engineering.20261025.json"
+      ],
+      "limitations": [
+        "Engineering only: no scoped runtime assertions; the runtime harness cannot yet call a software-unit DUT from the root Main OB.",
+        "Baseline archive rebuilt 25 October 2026 (artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21, sha256 39cea56a...); the 13 October archive is no longer on this PC."
       ]
     }
   ],
@@ -8731,7 +8765,9 @@
           "local.typed.runtime.20261024",
           "local.typed.runtime.reruns.20261024",
           "local.typed.resolution.20261025",
-          "local.typed.native-boundaries.20261025"
+          "local.typed.native-boundaries.20261025",
+          "local.typed.insertion.20261025",
+          "local.typed.routes.engineering.20261025"
         ]
       },
       "availability": {

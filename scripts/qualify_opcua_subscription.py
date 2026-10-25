@@ -49,7 +49,7 @@ def main():
     source_paths = [
         "scripts/qualify_opcua_subscription.py", "scripts/qualify_opcua_subscription_inputs.py", "scripts/opcua_subscription_checks.py", "scripts/opcua_runtime_checks.py", "scripts/smoke_mcp.py",
         "contracts/opcua-runtime.v1.schema.json", "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
+        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeCaptures.cs", "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/PhysicalRuntime/OpcUaCaptureContracts.cs", "contracts/opcua-runtime-subscription.v1.schema.json",
@@ -129,9 +129,10 @@ def main():
         check(fixture("audit")["audit"] == snapshot["audit"], "Status and repeated connect emit no UA service")
         call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected), code="UaEndpointSessionUnresolved")
         names = ["int64", "uint64", "double", "bool", "text", "bad", "uncertain", "missingTimes", "array", "denied", "structure", "byteArray", "byteString", "minimumDate"]
+        names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         capture = uuid.uuid4().hex
-        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=14)
+        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=len(names))
         check_unknown_subscription_inputs(c, request, fixture, out / "store", check, report.setdefault("inputGuardResponses", []))
         call(c,"subscription_start",dict(captureId=capture,request=request))
         def ended(identifier):
@@ -143,7 +144,7 @@ def main():
         status=ended(capture);snapshot_ref=status["snapshotRef"]
         page=call(c,"subscription_page",dict(snapshotRef=snapshot_ref,count=200))
         Draft202012Validator({**capture_schema,"$ref":"#/$defs/page"}).validate(page)
-        verify_subscription(page["rows"],attempt);check(True,"Independent original settings/items/sequences/value/status/time/acknowledgement oracle")
+        verify_subscription(page["rows"],attempt,len(names));check(True,"Independent original settings/items/sequences/value/status/time/acknowledgement oracle")
         check(status["recordedProgress"]["terminalReason"]=="notificationLimit" and status["recordedProgress"]["remoteCleanupConfirmed"],"Bounded samples and confirmed DeleteSubscriptions")
         exported=call(c,"subscription_export",dict(snapshotRef=snapshot_ref,format="csv"))
         def download(artifact):
@@ -181,7 +182,7 @@ def main():
         check(stopped["recordedProgress"]["terminalReason"]=="stopped","Explicit bounded stop")
         check(call(c,"disconnect",dict(attemptId=attempt))["state"]=="closed","Owned session closed after subscriptions")
         audit=fixture("audit");verify_subscription_audit(audit["audit"],healthy=True)
-        report["negativeControls"]=subscription_controls(page["rows"],attempt,audit["audit"])
+        report["negativeControls"]=subscription_controls(page["rows"],attempt,audit["audit"],len(names))
         user = dict(selected, authentication="username", user="reader", vaultName=vault)
         binding = call(c, "credential_binding", dict(selection=user))
         write(out / "binding.json", binding)

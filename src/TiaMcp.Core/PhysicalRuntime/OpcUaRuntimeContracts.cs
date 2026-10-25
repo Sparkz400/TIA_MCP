@@ -20,6 +20,8 @@ public sealed record OpcUaRuntimeValue(OpcUaRuntimeNode Node, string Outcome, st
     OpcUaRuntimeNode? DataType, int? ValueRank, uint[]? ArrayDimensions, string StatusCode, string Quality,
     DateTimeOffset? SourceTimestamp, DateTimeOffset? ServerTimestamp, ushort SourcePicoseconds,
     ushort ServerPicoseconds, string? Encoding, object? Value, string? ErrorCode);
+/// <summary>Flat row-major values with observed dimensions, separate from server-declared maxima.</summary>
+public sealed record OpcUaRuntimeArray(int[]? Dimensions, string ElementEncoding, object?[]? Elements);
 public sealed record OpcUaRuntimeReference(OpcUaRuntimeNode? Node, string NodeClass, string BrowseName,
     string? BrowseNameNamespaceUri, string DisplayName, bool IsForward, OpcUaRuntimeNode? ReferenceType,
     OpcUaRuntimeNode? TypeDefinition, string? UnsupportedReason);

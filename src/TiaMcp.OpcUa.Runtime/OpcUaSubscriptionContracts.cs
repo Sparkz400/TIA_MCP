@@ -73,7 +73,7 @@ internal static class OpcUaSubscriptionContracts
     internal static void ValidateValue(OpcUaSubscriptionPlan p, OpcUaRuntimeValue value)
     {
         Require(p.Request.Nodes.Contains(value.Node));
-        // Reuse the established strict scalar, status, type, timestamp and canonical JSON checks.
+        // Reuse the established strict value, status, type, timestamp and canonical JSON checks.
         var request = new OpcUaCaptureRequest(p.Request.AttemptId,[value.Node],100,p.Request.DurationSeconds);
         var plan = new RuntimeCapturePlan(p.CaptureId,p.HostId,p.CreatedUtc,OpcUaCaptureContracts.StorageRequest(request),[],UaContext:new(request,p.Session));
         string json = JsonSerializer.Serialize(new OpcUaRuntimeReadResult(request.AttemptId,p.CreatedUtc,p.CreatedUtc,[value]),BridgeProtocol.Json);

@@ -92,9 +92,12 @@ internal sealed partial class FixtureServer
             v.ServerTimestamp=name=="missingTimes"?DateTime.MinValue:ServerTime;
             v.SourcePicoseconds=name=="missingTimes"?(ushort)0:(ushort)12;v.ServerPicoseconds=name=="missingTimes"?(ushort)0:(ushort)34;
             if(name=="bad")v.StatusCode=StatusCodes.BadSensorFailure;
+            if(name=="badArray")v.StatusCode=StatusCodes.BadSensorFailure;
+            if(name=="uncertainArray")v.StatusCode=StatusCodes.UncertainInitialValue;
             if(name=="uncertain")v.StatusCode=StatusCodes.UncertainInitialValue;
             if(name=="denied")v.StatusCode=StatusCodes.BadUserAccessDenied;
             if(name=="byteArray")v.WrappedValue=new Variant(new byte[]{1,2,3},new TypeInfo(BuiltInType.Byte,ValueRanks.OneDimension));
+            if(name=="nullArray")v.WrappedValue=new Variant(null,new TypeInfo(BuiltInType.Int32,ValueRanks.OneDimension));
             if(Mode=="subscriptionOverflow")v.StatusCode=new StatusCode(v.StatusCode.Code|0x00000480u);
             if(Mode=="secretEcho" && name=="text")v.Value="prefix fixture-only-secret suffix";
         }

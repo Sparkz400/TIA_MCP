@@ -1,11 +1,11 @@
 {
   "schemaVersion": "project-explorer-bundle.v1",
-  "generatedAtUtc": "2026-10-24T13:37:28.617Z",
+  "generatedAtUtc": "2026-10-25T14:38:24.725Z",
   "entryPoint": "index.html",
   "snapshotId": null,
   "networkRequired": false,
-  "bytes": 152321,
-  "sha256": "6abbac6a787c8c64d89a387aa0c073bafa991a249021d0a20d5fa448f5869cfb",
+  "bytes": 153129,
+  "sha256": "e17e1abfce52ea688f98f7dd42da2e15938f0123cec5e8cf85967f5ac1c48356",
   "assets": [
     {
       "path": "index.template.html",
@@ -24,8 +24,8 @@
     },
     {
       "path": "client.js",
-      "bytes": 16008,
-      "sha256": "0457462444ece4255177c42a569284babc41caf777eb6f592ebaa8b21e578506"
+      "bytes": 16816,
+      "sha256": "7bc0f2373df69470a75a1371aea699f02addf9e834e09e852b282d5b1be61370"
     },
     {
       "path": "explorer.js",

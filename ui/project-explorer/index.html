@@ -466,10 +466,10 @@
   async function connectMcpHost({ onResult = () => {}, onContext = () => {}, onDisconnect = () => {}, windowObject = globalThis, timeoutMs = 10000 } = {}) {
     const win = windowObject, parent = win.parent;
     if (!parent || parent === win) M.fail('host_unsupported', 'MCP Apps requires an embedding host.');
-    let sequence = 0, origin = null, initialized = false, closed = false; const pending = new Map(), notifications = [];
+    let sequence = 0, origin = null, initialized = false, closed = false, resizeObserver, resizeTimer, lastSize; const pending = new Map(), notifications = [];
     const prefix = 'tia-explorer-' + Math.random().toString(36).slice(2) + '-';
     const send = message => parent.postMessage(message, origin && origin !== 'null' ? origin : '*');
-    function close(reason) { if (closed) return; closed = true; win.removeEventListener('message', listener); for (const entry of pending.values()) { clearTimeout(entry.timer); entry.reject(Object.assign(new Error(reason), { code: 'session_lost' })); } pending.clear(); onDisconnect(reason); }
+    function close(reason) { if (closed) return; closed = true; resizeObserver?.disconnect(); clearTimeout(resizeTimer); win.removeEventListener('message', listener); for (const entry of pending.values()) { clearTimeout(entry.timer); entry.reject(Object.assign(new Error(reason), { code: 'session_lost' })); } pending.clear(); onDisconnect(reason); }
     function request(method, params, timeout = 120000) {
       if (closed) return Promise.reject(Object.assign(new Error('MCP host session ended.'), { code: 'session_lost' }));
       if (!['ui/initialize', 'tools/call', 'ui/message'].includes(method)) M.fail('read_only', 'Protocol operation is not allowed.');
@@ -508,6 +508,21 @@
         async sendSelection(ref) { const response = await request('ui/message', { role: 'user', content: [{ type: 'text', text: 'Inspect this exact project object. Re-resolve before a fresh read or prepared change.\n' + JSON.stringify(ref) }] }); if (response?.isError) M.fail('host_rejected', 'Host rejected selection.'); }
       };
       send({ jsonrpc: '2.0', method: 'ui/notifications/initialized', params: {} });
+      if (win.ResizeObserver && win.document?.body) {
+        resizeObserver = new win.ResizeObserver(() => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            if (closed) return;
+            const width = win.document.documentElement.clientWidth, height = Math.ceil(win.document.body.getBoundingClientRect().height);
+            const size = width + ':' + height;
+            if (width > 0 && height > 0 && size !== lastSize) {
+              lastSize = size;
+              send({ jsonrpc: '2.0', method: 'ui/notifications/size-changed', params: { width, height } });
+            }
+          }, 0);
+        });
+        resizeObserver.observe(win.document.body);
+      }
       // Return before processing tool results so the caller can bind its transport.
       setTimeout(() => { transportReady = true; for (const notification of notifications.splice(0)) Promise.resolve(onResult(notification)).catch(onDisconnect); }, 0);
       return transport;
