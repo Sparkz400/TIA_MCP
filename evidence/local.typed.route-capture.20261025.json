@@ -1,0 +1,99 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-capture.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T16:38:59+00:00",
+  "source": {
+    "commit": "f267de5bc0d1bafb8a79367d5d527777e66d0fc1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py: 41 independently authored native reference inputs (3 prerequisites in route-capture-prerequisites.v1.json: TgpUnit_GlobalTimer SCL storage and the TgpNamespace_TemplateFB_LAD/FBD native exports; then all 38 inputs of route-capture-packet.v1.json) imported one at a time into one owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...). Each input compiled clean, saved, added exactly its declared blocks (48 in total) and left every existing native object's XML unchanged; the final saved snapshot matched a fresh-process reopen; both owned TIA lifetimes cleaned up with Host exit 0.",
+  "limitations": [
+    "Native reference capture only: no typed builder, profile activation, changed-state recovery or runtime is established.",
+    "The 80 pending route cells and inactive profile candidates still need extraction, review and builder qualification."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "43d68fb04de18d9061cf718500449a8d968b325fec84bed4422092e8a29e40b0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "fd0f1fab2c7730a331582f8460f637329e2d43d2e125a3182f08e135405ffc06"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-capture.json",
+      "sha256": "895318ed928db53141666754da28685d081eb671535c255428a8da0d391a5ba5",
+      "bytes": 458543,
+      "completed": true,
+      "steps": [
+        "route-Unit-global-timer-storage.scl: captured",
+        "TgpNamespace_TemplateFB_LAD.xml: captured",
+        "TgpNamespace_TemplateFB_FBD.xml: captured",
+        "route-Namespace-advanced-callees.scl: captured",
+        "route-Namespace-qualified-storage.scl: captured",
+        "route-Namespace-qualified-numeric-fc-lad.s7dcl: captured",
+        "route-Namespace-qualified-numeric-fc-fbd.s7dcl: captured",
+        "route-Namespace-qualified-numeric-fb-lad.s7dcl: captured",
+        "route-Namespace-qualified-numeric-fb-fbd.s7dcl: captured",
+        "route-Namespace-qualified-numeric-fb-global-lad.s7dcl: captured",
+        "route-Namespace-qualified-numeric-fb-global-fbd.s7dcl: captured",
+        "route-Namespace-qualified-eq-lad.s7dcl: captured",
+        "route-Namespace-qualified-eq-fbd.s7dcl: captured",
+        "route-Unit-native-ton-lad.xml: captured",
+        "route-Unit-native-ton-fbd.xml: captured",
+        "route-Unit-native-ton-global-lad.xml: captured",
+        "route-Unit-native-ton-global-fbd.xml: captured",
+        "route-Namespace-native-ton-lad.xml: captured",
+        "route-Namespace-native-ton-fbd.xml: captured",
+        "route-Namespace-native-ton-global-lad.xml: captured",
+        "route-Namespace-native-ton-global-fbd.xml: captured",
+        "route-Unit-qualified-ne-lad.s7dcl: captured",
+        "route-Unit-qualified-ne-fbd.s7dcl: captured",
+        "route-Unit-qualified-lt-lad.s7dcl: captured",
+        "route-Unit-qualified-lt-fbd.s7dcl: captured",
+        "route-Unit-qualified-le-lad.s7dcl: captured",
+        "route-Unit-qualified-le-fbd.s7dcl: captured",
+        "route-Unit-qualified-gt-lad.s7dcl: captured",
+        "route-Unit-qualified-gt-fbd.s7dcl: captured",
+        "route-Unit-qualified-ge-lad.s7dcl: captured",
+        "route-Unit-qualified-ge-fbd.s7dcl: captured",
+        "route-Namespace-qualified-ne-lad.s7dcl: captured",
+        "route-Namespace-qualified-ne-fbd.s7dcl: captured",
+        "route-Namespace-qualified-lt-lad.s7dcl: captured",
+        "route-Namespace-qualified-lt-fbd.s7dcl: captured",
+        "route-Namespace-qualified-le-lad.s7dcl: captured",
+        "route-Namespace-qualified-le-fbd.s7dcl: captured",
+        "route-Namespace-qualified-gt-lad.s7dcl: captured",
+        "route-Namespace-qualified-gt-fbd.s7dcl: captured",
+        "route-Namespace-qualified-ge-lad.s7dcl: captured",
+        "route-Namespace-qualified-ge-fbd.s7dcl: captured",
+        "saved reopen: verified"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
