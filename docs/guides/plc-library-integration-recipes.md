@@ -167,7 +167,10 @@ The current fixture requests a new standalone FC and retains a separate pre-exis
 Keep the native artifact root short for Siemens archive/project path limits. `--caller-mode existing`
 first creates the fixture caller FC from the same source, then inserts the component call after its
 network. The qualifier's caller comparison reverses exactly the following-ID shift and requires the
-native `callerInsertion` proof. Before the scope decision, the first native run stopped at this boundary:
+native `callerInsertion` proof. This mode passed natively for an existing FBD FC caller
+([existing-caller installation](../verification/component-existing-caller-20261025.md)). Use a Debug
+worker build (registered in the Openness allow-list by its post-build step); an unregistered Release
+worker makes TIA wait on its access prompt. Before the scope decision, the first native run stopped at this boundary:
 FB/UDT authoring, dependency/archive validation and consumer staging succeeded,
 then following native title IDs blocked insertion before import. Both owned
 sessions exited cleanly. Combined installation remains unqualified; see the

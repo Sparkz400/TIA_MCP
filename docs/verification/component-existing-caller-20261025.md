@@ -5,9 +5,13 @@ caller, under the [insertion-ID scope decision](../plans/insertion-id-renumberin
 Offline support merged in Sparkz400/TIA_MCP#52, building on lane A's typed prediction
 (Sparkz400/TIA_MCP#50).
 
-**Status: not natively qualified.** No run has yet completed installation. Native
-runs found three defects, all fixed. The last three attempts then hung while TIA
-Portal started, after WinCC Professional was installed without a reboot.
+**Status: passed** in run b07 (`local.plc_component.existing_caller.20261025`,
+source 13b9427). The installation passed full compile and save, complete
+preservation, fresh reopen and first-checkpoint recovery. V21 renumbered exactly
+as predicted: the inserted network took ID `8` and the following block-title IDs
+moved `8→D` and `9→E` (+5). Reversing that one shift recovered the original caller
+exactly, both in the native `callerInsertion` proof and in the qualifier.
+Earlier runs found three defects, all fixed before b07.
 
 ## Runs
 
@@ -22,6 +26,13 @@ ignored `artifacts/` trees of the short worktrees `D:/tbb` … `D:/tbe`.
 | b03 | `tia_start` | Portal did not answer within 600 s. Nothing created. |
 | b04 | Reviewed typed apply | Coordinator rejected its own journal (`ComponentJournalInvalid`): a native timestamp `…22.8245720Z` was reparsed as `DateTime` and reserialized as `…824572Z`. Nothing dispatched. |
 | b05, b06 | `tia_start` | Portal did not answer within 600 s. The harness retained the owned worker/Portal (no automatic termination); they were stopped by exact PID after verifying image paths. Nothing created. |
+| b07 | Complete sequence | **Passed.** Debug build in `D:/tbf`, registered by the project's post-build allow-list step. |
+
+**Why b03, b05 and b06 hung:** these runs used Release worker builds. Only Debug
+builds register themselves in the Openness allow-list
+(`scripts/Register-DevOpennessWorker.ps1`), so TIA waited on its access prompt.
+`D:/tbe`, used by b05 and b06, never got an entry. Use a Debug build, or register
+the Release worker, before a native run.
 
 No run replayed a mutation. Every failure stopped before the next native mutation boundary.
 
@@ -40,9 +51,9 @@ No run replayed a mutation. Every failure stopped before the next native mutatio
 
 ## Still open
 
-- **Native acceptance:** one existing-caller run through installation, preservation
-  (reversed following-ID shift), save/fresh reopen and first-checkpoint recovery.
-  Blocked until the PC is restarted after the WinCC Professional installation.
+- **Other callers:** only an existing FBD FC, inserting after its last network, is
+  qualified. LAD, FB and multi-network placements have no native run; OB callers are refused.
+- **Runtime:** the existing caller is not called from an OB in b07.
 - `LibraryJournalStore.Read` (library change journal, lanes C/E) parses dates the same
   way and can hit the same hash mismatch.
 - Production combined `library_integrate` apply and OB insertion stay disabled.

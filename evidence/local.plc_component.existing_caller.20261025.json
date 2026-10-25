@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plc_component.existing_caller.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T20:07:39+00:00",
+  "source": {
+    "commit": "13b9427b32a0ae7e8d0fc26a0a48c4d02cc622f8",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_plc_component.py --run-native --caller-mode existing (author_new_source, run b07): fresh owned de-DE scratch authors and releases TiaMcpComponentState UDT and TiaMcpComponentGate FB 1.0.0; a fresh consumer first creates the existing FBD FC TiaMcpComponentCaller (one network, block title after it) and an unrelated peer FC, then imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 from the captured storage profile and inserts the component call network after caller network 3 (typed insertNetwork). V21 renumbering matched the prediction exactly: inserted network 8, following block-title IDs 8->D and 9->E (+5); the native callerInsertion proof and the qualifier both reverse that one shift and recover the original caller exactly. Full compile and save, complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, first-import-checkpoint retrieval to a new location equal to the baseline and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2.",
+  "limitations": [
+    "Qualification-only route; production combined library_integrate apply stays disabled.",
+    "Existing FBD FC caller only, inserting after its last network; LAD, FB and OB callers are not qualified (OB callers are refused).",
+    "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
+    "Storage is the captured component04 profile; no other FB layouts.",
+    "Runtime not exercised: the caller is not called from an OB in this run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c79fde7069f06348d05f1869d761c21ce53cd25d0a700330a4e227df2e3500f6"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "2e0ed9b4f0f0dd2b33d296cafcf2691f3f09effa65f3b2c8bb07e76507f26e41"
+    }
+  ],
+  "runs": [
+    {
+      "report": "component-existing-caller-b07.json",
+      "sha256": "7e3bb4789c865effd67605cfd35a1204351358655964e6b040687ca931945ca0",
+      "bytes": 3258,
+      "completed": true,
+      "steps": [
+        "author_new_source: explicitSourceAttributesVerified=True",
+        "author_new_source: sourceContentPolicyVerified=True",
+        "author_new_source: preservationVerified=True",
+        "author_new_source: freshReopenVerified=True",
+        "author_new_source: firstCheckpointRecoveryVerified=True",
+        "author_new_source: runtimeVerified=False",
+        "author_new_source: callerInsertion={\"insertAfterNetworkId\":\"3\",\"insertedNetworkId\":\"8\",\"insertedObjectIds\":5,\"policy\":\"insertion-following-id-shift-v1\",\"shiftedObjectIds\":[\"8->D\",\"9->E\"],\"verified\":true}",
+        "author_new_source: component_window_begin=reserved",
+        "author_new_source: component_window_start=library_prepared",
+        "author_new_source: observation=library_prepared",
+        "author_new_source: step_reviewed=prepared",
+        "author_new_source: response=library_applied",
+        "author_new_source: observation=library_applied",
+        "author_new_source: response=import_verified",
+        "author_new_source: observation=import_verified",
+        "author_new_source: response=graphical_prepared",
+        "author_new_source: observation=graphical_prepared",
+        "author_new_source: step_reviewed=prepared",
+        "author_new_source: response=graphical_applied",
+        "author_new_source: observation=graphical_applied",
+        "author_new_source: response=installation_verified",
+        "author_new_source: observation=installation_verified",
+        "author_new_source: component_window_owner-resume=installation_verified",
+        "author_new_source: component_window_owner-resume=active",
+        "author_new_source: component_window_recover=restored_to_new_locations",
+        "author_new_source: initial_checkpoint_restore_result=restored_to_new_locations",
+        "author_new_source: component_window_owner-resume=installation_verified",
+        "author_new_source: component_window_complete=released"
+      ],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}
