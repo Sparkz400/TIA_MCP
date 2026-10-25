@@ -2187,8 +2187,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryJournalStore.cs",
-      "sha256": "e3081f72f6ea386f0484496236d274cd805ac8e816c6f6ea3e49337c0d724dc8",
-      "bytes": 2967
+      "sha256": "1801615a807ab62fa42541caae23f37cbb30abcc1370019d89dea8ca94945636",
+      "bytes": 3245
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryReferenceReachability.cs",
