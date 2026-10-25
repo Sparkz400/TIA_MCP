@@ -69,8 +69,8 @@ consume it only after it is merged, and never edit it themselves.
 
 ## External blockers (user)
 
-- Vendor packages (PracticalSeries at its pinned commit, 124 MB DMC): download
-  approval. This unblocks the vendor intake review and the two vendor distributions.
+- Vendor packages: no longer blocked. They were downloaded on 24 October and qualified on 25 October;
+  the open review and DMC system/clock-memory items are in the [TODO](../TODO.md#resume-and-integration).
 - VMware guest: VM deployment qualification, the open dispatch ticket, transfer checks.
 - HMI targets and licenses (e.g. RT Professional), plus a clean Classic fixture
   with a valid start screen.
