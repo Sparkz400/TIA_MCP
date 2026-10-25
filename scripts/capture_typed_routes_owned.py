@@ -21,6 +21,7 @@ from smoke_mcp import ROOT
 from typed_graphical_owned_session import TypedOwnedSession
 from compilation_evidence import require_clean_compile
 from engineering_preservation import PAYLOAD_HASH_POLICY
+from typed_graphical_native_expectations import adapt_reference_culture, project_culture
 
 
 def authored_reference(path, unit):
@@ -79,7 +80,8 @@ def capture(args):
         "payloadHashPolicy": PAYLOAD_HASH_POLICY}
     harness_paths = [pathlib.Path(__file__).resolve(), pathlib.Path(__file__).with_name("typed_graphical_owned_session.py").resolve(),
         pathlib.Path(__file__).with_name("qualification_owned_scratch.py").resolve(),
-        pathlib.Path(__file__).with_name("engineering_preservation.py").resolve()]
+        pathlib.Path(__file__).with_name("engineering_preservation.py").resolve(),
+        pathlib.Path(__file__).with_name("typed_graphical_native_expectations.py").resolve()]
     report["harnessFiles"] = [{"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()} for path in harness_paths]
     stop = StopRequest(args.stop_file or output / "stop-request.json")
     def persist():
@@ -101,7 +103,12 @@ def capture(args):
         units = [row for row in report["inventory"]["softwareScopes"] if row["kind"] == "softwareUnit" and row["name"] == args.unit]
         require(len(units) == 1, "Exact software-unit selection is missing or ambiguous.")
         scope = units[0]["path"]
+        # Native XML inputs were derived in a de-DE project; only empty text items follow the observed project culture.
+        report["projectCulture"] = project_culture(session.invoke("block_read", {"blockName": "Main"})["xml"])
         for ordinal, (entry, kind, payload) in enumerate(specifications):
+            if kind == "block_import_xml":
+                xml, entry["cultureItemsRetargeted"] = adapt_reference_culture(payload["xml"], report["projectCulture"])
+                payload = {**payload, "xml": xml}
             if stop():
                 report["status"] = "stopped_by_request"
                 break
