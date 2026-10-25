@@ -1,0 +1,35 @@
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the [documentation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/README.md) and [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md) first.
+        Security issue? Report it [privately](https://github.com/Sparkz400/TIA_MCP/security/advisories/new) instead.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to do, and where are you stuck?
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you tried
+      description: Commands, MCP arguments or docs you followed, and what happened.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      value: |
+        - TIA MCP commit or release:
+        - TIA Portal / PLCSIM version:
+        - Windows:
+        - MCP client:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: This post contains no credentials, customer project data or Siemens binaries.
+          required: true
