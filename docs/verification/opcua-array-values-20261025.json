@@ -4,27 +4,27 @@
   "baseCommit": "7b3d27b04d014c090035770d164bebdad964a7d6",
   "scope": "Read-only OPC UA arrays and matrices; no TIA, Siemens CPU or physical-device qualification.",
   "sourceSha256": {
-    "contracts/opcua-runtime-capture.v1.schema.json": "3cc9d86d84b14648f754e64fa0f1c33ecf1ee24cea211bbe1646c9e026fa7a28",
-    "contracts/opcua-runtime-subscription.v1.schema.json": "5e37ba5c4d02a6fd10d3ea8ebb91e728825f1f9050c471794833a3df5abad680",
-    "contracts/opcua-runtime.v1.schema.json": "764f483d2e2051684b4deb45b971819234712667deb5575db5a5bc5e58cc3765",
+    "contracts/opcua-runtime-capture.v1.schema.json": "aa2aca768ee9af72d65af1d65fac483d702ff7497c9103cd02d2c5de64a33c33",
+    "contracts/opcua-runtime-subscription.v1.schema.json": "8fde0d9f8692c5b4b6e3404d1b4199fc9807f42971faa73a13fac7e818efe1e0",
+    "contracts/opcua-runtime.v1.schema.json": "57e66b2a2a1845738ceb0600da84d914f100a989bb2f3236fd8d04fba6d1207d",
     "scripts/opcua_runtime_checks.py": "95e3f0465aee0d12eae3bb4cfb5a05ed3387e28890c5b933cfada13ab51b68ba",
-    "scripts/opcua_subscription_checks.py": "5aef285238ee3238f13d3f056fe5ae80a101931a320cb697ab275327f84dc6fc",
+    "scripts/opcua_subscription_checks.py": "f74a62cc0182056c0bdab03e7fd4ba3ae58737b724ff5e1870841862e012ab2c",
     "scripts/qualify_opcua_capture.py": "e2bd5c4b17b88c5e92bcd088d4fea9c5c6e15fef002ad423d77b62be04a39f0c",
     "scripts/qualify_opcua_runtime.py": "8b733c73d33e60f4329de1d43779a4c659690b16587bd8726c62da7326e3125c",
     "scripts/qualify_opcua_subscription.py": "898bec14742ace6b9d984f7f406f3cf4f438f560e81a2c56db5916bc43c04185",
-    "scripts/test_opcua_subscription_contract.py": "cd9a9c9ae2f83d1138c733574552b0ee249f0f7d21714a1aab50b7a5668b0f61",
+    "scripts/test_opcua_subscription_contract.py": "75bf65c74aacf651a058e6052e623efac16930ce7604004db752c2be5b4fe7a5",
     "src/TiaMcp.Core/PhysicalRuntime/OpcUaCaptureContracts.cs": "096d4caa38880e674cd8db2baef06f049de33bd7e1030a5b99c6464c765b4fb0",
     "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs": "aab966c9f4ec922c29dfee6f449af6497924b67108efce685dd2c9139f7ee060",
-    "src/TiaMcp.Host/OpcUaRuntimeTools.cs": "b24b52a77b897dde1fceb1f77326810bcbb6e3db6cfc11d4f93893634281f2a1",
+    "src/TiaMcp.Host/OpcUaRuntimeTools.cs": "7312d7a706e75115a43a4f838bd99fb4ccb54f024bc8cd0f4ec05bb903f28611",
     "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs": "2952cd9c50513509e316ea348b8688a0b92365b80faa7edcc184873fc4a8b004",
-    "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs": "1b044156cab1913f60f1aebfd096fc13ebc009171006814386ad62df9ceffacb",
-    "tests/TiaMcp.OpcUa.Runtime.Tests/CaptureChecks.cs": "5aebf9190918d6b34a9fa273c4865615b25fedd687cd7b100527e461768e6801",
+    "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs": "f5af7e50d8d73654bfb91bd490cd20f3848070d7479facd0ee059492f235e13b",
+    "tests/TiaMcp.OpcUa.Runtime.Tests/CaptureChecks.cs": "d3535c11cfc7cea048d578f88af5d935604b847a11cd41fb085455236e78277f",
     "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs": "5c86fadf4e1dd29b36b6e3acc1df146a021ea57fd123c543d5eb3798cec12d41",
     "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.cs": "eeb37727ef557d7fbfd95f4181a9ad07bbe3e5749a8597822c770848044f87ba",
-    "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs": "cd2c740a38924590049506f8d38f0f3599529baf6810a8ee96bd8559cf310566",
-    "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionChecks.cs": "47140750fc81d2c2c2aca6f1d17dbed4024cea1fc6e1698bad24f42b4f067da5",
+    "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs": "0945bc28dfa2d76efea632798d8ec72c38b417c36c7f6bf3b268384d83372ac5",
+    "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionChecks.cs": "011483f2c8aa2df2c5cd46d794eb7afe9d4236c03ce13312071638ae7b093332",
     "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs": "34561b8a8b1d6228f1fec5a856267239c8e63de5ca67e1af1d13a71c522e042e",
-    "tests/TiaMcp.OpcUa.Runtime.Tests/ArrayValueChecks.cs": "68872576efc005898d46154ce639c850e47a620fe8f4208728c63e27cfee5e68"
+    "tests/TiaMcp.OpcUa.Runtime.Tests/ArrayValueChecks.cs": "52960998ca40a52ad564b98d4b21786c043650f4b65d16d2e875f9de87281994"
   },
   "validation": {
     "runtimeChecks": 600,
@@ -43,5 +43,6 @@
     "maximumRank": 32,
     "maximumObservedDimension": 4096,
     "outputBytes": 1048576
-  }
+  },
+  "sourceHashScope": "Checkout-stable LF source; original tested source bytes are retained under validated-source with the local binary receipts."
 }
