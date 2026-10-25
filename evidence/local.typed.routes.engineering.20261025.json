@@ -1,0 +1,83 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.routes.engineering.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T13:00:05+00:00",
+  "source": {
+    "commit": "097ec8ee5a2559597371592a07ac52b411e23c12",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py, engineering-only, 24 software-unit and alternate-namespace route cases from a SHA-bound baseline archive (fresh UnitSeeder seed of TiaMcp_UnitA/TiaMcp_UnitB with the TiaMcp_UnitA.Alternate namespace, retrieved into a new owned project per case): Boolean network replacement and FC/FB block creation in both routes, unit Int equality, numeric FC and FB calls with local, existing global, created multi and created global instance storage, LAD and FBD. Every case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Engineering only: no scoped runtime assertions; the runtime harness cannot yet call a software-unit DUT from the root Main OB.",
+    "Baseline archive rebuilt 25 October 2026 (artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21, sha256 39cea56a...); the 13 October archive is no longer on this PC."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "57a5d9c10323a3b277ecd3fa2ac25fb613b54c224422f347d04226185360c968"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b6ce64acce234679e9fb3504f3769fff603fbd3671cdf4360ac01b48c075350"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-route.json",
+      "sha256": "41e7706b125a6baf71c91389102aaacc84ce72b013e3e1e447dbed65d6b7ee41",
+      "bytes": 191463,
+      "completed": true,
+      "steps": [
+        "typed-namespace-fbd: passed",
+        "typed-namespace-fbd-create-fb: passed",
+        "typed-namespace-fbd-create-fc: passed",
+        "typed-namespace-lad: passed",
+        "typed-namespace-lad-create-fb: passed",
+        "typed-namespace-lad-create-fc: passed",
+        "typed-unit-eq-fbd: passed",
+        "typed-unit-eq-lad: passed",
+        "typed-unit-fbd: passed",
+        "typed-unit-fbd-create-fb: passed",
+        "typed-unit-fbd-create-fc: passed",
+        "typed-unit-lad: passed",
+        "typed-unit-lad-create-fb: passed",
+        "typed-unit-lad-create-fc: passed",
+        "typed-unit-numeric-fb-fbd: passed",
+        "typed-unit-numeric-fb-fbd-createglobal: passed",
+        "typed-unit-numeric-fb-fbd-createmulti: passed",
+        "typed-unit-numeric-fb-fbd-global: passed",
+        "typed-unit-numeric-fb-lad: passed",
+        "typed-unit-numeric-fb-lad-createglobal: passed",
+        "typed-unit-numeric-fb-lad-createmulti: passed",
+        "typed-unit-numeric-fb-lad-global: passed",
+        "typed-unit-numeric-fc-fbd: passed",
+        "typed-unit-numeric-fc-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

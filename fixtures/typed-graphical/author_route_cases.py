@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-ARCHIVE = "artifacts/changes/change-67bbbd56c474486d8c25150e9354d695/before.zap21"
-ARCHIVE_SHA256 = "b67df643e6b13f6506880f2b50cb47b20eebb2d66950a788ce6accd752eee2f8"
+ARCHIVE = "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21"
+ARCHIVE_SHA256 = "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
 
 
 def main():

@@ -847,8 +847,8 @@
     },
     {
       "path": "src/TiaMcp.Core/BridgeClient.cs",
-      "sha256": "9b0ecb9ceeada778d2ba99a5278bcd5d723a01994b4aad5115acb45fb85fdf99",
-      "bytes": 9404
+      "sha256": "317ff4210817914a19c1c5724c6682b8d6524f3a9e7d281239cd7d75539bd120",
+      "bytes": 9536
     },
     {
       "path": "src/TiaMcp.Core/BridgeProtocol.cs",
@@ -13848,8 +13848,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -30066,8 +30066,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -31703,8 +31703,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -31785,8 +31785,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -31999,8 +31999,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -32505,8 +32505,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -32956,8 +32956,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -33537,8 +33537,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -33614,8 +33614,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -34968,8 +34968,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -35066,8 +35066,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -35546,8 +35546,8 @@
         {
           "path": "src/TiaMcp.Core/BridgeClient.cs",
           "name": "CallAsync",
-          "line": 30,
-          "endLine": 70,
+          "line": 31,
+          "endLine": 71,
           "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
         },
         {
@@ -92355,7 +92355,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "2a83bfb649a116c188b66d517db425dc8b1eed67d1f43ead9646f90bf1f1c43c"
+      "sha256": "853fd1043dde4943a1fa7b0c68bf9186cc24e6ea456efd4aae3090085d30bccb"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",

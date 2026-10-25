@@ -4,7 +4,7 @@ import pathlib
 import tempfile
 import unittest
 
-from typed_resolution_curation import curation_report
+from typed_resolution_curation import capture_curation_report, curation_report
 
 
 class ResolutionCurationTests(unittest.TestCase):
@@ -27,6 +27,16 @@ class ResolutionCurationTests(unittest.TestCase):
             self.assertFalse(curation_report([(unpreserved, "is unknown")])["completed"])
             self.assertFalse(curation_report([(rejected, "passed")])["completed"])
             self.assertEqual([{"name": "change_apply", "isError": False}], curation_report([(passed, "passed")])["toolCalls"])
+
+    def test_capture_requires_every_input_saved_reopen_and_clean_exit(self):
+        passed = {"status": "passed", "completed": True, "persistenceVerified": True, "remainingSources": [],
+                  "fixtures": [{"sourcePath": "a.scl", "engineeringVerified": True}], "calls": [{"tool": "change_apply", "status": "passed"}]}
+        with tempfile.TemporaryDirectory() as folder:
+            for change, expected in ((lambda r: None, True), (lambda r: r.update(persistenceVerified=False), False),
+                    (lambda r: r.update(remainingSources=["b.scl"]), False), (lambda r: r.update(cleanupFailure="x"), False)):
+                report = json.loads(json.dumps(passed)); change(report)
+                path = pathlib.Path(folder) / "capture.json"; path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(expected, capture_curation_report(path)["completed"])
 
 
 if __name__ == "__main__":
