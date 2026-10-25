@@ -49,6 +49,7 @@ def in_stage(journal, stage):
 
 def interrupted_apply(h, kind, payload, stage):
     prepared = h.prepare(kind, payload)
+    earlier = set(h.unresolved_admissions())
     journal = h.directory / "changes" / ("change-" + prepared["changeId"]) / "journal.json"
     portal = psutil.Process(h.tool("tia_session_status")["processId"])
     worker = owned_child(h, h.args.worker)
@@ -82,7 +83,10 @@ def interrupted_apply(h, kind, payload, stage):
         require("Portal" in portal.name(), "Owned portal process identity changed")
         portal.kill()
         portal.wait(60)
-        dispatch.update(state="interrupted", response=response, portalKilled=portal.pid)
+        owned = [a for a in h.unresolved_admissions() if a not in earlier]
+        require(len(owned) == 1, "The interrupted change must own exactly one new unresolved admission: %s" % owned)
+        prepared["admissionId"] = owned[0]
+        dispatch.update(state="interrupted", response=response, portalKilled=portal.pid, admissionId=owned[0])
         return {"killedAtEvent": dispatch["killedAtEvent"], "response": response}
     h.stage("kill worker during %s %s" % (kind, stage), kill)
     return prepared
@@ -109,9 +113,7 @@ def reconcile(h, prepared, label, held_reason=None):
     h.stage("fresh session refuses replay", no_replay)
     if held_reason:
         def held():
-            unresolved = h.unresolved_admissions()
-            require(len(unresolved) == 1, "Expected one unresolved admission: %s" % unresolved)
-            result = h.tool("engineering_admission_reconcile", {"admissionId": unresolved[0]})
+            result = h.tool("engineering_admission_reconcile", {"admissionId": prepared["admissionId"]})
             require(result.get("released") is False and any(held_reason in r for r in result.get("reasons", [])),
                     "Admission was not held for %r: %s" % (held_reason, result.get("reasons")))
             error = h.call_error("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
@@ -119,7 +121,7 @@ def reconcile(h, prepared, label, held_reason=None):
             return {"reasons": result["reasons"], "restoreRefusal": error}
         h.stage("partially saved outcome stays held; restore blocked", held)
         return
-    h.reconcile_admission("reconcile the interrupted admission in a fresh session")
+    h.reconcile_admission("reconcile the interrupted admission in a fresh session", prepared["admissionId"])
     if h.tool("tia_session_status").get("projects"):  # Restore needs an empty owned instance.
         h.stage("close verification session", lambda: h.tool("tia_detach"))
         h.owned_portal(label + " (empty)")

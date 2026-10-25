@@ -59,7 +59,8 @@ def body(h):
 
     def uses_by_plc(version, expected):
         rows = h.verify_use(consumer, version, sum(expected.values()))["items"]
-        observed = {p: sum(1 for r in rows if r["softwarePath"] == p or r["softwarePath"].startswith(p + "/")) for p in (first_plc, second_plc)}
+        # softwarePath is the owning device item; the PLC path extends it with /plc/<name>.
+        observed = {p: sum(1 for r in rows if p == r["softwarePath"] or p.startswith(r["softwarePath"] + "/plc/")) for p in (first_plc, second_plc)}
         require(observed == expected, "Uses per PLC differ for %s %s: %s" % (version["typeName"], version["version"], observed))
         return observed
     h.stage("FB 1.0.0 used once in each PLC", lambda: uses_by_plc(fb, {first_plc: 1, second_plc: 1}))
