@@ -17,7 +17,7 @@ Earlier runs found three defects, all fixed before b07.
 
 All runs: `qualify_plc_component.py --run-native --caller-mode existing`, CPU 1511-1 PN
 V4.1, TIA V21 Update 2, each under `scripts/native_lane.py`. Raw reports stay in the
-ignored `artifacts/` trees of the short worktrees `D:/tbb` … `D:/tbe`.
+ignored `artifacts/` trees of the short worktrees `D:/tbb` … `D:/tbf`.
 
 | Run | Reached | Result |
 | --- | --- | --- |
