@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "112c98db340fa91139ffc01a3ffa04f3e91d89bfce35c969fba14069b5872a73",
-      "bytes": 749317
+      "sha256": "d8c3556454b4da9a11fde84bd44f75ae7d713c1b07d82f3434874ad387339cf7",
+      "bytes": 751505
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -85311,6 +85311,13 @@
           "artifacts": [
             "evidence/local.plc_component.runtime.20261024.json"
           ]
+        },
+        {
+          "id": "local.plc_component.existing_caller.20261025",
+          "profileSha256": "c0eeeae4d6dfb504c1b04b00134a64c607c786011dcfc82f9fa503d160286a5f",
+          "artifacts": [
+            "evidence/local.plc_component.existing_caller.20261025.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94612,6 +94619,11 @@
       "sha256": "16cdd557fbd90bc4eea5ddea5931961daa238e42047c7cc8845abd4a34690d34"
     },
     {
+      "path": "evidence/local.plc_component.existing_caller.20261025.json",
+      "state": "observed",
+      "sha256": "be39d685b9d99185e66aa0b0bef6982c7efd933e52dbbebd7d03878d56d26ac3"
+    },
+    {
       "path": "evidence/local.plc_component.install.20261024.json",
       "state": "observed",
       "sha256": "3654669852bab08a630e373de084b456f19657e66553d2c825fe2001fca40d2b"
@@ -94944,6 +94956,10 @@
     {
       "id": "local.package.v02",
       "profileSha256": "f7a9999ae8b75bf5e2fea8d7654f4af11bcfa57e9ab008212ef90590a7cb1587"
+    },
+    {
+      "id": "local.plc_component.existing_caller.20261025",
+      "profileSha256": "c0eeeae4d6dfb504c1b04b00134a64c607c786011dcfc82f9fa503d160286a5f"
     },
     {
       "id": "local.plc_component.install.20261024",
