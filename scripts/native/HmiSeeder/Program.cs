@@ -40,6 +40,7 @@ internal static partial class Program
     private static JObject Report;
     private static bool PositiveFixture;
     private static bool TextListFixture;
+    private static string CurrentProfile;
     private static readonly string[] TextListInputNames = { "QualificationTextLists.hmi.yml", "QualificationTextLists.TextLibrary.hmi.yml" };
     [STAThread]
     private static int Main(string[] args)
@@ -104,6 +105,7 @@ internal static partial class Program
             foreach (var profile in profiles)
             {
                 if (requested != null && !requested.Contains(profile[0])) continue;
+                CurrentProfile = profile[0];
                 var row = new JObject { ["profile"] = profile[0], ["catalogFilter"] = profile[1], ["status"] = "unverified",
                     ["fixtureMode"] = mode, ["deliberateInvalidReferences"] = !PositiveFixture,
                     ["resourceFixture"] = TextListFixture ? "documented-bilingual-text-list" : "none",
@@ -242,6 +244,8 @@ internal static partial class Program
             foreach (var role in new[] { new[] { "ScreenTemplateFolder", "ScreenTemplates", "Hmi.Screen.ScreenTemplate", "" }, new[] { "ScreenPopupFolder", "ScreenPopups", "Hmi.Screen.ScreenPopup", "<Width>320</Width><Height>240</Height>" } })
             {
                 var step = new JObject { ["authoredScreenInput"] = "Overview_A", ["role"] = role[0] }; ((JArray)result["steps"]).Add(step);
+                // Run h2/s1 (25 Oct 2026): this popup import terminated the native Portal on KTP700 Basic PN, so it is not authored there.
+                if (CurrentProfile == "classic-basic" && role[0] == "ScreenPopupFolder") { step["status"] = "notAuthored"; step["reason"] = "Popup import terminated the native Portal on this Basic panel profile"; continue; }
                 try
                 {
                     string file = Path.Combine(directory, "input_" + sw.Name + "_" + role[1] + ".xml");
