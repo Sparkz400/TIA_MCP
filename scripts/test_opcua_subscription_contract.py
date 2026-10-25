@@ -71,6 +71,20 @@ class SubscriptionContractTests(unittest.TestCase):
         for field in ('reconnect','transfer','write','resume','method','force'):
             self.assertFalse(validator('request').is_valid({**self.request,field:True}))
 
+    def test_bounded_recovery_contracts_agree(self):
+        polling = json.loads((ROOT / 'contracts/opcua-runtime-capture.v1.schema.json').read_text(encoding='utf-8'))
+        self.assertEqual(polling['$defs']['reconnectEvent'], SCHEMA['$defs']['reconnectEvent'])
+        for schema in (polling, SCHEMA):
+            request = Draft202012Validator(schema['$defs']['request']['properties']['maximumReconnectAttempts'])
+            for value in (0, 1, 3): self.assertTrue(request.is_valid(value))
+            for value in (-1, 4, 0.5, True): self.assertFalse(request.is_valid(value))
+        event = {'attempt':1, 'state':'starting', 'errorCode':'UaTransportInterrupted'}
+        validator('reconnectEvent').validate(event)
+        validator('reconnectEvent').validate({**event, 'state':'succeeded', 'errorCode':None})
+        validator('reconnectEvent').validate({**event, 'state':'failed', 'errorCode':'UaSessionExpired'})
+        for change in ({'attempt':4}, {'errorCode':'UaAuthenticationDenied'}, {'state':'succeeded'}, {'extra':True}):
+            self.assertFalse(validator('reconnectEvent').is_valid({**event, **change}))
+
     def test_page_and_export_boundaries(self):
         ref = 'ua-subscription:'+'b'*32+':1:'+'c'*64
         validator('pageInput').validate(dict(snapshotRef=ref,count=200,offset=0))

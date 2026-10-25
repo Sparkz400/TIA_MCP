@@ -108,11 +108,12 @@ internal static class SubscriptionChecks
         }
         finally{server.Mode="normal";await subscriptions.DisposeAsync();}
     }
-    private static async Task RetainedControls(string root,OpcUaRuntimeSessionStore sessions,string capture,JsonElement status,Action<bool,string> check)
+    internal static async Task RetainedControls(string root,OpcUaRuntimeSessionStore sessions,string capture,JsonElement status,Action<bool,string> check,
+        (string Name,Action<JsonObject[]> Change)[]? changes=null)
     {
         string original=Path.Combine(root,"runtime-ua-subscriptions",capture);
         var originalHashes=Directory.GetFiles(original).ToDictionary(x=>x,x=>Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(x))));
-        var mutations=new (string Name,Action<JsonObject[]> Change)[] {
+        var mutations=changes??new (string Name,Action<JsonObject[]> Change)[] {
             ("unselected item id",segments=>First(segments)["notifications"]![0]!["monitoredItemId"]=4294967295u),
             ("messages after terminal status",segments=>First(segments)["statusChanges"]=new JsonArray("0x800a0000")),
             ("oversized status list",segments=>First(segments)["statusChanges"]=new JsonArray(Enumerable.Range(0,5000).Select(_=>(JsonNode?)JsonValue.Create("0x00000000")).ToArray())),

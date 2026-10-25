@@ -9,7 +9,7 @@ using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.OpcUa.Runtime;
 
-/// <summary>One owned, pinned, encrypted UA session. No reconnect or value mutation surface.</summary>
+/// <summary>One owned, pinned, encrypted UA session. Recovery never creates a replacement session.</summary>
 internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
 {
     internal const int TimeoutMs = 10_000;
@@ -25,6 +25,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal bool PeerVerified { get; private set; }
     internal bool SessionDispatched { get; private set; }
     internal bool Unusable { get; private set; }
+    internal bool CanReconnect { get; private set; }
     internal DateTimeOffset LastUsed { get; private set; } = DateTimeOffset.UtcNow;
 
     internal OpcUaRuntimeClient(OpcUaRuntimeSelection selection, X509Certificate2 clientCertificate, string clientUri, string pkiPath)
@@ -246,7 +247,22 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     }
 
     private ISession Session => session is { Connected: true } s && !Unusable ? s : throw Error("UaSessionUnavailable");
-    internal void Invalidate() => Unusable = true;
+    internal void Invalidate(bool reconnectable = false) { Unusable = true; CanReconnect = reconnectable && session is not null; }
+    internal async Task Reconnect(CancellationToken ct)
+    {
+        if(!CanReconnect || session is null) throw Error("UaReconnectUnavailable");
+        using var leaf=CertificateFactory.Create(session.ConfiguredEndpoint.Description.ServerCertificate);
+        if(!ValidPinnedLeaf(leaf)) throw Error("UaCertificateRejected");
+        await configuration.CertificateValidator.ValidateAsync(leaf,ct);
+        configuration.CertificateValidator.ValidateDomains(leaf,session.ConfiguredEndpoint);
+        var original=session.SessionId;
+        await session.ReconnectAsync(null,null,ct);
+        session.KeepAliveInterval=Timeout.Infinite;
+        if(session.SessionId!=original) throw Error("UaSessionIdentityChanged");
+        Unusable=false;
+        try {await VerifyIdentity(ct);CanReconnect=false;}
+        catch {Unusable=true;throw;}
+    }
     internal async Task<bool> Close()
     {
         if (session is null) { ForgetPassword(); return !SessionDispatched; }

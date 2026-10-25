@@ -1,10 +1,11 @@
 using System.Text.Json;
 using TiaMcp.Core;
 using TiaMcp.Core.Diagnostics;
+using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.OpcUa.Runtime;
 
-/// <summary>Explicit bounded Publish/Republish acquisition. No reconnect, transfer or restart replay.</summary>
+/// <summary>Explicit bounded Publish/Republish acquisition. Recovery never transfers or recreates subscriptions.</summary>
 public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,string artifactsRoot) : IAsyncDisposable
 {
     private sealed class Running(string attemptId)
@@ -72,6 +73,23 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
         bool Expired()=>entry.Stop.IsCancellationRequested || Elapsed()>=plan.Request.DurationSeconds*1000d;
         void Append(OpcUaSubscriptionEvent e)=>writer.Append(new(writer.Rows,Elapsed(),DateTimeOffset.UtcNow,e));
         var seen=new HashSet<uint>();var missingRanges=new List<(uint From,long Count)>(); var acknowledgements=new HashSet<uint>(); uint expected=1;int republished=0;
+        int reconnects=0;bool recovering=false;
+        using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds));
+        using var recoveryStop=CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token,duration.Token);
+        void Recovery(OpcUaReconnectEvent e) {Append(new("reconnect",subscription,Reconnect:e));writer.Flush(Elapsed());}
+        async Task<bool> Recover(string error)
+        {
+            while(!Expired() && OpcUaReconnectHistory.Retryable(error) && reconnects<plan.Request.MaximumReconnectAttempts)
+            {
+                int attempt=++reconnects;Recovery(new(attempt,"starting",error));string? failure=null;
+                try {await Task.Delay(500,recoveryStop.Token);await sessions.ReconnectAcquisition(plan.Request.AttemptId,plan.CaptureId,recoveryStop.Token);}
+                catch(Exception e) {failure=e is BridgeException b && b.Code.StartsWith("Ua",StringComparison.Ordinal)?b.Code:recoveryStop.IsCancellationRequested?"UaCancelled":"UaReconnectFailed";}
+                Recovery(new(attempt,failure is null?"succeeded":"failed",failure));
+                if(failure is null){recovering=true;return true;}
+                error=failure;
+            }
+            return false;
+        }
         try
         {
             // Stop is observed between bounded service calls; cancellation does not silently destroy
@@ -82,6 +100,23 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
             if(created.Items.All(x=>(OpcUaSubscriptionContracts.Status(x.StatusCode)&0x80000000)!=0)){reason="allItemsFailed";return;}
             while(!Expired())
             {
+                try
+                {
+                if(recovering)
+                {
+                    // Drain potentially lost responses before issuing another Publish; each envelope stays original.
+                    if(republished>=plan.Request.MaximumRepublish)throw OpcUaRuntimeClient.Error("UaReconnectRepublishLimit");
+                    var recovered=await sessions.Republish(plan.Request.AttemptId,plan.CaptureId,expected,CancellationToken.None);republished++;
+                    if(recovered.Kind=="republish")
+                    {
+                        missingRanges.Add((expected,1));Append(new("gap",subscription,GapFrom:expected,GapTo:expected,MissingCount:1));
+                        Append(recovered with {Duplicate=!seen.Add(expected)});acknowledgements.Add(expected);expected=Next(expected);
+                        if(recovered.StatusChanges is {Length:>0}){reason="serverStatusChanged";break;}
+                        if(writer.Notifications>=plan.Request.MaximumNotifications){reason="notificationLimit";break;}
+                    }
+                    else {Append(recovered);recovering=false;}
+                    writer.Flush(Elapsed());continue;
+                }
                 var message=await sessions.Publish(plan.Request.AttemptId,plan.CaptureId,acknowledgements.ToArray(),CancellationToken.None);
                 acknowledgements.Clear();uint sequence=message.SequenceNumber!.Value;
                 ulong gap=((ulong)sequence+uint.MaxValue-expected)%uint.MaxValue;
@@ -94,9 +129,11 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                 if(message.StatusChanges is {Length:>0}){reason="serverStatusChanged";writer.Flush(Elapsed());break;}
                 if(!message.KeepAlive)acknowledgements.Add(sequence);
                 bool limit=writer.Notifications>=plan.Request.MaximumNotifications;
+                uint firstMissing=expected;
+                if(ahead)expected=message.KeepAlive?sequence:Next(sequence);
                 if(ahead && gap>0 && !limit)
                 {
-                    uint missing=expected;ulong attempted=0;
+                    uint missing=firstMissing;ulong attempted=0;
                     for(ulong n=0;n<gap && !Expired() && republished<plan.Request.MaximumRepublish;n++,missing=Next(missing))
                     {
                         var recovered=await sessions.Republish(plan.Request.AttemptId,plan.CaptureId,missing,CancellationToken.None);republished++;attempted++;
@@ -110,10 +147,12 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                     }
                     if(attempted<gap && !Expired() && !limit && republished>=plan.Request.MaximumRepublish){reason="sequenceGapLimit";limit=true;}
                 }
-                if(ahead)expected=message.KeepAlive?sequence:Next(sequence);
                 // Acknowledge only after the complete original received/recovered envelope is committed.
                 writer.Flush(Elapsed());
                 if(limit){if(reason is not ("sequenceGapLimit" or "serverStatusChanged"))reason="notificationLimit";break;}
+                }
+                catch(BridgeException e) when(OpcUaReconnectHistory.Retryable(e.Code))
+                { if(!await Recover(e.Code))throw; }
             }
         }
         catch(BridgeException e) when(e.Code is "UaSubscriptionByteLimit" or "UaSubscriptionValueLimit") {reason=e.Code=="UaSubscriptionByteLimit"?"byteLimit":"valueLimit";}

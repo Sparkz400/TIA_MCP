@@ -14,7 +14,8 @@ public sealed record OpcUaSubscriptionRequest(string AttemptId,
     uint QueueSize = 16, bool DiscardOldest = true, uint KeepAliveCount = 10, uint LifetimeCount = 30,
     int DurationSeconds = 10, int MaximumNotifications = 10000, long MaximumBytes = 64L << 20,
     int MaximumRepublish = 16,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0);
 
 // Strictness is scoped to this new request; shared node contracts and existing
 // manual-read/polling deserialization keep their established behavior.
@@ -41,7 +42,8 @@ public sealed record OpcUaSubscriptionEvent(string Kind, uint SubscriptionId,
     OpcUaSubscriptionValue[]? Notifications = null, string[]? StatusChanges = null,
     uint? RequestedSequenceNumber = null, string? StatusCode = null,
     OpcUaSubscriptionCreated? Created = null, string? ErrorCode = null,
-    uint? GapFrom = null, uint? GapTo = null, long MissingCount = 0);
+    uint? GapFrom = null, uint? GapTo = null, long MissingCount = 0,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaReconnectEvent? Reconnect = null);
 public sealed record OpcUaSubscriptionRow(long Sequence, double ElapsedMilliseconds, DateTimeOffset ObservedUtc,
     OpcUaSubscriptionEvent Event);
 public sealed record OpcUaSubscriptionProgress(string State, string? TerminalReason, double ElapsedMilliseconds,
@@ -55,6 +57,7 @@ internal static class OpcUaSubscriptionContracts
     {
         Require(r is not null && ProtectedCredentialGuard.IsId(r.AttemptId) && r.Nodes is { Length: >= 1 and <= 64 });
         DiagnosticUaBindings.ValidateId(r.DiagnosticBindingId);
+        Require(r.MaximumReconnectAttempts is >= 0 and <= 3);
         foreach (var node in r.Nodes) OpcUaRuntimeClient.ValidateNode(node);
         Require(r.Nodes.Distinct().Count() == r.Nodes.Length && r.PublishingIntervalMilliseconds is >= 100 and <= 1000 &&
             r.SamplingIntervalMilliseconds is >= 0 and <= 60000 && r.QueueSize is >= 1 and <= 1024 &&
@@ -88,7 +91,9 @@ internal static class OpcUaSubscriptionContracts
     internal static void ValidateRow(OpcUaSubscriptionPlan p, OpcUaSubscriptionRow r)
     {
         Require(r.Sequence >= 0 && double.IsFinite(r.ElapsedMilliseconds) && r.ElapsedMilliseconds>=0);
-        var e=r.Event; Require(e is not null && e.Kind is "created" or "publish" or "republish" or "gap" or "deleted" or "failure");
+        var e=r.Event; Require(e is not null && e.Kind is "created" or "publish" or "republish" or "gap" or "deleted" or "failure" or "reconnect");
+        if(e.Kind=="reconnect") {Require(e.Reconnect is not null && e.SubscriptionId>0);OpcUaReconnectHistory.Validate(e.Reconnect,p.Request.MaximumReconnectAttempts);}
+        else Require(e.Reconnect is null);
         if(e.StatusCode is not null) Status(e.StatusCode);
         Require(e.AvailableSequenceNumbers is null || e.AvailableSequenceNumbers.Length<=4096 && e.AvailableSequenceNumbers.All(x=>x>0));
         Require(e.AcknowledgedSequenceNumbers is null || e.AcknowledgedSequenceNumbers.Length<=65 && e.AcknowledgedSequenceNumbers.All(x=>x>0));

@@ -16,6 +16,10 @@ internal sealed partial class FixtureServer : StandardServer
     internal readonly ConcurrentQueue<object> Audit = new();
     internal string Mode = "normal";
     internal int ReadDelayMs;
+    internal int FailValueReads, DropPublishResponses;
+    internal int ActivationRequests;
+    internal uint ReactivationFailure;
+    internal string? ModeAfterReactivation;
     internal string? TrustedClientSha256;
     internal readonly ConcurrentQueue<object> ClientCertificateChecks = new();
     private int activeReads;
@@ -39,11 +43,13 @@ internal sealed partial class FixtureServer : StandardServer
     internal int NextDelayMs;
     internal readonly TaskCompletionSource NextEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
     internal X509Certificate2? AdvertisedCertificate;
+    internal string? AdvertisedEndpoint;
+    private ApplicationConfiguration? fixtureConfiguration;
     internal int SessionCount => ServerInternal.SessionManager.GetSessions().Count;
     internal readonly TaskCompletionSource ReadEntered = new(TaskCreationOptions.RunContinuationsAsynchronously);
     internal string Endpoint { get; private set; } = "";
     internal X509Certificate2 Certificate { get; private set; } = null!;
-    internal OpcUaRuntimeSelection Selection => new(Endpoint, Application, Convert.ToHexStringLower(SHA256.HashData(Certificate.RawData)));
+    internal OpcUaRuntimeSelection Selection => new(AdvertisedEndpoint??Endpoint, Application, Convert.ToHexStringLower(SHA256.HashData(Certificate.RawData)));
     internal static OpcUaRuntimeNode Node(string name) => new(Namespace, "string", name);
     internal static readonly Dictionary<string, (NodeId Type, object Value)> Values = new() {
         ["int64"] = (DataTypeIds.Int64, long.MinValue), ["uint64"] = (DataTypeIds.UInt64, ulong.MaxValue),
@@ -111,6 +117,7 @@ internal sealed partial class FixtureServer : StandardServer
             e.Accept = e.Error.StatusCode == StatusCodes.BadCertificateUntrusted && (TrustedClientSha256 is null || sha256 == TrustedClientSha256);
             ClientCertificateChecks.Enqueue(new { sha256, accepted = e.Accept });
         };
+        fixtureConfiguration=configuration;
         await StartAsync(configuration);
         var listeners = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Where(x => x.Port == port).ToArray();
         if (listeners.Length == 0 || listeners.Any(x => !System.Net.IPAddress.IsLoopback(x.Address)))
@@ -140,6 +147,16 @@ internal sealed partial class FixtureServer : StandardServer
         if (Mode == "stale" && type == RequestType.Read) throw new ServiceResultException(StatusCodes.BadSessionIdInvalid);
         return base.ValidateRequest(channel, header, type);
     }
+    public override async Task<ActivateSessionResponse> ActivateSessionAsync(SecureChannelContext channel,RequestHeader header,
+        SignatureData signature,SignedSoftwareCertificateCollection certificates,StringCollection locales,ExtensionObject identity,
+        SignatureData userSignature,CancellationToken ct)
+    {
+        Interlocked.Increment(ref ActivationRequests);
+        if(ReactivationFailure!=0)throw new ServiceResultException(ReactivationFailure);
+        var result=await base.ActivateSessionAsync(channel,header,signature,certificates,locales,identity,userSignature,ct);
+        if(ModeAfterReactivation is { } mode){Mode=mode;ModeAfterReactivation=null;}
+        return result;
+    }
     public override async Task<GetEndpointsResponse> GetEndpointsAsync(SecureChannelContext channel, RequestHeader header,
         string endpointUrl, StringCollection locales, StringCollection profiles, CancellationToken ct)
     {
@@ -149,6 +166,15 @@ internal sealed partial class FixtureServer : StandardServer
             foreach (var endpoint in result.Endpoints) endpoint.Server.ApplicationUri = "urn:wrong:application";
         if (AdvertisedCertificate is not null)
             foreach (var endpoint in result.Endpoints) endpoint.ServerCertificate = AdvertisedCertificate.RawData;
+        if(AdvertisedEndpoint is not null)foreach(var endpoint in result.Endpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
+        return result;
+    }
+    public override async Task<CreateSessionResponse> CreateSessionAsync(SecureChannelContext channel,RequestHeader header,
+        ApplicationDescription client,string serverUri,string endpointUrl,string sessionName,byte[] nonce,byte[] certificate,
+        double timeout,uint maximumResponse,CancellationToken ct)
+    {
+        var result=await base.CreateSessionAsync(channel,header,client,serverUri,endpointUrl,sessionName,nonce,certificate,timeout,maximumResponse,ct);
+        if(AdvertisedEndpoint is not null)foreach(var endpoint in result.ServerEndpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
         return result;
     }
     public override Task<BrowseResponse> BrowseAsync(SecureChannelContext channel, RequestHeader header, ViewDescription view,
@@ -179,6 +205,11 @@ internal sealed partial class FixtureServer : StandardServer
             // Model an already accepted remote request whose completion is independent of
             // client cancellation. The exact test-owned request has a bounded release.
             await boundary.Release.Task.WaitAsync(TimeSpan.FromSeconds(30));
+        }
+        if(FailValueReads>0 && nodes.Any(x=>x.NodeId.NamespaceIndex>1 && x.AttributeId==Attributes.Value))
+        {
+            Interlocked.Decrement(ref FailValueReads);Audit.Enqueue(new {operation="FixtureTransportReadFailure",at=DateTimeOffset.UtcNow});
+            throw new ServiceResultException(StatusCodes.BadConnectionClosed);
         }
         if (ReadDelayMs > 0 && nodes.Any(x => x.NodeId.NamespaceIndex > 1))
         {
@@ -229,6 +260,7 @@ internal sealed partial class FixtureServer : StandardServer
     {
         await StopAsync(); Dispose(); Certificate.Dispose(); AdvertisedCertificate?.Dispose();
     }
+    internal async Task RestartFixture() {await StopAsync();await StartAsync(fixtureConfiguration!);}
     private sealed class FixtureNodes(IServerInternal server, ApplicationConfiguration configuration)
         : CustomNodeManager2(server, configuration, Namespace)
     {
