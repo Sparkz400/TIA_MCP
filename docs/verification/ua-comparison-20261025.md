@@ -84,4 +84,9 @@ requires literal text and no injected elements. Numeric import validation remain
 in place. The second full package run was stopped before this fix; owned process
 identities and confirmed exits are in `codeql-package-interruption-processes.json`
 and `codeql-package-interruption-exit.json`. That interrupted run is not passing
-evidence. Fresh CodeQL analysis must confirm the fix; the alert is not dismissed.
+evidence. GitHub analysis on `c9778bc` marks alert #8 fixed; the alert was not dismissed.
+
+`full-package-secure` caught a stale asset manifest after Git normalized the edited
+Explorer source to the repository's LF line endings during rebase. The portable
+bundle was regenerated from the normalized source, and the byte/hash verifier
+passed. The failed package is retained as an investigation, not passing evidence.
