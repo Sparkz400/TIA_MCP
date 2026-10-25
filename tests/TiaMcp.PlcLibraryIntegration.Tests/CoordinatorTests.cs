@@ -246,6 +246,10 @@ internal static class CoordinatorTests
             var s = new Scenario(); s.ToTypedPrepared(); s.Apply("graphical"); s.Ops.InstallationMutation = r => r["callerMatchesPrepared"] = false;
             Reject("ComponentReadbackMismatch", () => s.Next());
         });
+        test("existing caller without the insertion preservation proof stops completion", () => {
+            var s = new Scenario(); s.ToTypedPrepared(); s.Apply("graphical"); s.Ops.InstallationMutation = r => r.Remove("callerInsertion");
+            Reject("ComponentReadbackMismatch", () => s.Next());
+        });
         test("journal tampering fails closed on reopen", () => {
             var s = new Scenario(); var record = JObject.Parse(File.ReadAllText(s.Journal)); record["record"]["state"] = "installation_verified"; File.WriteAllText(s.Journal, record.ToString());
             Reject("ComponentJournalInvalid", () => PlcComponentCoordinator.Open(s.Directory, s.Ops));
@@ -362,7 +366,7 @@ internal static class CoordinatorTests
         {
             InstallationReads++; var result = Evidence(contract);
             result["callerExists"] = true; result["caller"] = new JObject { ["kind"] = "FC", ["language"] = "FBD" };
-            result["callerSha256"] = new string('d', 64); result["callerMatchesPrepared"] = true; result["instanceMatchesPrepared"] = true;
+            result["callerSha256"] = new string('d', 64); result["callerMatchesPrepared"] = true; result["instanceMatchesPrepared"] = true; result["callerInsertion"] = new JObject { ["verified"] = true };
             result["instance"] = new JObject { ["path"] = "/plc/blocks/Motor_1", ["number"] = 3, ["instanceOfName"] = "Motor", ["contentSha256"] = new string('e', 64) };
             InstallationMutation?.Invoke(result); return result;
         }

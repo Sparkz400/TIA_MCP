@@ -33,9 +33,14 @@ Test("LAD explicit unconditional rail and InOut wiring validate against current 
     Equal("powerrail", typed["model"]["nodes"][0].Value<string>("kind")); Equal("call", typed["model"]["connections"][2]["to"].Value<string>("node"));
 });
 Test("native following IDs are explicit blockers, not a false executable plan", () => {
-    var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.OB").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9")));
+    var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9")));
     Equal("NativeIdPreservationUnsupported", f.Build()["blockers"][0].Value<string>("code"));
 });
+Test("predictable following ID shift no longer blocks existing-caller insertion", () => {
+    var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit><MultilingualText ID=\"2\" CompositionName=\"Title\"><ObjectList><MultilingualTextItem ID=\"3\" /></ObjectList></MultilingualText></ObjectList></SW.Blocks.FC></Document>");
+    f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; Equal(0, ((JArray)f.Build()["blockers"]).Count);
+});
+Test("OB callers stay refused", () => Reject("UnsupportedIntegrationCaller", f => { f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; }));
 Test("plan does not mutate payload or captured evidence", () => { var f = new Fixture(); string before = f.Payload.ToString() + f.Inventory.ToString() + f.Versions.ToString() + f.Fb.ToString() + f.Caller.ToString(); f.Build(); Equal(before, f.Payload.ToString() + f.Inventory.ToString() + f.Versions.ToString() + f.Fb.ToString() + f.Caller.ToString()); });
 Test("dependency versions all pinned", () => { var f = new Fixture(); f.AddDependency(); Equal(2, ((JArray)f.Build()["versions"]).Count); });
 Test("case variants of valid GUID pins match native identities", () => { var f = new Fixture(); f.Payload["selection"][0]["typeGuid"] = Fixture.Type.ToUpperInvariant(); Equal("planned_only", f.Build().Value<string>("status")); });
@@ -133,6 +138,7 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
 TextBoundaryTests.Run(Test);
 CoordinatorTests.Run(Test);
 StandaloneTests.Run(Test);
+CallerInsertionTests.Run(Test);
 QualificationTests.Run(Test);
 ContentContractTests.Run(Test);
 ContentArtifactTests.Run(Test);
@@ -157,10 +163,10 @@ sealed class Fixture
     <Document><SW.Blocks.FB ID="0"><AttributeList><Name>Motor</Name><Namespace/><ProgrammingLanguage>SCL</ProgrammingLanguage><Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5"><Section Name="Input"><Member Name="Enable" Datatype="Bool"/></Section><Section Name="Output"><Member Name="Active" Datatype="Bool"/></Section><Section Name="InOut"/><Section Name="Static"/></Sections></Interface></AttributeList></SW.Blocks.FB></Document>
     """);
     internal XDocument Caller = XDocument.Parse("""
-    <Document><SW.Blocks.OB ID="0"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.OB></Document>
+    <Document><SW.Blocks.FC ID="0"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>
     """);
     internal JObject Inventory = JObject.Parse("""
-    {"complete":true,"objects":[{"name":"Main","path":"/plc/blocks/Main","kind":"OB","number":1,"language":"FBD","protected":false,"namespace":""},{"name":"ExistingDb","path":"/plc/blocks/ExistingDb","kind":"DB","number":1}],"tags":[{"name":"EnableMotor","path":"/plc/tags/IO/tags/EnableMotor","tablePath":"/plc/tags/IO","dataType":"Bool","logicalAddress":"%I0.0","isSafety":false},{"name":"MotorRunning","path":"/plc/tags/IO/tags/MotorRunning","tablePath":"/plc/tags/IO","dataType":"Bool","logicalAddress":"%Q0.0","isSafety":false}]}
+    {"complete":true,"objects":[{"name":"Main","path":"/plc/blocks/Main","kind":"FC","number":1,"language":"FBD","protected":false,"namespace":""},{"name":"ExistingDb","path":"/plc/blocks/ExistingDb","kind":"DB","number":1}],"tags":[{"name":"EnableMotor","path":"/plc/tags/IO/tags/EnableMotor","tablePath":"/plc/tags/IO","dataType":"Bool","logicalAddress":"%I0.0","isSafety":false},{"name":"MotorRunning","path":"/plc/tags/IO/tags/MotorRunning","tablePath":"/plc/tags/IO","dataType":"Bool","logicalAddress":"%Q0.0","isSafety":false}]}
     """);
     internal JObject Build() => PlcLibraryIntegrationPlanner.Build(Payload, Versions, Fb, Caller, Inventory);
     internal void Standalone(string language = "FBD") {

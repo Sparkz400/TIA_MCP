@@ -9,6 +9,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import traceback
 import uuid
@@ -330,12 +331,30 @@ def verify_preserved_installation(before, after, caller, added):
                 "Caller snapshot has missing, empty or duplicate native object IDs.")
         return found
 
-    old_ids = {node.getAttribute("ID") for node in units(old)}
-    inserted = [node for node in units(new) if node.getAttribute("ID") not in old_ids]
-    require(len(inserted) == 1, "Caller must gain exactly one network with distinct native identity.")
-    inserted[0].parentNode.removeChild(inserted[0])
-    require(native_payload(old.toxml()) == native_payload(new.toxml()),
-            "Caller content outside the inserted network changed.")
+    old_count, new_count = len(units(old)), len(units(new))
+    require(new_count == old_count + 1, "Caller must gain exactly one network with distinct native identity.")
+    expected = native_payload(old.toxml())
+
+    def restores(index):
+        # Scope decision 2026-10-25: V21 shifts every following object ID by the
+        # inserted network's ID count. Reverse exactly that shift, nothing else.
+        candidate = new.cloneNode(True)
+        unit = units(candidate)[index]
+        inside = [unit, *unit.getElementsByTagName("*")]
+        count = sum(node.hasAttribute("ID") for node in inside)
+        nodes = list(candidate.getElementsByTagName("*"))
+        for node in nodes[nodes.index(unit) + len(inside):]:
+            if node.hasAttribute("ID"):
+                value = node.getAttribute("ID")
+                if not re.fullmatch(r"0|[1-9A-F][0-9A-F]{0,6}", value) or int(value, 16) < count:
+                    return False
+                node.setAttribute("ID", format(int(value, 16) - count, "X"))
+        unit.parentNode.removeChild(unit)
+        return native_payload(candidate.toxml()) == expected
+
+    # Two candidates can restore only when they are equal up to that shift.
+    require(any(restores(index) for index in range(new_count)),
+            "Caller content outside the inserted network changed beyond the accepted following-ID shift.")
 
 
 def first_available_db_number(blocks):

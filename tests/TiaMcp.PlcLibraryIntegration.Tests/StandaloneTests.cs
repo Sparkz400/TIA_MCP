@@ -46,7 +46,7 @@ internal static class StandaloneTests
         test("standalone caller requires absent native export", () => Reject("IntegrationCallerMismatch", f => f.Caller = new Fixture().Caller));
         test("explicit existing mode preserves legacy metadata blocker", () => {
             var f = new Fixture(); f.Payload["integration"]["caller"]["mode"] = "existing";
-            f.Caller.Root.Element("SW.Blocks.OB").Element("ObjectList").Add(new System.Xml.Linq.XElement("MultilingualText", new System.Xml.Linq.XAttribute("ID", "9")));
+            f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new System.Xml.Linq.XElement("MultilingualText", new System.Xml.Linq.XAttribute("ID", "9")));
             Equal("NativeIdPreservationUnsupported", f.Build()["blockers"][0].Value<string>("code"));
         });
     }

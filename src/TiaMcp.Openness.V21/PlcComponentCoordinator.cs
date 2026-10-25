@@ -205,6 +205,8 @@ namespace TiaMcp.Openness.V21
                         (evidence.Value<bool?>("callerExists") != true || evidence.Value<string>("callerPath") != PlcLibraryIntegrationPlanner.CallerPath((JObject)contract["payload"]) ||
                          evidence["caller"]?.Value<string>("kind") != "FC" || evidence["caller"]?.Value<string>("language") != contract["payload"]["integration"]["caller"].Value<string>("language")))
                         Fail("ComponentReadbackMismatch", "Standalone caller must resolve as the exact newly created FC in the requested language.");
+                    if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller((JObject)contract["payload"]) && evidence["callerInsertion"]?.Value<bool?>("verified") != true)
+                        Fail("ComponentReadbackMismatch", "Existing caller lacks the original-vs-installed insertion preservation proof.");
                 }
                 else ValidateOriginalCaller(record, evidence);
                 record[installed ? "installationEvidence" : "importEvidence"] = evidence.DeepClone();
