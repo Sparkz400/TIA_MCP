@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or setup help
+    url: https://github.com/Sparkz400/TIA_MCP/discussions/categories/q-a
+    about: Ask how to install, configure or use TIA MCP.
+  - name: Idea or early proposal
+    url: https://github.com/Sparkz400/TIA_MCP/discussions/categories/ideas
+    about: Discuss an idea before it becomes a feature request.
+  - name: Security vulnerability
+    url: https://github.com/Sparkz400/TIA_MCP/security/advisories/new
+    about: Report privately. Never open a public issue for security problems.

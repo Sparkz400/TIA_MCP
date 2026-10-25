@@ -1,0 +1,72 @@
+name: Bug report
+description: Report a reproducible problem with TIA MCP
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security issue? Do not open an issue; follow [SECURITY.md](https://github.com/Sparkz400/TIA_MCP/blob/main/SECURITY.md).
+        Setup or usage question? Ask in [Q&A](https://github.com/Sparkz400/TIA_MCP/discussions/categories/q-a).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal steps, commands or MCP arguments, using a synthetic or scratch project.
+      placeholder: |
+        1. Open the sample project ...
+        2. Call `...` with arguments ...
+        3. See ...
+    validations:
+      required: true
+  - type: dropdown
+    id: run
+    attributes:
+      label: Run type
+      options:
+        - Offline only (no Siemens software)
+        - Native engineering (TIA Portal Openness)
+        - PLCSIM Advanced simulation
+        - Project Explorer UI
+        - Packaging or installation
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Commit or package manifest
+      placeholder: e.g. ab8ee0a or tia-mcp-offline_20261024_074220_7ba3311d
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include only what is relevant.
+      value: |
+        - Windows:
+        - .NET / Python / Node:
+        - TIA Portal / PLCSIM version:
+        - CPU / firmware:
+        - MCP client:
+  - type: textarea
+    id: output
+    attributes:
+      label: Sanitized error output
+      description: Logs or tool results with credentials, IP addresses and project identifiers removed.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: This report contains no credentials, customer project data or Siemens binaries.
+          required: true
