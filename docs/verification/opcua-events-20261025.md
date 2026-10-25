@@ -46,8 +46,9 @@ Evidence root: `artifacts/opcua-events-20261025` in the primary checkout.
 
 Reproduce through `Test-OfflinePackage.ps1` (full mode), which includes the managed
 UA suite, actual Host subscription and diagnostic workflows, independent schema /
-service checks and browser checks against relocated package binaries. The focused
-suite is available as `TiaMcp.OpcUa.Runtime.Tests --events-only --output <fresh>`.
+service checks. Run `qualify_diagnostic_ua_observation_browser.mjs` separately from
+the relocated package root, with its diagnostic Host output and sample paths, to
+check the packaged browser assets and reports. The focused suite is available as `TiaMcp.OpcUa.Runtime.Tests --events-only --output <fresh>`.
 
 ## Preserved investigation
 
@@ -103,3 +104,18 @@ qualification passed locally (124 checks, `session-host/result.json`). CI now
 retains MCP `result.json` beside `verification.json` so a repeated failure has its
 original diagnostic evidence. No cause is inferred from that unobserved detail;
 the failed run is preserved under `ci-managed-0`.
+
+## Final local package evidence
+
+`full-package-final/result.json` passes all **53** stages. Its rebuilt managed UA
+suite passes **928** checks, actual subscription Host workflow **534**, and
+prebound diagnostic Host workflow **1,064**. The standalone session and polling
+Host checks pass **124** and **221** respectively. `browser-packaged/result.json`
+passes **159** checks using the actual relocated package's scripts, viewer assets
+and diagnostic reports. Native execution is false throughout.
+
+The ZIP and checksum are preserved outside the task worktree in
+`artifacts/opcua-events-20261025/release/`; `preserved-release.json` records their
+hashes and the validated manifest. The final application/test tree is unchanged
+from package build commit `e9e6ae4`; subsequent changes only repair CI setup/result
+retention and update this evidence note. Current-head CI remains a separate gate.
