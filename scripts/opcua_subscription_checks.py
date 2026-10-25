@@ -3,7 +3,7 @@ import copy
 from opcua_runtime_checks import require, verify_values, ALLOWED
 
 SUBSCRIPTION_SERVICES = {"CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions"}
-FIXTURE_OBSERVATIONS = {"SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish", "PublishEntered", "PublishCompleted"}
+FIXTURE_OBSERVATIONS = {"SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish", "PublishEntered", "PublishCompleted", "FixtureLostPublishResponse"}
 
 
 def verify_subscription(rows, attempt, expected_count=14):

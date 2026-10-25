@@ -78,6 +78,8 @@ try
             if (op == "mode") server.Mode = command.RootElement.GetProperty("value").GetString()!;
             if (op == "readDelay") server.ReadDelayMs = command.RootElement.GetProperty("value").GetInt32();
             if (op == "trustClient") server.TrustedClientSha256 = command.RootElement.GetProperty("sha256").GetString();
+            if (op == "failValueReads") server.FailValueReads = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "dropPublishResponses") server.DropPublishResponses = command.RootElement.GetProperty("value").GetInt32();
             Save("server-live", new { sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() });
             Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray(), clientCertificates = server.ClientCertificateChecks.ToArray() }, BridgeProtocol.Json));
             Console.Out.Flush();
@@ -87,6 +89,9 @@ try
     else
     {
         SubscriptionInputChecks.Run(Check);
+        var reconnectServer=await Start("reconnect");
+        await ReconnectChecks.Run(reconnectServer,output,Check);
+        Save("reconnect-server-audit",reconnectServer.Audit.ToArray());
         await ArrayValueChecks.Run(server, output, Check);
         await SubscriptionChecks.Run(server, output, Check);
         Save("subscription-server-audit",server.Audit.ToArray());
@@ -289,6 +294,7 @@ try
             await store.Disconnect(recovered);
         }
         var allowed = new HashSet<string> { "GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse", "BrowseNext", "Continuation", "CloseSession", "CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions", "SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish" };
+        allowed.UnionWith(["PublishEntered","PublishCompleted","FixtureTransportReadFailure","FixtureLostPublishResponse"]);
         foreach (var audit in servers.SelectMany(s => s.Audit))
             Check(allowed.Contains(JsonSerializer.SerializeToElement(audit).GetProperty("operation").GetString()!), "Wire operation allowed");
         passed = true;

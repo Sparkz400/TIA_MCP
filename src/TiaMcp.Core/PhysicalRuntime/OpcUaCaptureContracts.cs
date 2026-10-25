@@ -9,7 +9,8 @@ namespace TiaMcp.Core.PhysicalRuntime;
 
 public sealed record OpcUaCaptureRequest(string AttemptId, OpcUaRuntimeNode[] Nodes, int IntervalMilliseconds,
     int DurationSeconds, int MaximumSamples = 100000, long MaximumBytes = 64L << 20,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0);
 public sealed record OpcUaCaptureContext(OpcUaCaptureRequest Request, OpcUaRuntimeStatus Session);
 
 /// <summary>UA-specific admission and retained evidence validation; the durable capture journal is shared.</summary>
@@ -21,6 +22,7 @@ public static class OpcUaCaptureContracts
     {
         Require(request is not null && request.Nodes is { Length: >= 1 and <= 64 });
         DiagnosticUaBindings.ValidateId(request.DiagnosticBindingId);
+        Require(request.MaximumReconnectAttempts is >= 0 and <= 3);
         foreach (var node in request.Nodes) ValidateNode(node);
         Require(request.Nodes.Distinct().Count() == request.Nodes.Length);
         var result = new RuntimeCaptureRequest(request.AttemptId, request.Nodes.Select(SelectionId).ToArray(),
@@ -77,6 +79,26 @@ public static class OpcUaCaptureContracts
             }
         }
         if (item.Quality == "Bad") Require(item.Outcome == "itemError");
+    }
+    public static void ValidateReconnectRows(RuntimeCapturePlan plan,IEnumerable<RuntimeCaptureRow> rows)
+    {
+        var history=new OpcUaReconnectHistory(plan.UaContext!.Request.MaximumReconnectAttempts);
+        string? error=null;double elapsed=0;
+        foreach(var row in rows)
+        {
+            Require(row.ElapsedMilliseconds>=elapsed);elapsed=row.ElapsedMilliseconds;
+            if(row.Reconnect is { } e)
+            {
+                if(e.State=="starting")Require(e.ErrorCode==error && OpcUaReconnectHistory.Retryable(error));
+                history.Apply(e);
+                if(e.State!="starting")error=e.ErrorCode;
+            }
+            else if(row.Kind=="read")
+            {
+                Require(history.Healthy && !history.Pending && error is null);
+                error=row.ErrorCode;
+            }
+        }
     }
     public static string? ScalarEncoding(string? type) => type switch {
         "Boolean" => "boolean",
@@ -158,7 +180,7 @@ public static class OpcUaCaptureContracts
     }
     private static bool ByteString(string text)
     { try { var bytes=Convert.FromBase64String(text);return bytes.Length<=65536 && Convert.ToBase64String(bytes)==text; } catch { return false; } }
-    public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaSessionUnavailable", "UaSessionExpired",
+    public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaTransportInterrupted", "UaSessionUnavailable", "UaSessionExpired",
         "UaSessionRecordChanged", "UaSessionIdentityMismatch", "UaSessionIdentityChanged", "UaCredentialUnavailable",
         "UaNamespaceUnavailable", "UaAuthenticationDenied", "UaCertificateRejected", "UaProtocolFailure",
         "UaResponseInvalid", "UaResponseLimit", "UaSecretEchoRejected", "UaCaptureReadFailed"];

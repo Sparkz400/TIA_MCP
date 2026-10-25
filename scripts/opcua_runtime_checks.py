@@ -10,7 +10,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 ALLOWED = {"GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse",
-           "BrowseNext", "Continuation", "CloseSession"}
+           "BrowseNext", "Continuation", "CloseSession", "FixtureTransportReadFailure"}
 NS = "urn:tiamcp:qualification:synthetic"
 UA = "http://opcfoundation.org/UA/"
 

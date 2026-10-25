@@ -401,6 +401,13 @@
           ],
           "pattern": "^[0-9a-f]{64}$",
           "description": "Optional immutable diagnostic_ua_binding_plan ID selected before capture; exact session attempt and ordered nodes are revalidated."
+        },
+        "maximumReconnectAttempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0,
+          "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
         }
       },
       "required": [
@@ -481,6 +488,13 @@
           ],
           "pattern": "^[0-9a-f]{64}$",
           "description": "Optional immutable diagnostic_ua_binding_plan ID selected before capture; exact session attempt and ordered nodes are revalidated."
+        },
+        "maximumReconnectAttempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0,
+          "description": "Opt-in same-session reactivation attempts across the entire capture. No new session, subscription transfer or Host-restart replay."
         }
       },
       "required": [
@@ -672,7 +686,8 @@
             "republish",
             "gap",
             "deleted",
-            "failure"
+            "failure",
+            "reconnect"
           ]
         },
         "subscriptionId": {
@@ -866,6 +881,9 @@
         "missingCount": {
           "type": "integer",
           "minimum": 0
+        },
+        "reconnect": {
+          "$ref": "#/$defs/reconnectEvent"
         }
       },
       "required": [
@@ -1302,6 +1320,32 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "reconnect"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reconnect"
+            ],
+            "properties": {
+              "subscriptionId": {
+                "minimum": 1
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "reconnect"
+              ]
+            }
+          }
         }
       ]
     },
@@ -1498,7 +1542,10 @@
           "const": "subscription"
         },
         "reconnectPolicy": {
-          "const": "none"
+          "enum": [
+            "none",
+            "boundedSameSession"
+          ]
         },
         "transferPolicy": {
           "const": "none"
@@ -1834,6 +1881,82 @@
           }
         }
       }
+    },
+    "reconnectEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt",
+        "state",
+        "errorCode"
+      ],
+      "properties": {
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "state": {
+          "enum": [
+            "starting",
+            "succeeded",
+            "failed"
+          ]
+        },
+        "errorCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80,
+          "pattern": "^Ua"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "errorCode": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "starting"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "errorCode": {
+                "enum": [
+                  "UaTransportInterrupted",
+                  "UaTimeout"
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "x-tool-contracts": {

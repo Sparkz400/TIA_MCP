@@ -10,7 +10,7 @@ The implementation pins the maintained OPC Foundation .NET Standard **1.5.378.18
 4. Browse immediate hierarchical references with `runtime_ua_browse` and read explicit nodes with `runtime_ua_read`. Node identity uses the exact namespace URI plus a canonical numeric, string, GUID or base64 opaque identifier. Namespace indexes are session-local and never accepted as durable identities.
 5. Use `runtime_ua_status` for local retained state and `runtime_ua_disconnect` for bounded cleanup.
 
-Acquisition and reads recheck the namespace table, server URI table and server start time. Changed observations invalidate the session. No automatic reconnect, node registration, history read, arbitrary service invocation, write, method Call, forcing or download surface is exposed. The stack performs the secure-channel and session services needed for authenticated reads. The separate [subscription workflow](opcua-runtime-subscriptions.md) explicitly creates bounded monitored-item acquisition; connecting alone does not start it.
+Acquisition and reads recheck the namespace table, server URI table and server start time. Changed observations invalidate the session. No implicit reconnect, node registration, history read, arbitrary service invocation, write, method Call, forcing or download surface is exposed. The stack performs the secure-channel and session services needed for authenticated reads. The separate [subscription workflow](opcua-runtime-subscriptions.md) explicitly creates bounded monitored-item acquisition; connecting alone does not start it.
 
 Values retain the decoded built-in type, declared DataType identity, ValueRank and ArrayDimensions, raw 32-bit status, Good/Uncertain/Bad classification, original nullable source/server timestamps and both picosecond fields. Integers use exact decimal strings, including Int64 and UInt64; floating values use round-trip strings. A missing timestamp remains null. A decoded scalar DateTime remains a date value, including its minimum decoded value; it is not treated as a missing measurement timestamp.
 
@@ -22,7 +22,7 @@ Bounds are fixed: four live owned clients per artifact store, 1,024 retained att
 
 Retained records are under `runtime-ua` with a single owner lock. No private key, password, UA authentication token or reusable session handle is recorded. An interrupted connect/read or unconfirmed close remains `remoteSessionUnknown`; an actually different Host observes `hostEndedRemoteUnknown`. An unresolved endpoint reservation blocks fresh IDs in the same artifact store. Explicit `acknowledgeUnknown=true` records `abandonedRemoteUnknown` and releases only the local reservation; it does not claim remote logout. Browse cleanup failure is retained separately from the original operation error where both occurred. Record publication failure cannot skip closing other captured live transports or releasing the original owner lock.
 
-The [contract](../../contracts/opcua-runtime.v1.schema.json), [session qualification](../verification/opcua-runtime-wave4-20261020.md) and [array/matrix checks](../verification/opcua-array-values-20261025.md) describe the session profile and actual local evidence. Siemens CPU model/firmware, security configuration, real trust provisioning and runtime license compatibility remain physical qualification prerequisites. The [bounded polling capture workflow](opcua-runtime-capture.md) reuses these exact secure reads and retains their quality/status/timestamps. [Bounded subscriptions](opcua-runtime-subscriptions.md) have a separate retained contract and qualification. Reconnect/transfer and mutation workflows remain unsupported.
+The [contract](../../contracts/opcua-runtime.v1.schema.json), [session qualification](../verification/opcua-runtime-wave4-20261020.md) and [array/matrix checks](../verification/opcua-array-values-20261025.md) describe the session profile and actual local evidence. Siemens CPU model/firmware, security configuration, real trust provisioning and runtime license compatibility remain physical qualification prerequisites. The [bounded polling capture workflow](opcua-runtime-capture.md) reuses these exact secure reads and retains their quality/status/timestamps. [Bounded subscriptions](opcua-runtime-subscriptions.md) have a separate retained contract and qualification. Captures can explicitly opt into [bounded same-session reconnect](#controlled-acquisition-reconnect). Session replacement, subscription transfer and mutation workflows remain unsupported.
 
 An active polling capture or subscription exclusively reserves its owned session. Manual read, browse, disconnect and another acquisition refuse with `UaSessionAcquisitionBusy` until it stops and releases that reservation. Retained status remains available. Stop the original acquisition first, then explicitly disconnect; stopping acquisition and closing the session have separate outcomes.
 
@@ -55,3 +55,40 @@ $identity = ./TiaMcp.Host.exe --ua-identity-store inspect --name default | Conve
 Certificates use RSA 2048 and a twelve-month lifetime. Rotation keeps the application URI but replaces the key and certificate. It requires the exact current fingerprint, including when the old certificate has expired. A stale fingerprint refuses, so retrying after a lost rotation reply cannot rotate twice; inspect to discover the current result. Atomic publication failure preserves the old complete record. Missing, damaged, unreadable or insecure stores refuse without generating replacements. Choose a fresh name and explicitly provision its public certificate if the original identity cannot be recovered. The CLI cannot recover damaged private-key bytes or revoke a certificate on a server.
 
 An expired or not-yet-valid identity remains inspectable but refuses new connections with `UaClientIdentityTimeInvalid`. Rotation requires new explicit server trust provisioning. Reusing the identity never restores old session tokens, reconnects, resumes polling/subscriptions or clears unresolved endpoint reservations. Each Host still has a new ownership ID and the existing uncertain-outcome rules apply. Encrypted loopback validation establishes software behavior only; real-device certificate acceptance remains unqualified. See [implementation evidence](../verification/opcua-persistent-identity-20261025.md).
+
+## Controlled acquisition reconnect
+
+Polling and subscription start requests accept `maximumReconnectAttempts` from 0
+through 3. The default is 0, preserving fail-on-interruption behavior. A positive
+value permits that many attempts across the entire live capture, with a 500 ms
+cancellable delay before each attempt and the existing ten-second service budget.
+Recovery consumes the original duration, sample/notification and storage budgets.
+
+Only a transport interruption or service timeout can initiate recovery. The same
+Host must still own the original session and its acquisition lease. Each attempt
+rechecks protected credential admission and client/server certificate validity,
+reactivates the original session on an encrypted channel, and verifies its original
+session ID, namespace and server-URI tables, and server start time. Identity changes,
+expired/lost sessions, retired credentials, authentication failures and invalid
+responses stop recovery. There is no replacement session, subscription transfer,
+trust update or release of an unresolved endpoint reservation.
+
+The journal commits a `starting` event before network recovery, followed by
+`succeeded` or `failed` with a bounded error code. Their original monotonic elapsed
+and wall-clock observations delimit an interruption with unknown remote data loss.
+A successful reconnect does not establish complete sampling. Polling retains its
+failed read and skipped slots, then continues at the next scheduled cycle.
+Subscriptions retain their original subscription/item identities and drain bounded
+Republish responses before sending Publish again; retransmissions, detected gaps,
+duplicates, unavailable messages and overflow remain separate evidence.
+
+Repeated start, status, page, export and stop after a Host restart remain local
+observations. They never reactivate a session or restart acquisition, including
+when the original request opted into recovery. Stopping during recovery cancels
+further attempts; uncertain remote state remains reserved. Explicit session cleanup
+continues to report its own outcome.
+
+This uses the pinned SDK's session reactivation, following the
+[OPC Foundation reconnect sequence](https://reference.opcfoundation.org/specs/OPC-10000-4/6.7).
+No background SDK reconnect handler, subscription recreation, ResendData method or
+write service is enabled. See [local implementation evidence](../verification/opcua-controlled-reconnect-20261025.md).
