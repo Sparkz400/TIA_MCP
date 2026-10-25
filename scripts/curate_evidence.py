@@ -31,7 +31,9 @@ def tree(path):
 
 def run(path):
     report = json.loads(path.read_text(encoding="utf-8"))
-    calls = report.get("toolCalls", [])
+    # Qualifiers that log each MCP call as a step (tool + isError) have no separate toolCalls list.
+    calls = report.get("toolCalls") or [{"name": st["tool"], "isError": st["isError"]}
+                                        for st in report.get("steps", []) if "tool" in st and "isError" in st]
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
             "completed": report.get("completed") is True,
             "steps": [step.get("name") or step.get("tool") for step in report.get("steps", [])],
