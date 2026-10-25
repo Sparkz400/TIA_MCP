@@ -4,6 +4,21 @@
 
 See the [consolidated TODO](../TODO.md) for the current work order. This page retains detailed acceptance criteria and dated progress.
 
+## Lane A — 25 October 2026
+
+- Software-unit baseline rebuilt from a fresh UnitSeeder seed; all 24 route cases passed all four
+  engineering gates (`evidence/local.typed.routes.engineering.20261025.json`).
+- The three objects the lost baseline held implicitly (`TgpNamespace_TemplateFB_LAD/FBD`,
+  `TgpUnit_GlobalTimer`) are explicit inputs in `route-capture-prerequisites.v1.json`. One capture of
+  those plus all 38 packet inputs imported, compiled and saved every input (48 blocks), preserved all
+  existing XML, matched a fresh-process reopen and cleaned up both owned lifetimes
+  (`evidence/local.typed.route-capture.20261025.json`). It is native reference evidence only.
+- Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
+  refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
+- Existing-caller insertion is qualified under the 25 October scope decision (section 5).
+- Still open: candidate extraction/review and activation for the captured routes, the 80 pending
+  route cells, scoped runtime (the runtime harness cannot call a software-unit DUT from `Main`).
+
 ## Lane A — 24 October 2026
 
 The raw artifacts behind the 8–13 October evidence (`artifacts/tq*`, `p16t`, `p17t`,
