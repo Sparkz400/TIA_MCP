@@ -2,6 +2,12 @@
 
 ## Components
 
+Retained UA captures can be compared offline with explicit signal mappings and
+Host receipt-time windows. Both original chains and quality/gap evidence remain
+available in reports and portable Explorer; see
+[UA capture comparison](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/diagnostic-ua-comparison.md)
+for exact limits and qualification boundaries.
+
 - **MCP client** talks to the Host over stdio.
 - **Host** (`TiaMcp.Host`, .NET 10, Windows) serves the MCP tools, portable document workflows and saved project reviews.
 - **OPC UA client** supports bounded read-only scalar, array and matrix acquisition without TIA. An optional named client identity uses protected Windows per-user storage separately from retained session records; certificate persistence does not restore sessions. Bounded subscriptions can also record an explicit event notifier and selected signals, preserving original event fields, queue overflow and receipt-ordered timelines; see the [event profile](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime-subscriptions.md#read-only-alarm-and-event-capture). Captures can explicitly opt into bounded recovery of the same live session, retaining downtime and uncertainty; Host restart never resumes acquisition. See the [runtime workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md) for setup, rotation, representations, limits and qualification boundaries.

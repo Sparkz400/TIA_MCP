@@ -15,6 +15,7 @@ import uuid
 from smoke_mcp import Client
 from test_diagnostic_ua_binding_contract import validator
 from qualify_diagnostic_ua_observation import qualify as qualify_observation
+from qualify_diagnostic_ua_comparison import qualify as qualify_comparison
 
 
 def main():
@@ -181,6 +182,19 @@ def main():
         check(sum(len(r["event"].get("events",[])) for r in document["captureSource"]["rows"])==2,"Prebound diagnostic report retains original repeated events alongside signals")
         check(fixture("audit")==baseline,"Event timeline composition has no remote services")
         observations.append(observed);retained.append(("subscription",capture,req,status["snapshotRef"]))
+        first_events = status['snapshotRef']
+        capture=uuid.uuid4().hex
+        req={**req,'maximumNotifications':len(nodes)+1}
+        call('runtime_ua_subscription_start',dict(captureId=capture,request=req))
+        deadline=time.monotonic()+10
+        while call('runtime_ua_subscription_status',dict(captureId=capture))['recordedProgress']['rows']==0:
+            check(time.monotonic()<deadline,'Second event capture starts within deadline');time.sleep(0.05)
+        fixture('emitEvent',number=3,severity=900)
+        second_events=complete('subscription',capture)['snapshotRef']
+        before_comparison=fixture('audit')
+        comparisons=[qualify_comparison(call,check,first_events,second_events,out/'comparisons','events'),
+                     qualify_comparison(call,check,observations[0]['snapshotRef'],observations[1]['snapshotRef'],out/'comparisons','polling-subscription')]
+        check(fixture('audit')==before_comparison,'Comparisons, guards and exports perform no UA services')
         for mode in ("subscriptionDuplicate", "subscriptionGap", "subscriptionOverflow", "subscriptionRepublishUnavailable", "subscriptionCreateItemsDenied"):
             fixture("mode", value=mode)
             capture = uuid.uuid4().hex
@@ -194,6 +208,9 @@ def main():
             check(doc["events"][field] > 0, "Report preserves " + mode)
             check(fixture("audit") == baseline, "Adverse report processing performs no remote services")
             observations.append(observed)
+            before_comparison=fixture('audit')
+            comparisons.append(qualify_comparison(call,check,first_events,status['snapshotRef'],out/'comparisons',mode))
+            check(fixture('audit')==before_comparison,'Adverse comparison performs no UA service')
             retained.append(("subscription",capture,req,status["snapshotRef"]))
         fixture("mode", value="normal")
         call("runtime_ua_disconnect", dict(attemptId=attempt))
@@ -211,11 +228,16 @@ def main():
         for observation in observations:
             call("diagnostic_ua_observe", dict(snapshotRef=observation["snapshotRef"]), "ArtifactUnavailable")
             call("diagnostic_ua_report_export", dict(reportId=observation["id"], format="json"), "ArtifactUnavailable")
+        for comparison in comparisons:
+            call('diagnostic_ua_report_export',dict(reportId=comparison['id'],format='json'),'ArtifactUnavailable')
         check(fixture("audit") == before, "Restart observations never replay services or require missing binding")
         path.write_bytes(original)
         for observation in observations:
             check(call("diagnostic_ua_observe", dict(snapshotRef=observation["snapshotRef"]))["id"] == observation["id"], "Restart produces identical observation from originals")
             call("diagnostic_ua_report_export", dict(reportId=observation["id"], format="html"))
+        for comparison in comparisons:
+            check(call('diagnostic_ua_compare',comparison['arguments'])['id']==comparison['id'],'Second Host derives the identical comparison')
+            call('diagnostic_ua_report_export',dict(reportId=comparison['id'],format='html'))
         check(fixture("audit") == before, "Restart report revalidation performs no UA service")
         report["status"] = "passed"
     except BaseException as error:
