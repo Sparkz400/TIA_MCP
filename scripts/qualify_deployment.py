@@ -204,7 +204,8 @@ class McpClient:
         except (BrokenPipeError, OSError):
             pass
         try:
-            self.process.wait(timeout=min(75, max(1, self.timeout)))
+            # Two native workers, each up to BridgeClient.WorkerExitBudgetSeconds (120 s).
+            self.process.wait(timeout=min(255, max(1, self.timeout)))
         except subprocess.TimeoutExpired:
             forced = True
             # Only our direct launcher/SSH process is owned. Never kill a process

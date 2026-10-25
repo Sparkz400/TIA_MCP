@@ -6,7 +6,7 @@ The runner supplies a fresh `creationId` before every `sim_create`; the audit pe
 
 Elapsed timer assertions now reference an earlier named single-call step rather than equating requested host sleep with PLC elapsed time. The new `elapsed` assertion records `[current.begin - origin.end, current.end - origin.begin]`, clipped at zero and the authored timer preset. A one-millisecond resolution allowance is explicit in the TON fixture; measured uncertainty above 500 ms blocks qualification. This bounds host-observed call separation, includes intervening transport/report work, and does not establish scan synchronization or a PLC monotonic timestamp. Original failed reports and their suite hashes remain unchanged; revised suites produce new hashes. The nine-family timer suite adds an explicit zero-elapsed start assertion.
 
-The host waits up to ten seconds for its exact worker to exit after pipe EOF and emits a structured `bridgeWorkerExit` diagnostic. A timeout records unverified exit without terminating native work. Host exit and TIA project-lock release remain distinct observations.
+The host waits up to 120 seconds for its exact worker to exit after pipe EOF (the worker exits only after its owned Portal closes; 42.2 s was measured after a 1.5 h capture) and emits a structured `bridgeWorkerExit` diagnostic. A timeout records unverified exit without terminating native work. Host exit and TIA project-lock release remain distinct observations.
 
 `scripts/run_block_tests.py` connects native FC/FB interface inspection, SCL test-program generation, the existing engineering/simulator MCP tools, and independently authored runtime expectations. The default command prepares reviewable artifacts without starting TIA or PLCSIM:
 

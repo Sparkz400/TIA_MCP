@@ -313,7 +313,7 @@ def graceful_close(client):
         pass
     timed_out = False
     try:
-        client.process.wait(timeout=60)
+        client.process.wait(timeout=255)  # two workers × BridgeClient.WorkerExitBudgetSeconds, plus margin
     except subprocess.TimeoutExpired:
         timed_out = True
     client.output_reader.join(timeout=1)
