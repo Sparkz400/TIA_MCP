@@ -14,14 +14,30 @@ are loaded from your installed products and are not redistributed.
 > validated in CI; live TIA Portal and PLCSIM runtime qualification is incomplete
 > (see [Current status](docs/STATUS.md)). Use it only with offline projects, copies,
 > scratch projects and simulators you own, never with production PLCs or plants.
-> Provided "as is", without warranty, under the [Apache License 2.0](LICENSE).
->
-> Siemens, TIA Portal, SIMATIC, STEP 7, WinCC and PLCSIM are trademarks of Siemens AG.
-> This project is independent and not affiliated with, endorsed or supported by Siemens.
-> OPC UA is a trademark of the OPC Foundation.
+> Independent project, not affiliated with Siemens ([trademarks](#license)).
 
-[Documentation](docs/README.md) · [Current status](docs/STATUS.md) ·
-[Remaining work](docs/TODO.md) · [Contributing](CONTRIBUTING.md)
+[Documentation](docs/README.md) · [Wiki](https://github.com/Sparkz400/TIA_MCP/wiki) ·
+[Current status](docs/STATUS.md) · [Remaining work](docs/TODO.md) ·
+[Discussions](https://github.com/Sparkz400/TIA_MCP/discussions) · [Contributing](CONTRIBUTING.md)
+
+<!-- Demo: add docs/assets/demo.gif here (about 30 s: discover a session, find a
+     block's callers, preview a change) and reference it as the first image. -->
+
+## What you can ask
+
+With the server connected, ask your MCP client in plain language:
+
+- *"List the open TIA Portal sessions and open the packaging-line project."*
+  → `tia_discover`, `project_open`
+- *"Which blocks call `MotorControl`, and what is affected if I change its interface?"*
+  → `call_graph`, `change_impact`
+- *"Prepare that change, show me the preview, then apply it with a checkpoint."*
+  → `change_prepare`, `change_apply`, `change_restore` if it goes wrong
+- *"Create a PLCSIM instance and test that `Motor_On` follows `Start`."*
+  → `sim_create`, `sim_test`
+- *"Give me a health report of this project."* → `project_health_report`
+
+Ask `feature_catalog` and `target_capabilities` what your target supports.
 
 ## Explore a project
 
@@ -50,11 +66,8 @@ For the full engineering build and MCP server:
 Use your normal authorized Windows engineering account. See
 [environment diagnostics](docs/guides/environment-diagnostics.md) and
 [Openness registration](docs/guides/openness-application-registration.md) for setup.
-You can review [detached Add-In selections](docs/reference/addin-selections.md) against saved project reviews without TIA; native companion delivery remains open.
-You can also compare [supplied Project Server observations](docs/reference/multiuser-observations.md), retaining session/lock/marking differences and coverage gaps without connecting to a server. Native collaboration workflows remain open.
-The [Teamcenter supplied-review workflow](docs/reference/teamcenter-observations.md) compares item/revision/dataset metadata and retains uploaded local manifests; it does not verify native cache contents or grant checkout ownership.
-
-You can run the offline checks below without Siemens software. Local Windows [protected credential commands](docs/reference/protected-credentials.md) also work without Siemens, using hidden console input or an explicit stdin pipe; they do not configure a PLC or server.
+Without Siemens software you can still use the portable workflows and run the
+offline checks, as described below.
 
 ### Working without any Siemens installation
 
@@ -97,6 +110,16 @@ Already available in this setup:
   inspect history and export exact revisions through the [offline VCI Git workflow](docs/reference/vci-host-workflow.md).
   This additionally requires the explicit `--git-executable` Host option.
   Supplied [package mappings and three-way conflicts](docs/reference/vci-package-workflow.md) can also be reviewed offline.
+- Review [detached Add-In selections](docs/reference/addin-selections.md) against
+  saved project reviews; native companion delivery remains open.
+- Compare [supplied Project Server observations](docs/reference/multiuser-observations.md),
+  retaining session/lock/marking differences and coverage gaps without connecting
+  to a server. Native collaboration workflows remain open.
+- Compare Teamcenter item/revision/dataset metadata through the
+  [supplied-review workflow](docs/reference/teamcenter-observations.md); it does not
+  verify native cache contents or grant checkout ownership.
+- Use the local Windows [protected credential commands](docs/reference/protected-credentials.md)
+  with hidden console input or an explicit stdin pipe; they do not configure a PLC or server.
 - Run the portable development checks below against retained or synthetic
   fixtures, and audit which historical evidence files are unavailable.
 
@@ -214,3 +237,8 @@ TIA MCP's original code and documentation are licensed under
 [NOTICE](NOTICE). Third-party material retains its own license;
 see [the OPC Foundation schema attribution](third-party/opcua/README.md).
 Siemens products and SDK assemblies remain subject to their own license terms.
+Provided "as is", without warranty.
+
+Siemens, TIA Portal, SIMATIC, STEP 7, WinCC and PLCSIM are trademarks of Siemens AG.
+This project is independent and not affiliated with, endorsed or supported by Siemens.
+OPC UA is a trademark of the OPC Foundation.
