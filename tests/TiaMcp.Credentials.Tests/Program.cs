@@ -12,6 +12,8 @@ using TiaMcp.Host;
 
 if (args.Length > 0 && args[0] == "--lost-reply") { OperationChecks.LostReply(args); return; }
 if (args.Length > 0 && args[0] == "--recovery-lost-reply") { RecoveryChecks.LostReply(args); return; }
+if (args.Length == 2 && args[0] == "--ua-probe") { UaIdentityChecks.Probe(args[1]); return; }
+if (args.Length == 2 && args[0] == "--ua-hold") { using var lease = new CredentialVault(args[1]).OpenUaIdentity(); Console.WriteLine("held"); Console.Out.Flush(); Console.ReadLine(); return; }
 if (args.Length > 0 && args[0] == "--probe")
 {
     try
@@ -128,6 +130,7 @@ Reject(()=>capacity.Create(binding,secret),"CredentialCapacity","Retained orphan
 CryptographicOperations.ZeroMemory(secret);
 OperationChecks.Run(Path.Combine(output, "operations"));
 RecoveryChecks.Run(Path.Combine(output, "recovery"));
+UaIdentityChecks.Run(Path.Combine(output, "ua-identity"), Check);
 File.WriteAllText(Path.Combine(output, "verification.json"), JsonSerializer.Serialize(new { completed=true, nativeExecuted=false, currentUserDpapiExecuted=true, crossUserProfileTested=false, count=checks.Count, checks }, CredentialVault.Json));
 Console.WriteLine($"PASS protected credential storage: {checks.Count} checks; actual current-user DPAPI/ACL, no native provider. Receipts retained at {output}");
 

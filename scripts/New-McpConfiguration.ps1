@@ -5,12 +5,14 @@ param(
     [string]$TiaApiDirectory,
     [string]$SimulatorApiDirectory,
     [string]$GitExecutable,
+    [string]$UaClientIdentity,
     [ValidateSet('Direct','InteractiveUser')][string]$SessionMode = 'Direct',
     [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
     [ValidateRange(1,120)][int]$ConnectTimeoutSeconds = 15,
     [switch]$StrictBundle
 )
 $ErrorActionPreference = 'Stop'
+if ($PSBoundParameters.ContainsKey('UaClientIdentity') -and $UaClientIdentity -cnotmatch '^(default|[0-9a-f]{32})$') { throw 'UaClientIdentity must be default or 32 lowercase hexadecimal characters.' }
 function Assert-WindowsPath([string]$Path, [string]$Label) {
     if (-not ($Path -match '^[A-Za-z]:[\\/]' -or $Path -match '^\\\\[^\\/?\.][^\\/]*[\\/][^\\/]+([\\/]|$)') -or
         $Path -match '[\x00-\x1f"<>|?*]' -or $Path.Substring(2).Contains(':') -or
@@ -28,6 +30,7 @@ foreach ($override in @(@{value=$ArtifactsDirectory; name='ArtifactsDirectory'},
     if ($override.value) { $launcherArguments += @(('-' + $override.name), $override.value) }
 }
 if ($StrictBundle) { $launcherArguments += '-StrictBundle' }
+if ($UaClientIdentity) { $launcherArguments += @('-UaClientIdentity', $UaClientIdentity) }
 if ($SessionMode -eq 'InteractiveUser') { $launcherArguments += '-InteractiveSession' }
 if ($SshHost) {
     if ($SshHost -notmatch '^(?:[a-zA-Z0-9_][a-zA-Z0-9_.-]*@)?[a-zA-Z0-9_][a-zA-Z0-9_.-]*$') {

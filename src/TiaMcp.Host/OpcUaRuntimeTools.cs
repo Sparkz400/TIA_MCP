@@ -26,7 +26,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
         throw new BridgeException("InvalidRequest", "Expected an immutable polling or subscription snapshot reference."));
 
     [McpServerTool(Name = "runtime_ua_client_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Return this Host's ephemeral OPC UA client public certificate and application URI for explicit server trust provisioning. Private keys never leave Host memory. A Host restart creates a new client identity; no physical connection is performed.")]
+    [Description("Return this Host's OPC UA client public certificate, application URI, validity and storage mode for explicit server trust provisioning. With --ua-client-identity NAME, a pre-created Windows current-user DPAPI identity survives Host restarts; its private key is never returned. Without that option identity is ephemeral. No physical connection, automatic replacement or server trust change is performed.")]
     public Task<CallToolResult> ClientIdentity() => Run(() => Task.FromResult(sessions.Store.ClientIdentity()));
     [McpServerTool(Name = "runtime_ua_credential_binding", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Build the protected username credential binding for one exact opc.tcp endpoint, server application URI and leaf SHA256. Store a JSON-string password through the local credential CLI, never through MCP arguments. Set authentication=username; omit credential while obtaining this binding.")]
@@ -44,7 +44,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     public Task<CallToolResult> Read(string attemptId, OpcUaRuntimeNode[] nodes, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Read(attemptId, nodes, cancellationToken));
     [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read retained UA attempt state without network traffic. Host restart preserves hostEndedRemoteUnknown; session tokens and private keys are not persisted or adopted.")]
+    [Description("Read retained UA attempt state without network traffic. Host restart preserves hostEndedRemoteUnknown; session tokens are not persisted or adopted. A separately protected client certificate does not resume sessions or acquisition.")]
     public Task<CallToolResult> Status(string attemptId, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Status(attemptId, cancellationToken));
     [McpServerTool(Name = "runtime_ua_disconnect", ReadOnly = false, Destructive = false, OpenWorld = true)]

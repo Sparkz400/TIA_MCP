@@ -53,12 +53,26 @@ internal static class ArrayValueChecks
             }
             finally { server.Mode = "normal"; }
             string capture = Id();
-            await captures.Start(capture, new(attempt, nodes, 100, 10, MaximumSamples: names.Length), default);
-            var poll = await End(() => captures.Status(capture, default));
+            JsonElement poll;
+            // Exercise the gap rows a slower packaged runner can legitimately retain.
+            server.ReadDelayMs = 25;
+            try
+            {
+                await captures.Start(capture, new(attempt, nodes, 100, 10, MaximumSamples: names.Length), default);
+                poll = await End(() => captures.Status(capture, default));
+            }
+            finally { server.ReadDelayMs = 0; }
             pollRef = poll.GetProperty("snapshotRef").GetString()!;
             pollRows = Json(captures.Page(pollRef, 0, 200)).GetProperty("rows").Clone();
-            Verify(pollRows.EnumerateArray().Select(row => JsonDocument.Parse(row.GetProperty("readResultJson").GetString()!)
-                .RootElement.GetProperty("items")[0].Deserialize<OpcUaRuntimeValue>(BridgeProtocol.Json)!), "poll", check);
+            var reads = pollRows.EnumerateArray().Where(row => row.GetProperty("kind").GetString() == "read").ToArray();
+            check(reads.Length == names.Length && reads.All(row => row.GetProperty("readResultJson").ValueKind == JsonValueKind.String),
+                "Array polling retains every successful read separately from gaps");
+            check(pollRows.EnumerateArray().Any(row => row.GetProperty("kind").GetString() == "gap"), "Delayed array polling retains explicit skipped-slot gaps");
+            Verify(reads.Select(row =>
+            {
+                using var result = JsonDocument.Parse(row.GetProperty("readResultJson").GetString()!);
+                return result.RootElement.GetProperty("items")[0].Deserialize<OpcUaRuntimeValue>(BridgeProtocol.Json)!;
+            }), "poll", check);
             var pollExport = Json(await captures.Export(pollRef, "csv", default));
             var exported = VerifyExport(pollExport, pollRows, "poll", check);
             var plan = exported.GetProperty("capture").GetProperty("plan").Deserialize<RuntimeCapturePlan>(BridgeProtocol.Json)!;

@@ -9,6 +9,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
 {
     public PackageIntakeLimits LibraryLimits { get; init; } = new();
     public string? GitExecutable { get; init; }
+    public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
     public bool AddInHandoff { get; init; }
     // Deliberately excluded from normal feature/catalog advertisements.
@@ -31,6 +32,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             : Path.Combine(root, "src", "TiaMcp.Simulator.V8", "bin", "Debug", "net48", "TiaMcp.Simulator.V8.exe");
         string? api = null;
         string? gitExecutable = null;
+        string? uaClientIdentity = null;
         string? simulatorApi = null;
         var timeout = 120;
         var diagnose = false;
@@ -68,6 +70,10 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                 case "--sim-worker": simulator = Path.GetFullPath(args[i]); break;
                 case "--sim-api-dir": simulatorApi = Path.GetFullPath(args[i]); break;
                 case "--artifacts": artifacts = Path.GetFullPath(args[i]); break;
+                case "--ua-client-identity":
+                    if (uaClientIdentity is not null || args[i] != "default" && !TiaMcp.Core.Security.ProtectedCredentialGuard.IsId(args[i]))
+                        throw new ArgumentException("--ua-client-identity requires one default or 32-lowercase-hex name.");
+                    uaClientIdentity = args[i]; break;
                 case "--watch-qualification": watchQualificationPoint = args[i]; break;
                 case "--library-limits-file": libraryLimits = ReadLibraryLimits(args[i]); break;
                 case "--api-dir": api = Path.GetFullPath(args[i]); break;
@@ -95,7 +101,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || watchQualificationPoint is not null))
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { AddInHandoff = addInHandoff, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

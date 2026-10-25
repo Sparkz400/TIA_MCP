@@ -77,8 +77,9 @@ try
             if (op == "stop") break;
             if (op == "mode") server.Mode = command.RootElement.GetProperty("value").GetString()!;
             if (op == "readDelay") server.ReadDelayMs = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "trustClient") server.TrustedClientSha256 = command.RootElement.GetProperty("sha256").GetString();
             Save("server-live", new { sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() });
-            Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() }, BridgeProtocol.Json));
+            Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray(), clientCertificates = server.ClientCertificateChecks.ToArray() }, BridgeProtocol.Json));
             Console.Out.Flush();
         }
         passed = true;
