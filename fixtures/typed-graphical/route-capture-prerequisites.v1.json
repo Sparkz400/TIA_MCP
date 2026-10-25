@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Explicit inputs for the three objects the lost 13 October baseline archive supplied implicitly; captured before route-capture-packet.v1.json.",
+  "unit": "TiaMcp_UnitA",
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-global-timer-storage.scl",
+      "sha256": "4d7f81d58dfe058d5d4cc7e9bc2a0c19f151746af83b3c4afb2817d45a80f32c",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_GlobalTimer"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+      "sha256": "08d2398a78317c919f4ec61ebe1e1e8318638f6227521e5639bce211919e339c",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TemplateFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_FBD.xml",
+      "sha256": "58cd1aec0201bd1811506566234e555533fc87c05a6aa80d8927eff10f945365",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TemplateFB_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    }
+  ]
+}
