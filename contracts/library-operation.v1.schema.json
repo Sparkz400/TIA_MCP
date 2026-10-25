@@ -1221,7 +1221,8 @@
                 "destinationComposition": {
                   "enum": [
                     "blocks",
-                    "types"
+                    "types",
+                    "tagTables"
                   ]
                 }
               },
