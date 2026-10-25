@@ -58,6 +58,15 @@ and pages through original rows. **Download capture JSON** preserves the supplie
 file bytes. These local consistency checks do not authenticate the source.
 Existing Web runtime capture imports retain their previous behavior.
 
+Mixed signal/event subscriptions include a receipt-ordered event timeline in
+readable exports and show exact event fields in Explorer's original-row view.
+Repeated IDs and duplicate envelopes remain visible; event times and Host times
+are separate clocks. The existing `events.overflowNotifications` summary counts
+signal DataValue overflow only; event queue overflow is explicit in each original
+event notification and the timeline. No active-alarm inventory or automatic
+source-to-signal association is inferred. See the
+[bounded event profile](opcua-runtime-subscriptions.md#read-only-alarm-and-event-capture).
+
 ## Retention and refusal boundaries
 
 The Host reopens and validates the original chain, binding, experiment and saved

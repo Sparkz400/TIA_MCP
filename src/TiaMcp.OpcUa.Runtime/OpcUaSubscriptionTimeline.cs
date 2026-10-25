@@ -27,7 +27,7 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
     {
         if(p.State!="ended")return;
         if(p.TerminalReason=="notificationLimit")Require(Notifications==plan.Request.MaximumNotifications);
-        if(p.TerminalReason=="allItemsFailed")Require(created is not null && created.Items.All(x=>(OpcUaSubscriptionContracts.Status(x.StatusCode)&0x80000000)!=0) && Notifications==0);
+        if(p.TerminalReason=="allItemsFailed")Require(created is not null && OpcUaSubscriptionContracts.AllItemsFailed(created) && Notifications==0);
         if(p.TerminalReason=="serverStatusChanged")Require(serverStatus);
         if(serverStatus)Require(p.TerminalReason is "serverStatusChanged" or "stopped" or "hostShutdown");
         if(p.TerminalReason=="sequenceGapLimit")Require(Missing>republish-recoveryProbes && republish==plan.Request.MaximumRepublish);
@@ -56,6 +56,8 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
                     value.Value.DataType==item.Metadata.DataType && value.Value.ValueRank==item.Metadata.ValueRank &&
                     JsonElement.DeepEquals(JsonSerializer.SerializeToElement(value.Value.ArrayDimensions),JsonSerializer.SerializeToElement(item.Metadata.ArrayDimensions)));
             }
+            foreach(var notification in e.Events??[])Require(created.EventItem is { } item && notification.ClientHandle==item.ClientHandle &&
+                notification.MonitoredItemId==item.MonitoredItemId && (OpcUaSubscriptionContracts.Status(item.StatusCode)&0x80000000)==0);
             serverStatus|=e.StatusChanges is {Length:>0};
             if(e.Kind=="gap") {Require(pendingGap is null && e.GapFrom==expected);pendingGap=e;gaps.Add((e.GapFrom!.Value,e.MissingCount));}
             else if(e.Kind=="publish")

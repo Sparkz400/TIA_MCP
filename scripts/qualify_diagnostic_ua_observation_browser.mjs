@@ -45,6 +45,16 @@ try{
   check((await page.locator('.runtime-panel').innerText()).includes('Hypotheses remain unresolved'),'Explorer uncertainty visible '+filename);
   check(await page.locator('.ua-signal').count()===doc.signals.length,'All selected signals visible '+filename);
   check(await page.locator('.runtime-panel script,.runtime-panel img,.runtime-panel iframe').count()===0,'Hostile report evidence remains text '+filename);
+  if(doc.captureSource.plan.request?.events){
+   check(await page.locator('.ua-event').count()===2,'Original repeated event records visible');
+   const evidence=await page.locator('.runtime-panel').innerText();
+   check(evidence.includes('Übertemperatur <script>alert(1)</script>')&&evidence.includes('repeated EventId')&&evidence.includes('ReceiveTime'),'Exact localized event, repetition and separate clocks visible');
+   await page.setViewportSize({width:1440,height:900});
+   await page.locator('.ua-event').first().scrollIntoViewIfNeeded();
+   const bounds=await page.locator('.ua-event').first().boundingBox();
+   check(bounds&&bounds.y>=0&&bounds.y<900,'Event timeline is in the visible viewport');
+   const shot=path.join(output,'event-timeline.png');await page.screenshot({path:shot});report.screenshots.push(shot);
+  }
   const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download capture JSON',exact:true}).click();
   const download=await downloadPromise,saved=path.join(output,filename);await download.saveAs(saved);
   check(await fs.readFile(saved,'utf8')===text,'Explorer download preserves original report bytes '+filename);
@@ -52,7 +62,7 @@ try{
   const rejection=await page.evaluate(async value=>{try{await projectExplorer.loadRuntimeCapture(JSON.stringify(value));return 'accepted';}catch(e){return e.message;}},changed);
   check(rejection.includes('Invalid UA observation'),'Explorer refuses forged summary '+filename);
   check(await page.evaluate(()=>projectExplorer.runtimeCapture.doc.signals[0].goodValues)===doc.signals[0].goodValues,'Refusal preserves previous valid view '+filename);
-  if(!['capture-observation.json','subscription-observation.json'].includes(filename))continue;
+  if(!['capture-observation.json','subscription-observation.json','events-observation.json'].includes(filename))continue;
   await page.locator('.ua-signal summary').nth(1).click();
   check((await page.locator('.ua-signal').nth(1).innerText()).includes('18446744073709551615'),'Exact UInt64 visible '+filename);
   for(const width of [1440,390]){

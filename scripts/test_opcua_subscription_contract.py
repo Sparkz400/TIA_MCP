@@ -67,6 +67,16 @@ class SubscriptionContractTests(unittest.TestCase):
                       [dict(self.request['nodes'][0],identifier=str(i)) for i in range(65)]]:
             self.assertFalse(validator('request').is_valid({**self.request,'nodes':nodes}))
 
+    def test_event_only_and_mixed_selection(self):
+        selected = dict(notifier=self.request['nodes'][0], minimumSeverity=500)
+        for nodes in ([], self.request['nodes']):
+            validator('request').validate({**self.request, 'nodes':nodes, 'events':selected})
+        for changed in (dict(minimumSeverity=-1),dict(minimumSeverity=1001),dict(minimumSeverity=1.5),dict(acknowledge=True),dict(notifier=None)):
+            self.assertFalse(validator('request').is_valid({**self.request,'events':{**selected,**changed}}))
+        self.assertFalse(validator('request').is_valid({**self.request,'nodes':[],'events':selected,'diagnosticBindingId':'a'*64}))
+        validator('request').validate({**self.request,'events':None})
+        self.assertFalse(validator('request').is_valid({**self.request,'nodes':[],'events':None}))
+
     def test_unadvertised_control_and_recovery_requests_refuse(self):
         for field in ('reconnect','transfer','write','resume','method','force'):
             self.assertFalse(validator('request').is_valid({**self.request,field:True}))
@@ -90,7 +100,7 @@ class SubscriptionContractTests(unittest.TestCase):
         validator('pageInput').validate(dict(snapshotRef=ref,count=200,offset=0))
         for updates in [dict(count=201),dict(count=0),dict(offset=-1),dict(snapshotRef=ref.replace(':1:',':01:'))]:
             self.assertFalse(validator('pageInput').is_valid({'snapshotRef':ref, **updates}))
-        for fmt in ('json','csv'): validator('exportInput').validate(dict(snapshotRef=ref,format=fmt))
+        for fmt in ('json','csv','html','markdown'): validator('exportInput').validate(dict(snapshotRef=ref,format=fmt))
         self.assertFalse(validator('exportInput').is_valid(dict(snapshotRef=ref,format='binary')))
 
     def test_event_kind_and_sequence_requirements(self):

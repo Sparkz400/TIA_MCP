@@ -3,7 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using TiaMcp.Core;
+using TiaMcp.Core.Diagnostics;
 using TiaMcp.Core.EngineeringJobs;
 
 namespace TiaMcp.OpcUa.Runtime;
@@ -76,10 +78,17 @@ internal sealed class OpcUaSubscriptionStore : IDisposable
     { var snapshot=Load(snapshotRef);return(snapshot.Plan,snapshot.Progress,Rows(snapshot)); }
     public object Export(string snapshotRef, string format, bool live)
     {
-        Require(format is "json" or "csv","OpcUaSubscriptionFormatInvalid"); var snapshot = Load(snapshotRef);
+        Require(format is "json" or "csv" or "html" or "markdown","OpcUaSubscriptionFormatInvalid"); var snapshot = Load(snapshotRef);
+        string? timeline = null;
+        if (format is "html" or "markdown")
+        {
+            Require(snapshot.Progress.Rows <= 10000,"UaSubscriptionLimit");
+            timeline = DiagnosticUaTimeline.Export(snapshotRef,JsonSerializer.SerializeToNode(snapshot.Progress,Json)!,
+                JsonSerializer.SerializeToNode(Rows(snapshot),Json)!.AsArray(),format=="html");
+        }
         lock (quotaGate)
         {
-            Capacity((snapshot.Plan.Request.MaximumBytes+PlanBytes) * (format == "csv" ? 3 : 1));
+            Capacity((snapshot.Plan.Request.MaximumBytes+PlanBytes) * (format == "csv" ? 3 : 1) + (timeline is null ? 0 : Encoding.UTF8.GetByteCount(timeline)));
             string exportId = Guid.NewGuid().ToString("N"); var artifacts = new List<object>();
             string jsonPath = PathFor(snapshot.Plan.CaptureId,exportId+".json");
             using (var output = New(jsonPath))
@@ -109,6 +118,11 @@ internal sealed class OpcUaSubscriptionStore : IDisposable
                     output.Flush(true);
                 }
                 artifacts.Add(Artifact(csvPath));
+            }
+            if (timeline is not null)
+            {
+                string timelinePath=PathFor(snapshot.Plan.CaptureId,exportId+(format=="html"?".html":".md"));
+                WriteNew(timelinePath,Encoding.UTF8.GetBytes(timeline)); artifacts.Add(Artifact(timelinePath));
             }
             return new { snapshotRef, artifacts, nativeQualified = false, csvCompanionJson = format == "csv" };
         }

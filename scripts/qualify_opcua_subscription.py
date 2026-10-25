@@ -21,6 +21,7 @@ from smoke_mcp import Client, ROOT
 from opcua_runtime_checks import require
 from opcua_subscription_checks import verify_subscription, verify_subscription_audit, subscription_controls
 from qualify_opcua_subscription_inputs import check_unknown_subscription_inputs
+from qualify_opcua_events import qualify as qualify_events
 
 
 def write(path, value):
@@ -58,6 +59,7 @@ def main():
     source_paths += [str(p.relative_to(ROOT)).replace("\\", "/") for p in sorted((ROOT/"src/TiaMcp.OpcUa.Runtime").glob("*Subscription*.cs"))]
     source_paths += ["src/TiaMcp.Host/OpcUaSubscriptionTools.cs", "contracts/opcua-runtime-subscription.v1.schema.json", "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs"]
     source_paths += ["src/TiaMcp.Core/PhysicalRuntime/OpcUaReconnectEvent.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/ReconnectChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs"]
+    source_paths += ["scripts/qualify_opcua_events.py", "src/TiaMcp.OpcUa.Runtime/OpcUaEventContracts.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Events.cs", "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/EventChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Events.cs"]
     def source_inputs():
         return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in source_paths}
     source_before = source_inputs(); write(out / "sources-before.json", source_before)
@@ -221,6 +223,10 @@ def main():
         recovery_audit=fixture("audit")["audit"][len(before_recovery):]
         check(sum(e["operation"]=="ActivateSession" for e in recovery_audit)==1 and not any(e["operation"] in {"CreateSession","TransferSubscriptions","Write","Call"} for e in recovery_audit),"Exactly one same-session activation without replacement or mutation")
         write(out/"recovered-export.json",recovered_json)
+        event_capture,event_request,event_ref,event_rows=qualify_events(c,call,fixture,ended,download,capture_schema,attempt,nodes,out,check)
+        call(c,"disconnect",dict(attemptId=attempt))
+        attempt=uuid.uuid4().hex
+        check(call(c,"connect",dict(attemptId=attempt,selection=user))["state"]=="connected","Fresh protected session after intentional hostile event refusal")
         retired = subprocess.run([str(host), "--credential-store", "retire", "--vault-name", vault,
                                   "--binding", str(out / "binding.json"), "--reference", str(out / "reference.json")],
                                  capture_output=True, timeout=30)
@@ -258,6 +264,8 @@ def main():
         check(call(c,"subscription_status",dict(captureId=recovery_capture))["snapshotRef"]==recovery_ref,"Recovered capture reopens unchanged after Host restart")
         call(c,"subscription_start",dict(captureId=recovery_capture,request=recovery_request))
         check(call(c,"subscription_page",dict(snapshotRef=recovery_ref,count=200))["rows"]==recovery_rows,"Exact recovery events survive another Host")
+        call(c,"subscription_start",dict(captureId=event_capture,request=event_request))
+        check(call(c,"subscription_page",dict(snapshotRef=event_ref,count=200))["rows"]==event_rows,"Original event fields survive Host restart without replay")
         interrupted_status=call(c,"subscription_status",dict(captureId=interrupted))
         check(interrupted_status["state"]=="interrupted" and interrupted_status["uncommittedDataUnknown"],"New Host reports interrupted prefix and unknown tail")
         call(c,"subscription_start",dict(captureId=interrupted,request=crash_request))

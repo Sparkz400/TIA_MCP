@@ -29,6 +29,14 @@ internal sealed partial class FixtureServer
             item.RequestedParameters.QueueSize=Math.Min(4,item.RequestedParameters.QueueSize);
         }
         var response=await base.CreateMonitoredItemsAsync(channel,header,subscription,timestamps,items,ct);
+        foreach(var item in items.Where(i=>i.ItemToMonitor.AttributeId==Attributes.EventNotifier))
+        {
+            var filter=(EventFilter)item.RequestedParameters.Filter.Body;
+            Audit.Enqueue(new {operation="FixtureEventFilter",node=item.ItemToMonitor.NodeId.ToString(),
+                fields=filter.SelectClauses.Select(s=>new{type=s.TypeDefinitionId.ToString(),path=s.BrowsePath.Select(p=>p.ToString()).ToArray(),attribute=s.AttributeId}).ToArray(),
+                operators=filter.WhereClause.Elements.Select(e=>e.FilterOperator.ToString()).ToArray(),
+                minimumSeverity=((LiteralOperand)filter.WhereClause.Elements[0].FilterOperands[1].Body).Value.Value});
+        }
         Audit.Enqueue(new {operation="ItemsCreated",subscription,items=response.Results.Select((r,i)=>new {clientHandle=items[i].RequestedParameters.ClientHandle,
             node=Convert.ToString(items[i].ItemToMonitor.NodeId.Identifier),status=$"0x{r.StatusCode.Code:x8}",id=r.MonitoredItemId,
             revisedSampling=r.RevisedSamplingInterval,revisedQueue=r.RevisedQueueSize}).ToArray()});
@@ -92,6 +100,7 @@ internal sealed partial class FixtureServer
     }
     private void Normalize(NotificationMessage message)
     {
+        AlterEvent(message);
         foreach(var changes in message.NotificationData.Select(x=>x.Body).OfType<DataChangeNotification>())
         foreach(var n in changes.MonitoredItems)
         {

@@ -437,8 +437,8 @@
     },
     {
       "path": "contracts/opcua-runtime-subscription.v1.schema.json",
-      "sha256": "2afd895c04b34348d7278fe3928632e768257269bf0eabf39a7a6ac0e8c3c680",
-      "bytes": 46138
+      "sha256": "cbb1e7e244b840865a887a9d9384433eb604d8bd5d687139849c978f8764a35c",
+      "bytes": 53946
     },
     {
       "path": "contracts/opcua-runtime.v1.schema.json",
@@ -982,8 +982,13 @@
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
-      "sha256": "84aef27430ed0e282c311989ead395e2430af7a8e52649919a341711b30166a8",
-      "bytes": 15651
+      "sha256": "a5cd758ffc8a7ebf871a7cb770990fec22d24ba9e119e1a799fdd27119ead582",
+      "bytes": 15829
+    },
+    {
+      "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+      "sha256": "f7306a4daf82f778df1013bcb79f271a98cec0ff1135d277d29788abfad5de27",
+      "bytes": 4905
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticWatchPlanning.cs",
@@ -1787,8 +1792,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
-      "sha256": "e084e8c2d6575b4a509674a293a56d01f06efb47c4658b2783152247fd6ad31b",
-      "bytes": 4685
+      "sha256": "1594d62287c1295393b8700977094df4e0d90a7efe66ce75e053524db6d7269d",
+      "bytes": 5220
     },
     {
       "path": "src/TiaMcp.Host/OpcUaTools.cs",
@@ -1991,6 +1996,11 @@
       "bytes": 338
     },
     {
+      "path": "src/TiaMcp.OpcUa.Runtime/OpcUaEventContracts.cs",
+      "sha256": "88aa6ce523aa312aed4ef0bc5aedd9dfcb172e0cefa5f89103796d30a902a45c",
+      "bytes": 5106
+    },
+    {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeCaptures.cs",
       "sha256": "333c013c7320d1148c612f3d12e3e2f778e6b24b297ececa6a608c9d28ddf96b",
       "bytes": 11445
@@ -2001,9 +2011,14 @@
       "bytes": 2178
     },
     {
+      "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Events.cs",
+      "sha256": "0d90a4274e9e478ea6fb1d2a30652a494075e7cec90de78fb50cb220b2d50621",
+      "bytes": 1943
+    },
+    {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Subscriptions.cs",
-      "sha256": "45434e8f49e1b1a9c649fb0e4ade8f18453c325f8b0a862a36ab49f6dcac2b4a",
-      "bytes": 6690
+      "sha256": "345c1de252c297c75b378ea698a842830125e3f9295a901998f16f2620828c27",
+      "bytes": 9877
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
@@ -2017,23 +2032,23 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSubscriptions.cs",
-      "sha256": "53e889c7c72b8487acf8cebda1c3815e7d4b6a9b5b1594e26264e149b6dfdf8b",
-      "bytes": 12483
+      "sha256": "7b403ded4f6433b674956c051a1a630d3847778b1fd263bab4c2e4a87a20f670",
+      "bytes": 12448
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs",
-      "sha256": "882497a553e06a6ac2ec58b94cab501f08ed2616f4497352ed4aeda539c8d2d1",
-      "bytes": 11315
+      "sha256": "1a7dea11349d15a3351b32b00813c030860f4e4577c7d86bac64120321c94d80",
+      "bytes": 12271
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionStore.cs",
-      "sha256": "a40249d272b2d4d1f6cbdad00e0dfeff0719537ef9e039fcab4771d579d68009",
-      "bytes": 21513
+      "sha256": "1a63cd2c273eb6256b070ca201bae985ca2327fc20bdb583176d3dfe3aa690ee",
+      "bytes": 22339
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionTimeline.cs",
-      "sha256": "adff129e40583ab31fbe239d96585e34ea7ab27ea2385364ba3c7dd4e9a41b7d",
-      "bytes": 6454
+      "sha256": "1435a47f1e6cc355d312096b970fa447a4d2be34c743605306a502ba54ce6f38",
+      "bytes": 6700
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/TiaMcp.OpcUa.Runtime.csproj",
@@ -15890,6 +15905,13 @@
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
         },
         {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
+        },
+        {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
           "line": 119,
@@ -16520,6 +16542,13 @@
           "line": 125,
           "endLine": 141,
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -17325,6 +17354,13 @@
           "line": 125,
           "endLine": 141,
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -36520,6 +36556,13 @@
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
         },
         {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
+        },
+        {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
           "line": 119,
@@ -40742,6 +40785,13 @@
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
         },
         {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
+        },
+        {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
           "line": 119,
@@ -44598,6 +44648,13 @@
           "line": 125,
           "endLine": 141,
           "sha256": "dc0ef859c3b967fd0a262f31e0cb6eff173bbc1e0033ad4a4107081ba830c14f"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
+          "name": "Export",
+          "line": 52,
+          "endLine": 58,
+          "sha256": "7e1cdc763327f92a225a73c9f28809be4242cfc18124b032223b7081a1b06490"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -79111,6 +79168,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -79583,6 +79641,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -80067,6 +80126,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
         "src/TiaMcp.Host/AccessTools.cs",
@@ -85146,6 +85206,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaBindings.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/Diagnostics/RuntimeCaptureAcquisitionSource.cs",
         "src/TiaMcp.Core/Diagnostics/TraceQualityMeasurements.cs",
         "src/TiaMcp.Core/DriveProfileWorkflowStore.cs",
@@ -85672,6 +85733,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
         "src/TiaMcp.Host/AccessTools.cs",
@@ -86626,6 +86688,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
         "src/TiaMcp.Host/AccessTools.cs",
@@ -87597,6 +87660,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticReportExport.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticUaTimeline.cs",
         "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
         "src/TiaMcp.Host/AccessTools.cs",
