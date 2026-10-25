@@ -78,7 +78,10 @@ def body(h):
     source = h.open_archive(generation_two)
     h.refuse("refuse an update while unit uses have no OB-rooted reference", "library_update_project",
              h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}), "LibraryUpdateCleanupRisk")
-    h.stage("the unit stays at 1.0.0", lambda: h.verify_use(consumer, fb, 1) and h.verify_use(consumer, second, 0))
+    def unchanged():
+        require([x["version"] for x in h.versions(consumer, FB)] == ["1.0.0"], "The refused update copied a version into the project")
+        return h.verify_use(consumer, fb, 1)
+    h.stage("the unit stays at 1.0.0 and no newer version was copied", unchanged)
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
