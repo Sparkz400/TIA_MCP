@@ -34,6 +34,10 @@ No. TIA MCP is independent and not affiliated with, endorsed or supported by Sie
 
 [Apache License 2.0](https://github.com/Sparkz400/TIA_MCP/blob/main/LICENSE); keep the attribution in [NOTICE](https://github.com/Sparkz400/TIA_MCP/blob/main/NOTICE). Siemens products and SDK assemblies stay under their own terms.
 
+Supplied vendor libraries keep their own notices and prerequisites. The
+[PAL/DMC review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
+records the reviewed packages and exclusions; they are not bundled with TIA MCP by that review.
+
 ## Where do I ask something that is not answered here?
 
 [Discussions → Q&A](https://github.com/Sparkz400/TIA_MCP/discussions/categories/q-a).

@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-25T14:09:00.400705+00:00",
+  "reviewer": "Codex; independent of the prior Claude vendor qualification",
+  "baseCommit": "a2b17ee175c8e44deea7235901cd9c0e7ad0d1c7",
+  "scope": "Retained library/source package integrity, license notices and documented prerequisites; no native execution or toolbox dependency qualification.",
+  "receiptSha256": "8c90a90b1db7ba7286a3e4e07d160bec685728cc6c61b268c619a3e470c1a94f",
+  "inspectionScriptSha256": "06ee3b27c3e4f24a83c9fe0ff41bd8c3288eff9e68bbc0d5e0862f7b1d5e9174",
+  "totals": {
+    "packages": 7,
+    "bytes": 467587713,
+    "outerZipEntries": 236,
+    "matchingLicenseReceiptHashes": 8,
+    "matchingInnerArchiveReceiptHashes": 18,
+    "inventoriedNativeArchives": 23
+  },
+  "checks": {
+    "packageSizeAndSha256": true,
+    "outerZipCrc": true,
+    "uniqueOuterZipNames": true,
+    "noOuterPathTraversal": true,
+    "recordedLicenseSha256": true,
+    "recordedInnerArchiveSizeAndSha256": true,
+    "originalBytesUnchangedAfterRead": true,
+    "palPinnedUpstreamLicenseMatches": true,
+    "allDmcSourceUrlsListedByPublisher": true
+  },
+  "upstreamSources": [
+    {
+      "url": "https://openplclibrary.com/",
+      "sha256": "08483ab7dea55ea2040098f5e717a1e8c95b500df87e842d2bc79853c063e6c6",
+      "bytes": 54732
+    },
+    {
+      "url": "https://raw.githubusercontent.com/practicalseries/PS2001-pal-software/e46b222ed9fb736456ccda40c4aa33af6c143b32/LICENCE.md",
+      "sha256": "47e92509191faf0275dcc06cf3ce3c114c7e5602a2ebb0f070b98426416d682e",
+      "bytes": 9428
+    }
+  ],
+  "packages": [
+    {
+      "id": "pal",
+      "file": "pal-e46b222.zip",
+      "url": "https://github.com/practicalseries/PS2001-pal-software/archive/e46b222ed9fb736456ccda40c4aa33af6c143b32.zip",
+      "bytes": 582837,
+      "sha256": "cf1ab643d927015aa8cb4b529ba018d196bd3aa4c2a05d0cc32954749ac48860",
+      "entryCount": 88,
+      "licenses": [
+        {
+          "path": "PS2001-pal-software-e46b222ed9fb736456ccda40c4aa33af6c143b32/LICENCE.md",
+          "sha256": "47e92509191faf0275dcc06cf3ce3c114c7e5602a2ebb0f070b98426416d682e",
+          "notice": "© 2020 Michael Gledhill",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [],
+      "nestedApplications": [],
+      "xmlCount": 55,
+      "engineeringVersions": [
+        "V16"
+      ],
+      "tagTablePaths": [
+        "PS2001-pal-software-e46b222ed9fb736456ccda40c4aa33af6c143b32/CON100/PLC tags/Default tag table.xml",
+        "PS2001-pal-software-e46b222ed9fb736456ccda40c4aa33af6c143b32/CON100/PLC tags/PAL_SystemTags.xml"
+      ]
+    },
+    {
+      "id": "dmc",
+      "file": "Siemens-Open-Library-V19.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2024/04/Siemens-Open-Library-V19.zip",
+      "bytes": 124287921,
+      "sha256": "1a7289c169084a49e9c9bce83ca7956b6696e2d3d733218b4ec10e0e902bfacb",
+      "entryCount": 30,
+      "licenses": [
+        {
+          "path": "Siemens-Open-Library-V19/1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "b112b1ac6f570a4dc0f00346f292bcbb7f22afc168b24df237956c93b44677c8",
+          "notice": "Copyright (c) 2019 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "Siemens-Open-Library-V19/4_Modbus/License.txt",
+          "sha256": "e501c1b977efe706fec1856425aa48e0eadbc92bbbf8b2827814c8ff3114eea2",
+          "notice": "Copyright (c) 2021 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "Siemens-Open-Library-V19/2_Library/Open Library V19 Comfort.zal19",
+          "bytes": 9636739,
+          "sha256": "cd4223f03725904e12c8cd5a977a2e4799cb4c4f0f715f15afbf4c18c23cbfd7"
+        },
+        {
+          "path": "Siemens-Open-Library-V19/2_Library/Open Library V19 PLC.zal19",
+          "bytes": 6938169,
+          "sha256": "153c36545b8d09a9bfa5432863fa9604cdd8cbb23462f5d09891ca0abd46d439"
+        },
+        {
+          "path": "Siemens-Open-Library-V19/2_Library/Open Library V19 Professional.zal19",
+          "bytes": 8851098,
+          "sha256": "7c337347d82f7f6a2128c6c8afd338981ec0e9ad8e2eaa9b03eb8981954bbbd9"
+        },
+        {
+          "path": "Siemens-Open-Library-V19/2_Library/Open Library V19 Unified.zal19",
+          "bytes": 42564154,
+          "sha256": "e395f48b3415e144f487a682c43dd2fbd2e3b8e67a22a65ccba75de4d461b983"
+        },
+        {
+          "path": "Siemens-Open-Library-V19/2_Library/Open Library V19.zal19",
+          "bytes": 47185961,
+          "sha256": "ed8fe3f52e90399475b321e40f7ce842d86e414324f06f1b078f44fcb666eed3"
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "Siemens-Open-Library-V19/3_Alarm Generator/DMC_Siemens_Toolbox_v1.6.0.zip",
+          "sha256": "d3f7bb0671e5c2b56fa7156841921e05b18e122aa696382449b3b6f549ecc1b5",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    },
+    {
+      "id": "dmc-v18",
+      "file": "Siemens-Open-Library-V18.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2024/04/Siemens-Open-Library-V18.zip",
+      "bytes": 84012326,
+      "sha256": "6c34b2c32336aa60bb851e4914c6b0f465984eb1a9d90983a4e1c77406d54155",
+      "entryCount": 29,
+      "licenses": [
+        {
+          "path": "Siemens-Open-Library-V18/1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "b112b1ac6f570a4dc0f00346f292bcbb7f22afc168b24df237956c93b44677c8",
+          "notice": "Copyright (c) 2019 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "Siemens-Open-Library-V18/4_Modbus/License.txt",
+          "sha256": "e501c1b977efe706fec1856425aa48e0eadbc92bbbf8b2827814c8ff3114eea2",
+          "notice": "Copyright (c) 2021 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "Siemens-Open-Library-V18/2_Library/Open Library V18 Comfort.zal18",
+          "bytes": 10866614,
+          "sha256": "dea7f5f9c96b79edb01ade3f3fd3c5ca661c1f4b8b92eb370bf108ba09251675",
+          "receiptMatches": true
+        },
+        {
+          "path": "Siemens-Open-Library-V18/2_Library/Open Library V18 PLC.zal18",
+          "bytes": 7739859,
+          "sha256": "711f182dfb3c6680600164e5a9f24be867a550d1f9c34ed9cc458fada602ef76",
+          "receiptMatches": true
+        },
+        {
+          "path": "Siemens-Open-Library-V18/2_Library/Open Library V18 Professional.zal18",
+          "bytes": 12658174,
+          "sha256": "613d6af119b9ef62078dcf3adc817edf064d398f4f2b088009718948646248f6",
+          "receiptMatches": true
+        },
+        {
+          "path": "Siemens-Open-Library-V18/2_Library/Open Library V18 Unified.zal18",
+          "bytes": 43711881,
+          "sha256": "d3636a9ab973aeed028e2190a17f9deaccd42ff5bfe664b301048a8adad79bb3",
+          "receiptMatches": true
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "Siemens-Open-Library-V18/3_Alarm Generator/DMC_Siemens_Toolbox_v1.6.0.zip",
+          "sha256": "d3f7bb0671e5c2b56fa7156841921e05b18e122aa696382449b3b6f549ecc1b5",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    },
+    {
+      "id": "dmc-v17",
+      "file": "Siemens-Open-Library-V17-V5.0.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2022/09/Siemens-Open-Library-V17-V5.0.zip",
+      "bytes": 149771810,
+      "sha256": "e50235e4ecc96831ab030dd968f0d7f58677eec16ab0789debd21e3dc89d2703",
+      "entryCount": 29,
+      "licenses": [
+        {
+          "path": "1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "b112b1ac6f570a4dc0f00346f292bcbb7f22afc168b24df237956c93b44677c8",
+          "notice": "Copyright (c) 2019 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "4_Modbus/License.txt",
+          "sha256": "e501c1b977efe706fec1856425aa48e0eadbc92bbbf8b2827814c8ff3114eea2",
+          "notice": "Copyright (c) 2021 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "2_Library/Open Library V17 Comfort.zal17",
+          "bytes": 11102519,
+          "sha256": "64c63fc647b38f0fffdb88177de4e5e64df6ef31cc7e2bad805392158b700452",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V17 PLC.zal17",
+          "bytes": 8205568,
+          "sha256": "5568ea43f5a60dea0e4922e79fdaa0ecaa14cc08ceb03055b34d72db07d4a775",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V17 Professional.zal17",
+          "bytes": 12890027,
+          "sha256": "d3bf017b9100864062c515b3b44afa5a0e842ed32311b69ba5631eabbabf045d",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V17 Unified.zal17",
+          "bytes": 53439880,
+          "sha256": "db7b64e3e6f3de1ffd3543259b0606a4ba47dcc66a2cf0208befdc291a17b746",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V17.zal17",
+          "bytes": 55340427,
+          "sha256": "d824163703773f61e9c4fe697efa85999af28f12a96b644dfe6b5e0a3afa96b5",
+          "receiptMatches": true
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "3_Alarm Generator/DMC_Siemens_Toolbox_v1.5.0.37733.zip",
+          "sha256": "2dff6c696aa6ae6bb1efe4368b26da6b034389916f4686f11c9122fbfde793fb",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    },
+    {
+      "id": "dmc-v16",
+      "file": "Siemens-Open-Library-V16-V4.1.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2022/09/Siemens-Open-Library-V16-V4.1.zip",
+      "bytes": 36190566,
+      "sha256": "df22ac1644a50a5885fcc83aa43b081bf6ccecb21e1f71973c3e9842dd2a3e93",
+      "entryCount": 25,
+      "licenses": [
+        {
+          "path": "1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "ca5114f981fff139b3de8f917d79c5d2417f645c840954f6fdf989ed86679894",
+          "notice": "Copyright (c) 2019 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "4_Modbus/License.txt",
+          "sha256": "4ca5ffe8e33019c28da78313cdd8ab692344e2aeeba4ca4f1e3ee3ca34b74123",
+          "notice": "Copyright (c) 2018 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "2_Library/Open Library V16 Comfort.zal16",
+          "bytes": 9506183,
+          "sha256": "ce5bda631268d7b2c94baf0f2a160562c6405d9651d0fa2e03801b048df61786",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V16 PLC.zal16",
+          "bytes": 6291093,
+          "sha256": "e028b17fa30649734ab4529ae04eb82b53e914751faa0722145b3f77702707a0",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V16.zal16",
+          "bytes": 11354454,
+          "sha256": "95d543a2e225477ac9d6b486d5d8e99909ae1c8887732da4c924c5ac23e1c904",
+          "receiptMatches": true
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "3_Alarm Generator/DMC_Siemens_Toolbox_v1.5.0.37733.zip",
+          "sha256": "2dff6c696aa6ae6bb1efe4368b26da6b034389916f4686f11c9122fbfde793fb",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    },
+    {
+      "id": "dmc-v15",
+      "file": "Siemens-Open-Library-V15-V4.0.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2019/06/Siemens-Open-Library-V15-V4.0.zip",
+      "bytes": 35751338,
+      "sha256": "fa5d97d0da272047c1fcd95b7f641150d8f506ad0d8ae884989ae7ef0c7ce0f3",
+      "entryCount": 21,
+      "licenses": [
+        {
+          "path": "1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "ca5114f981fff139b3de8f917d79c5d2417f645c840954f6fdf989ed86679894",
+          "notice": "Copyright (c) 2019 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "4_Modbus/License.txt",
+          "sha256": "4ca5ffe8e33019c28da78313cdd8ab692344e2aeeba4ca4f1e3ee3ca34b74123",
+          "notice": "Copyright (c) 2018 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "2_Library/Open Library V15 Comfort.zal15",
+          "bytes": 9360940,
+          "sha256": "8c3b26b81fce434065adbd1a8366bf9fb58a10054555606c29379e9afe0af9f5",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V15 PLC.zal15",
+          "bytes": 6118173,
+          "sha256": "36ce61a5812bfacbca48bc450b6b66b3df46ad50b9dd9049cf865d9f2dc599c0",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V15.zal15",
+          "bytes": 11174783,
+          "sha256": "b1a080960a4742c1671774ceb251fa00832ed005678276d1df5573de28ca55b7",
+          "receiptMatches": true
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "3_Alarm Generator/DMC_Siemens_Toolbox_v1.5.0.37733.zip",
+          "sha256": "2dff6c696aa6ae6bb1efe4368b26da6b034389916f4686f11c9122fbfde793fb",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    },
+    {
+      "id": "dmc-v14",
+      "file": "Siemens-Open-Library-V14SP1-V3.0.zip",
+      "url": "https://openplclibrary.com/wp-content/uploads/2018/12/Siemens-Open-Library-V14SP1-V3.0.zip",
+      "bytes": 36990915,
+      "sha256": "2be5adcf2a761c6fb232e6430628281509b99ddfc18e39de2bd9dafc49950408",
+      "entryCount": 14,
+      "licenses": [
+        {
+          "path": "1_Documentation/2- Siemens Open Library - Initial Setup.pdf",
+          "sha256": "9092d922e04ac3d2a751c96bbd8665232e32e88f9bbbffa7e8f9c7887a7658f9",
+          "notice": "Copyright (c) 2018 DMC, Inc.",
+          "license": "MIT",
+          "page": 3
+        },
+        {
+          "path": "5_Modbus/LICENSE.txt",
+          "sha256": "c9fa534962f84679df247e70da32f44f48f6d5935f0425c0472ead1a675bcdff",
+          "notice": "Copyright (c) 2017 Ola Bjørnli",
+          "license": "MIT",
+          "page": null
+        }
+      ],
+      "archives": [
+        {
+          "path": "2_Library/Open Library V14 SP1 (S7-300).zal14",
+          "bytes": 6195184,
+          "sha256": "68c5763cc0747fa611a70b9e3a7552464cf39fa66542308432ab3ff117301c40",
+          "receiptMatches": true
+        },
+        {
+          "path": "2_Library/Open Library V14 SP1.zal14",
+          "bytes": 9195049,
+          "sha256": "cc8c9e95c1911437cc53f42d4237b433971510e530f907300cee1768a290e742",
+          "receiptMatches": true
+        },
+        {
+          "path": "3_Example Project/OpenLibraryExample.zap14",
+          "bytes": 12866702,
+          "sha256": "4e04ef6c5f34e676eadf9a71a912bed11043252ebc480ce55aa998d1b6093b2b",
+          "receiptMatches": true
+        }
+      ],
+      "nestedApplications": [
+        {
+          "path": "4_Alarm Generator/DMC_Siemens_Toolbox_v1.5.0.37733.zip",
+          "sha256": "2dff6c696aa6ae6bb1efe4368b26da6b034389916f4686f11c9122fbfde793fb",
+          "entryCount": 27,
+          "licensePaths": [],
+          "executableCount": 25,
+          "executed": false
+        }
+      ]
+    }
+  ],
+  "remainingGates": [
+    "PAL intermediate-version import/upgrade",
+    "DMC system and clock memory configuration on each consuming CPU; full FB compile and runtime",
+    "Product-specific HMI and SiVArc qualification",
+    "Toolbox executable/dependency redistribution review if bundling is proposed",
+    "Native scale and final engineering package acceptance"
+  ]
+}

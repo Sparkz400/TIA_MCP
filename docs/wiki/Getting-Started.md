@@ -33,6 +33,10 @@ From the repository root:
 
 If the probe reports missing prerequisites, follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md).
 
+Vendor libraries can have additional CPU, tag-table and product requirements.
+Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
+before using the retained packages; receipt verification does not qualify native compatibility.
+
 ## Connect an MCP client
 
 Configure a stdio server with your actual checkout path:
