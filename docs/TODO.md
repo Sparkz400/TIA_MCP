@@ -6,7 +6,7 @@ are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.
 
 ## Resume and integration
 
-- [ ] Finalize independent review of the vendor receipts, licenses and prerequisites. PracticalSeries PAL and DMC V14–V19 are downloaded and match their receipt hashes (`D:\lcq\vendor\receipts.json`, outside the repository). Intake, the DMC V19 upgrade/reopen/instantiation and PAL's refused V16 import passed ([vendor](../evidence/local.library_vendor.20261025.json), [DMC prerequisites](../evidence/local.library_dmc_prerequisites.20261025.json)).
+- [x] Independently review vendor receipts, licenses and prerequisites. All seven retained PAL/DMC ZIPs, recorded license hashes and inner-archive hashes match. Version-specific notices, older setup guides and the unreviewed toolbox dependency boundary are recorded in the [independent review](verification/vendor-intake-review-20261025.md). Native compatibility, DMC CPU setup and HMI/runtime gates remain separate.
 - [ ] Qualify DMC's remaining prerequisite: system and clock memory bytes on every CPU. They are outside the reviewed hardware write allowlist, so DMC FB compilation is not claimed.
 
 ## Native admission and runtime
