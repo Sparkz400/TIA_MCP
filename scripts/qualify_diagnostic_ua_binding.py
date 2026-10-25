@@ -165,6 +165,22 @@ def main():
                  "UaCaptureRequestChanged" if kind == "capture" else "UaSubscriptionRequestChanged")
             check(fixture("audit") == baseline, "Retroactive binding refuses without remote services")
             retained.append((kind, old_capture, unbound, old_status["snapshotRef"]))
+        fixture("mode", value="normal")
+        capture=uuid.uuid4().hex
+        req=dict(attemptId=attempt,nodes=nodes,diagnosticBindingId=receipt["id"],durationSeconds=8,maximumNotifications=len(nodes)+2,
+                 events=dict(notifier=dict(nodes[0],identifier="fixture"),minimumSeverity=500))
+        call("runtime_ua_subscription_start",dict(captureId=capture,request=req))
+        deadline=time.monotonic()+10
+        while call("runtime_ua_subscription_status",dict(captureId=capture))["recordedProgress"]["rows"]==0:
+            check(time.monotonic()<deadline,"Bounded mixed-event setup");time.sleep(0.05)
+        fixture("emitEvent",number=2,severity=700);fixture("emitEvent",number=2,severity=700)
+        status=complete("subscription",capture)
+        baseline=fixture("audit")
+        observed=qualify_observation(call,check,status["snapshotRef"],root,out/"observations","events")
+        document=json.loads(Path(observed["artifact"]["path"]).read_bytes())
+        check(sum(len(r["event"].get("events",[])) for r in document["captureSource"]["rows"])==2,"Prebound diagnostic report retains original repeated events alongside signals")
+        check(fixture("audit")==baseline,"Event timeline composition has no remote services")
+        observations.append(observed);retained.append(("subscription",capture,req,status["snapshotRef"]))
         for mode in ("subscriptionDuplicate", "subscriptionGap", "subscriptionOverflow", "subscriptionRepublishUnavailable", "subscriptionCreateItemsDenied"):
             fixture("mode", value=mode)
             capture = uuid.uuid4().hex

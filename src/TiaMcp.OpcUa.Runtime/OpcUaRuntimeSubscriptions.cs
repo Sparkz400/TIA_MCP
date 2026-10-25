@@ -97,7 +97,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
             if(Expired())return;
             var created=await sessions.CreateSubscription(plan.CaptureId,plan.Request,CancellationToken.None);subscription=created.SubscriptionId;
             Append(new("created",subscription,Created:created));
-            if(created.Items.All(x=>(OpcUaSubscriptionContracts.Status(x.StatusCode)&0x80000000)!=0)){reason="allItemsFailed";return;}
+            if(OpcUaSubscriptionContracts.AllItemsFailed(created)){reason="allItemsFailed";return;}
             while(!Expired())
             {
                 try

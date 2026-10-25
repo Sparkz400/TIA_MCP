@@ -15,7 +15,8 @@ public sealed record OpcUaSubscriptionRequest(string AttemptId,
     int DurationSeconds = 10, int MaximumNotifications = 10000, long MaximumBytes = 64L << 20,
     int MaximumRepublish = 16,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), JsonConverter(typeof(OpcUaEventSelectionConverter))] OpcUaEventSelection? Events = null);
 
 // Strictness is scoped to this new request; shared node contracts and existing
 // manual-read/polling deserialization keep their established behavior.
@@ -33,7 +34,8 @@ public sealed record OpcUaSubscriptionPlan(string CaptureId, string HostId, Date
 public sealed record OpcUaMonitoredItem(uint ClientHandle, OpcUaRuntimeNode Node, string StatusCode,
     uint MonitoredItemId, double RevisedSamplingInterval, uint RevisedQueueSize, OpcUaRuntimeValue Metadata);
 public sealed record OpcUaSubscriptionCreated(uint SubscriptionId, double RevisedPublishingInterval,
-    uint RevisedLifetimeCount, uint RevisedKeepAliveCount, OpcUaMonitoredItem[] Items);
+    uint RevisedLifetimeCount, uint RevisedKeepAliveCount, OpcUaMonitoredItem[] Items,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaEventMonitoredItem? EventItem = null);
 public sealed record OpcUaSubscriptionValue(uint ClientHandle, uint MonitoredItemId, bool Overflow, OpcUaRuntimeValue Value);
 public sealed record OpcUaSubscriptionEvent(string Kind, uint SubscriptionId,
     uint? SequenceNumber = null, DateTimeOffset? PublishTime = null, bool KeepAlive = false,
@@ -43,7 +45,8 @@ public sealed record OpcUaSubscriptionEvent(string Kind, uint SubscriptionId,
     uint? RequestedSequenceNumber = null, string? StatusCode = null,
     OpcUaSubscriptionCreated? Created = null, string? ErrorCode = null,
     uint? GapFrom = null, uint? GapTo = null, long MissingCount = 0,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaReconnectEvent? Reconnect = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaReconnectEvent? Reconnect = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaEventNotification[]? Events = null);
 public sealed record OpcUaSubscriptionRow(long Sequence, double ElapsedMilliseconds, DateTimeOffset ObservedUtc,
     OpcUaSubscriptionEvent Event);
 public sealed record OpcUaSubscriptionProgress(string State, string? TerminalReason, double ElapsedMilliseconds,
@@ -55,7 +58,9 @@ internal static class OpcUaSubscriptionContracts
     internal static void Require([System.Diagnostics.CodeAnalysis.DoesNotReturnIf(false)] bool condition) { if (!condition) throw OpcUaRuntimeClient.Error("UaSubscriptionInvalid"); }
     internal static void Validate(OpcUaSubscriptionRequest r)
     {
-        Require(r is not null && ProtectedCredentialGuard.IsId(r.AttemptId) && r.Nodes is { Length: >= 1 and <= 64 });
+        Require(r is not null && ProtectedCredentialGuard.IsId(r.AttemptId) && r.Nodes is { Length: <= 64 } && (r.Nodes.Length>0 || r.Events is not null));
+        if(r.Events is { } events) {OpcUaRuntimeClient.ValidateNode(events.Notifier);Require(events.MinimumSeverity<=1000);}
+        Require(r.DiagnosticBindingId is null || r.Nodes.Length>0);
         DiagnosticUaBindings.ValidateId(r.DiagnosticBindingId);
         Require(r.MaximumReconnectAttempts is >= 0 and <= 3);
         foreach (var node in r.Nodes) OpcUaRuntimeClient.ValidateNode(node);
@@ -102,6 +107,7 @@ internal static class OpcUaSubscriptionContracts
         Require(e.StatusChanges is null || e.StatusChanges.Length<=4096);
         foreach(var status in e.StatusChanges??[]) Status(status);
         Require((e.Notifications?.Length??0)<=4096);
+        OpcUaEventContracts.Validate(p,e);
         foreach(var n in e.Notifications??[]) { Require(n.ClientHandle>=1 && n.ClientHandle<=p.Request.Nodes.Length && n.MonitoredItemId>0 && n.Value.Node==p.Request.Nodes[n.ClientHandle-1]); ValidateValue(p,n.Value); Require(n.Overflow==((Status(n.Value.StatusCode)&0x00000480)==0x00000480)); }
         bool message=e.Kind is "publish" or "republish";
         if(!message)Require(e.SequenceNumber is null && e.PublishTime is null && !e.KeepAlive && !e.Duplicate && !e.MoreNotifications &&
@@ -118,7 +124,7 @@ internal static class OpcUaSubscriptionContracts
         }
         else Require(e.Created is null);
         if(message)Require(e.SubscriptionId>0 && e.SequenceNumber>0 && e.PublishTime is not null && e.Notifications is not null && e.StatusChanges is not null &&
-            e.Notifications.Length<=1 && (!e.KeepAlive || e.Notifications.Length==0 && e.StatusChanges.Length==0 && !e.Duplicate));
+            e.Notifications.Length+(e.Events?.Length??0)<=1 && (!e.KeepAlive || e.Notifications.Length==0 && (e.Events?.Length??0)==0 && e.StatusChanges.Length==0 && !e.Duplicate));
         if(e.Kind=="publish")Require(e.AvailableSequenceNumbers is not null && e.AcknowledgedSequenceNumbers is not null && e.AcknowledgementResults is not null && e.RequestedSequenceNumber is null);
         if(e.Kind=="republish")Require(e.RequestedSequenceNumber==e.SequenceNumber && !e.KeepAlive && !e.MoreNotifications &&
             e.AvailableSequenceNumbers is null && e.AcknowledgedSequenceNumbers is null && e.AcknowledgementResults is null);
@@ -135,5 +141,7 @@ internal static class OpcUaSubscriptionContracts
         if(e.Kind=="deleted")Require(e.StatusCode is not null && e.SubscriptionId>0);
         else if(e.Kind!="failure")Require(e.StatusCode is null);
     }
-    internal static long Count(OpcUaSubscriptionEvent e) => e.Duplicate ? 0 : e.Notifications?.Length??0;
+    internal static bool AllItemsFailed(OpcUaSubscriptionCreated c) => c.Items.All(x=>(Status(x.StatusCode)&0x80000000)!=0) &&
+        (c.EventItem is null || (Status(c.EventItem.StatusCode)&0x80000000)!=0);
+    internal static long Count(OpcUaSubscriptionEvent e) => e.Duplicate ? 0 : (e.Notifications?.Length??0)+(e.Events?.Length??0);
 }

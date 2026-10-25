@@ -290,9 +290,32 @@
         if(!Array.isArray(read.items)||read.items.length!==1||read.attemptId!==request.attemptId||!same(read.items[0].node,nodes[index]))bad();
         observations[index].push(item(r,read.items[0],read.startedAt,read.completedAt));
       }else{
-        const e=r.event;if(!e||!['created','publish','republish','gap','deleted','failure'].includes(e.kind)||typeof e.duplicate!=='boolean'||typeof e.keepAlive!=='boolean')bad();
-        if(e.kind==='gap')events.gapRows++;
+        const e=r.event;if(!e||!['created','publish','republish','gap','deleted','failure','reconnect'].includes(e.kind)||typeof e.duplicate!=='boolean'||typeof e.keepAlive!=='boolean')bad();
+        if(e.kind==='gap'||e.kind==='reconnect'&&e.reconnect?.state==='starting')events.gapRows++;
         if(e.kind==='failure')events.failureEvents++;
+        if(e.events!==undefined){
+          const selected=request.events,item=creation?.eventItem;
+          if(!selected||!item||!same(selected.notifier,item.notifier)||!['publish','republish'].includes(e.kind)||!Array.isArray(e.events)||e.events.length+(e.notifications?.length||0)>1||e.keepAlive&&e.events.length)bad();
+          for(const n of e.events){
+            const names=['EventId','EventType','SourceNode','SourceName','Time','ReceiveTime','Message','Severity'];
+            if(n.clientHandle!==nodes.length+1||n.clientHandle!==item.clientHandle||n.monitoredItemId!==item.monitoredItemId||typeof n.overflow!=='boolean'||!Array.isArray(n.fields)||n.fields.length!==8)bad();
+            for(let index=0;index<8;index++){
+              const f=n.fields[index];
+              if(!f||f.name!==names[index]||!['value','null','status'].includes(f.kind)||f.text!==null&&(typeof f.text!=='string'||f.text.length>65536)||f.locale!==null&&(typeof f.locale!=='string'||f.locale.length>128))bad();
+              if(f.kind!=='value'){
+                if([0,1,5].includes(index)||f.text!==null||f.node!==null||f.locale!==null||f.kind==='null'&&f.statusCode!==null||f.kind==='status'&&(!/^0x[89a-f][0-9a-f]{7}$|^0x[4-7][0-9a-f]{7}$/.test(f.statusCode)))bad();
+                continue;
+              }
+              if(f.statusCode!==null||index!==6&&f.locale!==null)bad();
+              if([1,2].includes(index)){if(f.text!==null||!f.node||typeof f.node.namespaceUri!=='string'||typeof f.node.identifier!=='string'||!['numeric','string','guid','opaque'].includes(f.node.identifierType))bad();continue;}
+              if(f.node!==null||typeof f.text!=='string'&&!(index===6&&f.text===null))bad();
+              if(index===0){try{const value=atob(f.text);if(!value.length||value.length>4096||btoa(value)!==f.text)bad();}catch{bad();}}
+              if([4,5].includes(index)&&(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$/.test(f.text)||!Number.isFinite(Date.parse(f.text))))bad();
+              if(index===7&&(!/^(0|[1-9][0-9]*)$/.test(f.text)||Number(f.text)>65535))bad();
+            }
+            if(n.overflow!==same(n.fields[1].node,{namespaceUri:'http://opcfoundation.org/UA/',identifierType:'numeric',identifier:'3035'}))bad();
+          }
+        }
         if(e.duplicate){events.duplicateMessages++;continue;}
         if(e.keepAlive){events.keepalives++;continue;}
         for(const n of e.notifications||[]){

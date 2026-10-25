@@ -25,6 +25,9 @@ def check_unknown_subscription_inputs(client, request, fixture, store, check, re
         value = copy.deepcopy(request); value[key] = True; variants.append(("request." + key, value))
     for key in ("namespaceIndex", "identifierTypo", "reconnect"):
         value = copy.deepcopy(request); value["nodes"][0][key] = True; variants.append(("node." + key, value))
+    for key in ("acknowledge", "minimumSeverty"):
+        value = copy.deepcopy(request); value["events"] = dict(notifier=value["nodes"][0], **{key: True}); variants.append(("events." + key, value))
+    value = copy.deepcopy(request); value["events"] = dict(notifier={**value["nodes"][0], "namespaceIndex": 1}); variants.append(("events.notifier.namespaceIndex", value))
     for label, value in variants:
         arguments = dict(captureId=uuid.uuid4().hex, request=value)
         response = client.request("tools/call", dict(name="runtime_ua_subscription_start", arguments=arguments))
