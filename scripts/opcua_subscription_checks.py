@@ -3,17 +3,17 @@ import copy
 from opcua_runtime_checks import require, verify_values, ALLOWED
 
 SUBSCRIPTION_SERVICES = {"CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions"}
-FIXTURE_OBSERVATIONS = {"SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish", "PublishEntered", "PublishCompleted"}
+FIXTURE_OBSERVATIONS = {"SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish", "PublishEntered", "PublishCompleted", "FixtureLostPublishResponse"}
 
 
-def verify_subscription(rows, attempt):
+def verify_subscription(rows, attempt, expected_count=14):
     events = [r["event"] for r in rows]
     created = next(e["created"] for e in events if e["kind"] == "created")
     require(created["revisedPublishingInterval"] == 200 and created["revisedKeepAliveCount"] == 10 and created["revisedLifetimeCount"] >= 60, "independent revised subscription settings")
-    require(len(created["items"]) == 15 and created["items"][-1]["statusCode"] == "0x80340000" and created["items"][-1]["monitoredItemId"] == 0, "independent per-item failure")
+    require(len(created["items"]) == expected_count + 1 and created["items"][-1]["statusCode"] == "0x80340000" and created["items"][-1]["monitoredItemId"] == 0, "independent per-item failure")
     require(all(i["revisedSamplingInterval"] == 200 and i["revisedQueueSize"] == 4 for i in created["items"][:-1]), "independent revised item settings")
     messages = [e for e in events if e["kind"] == "publish"]
-    require([e["sequenceNumber"] for e in messages] == list(range(1, 15)), "independent original sequence oracle")
+    require([e["sequenceNumber"] for e in messages] == list(range(1, expected_count + 1)), "independent original sequence oracle")
     require(all(not e["duplicate"] and not e["keepAlive"] and len(e["notifications"]) == 1 for e in messages), "one original notification per service")
     require(all(e["acknowledgedSequenceNumbers"] == [index] and e["acknowledgementResults"] == ["0x00000000"] for index, e in enumerate(messages[1:], 1)), "independent previous-message acknowledgement oracle")
     values = [n["value"] for e in messages for n in e["notifications"]]
@@ -35,7 +35,7 @@ def verify_subscription_audit(audit, healthy=False):
     require(not {"TransferSubscriptions", "Write", "Call", "HistoryRead"} & set(ops), "no transfer or mutation")
 
 
-def subscription_controls(rows, attempt, audit):
+def subscription_controls(rows, attempt, audit, expected_count=14):
     refused = []
     def value(r): return next(x["event"]["notifications"][0] for x in r if x["event"]["kind"] == "publish")
     for name, mutate in [
@@ -47,7 +47,7 @@ def subscription_controls(rows, attempt, audit):
         ("cleanup", lambda r: r[-1]["event"].update(statusCode="0x800a0000")),
     ]:
         altered = copy.deepcopy(rows); mutate(altered)
-        try: verify_subscription(altered, attempt)
+        try: verify_subscription(altered, attempt, expected_count)
         except (ValueError, KeyError, TypeError): refused.append(name)
         else: raise ValueError("Independent oracle accepted mutation " + name)
     for operation in ["Write", "TransferSubscriptions", "Call"]:

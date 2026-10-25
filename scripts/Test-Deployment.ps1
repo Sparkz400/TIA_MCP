@@ -11,13 +11,13 @@ function Assert-Rejected([scriptblock]$Action, [string]$Message, [string]$Expect
     try { & $Action | Out-Null } catch { $rejected = -not $ExpectedReason -or $_.Exception.Message -match $ExpectedReason }
     Assert-Check $rejected $Message
 }
-$local = (& $generator -BundlePath 'C:\TIA MCP' -ArtifactsDirectory 'D:\Evidence' -TiaApiDirectory 'C:\TIA API' -SimulatorApiDirectory 'C:\SIM API' -GitExecutable 'C:\Program Files\Git\cmd\git.exe' -TimeoutSeconds 73 -StrictBundle) | ConvertFrom-Json
+$local = (& $generator -BundlePath 'C:\TIA MCP' -ArtifactsDirectory 'D:\Evidence' -TiaApiDirectory 'C:\TIA API' -SimulatorApiDirectory 'C:\SIM API' -GitExecutable 'C:\Program Files\Git\cmd\git.exe' -UaClientIdentity default -TimeoutSeconds 73 -StrictBundle) | ConvertFrom-Json
 Assert-Check ($local.mcpServers.'tia-v21'.command -eq 'powershell.exe' -and $local.mcpServers.'tia-v21'.args -contains 'C:\TIA MCP\scripts\Start-TiaMcp.ps1') 'Local configuration lost its absolute path with spaces.'
-foreach ($value in @('-ArtifactsDirectory','D:\Evidence','-TiaApiDirectory','C:\TIA API','-SimulatorApiDirectory','C:\SIM API','-GitExecutable','C:\Program Files\Git\cmd\git.exe','-TimeoutSeconds','73','-StrictBundle')) {
+foreach ($value in @('-ArtifactsDirectory','D:\Evidence','-TiaApiDirectory','C:\TIA API','-SimulatorApiDirectory','C:\SIM API','-GitExecutable','C:\Program Files\Git\cmd\git.exe','-UaClientIdentity','default','-TimeoutSeconds','73','-StrictBundle')) {
     Assert-Check ($local.mcpServers.'tia-v21'.args -contains $value) ('Local arguments lost: ' + $value)
 }
 $hostileButValid = 'C:\TIA '' & $(literal) %PATH%; name'
-$remote = (& $generator -BundlePath $hostileButValid -SshHost 'engineer@tia-vm' -ArtifactsDirectory 'D:\Evidence Folder' -TiaApiDirectory 'C:\TIA API' -SimulatorApiDirectory 'C:\SIM API' -GitExecutable ($hostileButValid + '\git.exe') -ConnectTimeoutSeconds 19 -TimeoutSeconds 73 -StrictBundle) | ConvertFrom-Json
+$remote = (& $generator -BundlePath $hostileButValid -SshHost 'engineer@tia-vm' -ArtifactsDirectory 'D:\Evidence Folder' -TiaApiDirectory 'C:\TIA API' -SimulatorApiDirectory 'C:\SIM API' -GitExecutable ($hostileButValid + '\git.exe') -UaClientIdentity default -ConnectTimeoutSeconds 19 -TimeoutSeconds 73 -StrictBundle) | ConvertFrom-Json
 Assert-Check ($remote.mcpServers.'tia-v21'.command -eq 'ssh.exe') 'Remote configuration does not use OpenSSH.'
 foreach ($argument in @('StrictHostKeyChecking=yes','BatchMode=yes','ConnectTimeout=19','ConnectionAttempts=1','ServerAliveInterval=15','ServerAliveCountMax=3','-T','--','engineer@tia-vm')) {
     Assert-Check ($remote.mcpServers.'tia-v21'.args -contains $argument) ('Remote configuration lost SSH control: ' + $argument)
@@ -111,6 +111,10 @@ Copy-Item -LiteralPath $verifier -Destination (Join-Path $testRoot 'scripts/Veri
 $entries = @($required | ForEach-Object { $file = Get-Item -LiteralPath (Join-Path $testRoot $_); @{path=$_; bytes=$file.Length; sha256=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()} })
 Write-TestManifest $entries
 $testLauncher = Join-Path $testRoot 'scripts/Start-TiaMcp.ps1'
+foreach ($identityName in @('', '../escape', 'DEFAULT', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaA', 'default;exit')) {
+    Assert-Rejected { & $generator -BundlePath 'C:\TiaMcp' -UaClientIdentity $identityName } 'Generator accepted an invalid identity name.' 'UaClientIdentity must be'
+    Assert-Rejected { & $testLauncher -UaClientIdentity $identityName } 'Launcher accepted an invalid identity name.' 'UaClientIdentity must be'
+}
 Assert-Rejected { & $testLauncher -ArtifactsDirectory (Join-Path $testRoot 'artifacts') } 'Launcher allowed bundle-local artifacts.' 'ArtifactsDirectory must be outside'
 Assert-Rejected { & $testLauncher -ArtifactsDirectory 'relative/path' } 'Launcher accepted a relative artifact directory.' 'must be fully qualified'
 $unlistedRuntime = Join-Path $testRoot 'injected.dll'

@@ -63,7 +63,7 @@ public sealed class DiagnosticUaObservations(string artifactsRoot, Func<string, 
             else
             {
                 var evt = row!["event"]!; string kind = D.Text(evt, "kind");
-                if (kind == "gap") gapRows++;
+                if (kind == "gap" || kind == "reconnect" && D.Text(evt["reconnect"],"state")=="starting") gapRows++;
                 if (kind == "failure") failures++;
                 if (evt["duplicate"]!.GetValue<bool>()) { duplicates++; continue; }
                 if (evt["keepAlive"]!.GetValue<bool>()) { keepalives++; continue; }

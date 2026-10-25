@@ -9,7 +9,8 @@ namespace TiaMcp.Core.PhysicalRuntime;
 
 public sealed record OpcUaCaptureRequest(string AttemptId, OpcUaRuntimeNode[] Nodes, int IntervalMilliseconds,
     int DurationSeconds, int MaximumSamples = 100000, long MaximumBytes = 64L << 20,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int MaximumReconnectAttempts = 0);
 public sealed record OpcUaCaptureContext(OpcUaCaptureRequest Request, OpcUaRuntimeStatus Session);
 
 /// <summary>UA-specific admission and retained evidence validation; the durable capture journal is shared.</summary>
@@ -21,6 +22,7 @@ public static class OpcUaCaptureContracts
     {
         Require(request is not null && request.Nodes is { Length: >= 1 and <= 64 });
         DiagnosticUaBindings.ValidateId(request.DiagnosticBindingId);
+        Require(request.MaximumReconnectAttempts is >= 0 and <= 3);
         foreach (var node in request.Nodes) ValidateNode(node);
         Require(request.Nodes.Distinct().Count() == request.Nodes.Length);
         var result = new RuntimeCaptureRequest(request.AttemptId, request.Nodes.Select(SelectionId).ToArray(),
@@ -68,11 +70,71 @@ public static class OpcUaCaptureContracts
         if (item.Outcome != "value") Require(nullValue && item.Encoding is null && item.ErrorCode is not null);
         else
         {
-            Require(item.Quality != "Bad" && item.DataType is not null && item.ValueRank is < 0 && item.ErrorCode is null &&
-                item.Encoding is "null" or "boolean" or "decimalInteger" or "roundTripFloat" or "roundTripDouble" or "string" or "utcDateTime" or "guid" or "base64");
-            ValidateScalar(item, nullValue);
+            Require(item.Quality != "Bad" && item.DataType is not null && item.ValueRank is not null && item.ErrorCode is null);
+            if (item.Encoding == "array") ValidateArray(item);
+            else
+            {
+                Require((item.ValueRank is < 0 || item.Encoding == "null") && item.Encoding is "null" or "boolean" or "decimalInteger" or "roundTripFloat" or "roundTripDouble" or "string" or "utcDateTime" or "guid" or "base64");
+                ValidateScalar(item, nullValue);
+            }
         }
         if (item.Quality == "Bad") Require(item.Outcome == "itemError");
+    }
+    public static void ValidateReconnectRows(RuntimeCapturePlan plan,IEnumerable<RuntimeCaptureRow> rows)
+    {
+        var history=new OpcUaReconnectHistory(plan.UaContext!.Request.MaximumReconnectAttempts);
+        string? error=null;double elapsed=0;
+        foreach(var row in rows)
+        {
+            Require(row.ElapsedMilliseconds>=elapsed);elapsed=row.ElapsedMilliseconds;
+            if(row.Reconnect is { } e)
+            {
+                if(e.State=="starting")Require(e.ErrorCode==error && OpcUaReconnectHistory.Retryable(error));
+                history.Apply(e);
+                if(e.State!="starting")error=e.ErrorCode;
+            }
+            else if(row.Kind=="read")
+            {
+                Require(history.Healthy && !history.Pending && error is null);
+                error=row.ErrorCode;
+            }
+        }
+    }
+    public static string? ScalarEncoding(string? type) => type switch {
+        "Boolean" => "boolean",
+        "SByte" or "Byte" or "Int16" or "UInt16" or "Int32" or "UInt32" or "Int64" or "UInt64" => "decimalInteger",
+        "Float" => "roundTripFloat", "Double" => "roundTripDouble", "String" => "string",
+        "DateTime" => "utcDateTime", "Guid" => "guid", "ByteString" => "base64", _ => null };
+    public static bool ArrayShapeMatches(int? rank, uint[]? declared, int[]? dimensions, int? count)
+    {
+        if (rank is null or < -3 or -1 or > 32 || declared is { Length: > 32 }) return false;
+        if (dimensions is null) return count is null;
+        if (dimensions.Length is < 1 or > 32 || count is null or < 0 or > 4096 ||
+            dimensions.Any(d => d is < 0 or > 4096) || rank > 0 && rank != dimensions.Length ||
+            rank == -3 && dimensions.Length != 1) return false;
+        if (declared is { Length: > 0 } && (declared.Length != dimensions.Length ||
+            declared.Where((d, i) => d != 0 && dimensions[i] > d).Any())) return false;
+        long product = dimensions.Contains(0) ? 0 : 1;
+        if (product != 0) foreach (int d in dimensions) { product *= d; if (product > 4096) return false; }
+        return product == count;
+    }
+    private static void ValidateArray(OpcUaRuntimeValue item)
+    {
+        Require(item.Value is JsonElement { ValueKind: JsonValueKind.Object });
+        var json = (JsonElement)item.Value!;
+        OpcUaRuntimeArray? array;
+        try { array = json.Deserialize<OpcUaRuntimeArray>(new JsonSerializerOptions(BridgeProtocol.Json) {
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, RespectRequiredConstructorParameters = true }); }
+        catch (JsonException) { throw new BridgeException("UaCaptureInvalid", "Invalid retained UA array."); }
+        Require(array is not null && JsonElement.DeepEquals(json, JsonSerializer.SerializeToElement(array, BridgeProtocol.Json)) &&
+            ScalarEncoding(item.BuiltInType) is { } encoding && array.ElementEncoding == encoding &&
+            ArrayShapeMatches(item.ValueRank, item.ArrayDimensions, array.Dimensions, array.Elements?.Length));
+        foreach (var element in array.Elements ?? [])
+        {
+            bool isNull = element is null || element is JsonElement { ValueKind: JsonValueKind.Null };
+            Require(!isNull || item.BuiltInType is "String" or "ByteString");
+            ValidateScalar(item with { Encoding = isNull ? "null" : array.ElementEncoding, Value = element }, isNull);
+        }
     }
     private static void ValidateScalar(OpcUaRuntimeValue item, bool nullValue)
     {
@@ -118,7 +180,7 @@ public static class OpcUaCaptureContracts
     }
     private static bool ByteString(string text)
     { try { var bytes=Convert.FromBase64String(text);return bytes.Length<=65536 && Convert.ToBase64String(bytes)==text; } catch { return false; } }
-    public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaSessionUnavailable", "UaSessionExpired",
+    public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaTransportInterrupted", "UaSessionUnavailable", "UaSessionExpired",
         "UaSessionRecordChanged", "UaSessionIdentityMismatch", "UaSessionIdentityChanged", "UaCredentialUnavailable",
         "UaNamespaceUnavailable", "UaAuthenticationDenied", "UaCertificateRejected", "UaProtocolFailure",
         "UaResponseInvalid", "UaResponseLimit", "UaSecretEchoRejected", "UaCaptureReadFailed"];

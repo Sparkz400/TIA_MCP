@@ -1,11 +1,13 @@
 """Actual packaged/working Host MCP + DPAPI + real local encrypted UA fixture."""
 import argparse
+import base64
 import datetime as dt
 import hashlib
 import json
 import os
 from pathlib import Path
 import queue
+import shutil
 import subprocess
 import threading
 import uuid
@@ -42,8 +44,10 @@ def main():
     source_paths = [
         "scripts/qualify_opcua_runtime.py", "scripts/opcua_runtime_checks.py", "scripts/smoke_mcp.py",
         "contracts/opcua-runtime.v1.schema.json", "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
+        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/Security/CredentialVault.OpcUaIdentity.cs", "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+        "src/TiaMcp.Host/Security/CredentialVault.cs", "src/TiaMcp.Host/HostOptions.cs", "src/TiaMcp.Host/Program.cs",
         "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.cs",
     ]
     def source_inputs():
@@ -52,18 +56,40 @@ def main():
     clients = []; server = None; server_lines = queue.Queue(); server_errors = []
     birth = None
     secret = "fixture-only-secret"; vault = uuid.uuid4().hex; final_id = None
+    identity_name = uuid.uuid4().hex
+    identity_root = Path(os.environ["LOCALAPPDATA"]) / "TiaMcpOpcUaIdentities" / identity_name
     schema = json.loads((ROOT / "contracts/opcua-runtime.v1.schema.json").read_text())
     Draft202012Validator.check_schema(schema)
     def fixture(operation, **kwargs):
         server.stdin.write(json.dumps(dict(operation=operation, **kwargs)) + "\n"); server.stdin.flush()
         return json.loads(server_lines.get(timeout=20))
-    def client():
-        c = Client(host, 35, ["--no-native-workers", "--artifacts", str(out / "store")])
+    def client(identity=None):
+        extra = ["--ua-client-identity", identity] if identity else []
+        c = Client(host, 35, ["--no-native-workers", "--artifacts", str(out / "store"), *extra])
         birth = psutil.Process(c.process.pid).create_time()
         clients.append((c, birth))
         c.request("initialize", dict(protocolVersion="2025-11-25", capabilities={}, clientInfo=dict(name="ua-loopback", version="1")))
         c.notify("notifications/initialized")
         return c
+    def close_client(c):
+        owned = next(item for item in clients if item[0] is c)
+        receipt = c.close()
+        report["processes"].append(dict(role="Host", pid=c.process.pid, birth=owned[1], originalOwnedProcessWaited=True, **receipt))
+        report.setdefault("hostLogs", []).extend(c.errors)
+        clients.remove(owned)
+        check(receipt["hostExitCode"] == 0 and not receipt["forcedHostStop"], "Identity lifecycle Host closes normally")
+    def identity_command(operation, *extra, code=None):
+        result = subprocess.run([str(host), "--ua-identity-store", operation, "--name", identity_name, *extra],
+                                capture_output=True, timeout=30)
+        check(result.returncode == (1 if code else 0), "Identity command outcome: " + operation)
+        value = json.loads(result.stderr if code else result.stdout)
+        if code:
+            check(value["error"] == code and value["privateKeyExported"] is False, "Identity command refuses: " + code)
+        else:
+            check(value["privateKeyStorage"] == "windowsDpapiCurrentUser" and value["privateKeyExported"] is False,
+                  "Identity command returns only public status")
+        report.setdefault("identityCommands", []).append(dict(operation=operation, value=value))
+        return value
     def call(c, name, arguments=None, code=None):
         response = c.request("tools/call", dict(name="runtime_ua_" + name, arguments=arguments or {}))
         check(secret not in json.dumps(response), "Response redacted: " + name)
@@ -115,6 +141,7 @@ def main():
         call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected), code="UaEndpointSessionUnresolved")
         names = ["int64", "uint64", "double", "bool", "text", "bad", "uncertain", "missingTimes", "array",
                  "denied", "structure", "byteArray", "byteString", "minimumDate"]
+        names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         values = call(c, "read", dict(attemptId=attempt, nodes=nodes)); write(out / "values.json", values)
         verify_values(values); check(True, "Independent exact value/type/quality/time oracle")
@@ -145,6 +172,52 @@ def main():
         call(c, "read", dict(attemptId=attempt, nodes=[nodes[0]]), code="UaCredentialUnavailable")
         check(fixture("audit")["audit"] == snapshot["audit"], "Retired credential refuses before any UA request")
         check(call(c, "disconnect", dict(attemptId=attempt))["state"] == "closed", "Retirement still allows owned cleanup")
+
+        close_client(c)
+        check(not identity_root.exists(), "Fresh isolated identity name")
+        identity_command("inspect", code="UaClientIdentityMissing")
+        persistent = identity_command("create")
+        identity_command("create", code="UaClientIdentityAlreadyExists")
+        public_path = out / "client-public.der"
+        check(identity_command("export", "--output", str(public_path)) == persistent, "Public export preserves original status")
+        check(public_path.read_bytes() == base64.b64decode(persistent["certificateDerBase64"]) and
+              hashlib.sha256(public_path.read_bytes()).hexdigest() == persistent["certificateSha256"], "Export contains exact public DER only")
+        identity_command("export", "--output", str(public_path), code="UaClientIdentityUnavailable")
+        fixture("trustClient", sha256=persistent["certificateSha256"])
+        c = client(identity_name)
+        current = call(c, "client_identity")
+        check(all(current[k] == persistent[k] for k in ["applicationUri", "certificateSha256", "certificateDerBase64", "privateKeyStorage", "state"]),
+              "Host loads exact protected identity")
+        identity_command("rotate", "--expected-sha256", persistent["certificateSha256"], code="CredentialStoreBusy")
+        persistent_attempt = uuid.uuid4().hex
+        check(call(c, "connect", dict(attemptId=persistent_attempt, selection=selected))["state"] == "connected", "Protected private key authenticates on pinned fixture")
+        call(c, "read", dict(attemptId=persistent_attempt, nodes=[nodes[0]]))
+        check(any(x["sha256"] == persistent["certificateSha256"] and x["accepted"] for x in fixture("audit")["clientCertificates"]),
+              "Server independently observed and accepted exact public certificate")
+        close_client(c)
+        audit_before = fixture("audit")
+        c = client(identity_name)
+        reopened = call(c, "client_identity")
+        check(reopened["hostId"] != current["hostId"] and all(reopened[k] == current[k] for k in
+              ["applicationUri", "certificateSha256", "certificateDerBase64", "privateKeyStorage"]), "Host restart preserves identity while replacing session owner")
+        check(call(c, "status", dict(attemptId=persistent_attempt))["state"] == "closed", "Restart retains closed session without adoption")
+        check(fixture("audit")["audit"] == audit_before["audit"], "Identity reopen and retained status cause no remote requests")
+        restart_attempt = uuid.uuid4().hex
+        check(call(c, "connect", dict(attemptId=restart_attempt, selection=selected))["state"] == "connected", "Fresh session after restart uses unchanged server trust")
+        close_client(c)
+        identity_command("rotate", "--expected-sha256", "0" * 64, code="UaClientIdentityChanged")
+        rotated = identity_command("rotate", "--expected-sha256", persistent["certificateSha256"])
+        check(rotated["applicationUri"] == persistent["applicationUri"] and rotated["certificateSha256"] != persistent["certificateSha256"],
+              "Explicit CLI rotation changes key while preserving application URI")
+        identity_command("rotate", "--expected-sha256", persistent["certificateSha256"], code="UaClientIdentityChanged")
+        c = client(identity_name)
+        check(call(c, "client_identity")["certificateSha256"] == rotated["certificateSha256"], "Restart observes rotated certificate")
+        denied = call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected))
+        check(denied["state"] != "connected", "Rotated key is rejected until new server trust is explicitly provisioned")
+        check(any(x["sha256"] == rotated["certificateSha256"] and not x["accepted"] for x in fixture("audit")["clientCertificates"]),
+              "Server independently rejects untrusted rotated certificate")
+        call(c, "disconnect", dict(attemptId=denied["attemptId"], acknowledgeUnknown=True))
+        fixture("trustClient", sha256=rotated["certificateSha256"])
         final_id = uuid.uuid4().hex
         check(call(c, "connect", dict(attemptId=final_id, selection=selected))["state"] == "connected", "Fresh healthy capture-independent session for Host disposal")
         report["status"] = "passed"
@@ -206,6 +279,18 @@ def main():
         source_after = source_inputs(); write(out / "sources-after.json", source_after)
         cleanup_check(source_before == source_after, "Exact qualification source inputs unchanged")
         report["sourceHashes"] = source_before
+        # Only this run's random name; never remove the shared identity parent or another profile.
+        if identity_root.exists():
+            expected_parent = (Path(os.environ["LOCALAPPDATA"]) / "TiaMcpOpcUaIdentities").resolve(strict=True)
+            cleanup_check(identity_root.name == identity_name and len(identity_name) == 32 and
+                          identity_root.resolve(strict=True).parent == expected_parent and
+                          not identity_root.is_symlink() and not identity_root.is_junction(), "Owned identity cleanup path verified")
+            if not cleanup_errors:
+                try:
+                    shutil.rmtree(identity_root)
+                    cleanup_check(not identity_root.exists(), "Disposable protected identity removed after all owners exited")
+                except OSError:
+                    cleanup_check(False, "Owned identity cleanup failed; protected store retained")
         report["cleanupErrors"] = cleanup_errors
         write(out / "result.json", report)
     require(report["status"] == "passed", "Qualification failed; see retained original result.json")

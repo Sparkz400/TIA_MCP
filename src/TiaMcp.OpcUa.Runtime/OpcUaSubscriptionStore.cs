@@ -123,7 +123,7 @@ internal sealed class OpcUaSubscriptionStore : IDisposable
         return new { schemaVersion = "opcua-runtime-subscription-status.v1", captureId = snapshot.Plan.CaptureId, snapshotRef = snapshot.Reference,
             state, recordedProgress = snapshot.Progress, localFailure, plan = snapshot.Plan, committedBytes = snapshot.Bytes, uncommittedTailPresent = tail,
             uncommittedDataUnknown = snapshot.Progress.State == "running", acquisitionMode = "subscription",
-            reconnectPolicy = "none", transferPolicy = "none", sourceCompletenessVerified = false, physicalQualified = false,
+            reconnectPolicy = snapshot.Plan.Request.MaximumReconnectAttempts>0?"boundedSameSession":"none", transferPolicy = "none", sourceCompletenessVerified = false, physicalQualified = false,
             atomicAcrossSignals = false, scanSynchronized = false, programMatchVerified = false, nativeQualified = false };
     }
     private Snapshot Load(string reference)

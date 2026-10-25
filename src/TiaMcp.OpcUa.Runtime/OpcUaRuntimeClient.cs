@@ -9,7 +9,7 @@ using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.OpcUa.Runtime;
 
-/// <summary>One owned, pinned, encrypted UA session. No reconnect or value mutation surface.</summary>
+/// <summary>One owned, pinned, encrypted UA session. Recovery never creates a replacement session.</summary>
 internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
 {
     internal const int TimeoutMs = 10_000;
@@ -25,6 +25,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     internal bool PeerVerified { get; private set; }
     internal bool SessionDispatched { get; private set; }
     internal bool Unusable { get; private set; }
+    internal bool CanReconnect { get; private set; }
     internal DateTimeOffset LastUsed { get; private set; } = DateTimeOffset.UtcNow;
 
     internal OpcUaRuntimeClient(OpcUaRuntimeSelection selection, X509Certificate2 clientCertificate, string clientUri, string pkiPath)
@@ -165,12 +166,15 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
             var typeNode = StatusCode.IsGood(type.StatusCode) && type.Value is NodeId dataType ? External(dataType) : null;
             int? valueRank = StatusCode.IsGood(rank.StatusCode) && rank.Value is int r ? r : null;
             var builtIn = value.WrappedValue.TypeInfo?.BuiltInType.ToString();
-            (string? encoding, object? data, string? unsupported) = valueRank is >= 0 || value.WrappedValue.TypeInfo?.ValueRank is >= 0
-                ? (null, null, "UaArrayUnsupported") : Scalar(value.Value);
+            var declaredDimensions = StatusCode.IsGood(dimensions.StatusCode) ? dimensions.Value as uint[] : null;
+            bool array = value.WrappedValue.TypeInfo?.ValueRank is >= 0 || value.Value is Matrix;
+            (string? encoding, object? data, string? unsupported) = array
+                ? ArrayValue(value.WrappedValue, valueRank, declaredDimensions) : Scalar(value.Value);
+            if (!array && valueRank is >= 0 && value.Value is not null) (encoding, data, unsupported) = (null, null, "UaArrayShapeMismatch");
             string outcome = quality == "Bad" ? "itemError" : typeNode is null || valueRank is null ? "metadataError" :
                 unsupported is not null ? "unsupported" : "value";
             return new(node, outcome, builtIn, typeNode, valueRank,
-                StatusCode.IsGood(dimensions.StatusCode) ? dimensions.Value as uint[] : null,
+                declaredDimensions,
                 $"0x{value.StatusCode.Code:x8}", quality, Time(value.SourceTimestamp), Time(value.ServerTimestamp),
                 value.SourcePicoseconds, value.ServerPicoseconds, outcome == "value" ? encoding : null,
                 outcome == "value" ? data : null, outcome == "value" ? null : unsupported ?? (outcome == "itemError" ? "UaItemBad" : "UaMetadataUnavailable"));
@@ -243,7 +247,22 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
     }
 
     private ISession Session => session is { Connected: true } s && !Unusable ? s : throw Error("UaSessionUnavailable");
-    internal void Invalidate() => Unusable = true;
+    internal void Invalidate(bool reconnectable = false) { Unusable = true; CanReconnect = reconnectable && session is not null; }
+    internal async Task Reconnect(CancellationToken ct)
+    {
+        if(!CanReconnect || session is null) throw Error("UaReconnectUnavailable");
+        using var leaf=CertificateFactory.Create(session.ConfiguredEndpoint.Description.ServerCertificate);
+        if(!ValidPinnedLeaf(leaf)) throw Error("UaCertificateRejected");
+        await configuration.CertificateValidator.ValidateAsync(leaf,ct);
+        configuration.CertificateValidator.ValidateDomains(leaf,session.ConfiguredEndpoint);
+        var original=session.SessionId;
+        await session.ReconnectAsync(null,null,ct);
+        session.KeepAliveInterval=Timeout.Infinite;
+        if(session.SessionId!=original) throw Error("UaSessionIdentityChanged");
+        Unusable=false;
+        try {await VerifyIdentity(ct);CanReconnect=false;}
+        catch {Unusable=true;throw;}
+    }
     internal async Task<bool> Close()
     {
         if (session is null) { ForgetPassword(); return !SessionDispatched; }

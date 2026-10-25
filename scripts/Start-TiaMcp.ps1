@@ -3,12 +3,14 @@ param(
     [string]$TiaApiDirectory,
     [string]$SimulatorApiDirectory,
     [string]$GitExecutable,
+    [string]$UaClientIdentity,
     [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
     [switch]$StrictBundle,
     [switch]$InteractiveSession,
     [switch]$Diagnose
 )
 $ErrorActionPreference = 'Stop'
+if ($PSBoundParameters.ContainsKey('UaClientIdentity') -and $UaClientIdentity -cnotmatch '^(default|[0-9a-f]{32})$') { throw 'UaClientIdentity must be default or 32 lowercase hexadecimal characters.' }
 $bundleRoot = [IO.Path]::GetFullPath((Split-Path $PSScriptRoot -Parent))
 $hostExecutable = Join-Path $bundleRoot 'host/TiaMcp.Host.exe'
 $engineeringWorker = Join-Path $bundleRoot 'workers/openness/TiaMcp.Openness.V21.exe'
@@ -46,6 +48,7 @@ while ($ancestor) {
 $launchArguments = @('--worker', $engineeringWorker, '--sim-worker', $simulatorWorker, '--artifacts', $ArtifactsDirectory, '--timeout-seconds', $TimeoutSeconds.ToString())
 if ($verification.bundleKind -eq 'offline') { $launchArguments += '--no-native-workers' }
 if ($GitExecutable) { $launchArguments += @('--git-executable', $GitExecutable) }
+if ($UaClientIdentity) { $launchArguments += @('--ua-client-identity', $UaClientIdentity) }
 if ($Diagnose) { $launchArguments += '--diagnose' }
 if ($TiaApiDirectory) { $launchArguments += @('--api-dir', $TiaApiDirectory) }
 if ($SimulatorApiDirectory) { $launchArguments += @('--sim-api-dir', $SimulatorApiDirectory) }

@@ -1,6 +1,6 @@
 # Bounded OPC UA subscription acquisition
 
-`runtime_ua_subscription_start`, `status`, `stop`, `page` and `export` operate on the existing encrypted, pinned, owned `runtime_ua_connect` session. The client explicitly invokes CreateSubscription, CreateMonitoredItems, Publish, bounded Republish and DeleteSubscriptions. It does not register an SDK background subscription, reconnect, transfer, call methods, or write process values. Durable local evidence is separate from the OPC UA server's optional durable-subscription feature; SetSubscriptionDurable is not invoked.
+`runtime_ua_subscription_start`, `status`, `stop`, `page` and `export` operate on the existing encrypted, pinned, owned `runtime_ua_connect` session. The client explicitly invokes CreateSubscription, CreateMonitoredItems, Publish, bounded Republish and DeleteSubscriptions. It does not register an SDK background subscription, transfer, call methods, or write process values. Optional `maximumReconnectAttempts: 1..3` permits [bounded same-session recovery](opcua-runtime.md#controlled-acquisition-reconnect); the default is zero. Durable local evidence is separate from the OPC UA server's optional durable-subscription feature; SetSubscriptionDurable is not invoked.
 
 ## Acceptance and workflow
 
@@ -14,7 +14,7 @@ The milestone's acceptance is an actual encrypted independent loopback fixture, 
 
 A repeated identical capture ID observes original retained intent. Changed intent refuses. Another Host opens evidence only; it never recreates, transfers or resumes the subscription. Connect/disconnect retain the original session's separate reservation and unknown-remote-state semantics.
 
-Unknown members of the subscription `request` or its nested `nodes` refuse during MCP deserialization before session access or capture intent. This includes unsupported reconnect/transfer/write/resume options and misspelled settings. The guard is scoped to subscription requests; existing shared read/poll node deserialization and the MCP SDK's handling of unbound outer tool arguments are unchanged.
+Unknown members of the subscription `request` or its nested `nodes` refuse during MCP deserialization before session access or capture intent. This includes unsupported `reconnect`/transfer/write/resume options (the supported bounded option is `maximumReconnectAttempts`) and misspelled settings. The guard is scoped to subscription requests; existing shared read/poll node deserialization and the MCP SDK's handling of unbound outer tool arguments are unchanged.
 
 ## Evidence and ordering
 
@@ -23,13 +23,13 @@ Optional `request.diagnosticBindingId` selects an immutable
 Its exact session attempt, ordered nodes and original experiment are revalidated
 before session acquisition. Existing unbound subscriptions cannot be rebound.
 
-Each notification retains the complete decoded scalar representation used by existing UA reads: exact Int64/UInt64 decimal strings, builtin and declared type, scalar rank/dimensions, raw 32-bit status and quality, original nullable source/server timestamps, and both picosecond fields. Bad values are suppressed, uncertain values remain uncertain and unsupported arrays/structures stay explicit. Declared type/rank metadata is observed at subscription creation; it is not a promise that the server's declarations remain unchanged. Identity reads before services recheck namespace/server tables and server start time. Protected credential admission is rechecked for each service.
+Each notification retains the complete decoded scalar or bounded array/matrix representation used by existing UA reads: exact Int64/UInt64 decimal strings, builtin and declared type, scalar rank/dimensions, raw 32-bit status and quality, original nullable source/server timestamps, and both picosecond fields. Bad values are suppressed, uncertain values remain uncertain and unsupported element types/structures stay explicit. Arrays carry the same observed dimensions and exact flat element encodings as [manual reads](opcua-runtime.md); exports and reopened journals retain and validate the complete envelope. Declared type/rank metadata is observed at subscription creation; it is not a promise that the server's declarations remain unchanged. Identity reads before services recheck namespace/server tables and server start time. Protected credential admission is rechecked for each service.
 
 Publish envelopes retain original sequence number, publish time, available retransmission sequence numbers, MoreNotifications, submitted acknowledgements and original per-acknowledgement status. DataValue overflow information bits remain separate from sequence gaps. Keepalives advertise the next sequence number and contribute no sample. StatusChangeNotification codes are retained and terminate acquisition. Event subscriptions and other extension-object forms refuse; there is no silent conversion to polling.
 
 Duplicate notification messages retain the original received envelope with `duplicate=true`; their notifications do not increase the unique notification count. Sequence gaps retain the original inclusive range and observed missing count even when a later Republish recovers it. The missing count describes detected gaps, not final unrecovered sample loss. Retransmissions have their own original sequence/time/data envelope. Bad_MessageNotAvailable remains a failure event with its requested sequence and exact status. The counter excludes sequence zero and wraps from 4294967295 to 1.
 
-At most the requested total number of missing messages is republished. No retry/reconnect/transfer loop occurs after service failure. Messages are acknowledged only after their complete local envelope has been committed. An acknowledgement is not a guarantee that every intermediate PLC value was sampled or retained by the server.
+At most the requested total number of missing messages is republished. With recovery disabled, service failure ends acquisition. Opt-in recovery only reactivates the original session after a transport error or timeout; it cannot transfer or recreate a subscription. Messages are acknowledged only after their complete local envelope has been committed. An acknowledgement is not a guarantee that every intermediate PLC value was sampled or retained by the server.
 
 ## Bounds and lifecycle
 
@@ -44,3 +44,24 @@ A crash retains only the committed prefix and unknown uncommitted loss. A partia
 The profile does not establish independent PLC/program/address association, complete physical sampling, scan synchronization, native TIA behavior or physical server/CPU compatibility. Exact local hashes establish consistency, not remote authenticity beyond the selected encrypted session's certificate pin.
 
 Contract: [opcua-runtime-subscription.v1](../../contracts/opcua-runtime-subscription.v1.schema.json). Qualification: [21 October 2026](../verification/opcua-subscriptions-20261021.md). Protocol references: [OPC Foundation subscription behavior](https://reference.opcfoundation.org/specs/OPC-10000-4/5.14.1.1), [Publish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.5) and [Republish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.6). Production uses the already pinned OPC Foundation .NET Standard 1.5.378.182 package.
+
+## Recovery evidence
+
+Each `reconnect` event contains `reconnect: {attempt, state, errorCode}`. Attempts
+are numbered across the entire capture. `starting` and its `succeeded`/`failed`
+result are committed separately, so a crash can retain an unfinished attempt as
+uncertain evidence. An interruption is not a known count of lost notifications.
+
+After reactivation, Republish starts at the next expected sequence. Each recovered
+message retains its original envelope and a detected one-message gap; a
+Bad_MessageNotAvailable response ends this drain. Only then does normal Publish
+continue. These calls consume the original `maximumRepublish` budget. Exhausting
+that budget ends acquisition with `UaReconnectRepublishLimit`, rather than silently
+skipping recovery. A zero Republish budget therefore permits session reactivation
+but cannot continue the subscription. Notification limits and server status changes
+can also end the drain. No values or missing source times are interpolated.
+
+The chronological reader rejects impossible attempt order, data after failed
+recovery, Publish before the recovery drain completes, and acknowledgements of
+uncommitted messages. JSON and CSV retain the full recovery events. Diagnostic
+observations count the interruption as a gap and preserve the original evidence.

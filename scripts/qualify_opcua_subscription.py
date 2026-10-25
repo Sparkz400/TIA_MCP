@@ -49,7 +49,7 @@ def main():
     source_paths = [
         "scripts/qualify_opcua_subscription.py", "scripts/qualify_opcua_subscription_inputs.py", "scripts/opcua_subscription_checks.py", "scripts/opcua_runtime_checks.py", "scripts/smoke_mcp.py",
         "contracts/opcua-runtime.v1.schema.json", "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
+        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeCaptures.cs", "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/PhysicalRuntime/OpcUaCaptureContracts.cs", "contracts/opcua-runtime-subscription.v1.schema.json",
@@ -57,6 +57,7 @@ def main():
     ]
     source_paths += [str(p.relative_to(ROOT)).replace("\\", "/") for p in sorted((ROOT/"src/TiaMcp.OpcUa.Runtime").glob("*Subscription*.cs"))]
     source_paths += ["src/TiaMcp.Host/OpcUaSubscriptionTools.cs", "contracts/opcua-runtime-subscription.v1.schema.json", "tests/TiaMcp.OpcUa.Runtime.Tests/SubscriptionChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs"]
+    source_paths += ["src/TiaMcp.Core/PhysicalRuntime/OpcUaReconnectEvent.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/ReconnectChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs"]
     def source_inputs():
         return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in source_paths}
     source_before = source_inputs(); write(out / "sources-before.json", source_before)
@@ -129,9 +130,10 @@ def main():
         check(fixture("audit")["audit"] == snapshot["audit"], "Status and repeated connect emit no UA service")
         call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected), code="UaEndpointSessionUnresolved")
         names = ["int64", "uint64", "double", "bool", "text", "bad", "uncertain", "missingTimes", "array", "denied", "structure", "byteArray", "byteString", "minimumDate"]
+        names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         capture = uuid.uuid4().hex
-        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=14)
+        request = dict(attemptId=attempt,nodes=nodes+[dict(nodes[0],identifier="absent")],publishingIntervalMilliseconds=100,samplingIntervalMilliseconds=100,queueSize=16,durationSeconds=10,maximumNotifications=len(names))
         check_unknown_subscription_inputs(c, request, fixture, out / "store", check, report.setdefault("inputGuardResponses", []))
         call(c,"subscription_start",dict(captureId=capture,request=request))
         def ended(identifier):
@@ -143,7 +145,7 @@ def main():
         status=ended(capture);snapshot_ref=status["snapshotRef"]
         page=call(c,"subscription_page",dict(snapshotRef=snapshot_ref,count=200))
         Draft202012Validator({**capture_schema,"$ref":"#/$defs/page"}).validate(page)
-        verify_subscription(page["rows"],attempt);check(True,"Independent original settings/items/sequences/value/status/time/acknowledgement oracle")
+        verify_subscription(page["rows"],attempt,len(names));check(True,"Independent original settings/items/sequences/value/status/time/acknowledgement oracle")
         check(status["recordedProgress"]["terminalReason"]=="notificationLimit" and status["recordedProgress"]["remoteCleanupConfirmed"],"Bounded samples and confirmed DeleteSubscriptions")
         exported=call(c,"subscription_export",dict(snapshotRef=snapshot_ref,format="csv"))
         def download(artifact):
@@ -181,7 +183,7 @@ def main():
         check(stopped["recordedProgress"]["terminalReason"]=="stopped","Explicit bounded stop")
         check(call(c,"disconnect",dict(attemptId=attempt))["state"]=="closed","Owned session closed after subscriptions")
         audit=fixture("audit");verify_subscription_audit(audit["audit"],healthy=True)
-        report["negativeControls"]=subscription_controls(page["rows"],attempt,audit["audit"])
+        report["negativeControls"]=subscription_controls(page["rows"],attempt,audit["audit"],len(names))
         user = dict(selected, authentication="username", user="reader", vaultName=vault)
         binding = call(c, "credential_binding", dict(selection=user))
         write(out / "binding.json", binding)
@@ -199,6 +201,26 @@ def main():
         protected_status=ended(protected_capture)
         protected_rows=call(c,"subscription_page",dict(snapshotRef=protected_status["snapshotRef"]))["rows"]
         check([n["value"]["value"] for r in protected_rows for n in (r["event"]["notifications"] or [])]==["-9223372036854775808","18446744073709551615"],"Actual DPAPI protected subscription exact values")
+        recovery_capture=uuid.uuid4().hex
+        before_recovery=fixture("audit")["audit"]
+        fixture("dropPublishResponses",value=1)
+        recovery_request=dict(attemptId=attempt,nodes=nodes[:2],durationSeconds=8,maximumNotifications=2,maximumReconnectAttempts=2)
+        call(c,"subscription_start",dict(captureId=recovery_capture,request=recovery_request))
+        recovery_status=ended(recovery_capture);recovery_ref=recovery_status["snapshotRef"]
+        recovery_rows=call(c,"subscription_page",dict(snapshotRef=recovery_ref,count=200))["rows"]
+        transitions=[r["event"]["reconnect"] for r in recovery_rows if "reconnect" in r["event"]]
+        check([r["state"] for r in transitions]==["starting","succeeded"],"Protected subscription records reactivation boundaries")
+        check([n["value"]["value"] for r in recovery_rows for n in (r["event"]["notifications"] or [])]==["-9223372036854775808","18446744073709551615"],"Lost protected notification recovered without duplicate counting")
+        check(any(r["event"]["kind"]=="republish" for r in recovery_rows),"Lost response retained as original retransmission")
+        recovered_export=call(c,"subscription_export",dict(snapshotRef=recovery_ref,format="csv"))
+        recovered_json=json.loads(download(recovered_export["artifacts"][0]))
+        recovered_csv=list(csv.DictReader(io.StringIO(download(recovered_export["artifacts"][1]).decode())))
+        check([json.loads(r["event_json"]) for r in recovered_csv]==[r["event"] for r in recovery_rows],"CSV preserves recovery envelopes")
+        Draft202012Validator({**capture_schema,"$ref":"#/$defs/export"}).validate(recovered_json)
+        call(c,"subscription_start",dict(captureId=uuid.uuid4().hex,request=dict(recovery_request,maximumReconnectAttempts=4)),code="UaSubscriptionInvalid")
+        recovery_audit=fixture("audit")["audit"][len(before_recovery):]
+        check(sum(e["operation"]=="ActivateSession" for e in recovery_audit)==1 and not any(e["operation"] in {"CreateSession","TransferSubscriptions","Write","Call"} for e in recovery_audit),"Exactly one same-session activation without replacement or mutation")
+        write(out/"recovered-export.json",recovered_json)
         retired = subprocess.run([str(host), "--credential-store", "retire", "--vault-name", vault,
                                   "--binding", str(out / "binding.json"), "--reference", str(out / "reference.json")],
                                  capture_output=True, timeout=30)
@@ -233,6 +255,9 @@ def main():
         write(out/"crash-request-settlement.json",settlement)
         before_audit=boundary["audit"]
         c=client()
+        check(call(c,"subscription_status",dict(captureId=recovery_capture))["snapshotRef"]==recovery_ref,"Recovered capture reopens unchanged after Host restart")
+        call(c,"subscription_start",dict(captureId=recovery_capture,request=recovery_request))
+        check(call(c,"subscription_page",dict(snapshotRef=recovery_ref,count=200))["rows"]==recovery_rows,"Exact recovery events survive another Host")
         interrupted_status=call(c,"subscription_status",dict(captureId=interrupted))
         check(interrupted_status["state"]=="interrupted" and interrupted_status["uncommittedDataUnknown"],"New Host reports interrupted prefix and unknown tail")
         call(c,"subscription_start",dict(captureId=interrupted,request=crash_request))

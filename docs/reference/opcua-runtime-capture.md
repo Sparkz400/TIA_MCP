@@ -17,7 +17,7 @@ before session acquisition. Existing unbound captures cannot be rebound.
 
 Nodes are read sequentially, once per admitted polling cycle, with the existing credential and namespace/server/start-time identity checks before each read. A selection ID is derived from the exact namespace URI, canonical identifier type and identifier; namespace indexes are never durable node identities. Requested polling intervals are not server sampling intervals and are not scan synchronization. A delayed read skips elapsed polling slots instead of catching up; gap rows retain the skipped count. Partial final cycles remain partial.
 
-Each read row contains the complete original decoded UA read-result JSON as a string. This preserves Int64/UInt64 decimal strings, type identity, rank/dimensions, raw 32-bit status, Good/Uncertain/Bad classification, nullable source/server timestamps and picoseconds. Bad values remain suppressed; uncertain values remain uncertain; unsupported forms remain explicit. Retained scalar validation enforces canonical decoded builtin/encoding pairs and numeric ranges; a custom declared DataType remains a separate original declaration. Nothing is interpolated, no timestamp is invented, and client wall-clock ordering is not substituted for source-clock agreement. Separate monotonic elapsed/scheduled times describe host acquisition only.
+Each read row contains the complete original decoded UA read-result JSON as a string. This preserves Int64/UInt64 decimal strings, type identity, rank/dimensions, raw 32-bit status, Good/Uncertain/Bad classification, nullable source/server timestamps and picoseconds. Bad values remain suppressed; uncertain values remain uncertain; unsupported forms remain explicit. Retained scalar and array validation enforces canonical decoded builtin/encoding pairs and numeric ranges, exact array counts/order and declared versus observed shape. JSON and CSV retain the complete array envelope; reopen revalidates it without acquiring new values; a custom declared DataType remains a separate original declaration. Nothing is interpolated, no timestamp is invented, and client wall-clock ordering is not substituted for source-clock agreement. Separate monotonic elapsed/scheduled times describe host acquisition only.
 
 Any service failure ends this capture; per-item bad/unsupported results remain successful transport observations. Duration expiration, explicit stop, Host shutdown, sample/byte/value limits and storage failure have distinct terminal reasons. A publication failure can leave an uncommitted tail; reopen exposes only the verified committed prefix and unknown loss. Retained hashes establish byte consistency, not source authenticity, device identity, or an executable PLC/program/address association.
 
@@ -27,6 +27,21 @@ Limits are 1–64 unique nodes, intervals 100–60,000 ms, duration 1–3,600 se
 
 Capture stop cancels this Host's own worker. Host shutdown stops workers before closing its captured UA sessions, even when capture publication fails. An actual Host crash does not manufacture a completed terminal segment: another Host reports `interrupted`, keeps the original bytes, and performs no network call on status/page/export/repeated start/stop. The UA session separately remains `hostEndedRemoteUnknown` until explicit local acknowledgement or independently established cleanup; acknowledgement does not prove remote logout.
 
-This profile provides polling only. [Bounded UA subscriptions](opcua-runtime-subscriptions.md) separately retain monitored-item revisions and Publish/Republish evidence. Automatic transfer/reconnect remain unsupported. There is no subscription-to-polling relabeling, diagnostic behavioral verdict, physical-device qualification, runtime write, or native TIA operation. Polling reserves the session against competing acquisitions and manual read/browse/disconnect until the capture releases its lease.
+This profile provides polling only. [Bounded UA subscriptions](opcua-runtime-subscriptions.md) separately retain monitored-item revisions and Publish/Republish evidence. Subscription transfer and implicit reconnect remain unsupported; bounded same-session recovery requires the explicit option below. There is no subscription-to-polling relabeling, diagnostic behavioral verdict, physical-device qualification, runtime write, or native TIA operation. Polling reserves the session against competing acquisitions and manual read/browse/disconnect until the capture releases its lease.
 
 Contract: [opcua-runtime-capture.v1](../../contracts/opcua-runtime-capture.v1.schema.json). Qualification is exercised by the existing managed UA suite plus `scripts/qualify_opcua_capture.py`; the latter starts an actual encrypted loopback server and Host, verifies exact values independently, downloads artifacts, crashes its original owned Host, and reopens without replay.
+
+## Optional transport recovery
+
+Set `maximumReconnectAttempts: 1..3` in the original start request to enable
+[bounded same-session reconnect](opcua-runtime.md#controlled-acquisition-reconnect).
+Omission or zero retains the original stop-on-error behavior. The failed read stays
+in the journal; recovery continues at a future scheduled polling cycle and records
+the skipped slots. It never replaces the failed read with a retry result.
+
+Recovery boundaries are `gap` rows with `skippedPolls: 0` and an additional
+`reconnect: {attempt, state, errorCode}` object. Ordinary gap rows still report the
+number of skipped polling slots. JSON preserves both forms; CSV for opted-in
+captures adds a `reconnect_json` column. Existing captures retain their original
+CSV layout and serialized bytes. Status and reopened evidence never initiate
+network recovery.

@@ -74,8 +74,8 @@ class Client:
         except (BrokenPipeError, OSError):
             pass
         try:
-            # The host can wait up to 30 seconds for each of two native workers.
-            self.process.wait(timeout=75)
+            # The host can wait up to 120 seconds (BridgeClient.WorkerExitBudgetSeconds) for each of two native workers.
+            self.process.wait(timeout=255)
         except subprocess.TimeoutExpired:
             forced = True
             self.process.kill()  # This owns only the MCP host, never a Siemens process.

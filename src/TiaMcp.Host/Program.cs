@@ -8,6 +8,7 @@ using TiaMcp.Host;
 try
 {
     if (args.Length > 0 && args[0] == "--credential-store") return CredentialCommand.Run(args[1..]);
+    if (args.Length > 0 && args[0] == "--ua-identity-store") return UaClientIdentityCommand.Run(args[1..]);
     if (args.Length > 0 && args[0].StartsWith("--session-relay-", StringComparison.Ordinal))
         return await SessionRelay.RunAsync(args);
     var options = TiaMcp.Host.HostOptions.Parse(args);

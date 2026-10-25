@@ -42,10 +42,18 @@ internal sealed partial class FixtureServer
         {
         if(Mode=="subscriptionPublishDenied")throw new ServiceResultException(StatusCodes.BadUserAccessDenied);
         var response=await base.PublishAsync(channel,header,acks,ct);publishOrdinal++;
-        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && publishOrdinal==1)
+        if(DropPublishResponses>0)
+        {
+            Interlocked.Decrement(ref DropPublishResponses);
+            Audit.Enqueue(new {operation="FixtureLostPublishResponse",sequence=response.NotificationMessage.SequenceNumber});
+            throw new ServiceResultException(StatusCodes.BadConnectionClosed);
+        }
+        if(Mode is "subscriptionGap" or "subscriptionRepublishUnavailable" or "subscriptionRepublishStatus" && publishOrdinal==1 || Mode=="subscriptionGapAfterRecovery" && publishOrdinal==2)
         {
             Audit.Enqueue(new {operation="FixtureDroppedPublish",sequence=response.NotificationMessage.SequenceNumber});
+            var acknowledgementResults=response.Results;
             response=await base.PublishAsync(channel,header,[],ct);
+            response.Results=acknowledgementResults;
         }
         Normalize(response.NotificationMessage);
         if(Mode=="subscriptionDuplicate")
@@ -70,6 +78,7 @@ internal sealed partial class FixtureServer
     public override async Task<RepublishResponse> RepublishAsync(SecureChannelContext channel,RequestHeader header,uint subscription,uint sequence,CancellationToken ct)
     {
         Audit.Enqueue(new {operation="RepublishRequested",subscription,sequence});
+        if(Mode=="subscriptionGapAfterRecovery" && publishOrdinal==1 && sequence==2)throw new ServiceResultException(StatusCodes.BadMessageNotAvailable);
         if(Mode=="subscriptionRepublishUnavailable")throw new ServiceResultException(StatusCodes.BadMessageNotAvailable);
         var response=await base.RepublishAsync(channel,header,subscription,sequence,ct);Normalize(response.NotificationMessage);
         if(Mode=="subscriptionRepublishStatus")response.NotificationMessage.NotificationData=[new ExtensionObject(new StatusChangeNotification {Status=StatusCodes.BadTimeout})];
@@ -92,9 +101,12 @@ internal sealed partial class FixtureServer
             v.ServerTimestamp=name=="missingTimes"?DateTime.MinValue:ServerTime;
             v.SourcePicoseconds=name=="missingTimes"?(ushort)0:(ushort)12;v.ServerPicoseconds=name=="missingTimes"?(ushort)0:(ushort)34;
             if(name=="bad")v.StatusCode=StatusCodes.BadSensorFailure;
+            if(name=="badArray")v.StatusCode=StatusCodes.BadSensorFailure;
+            if(name=="uncertainArray")v.StatusCode=StatusCodes.UncertainInitialValue;
             if(name=="uncertain")v.StatusCode=StatusCodes.UncertainInitialValue;
             if(name=="denied")v.StatusCode=StatusCodes.BadUserAccessDenied;
             if(name=="byteArray")v.WrappedValue=new Variant(new byte[]{1,2,3},new TypeInfo(BuiltInType.Byte,ValueRanks.OneDimension));
+            if(name=="nullArray")v.WrappedValue=new Variant(null,new TypeInfo(BuiltInType.Int32,ValueRanks.OneDimension));
             if(Mode=="subscriptionOverflow")v.StatusCode=new StatusCode(v.StatusCode.Code|0x00000480u);
             if(Mode=="secretEcho" && name=="text")v.Value="prefix fixture-only-secret suffix";
         }

@@ -38,7 +38,7 @@ internal static class SubscriptionChecks
             check(values["uncertain"].Quality=="Uncertain" && values["uncertain"].StatusCode=="0x40920000","Subscription preserves uncertain raw status");
             check(values["int64"].SourceTimestamp==new DateTimeOffset(FixtureServer.SourceTime) && values["int64"].ServerTimestamp==new DateTimeOffset(FixtureServer.ServerTime) && values["int64"].SourcePicoseconds==12 && values["int64"].ServerPicoseconds==34,"Subscription preserves original timestamps and picoseconds");
             check(values["missingTimes"].SourceTimestamp is null && values["missingTimes"].ServerTimestamp is null,"Subscription absent clocks remain null");
-            check(values["array"].Outcome=="unsupported" && values["byteArray"].Outcome=="unsupported" && values["byteString"].Outcome=="value","Subscription unsupported forms and ByteString distinction");
+            check(values["array"].Encoding=="array" && values["byteArray"].Encoding=="array" && values["byteString"].Outcome=="value","Subscription arrays and ByteString distinction");
             check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="notificationLimit" && status.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean(),"Notification bound and confirmed remote deletion retained");
             var actual=events.Where(x=>x.Kind=="publish").ToArray();
             check(actual.Select(x=>x.SequenceNumber).SequenceEqual(Enumerable.Range(1,14).Select(x=>(uint?)x)),"Original actual Publish sequence numbers");
@@ -108,11 +108,12 @@ internal static class SubscriptionChecks
         }
         finally{server.Mode="normal";await subscriptions.DisposeAsync();}
     }
-    private static async Task RetainedControls(string root,OpcUaRuntimeSessionStore sessions,string capture,JsonElement status,Action<bool,string> check)
+    internal static async Task RetainedControls(string root,OpcUaRuntimeSessionStore sessions,string capture,JsonElement status,Action<bool,string> check,
+        (string Name,Action<JsonObject[]> Change)[]? changes=null)
     {
         string original=Path.Combine(root,"runtime-ua-subscriptions",capture);
         var originalHashes=Directory.GetFiles(original).ToDictionary(x=>x,x=>Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(x))));
-        var mutations=new (string Name,Action<JsonObject[]> Change)[] {
+        var mutations=changes??new (string Name,Action<JsonObject[]> Change)[] {
             ("unselected item id",segments=>First(segments)["notifications"]![0]!["monitoredItemId"]=4294967295u),
             ("messages after terminal status",segments=>First(segments)["statusChanges"]=new JsonArray("0x800a0000")),
             ("oversized status list",segments=>First(segments)["statusChanges"]=new JsonArray(Enumerable.Range(0,5000).Select(_=>(JsonNode?)JsonValue.Create("0x00000000")).ToArray())),

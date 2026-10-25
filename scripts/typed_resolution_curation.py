@@ -37,11 +37,27 @@ def curation_report(runs):
     return {"completed": completed, "steps": steps, "toolCalls": calls}
 
 
+def capture_curation_report(path):
+    """A capture_typed_routes_owned.py report: completed only with every input captured, saved reopen verified and cleanup clean."""
+    report = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    fixtures = report.get("fixtures", [])
+    completed = (report.get("status") == "passed" and report.get("completed") is True and report.get("persistenceVerified") is True
+                 and not report.get("remainingSources") and not report.get("cleanupFailure") and bool(fixtures)
+                 and all(entry.get("engineeringVerified") is True for entry in fixtures))
+    return {"completed": completed,
+            "steps": [{"name": pathlib.Path(entry["sourcePath"]).name + ": " + ("captured" if entry.get("engineeringVerified") else "not captured")} for entry in fixtures]
+                     + [{"name": "saved reopen: " + ("verified" if report.get("persistenceVerified") else "not verified")}],
+            "toolCalls": [{"name": call["tool"], "isError": call["status"] != "passed"} for call in report.get("calls", [])]}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--run", action="append", required=True, help="<result.json>=<passed|expected rejection text>")
+    parser.add_argument("--run", action="append", default=[], help="<result.json>=<passed|expected rejection text>")
+    parser.add_argument("--capture", type=pathlib.Path, help="A capture_typed_routes_owned.py capture.json instead of --run reports.")
     parser.add_argument("--output", type=pathlib.Path, required=True)
     args = parser.parse_args()
-    runs = [tuple(item.split("=", 1)) for item in args.run]
-    args.output.write_text(json.dumps(curation_report(runs), indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"completed": curation_report(runs)["completed"], "runs": len(runs)}))
+    if bool(args.run) == bool(args.capture):
+        parser.error("Select --run reports or one --capture report.")
+    result = capture_curation_report(args.capture) if args.capture else curation_report([tuple(item.split("=", 1)) for item in args.run])
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"completed": result["completed"], "steps": len(result["steps"])}))

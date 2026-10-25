@@ -81,7 +81,7 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
     }
     private async Task Poll(RuntimeCapturePlan plan,RuntimeCaptureStore.Writer writer,Running entry)
     {
-        long started=clock.GetTimestamp(), cycle=0, lastReadCycle=-1,accountedThrough=-1; string reason="durationLimit";
+        long started=clock.GetTimestamp(), cycle=0, lastReadCycle=-1,accountedThrough=-1; string reason="durationLimit";int reconnects=0;
         using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds),clock);
         using var deadline=CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token,duration.Token);
         double durationMilliseconds=plan.Request.DurationSeconds*1000d;
@@ -90,6 +90,25 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
         using var stopObservation=entry.Stop.Token.Register(()=>Volatile.Write(ref stoppedElapsed,Elapsed()));
         // Timer callbacks can run late; elapsed time must independently prevent new reads.
         bool Expired()=>deadline.IsCancellationRequested || Elapsed()>=durationMilliseconds;
+        void Recovery(OpcUaReconnectEvent e)
+        {
+            writer.Append(new(writer.Rows,"gap",null,cycle,cycle*(double)plan.Request.IntervalMilliseconds,Elapsed(),clock.GetUtcNow(),null,null,0,e));
+            writer.Flush(Elapsed());
+        }
+        async Task<bool> Recover(string error)
+        {
+            while(!Expired() && OpcUaReconnectHistory.Retryable(error) && reconnects<plan.UaContext!.Request.MaximumReconnectAttempts)
+            {
+                int attempt=++reconnects;Recovery(new(attempt,"starting",error));
+                string? failure=null;
+                try {await Task.Delay(TimeSpan.FromMilliseconds(500),clock,deadline.Token);await sessions.ReconnectAcquisition(plan.Request.AttemptId,plan.CaptureId,deadline.Token);}
+                catch(Exception e) {failure=e is BridgeException b && b.Code.StartsWith("Ua",StringComparison.Ordinal)?b.Code:deadline.IsCancellationRequested?"UaCancelled":"UaReconnectFailed";}
+                Recovery(new(attempt,failure is null?"succeeded":"failed",failure));
+                if(failure is null)return true;
+                error=failure;
+            }
+            return false;
+        }
         void RecordElapsedGaps()
         {
             if(lastReadCycle<0)return;
@@ -126,7 +145,11 @@ public sealed class OpcUaRuntimeCaptures(OpcUaRuntimeSessionStore sessions, stri
                     catch(Exception failure) { error=OpcUaCaptureContracts.ReadError(failure); }
                     try { writer.Append(new(writer.Rows,"read",selectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
                     catch(BridgeException failure) when(failure.Code is "RuntimeCaptureByteLimit" or "RuntimeCaptureValueLimit") {writer.RecordDroppedResult();throw;}
-                    if(error is not null) {reason=deadline.IsCancellationRequested?"durationLimit":"sessionUnavailable";finish=true;break;}
+                    if(error is not null)
+                    {
+                        if(writer.ReadAttempts<plan.Request.MaximumSamples && await Recover(error))break; // Continue at the next scheduled cycle; the failed read is never replaced.
+                        reason=deadline.IsCancellationRequested?"durationLimit":"sessionUnavailable";finish=true;break;
+                    }
                     if(writer.ReadAttempts>=plan.Request.MaximumSamples){reason="sampleLimit";finish=true;break;}
                 }
                 RecordElapsedGaps();

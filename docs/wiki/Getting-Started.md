@@ -12,6 +12,8 @@ dotnet build src/TiaMcp.Host/TiaMcp.Host.csproj -c Release --artifacts-path arti
 
 Point a stdio MCP client at `artifacts/host-only/bin/TiaMcp.Host/release/TiaMcp.Host.exe` with an absolute path. Add `--artifacts <dir>` for retained uploads and reports, and `--no-native-workers` to refuse Siemens calls.
 
+For OPC UA trust that survives Host restarts, explicitly create a protected client identity and add `--ua-client-identity <name>` to the Host arguments. Setup, public certificate export and rotation are described in the [OPC UA identity workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md#protected-persistent-client-identity). The option needs a Windows user profile; it does not configure server trust or resume sessions.
+
 For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens).
 
 ## On an engineering workstation

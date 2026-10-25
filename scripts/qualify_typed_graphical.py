@@ -154,7 +154,7 @@ def run_case(case, args, output):
         report["binaries"] = binary_manifest(args.host, args.worker, args.sim_worker if args.live else None)
         # TIA limits project directories to 143 characters; keep native roots short.
         native_artifacts = pathlib.Path(getattr(args, "artifacts", None) or ROOT / "artifacts").resolve() / ("q" + uuid.uuid4().hex[:6])
-        native_artifacts.mkdir(exist_ok=False)
+        native_artifacts.mkdir(parents=True, exist_ok=False)
         report["nativeArtifacts"] = str(native_artifacts)
         session = TypedOwnedSession(args.host, args.worker, native_artifacts, report, persist,
             timeout=getattr(args, "timeout", 300), sim_worker=args.sim_worker if args.live else None,

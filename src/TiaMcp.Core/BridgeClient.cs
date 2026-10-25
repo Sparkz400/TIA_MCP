@@ -19,6 +19,7 @@ public interface IBridgeClient
 /// <summary>One serialized engineering session. Failed transport is terminal; mutations are never replayed.</summary>
 public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncDisposable
 {
+    public const int WorkerExitBudgetSeconds = 120;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private NamedPipeServerStream? _pipe;
     private BoundedLineReader? _reader;
@@ -150,9 +151,9 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
                 var exitWait = Stopwatch.StartNew();
                 try
                 {
-                    // PLCSIM manager shutdown can take just over ten seconds even
-                    // after owned OFF/unregister and explicit interface release.
-                    using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                    // The worker exits only after its owned Portal closes: 42.2 s measured after a
+                    // 1.5 h, 48-block capture, plus PLCSIM manager shutdown of just over ten seconds.
+                    using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(WorkerExitBudgetSeconds));
                     await _worker.WaitForExitAsync(deadline.Token);
                     exited = true;
                     exitCode = _worker.ExitCode;
@@ -163,7 +164,7 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
                 {
                     Console.Error.WriteLine(JsonSerializer.Serialize(new { bridgeWorkerExit = new {
                         processId = workerId, startedAtUtc, processExitVerified = exited, exitCode,
-                        waitBudgetSeconds = 30, elapsedMs = exitWait.ElapsedMilliseconds,
+                        waitBudgetSeconds = WorkerExitBudgetSeconds, elapsedMs = exitWait.ElapsedMilliseconds,
                         forcedTermination = false, projectLockReleaseVerified = false } }, BridgeProtocol.Json));
                     _worker.Dispose();
                 }

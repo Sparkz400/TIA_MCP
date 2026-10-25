@@ -47,12 +47,13 @@ def main():
     source_paths = [
         "scripts/qualify_opcua_capture.py", "scripts/opcua_runtime_checks.py", "scripts/smoke_mcp.py",
         "contracts/opcua-runtime.v1.schema.json", "src/TiaMcp.Core/PhysicalRuntime/OpcUaRuntimeContracts.cs",
-        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
+        "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeCaptures.cs", "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
         "src/TiaMcp.Core/PhysicalRuntime/OpcUaCaptureContracts.cs", "contracts/opcua-runtime-capture.v1.schema.json",
         "tests/TiaMcp.OpcUa.Runtime.Tests/CaptureChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.cs",
     ]
+    source_paths += ["src/TiaMcp.Core/PhysicalRuntime/OpcUaReconnectEvent.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/ReconnectChecks.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.Subscriptions.cs"]
     def source_inputs():
         return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in source_paths}
     source_before = source_inputs(); write(out / "sources-before.json", source_before)
@@ -126,6 +127,7 @@ def main():
         call(c, "connect", dict(attemptId=uuid.uuid4().hex, selection=selected), code="UaEndpointSessionUnresolved")
         names = ["int64", "uint64", "double", "bool", "text", "bad", "uncertain", "missingTimes", "array",
                  "denied", "structure", "byteArray", "byteString", "minimumDate"]
+        names += ["uint64Array", "int64Matrix", "emptyArray", "stringArray", "byteStrings", "doubleMatrix"]
         nodes = [dict(namespaceUri=ready["namespaceUri"], identifierType="string", identifier=name) for name in names]
         values = call(c, "read", dict(attemptId=attempt, nodes=nodes)); write(out / "values.json", values)
         verify_values(values); check(True, "Independent exact value/type/quality/time oracle")
@@ -194,6 +196,31 @@ def main():
             require(time.monotonic()<deadline,"protected capture completion");time.sleep(0.05)
         protected_rows=call(c,"capture_page",dict(snapshotRef=protected_status["snapshotRef"]))["rows"]
         check([json.loads(r["readResultJson"])["items"][0]["value"] for r in protected_rows if r["kind"]=="read"]==["-9223372036854775808","18446744073709551615"],"Actual protected DPAPI capture retains exact integer extrema")
+        recovery_capture=uuid.uuid4().hex
+        before_recovery=fixture("audit")["audit"]
+        fixture("failValueReads",value=1)
+        recovery_request=dict(attemptId=attempt,nodes=nodes[:1],intervalMilliseconds=100,durationSeconds=8,maximumSamples=3,maximumReconnectAttempts=2)
+        call(c,"capture_start",dict(captureId=recovery_capture,request=recovery_request))
+        deadline=time.monotonic()+15
+        while True:
+            recovery_status=call(c,"capture_status",dict(captureId=recovery_capture))
+            if recovery_status["state"]!="running":break
+            require(time.monotonic()<deadline,"recovered polling completion");time.sleep(0.05)
+        recovery_ref=recovery_status["snapshotRef"]
+        recovery_rows=call(c,"capture_page",dict(snapshotRef=recovery_ref,count=200))["rows"]
+        transitions=[r["reconnect"] for r in recovery_rows if "reconnect" in r]
+        check([r["state"] for r in transitions]==["starting","succeeded"],"Protected polling records reactivation boundaries")
+        check([r["errorCode"] for r in recovery_rows if r["errorCode"]]==["UaTransportInterrupted"],"Original failed read is retained")
+        check([json.loads(r["readResultJson"])["items"][0]["value"] for r in recovery_rows if r["readResultJson"]]==["-9223372036854775808"]*2,"Protected polling continues with exact values")
+        recovered_export=call(c,"capture_export",dict(snapshotRef=recovery_ref,format="csv"))
+        recovered_json=json.loads(download(recovered_export["artifacts"][0]))
+        recovered_csv=list(csv.DictReader(io.StringIO(download(recovered_export["artifacts"][1]).decode())))
+        check([json.loads(r["reconnect_json"]) for r in recovered_csv if r["reconnect_json"]]==transitions,"CSV preserves reconnect details")
+        Draft202012Validator({**capture_schema,"$ref":"#/$defs/export"}).validate(recovered_json)
+        call(c,"capture_start",dict(captureId=uuid.uuid4().hex,request=dict(recovery_request,maximumReconnectAttempts=4)),code="UaCaptureInvalid")
+        recovery_audit=fixture("audit")["audit"][len(before_recovery):]
+        check(sum(e["operation"]=="ActivateSession" for e in recovery_audit)==1 and not any(e["operation"] in {"CreateSession","TransferSubscriptions","Write","Call"} for e in recovery_audit),"Exactly one same-session activation without replacement or mutation")
+        write(out/"recovered-export.json",recovered_json)
         retired = subprocess.run([str(host), "--credential-store", "retire", "--vault-name", vault,
                                   "--binding", str(out / "binding.json"), "--reference", str(out / "reference.json")],
                                  capture_output=True, timeout=30)
@@ -218,6 +245,9 @@ def main():
         prior_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
         before_audit=fixture("audit")["audit"]
         c=client()
+        check(call(c,"capture_status",dict(captureId=recovery_capture))["snapshotRef"]==recovery_ref,"Recovered capture reopens unchanged after Host restart")
+        call(c,"capture_start",dict(captureId=recovery_capture,request=recovery_request))
+        check(call(c,"capture_page",dict(snapshotRef=recovery_ref,count=200))["rows"]==recovery_rows,"Exact recovery events survive another Host")
         interrupted_status=call(c,"capture_status",dict(captureId=interrupted))
         check(interrupted_status["state"]=="interrupted" and interrupted_status["uncommittedDataUnknown"],"New Host reports interrupted prefix and unknown tail")
         call(c,"capture_start",dict(captureId=interrupted,request=crash_request))

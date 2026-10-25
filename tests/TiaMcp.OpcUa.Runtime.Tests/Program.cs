@@ -77,8 +77,11 @@ try
             if (op == "stop") break;
             if (op == "mode") server.Mode = command.RootElement.GetProperty("value").GetString()!;
             if (op == "readDelay") server.ReadDelayMs = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "trustClient") server.TrustedClientSha256 = command.RootElement.GetProperty("sha256").GetString();
+            if (op == "failValueReads") server.FailValueReads = command.RootElement.GetProperty("value").GetInt32();
+            if (op == "dropPublishResponses") server.DropPublishResponses = command.RootElement.GetProperty("value").GetInt32();
             Save("server-live", new { sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() });
-            Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray() }, BridgeProtocol.Json));
+            Console.WriteLine(JsonSerializer.Serialize(new { ok = true, sessions = server.SessionCount, activePublishes=server.ActivePublishes, activeReads=server.ActiveReads, audit = server.Audit.ToArray(), clientCertificates = server.ClientCertificateChecks.ToArray() }, BridgeProtocol.Json));
             Console.Out.Flush();
         }
         passed = true;
@@ -86,6 +89,10 @@ try
     else
     {
         SubscriptionInputChecks.Run(Check);
+        var reconnectServer=await Start("reconnect");
+        await ReconnectChecks.Run(reconnectServer,output,Check);
+        Save("reconnect-server-audit",reconnectServer.Audit.ToArray());
+        await ArrayValueChecks.Run(server, output, Check);
         await SubscriptionChecks.Run(server, output, Check);
         Save("subscription-server-audit",server.Audit.ToArray());
         server.Audit.Clear();
@@ -111,10 +118,10 @@ try
             Check(items["missingTimes"].SourceTimestamp is null && items["missingTimes"].ServerTimestamp is null, "No fabricated missing timestamps");
             Check(items["int64"].SourceTimestamp == new DateTimeOffset(FixtureServer.SourceTime) && items["int64"].ServerTimestamp == new DateTimeOffset(FixtureServer.ServerTime) &&
                 items["int64"].SourcePicoseconds == 12 && items["int64"].ServerPicoseconds == 34, "Exact original timestamps and picoseconds");
-            Check(items["array"].Outcome == "unsupported" && items["array"].ValueRank == 1 && items["array"].ArrayDimensions!.SequenceEqual([3u]) &&
-                items["array"].DataType!.NamespaceUri == Opc.Ua.Namespaces.OpcUa, "Unsupported array preserves dimensions and type");
+            Check(items["array"].Outcome == "value" && items["array"].ValueRank == 1 && items["array"].ArrayDimensions!.SequenceEqual([3u]) &&
+                items["array"].DataType!.NamespaceUri == Opc.Ua.Namespaces.OpcUa, "Array preserves dimensions and type");
             Check(items["structure"].Outcome == "unsupported" && items["structure"].Value is null, "Unsupported structure cannot become default value");
-            Check(items["byteArray"].Outcome == "unsupported" && items["byteString"].Outcome == "value" && (string?)items["byteString"].Value == "AQID",
+            Check(items["byteArray"].Encoding == "array" && items["byteString"].Outcome == "value" && (string?)items["byteString"].Value == "AQID",
                 "Byte array differs from scalar ByteString");
             Check(items["minimumDate"].Value is string, "Decoded minimum scalar DateTime is retained rather than null");
             var browse = await store.Browse(id, FixtureServer.Node("fixture"), 4); Save("browse", browse);
@@ -180,12 +187,13 @@ try
             Check((await store.Status(id)).State == "remoteSessionUnknown", "Cancelled request cannot revive session");
             server.ReadDelayMs = 0; Check((await store.Disconnect(id)).State == "closed", "Cancelled request owned cleanup");
         }
-        await using (var store = Store("username"))
+        foreach (string echoNode in new[] { "text", "stringArray" })
+        await using (var store = Store("username-" + echoNode))
         {
             string id = Id(); var status = await store.Connect(id, User(server.Selection));
             Check(status.State == "connected", "Protected-consumer username fixture authenticates");
             server.Mode = "secretEcho";
-            await Refused(() => store.Read(id, [FixtureServer.Node("text")]), "UaSecretEchoRejected", "Server value cannot echo credential");
+            await Refused(() => store.Read(id, [FixtureServer.Node(echoNode)]), "UaSecretEchoRejected", "Server value cannot echo credential: " + echoNode);
             server.Mode = "normal"; await store.Disconnect(id);
         }
         await using (var store = Store("browse-cancel"))
@@ -286,6 +294,7 @@ try
             await store.Disconnect(recovered);
         }
         var allowed = new HashSet<string> { "GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse", "BrowseNext", "Continuation", "CloseSession", "CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions", "SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish" };
+        allowed.UnionWith(["PublishEntered","PublishCompleted","FixtureTransportReadFailure","FixtureLostPublishResponse"]);
         foreach (var audit in servers.SelectMany(s => s.Audit))
             Check(allowed.Contains(JsonSerializer.SerializeToElement(audit).GetProperty("operation").GetString()!), "Wire operation allowed");
         passed = true;

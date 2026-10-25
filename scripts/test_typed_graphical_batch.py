@@ -488,6 +488,20 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertFalse(packet["typedBuilderQualification"])
         self.assertFalse(packet["runtimeQualification"])
 
+    def test_capture_prerequisites_supply_the_objects_the_lost_baseline_held(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-prerequisites.v1.json").read_bytes())
+        main = json.loads((root / "fixtures/typed-graphical/route-capture-packet.v1.json").read_bytes())
+        names = []
+        for entry in packet["sources"]:
+            observed, _, _ = authored_reference(root / entry["path"], packet["unit"])
+            for key in ("names", "namespace", "route", "authoredFormat"):
+                self.assertEqual(entry[key], observed[key])
+            self.assertEqual(entry["sha256"], observed["fileSha256"])
+            names.extend(entry["names"])
+        self.assertEqual(["TgpUnit_GlobalTimer", "TgpNamespace_TemplateFB_LAD", "TgpNamespace_TemplateFB_FBD"], names)
+        self.assertFalse(set(names) & {name for entry in main["sources"] for name in entry["names"]})
+
     def test_source_parser_rejects_cross_unit_or_unscoped_reference(self):
         with tempfile.TemporaryDirectory() as directory:
             source = pathlib.Path(directory) / "source.scl"

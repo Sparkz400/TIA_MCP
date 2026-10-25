@@ -19,7 +19,8 @@ public sealed record RuntimeCapturePlan(string CaptureId, string HostId, DateTim
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaCaptureContext? UaContext = null);
 public sealed record RuntimeCaptureRow(long Sequence, string Kind, string? SelectionId, long Cycle,
     double ScheduledMilliseconds, double ElapsedMilliseconds, DateTimeOffset ObservedUtc,
-    string? ReadResultJson, string? ErrorCode, long SkippedPolls);
+    string? ReadResultJson, string? ErrorCode, long SkippedPolls,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OpcUaReconnectEvent? Reconnect = null);
 public sealed record RuntimeCaptureProgress(string State, string? TerminalReason, double ElapsedMilliseconds,
     DateTimeOffset ObservedUtc, long Rows, long ReadAttempts, long SkippedPolls, long DroppedReadResults);
 
@@ -139,12 +140,14 @@ public sealed class RuntimeCaptureStore : IDisposable
                 using (var output = New(csvPath))
                 using (var writer = new StreamWriter(output,new UTF8Encoding(false)))
                 {
-                    writer.WriteLine("sequence,kind,selection_id,cycle,scheduled_ms,elapsed_ms,observed_utc,error_code,skipped_polls,read_result_json");
+                    bool recovery=snapshot.Plan.UaContext?.Request.MaximumReconnectAttempts>0;
+                    writer.WriteLine("sequence,kind,selection_id,cycle,scheduled_ms,elapsed_ms,observed_utc,error_code,skipped_polls,read_result_json"+(recovery?",reconnect_json":""));
                     foreach (var row in Rows(snapshot))
                     {
                         string[] cells = [row.Sequence.ToString(CultureInfo.InvariantCulture),row.Kind,row.SelectionId??"",row.Cycle.ToString(CultureInfo.InvariantCulture),
                             row.ScheduledMilliseconds.ToString("R",CultureInfo.InvariantCulture),row.ElapsedMilliseconds.ToString("R",CultureInfo.InvariantCulture),row.ObservedUtc.ToString("O"),
                             row.ErrorCode??"",row.SkippedPolls.ToString(CultureInfo.InvariantCulture),row.ReadResultJson??""];
+                        if(recovery)cells=[..cells,row.Reconnect is null?"":JsonSerializer.Serialize(row.Reconnect,Json)];
                         writer.WriteLine(string.Join(',',cells.Select(x=>"\""+x.Replace("\"","\"\"")+"\""))); writer.Flush();
                         Require(output.Length <= 2*(MaximumCaptureBytes+PlanBytes),"RuntimeCaptureCapacity");
                     }
@@ -197,14 +200,16 @@ public sealed class RuntimeCaptureStore : IDisposable
                 {
                     Require(plan.Request.SelectionIds.Contains(row.SelectionId) && (row.ReadResultJson is null) != (row.ErrorCode is null) && row.SkippedPolls == 0,"RuntimeCaptureIntegrityFailure"); attempts++;
                 }
-                else { Require(row.SelectionId is null && row.ReadResultJson is null && row.ErrorCode is null && row.SkippedPolls > 0,"RuntimeCaptureIntegrityFailure"); skipped += row.SkippedPolls; }
+                else skipped += row.SkippedPolls;
             }
             segments.Add(new(index,expected,first,segment.Rows.Length)); expected = segment.PreviousSha256; nextSequence = first;
         }
         Require(Hash(planBytes) == expected && (count == 0 || nextSequence == 0),"RuntimeCaptureIntegrityFailure");
         var progress = last ?? new("running",null,0,plan.CreatedUtc,0,0,0,0);
         Require(progress.ReadAttempts == attempts && progress.SkippedPolls == skipped && attempts + progress.DroppedReadResults <= plan.Request.MaximumSamples,"RuntimeCaptureIntegrityFailure");
-        segments.Reverse(); return new(reference,plan,progress,segments.ToArray(),bytes);
+        segments.Reverse(); var snapshot=new Snapshot(reference,plan,progress,segments.ToArray(),bytes);
+        if(plan.UaContext?.Request.MaximumReconnectAttempts>0)OpcUaCaptureContracts.ValidateReconnectRows(plan,Rows(snapshot));
+        return snapshot;
     }
     private static void ValidateProgress(RuntimeCaptureProgress progress)
     {
@@ -221,9 +226,16 @@ public sealed class RuntimeCaptureStore : IDisposable
             double.IsFinite(row.ElapsedMilliseconds) && row.ElapsedMilliseconds >= 0,"RuntimeCaptureIntegrityFailure");
         if(row.Kind == "gap")
         {
-            Require(row.SelectionId is null && row.ReadResultJson is null && row.ErrorCode is null && row.SkippedPolls is > 0 and <= 36000,"RuntimeCaptureIntegrityFailure");return;
+            Require(row.SelectionId is null && row.ReadResultJson is null && row.ErrorCode is null,"RuntimeCaptureIntegrityFailure");
+            if(row.Reconnect is not null)
+            {
+                Require(plan.UaContext is not null && row.SkippedPolls==0,"RuntimeCaptureIntegrityFailure");
+                OpcUaReconnectHistory.Validate(row.Reconnect,plan.UaContext!.Request.MaximumReconnectAttempts);
+            }
+            else Require(row.SkippedPolls is > 0 and <= 36000,"RuntimeCaptureIntegrityFailure");
+            return;
         }
-        Require(row.Kind == "read" && row.SkippedPolls == 0 && plan.Request.SelectionIds.Contains(row.SelectionId) &&
+        Require(row.Reconnect is null && row.Kind == "read" && row.SkippedPolls == 0 && plan.Request.SelectionIds.Contains(row.SelectionId) &&
             (row.ReadResultJson is null) != (row.ErrorCode is null),"RuntimeCaptureIntegrityFailure");
         if (plan.UaContext is not null) { OpcUaCaptureContracts.ValidateRead(plan,row); return; }
         if(row.ErrorCode is not null)
@@ -327,6 +339,7 @@ public sealed class RuntimeCaptureStore : IDisposable
             try { Publish("ended",reason,elapsed); }
             finally { ended=true;lock(store.quotaGate)store.reservations.Remove(plan.CaptureId); }
         }
+        public void Flush(double elapsed) { if(pending.Count>0)Publish("running",null,elapsed); }
         private void Publish(string state,string? reason,double elapsed)
         {
             Require(store.Head(plan.CaptureId)==Reference,"RuntimeCaptureRecordChanged");
