@@ -30,7 +30,7 @@ Clients advertising the MCP Apps extension and `text/html;profile=mcp-app` recei
 
 ### Desktop MCP Apps host acceptance (manual, open)
 
-No real desktop MCP Apps host has been qualified yet; it needs a host product installed and configured by its user. Register the Host as a stdio server in that product, then record each step with its product name and version:
+VS Code 1.140.0 has passed [desktop rendering and retained-snapshot interaction checks](../verification/explorer-desktop-20261025.md), including resize negotiation and historical-selection refusal. Full production Host/native acceptance remains open. Register the engineering Host as a stdio server in that product, then record each step with its product name and version:
 
 1. **Negotiated resource loading.** `tools/list` exposes `_meta.ui.resourceUri` only after the product advertises MCP Apps; the product loads `ui://tia-project-explorer/view.html` with no network requests (check the product's developer console).
 2. **Exact selection roundtrip.** After `project_model_capture`, select a block in the embedded tree, send the selection, and confirm the agent's next `project_model_details` call carries all six reference fields unchanged and matches an independent `block_read`.

@@ -38,6 +38,13 @@ Supplied vendor libraries keep their own notices and prerequisites. The
 [PAL/DMC review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
 records the reviewed packages and exclusions; they are not bundled with TIA MCP by that review.
 
+## Has the Explorer been tested in a desktop MCP Apps host?
+
+VS Code rendered the Explorer and exercised retained-snapshot search, selection,
+relationships and stale-selection refusal. Fresh production Host/native
+acceptance remains open. See the
+[desktop evidence and limits](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/explorer-desktop-20261025.md).
+
 ## Where do I ask something that is not answered here?
 
 [Discussions → Q&A](https://github.com/Sparkz400/TIA_MCP/discussions/categories/q-a).

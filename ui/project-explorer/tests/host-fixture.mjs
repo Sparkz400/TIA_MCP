@@ -3,7 +3,7 @@ export function hostFixture(scripts, snapshot) {
   return `<!doctype html><html><body style="margin:0"><iframe id="app" src="mcp-app.html" style="border:0;width:100vw;height:100vh"></iframe><script>${scripts.replace(/<\/script/gi,'<\\/script')}
 const fixture=${JSON.stringify(snapshot).replace(/</g,'\\u003c')};
 const transport=new ProjectExplorerClient.OfflineTransport(fixture);
-let requests=[],selections=[],artifactBytes,artifactManifest;window.tamperArtifact=false;
+let requests=[],selections=[],sizes=[],artifactBytes,artifactManifest;window.tamperArtifact=false;
 window.addEventListener('message',async e=>{
   if(e.source!==document.getElementById('app').contentWindow)return;const m=e.data;
   const respond=result=>e.source.postMessage({jsonrpc:'2.0',id:m.id,result},'*');
@@ -32,5 +32,6 @@ window.addEventListener('message',async e=>{
       respond({content:[{type:'text',text:JSON.stringify(result)}]});
     }catch(error){e.source.postMessage({jsonrpc:'2.0',id:m.id,error:{code:-32000,message:error.message}},'*');}
   }else if(m.method==='ui/message'){selections.push(m.params);respond({});}
+  else if(m.method==='ui/notifications/size-changed'){sizes.push(m.params);if(window.resizeApp)document.getElementById('app').style.height=m.params.height+'px';}
 });</script></body></html>`;
 }
