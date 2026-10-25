@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.13",
+  "catalogVersion": "0.4.14",
   "targetTiaVersions": [
     21
   ],
@@ -1874,6 +1874,23 @@
         "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
         "Storage is the captured component04 profile; no other FB layouts.",
         "Runtime not exercised: the caller is not called from an OB in this run."
+      ]
+    },
+    {
+      "id": "local.typed.route-profiles.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "72db207bd5c9ca13b7dc1225850060e1fb5bc9e6",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 28 audited route profiles and 4 namespace storage templates staged from local.typed.route-capture.20261025: software-unit Ne/Lt/Le/Gt/Ge and TON (local and existing global), alternate-namespace Eq/Ne/Lt/Le/Gt/Ge and TON (local and existing global), and namespace numeric FC and FB calls with local, existing global, created multi and created global storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-profiles.20261025.json"
+      ],
+      "limitations": [
+        "Engineering only; scoped runtime is not covered.",
+        "TOF/TP/CTU/CTD/CTUD route cells are not covered; their native references are captured separately."
       ]
     }
   ],
@@ -8786,6 +8803,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON, numeric FC/FB calls and storage variants (28 audited profiles, local.typed.route-profiles.20261025); TOF/TP and counters on those routes await their IEC capture, and scoped runtime is unqualified.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8805,7 +8823,8 @@
           "local.typed.native-boundaries.20261025",
           "local.typed.insertion.20261025",
           "local.typed.routes.engineering.20261025",
-          "local.typed.route-capture.20261025"
+          "local.typed.route-capture.20261025",
+          "local.typed.route-profiles.20261025"
         ]
       },
       "availability": {
