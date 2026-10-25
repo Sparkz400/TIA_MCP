@@ -18,6 +18,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private readonly string root, hostId = Guid.NewGuid().ToString("N");
     private readonly string clientUri;
     private readonly X509Certificate2 certificate;
+    private readonly bool protectedIdentity;
     private readonly OpcUaCredentialConsumer credentialConsumer;
     private readonly FileStream owner;
     private readonly SemaphoreSlim gate = new(1);
@@ -29,16 +30,18 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     private bool idleFailed;
     private static readonly JsonSerializerOptions Json = new(BridgeProtocol.Json) { MaxDepth = 24 };
 
-    public OpcUaRuntimeSessionStore(string directory, OpcUaCredentialConsumer? credentialConsumer = null)
+    // The Host retains ownership of a supplied certificate and its protected-store lease.
+    public OpcUaRuntimeSessionStore(string directory, OpcUaCredentialConsumer? credentialConsumer = null, X509Certificate2? protectedClientCertificate = null)
     {
         root = Path.GetFullPath(directory); Plain(root); Directory.CreateDirectory(root); Plain(root);
         var ownerPath = Path.Combine(root, "owner.lock"); Plain(ownerPath);
         owner = new FileStream(ownerPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
         this.credentialConsumer = credentialConsumer ?? ((_, _) => throw Error("UaProtectedCredentialUnavailable"));
-        clientUri = "urn:tiamcp:owned-client:" + hostId;
+        protectedIdentity = protectedClientCertificate is not null;
         try
         {
-            certificate = CertificateFactory.CreateCertificate(clientUri, "TIA MCP read-only UA", "CN=TIA MCP read-only UA",
+            clientUri = protectedIdentity ? X509Utils.GetApplicationUrisFromCertificate(protectedClientCertificate!).Single() : "urn:tiamcp:owned-client:" + hostId;
+            certificate = protectedClientCertificate ?? CertificateFactory.CreateCertificate(clientUri, "TIA MCP read-only UA", "CN=TIA MCP read-only UA",
                 [System.Net.Dns.GetHostName()]).SetLifeTime(1).SetRSAKeySize(2048).CreateForRSA();
             idle = Idle();
         }
@@ -47,12 +50,17 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
 
     public object ClientIdentity() => new { schemaVersion = "opcua-runtime-client-identity.v1", hostId,
         applicationUri = clientUri, certificateSha256 = Convert.ToHexStringLower(SHA256.HashData(certificate.RawData)),
-        certificateDerBase64 = Convert.ToBase64String(certificate.RawData), privateKeyStorage = "ephemeralHostMemory",
-        expiresAt = certificate.NotAfter.ToUniversalTime(), physicalQualified = false,
+        certificateDerBase64 = Convert.ToBase64String(certificate.RawData), privateKeyStorage = protectedIdentity ? "windowsDpapiCurrentUser" : "ephemeralHostMemory",
+        notBefore = certificate.NotBefore.ToUniversalTime(), expiresAt = certificate.NotAfter.ToUniversalTime(),
+        state = ClientCertificateState(certificate), physicalQualified = false,
         runtimeBinaries = new[] { typeof(OpcUaRuntimeSessionStore).Assembly, typeof(OpcUaRuntimeSelection).Assembly,
             typeof(Opc.Ua.Client.Session).Assembly, typeof(CertificateFactory).Assembly, typeof(Variant).Assembly }
             .Distinct().Select(a => new { name = a.GetName().Name, version = a.GetName().Version!.ToString(),
                 sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(a.Location))) }) };
+
+    public static string ClientCertificateState(X509Certificate2 certificate) =>
+        DateTime.UtcNow < certificate.NotBefore.ToUniversalTime() ? "notYetValid" :
+        DateTime.UtcNow >= certificate.NotAfter.ToUniversalTime() ? "expired" : "current";
 
     public static CredentialBinding Binding(OpcUaRuntimeSelection selection)
     {
@@ -104,6 +112,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 if (old.Selection != selection) throw Error("UaAttemptContextMismatch");
                 return Observe(old);
             }
+            if (ClientCertificateState(certificate) != "current") throw Error("UaClientIdentityTimeInvalid");
             var records = Directory.EnumerateFiles(root, "*.json").Take(1025).ToArray();
             if (live.Count >= 4 || records.Length >= 1024) throw Error("UaSessionCapacity");
             foreach (var path in records)
@@ -301,7 +310,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         finally
         {
             disposed = true;
-            try { certificate.Dispose(); } finally { owner.Dispose(); gate.Release(); }
+            try { if (!protectedIdentity) certificate.Dispose(); } finally { owner.Dispose(); gate.Release(); }
         }
         if (failed) throw Error("UaCleanupPublicationFailed");
     }

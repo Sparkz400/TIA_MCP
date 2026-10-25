@@ -1752,8 +1752,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
-      "sha256": "ef7a66b0413c654afd8a0995097e99b2c30a1ae05d5f7c32f7be784224aad587",
-      "bytes": 8193
+      "sha256": "499f8ce2ae701d51a291967f89a71ba8ea68259cb177cb613911e97272f4a76f",
+      "bytes": 8688
     },
     {
       "path": "src/TiaMcp.Host/LibraryPackageTools.cs",
@@ -1772,13 +1772,13 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeSessions.cs",
-      "sha256": "293bb58750b753b5ec4ded70305693fa190a631880c19bdeeb1c94078171ddd1",
-      "bytes": 1342
+      "sha256": "80cd1b3188e797248d68bf57f5a5ddcf251ef1748c9c3ba81818ae9dc5b91c1f",
+      "bytes": 1765
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
-      "sha256": "7312d7a706e75115a43a4f838bd99fb4ccb54f024bc8cd0f4ec05bb903f28611",
-      "bytes": 11817
+      "sha256": "04cb3d3922ed51ecba9caf0c2953bf19bac31683642a994e82164f2da40c6f18",
+      "bytes": 12043
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
@@ -1802,8 +1802,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Program.cs",
-      "sha256": "55a790379fffe3b1e2b3b6bfe9cc78f6b526a319e1bcda3cd4e04962ca51b2c7",
-      "bytes": 6254
+      "sha256": "30ad4f5fea6289d9afa9eddc43c7f61ff4a93de7b607abcc138948acf8d1685b",
+      "bytes": 6362
     },
     {
       "path": "src/TiaMcp.Host/ProjectExplorerArtifacts.cs",
@@ -1861,6 +1861,11 @@
       "bytes": 6279
     },
     {
+      "path": "src/TiaMcp.Host/Security/CredentialVault.OpcUaIdentity.cs",
+      "sha256": "3f48b93084bd6d11f00705df89bc9679f640f41c47abac0b36d4010bf2cbdaf1",
+      "bytes": 7487
+    },
+    {
       "path": "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
       "sha256": "12eff7da1f02449a088edd8624f47f6a4866258f23b5a2bde88d339b7a5b90d0",
       "bytes": 7804
@@ -1869,6 +1874,11 @@
       "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
       "sha256": "6d2b55e144e2d27cb1ed58eb79fcc840cba40c675888a7e58b74f98eb87551e7",
       "bytes": 16366
+    },
+    {
+      "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+      "sha256": "4dc56c9dbf364a5ed037ce671871d568c588bd7f7d85e6b7928e8c8c72625b4c",
+      "bytes": 3150
     },
     {
       "path": "src/TiaMcp.Host/SessionRelay.cs",
@@ -1997,8 +2007,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
-      "sha256": "d1f5bf02a99c0bdf230b8a40c49b35ca18e439aaf1a56cdf715dacc4142c7beb",
-      "bytes": 20623
+      "sha256": "0b08cefaf7d0a9bcbac08590548e4b08ec60ea2cf9f9878136aef5cfe7f9d327",
+      "bytes": 21563
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSubscriptions.cs",
@@ -3271,6 +3281,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -3756,6 +3773,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -4245,6 +4269,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -4702,6 +4733,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -5247,6 +5285,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -5518,6 +5563,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -5773,6 +5825,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -6151,6 +6210,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -6443,6 +6509,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -6698,6 +6771,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -7110,6 +7190,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -7434,6 +7521,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -7762,6 +7856,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -8088,6 +8189,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -8407,6 +8515,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -8675,6 +8790,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -9769,6 +9891,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -10093,6 +10222,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -10582,6 +10718,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -10899,6 +11042,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -11360,6 +11510,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -11817,6 +11974,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -12306,6 +12470,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -12763,6 +12934,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -13250,6 +13428,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -15104,9 +15289,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -15254,6 +15439,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -16561,6 +16753,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -16978,6 +17177,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -17303,6 +17509,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -17896,6 +18109,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -18383,6 +18603,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -18808,9 +19035,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -19207,6 +19434,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -19531,6 +19765,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -19859,6 +20100,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -20185,6 +20433,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -20504,6 +20759,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -20772,6 +21034,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -21544,6 +21813,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -22031,6 +22307,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -22492,6 +22775,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -22739,6 +23029,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -23296,9 +23593,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -23656,9 +23953,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         },
         {
           "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -24008,6 +24305,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -24300,6 +24604,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -24555,6 +24866,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -24826,6 +25144,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -25235,9 +25560,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -25675,6 +26000,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -26136,6 +26468,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -26526,6 +26865,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -26859,6 +27205,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -27122,6 +27475,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -27369,6 +27729,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -27704,6 +28071,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -28037,6 +28411,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -28363,6 +28744,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -28638,6 +29026,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -30232,9 +30627,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -31127,6 +31522,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -31612,6 +32014,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -35803,9 +36212,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -35953,6 +36362,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -36258,6 +36674,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -36748,6 +37171,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -36981,6 +37411,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -37244,6 +37681,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -37600,6 +38044,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -37910,6 +38361,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -38238,6 +38696,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -38478,6 +38943,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -38967,6 +39439,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -39284,6 +39763,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -39745,6 +40231,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -40021,6 +40514,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -40396,6 +40896,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -40893,6 +41400,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -41133,6 +41647,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -41403,6 +41924,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -41766,6 +42294,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -42044,6 +42579,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -42313,6 +42855,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -42641,6 +43190,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -42903,6 +43459,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -43379,6 +43942,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -43683,6 +44253,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -44177,6 +44754,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -44674,6 +45258,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -44914,6 +45505,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -45184,6 +45782,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -45547,6 +46152,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -45852,6 +46464,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -46121,6 +46740,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -46449,6 +47075,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -46711,6 +47344,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -47026,6 +47666,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -47330,6 +47977,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -48001,6 +48655,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -48227,9 +48888,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 21,
-          "endLine": 99,
-          "sha256": "cef1476a31dfa214ac0f2666bfe9f2295f79dbe840652f8fc80379592becb7b9"
+          "line": 22,
+          "endLine": 105,
+          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -48601,6 +49262,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -50624,6 +51292,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -51109,6 +51784,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -51887,6 +52569,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -52344,6 +53033,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -52833,6 +53529,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -53290,6 +53993,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -56833,6 +57543,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -57124,6 +57841,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -57371,6 +58095,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -57655,6 +58386,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -57990,6 +58728,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -58323,6 +59068,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -58635,6 +59387,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -59064,6 +59823,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -59621,6 +60387,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -60280,6 +61053,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -60669,6 +61449,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -61319,6 +62106,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -61636,6 +62430,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -61964,6 +62765,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -62211,6 +63019,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -62611,6 +63426,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -62865,6 +63687,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -63123,6 +63952,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -63371,6 +64207,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -63627,6 +64470,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -63963,6 +64813,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -64217,6 +65074,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -64476,6 +65340,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -64733,6 +65604,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -64982,6 +65860,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -65229,6 +66114,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -65556,6 +66448,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -66640,6 +67539,13 @@
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
         },
         {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
           "name": "Run",
           "line": 20,
@@ -67125,6 +68031,13 @@
           "line": 11,
           "endLine": 65,
           "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
         },
         {
           "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -72873,6 +73786,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -72939,6 +73853,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73005,6 +73920,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73069,6 +73985,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73259,6 +74176,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73315,6 +74233,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73381,6 +74300,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -73439,6 +74359,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73497,6 +74418,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -73561,6 +74483,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -73624,6 +74547,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73681,6 +74605,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73736,6 +74661,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73789,6 +74715,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73841,6 +74768,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -73890,6 +74818,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77062,6 +77991,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77115,6 +78045,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77181,6 +78112,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77233,6 +78165,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77297,6 +78230,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77361,6 +78295,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77427,6 +78362,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77491,6 +78427,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -77557,6 +78494,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -78002,6 +78940,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -78939,6 +79878,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79062,6 +80002,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79117,6 +80058,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79533,6 +80475,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79599,6 +80542,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79851,6 +80795,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79908,6 +80853,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -79963,6 +80909,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80016,6 +80963,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80068,6 +81016,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80117,6 +81066,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80339,6 +81289,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80405,6 +81356,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80519,6 +81471,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80567,6 +81520,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80897,6 +81851,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -80969,6 +81924,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -81026,6 +81982,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81103,6 +82060,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -81240,6 +82198,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81304,6 +82263,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81396,6 +82356,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81453,6 +82414,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81502,6 +82464,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81549,6 +82512,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81604,6 +82568,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81657,6 +82622,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81709,6 +82675,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -81758,6 +82725,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -83060,6 +84028,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -83126,6 +84095,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -84196,6 +85166,7 @@
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SessionRelay.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -84634,6 +85605,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -84689,6 +85661,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85035,6 +86008,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85083,6 +86057,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85139,6 +86114,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -85191,6 +86167,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85243,6 +86220,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85296,6 +86274,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85344,6 +86323,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85410,6 +86390,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85462,6 +86443,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85526,6 +86508,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85576,6 +86559,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85631,6 +86615,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -85977,6 +86962,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86025,6 +87011,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86081,6 +87068,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -86133,6 +87121,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86180,6 +87169,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86228,6 +87218,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SessionRelay.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -86277,6 +87268,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86325,6 +87317,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86393,6 +87386,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -86533,6 +87527,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -86591,6 +87586,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86937,6 +87933,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -86985,6 +87982,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87041,6 +88039,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -87093,6 +88092,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87143,6 +88143,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87191,6 +88192,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SessionRelay.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -87240,6 +88242,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87288,6 +88291,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87336,6 +88340,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87391,6 +88396,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -87492,6 +88498,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -87576,6 +88583,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88154,6 +89162,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88220,6 +89229,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88413,6 +89423,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88477,6 +89488,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88575,6 +89587,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -88639,6 +89652,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89725,6 +90739,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89777,6 +90792,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89824,6 +90840,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89874,6 +90891,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89930,6 +90948,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -89983,6 +91002,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90031,6 +91051,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90095,6 +91116,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
@@ -90177,6 +91199,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90246,6 +91269,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90298,6 +91322,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90394,6 +91419,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90448,6 +91474,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90503,6 +91530,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90550,6 +91578,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90670,6 +91699,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90719,6 +91749,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90768,6 +91799,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90816,6 +91848,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90865,6 +91898,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90918,6 +91952,7 @@
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -90967,6 +92002,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91015,6 +92051,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91063,6 +92100,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91111,6 +92149,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91159,6 +92198,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91211,6 +92251,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91473,6 +92514,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
@@ -91539,6 +92581,7 @@
         "src/TiaMcp.Host/RuntimeHandoffTools.cs",
         "src/TiaMcp.Host/SafetyEvidenceTools.cs",
         "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
         "src/TiaMcp.Host/SoftwareUnitTools.cs",
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",

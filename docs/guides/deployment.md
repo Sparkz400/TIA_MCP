@@ -86,6 +86,8 @@ The generated server key remains `tia-v21` for compatibility. Import the externa
 configuration into your MCP client; generation does not modify client settings.
 Direct Host invocation must also specify an external `--artifacts` directory.
 
+For persistent OPC UA client trust, first [create the protected identity](../reference/opcua-runtime.md#protected-persistent-client-identity) with the packaged Host executable. Pass `-UaClientIdentity <name>` to `New-McpConfiguration.ps1` or `Start-TiaMcp.ps1`; direct Host invocation uses `--ua-client-identity <name>`. For SSH or interactive sessions, create the identity on the execution machine under the account running the Host. Identity keys remain in that account's protected local profile, outside the relocatable bundle and artifact directory; this option never transfers keys or configures server trust.
+
 The portable binary disables native workers at build time. Native calls such as
 `tia_discover` and `sim_status` return `NativeWorkersDisabled`; invalid requests may
 still fail earlier validation. The full catalog remains visible with its existing

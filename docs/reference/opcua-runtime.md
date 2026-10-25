@@ -4,7 +4,7 @@ The online client is separate from `TiaMcp.OpcUa`, which continues to parse and 
 
 The implementation pins the maintained OPC Foundation .NET Standard **1.5.378.182** client package, including native .NET 10 assets. It deliberately supports a narrower profile than the SDK: explicit `opc.tcp` URL, exact server application URI, supplied leaf-certificate SHA256, `Basic256Sha256`, `SignAndEncrypt`, and either anonymous or protected username authentication. The supplied pin establishes trust in that exact leaf; validity, RSA key size/usage, server authentication usage, application URI, hostname and SDK signature checks remain mandatory. No other policy or endpoint is selected automatically. The SDK validates agreement between the discovery certificate and authenticated session certificate. [Dependency provenance and license notices](../../third-party/opcua-runtime/README.md).
 
-1. Call `runtime_ua_client_identity`. The returned DER is a public certificate for explicit server trust provisioning. Its private key stays in this Host's memory and is not exported or persisted. Restarting the Host creates a new client identity, which requires new server trust provisioning.
+1. Choose an ephemeral identity (the default), or configure a [protected persistent identity](#protected-persistent-client-identity) before starting the Host. Call `runtime_ua_client_identity`; its DER is the public certificate for explicit server trust provisioning. The response includes the storage mode, validity dates and `current`, `expired` or `notYetValid` state. Private keys are never returned. In ephemeral mode, restarting the Host creates a new identity and requires new server trust provisioning.
 2. For username authentication, obtain `runtime_ua_credential_binding` with the exact endpoint, application URI, certificate pin, username and vault name. Store a JSON-string password using the existing local [protected-credential CLI](protected-credentials.md). Supply the returned reference to `runtime_ua_connect`; never pass passwords through tool arguments. The vault consumer remains held while credentials are used. Each later browse/read rechecks the protected reference before network work.
 3. Call `runtime_ua_connect` with a new 32-character lowercase hexadecimal attempt ID. Repeating that ID observes the retained outcome; it does not create another session.
 4. Browse immediate hierarchical references with `runtime_ua_browse` and read explicit nodes with `runtime_ua_read`. Node identity uses the exact namespace URI plus a canonical numeric, string, GUID or base64 opaque identifier. Namespace indexes are session-local and never accepted as durable identities.
@@ -25,3 +25,33 @@ Retained records are under `runtime-ua` with a single owner lock. No private key
 The [contract](../../contracts/opcua-runtime.v1.schema.json), [session qualification](../verification/opcua-runtime-wave4-20261020.md) and [array/matrix checks](../verification/opcua-array-values-20261025.md) describe the session profile and actual local evidence. Siemens CPU model/firmware, security configuration, real trust provisioning and runtime license compatibility remain physical qualification prerequisites. The [bounded polling capture workflow](opcua-runtime-capture.md) reuses these exact secure reads and retains their quality/status/timestamps. [Bounded subscriptions](opcua-runtime-subscriptions.md) have a separate retained contract and qualification. Reconnect/transfer and mutation workflows remain unsupported.
 
 An active polling capture or subscription exclusively reserves its owned session. Manual read, browse, disconnect and another acquisition refuse with `UaSessionAcquisitionBusy` until it stops and releases that reservation. Retained status remains available. Stop the original acquisition first, then explicitly disconnect; stopping acquisition and closing the session have separate outcomes.
+
+## Protected persistent client identity
+
+This Windows-only option preserves the application URI and certificate across Host restarts. Create it explicitly with the Host executable, then add the name to the Host's MCP launch arguments:
+
+```powershell
+./TiaMcp.Host.exe --ua-identity-store create --name default
+./TiaMcp.Host.exe --ua-identity-store export --name default --output ./client-public.der
+./TiaMcp.Host.exe --no-native-workers --artifacts C:/TiaMcpData --ua-client-identity default
+```
+
+Use `default` or a distinct 32-character lowercase hexadecimal name. The public DER file must be new; export refuses to overwrite an existing file. Provision this public certificate in the selected server's trust list using that server's normal administration workflow. The CLI never changes server trust. Without `--ua-client-identity`, existing ephemeral behavior remains unchanged.
+
+The packaged launcher and MCP configuration generator accept `-UaClientIdentity <name>` and forward it to the Host. Create the identity under the Windows account on the machine that will execute the Host, including for SSH/session-relay launch. See [deployment](../guides/deployment.md).
+
+The identity lives under `%LOCALAPPDATA%/TiaMcpOpcUaIdentities/<name>`, separately from portable artifacts and login-password vaults. It reuses the protected credential store's current-user-only ACL checks, path/hard-link refusal, bounded strict JSON and atomic file replacement. Windows DPAPI CurrentUser protects the PFX, bound to the exact directory, owner, vault identity, application URI and public certificate. Decrypted PFX buffers are cleared; key import uses .NET's `EphemeralKeySet`, so the imported private key is not separately written to the OS key store. There is no private-key import/export command. This protection does not isolate the key from other programs running as the same Windows user.
+
+One Host exclusively owns each named identity for its lifetime. A second Host, CLI inspection/export or rotation reports `CredentialStoreBusy` until that owner exits. Stop the owning Host before administering the identity; while it runs, `runtime_ua_client_identity` supplies public status. Normal exit and process loss release the OS file lock. A copied or partially deleted store is not automatically repaired or rebound to another path, user or machine. Keep the Windows profile and original protected store for recovery; a portable artifact bundle does not contain the private key.
+
+Inspect or rotate explicitly while the identity is idle:
+
+```powershell
+$identity = ./TiaMcp.Host.exe --ua-identity-store inspect --name default | ConvertFrom-Json
+./TiaMcp.Host.exe --ua-identity-store rotate --name default --expected-sha256 $identity.certificateSha256
+./TiaMcp.Host.exe --ua-identity-store export --name default --output ./client-public-rotated.der
+```
+
+Certificates use RSA 2048 and a twelve-month lifetime. Rotation keeps the application URI but replaces the key and certificate. It requires the exact current fingerprint, including when the old certificate has expired. A stale fingerprint refuses, so retrying after a lost rotation reply cannot rotate twice; inspect to discover the current result. Atomic publication failure preserves the old complete record. Missing, damaged, unreadable or insecure stores refuse without generating replacements. Choose a fresh name and explicitly provision its public certificate if the original identity cannot be recovered. The CLI cannot recover damaged private-key bytes or revoke a certificate on a server.
+
+An expired or not-yet-valid identity remains inspectable but refuses new connections with `UaClientIdentityTimeInvalid`. Rotation requires new explicit server trust provisioning. Reusing the identity never restores old session tokens, reconnects, resumes polling/subscriptions or clears unresolved endpoint reservations. Each Host still has a new ownership ID and the existing uncertain-outcome rules apply. Encrypted loopback validation establishes software behavior only; real-device certificate acceptance remains unqualified. See [implementation evidence](../verification/opcua-persistent-identity-20261025.md).

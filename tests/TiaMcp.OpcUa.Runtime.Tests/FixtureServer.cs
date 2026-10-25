@@ -16,6 +16,8 @@ internal sealed partial class FixtureServer : StandardServer
     internal readonly ConcurrentQueue<object> Audit = new();
     internal string Mode = "normal";
     internal int ReadDelayMs;
+    internal string? TrustedClientSha256;
+    internal readonly ConcurrentQueue<object> ClientCertificateChecks = new();
     private int activeReads;
     internal int ActiveReads => Volatile.Read(ref activeReads);
     internal sealed class ReadBoundary
@@ -104,7 +106,11 @@ internal sealed partial class FixtureServer : StandardServer
         await configuration.ValidateAsync(ApplicationType.Server);
         // Test server only: accept the generated client certificates, never part of production trust.
         configuration.CertificateValidator.CertificateValidation += (_, e) =>
-            e.Accept = e.Error.StatusCode == StatusCodes.BadCertificateUntrusted;
+        {
+            string sha256 = Convert.ToHexStringLower(SHA256.HashData(e.Certificate.RawData));
+            e.Accept = e.Error.StatusCode == StatusCodes.BadCertificateUntrusted && (TrustedClientSha256 is null || sha256 == TrustedClientSha256);
+            ClientCertificateChecks.Enqueue(new { sha256, accepted = e.Accept });
+        };
         await StartAsync(configuration);
         var listeners = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Where(x => x.Port == port).ToArray();
         if (listeners.Length == 0 || listeners.Any(x => !System.Net.IPAddress.IsLoopback(x.Address)))
