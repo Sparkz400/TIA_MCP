@@ -102,6 +102,14 @@ try{
   await page.locator('[data-action=capture-compare-side][data-side=before]').click();
   const downloadPromise=page.waitForEvent('download');await page.locator('[data-action=capture-download]').click();const downloaded=await downloadPromise;
   check(await fs.readFile(await downloaded.path(),'utf8')===text,'Downloaded comparison preserves supplied original bytes');
+  if(filename==='events.json'){
+   const hostile='<img data-count-injection="true">';
+   // Exercise the renderer separately from the importer validation boundary.
+   await page.evaluate(value=>{for(const key of ['beforeCount','afterCount','countDifference'])projectExplorer.runtimeCapture.doc.eventGroups[0][key]=value;projectExplorer.renderUaComparison();},hostile);
+   check(await page.locator('.ua-comparison-events [data-count-injection]').count()===0,'Event counts cannot create HTML elements');
+   check((await page.locator('.ua-comparison-events tbody tr').first().locator('td').allTextContents()).slice(1).every(value=>value===hostile),'All three event counts preserve hostile text literally');
+   await page.evaluate(value=>projectExplorer.loadRuntimeCapture(value),text);
+  }
   for(const width of [1440,390]){await page.setViewportSize({width,height:900});await page.evaluate(()=>scrollTo(0,0));check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Comparison fits viewport '+width+' '+filename);}
   if(filename==='events.json'){await page.setViewportSize({width:1440,height:1000});await page.evaluate(()=>scrollTo(0,0));const shot=path.join(output,'ua-before-after-comparison.png');await page.screenshot({path:shot});report.screenshots.push(shot);}
   for(const width of [1440,390]){

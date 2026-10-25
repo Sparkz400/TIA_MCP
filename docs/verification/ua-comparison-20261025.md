@@ -74,3 +74,13 @@ process identities and confirmed exits are recorded in
 `interrupted-package-processes.json` and `interrupted-package-exit.json`.
 That interrupted package is not passing evidence. The portable reader also no
 longer mistakes an Int64/UInt64 array envelope for a scalar decimal string.
+
+CodeQL alert #8 identified unescaped event-count cells in the comparison renderer.
+All three cells now use the existing HTML escaping helper. The browser regression
+mutates those three values after import to check the renderer independently:
+`browser-security-before` fails because elements were created; `browser-security`
+requires literal text and no injected elements. Numeric import validation remains
+in place. The second full package run was stopped before this fix; owned process
+identities and confirmed exits are in `codeql-package-interruption-processes.json`
+and `codeql-package-interruption-exit.json`. That interrupted run is not passing
+evidence. The security alert is resolved by code and fresh analysis, not dismissed.
