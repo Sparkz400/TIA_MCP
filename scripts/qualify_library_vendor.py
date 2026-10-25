@@ -137,15 +137,14 @@ def body(h):
     # V21 refuses SimaticML whose Engineering version is V16; one document proves the refusal and that nothing was imported.
     first = sorted(objects, key=lambda o: (ORDER.index(o["element"]), o["name"]))[0]
     kind, field = KIND_BY_ELEMENT.get(first["element"], ("block_import_xml", "expectedBlockNames"))
-    before = h.tool("project_inventory", {"maxItems": 2000})
+    before = h.inventory()
     prepared = h.prepare(kind, {"scopePath": plc_path, "xml": first["text"], field: [first["name"]]})
 
     def refused_import():
         error = h.call_error("change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
         require("engineering version 'V16'" in (error.get("message") or "") and "not supported" in error.get("message", ""),
                 "V16 import was not refused for its Engineering version: %s" % error.get("message"))
-        after = h.tool("project_inventory", {"maxItems": 2000})
-        require(before.get("types") == after.get("types") and before.get("blocks") == after.get("blocks"), "A refused PAL import changed the PLC")
+        require(before == h.inventory(), "A refused PAL import changed blocks, types or tag tables")
         return {"object": first["name"], "error": error}
     h.report["palImport"] = h.stage("V21 refuses PAL's V16 SimaticML (" + first["name"] + ")", refused_import)
     # The engineering route may finish its own admission; only an unresolved one needs a fresh-session reconciliation.

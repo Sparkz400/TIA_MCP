@@ -42,7 +42,8 @@ def in_stage(journal, stage):
         events = json.loads(journal.read_text(encoding="utf-8")).get("events", [])
     except (OSError, ValueError):
         return None  # Mid-replacement; poll again.
-    states = [e.get("state") for e in events if e.get("stage") == stage]
+    # A stage ending in "_" names a per-resource family such as "save_library-<id>".
+    states = [e.get("state") for e in events if e.get("stage") == stage or stage.endswith("_") and str(e.get("stage", "")).startswith(stage)]
     return events[-1] if "dispatching" in states and not ({"completed", "failed"} & set(states)) else None
 
 
@@ -73,7 +74,7 @@ def interrupted_apply(h, kind, payload, stage):
                 worker.kill()
                 dispatch["killedAtEvent"] = event
                 break
-            time.sleep(0.02)
+            time.sleep(0.005)
         require("killedAtEvent" in dispatch, "The transaction ended before stage %s dispatched: %s" % (stage, response))
         thread.join(120)
         require(not thread.is_alive(), "change_apply did not return after the worker was killed")
@@ -129,24 +130,26 @@ def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
 
-    # Multi-resource: a project checkpoint plus a writable global library, killed while compiling.
-    plc = h.owned_scratch("multi-resource")
-    blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
-    library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
-    h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": plc},
-            "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}})
-    first = interrupted_apply(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library,
-                              "target": {"plcPath": plc}, "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate"]}}, "compile")
+    # Multi-resource: a project checkpoint plus a writable global library, killed during the native mutation,
+    # while compiling, and while saving the global library.
+    for stage in ("native_mutation", "compile", "save_library-"):
+        plc = h.owned_scratch("multi-resource " + stage)
+        blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == plc}
+        library = h.apply("library_create", {"schemaVersion": 1, "name": "InterruptQualification"})["journal"]["result"]["library"]["libraryId"]
+        h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": plc},
+                "object": {"kind": "block", "objectPath": blocks["TiaMcp_IsEnabled"]}})
+        interrupted = interrupted_apply(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library,
+                                        "target": {"plcPath": plc}, "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate"]}}, stage)
 
-    def verify_multi(resources):
-        require(sorted(r["kind"] for r in resources) == ["library", "project"], "Expected one project and one library resource")
-        recovered = next(r for r in resources if r["kind"] == "library")["library"]["libraryId"]
-        names = [x["name"] for x in h.query(recovered)["items"] if x.get("kind") == "masterCopy"]
-        require(names == ["TiaMcp_IsEnabled"], "Recovered library is not the pre-change state: %s" % names)
-        inventory = {b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
-        require({"Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate"} <= inventory, "Recovered project lacks its blocks")
-        return {"masterCopies": names, "blocks": sorted(inventory)}
-    reconcile_and_recover(h, first, verify_multi)
+        def verify_multi(resources):
+            require(sorted(r["kind"] for r in resources) == ["library", "project"], "Expected one project and one library resource")
+            recovered = next(r for r in resources if r["kind"] == "library")["library"]["libraryId"]
+            names = [x["name"] for x in h.query(recovered)["items"] if x.get("kind") == "masterCopy"]
+            require(names == ["TiaMcp_IsEnabled"], "Recovered library is not the pre-change state: %s" % names)
+            inventory = {b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+            require({"Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate"} <= inventory, "Recovered project lacks its blocks")
+            return {"masterCopies": names, "blocks": sorted(inventory)}
+        reconcile_and_recover(h, interrupted, verify_multi)
 
     # Project-only: type authoring killed while archiving its checkpoint, before any native mutation.
     plc = h.owned_scratch("checkpoint")
@@ -170,8 +173,8 @@ def body(h):
 
     def original_unchanged():
         h.tool("project_open", {"path": scratch_path})
-        types = [t["name"] for t in h.tool("project_inventory", {"maxItems": 1000}).get("types", [])]
-        require("TiaMcpLibraryState" not in types, "The saved original contains the never-dispatched type")
+        types = [path for plc_inventory in h.inventory().values() for path, _ in plc_inventory["types"]]
+        require(not any(path.endswith("/TiaMcpLibraryState") for path in types), "The saved original contains the never-dispatched type")
         library_types = [x["name"] for x in h.query(h.project_library())["items"] if x.get("kind") == "type"]
         require(not library_types, "The saved original project library is not empty: %s" % library_types)
         return {"plcTypes": types, "libraryTypes": library_types}
@@ -188,6 +191,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "iq_", "V21 library transaction interruption: worker kill, fresh-host reconciliation, no replay, multi-resource recovery", [
-        "Two interruption points: compile after a multi-resource mutation, and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened). Other stages are not exercised.",
+        "Four interruption points: native mutation, compile and global-library save of a multi-resource change, and checkpoint archive before any mutation (no checkpoint exists, so the saved original is reopened).",
         "After the compile-stage kill the original project and library are left for inspection; only recovered copies are verified.",
         "Host-side shared admission behaviour is observed, not changed (lane E owns it)."], []).run(body)
