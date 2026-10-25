@@ -367,7 +367,7 @@
         const status=parseInt(v.statusCode.slice(2),16),quality=(status&0x80000000)?'Bad':(status&0x40000000)?'Uncertain':'Good';
         if(quality!==v.quality||quality==='Bad'&&(v.outcome!=='itemError'||v.value!==null)||v.outcome!=='value'&&(v.value!==null||v.encoding!==null))bad();
         if(v.encoding==='null'&&v.value!==null)bad();
-        if(v.outcome==='value'&&v.encoding!=='null'&&['Int64','UInt64'].includes(v.builtInType)){
+        if(v.outcome==='value'&&v.encoding!=='null'&&v.encoding!=='array'&&['Int64','UInt64'].includes(v.builtInType)){
           if(v.encoding!=='decimalInteger'||typeof v.value!=='string'||! /^-?(0|[1-9][0-9]*)$/.test(v.value)||v.value==='-0')bad();
           const n=BigInt(v.value);if(n<(v.builtInType==='UInt64'?0n:-9223372036854775808n)||n>(v.builtInType==='UInt64'?18446744073709551615n:9223372036854775807n))bad();
         }
@@ -429,12 +429,12 @@
         }else if(!r.event.duplicate)for(const n of r.event.notifications||[])if(same(n.value.node,mapping.node)){sequences.push(r.sequence);values.push(n.value);}
       }
       const count=f=>values.filter(f).length,good=v=>v.quality==='Good'&&v.outcome==='value'&&v.encoding!=='null',groups=new Map();let unrepresentable=0;
-      for(const v of values.filter(v=>good(v)&&v.valueRank===-1&&['decimalInteger','roundTripFloat','roundTripDouble'].includes(v.encoding))){
-        const type={builtInType:v.builtInType??null,dataType:v.dataType??null,encoding:v.encoding??null},key=JSON.stringify(type);
+      for(const v of values.filter(v=>good(v)&&['decimalInteger','roundTripFloat','roundTripDouble'].includes(v.encoding))){
+        const type={builtInType:v.builtInType??null,dataType:v.dataType??null,valueRank:v.valueRank??null,arrayDimensions:v.arrayDimensions??null,encoding:v.encoding??null},key=JSON.stringify(type);
         if(!groups.has(key))groups.set(key,{type,count:0,minimum:null,maximum:null,lo:null,hi:null});const g=groups.get(key),n=decimal(v.value);
         if(n===null){unrepresentable++;continue;}g.count++;if(g.lo===null||n<g.lo){g.lo=n;g.minimum=v.value;}if(g.hi===null||n>g.hi){g.hi=n;g.maximum=v.value;}
       }
-      return {selectedRowSequences:sequences,observations:values.length,hostReadErrors:errors,goodValues:count(good),uncertain:count(v=>v.quality==='Uncertain'),bad:count(v=>v.quality==='Bad'),nullValues:count(v=>v.encoding==='null'),unsupported:count(v=>v.outcome==='unsupported'),metadataErrors:count(v=>v.outcome==='metadataError'),nonScalarValues:count(v=>v.valueRank!==null&&v.valueRank>=0),
+      return {selectedRowSequences:sequences,observations:values.length,hostReadErrors:errors,goodValues:count(good),uncertain:count(v=>v.quality==='Uncertain'),bad:count(v=>v.quality==='Bad'),nullValues:count(v=>v.encoding==='null'),unsupported:count(v=>v.outcome==='unsupported'),metadataErrors:count(v=>v.outcome==='metadataError'),nonScalarValues:count(v=>v.encoding==='array'),
         trueValues:count(v=>good(v)&&v.encoding==='boolean'&&v.value===true),falseValues:count(v=>good(v)&&v.encoding==='boolean'&&v.value===false),numericRanges:[...groups.values()].map(({lo,hi,...g})=>g),numericNotRepresentable:unrepresentable,firstObservation:values[0]||null,lastObservation:values.at(-1)||null};
     }
     const seenBefore=new Set(),seenAfter=new Set();if(!Array.isArray(doc.signals)||doc.signals.length!==q.signalMap.length)bad();

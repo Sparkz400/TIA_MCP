@@ -84,7 +84,7 @@ try{
   check(await page.locator('pre code').last().textContent()===text+'\n','Markdown dynamic fence retains exact source '+filename);
  }
  const comparisons=path.join(input,'comparisons');
- if(samples){const fixture=JSON.parse(await fs.readFile(samples)).uaComparisonFixture;for(const name of ['observed','empty','numericLimits','aligned','fractional'])await M.verifyUaComparison(fixture[name]);check(true,'Managed exact UInt64 ranges, numeric exclusions, empty prefixes, distinct anchors and fractional boundaries verified');}
+ if(samples){const fixture=JSON.parse(await fs.readFile(samples)).uaComparisonFixture;for(const name of ['observed','empty','numericLimits','aligned','fractional','anyShape'])await M.verifyUaComparison(fixture[name]);check(true,'Managed exact UInt64 ranges, numeric exclusions, empty prefixes, distinct anchors, fractional boundaries and any-shape declarations verified');}
  for(const filename of (await fs.readdir(comparisons)).filter(f=>f.endsWith('.json'))){
   const file=path.resolve(comparisons,filename),text=await fs.readFile(file,'utf8'),doc=JSON.parse(text);report.inputs['comparison/'+filename]=sha(text);
   await M.verifyUaComparison(doc);check(true,'Independent window, mapping, scalar and event counts verified '+filename);

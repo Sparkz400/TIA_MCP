@@ -232,8 +232,8 @@
     },
     {
       "path": "contracts/diagnostic-ua-comparison.v1.schema.json",
-      "sha256": "1390f8d958ef68d20133be4c4425820247726163726b4f21e436a1931897a81c",
-      "bytes": 18508
+      "sha256": "fbf7504fe0dd30d8c3452ad4d90d3eea1e93af1fb727630102f5999f59bf18e7",
+      "bytes": 19046
     },
     {
       "path": "contracts/diagnostic-ua-observation-export.v1.schema.json",
@@ -992,8 +992,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
-      "sha256": "94c09e5e70130649d3152eb55794ba3c1ba647eae6b6d1f22b582989319d3173",
-      "bytes": 19317
+      "sha256": "770204683cb98fec7591131d434fa9e54fb71693c5344fc902ac331cf668333b",
+      "bytes": 19360
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaObservations.cs",
@@ -15929,8 +15929,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -16575,8 +16575,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -17904,8 +17904,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -37300,8 +37300,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -41536,8 +41536,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -45408,8 +45408,8 @@
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Export",
-          "line": 171,
-          "endLine": 184,
+          "line": 172,
+          "endLine": 185,
           "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
         },
         {
@@ -80223,8 +80223,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -80237,8 +80237,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -80725,8 +80725,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -80739,8 +80739,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -81379,8 +81379,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -81393,8 +81393,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -86694,8 +86694,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -86708,8 +86708,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -87131,8 +87131,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -87145,8 +87145,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -88115,8 +88115,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -88129,8 +88129,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",
@@ -89116,8 +89116,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison.v1",
@@ -89130,8 +89130,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
             "name": "Export",
-            "line": 171,
-            "endLine": 184,
+            "line": 172,
+            "endLine": 185,
             "sha256": "a2a1f0a3cc743286499477294999fedc346b72b575c1d2ef9efe8b597f356394"
           },
           "literal": "diagnostic-ua-comparison-export.v1",

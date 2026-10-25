@@ -16,27 +16,29 @@ recomputed from the combined source instead of replacing either implementation.
 Evidence is preserved outside the task checkout under
 `artifacts/ua-comparison-20261025` in the primary checkout.
 
-- Managed diagnostics pass all 47 groups. Focused comparison checks cover exact
+- `managed-frozen.log`: diagnostics pass all 47 groups, including 48 focused
+  comparison checks covering exact
   UInt64 ranges, Good/Uncertain/null/error separation, selected and excluded rows,
   empty/running prefixes, self-comparison labels, explicit mapping refusal,
   changed-review admission, missing originals, honestly rehashed alterations,
   numeric range/precision exclusions and the combined 8 MiB quota. An individually
   valid large observation is refused as an oversized comparison without publishing
-  a partial diagnostic artifact. Later vectors add distinct anchors, inclusive
-  boundaries and fractional Host milliseconds immediately outside a window.
-- `host-final/result.json`: 2,104 checks passed through actual Host tools and an
+  a partial diagnostic artifact. Vectors also cover distinct anchors, inclusive
+  boundaries, fractional milliseconds immediately outside a window and scalar /
+  array values under `Any` rank, with original rank/dimensions retained.
+- `host-frozen/result.json`: 2,098 checks passed through actual Host tools and an
   independent encrypted loopback server. Comparisons cover polling/subscription,
   different event severities/counts, repeats, duplicate envelopes, gaps, overflow,
   unavailable Republish and denied monitoring. Original bytes are independently
   downloaded and checked. Exports/missing-source refusal and a second Host produce
   the same immutable comparisons; server audits show no comparison/export calls.
   Poll-loop check counts can vary with scheduler timing.
-- `browser-final/result.json`: 335 checks passed on generated portable assets,
+- `browser-frozen/result.json`: 335 checks passed on generated portable assets,
   desktop/mobile layouts, before/after original rows, exact JSON download, inert
   HTML/Markdown and independent refusal of altered windows, counts, ranges,
   mappings, event groups, source bytes and authority claims. The actual comparison
-  screenshot was visually inspected. Numeric exclusion and empty-prefix vectors
-  were also checked in the browser model.
+  screenshot was visually inspected. Numeric exclusion, empty-prefix, alignment,
+  fractional-boundary and `Any` rank vectors were checked in the browser model.
 - Explorer tests pass 30 checks; two existing optional fixture checks are skipped
   when their external managed-export fixture paths are not supplied. Both new
   comparison contract tests, all three observation contract tests and portable
@@ -63,3 +65,12 @@ script's positional arguments and stopped before execution; later browser runs
 passed. `managed-final` used a non-hex fixture capture ID and was correctly refused;
 the fixture was corrected and `managed-final2` passed. These earlier failures are
 not presented as passing evidence.
+
+The first full package run was intentionally interrupted during source review:
+statistics must use observed encoding, not assume declared rank -1 is the only
+scalar case. Regression vectors now retain scalar and array values under `Any`
+rank separately, and numeric groups retain original rank/dimensions. The owned
+process identities and confirmed exits are recorded in
+`interrupted-package-processes.json` and `interrupted-package-exit.json`.
+That interrupted package is not passing evidence. The portable reader also no
+longer mistakes an Int64/UInt64 array envelope for a scalar decimal string.

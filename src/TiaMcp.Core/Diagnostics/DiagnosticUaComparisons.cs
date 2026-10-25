@@ -120,8 +120,9 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
         int Count(Func<JsonNode, bool> f) => values.Count(f);
         bool Good(JsonNode v) => D.Text(v, "quality") == "Good" && D.Text(v, "outcome") == "value" && D.Text(v, "encoding") != "null";
         var ranges = new JsonArray(); int unrepresentable = 0;
-        foreach (var group in values.Where(v => Good(v) && v["valueRank"]?.GetValue<int>() == -1 && D.Text(v, "encoding") is "decimalInteger" or "roundTripFloat" or "roundTripDouble")
-            .GroupBy(v => new JsonObject { ["builtInType"] = v["builtInType"]?.DeepClone(), ["dataType"] = v["dataType"]?.DeepClone(), ["encoding"] = v["encoding"]?.DeepClone() }.ToJsonString(), StringComparer.Ordinal))
+        foreach (var group in values.Where(v => Good(v) && D.Text(v, "encoding") is "decimalInteger" or "roundTripFloat" or "roundTripDouble")
+            .GroupBy(v => new JsonObject { ["builtInType"] = v["builtInType"]?.DeepClone(), ["dataType"] = v["dataType"]?.DeepClone(), ["valueRank"] = v["valueRank"]?.DeepClone(),
+                ["arrayDimensions"] = v["arrayDimensions"]?.DeepClone(), ["encoding"] = v["encoding"]?.DeepClone() }.ToJsonString(), StringComparer.Ordinal))
         {
             var numbers = new List<(decimal Number, string Text)>();
             foreach (var value in group)
@@ -134,7 +135,7 @@ public sealed class DiagnosticUaComparisons(string artifactsRoot, DiagnosticUaOb
         return new JsonObject { ["selectedRowSequences"] = selectedRows, ["observations"] = values.Count, ["hostReadErrors"] = hostErrors,
             ["goodValues"] = Count(Good), ["uncertain"] = Count(v => D.Text(v, "quality") == "Uncertain"), ["bad"] = Count(v => D.Text(v, "quality") == "Bad"),
             ["nullValues"] = Count(v => D.Text(v, "encoding") == "null"), ["unsupported"] = Count(v => D.Text(v, "outcome") == "unsupported"),
-            ["metadataErrors"] = Count(v => D.Text(v, "outcome") == "metadataError"), ["nonScalarValues"] = Count(v => v["valueRank"] is not null && v["valueRank"]!.GetValue<int>() >= 0),
+            ["metadataErrors"] = Count(v => D.Text(v, "outcome") == "metadataError"), ["nonScalarValues"] = Count(v => D.Text(v, "encoding") == "array"),
             ["trueValues"] = Count(v => Good(v) && D.Text(v, "encoding") == "boolean" && v["value"]!.GetValue<bool>()),
             ["falseValues"] = Count(v => Good(v) && D.Text(v, "encoding") == "boolean" && !v["value"]!.GetValue<bool>()),
             ["numericRanges"] = ranges, ["numericNotRepresentable"] = unrepresentable,

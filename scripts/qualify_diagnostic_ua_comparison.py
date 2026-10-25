@@ -57,9 +57,9 @@ def qualify(call, check, before_ref, after_ref, output, label):
             check(actual['selectedRowSequences'] == indices and actual['observations'] == len(values) and actual['hostReadErrors'] == errors, 'Independent exact mapped rows '+side)
             check(actual['goodValues'] == len(good) and actual['trueValues'] == sum(v['encoding'] == 'boolean' and v['value'] is True for v in good), 'Only original Good Boolean observations counted '+side)
             for group in actual['numericRanges']:
-                numbers = [v['value'] for v in good if v['valueRank'] == -1 and all(v[k] == group['type'][k] for k in ('builtInType','dataType','encoding'))]
+                numbers = [v['value'] for v in good if all(v[k] == group['type'][k] for k in ('builtInType','dataType','valueRank','arrayDimensions','encoding'))]
                 check(group['count'] == len(numbers) and group['minimum'] == min(numbers,key=Decimal) and group['maximum'] == max(numbers,key=Decimal), 'Independent Decimal range preserves original strings '+side)
-            check(actual['nonScalarValues'] == sum(v['valueRank'] is not None and v['valueRank'] >= 0 for v in values), 'Arrays retained separately from scalar statistics '+side)
+            check(actual['nonScalarValues'] == sum(v['encoding'] == 'array' for v in values), 'Arrays retained separately from scalar statistics '+side)
         events = [e for r in selected if not r.get('event',{}).get('duplicate',False) for e in r.get('event',{}).get('events',[])]
         duplicates = [e for r in selected if r.get('event',{}).get('duplicate',False) for e in r['event'].get('events',[])]
         counts = {}

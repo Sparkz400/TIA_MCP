@@ -456,7 +456,9 @@
                 "required": [
                   "builtInType",
                   "dataType",
-                  "encoding"
+                  "encoding",
+                  "valueRank",
+                  "arrayDimensions"
                 ],
                 "properties": {
                   "builtInType": {
@@ -480,6 +482,22 @@
                       "string",
                       "null"
                     ]
+                  },
+                  "valueRank": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "arrayDimensions": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
                   }
                 }
               },

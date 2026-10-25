@@ -39,7 +39,9 @@ experiment/replan acceptance.
 ## Compared evidence
 
 - Good scalar Boolean counts and numeric ranges grouped by original built-in
-  type, declared data type and encoding. Minima/maxima retain original decimal
+  type, declared data type/rank/dimensions and observed encoding. An `Any` rank
+  does not turn an observed scalar into an array or an observed array into a scalar.
+  Minima/maxima retain original decimal
   strings, including full Int64/UInt64 precision. Numbers outside exact decimal
   arithmetic remain in the evidence and increment `numericNotRepresentable`;
   they never round into a statistic.

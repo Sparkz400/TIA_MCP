@@ -38,12 +38,12 @@ internal static class UaComparisonChecks
                 for (int i = 0; i < 2; i++)
                 {
                     bool uncertain = cycle == 1 && i == 0;
-                    bool floating = id == '7' && i == 1;
+                    bool floating = id == '7' && i == 1, array = id == '5' && i == 1;
                     string? read = JsonSerializer.Serialize(new OpcUaRuntimeReadResult(request.AttemptId, time, time.AddMilliseconds(1),
-                        [new(nodes[i], "value", i == 0 ? "Boolean" : floating ? "Double" : "UInt64", new("http://opcfoundation.org/UA/", "numeric", i == 0 ? "1" : floating ? "11" : "9"), -1, [],
+                        [new(nodes[i], "value", i == 0 ? "Boolean" : floating ? "Double" : "UInt64", new("http://opcfoundation.org/UA/", "numeric", i == 0 ? "1" : floating ? "11" : "9"), i == 1 && id is '5' or '6' ? -2 : -1, [],
                             uncertain ? "0x40000000" : "0x00000000", uncertain ? "Uncertain" : "Good", cycle == 0 ? time : null, null, 12, 34,
-                            i == 0 ? "boolean" : floating ? "roundTripDouble" : cycle == 2 ? "null" : "decimalInteger",
-                            i == 0 ? !after : floating ? cycle == 0 ? "1E+100" : cycle == 1 ? "1E-100" : "1.25" : cycle == 2 ? null : cycle == 0 ? "18446744073709551615" : after ? "0" : "9007199254740993", null)]), BridgeProtocol.Json);
+                            i == 0 ? "boolean" : array ? "array" : floating ? "roundTripDouble" : cycle == 2 ? "null" : "decimalInteger",
+                            i == 0 ? !after : array ? new OpcUaRuntimeArray([2],"decimalInteger",["1","2"]) : floating ? cycle == 0 ? "1E+100" : cycle == 1 ? "1E-100" : "1.25" : cycle == 2 ? null : cycle == 0 ? "18446744073709551615" : after ? "0" : "9007199254740993", null)]), BridgeProtocol.Json);
                     string? error = cycle == 2 && i == 0 ? "UaTimeout" : null;
                     writer.Append(new(writer.Rows, "read", OpcUaCaptureContracts.SelectionId(nodes[i]), cycle, cycle * 100, cycle * 100 + i + 1 + (id == '9' && i == 1 ? 0.0001 : 0), time, error is null ? read : null, error, 0));
                 }
@@ -74,6 +74,9 @@ internal static class UaComparisonChecks
         var floatingDoc = store.Read(Id(comparisons.Compare(floatingCapture, after, wide)));
         Check(floatingDoc["signals"]![1]!["before"]!["numericNotRepresentable"]!.GetValue<int>() == 2 && floatingDoc["signals"]![1]!["before"]!["numericRanges"]![0]!["count"]!.GetValue<int>() == 1);
         Check(floatingDoc["signals"]![1]!["before"]!["numericRanges"]![0]!["minimum"]!.GetValue<string>() == "1.25");
+        var anyShape = store.Read(Id(comparisons.Compare(Capture('6',binding,false),Capture('5',binding,false),request)));
+        Check(anyShape["signals"]![1]!["before"]!["numericRanges"]![0]!["type"]!["valueRank"]!.GetValue<int>() == -2);
+        Check(anyShape["signals"]![1]!["after"]!["numericRanges"]!.AsArray().Count==0 && anyShape["signals"]![1]!["after"]!["nonScalarValues"]!.GetValue<int>()==2);
         Check(Id(comparisons.Compare(before, after, request)) == Id(receipt));
         var same = store.Read(Id(comparisons.Compare(before, before, request)));
         Check(same["sameCapture"]!.GetValue<bool>() && same["identicalPrefix"]!.GetValue<bool>());
@@ -125,7 +128,7 @@ internal static class UaComparisonChecks
         Reject("ProgramRevisionMismatch", () => comparisons.Compare(before, changedSource, request));
         var admitted = request.DeepClone().AsObject(); admitted["allowChangedSource"] = true;
         Check(store.Read(Id(comparisons.Compare(before, changedSource, admitted)))["sourceChanged"]!.GetValue<bool>());
-        Samples = new JsonObject { ["authority"] = "syntheticManagedProducer", ["observed"] = doc, ["empty"] = blank, ["numericLimits"] = floatingDoc, ["aligned"] = aligned, ["fractional"] = fractional };
+        Samples = new JsonObject { ["authority"] = "syntheticManagedProducer", ["observed"] = doc, ["empty"] = blank, ["numericLimits"] = floatingDoc, ["aligned"] = aligned, ["fractional"] = fractional, ["anyShape"] = anyShape };
         Console.WriteLine($"PASS UA comparison: {checks} exact window, mapping, quality, evidence and refusal checks.");
     }
 }
