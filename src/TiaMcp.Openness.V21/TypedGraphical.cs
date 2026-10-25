@@ -131,7 +131,8 @@ namespace TiaMcp.Openness.V21
             {
                 CanonicalizeNetworkIds(flgNet, null, model, pins, allocator, effects, networkId);
                 var unit = CreateCompileUnit(flgNet, networkId, model.Language, context.NetworkTemplateXml, allocator);
-                if (model.Operation == "insertNetwork") RequireInsertionIdPreservation(document, block, target, unit);
+                if (model.Operation == "insertNetwork" && target == null) RequireInsertionIdPreservation(document, block, target, unit);
+                else if (model.Operation == "insertNetwork") networkId = ShiftFollowingIdsForInsertion(document, target, unit, allocator, effects);
                 if (target != null) target.AddAfterSelf(unit); else block.Element("ObjectList").Add(unit);
             }
             effects.Insert(0, new TypedGraphicalEffect { Kind = model.Operation, Identity = networkId, Description = "Native " + model.Language + " network " + model.Operation + "; compilation and complete readback required." });

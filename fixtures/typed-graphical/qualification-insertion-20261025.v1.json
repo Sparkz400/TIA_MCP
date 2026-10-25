@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-10-25T13:02:14.101838+00:00",
+  "scope": "Completed exact fixture attempts only. Historical binary lineages remain explicit; this ledger does not certify the current release, remote hosts, unexecuted assertions or broader instruction/type/route combinations.",
+  "counts": {
+    "attempts": 2,
+    "distinctCells": 2,
+    "allFourNativeGates": 2,
+    "allFiveGates": 0
+  },
+  "cells": [
+    {
+      "fixtureId": "typed-insert-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/ins1/typed-insert-fbd/typed-insert-fbd/result.json",
+      "latestAttempt": "artifacts/ins1/typed-insert-fbd/typed-insert-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/ins1/typed-insert-fbd/typed-insert-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-insert-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/ins1/typed-insert-lad/typed-insert-lad/result.json",
+      "latestAttempt": "artifacts/ins1/typed-insert-lad/typed-insert-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/ins1/typed-insert-lad/typed-insert-lad/result.json"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "report": "artifacts/ins1/typed-insert-lad/typed-insert-lad/result.json",
+      "reportSha256": "9b2275afb35d0241511a9bfd9b8cab30fb954e9e991fd6e0a171ae9645321dc6",
+      "fixtureId": "typed-insert-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-25T12:58:18.390551+00:00",
+      "completedAtUtc": "2026-10-25T12:59:53.580049+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "standard",
+        "tiaVersion": "V21"
+      },
+      "operation": "insertNetwork",
+      "profiles": [
+        "v21.fw41.lad.branch.v1",
+        "v21.fw41.lad.coil.v1",
+        "v21.fw41.lad.contact.v1",
+        "v21.fw41.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\.claude\\worktrees\\catalog-reconcile-54d18c\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "b9772410dd9c4c0d4e9f11b7249cb5b5cae7912498cf1353f0460e583dfff57d",
+          "manifestSha256": "d165b7f1f067b71237fbbda1066c1b0b36e3fd512c8aad45ce2f4b6f212c2627"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\.claude\\worktrees\\catalog-reconcile-54d18c\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "623f15d5054c5123f8066c94d2b475468a46c581d419c6336e5c85a7c6f6f0f5",
+          "manifestSha256": "837b63e63014dadb4eb9f3d7ccb2c68a9f60147972c8d47947fcdc580ed4ae75"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/ins1/typed-insert-fbd/typed-insert-fbd/result.json",
+      "reportSha256": "c8982395c949cfc83f116f70b4cb774f8553d6c6d4a9360e0d249502fd4a0f61",
+      "fixtureId": "typed-insert-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-25T12:59:53.888977+00:00",
+      "completedAtUtc": "2026-10-25T13:01:28.921965+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "standard",
+        "tiaVersion": "V21"
+      },
+      "operation": "insertNetwork",
+      "profiles": [
+        "v21.fw41.fbd.and.v1",
+        "v21.fw41.fbd.assign.v1",
+        "v21.fw41.fbd.not.v1",
+        "v21.fw41.fbd.or.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\.claude\\worktrees\\catalog-reconcile-54d18c\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "b9772410dd9c4c0d4e9f11b7249cb5b5cae7912498cf1353f0460e583dfff57d",
+          "manifestSha256": "d165b7f1f067b71237fbbda1066c1b0b36e3fd512c8aad45ce2f4b6f212c2627"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\.claude\\worktrees\\catalog-reconcile-54d18c\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "623f15d5054c5123f8066c94d2b475468a46c581d419c6336e5c85a7c6f6f0f5",
+          "manifestSha256": "837b63e63014dadb4eb9f3d7ccb2c68a9f60147972c8d47947fcdc580ed4ae75"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    }
+  ]
+}

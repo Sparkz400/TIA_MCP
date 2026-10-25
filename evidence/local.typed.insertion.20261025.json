@@ -1,0 +1,61 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.insertion.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T13:02:14+00:00",
+  "source": {
+    "commit": "17a36ff3935051aae63885533e8e1941540803fc",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-lad and typed-insert-fbd on fresh owned TIA V21 scratch projects: a typed Boolean network inserted after the first network of an existing native caller (Tgp_Boolean_LAD/FBD). The builder predicted V21's renumbering (inserted unit IDs 8..C; block title IDs 8->D, 9->E). Each case passed import/compile, complete prepared XML equal to the native readback, the independent insertion contract (only following IDs shifted by exactly the inserted count; removing the unit and undoing the shift recovers the original caller exactly), untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
+    "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "6b2b57cf61057dacb13ad43a9fa60bf8983880ecb9b5c4eddfa5316df96badac"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "09fc42795b29af686ea73672c28f6265f43ba2c93cbfd51878be7a60fb6124cd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "insertion.json",
+      "sha256": "b7d723b3a19093a46714e02fa45c4e132698ddfaabddccf2744e8b6284bf860a",
+      "bytes": 10230,
+      "completed": true,
+      "steps": [
+        "typed-insert-fbd: passed",
+        "typed-insert-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
