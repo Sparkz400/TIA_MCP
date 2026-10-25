@@ -1,0 +1,97 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.resolution.20261025",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-25T11:58:38+00:00",
+  "source": {
+    "commit": "b83202792c33f7152525ad156794920cff471022",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_resolution.py on fresh owned TIA V21 scratch projects, LAD and FBD each: standard phase (exact tag-table owner, wrong table, first/second DB owner, wrong kind, missing member, wrong type), namespace phase with UnitSeeder software units (nested UDT resolved through the declaring namespace with fully qualified references, wrong type, missing member) and stale phase (duplicate-tag setup guard, stale tag address and stale DB ambiguity with deliberate-change recovery). Positive cases passed apply/compile, complete native preservation, reopen and checkpoint recovery; negative cases returned their exact diagnostic with the complete original XML unchanged.",
+  "limitations": [
+    "Typed operand resolution only; scoped runtime behavior is not covered.",
+    "Unqualified nested-namespace references and duplicate PLC tag names are rejected by TIA itself; see local.typed.native-boundaries.20261025."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ce9c30c217c1ddb57132e22ca893c464cc10aa027f2d7604c92db8eecef5dbd0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f45888207e437edd33cf5bfc4602cf3361e65db4ffa1eda4ce8cf51890804c4c"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "601b17dd628f6c0c1d55e2c78c965497d14520fda58b3bda566da2763bf4fe6d"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "7f0abcaf854fa19acbcad122a82f926e3a975dba5969cdd8267e737b8fcfa873"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-res.json",
+      "sha256": "f2cbd444f513dda4deb3ccae5299f5fe8e23dc858cb4578dcdfc1659f4258c40",
+      "bytes": 201649,
+      "completed": true,
+      "steps": [
+        "std-lad/tag-exact-owner: passed",
+        "std-lad/tag-wrong-table: passed",
+        "std-lad/db-first-owner: passed",
+        "std-lad/db-second-owner: passed",
+        "std-lad/db-wrong-kind: passed",
+        "std-lad/db-missing-member: passed",
+        "std-lad/db-wrong-type: passed",
+        "std-fbd/tag-exact-owner: passed",
+        "std-fbd/tag-wrong-table: passed",
+        "std-fbd/db-first-owner: passed",
+        "std-fbd/db-second-owner: passed",
+        "std-fbd/db-wrong-kind: passed",
+        "std-fbd/db-missing-member: passed",
+        "std-fbd/db-wrong-type: passed",
+        "ns-lad/nested-udt-namespace: passed",
+        "ns-lad/nested-udt-wrong-type: passed",
+        "ns-lad/nested-udt-missing-member: passed",
+        "ns-fbd/nested-udt-namespace: passed",
+        "ns-fbd/nested-udt-wrong-type: passed",
+        "ns-fbd/nested-udt-missing-member: passed",
+        "stale-lad/tag-duplicate-setup-guard: passed",
+        "stale-lad/stale-tag-address: passed",
+        "stale-lad/stale-db-ambiguity: passed",
+        "stale-fbd/tag-duplicate-setup-guard: passed",
+        "stale-fbd/stale-tag-address: passed",
+        "stale-fbd/stale-db-ambiguity: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

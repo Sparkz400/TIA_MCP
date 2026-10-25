@@ -24,7 +24,19 @@ using Siemens.Engineering.VersionControl;
 // Experimental collector only. No synchronize, block import, language write, online or runtime route exists.
 internal static class Program
 {
-    private const string Api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+    private static readonly string Api = InstalledApiDirectory();
+
+    // Siemens registers the installed V21 API location; C:\Program Files is only the setup default.
+    private static string InstalledApiDirectory()
+    {
+        using (var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64))
+        using (var key = hklm.OpenSubKey(@"SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48"))
+        {
+            var basePath = key?.GetValue("Siemens.Engineering.Base") as string;
+            return string.IsNullOrWhiteSpace(basePath) ? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48" : Path.GetDirectoryName(basePath);
+        }
+    }
+
     private static string output;
     private static int sequence;
     [STAThread] private static int Main(string[] args)

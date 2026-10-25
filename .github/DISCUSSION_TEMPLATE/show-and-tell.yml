@@ -1,0 +1,20 @@
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What you built
+      description: A workflow, script, prompt or integration that uses TIA MCP.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it works
+      description: Tools used, setup and any screenshots or snippets.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: Shared material uses synthetic or owned scratch projects and contains no credentials, customer data or Siemens binaries.
+          required: true

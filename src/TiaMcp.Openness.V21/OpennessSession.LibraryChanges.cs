@@ -426,6 +426,7 @@ namespace TiaMcp.Openness.V21
                 {
                     string name = node.Value<string>("typeName");
                     bool root = node.Value<string>("versionGuid") == version.Guid.ToString("D");
+                    RequireNoInstanceInOtherScope(change, plc, scope, node);
                     if (!names.Contains(name)) { created.Add(name); continue; }
                     if (root) throw new BridgeException("LibraryConflict", "An existing PLC object shares a selected name: " + name + ". Use explicit library_update_project for existing uses.");
                     if (reused.Any(x => x.Value<string>("versionGuid") == node.Value<string>("versionGuid"))) continue;

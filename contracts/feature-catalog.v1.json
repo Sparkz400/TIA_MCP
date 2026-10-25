@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.8",
+  "catalogVersion": "0.4.9",
   "targetTiaVersions": [
     21
   ],
@@ -1365,6 +1365,358 @@
       "limitations": [
         "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
         "Library revision covers library structure, type versions and master copies, not unexposed object document content."
+      ]
+    },
+    {
+      "id": "local.typed.runtime.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "8605e7f72d7477254a5c54e41582bffd56f4efd1",
+        "passedScope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate, one fresh owned TIA V21 scratch (CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, en-US project) and one owned PLCSIM Advanced V8 instance per case: 34 typed cells, LAD and FBD, standard route. Boolean truth table; Int eq/ne/lt/le/gt/ge at signed boundaries; TON/TOF/TP start-cancel-restart-complete; CTU/CTD/CTUD edges, reset/load and signed limits; FC, global-instance FB and multi-instance FB parameter flow; numeric FC input/in-out/output/return flow. Each case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, checkpoint restore with recovered reopen, and every independent runtime assertion (512 total), under semantic runtime preservation v1 (card verified at download and after provisioning restore, complete PLC XML before cleanup, project changes only from the receipted plc_compile save and provisioning)."
+      },
+      "artifacts": [
+        "evidence/local.typed.runtime.20261024.json"
+      ],
+      "limitations": [
+        "Standard route only; software-unit and namespace routes, scoped operands and storage-creation variants at runtime are not covered.",
+        "Numeric FB (two independent instances) and CTU 32767 saturation/reset did not run here: harness InOut-member defect and a reserved-keyword driver fixture, both fixed separately and pending rerun.",
+        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
+        "Existing-caller network insertion remains rejected (NativeIdPreservationUnsupported)."
+      ]
+    },
+    {
+      "id": "local.typed.runtime.reruns.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "55c1ccccd1e1edefa188009b4f054120ae5834d9",
+        "passedScope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate on fresh owned TIA V21 scratch projects (CPU 1511-1 PN V4.1) and owned PLCSIM Advanced V8 instances: numeric FB with two independent instances (left/right state, in-out and output flow) and CTU signed Int upper saturation at 32767 with the 32768th attempted edge and reset, LAD and FBD. All four passed import/compile, complete XML with untouched peers, save/reopen, checkpoint recovery and every runtime assertion (434 total), with the in-run semantic runtime preservation verdict."
+      },
+      "artifacts": [
+        "evidence/local.typed.runtime.reruns.20261024.json"
+      ],
+      "limitations": [
+        "Reruns after the shared-harness elementary IN_OUT fix (#30) and the CTU driver keyword fix (#31); complements local.typed.runtime.20261024 on a later build.",
+        "Standard route only; host application-call timing, not exact scan timing; the CTU driver pulses the typed FB at most 512 edges per call."
+      ]
+    },
+    {
+      "id": "local.plc_component.install.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1e8ec3d2cea6a38d3cbb800470511b4ee0aa318c",
+        "passedScope": "scripts/qualify_plc_component.py --run-native (author_new_source): fresh owned de-DE scratch authors TiaMcpComponentState UDT and TiaMcpComponentGate FB (simulation-capable), releases 1.0.0, publishes and archives; fresh owned consumer imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 (first available DB2, AutoNumber=false) and standalone FBD FC TiaMcpComponentCaller with call and Enable/Active tag bindings, full compile and save; complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.install.20261024.json"
+      ],
+      "limitations": [
+        "Qualification-only route; production combined library_integrate apply stays disabled.",
+        "Standalone new FC caller only; existing-caller insertion remains rejected by V21 native ID renumbering (NativeIdPreservationUnsupported).",
+        "Storage is the captured component04 profile, bound by complete installed FB/UDT content equality for a freshly authored source; no other FB layouts.",
+        "native04/native05 artifacts are not on this machine; source reuse and the native05 recovery audit were not run."
+      ]
+    },
+    {
+      "id": "local.plc_component.runtime.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1e8ec3d2cea6a38d3cbb800470511b4ee0aa318c",
+        "passedScope": "scripts/component_runtime.py --run-native on the c09 installation: saved installed project proven equal to its fresh-reopen snapshot, simulation-capable compilation enabled as its own change, OB1 Main call to TiaMcpComponentCaller as a separate reviewed source_upsert changing only OB1, then fresh owned PLCSIM Advanced V8 instance with verified card, generated-state save, scratch credential provisioning (owned empty-CPU trust) and restored-card check; ComponentEnable true/false/true/false drives ComponentActive on every edge. r05 continues r04 and r03 by recorded hash from the exact post-OB snapshot."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.runtime.20261024.json"
+      ],
+      "limitations": [
+        "Wall-clock polling, not scan-accurate; one component (Bool Enable/Active) on CPU1511.",
+        "OB insertion is a separate operation with its own acceptance; it is not part of component installation.",
+        "r03 stopped at the CPU configuration password and r04 at an unloaded simulator tag list; both harness gaps were fixed and r05 continued from the same saved post-OB project."
+      ]
+    },
+    {
+      "id": "local.remote-io.full-route.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47e295cf86ade4d98a5997014dfbe67bc8e9f238",
+        "passedScope": "scripts/qualify_remote_io.py --scope full --module ai on a new owned TIA V21 scratch project: CPU 1511-1 PN V4.1 plus catalog-selected ET 200SP IM 155-6 PN ST V6.4 and AI 4xU/I 2-wire ST (6ES7 134-6HD01-0BA1 V2.0). All ten gates passed, each with full two-device compile, complete diagnostics and strict configured-hardware preservation: controller assignment with the explicit generated server-module contract, server relocation, AI creation, slot move, input address change, reviewed channel change Smoothing None(0) to Weak(1) on analog input channel 0 (native ReadWrite, V21 enum Siemens.Engineering.HW.Smoothing, exact typed readback), fresh TIA/worker reopen with exact compiled-manifest equality, address checkpoint recovery, disconnect with an actual native CompileFailed outcome and in-session checkpoint recovery, and recovered fresh reopen. channelWriteQualified and fullRemoteIoRouteQualified true. Owned Portal, worker and Host exits verified."
+      },
+      "artifacts": [
+        "evidence/local.remote-io.full-route.20261024.json"
+      ],
+      "limitations": [
+        "Only the Smoothing channel setting is reviewed for channel writes, with the ET 200SP levels None/Weak/Medium/Strong; OperatingType, OperatingRange and InterferenceFrequencySuppression stay outside the allowlist.",
+        "One IM/AI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
+      ]
+    },
+    {
+      "id": "local.remote-io.lifecycle.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "402e38ed45aac7360593a53aec288e7245d4a09b",
+        "passedScope": "scripts/qualify_remote_io.py --scope configured-module-lifecycle --module di on a new owned TIA V21 scratch project: CPU 1511-1 PN V4.1 plus catalog-selected ET 200SP IM 155-6 PN ST V6.4 and DI 8x24VDC ST (6ES7 131-6BF01-0BA0). All nine gates passed, each with full two-device compile, complete diagnostics and strict configured-hardware preservation: controller assignment with the explicit generated server-module contract, explicit server relocation, DI creation, DI slot move, input address change, fresh TIA/worker reopen with exact compiled-manifest equality, address checkpoint recovery, disconnect with an actual native CompileFailed outcome and in-session checkpoint recovery, and recovered fresh reopen. Owned Portal, worker and Host exits verified."
+      },
+      "artifacts": [
+        "evidence/local.remote-io.lifecycle.20261024.json"
+      ],
+      "limitations": [
+        "Limited configured-module lifecycle profile only: channelWriteQualified and fullRemoteIoRouteQualified are false; the DI channels expose InputDelay as native read-only and no channel mutation occurred.",
+        "One IM/DI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
+      ]
+    },
+    {
+      "id": "local.library_releases.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+        "passedScope": "scripts/qualify_library_release_changes.py on build 4687b82 (frozen D:/lcq/b5), owned TIA V21 scratch projects: FB type 1.0.0, implementation-changing 1.1.0 (negated output) and breaking-interface 2.0.0 (output Active renamed Ready) created from documents in one native type identity with distinct version GUIDs; released exports match independently authored expectations; consumer updated 1.0.0 -> 1.1.0 compiles with unrelated native exports unchanged; 2.0.0 update fails compilation at the stale caller Main ('The formal parameter Active is invalid') without saving; its admission is reconciled in a fresh session; the checkpoint is restored into a new location and the unsaved original reopened, both linked to exactly 1.1.0. All 61 retained library observations (19 original-byte lock receipts) validate against the library schemas."
+      },
+      "artifacts": [
+        "evidence/local.library_releases.20261024.json"
+      ],
+      "limitations": [
+        "Behavior is asserted from native exports (body and interface), not executed on a CPU or PLCSIM.",
+        "Caller migration together with a breaking update is not offered; the breaking case is qualified as an expected compile failure plus recovery.",
+        "One PLC, standard groups; no software units, protected/F types or runtime."
+      ]
+    },
+    {
+      "id": "local.library_dependencies.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+        "passedScope": "scripts/qualify_library_dependencies.py on build 4687b82: nested UDT (member and Array[0..2]) <- FB <- FB (multi-instance) closure compared with an independently authored graph for 1.0.0 and for 1.1.0 after the Child reference is removed; publishing the root carries its exact closure; installed exact dependency reused (identical version metadata, preview creates only the missing objects); two instance DBs keep one exact link; exact-version update is a no-op; refusals before mutation for a non-default older version, a removed reference that would strand Child (LibraryUpdateCleanupRisk), a downgrade below a newer project default, a same-name different-GUID dependency and a same-name unlinked dependency; fresh reopen keeps links and default. All 64 retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_dependencies.20261024.json"
+      ],
+      "limitations": [
+        "One PLC with standard groups; multiple PLCs and software units are not exercised.",
+        "Siemens' version comparison covers metadata only; divergent content under an identical version GUID is not constructible through the public API.",
+        "No runtime execution, protected/F types or crash injection."
+      ]
+    },
+    {
+      "id": "local.library_lifecycle.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+        "passedScope": "scripts/qualify_library_lifecycle.py on build 4687b82: edit then discard restores the released link; discard of a committed version refused; malformed and mixed type-policy flags refused before mutation; DoNotUse blocks publication; read-only SetForUpdate on a PLC data type refused (AttributeNotWritable) instead of half-applying; type folders created, renamed and deleted with duplicate and root refusals; publication into an existing global library; master copy creation and duplicate refusal; deletion refused for default/used and non-default global versions, permitted for an unused non-default project version; fresh consumer instantiates the final generation without block-number collisions; the master-copy deletion checkpoint is restored into a new location. All 77 retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_lifecycle.20261024.json"
+      ],
+      "limitations": [
+        "Releases 1.1.0 and 1.2.0 reuse the original FB document; they are lifecycle generations, not behavior changes.",
+        "Folder moves are not offered; folders are created, renamed and deleted empty.",
+        "Version deletion is qualified only in project libraries."
+      ]
+    },
+    {
+      "id": "local.library_interruption.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
+        "passedScope": "scripts/qualify_library_interruption.py on build 48d4e38: (1) a multi-resource library_create_master_copy (project checkpoint plus writable global library) has its worker killed while compiling; a fresh host reports outcome_unknown from the durable journal, a fresh owned session refuses replay, the shared admission is reconciled in that fresh session, and change_restore retrieves both resources into new locations: the recovered library holds only the pre-change master copy and the project holds its blocks; a repeated restore is an idempotent readback. (2) library_create_type has its worker killed while archiving its checkpoint; after reconciliation restore is refused because no checkpoint completed, the journal proves the native mutation never dispatched, and the saved original reopens without the type."
+      },
+      "artifacts": [
+        "evidence/local.library_interruption.20261024.json"
+      ],
+      "limitations": [
+        "Two interruption points (compile and checkpoint archive); kills during native mutation and save are not exercised.",
+        "The original project and library after the compile-stage kill are left for inspection; only recovered copies are verified."
+      ]
+    },
+    {
+      "id": "local.library_upgrades.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
+        "passedScope": "scripts/qualify_library_upgrades.py on build 48d4e38 (frozen D:/lcq/b7) with the receipt-verified DMC Siemens Open Library V14 SP1-V18 downloads: each release ZIP stages and classifies its mixed contents; PLC archives V14 SP1 (S7-300, 244 versions), V15 (257), V16 (257), V17 (317) and V18 (317) upgrade into V21 on owned copies, read back complete with every version committed, re-archive and reopen with identical native version identities, and leave their source bytes unchanged; HMI-bearing V14 SP1, V18 Comfort, Professional and Unified archives upgrade with 12-22 elements of products absent from this installation reported as unavailable; a complete V17 companion directory and a read-only V16 directory also upgrade from owned copies. V21 completes and saves each conversion, then the native return throws 'Could not load type Dummy'; the saved V21 library is opened only when its conversion log records success, and the native error is recorded."
+      },
+      "artifacts": [
+        "evidence/local.library_upgrades.20261024.json"
+      ],
+      "limitations": [
+        "No V20 library exists; V19 is covered by the vendor evidence.",
+        "Content behavior of HMI elements and of unavailable elements is not exercised (lane D owns HMI).",
+        "Upgrade identity is checked within V21 (upgrade vs reopened archive); the older-format content cannot be read without the older TIA version."
+      ]
+    },
+    {
+      "id": "local.library_vendor.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d6c06ab73aea443b13c1a3fc9b6723599758b99e",
+        "passedScope": "scripts/qualify_library_vendor.py on build 48d4e38 with receipt-verified downloads: PracticalSeries PAL (practicalseries/PS2001-pal-software at e46b222, 582,837 bytes, MIT) and DMC Siemens Open Library 19.0 (124,287,921 bytes, MIT). Both stage against their receipts and classify (PAL: 55 SimaticML sources; DMC: five V19 global-library archives plus documentation and a nested Windows toolbox that is never run). All five DMC V19 archives (PLC 277, Comfort 334, Professional 332, Unified 343 and full 455 versions) upgrade into V21 on owned copies with every version committed and 22 elements of products absent from this installation listed as unavailable; the upgraded PLC library re-archives, reopens with identical identities, and the dependency-free data type mb_station_block_udt instantiates into a fresh project with an exact native link. TIA V21 refuses PAL's SimaticML ('The engineering version V16 ... is not supported') without changing the PLC."
+      },
+      "artifacts": [
+        "evidence/local.library_vendor.20261024.json"
+      ],
+      "limitations": [
+        "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC; only intake, licence and the V21 refusal are qualified.",
+        "DMC prerequisites (CPU system/clock memory bytes, 'Open Library' tag-table master copy) are outside current MCP routes; complete DMC PLC block compilation is not claimed.",
+        "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
+      ]
+    },
+    {
+      "id": "local.library_formats.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+        "passedScope": "scripts/qualify_library_formats.py on build 4687b82: read-only .zal21 archive and read-only .al21 directory each open as writable owned working copies, accept a persisted folder change and leave the source bytes and read-only state unchanged; an exclusively locked source is refused without registration or change; newer .zal22 is refused for open (LibraryUpgradeRequired) and upgrade (LibraryVersionUnsupported); a corrupt .zal21 and a lone .al21 marker are refused; a mixed ZIP (archive, complete directory, lone marker, loose SCL, README) classifies four candidates correctly and both complete library candidates open natively. All 12 retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_formats.20261024.json"
+      ],
+      "limitations": [
+        "Inputs are libraries created in the run; V14-V20 upgrades are separate evidence.",
+        "The locked source is simulated by an exclusive Windows handle, not a second TIA instance; its refusal surfaces as a generic EngineeringError."
+      ]
+    },
+    {
+      "id": "local.library_project_state.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+        "passedScope": "scripts\\qualify_library_project_state.py on build 4bb2e8f (frozen D;C:\\Program Files\\Git\\lcq\\b4); a failed source change leaves an inconsistent block in the unsaved consumer project; library_instantiate is then refused at preparation (FingerprintUnavailable naming the inherited block) before any checkpoint, compile or save, and the project inventory is unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_project_state.20261024.json"
+      ],
+      "limitations": [
+        "The unsaved erroneous block comes from a failed source change; arbitrary unsaved user edits are not reproduced.",
+        "Protected (know-how) objects are not exercised: no MCP route applies protection."
+      ]
+    },
+    {
+      "id": "local.library_scopes.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "824b0ba9a0c6bb43e369f3d2f3e3bdf3394ac2ab",
+        "passedScope": "scripts\\qualify_library_scopes.py on build 041b0d8 (frozen D;C:\\Program Files\\Git\\lcq\\b8); a second PLC of the scratch CPU type is added with scratch security; FB and UDT 1.0.0 are instantiated into both PLCs and referenced from an OB in each; uses are attributed per PLC; updating the second PLC to FB 1.1.0 (updateScope=entireSelectedPlc) moves only that PLC while the first keeps 1.0.0 and every native block export of the first PLC is unchanged; updating the first PLC then brings both to 1.1.0; a fresh reopen confirms both PLCs at 1.1.0 and the UDT unchanged. All 58 retained observations (19 lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_scopes.20261025.json"
+      ],
+      "limitations": [
+        "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
+        "Both PLCs use the scratch CPU type; mixed CPU families are not exercised."
+      ]
+    },
+    {
+      "id": "local.library_interruption.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "824b0ba9a0c6bb43e369f3d2f3e3bdf3394ac2ab",
+        "passedScope": "scripts/qualify_library_interruption.py on build 041b0d8: a multi-resource library_create_master_copy (project plus writable global library) has its worker killed during the native mutation and during compile; each time a fresh host reports outcome_unknown, a fresh owned session refuses replay, the admission is reconciled and both resources restore to the pre-change state with an idempotent repeated restore. Killed during the project save after the global library was already saved, reconciliation holds the admission ('The global library differs from its pre-transaction checkpoint') and restore stays blocked (ResourceBusy) for a human decision. Killed while archiving its checkpoint, library_create_type cannot be restored (no checkpoint), the journal proves no native mutation was dispatched and the saved original reopens without the type in PLC types or the project library."
+      },
+      "artifacts": [
+        "evidence/local.library_interruption.20261025.json"
+      ],
+      "limitations": [
+        "The global-library save itself completes too quickly to interrupt reliably; the project save after it is interrupted instead.",
+        "The held partially saved outcome is not resolved automatically; it needs an explicit human decision."
+      ]
+    },
+    {
+      "id": "local.library_dmc_prerequisites.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "36331cbdfdb548824f4bfdf1e211f45bc6929fd1",
+        "passedScope": "scripts/qualify_library_dmc_prerequisites.py on build 041b0d8 (frozen D:/lcq/b8): the upgraded, re-archived DMC Siemens Open Library V19 PLC library retained by the vendor run (hash-verified) opens in an owned scratch session; its 'Open Library' tag-table master copy instantiates into the PLC tags through library_instantiate destinationComposition=tagTables, exists exactly once afterwards, and a second copy is refused (LibraryConflict) without changing blocks, types or tag tables. All retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_dmc_prerequisites.20261025.json"
+      ],
+      "limitations": [
+        "CPU system and clock memory bytes, DMC's other documented prerequisite, are outside the reviewed hardware write allowlist; DMC FB compilation is not claimed.",
+        "The input is the vendor run's upgraded archive; the upgrade itself is vendor evidence."
+      ]
+    },
+    {
+      "id": "local.library_vendor.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "36331cbdfdb548824f4bfdf1e211f45bc6929fd1",
+        "passedScope": "Rerun of scripts/qualify_library_vendor.py on build 041b0d8 with refusal checks comparing blocks, PLC data types and tag tables of every PLC (software_inspect): PAL and DMC intake against receipts; all five DMC V19 archives upgrade into V21 with every version committed and absent-product elements listed as unavailable; the upgraded PLC library reopens with identical identities and mb_station_block_udt instantiates with an exact link; TIA V21 refuses PAL's V16 SimaticML and blocks, types and tag tables stay unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_vendor.20261025.json"
+      ],
+      "limitations": [
+        "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC.",
+        "DMC CPU clock-memory prerequisite is outside current MCP routes; complete DMC PLC block compilation is not claimed.",
+        "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
+      ]
+    },
+    {
+      "id": "local.library_formats.20261025",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "3ab2c78cbc2b14a98abc6054ec992a98556c10a6",
+        "passedScope": "Rerun of scripts/qualify_library_formats.py on build 041b0d8 with full block/type/tag-table refusal checks: read-only archive and directory sources give writable owned working copies and stay unchanged; an exclusively locked source is refused for its lock (the shared admission scope hashes the source first, so the refusal surfaces as an IOException naming the locked file) without registration or change; newer .zal22 open and upgrade, corrupt .zal21 and lone .al21 marker are refused; a mixed package classifies four candidates and both complete libraries open natively."
+      },
+      "artifacts": [
+        "evidence/local.library_formats.20261025.json"
+      ],
+      "limitations": [
+        "The locked source is simulated by an exclusive Windows handle, not a second TIA instance.",
+        "The library adapter's SourceLocked refusal is reached only when admission scoping does not hash the source first."
+      ]
+    },
+    {
+      "id": "local.engineering.boundaries.20261024",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "54e4bd6ff5bda932e35a34eaf3b6f4f33f726df5",
+        "passedScope": "scripts/qualify_interruption.py, TIA V21 owned scratch projects, one artifact root per scenario. apply-cancel: MCP notifications/cancelled while change_apply was applying; the next call got BridgeFaulted, the worker finished its call and exited with its TIA; a fresh Host reconciled the outcomeUnknown admission -> released (project verifiedApplied: fresh fingerprint equals journal afterFingerprint). stale-concurrent: a second Host attached to the same TIA applied a change between prepare and apply -> StaleRevision; a stale preview in the same Host after another apply -> StaleRevision; both previews stayed prepared and unclaimed, no admission was left, only the fresh changes are in the project. tia-unavailable: the owned TIA was terminated while idle; change_apply failed (EngineeringError: TIA Portal disposed or stopped) before any admission, the journal stayed prepared and a fresh session showed the project unchanged. library-open-kill: worker and TIA terminated after the open receipt was written -> held (source library unchanged; working copy partial). library-restore-complete: a library_create_master_copy change with project and global-library checkpoints was restored completely into new locations, then a fresh Host reopened both: the recovered project kept its fixture block, the recovered library had no master copies (its pre-change checkpoint) while the original library kept the applied master copy TiaMcp_IsEnabled."
+      },
+      "artifacts": [
+        "evidence/local.engineering.boundaries.20261024.json"
+      ],
+      "limitations": [
+        "Each scenario ran once; interruption is MCP cancellation or process termination, and where it landed inside a phase is timing-dependent.",
+        "Protected/know-how content is not covered: no protected fixture exists and creating one needs a protection password and new fixture code.",
+        "Fresh reopen after recovery compares fixture blocks and library master copies, not full object content."
       ]
     }
   ],
@@ -2796,7 +3148,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.engineering.interruption.rerun.20261024"
+          "local.engineering.interruption.rerun.20261024",
+          "local.engineering.boundaries.20261024"
         ]
       },
       "availability": {
@@ -3901,7 +4254,8 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.hardware.v02",
+          "local.remote-io.full-route.20261024"
         ]
       },
       "availability": {
@@ -4594,7 +4948,10 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4665,7 +5022,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "The complete distributed-I/O topology workflow remains unimplemented. Narrower configured module, slot, address, reviewed channel and controller-association operations are tracked separately under change.hardware_plug, change.hardware_move, change.hardware_address_set, change.hardware_channel_attributes and change.network_io_assign.",
+          "The reviewed single-controller ET 200SP route (one CPU 1511-1 PN, one IM 155-6 PN ST V6.4, one DI/AI module) is qualified through change.hardware_move, change.network_io_assign and change.hardware_channel_attributes. The complete or shared distributed-I/O topology workflow remains unimplemented; narrower configured module, slot, address, reviewed channel and controller-association operations are tracked separately under change.hardware_plug, change.hardware_move, change.hardware_address_set, change.hardware_channel_attributes and change.network_io_assign.",
           "Those routes do not establish shared-device/multi-controller topology, arbitrary module/channel support, or runtime qualification."
         ]
       },
@@ -5820,7 +6177,8 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.layers.hardware.20261008"
+          "local.layers.hardware.20261008",
+          "local.remote-io.full-route.20261024"
         ]
       },
       "availability": {
@@ -5916,7 +6274,9 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_plc_master.20261008"
+          "local.library_plc_master.20261008",
+          "local.library_formats.20261025",
+          "local.library_releases.20261024"
         ]
       },
       "availability": {
@@ -5958,7 +6318,10 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_formats.20261024",
+          "local.library_releases.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5999,7 +6362,10 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_formats.20261024",
+          "local.library_releases.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6081,7 +6447,10 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_formats.20261024",
+          "local.library_releases.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6414,7 +6783,9 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261008",
+          "local.library_vendor.20261025",
+          "local.library_upgrades.20261024"
         ]
       },
       "availability": {
@@ -6455,7 +6826,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.library_vendor.20261025",
+          "local.library_upgrades.20261024"
         ]
       },
       "availability": {
@@ -6587,7 +6960,10 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_plc_master.20261008"
+          "local.library_plc_master.20261008",
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
         ]
       },
       "availability": {
@@ -6639,7 +7015,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_upgrades.20261024",
+          "local.library_vendor.20261025",
+          "local.library_formats.20261025"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6691,7 +7071,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6732,6 +7116,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025). Software units and namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -6745,7 +7130,13 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_plc_master.20261008"
+          "local.library_plc_master.20261008",
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024",
+          "local.library_scopes.20261025",
+          "local.library_interruption.20261025",
+          "local.library_dmc_prerequisites.20261025"
         ]
       },
       "availability": {
@@ -6787,6 +7178,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025). Software units and namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -6798,7 +7190,13 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024",
+          "local.library_scopes.20261025",
+          "local.library_interruption.20261025"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6902,7 +7300,12 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024",
+          "local.library_interruption.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6955,7 +7358,13 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_plc_master.20261008"
+          "local.library_plc_master.20261008",
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024",
+          "local.library_interruption.20261024",
+          "local.library_scopes.20261025",
+          "local.library_interruption.20261025"
         ]
       },
       "availability": {
@@ -7007,7 +7416,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7058,7 +7471,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7109,7 +7526,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7160,7 +7581,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7211,7 +7636,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7262,7 +7691,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7313,7 +7746,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7365,7 +7802,11 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7469,7 +7910,10 @@
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.library_plc_master.20261008"
+          "local.library_plc_master.20261008",
+          "local.library_releases.20261024",
+          "local.library_dependencies.20261024",
+          "local.library_lifecycle.20261024"
         ]
       },
       "availability": {
@@ -8188,7 +8632,9 @@
         "status": "unverified",
         "evidenceIds": [
           "typed.builders.checkpoint.20261008",
-          "typed.builders.advanced-unit.20261012"
+          "typed.builders.advanced-unit.20261012",
+          "local.typed.runtime.20261024",
+          "local.typed.runtime.reruns.20261024"
         ]
       },
       "availability": {
@@ -8451,6 +8897,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for an explicit module/server move within one ET 200SP rack of the IM 155-6 PN ST V6.4 profile; cross-rack moves are not implemented.",
           "Native CanPlugMove plus exact hardware path; rejects built-in/software-bearing items. Compiled readback preserves other configured hardware fields.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -8459,8 +8906,11 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8501,7 +8951,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Exact hardware path, channel type, I/O type and channel number. Reviewed native read/write scalar parameters only; whole configured-hardware preservation and compile required.",
+          "Reviewed channel settings in the allowlist; only Smoothing (ET 200SP None/Weak/Medium/Strong) is natively qualified, on the AI 4xU/I 2-wire ST V2.0. Other allowlisted names are module-specific and unqualified.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -8510,8 +8960,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.remote-io.full-route.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8552,6 +9004,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract; shared-device and multi-controller assignments remain excluded.",
           "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation. Shared-device/multi-controller configurations remain excluded.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -8560,8 +9013,11 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9467,13 +9923,17 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Qualified for a fresh FB/UDT component: complete FC/DB/call/bindings install, preservation, save/reopen, first-checkpoint recovery and PLCSIM runtime with a separate OB1 call. Existing-caller installation and production combined library_integrate apply remain unqualified.",
           "Requires --component-qualification. Retains durable ownership across begin/status/recovery/completion; restart cannot resume installation. Unavailable on normal Hosts.",
           "Qualification-only tool registration does not enable a production mutation profile."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_component.install.20261024",
+          "local.plc_component.runtime.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
