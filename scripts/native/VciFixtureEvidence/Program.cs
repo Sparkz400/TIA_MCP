@@ -27,12 +27,23 @@ internal static class Program
 {
     private static string output;
     private static int eventId;
+    // Siemens registers the installed V21 API location; C:\Program Files is only the setup default.
+    private static string InstalledApiDirectory()
+    {
+        using (var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64))
+        using (var key = hklm.OpenSubKey(@"SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48"))
+        {
+            var basePath = key?.GetValue("Siemens.Engineering.Base") as string;
+            return string.IsNullOrWhiteSpace(basePath) ? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48" : Path.GetDirectoryName(basePath);
+        }
+    }
+
     [STAThread] private static int Main(string[] args)
     {
         AppDomain.CurrentDomain.AssemblyResolve += (_, e) => {
             string name = new AssemblyName(e.Name).Name;
             if (!name.StartsWith("Siemens.Engineering", StringComparison.Ordinal)) return null;
-            string path = Path.Combine(@"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48", name + ".dll");
+            string path = Path.Combine(InstalledApiDirectory(), name + ".dll");
             return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         };
         try { Console.WriteLine(Run(args)); return 0; }

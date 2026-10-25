@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a capability or workflow improvement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Still shaping the idea? Start in [Ideas](https://github.com/Sparkz400/TIA_MCP/discussions/categories/ideas) and open an issue once the scope is clear.
+        Check [Remaining work](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/TODO.md) first; it may already be planned.
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What are you trying to accomplish, and what blocks you today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: The expected outcome and any alternative approaches you considered.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - MCP tools
+        - Offline project inspection or export
+        - Native engineering (TIA Portal Openness)
+        - PLCSIM Advanced simulation
+        - OPC UA or runtime capture
+        - Project Explorer UI
+        - Packaging or installation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Target and acceptance criteria
+      description: |
+        Which TIA/PLCSIM versions, device types or MCP clients are involved?
+        How could this be verified with an owned scratch project or an offline fixture?
+    validations:
+      required: true

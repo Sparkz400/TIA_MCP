@@ -18,6 +18,15 @@ class CurateEvidenceTests(unittest.TestCase):
         self.assertEqual(["discovery", "tia_start"], summary["steps"])
         self.assertEqual((["tia_discover"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_tool_outcomes_from_steps_without_tool_calls(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "report.json")
+            path.write_text(json.dumps({"completed": True, "steps": [
+                {"tool": "change_apply", "isError": False}, {"tool": "change_apply", "isError": True},
+                {"tool": "tia_start"}]}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual((["change_apply"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
+
     def test_tree_hash_changes_with_any_binary(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

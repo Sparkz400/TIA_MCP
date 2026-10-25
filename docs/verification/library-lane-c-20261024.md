@@ -89,3 +89,14 @@ Build 041b0d8 (frozen `D:\lcq\b8`):
 - **Inventory checks.** `project_inventory` lists blocks only; refusal and recovery checks now also compare PLC data types and tag tables through `software_inspect`. The vendor and formats runs were repeated under this check.
 
 Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory.
+
+## Software units and namespaces — 25 October 2026
+
+After the user's elevated Openness grant, `scripts/native/LibraryUnitSeeder` seeds one software unit (`TiaMcp_LibUnit`, namespace preset `TiaMcp_LibUnit`). `local.library_units.20261025` (`qualify_library_units.py`, build a74211b, 49/49 steps):
+
+- Library FB and UDT instantiate into the unit once. TIA does not apply the unit's namespace preset to library instances.
+- TIA allows one instance of a library type per device. Instantiating the same type in the PLC root, or another unit, previously failed natively after the checkpoint; the preview now refuses it (`LibraryConflict`).
+- A PLC-wide update is refused while a unit use has no OB-rooted reference; no version is copied.
+- The unit use survives a fresh reopen.
+
+`local.library_dependencies.20261025` repeats the dependency run on this build to confirm same-scope reuse is unaffected.
