@@ -2,6 +2,27 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { fixture } = require('./fixture.cjs');
 const M = require('../model.js'), C = require('../client.js');
+test('embedded content reports changed size to the pinned host and stops on teardown', async () => {
+  let listener, resized, disconnected = false, height = 640;
+  const messages = [], body = { getBoundingClientRect: () => ({ height }) };
+  const parent = { postMessage(message, origin) {
+    messages.push({ message, origin });
+    if (message.method === 'ui/initialize') queueMicrotask(() => listener({ source: parent, origin: 'https://host.example', data: { jsonrpc: '2.0', id: message.id, result: { protocolVersion: '2026-01-26', hostCapabilities: { serverTools: {} } } } }));
+  } };
+  const win = { parent, document: { body, documentElement: { clientWidth: 420 } },
+    ResizeObserver: class { constructor(callback) { resized = callback; } observe(target) { assert.equal(target, body); resized(); } disconnect() { disconnected = true; } },
+    addEventListener: (_type, fn) => listener = fn, removeEventListener() {} };
+  const transport = await C.connectMcpHost({ windowObject: win });
+  const settle = () => new Promise(resolve => setTimeout(resolve, 10));
+  const sizes = () => messages.filter(row => row.message.method === 'ui/notifications/size-changed');
+  await settle(); assert.deepEqual(sizes().map(row => row.message.params), [{ width: 420, height: 640 }]);
+  assert.equal(sizes()[0].origin, 'https://host.example');
+  resized(); await settle(); assert.equal(sizes().length, 1);
+  height = 900; resized(); resized(); await settle(); assert.equal(sizes().length, 2);
+  assert.equal(sizes()[1].message.params.height, 900);
+  height = 1000; resized(); transport.close('test complete'); await settle();
+  assert.equal(disconnected, true); assert.equal(sizes().length, 2);
+});
 test('viewer transport blocks all mutation tools and unsupported actions before dispatch', async () => { let count = 0; const client = new C.ReadOnlyClient({ invoke: () => count++ }); for (const action of ['change_apply', 'change_prepare', 'download', 'hardware_write', 'project_close', 'tool']) await assert.rejects(client.invoke(action), /read operations only/); assert.equal(count, 0); });
 test('offline cursor is bound to query and released snapshot cannot be reused', async () => { const transport = new C.OfflineTransport(fixture()), client = new C.ReadOnlyClient(transport); const page = await client.invoke('children', { parentId: 'project', pageSize: 1 }); assert.ok(page.nextCursor); await assert.rejects(client.invoke('children', { parentId: 'hardware', pageSize: 1, cursor: page.nextCursor }), /Cursor/); await client.invoke('release'); await assert.rejects(client.invoke('status'), /released/); });
 test('offline metadata never claims live content verification', async () => { const transport = new C.OfflineTransport(fixture()); const reference = M.reference(transport.snapshot, transport.index.nodes.get('motor-a')); const detail = await transport.invoke('details', { reference }); assert.equal(detail.contentRevision, null); assert.equal(detail.contentFreshness, 'historicalObservationOnly'); assert.equal((await transport.invoke('verify', { reference })).valid, false); });
