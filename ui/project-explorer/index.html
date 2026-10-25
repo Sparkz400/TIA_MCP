@@ -367,7 +367,7 @@
         const status=parseInt(v.statusCode.slice(2),16),quality=(status&0x80000000)?'Bad':(status&0x40000000)?'Uncertain':'Good';
         if(quality!==v.quality||quality==='Bad'&&(v.outcome!=='itemError'||v.value!==null)||v.outcome!=='value'&&(v.value!==null||v.encoding!==null))bad();
         if(v.encoding==='null'&&v.value!==null)bad();
-        if(v.outcome==='value'&&v.encoding!=='null'&&['Int64','UInt64'].includes(v.builtInType)){
+        if(v.outcome==='value'&&v.encoding!=='null'&&v.encoding!=='array'&&['Int64','UInt64'].includes(v.builtInType)){
           if(v.encoding!=='decimalInteger'||typeof v.value!=='string'||! /^-?(0|[1-9][0-9]*)$/.test(v.value)||v.value==='-0')bad();
           const n=BigInt(v.value);if(n<(v.builtInType==='UInt64'?0n:-9223372036854775808n)||n>(v.builtInType==='UInt64'?18446744073709551615n:9223372036854775807n))bad();
         }
@@ -385,7 +385,85 @@
     if(!same(events,doc.events)||!same(declarations.map(s=>s.id).filter(id=>!mappings.some(m=>m.signalId===id)),doc.unselectedSignalIds)||!Array.isArray(doc.hypotheses)||doc.hypotheses.length!==expectedHypotheses.length||doc.hypotheses.some((h,i)=>h.verdict!=='unresolved'||h.id!==expectedHypotheses[i].id||h.statement!==expectedHypotheses[i].statement))bad();
     return doc;
   }
-  return { SCHEMA, LIMITS, escape, bytes, clamp, fail, validateSnapshot, reference, exactNode, SnapshotIndex, exportManifest, graphSvg, pngManifest, networkSvg, verifyUaObservation,
+  async function verifyUaComparison(doc) {
+    const bad=()=>fail('invalid_ua_comparison','Invalid UA comparison, original captures, explicit windows or derived counts.');
+    const canonical=(v,depth=0)=>{if(depth>64)bad();return v&&typeof v==='object'?Array.isArray(v)?v.map(x=>canonical(x,depth+1)):Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k],depth+1)])):v;};
+    const same=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+    const requireSame=(a,b)=>{if(!same(a,b))bad();};
+    const decimal=text=>{
+      if(typeof text!=='string'||text.length>128)return null;
+      const m=/^([+-]?)(\d+)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(text);if(!m)return null;
+      let digits=(m[2]+(m[3]||'')).replace(/^0+/,'');if(!digits)return 0n;
+      let exponent=Number(m[4]||0)-(m[3]||'').length;
+      while(digits.endsWith('0')){digits=digits.slice(0,-1);exponent++;}
+      if(!Number.isSafeInteger(exponent)||exponent < -28||digits.length+Math.max(exponent,0)>29)return null;
+      const coefficient=BigInt(digits)*10n**BigInt(Math.max(0,exponent));if(coefficient>79228162514264337593543950335n)return null;
+      return (m[1]==='-'?-1n:1n)*BigInt(digits)*10n**BigInt(exponent+28);
+    };
+    const millis=v=>{if(typeof v!=='number'||!Number.isFinite(v)||Math.abs(v)>1000000)bad();const n=decimal(String(v)),scale=10n**25n;if(n===null||n%scale)bad();return Number(n/scale);};
+    if(doc?.schemaVersion!=='diagnostic-ua-comparison.v1'||bytes(doc)>8*1024*1024||doc.clockBasis!=='hostElapsedSeconds'||doc.verdict!=='unresolved'||doc.resampled!==false||doc.sourceEvidenceRevalidated!==true||typeof doc.limits!=='string')bad();
+    const flags=['atomicAcrossSignals','scanSynchronized','programMatchVerified','addressMatchVerified','datatypeMatchVerified','sourceAuthenticityVerified','physicalQualified','clockSynchronizationVerified','assertionsAdmitted','causationProven','bugFixProven','nativeQualification','nativeAccessAttempted','sourceCompletenessVerified'];
+    if(!flags.every(k=>doc[k]===false))bad();
+    const q=doc.request;if(!q||Object.keys(q).some(k=>!['reason','beforeAnchorSeconds','afterAnchorSeconds','windowStartSeconds','windowEndSeconds','signalMap','allowChangedSource'].includes(k))||typeof q.reason!=='string'||!q.reason.trim()||q.reason.length>2000||q.allowChangedSource!==undefined&&typeof q.allowChangedSource!=='boolean'||!Array.isArray(q.signalMap)||q.signalMap.length<1||q.signalMap.length>64)bad();
+    const start=millis(q.windowStartSeconds),end=millis(q.windowEndSeconds);if(start>=end)bad();
+    const anchors={before:millis(q.beforeAnchorSeconds),after:millis(q.afterAnchorSeconds)};
+    for(const side of ['before','after']){
+      await verifyUaObservation(doc[side]);if(doc[side].snapshotRef!==doc[side+'SnapshotRef'])bad();
+      for(const r of doc[side].captureSource.rows)if(typeof r.elapsedMilliseconds!=='number'||!Number.isFinite(r.elapsedMilliseconds)||decimal(String(r.elapsedMilliseconds))===null)bad();
+    }
+    const changed=doc.before.binding.experiment.diagnosticCase.reviewId!==doc.after.binding.experiment.diagnosticCase.reviewId;
+    if(doc.sourceChanged!==changed||changed&&q.allowChangedSource!==true||doc.identicalPrefix!==(doc.beforeSnapshotRef===doc.afterSnapshotRef)||doc.sameCapture!==(doc.beforeSnapshotRef.split(':').slice(0,2).join(':')===doc.afterSnapshotRef.split(':').slice(0,2).join(':')))bad();
+    const elapsed=r=>decimal(String(r.elapsedMilliseconds)),scale=10n**28n;
+    const selected=(r,side)=>elapsed(r)>=BigInt(anchors[side]+start)*scale&&elapsed(r)<=BigInt(anchors[side]+end)*scale;
+    function window(side){const d=doc[side],rows=d.captureSource.rows,list=rows.filter(r=>selected(r,side));return {
+      selectedRowSequences:list.map(r=>r.sequence),excludedRows:rows.length-list.length,firstSelectedElapsedMilliseconds:list[0]?.elapsedMilliseconds??null,lastSelectedElapsedMilliseconds:list.at(-1)?.elapsedMilliseconds??null,
+      recordedRowsSpanRequestedWindow:!!rows.length&&elapsed(rows[0])<=BigInt(anchors[side]+start)*scale&&elapsed(rows.at(-1))>=BigInt(anchors[side]+end)*scale,
+      fullPrefixEvidence:d.events,recordedProgress:d.captureSource.recordedProgress,uncommittedDataUnknown:d.captureSource.uncommittedDataUnknown,completenessVerified:false};}
+    function signal(side,mapping){
+      const d=doc[side],values=[],sequences=[];let errors=0;
+      for(const r of d.captureSource.rows.filter(r=>selected(r,side))){
+        if(d.acquisitionMode==='polling'){
+          const index=d.binding.mappings.findIndex(m=>m.signalId===mapping.signalId);
+          if(r.kind!=='read'||r.selectionId!==d.captureSource.plan.request.selectionIds[index])continue;
+          sequences.push(r.sequence);if(r.errorCode!==null){errors++;continue;}values.push(JSON.parse(r.readResultJson).items[0]);
+        }else if(!r.event.duplicate)for(const n of r.event.notifications||[])if(same(n.value.node,mapping.node)){sequences.push(r.sequence);values.push(n.value);}
+      }
+      const count=f=>values.filter(f).length,good=v=>v.quality==='Good'&&v.outcome==='value'&&v.encoding!=='null',groups=new Map();let unrepresentable=0;
+      for(const v of values.filter(v=>good(v)&&['decimalInteger','roundTripFloat','roundTripDouble'].includes(v.encoding))){
+        const type={builtInType:v.builtInType??null,dataType:v.dataType??null,valueRank:v.valueRank??null,arrayDimensions:v.arrayDimensions??null,encoding:v.encoding??null},key=JSON.stringify(type);
+        if(!groups.has(key))groups.set(key,{type,count:0,minimum:null,maximum:null,lo:null,hi:null});const g=groups.get(key),n=decimal(v.value);
+        if(n===null){unrepresentable++;continue;}g.count++;if(g.lo===null||n<g.lo){g.lo=n;g.minimum=v.value;}if(g.hi===null||n>g.hi){g.hi=n;g.maximum=v.value;}
+      }
+      return {selectedRowSequences:sequences,observations:values.length,hostReadErrors:errors,goodValues:count(good),uncertain:count(v=>v.quality==='Uncertain'),bad:count(v=>v.quality==='Bad'),nullValues:count(v=>v.encoding==='null'),unsupported:count(v=>v.outcome==='unsupported'),metadataErrors:count(v=>v.outcome==='metadataError'),nonScalarValues:count(v=>v.encoding==='array'),
+        trueValues:count(v=>good(v)&&v.encoding==='boolean'&&v.value===true),falseValues:count(v=>good(v)&&v.encoding==='boolean'&&v.value===false),numericRanges:[...groups.values()].map(({lo,hi,...g})=>g),numericNotRepresentable:unrepresentable,firstObservation:values[0]||null,lastObservation:values.at(-1)||null};
+    }
+    const seenBefore=new Set(),seenAfter=new Set();if(!Array.isArray(doc.signals)||doc.signals.length!==q.signalMap.length)bad();
+    for(let i=0;i<q.signalMap.length;i++){
+      const m=q.signalMap[i];if(!m||Object.keys(m).length!==2||typeof m.before!=='string'||typeof m.after!=='string'||seenBefore.has(m.before)||seenAfter.has(m.after))bad();seenBefore.add(m.before);seenAfter.add(m.after);
+      const a=doc.before.binding.mappings.find(x=>x.signalId===m.before),b=doc.after.binding.mappings.find(x=>x.signalId===m.after);
+      if(!a||!b||a.unit!==b.unit||a.declaration.datatype!==b.declaration.datatype)bad();
+      requireSame(doc.signals[i],{beforeSignalId:m.before,afterSignalId:m.after,beforeMapping:a,afterMapping:b,sameNode:same(a.node,b.node),sameStorage:a.declaration.storagePath===b.declaration.storagePath&&same(a.declaration.memberPath,b.declaration.memberPath),before:signal('before',a),after:signal('after',b)});
+    }
+    const eventGroups={};
+    for(const side of ['before','after']){
+      requireSame(doc[side+'Window'],window(side));const selection=doc[side].captureSource.plan.request?.events||null,ids=new Set(),groups=new Map();let count=0,duplicates=0,repeated=0,overflow=0;
+      for(const r of doc[side].captureSource.rows.filter(r=>selected(r,side)))for(const e of r.event?.events||[]){
+        if(r.event.duplicate){duplicates++;continue;}count++;const id=e.fields[0].text;if(ids.has(id))repeated++;ids.add(id);if(e.overflow)overflow++;
+        const fields=[1,2,3,7].map(i=>e.fields[i]),key=JSON.stringify(fields);if(!groups.has(key))groups.set(key,{fields,count:0});groups.get(key).count++;
+      }
+      // Group ordering is presentation only; each exact original field tuple has one count.
+      const expected={selection,monitoringRequested:selection!==null,notifications:count,duplicateNotifications:duplicates,repeatedEventIds:repeated,overflowNotifications:overflow,groups:[...groups.values()]};
+      const actual=structuredClone(doc[side+'Events']);if(!actual||!Array.isArray(actual.groups)||actual.groups.length!==groups.size)bad();
+      const seenGroups=new Set();for(const g of actual.groups){const entries=[...groups.values()],i=entries.findIndex(x=>same(x.fields,g.fields));if(i<0||seenGroups.has(i)||!same(g,entries[i]))bad();seenGroups.add(i);}
+      actual.groups=expected.groups;requireSame(actual,expected);eventGroups[side]=groups;
+    }
+    if(doc.sameEventSelection!==same(doc.beforeEvents.selection,doc.afterEvents.selection)||!Array.isArray(doc.eventGroups))bad();
+    const combined=[];for(const side of ['before','after'])for(const g of eventGroups[side].values())if(!combined.some(x=>same(x.fields,g.fields))){
+      const count=s=>[...eventGroups[s].values()].find(x=>same(x.fields,g.fields))?.count||0;combined.push({fields:g.fields,beforeCount:count('before'),afterCount:count('after'),countDifference:count('after')-count('before')});}
+    if(doc.eventGroups.length!==combined.length)bad();const seen=new Set();for(const g of doc.eventGroups){const i=combined.findIndex(x=>same(x,g));if(i<0||seen.has(i))bad();seen.add(i);}
+    return doc;
+  }
+  return { SCHEMA, LIMITS, escape, bytes, clamp, fail, validateSnapshot, reference, exactNode, SnapshotIndex, exportManifest, graphSvg, pngManifest, networkSvg, verifyUaObservation, verifyUaComparison,
     verifyGraphReport, graphSequenceNetwork, withGraphAttachments };
 });
 
@@ -607,6 +685,7 @@
       if(typeof text!=='string' || new TextEncoder().encode(text).length>64*1024*1024+128*1024)throw new Error('Capture exceeds the reader limit.');
       const doc=JSON.parse(text), c=doc.capture, p=c?.plan;
       if(doc.schemaVersion==='diagnostic-ua-observation.v1')return this.loadUaObservation(doc,text);
+      if(doc.schemaVersion==='diagnostic-ua-comparison.v1')return this.loadUaComparison(doc,text);
       const invalid=()=>{throw new Error('Invalid runtime capture export or unsupported evidence claims.');};
       if(doc.schemaVersion!=='runtime-capture-export.v1' || c?.schemaVersion!=='runtime-capture-status.v1' || !p?.request || !Array.isArray(p.signals) || p.signals.length<1 || p.signals.length>64 || !Array.isArray(doc.rows) || doc.rows.length>200000 || doc.rows.length!==c.recordedProgress?.rows || !['running','ended','interrupted','historicalPrefix'].includes(c.state) || c.acquisitionMode!=='polling' || c.plcChangesBetweenPollsUnknown!==true || !['nativeQualified','programMatchVerified','atomicAcrossSignals','scanSynchronized'].every(k=>c[k]===false))invalid();
       const ids=new Set(p.signals.map(s=>s.selectionId));
@@ -660,6 +739,7 @@
       this.$('[data-action=release]').hidden=true;this.$('.runtime-panel').hidden=false;this.renderRuntimeCapture();
     }
     renderRuntimeCapture() {
+      if(this.runtimeCapture?.doc.schemaVersion==='diagnostic-ua-comparison.v1'){this.renderUaComparison();return;}
       if(this.runtimeCapture?.doc.schemaVersion==='diagnostic-ua-observation.v1'){this.renderUaObservation();return;}
       const view=this.runtimeCapture,{capture:c,rows:data}=view.doc, signals=c.plan.signals, selected=data.filter(r=>!view.filter || r.selectionId===view.filter || r.kind==='gap'), start=view.page*100;
       const labels=new Map(signals.map(s=>[s.selectionId,s.selection.symbol]));
@@ -828,6 +908,20 @@
       const generation = this.generation; this.$('.detail-body').innerHTML = '<div class="empty loading"><p>Reading bounded relationships and source evidence…</p></div>';
       try { const graph = await this.request('relationships', { reference: M.reference(this.snapshot, node), kinds: this.relationKind ? [this.relationKind] : [], direction: this.direction, depth: this.graphDepth, maxNodes: this.graphDepth > 1 ? 500 : 100, maxEdges: this.graphDepth > 1 ? 1000 : 200 }); if (token !== this.detailToken || generation !== this.generation) return; this.graph = graph; this.renderGraph(); } catch (e) { if (token === this.detailToken) { this.graph = { nodes: [], edges: [], unavailable: e.message }; this.renderGraph(); this.error(e); } }
     }
+    async loadUaComparison(doc,text) {
+      const token=this.uaImportToken,generation=this.generation;
+      await M.verifyUaComparison(doc);
+      if(token!==this.uaImportToken||generation!==this.generation)return;
+      this.runtimeCapture={doc,text,page:0,side:'before'};this.$('.welcome').hidden=true;this.$('.workspace').hidden=true;this.$('.projectbar').hidden=true;this.notice();
+      for(const action of ['export','refresh'])this.$('[data-action='+action+']').disabled=true;
+      this.$('[data-action=release]').hidden=true;this.$('.runtime-panel').hidden=false;this.renderUaComparison();
+    }
+    renderUaComparison() {
+      const view=this.runtimeCapture,d=view.doc,side=view.side,data=d[side].captureSource.rows,start=view.page*100;
+      const table=signal=>`<div class="table-wrap" tabindex="0"><table class="data-table"><thead><tr><th scope="col">Recorded statistic</th><th scope="col">Before</th><th scope="col">After</th></tr></thead><tbody>${['observations','goodValues','trueValues','falseValues','uncertain','bad','hostReadErrors','nullValues','unsupported','metadataErrors','nonScalarValues','numericNotRepresentable'].map(k=>`<tr><th scope="row">${esc(pretty(k))}</th><td>${esc(signal.before[k])}</td><td>${esc(signal.after[k])}</td></tr>`).join('')}</tbody></table></div>`;
+      this.$('.runtime-panel').innerHTML=`<div class="runtime-heading"><div><div class="eyebrow">Retained UA comparison</div><h2>Before / after captures</h2></div><div><button data-action="capture-download">Download comparison JSON</button> <button data-action="capture-close">Back to project</button></div></div><p class="runtime-warning">Original capture bytes and comparison counts checked locally. Hypotheses remain unresolved. Source authenticity, synchronized clocks and a successful fix are not established.</p><p>${esc(d.limits)}</p>${rows([['Reason',d.request.reason],['Window relative to anchors (seconds)',[d.request.windowStartSeconds,d.request.windowEndSeconds]],['Before Host anchor (seconds)',d.request.beforeAnchorSeconds],['After Host anchor (seconds)',d.request.afterAnchorSeconds],['Identical prefix',d.identicalPrefix],['Same capture',d.sameCapture],['Changed saved source',d.sourceChanged]])}<h3>Selected signal comparisons</h3>${d.signals.map(s=>`<section class="ua-comparison-signal"><h4>${esc(s.beforeSignalId)} → ${esc(s.afterSignalId)}</h4>${table(s)}<details><summary>Exact typed numeric ranges and mappings</summary>${rows([['Before ranges',s.before.numericRanges],['After ranges',s.after.numericRanges],['Before mapping',s.beforeMapping],['After mapping',s.afterMapping]])}</details></section>`).join('')}<h3>Recorded event group counts</h3><p>Type/source/severity tuples describe recorded fields, not matched alarm identities. Counts are not normalized by time or filter coverage. Event monitoring requested: before ${esc(d.beforeEvents.monitoringRequested)}, after ${esc(d.afterEvents.monitoringRequested)}. Same event selection: ${esc(d.sameEventSelection)}.</p><div class="table-wrap" tabindex="0"><table class="data-table ua-comparison-events"><thead><tr><th scope="col">Original fields</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Difference</th></tr></thead><tbody>${d.eventGroups.map(g=>`<tr><td><pre tabindex="0">${esc(JSON.stringify(g.fields,null,2))}</pre></td><td>${esc(g.beforeCount)}</td><td>${esc(g.afterCount)}</td><td>${esc(g.countDifference)}</td></tr>`).join('')}</tbody></table></div>${['before','after'].map(s=>`<details class="ua-comparison-window"><summary>${pretty(s)} window, event selection and full-prefix uncertainty</summary><pre tabindex="0">${esc(JSON.stringify({window:d[s+'Window'],events:d[s+'Events']},null,2))}</pre></details>`).join('')}<h3>Original capture rows</h3><p>All original rows remain available, including rows outside the selected window. Each source/server timestamp retains its own clock.</p><div class="runtime-controls"><button data-action="capture-compare-side" data-side="before" aria-pressed="${side==='before'}">Before capture</button><button data-action="capture-compare-side" data-side="after" aria-pressed="${side==='after'}">After capture</button><span>${esc(pretty(side))}: ${data.length?start+1:0}–${Math.min(start+100,data.length)} of ${data.length} rows</span><button data-action="capture-prev" ${start===0?'disabled':''}>Previous</button><button data-action="capture-next" ${start+100>=data.length?'disabled':''}>Next</button></div><div class="table-wrap" tabindex="0"><table class="data-table"><thead><tr><th scope="col">Row / Host elapsed ms</th><th scope="col">Original observation</th></tr></thead><tbody>${data.slice(start,start+100).map(r=>`<tr><td>${esc(r.sequence)} / ${esc(r.elapsedMilliseconds)}</td><td><pre tabindex="0">${esc(JSON.stringify(r,null,2))}</pre></td></tr>`).join('')}</tbody></table></div>`;
+      this.$('#connection-state').textContent='Offline UA comparison · no target connection';this.$('#freshness').textContent='Exact retained prefixes · no live acquisition';
+    }
     async loadUaObservation(doc,text) {
       const token=this.uaImportToken,generation=this.generation;
       await M.verifyUaObservation(doc);
@@ -868,6 +962,7 @@
         if (action === 'graph-source') { const bytes=await M.verifyGraphReport(this.graphPanels[Number(element.dataset.panel)].content);this.download(new Blob([bytes],{type:'application/xml'}),'graph-original.xml','application/xml');return; }
         if(action==='capture-open'){this.$('.capture-input').click();return;}
         if(action==='capture-download' && this.runtimeCapture){this.download(this.runtimeCapture.text,'runtime-capture.json','application/json');return;}
+        if(action==='capture-compare-side'&&this.runtimeCapture?.doc.schemaVersion==='diagnostic-ua-comparison.v1'){this.runtimeCapture.side=element.dataset.side;this.runtimeCapture.page=0;this.renderUaComparison();return;}
         if(action==='capture-prev' || action==='capture-next'){if(this.runtimeCapture){this.runtimeCapture.page+=action==='capture-next'?1:-1;this.renderRuntimeCapture();}return;}
         if(action==='capture-close'){this.runtimeCapture=null;this.$('.runtime-panel').hidden=true;this.$('.welcome').hidden=!!this.snapshot;this.$('.workspace').hidden=!this.snapshot;this.$('.projectbar').hidden=!this.snapshot;this.$('[data-action=release]').hidden=!this.snapshot;for(const a of ['export','refresh'])this.$('[data-action='+a+']').disabled=!this.snapshot;this.notice();if(this.snapshot)this.updateStatus();else{this.$('#connection-state').textContent='Portable viewer · no network connection';this.$('#freshness').textContent='Metadata and content freshness are separate';}return;}
         if (action === 'open') { this.$('.file-input').click(); return; }

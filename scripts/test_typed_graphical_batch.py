@@ -502,6 +502,22 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertEqual(["TgpUnit_GlobalTimer", "TgpNamespace_TemplateFB_LAD", "TgpNamespace_TemplateFB_FBD"], names)
         self.assertFalse(set(names) & {name for entry in main["sources"] for name in entry["names"]})
 
+    def test_iec_route_packet_covers_exactly_the_pending_route_references(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-iec-packet.v1.json").read_bytes())
+        names = []
+        for entry in packet["sources"]:
+            observed, _, _ = authored_reference(root / entry["path"], packet["unit"])
+            for key in ("names", "namespace", "route", "authoredFormat"):
+                self.assertEqual(entry[key], observed[key])
+            self.assertEqual(entry["sha256"], observed["fileSha256"])
+            names.extend(entry["names"])
+        self.assertEqual(len(names), len(set(names)))
+        pending = json.loads((root / "fixtures/typed-graphical/route-pending-references.v1.json").read_bytes())["unqualifiedCases"]
+        required = {pathlib.Path(path).stem for case in pending for path in case["missingIndependentNativeReferences"]}
+        captured = {name for entry in packet["sources"][packet["dependencyCount"]:] for name in entry["names"]}
+        self.assertEqual(required, captured)
+
     def test_source_parser_rejects_cross_unit_or_unscoped_reference(self):
         with tempfile.TemporaryDirectory() as directory:
             source = pathlib.Path(directory) / "source.scl"

@@ -62,10 +62,10 @@ attempt `r05`, which continues `r04` and `r03` by recorded hash):
 
 ## Still open
 
-- **Existing-caller installation:** V21 renumbers the following block-title IDs
-  on network insertion, and the typed route refuses that
-  (`NativeIdPreservationUnsupported`). Accepting it needs a preservation-policy
-  decision.
+- **Existing-caller installation:** the renumbering is accepted since the
+  [25 October scope decision](../plans/insertion-id-renumbering-decision-20261025.md);
+  native acceptance is tracked in
+  [existing-caller installation](component-existing-caller-20261025.md).
 - **native04/native05 artifacts:** they are not on this machine, so source reuse
   and the native05 recovery audit were not run.
 - **Production combined apply:** `library_integrate` apply stays disabled. Only

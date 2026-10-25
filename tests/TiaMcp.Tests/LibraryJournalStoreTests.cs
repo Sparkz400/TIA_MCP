@@ -45,6 +45,18 @@ internal static class LibraryJournalStoreTests
         return Task.CompletedTask;
     }
 
+    internal static Task NativeTimestampKeepsPreviewHash()
+    {
+        using var files = new Fixture();
+        // Seven fraction digits with a trailing zero, as TIA reports them; date parsing would drop the zero.
+        var preview = new JObject { ["target"] = "original-project", ["observedAtUtc"] = "2026-10-25T19:01:02.8245720Z" };
+        var record = new JObject { ["changeId"] = "lib-fixture", ["state"] = "prepared", ["preview"] = preview, ["previewHash"] = LibraryJournalStore.Hash(preview.ToString(Formatting.None)) };
+        LibraryJournalStore.Write(files.Journal, record);
+        var read = LibraryJournalStore.Read(files.Journal, "lib-fixture");
+        Check.Equal("2026-10-25T19:01:02.8245720Z", read["preview"]!.Value<string>("observedAtUtc"));
+        return Task.CompletedTask;
+    }
+
     private static JObject Record()
     {
         var preview = new JObject { ["target"] = "original-project", ["kind"] = "library_instantiate" };
