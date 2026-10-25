@@ -7,9 +7,10 @@ windows and signal mappings, and retains exact original evidence beside Good
 scalar statistics and recorded event-field counts. Existing observation and trace
 formats are unchanged. No dependency, worker or native acquisition route is added.
 
-Implementation is separate from Claude's existing-caller component PR #62. Main's
-catalog integration #64 was incorporated; the generated source bindings were
-recomputed from the combined source instead of replacing either implementation.
+Implementation is separate from Claude's component and HMI work. Main through
+`b965eff` is incorporated, including catalog integration #64, component PR #62 and
+journal-date fix #67. Generated source bindings are recomputed from the combined
+source instead of replacing either implementation.
 
 ## Evidence
 
@@ -33,7 +34,7 @@ Evidence is preserved outside the task checkout under
   downloaded and checked. Exports/missing-source refusal and a second Host produce
   the same immutable comparisons; server audits show no comparison/export calls.
   Poll-loop check counts can vary with scheduler timing.
-- `browser-frozen/result.json`: 335 checks passed on generated portable assets,
+- `browser-security/result.json`: 337 checks passed on generated portable assets,
   desktop/mobile layouts, before/after original rows, exact JSON download, inert
   HTML/Markdown and independent refusal of altered windows, counts, ranges,
   mappings, event groups, source bytes and authority claims. The actual comparison
@@ -83,4 +84,4 @@ requires literal text and no injected elements. Numeric import validation remain
 in place. The second full package run was stopped before this fix; owned process
 identities and confirmed exits are in `codeql-package-interruption-processes.json`
 and `codeql-package-interruption-exit.json`. That interrupted run is not passing
-evidence. The security alert is resolved by code and fresh analysis, not dismissed.
+evidence. Fresh CodeQL analysis must confirm the fix; the alert is not dismissed.
