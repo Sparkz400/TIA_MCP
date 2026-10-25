@@ -1,0 +1,8 @@
+NAMESPACE TiaMcp_UnitA
+DATA_BLOCK "TgpUnit_GlobalCounter"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"IEC_COUNTER"
+BEGIN
+END_DATA_BLOCK
+END_NAMESPACE

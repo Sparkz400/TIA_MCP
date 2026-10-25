@@ -2,54 +2,6 @@
   "schemaVersion": 1,
   "unqualifiedCases": [
     {
-      "fixtureId": "typed-unit-ne-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Ne_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-lt-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Lt_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-le-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Le_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-gt-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Gt_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-ge-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Ge_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-ton-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_TON_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
       "fixtureId": "typed-unit-tof-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpUnit_TOF_LAD.xml"
@@ -85,54 +37,6 @@
       "fixtureId": "typed-unit-ctud-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpUnit_CTUD_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-ne-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Ne_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-lt-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Lt_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-le-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Le_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-gt-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Gt_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-ge-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_Ge_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-ton-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_TON_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -178,14 +82,6 @@
       "runtimeVerified": false
     },
     {
-      "fixtureId": "typed-unit-existingglobal-ton-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_TON_Global_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
       "fixtureId": "typed-unit-existingglobal-tof-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpUnit_TOF_Global_LAD.xml"
@@ -221,14 +117,6 @@
       "fixtureId": "typed-unit-existingglobal-ctud-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpUnit_CTUD_Global_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-unit-existingglobal-ton-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpUnit_TON_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -274,62 +162,6 @@
       "runtimeVerified": false
     },
     {
-      "fixtureId": "typed-namespace-eq-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Eq_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ne-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Ne_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-lt-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Lt_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-le-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Le_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-gt-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Gt_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ge-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Ge_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ton-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TON_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
       "fixtureId": "typed-namespace-tof-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpNamespace_TOF_LAD.xml"
@@ -365,62 +197,6 @@
       "fixtureId": "typed-namespace-ctud-lad",
       "missingIndependentNativeReferences": [
         "fixtures/typed-graphical/native/TgpNamespace_CTUD_LAD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-eq-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Eq_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ne-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Ne_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-lt-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Lt_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-le-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Le_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-gt-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Gt_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ge-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_Ge_FBD.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-ton-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TON_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -466,113 +242,9 @@
       "runtimeVerified": false
     },
     {
-      "fixtureId": "typed-namespace-numeric-fc-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFC_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFC.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-lad-global",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-lad-createmulti",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-lad-createglobal",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fc-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFC_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFC.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-fbd-global",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-fbd-createmulti",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-numeric-fb-fbd-createglobal",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_NumericFB_DB.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-existingglobal-ton-lad",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TON_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
       "fixtureId": "typed-namespace-existingglobal-tof-lad",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TOF_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_TOF_Global_LAD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -580,8 +252,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-tp-lad",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TP_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_TP_Global_LAD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -589,8 +260,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctu-lad",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTU_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTU_Global_LAD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -598,8 +268,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctd-lad",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTD_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTD_Global_LAD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -607,17 +276,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctud-lad",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTUD_Global_LAD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
-      ],
-      "engineeringVerified": false,
-      "runtimeVerified": false
-    },
-    {
-      "fixtureId": "typed-namespace-existingglobal-ton-fbd",
-      "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TON_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTUD_Global_LAD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -625,8 +284,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-tof-fbd",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TOF_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_TOF_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -634,8 +292,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-tp-fbd",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_TP_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalTimer.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_TP_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -643,8 +300,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctu-fbd",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTU_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTU_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -652,8 +308,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctd-fbd",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTD_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTD_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false
@@ -661,8 +316,7 @@
     {
       "fixtureId": "typed-namespace-existingglobal-ctud-fbd",
       "missingIndependentNativeReferences": [
-        "fixtures/typed-graphical/native/TgpNamespace_CTUD_Global_FBD.xml",
-        "fixtures/typed-graphical/native/TgpNamespace_GlobalCounter.xml"
+        "fixtures/typed-graphical/native/TgpNamespace_CTUD_Global_FBD.xml"
       ],
       "engineeringVerified": false,
       "runtimeVerified": false

@@ -246,6 +246,10 @@ internal static class CoordinatorTests
             var s = new Scenario(); s.ToTypedPrepared(); s.Apply("graphical"); s.Ops.InstallationMutation = r => r["callerMatchesPrepared"] = false;
             Reject("ComponentReadbackMismatch", () => s.Next());
         });
+        test("journal reread keeps native timestamp strings exactly (b04: trailing-zero fraction)", () => {
+            var s = new Scenario(); s.Ops.PreparedMutation = p => p["observedAtUtc"] = "2026-10-25T16:41:22.8245720Z";
+            s.ToTypedPrepared(); Equal("graphical_applied", s.Apply("graphical").Value<string>("state"));
+        });
         test("existing caller without the insertion preservation proof stops completion", () => {
             var s = new Scenario(); s.ToTypedPrepared(); s.Apply("graphical"); s.Ops.InstallationMutation = r => r.Remove("callerInsertion");
             Reject("ComponentReadbackMismatch", () => s.Next());

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "catalog": "artifacts/stage-routes-01/profiles.candidate.v1.json",
+  "catalogSha256": "a7a61bd21a0fb0736697d671ef57a095fc3c45a2120f26bf78c047e7959874ec",
+  "capture": "artifacts/cap3/capture.json",
+  "captureSha256": "4a85301b1ff5acff4e617397379b7473e9ea95c80a627a39dbccbe57b4aa887d",
+  "counts": {
+    "sources": 48,
+    "profiles": 28,
+    "templates": 6
+  },
+  "prerequisiteEquivalence": [
+    {
+      "committed": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+      "committedSha256": "08d2398a78317c919f4ec61ebe1e1e8318638f6227521e5639bce211919e339c",
+      "reexport": "artifacts/stage-routes-01/native/TgpNamespace_TemplateFB_LAD.xml",
+      "reexportSha256": "db7d8a5c9b196ad39d5e76d3aa26725c8f4b47bb37901c007381af254f1effbf",
+      "equivalent": true
+    },
+    {
+      "committed": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_FBD.xml",
+      "committedSha256": "58cd1aec0201bd1811506566234e555533fc87c05a6aa80d8927eff10f945365",
+      "reexport": "artifacts/stage-routes-01/native/TgpNamespace_TemplateFB_FBD.xml",
+      "reexportSha256": "99e9a06d7e821851f12d701420f5e7f054f9dcb8b9240b8af9374af48c425e7d",
+      "equivalent": true
+    },
+    {
+      "committed": "fixtures/typed-graphical/native/TgpUnit_GlobalTimer.xml",
+      "committedSha256": "0b11710c79bb8d2c54f91390686ee18ce14c0e0fe042460da8bd0eaf012e4100",
+      "reexport": "artifacts/stage-routes-01/native/TgpUnit_GlobalTimer.xml",
+      "reexportSha256": "c5fa1271f40420774e561814f86edb58857b19ec2091ab2ccedcaf0a71941b54",
+      "equivalent": true
+    }
+  ],
+  "findings": [],
+  "passed": true
+}
