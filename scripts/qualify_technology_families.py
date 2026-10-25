@@ -240,9 +240,13 @@ def requested_value(expected, actual, native_type):
         require(math.isfinite(expected) and math.isfinite(actual), "Native scalar must be finite")
         if native_type == "System.Single":
             try:
-                return struct.pack("f", expected) == struct.pack("f", actual)
+                packed = struct.pack("f", expected), struct.pack("f", actual)
             except (OverflowError, struct.error) as error:
                 raise AssertionError("Requested scalar exceeds native Single range") from error
+            # Newer Python packs out-of-range values as infinity instead of raising.
+            require(all(math.isfinite(struct.unpack("f", p)[0]) for p in packed),
+                    "Requested scalar exceeds native Single range")
+            return packed[0] == packed[1]
         return expected == actual
     return type(actual) is type(expected) and actual == expected
 

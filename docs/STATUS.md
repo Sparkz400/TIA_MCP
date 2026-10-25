@@ -1,5 +1,7 @@
 # Current status
 
+**Release matrix frozen — 25 October 2026:** [`docs/plans/release-matrix.v1.json`](plans/release-matrix.v1.json) is generated from catalog `0.4.12` and the obligation ledger, with one row per feature and one cell per acceptance criterion. Rows: 35 shipped, 14 limited, 279 unqualified, 1 unavailable target, 10 deferred. Cells: 163 bound to evidence with artifact hashes, 1,379 open, each with an owning obligation. A test fails if the matrix goes stale. No native work ran.
+
 **Frozen runtime corpus passed — 24 October 2026:** All 9 families, 65 cases, 358 steps and 478 assertions passed in one isolated run on PLCSIM, and an independent audit recomputed every verdict. `sim_tags`, `sim_read`, `sim_write` and `simulation_discovery_baseline` are verified (`sim_state` stays unverified: `stop` was not exercised); catalog `0.4.6`. [Evidence](verification/runtime-frozen-20261024.md).
 
 **FileStorage exit qualified — 24 October 2026:** The FileStorage server gets its measured 360 s terminal deadline (it idles out after about 300 s) and exited naturally within it in three owned runs; other processes keep 45 s. [Evidence](verification/file-storage-exit-20261024.md).
