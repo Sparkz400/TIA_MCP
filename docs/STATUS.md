@@ -1,5 +1,7 @@
 # Current status
 
+**Scoped typed runtime — 26 October 2026:** Software-unit and alternate-namespace typed cells now run live: each case seeds the unit into a fresh scratch, generates the test harness inside the DUT's unit and namespace, and asserts on PLCSIM. 112 of 140 route cells pass all five gates (compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB with local, existing-global and created-global storage); the 28 created multi-instance cells are refused until a scoped dependent-instance effect pair is captured. Catalog `0.4.17`. [Ledger](verification/typed-lad-fbd-route-runtime-20261026.md).
+
 **Route storage creation engineering-qualified — 26 October 2026:** 48 software-unit and namespace TON/TOF/TP/CTU/CTD/CTUD cases that create a multi-instance member or a namespace-qualified global instance DB passed the four engineering gates. Typed routes now cover local, existing and created storage; scoped runtime remains open. Catalog `0.4.16`. [Ledger](verification/typed-lad-fbd-route-created-storage-20261026.md).
 
 **IEC route cells engineering-qualified — 26 October 2026:** A fresh owned capture of the 46-input IEC packet passed every import/compile/save and a fresh-process reopen; its 20 TOF/TP/CTU/CTD/CTUD software-unit and namespace profiles passed the binding audit and all 40 enabled cases passed the four engineering gates. All 80 reference route cells are now engineering-qualified; scoped runtime remains open. Catalog `0.4.15`. [Ledger](verification/typed-lad-fbd-route-iec-20261026.md), [typed TODO](plans/typed-lad-fbd-todo.md).

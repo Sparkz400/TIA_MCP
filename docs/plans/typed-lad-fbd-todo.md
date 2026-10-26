@@ -16,8 +16,8 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 - Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
-- Still open: scoped runtime (the runtime harness cannot call a software-unit DUT from `Main`),
-  scoped global operand encodings and dependent-DB effects.
+- Still open: scoped global operand encodings and dependent-DB effects (packet authored, not captured),
+  and runtime for created multi-instance route storage.
 
 ## Lane A — 26 October 2026
 
@@ -264,7 +264,16 @@ controller was modified.
   global storage (`local.typed.route-iec-capture.20261026`), so the target supports scoped IEC
   timers/counters; the SIMATIC SD import failure itself was not pursued.
 - [ ] Capture scoped global operand encodings and scoped dependent-DB effects
-  before enabling them. No scoped runtime assertions have run.
+  before enabling them. The capture packet is authored (`route-capture-scoped-packet.v1.json`,
+  17 inputs) but not executed.
+- [x] Scoped runtime: `qualify_typed_graphical.py --live --unit-seeder` seeds the unit into a fresh
+  scratch (keeping credential provenance) and generates the harness inside the DUT's unit and
+  namespace (named cycle OB, `NAMESPACE` source, qualified references and PLCSIM symbols). 112 of 140
+  route cells pass all five gates ([ledger](../verification/typed-lad-fbd-route-runtime-20261026.md),
+  reruns: [global numeric FB](../verification/typed-lad-fbd-route-runtime-reruns-20261026.md),
+  [local numeric FB](../verification/typed-lad-fbd-route-runtime-local-fb-20261026.md)). The 28 created
+  multi-instance cells are refused (`DependencyProfileUnavailable`) until a route effect pair exists.
+  The seeder must be the Openness-allowlisted lane A binary; a rebuilt seeder needs a new allowlist entry.
 - [ ] Retain failed-source recovery evidence: some incomplete native exports leave
   `afterFingerprint` unknown, so `change_restore` correctly refuses with
   `StaleRevision`. Exact checkpoint retrieval into a new owned project was verified

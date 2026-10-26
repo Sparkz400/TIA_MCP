@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.16",
+  "catalogVersion": "0.4.17",
   "targetTiaVersions": [
     21
   ],
@@ -1941,6 +1941,57 @@
       ],
       "limitations": [
         "Engineering only; scoped runtime is not covered."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "65fecaf17c04cbb594fc70bd62ef434b4a938f2e",
+        "passedScope": "scripts/qualify_typed_graphical.py --live --unit-seeder, one fresh owned TIA V21 scratch with a guarded UnitSeeder-seeded software unit and one owned PLCSIM Advanced V8 instance per case: 100 software-unit and alternate-namespace typed cells (see docs/verification/typed-lad-fbd-route-runtime-20261026.md) passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, checkpoint restore with recovered reopen, and every independent runtime assertion, with the test harness generated inside the DUT's unit and namespace."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.20261026.json"
+      ],
+      "limitations": [
+        "Created multi-instance storage is refused before runtime (DependencyProfileUnavailable: no route dependent-instance effect profile); the scoped instance-effect pair is authored but not captured.",
+        "Numeric FB local cases hit a harness type-resolution defect and global variants used an inapplicable two-instance oracle in this run; both are fixed and rerun separately (local.typed.scoped-runtime.reruns.20261026).",
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.reruns.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "00d54fc8d827327b9dcc1fb3d0e8d1656917aa28",
+        "passedScope": "Reruns on the fixed harness (namespace-qualified FB member types; single-instance oracle for shared global callee storage), live as in local.typed.scoped-runtime.20261026: software-unit and alternate-namespace numeric FB cells with existing-global and created-global storage, LAD and FBD (8 cells), each passing all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.reruns.20261026.json"
+      ],
+      "limitations": [
+        "Global and created-global variants assert the single-instance history steps; independent-instance behaviour does not apply to one shared callee DB.",
+        "Local numeric FB cells failed here on dependency identity (short block name versus qualified type) and are rerun separately."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.local-fb.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a61de1c05c59d6e517f9e5ec2938e76626023753",
+        "passedScope": "Software-unit and alternate-namespace numeric FB cells with local multi-instance callee storage, LAD and FBD (4 cells), live as in local.typed.scoped-runtime.20261026 after binding the scoped FB dependency to its namespace-qualified identity: each passed all five gates, including two independent harness instances keeping separate callee history."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.local-fb.20261026.json"
+      ],
+      "limitations": [
+        "Host application-call timing; not exact PLC scan timing."
       ]
     }
   ],
@@ -8853,7 +8904,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
-          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026); scoped runtime is unqualified.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes for 112 of 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb); created multi-instance storage is refused before runtime until a route dependent-instance effect pair is captured.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8877,7 +8928,10 @@
           "local.typed.route-profiles.20261025",
           "local.typed.route-iec-capture.20261026",
           "local.typed.route-iec.20261026",
-          "local.typed.route-created-storage.20261026"
+          "local.typed.route-created-storage.20261026",
+          "local.typed.scoped-runtime.20261026",
+          "local.typed.scoped-runtime.reruns.20261026",
+          "local.typed.scoped-runtime.local-fb.20261026"
         ]
       },
       "availability": {
