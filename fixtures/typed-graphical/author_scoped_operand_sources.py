@@ -110,8 +110,10 @@ def main():
         prefix = "Tgp" + label + "_"
         route = "softwareUnit" if namespace == UNIT else "namespace"
         db = f'"{namespace}.{prefix}OperandDB"'
-        for operand, source, target in (("Db", db + ".Flag", db + ".Target"),
-                                        ("Tag", '"TgpUnit_TagFlag"', '"TgpUnit_TagTarget"')):
+        # Unit tag callers are a native V21 boundary: compiling them fails with "Accessing this type of
+        # tag is not possible in software units" (artifacts/cap-scoped, 26 October). Their sources stay
+        # authored for the retained diagnostic but are not packet inputs.
+        for operand, source, target in (("Db", db + ".Flag", db + ".Target"),):
             for language in ("LAD", "FBD"):
                 name = prefix + "Operand" + operand + "_" + language
                 path = write("route-" + label + "-operand-" + operand.lower() + "-" + language.lower() + ".s7dcl",
@@ -128,9 +130,15 @@ def main():
     packet = {"schemaVersion": 1, "status": "authored-not-executed",
               "purpose": "Native references for scoped dependent-DB effects (software-unit and namespace instance-effect pairs) and scoped "
                          "global operand encodings: namespace-qualified global DB members and unit PLC tags read and written from LAD and FBD "
-                         "in both routes. Encodings and effects are unobserved until captured; nothing here enables a profile.",
+                         "in both routes. Unit tag operands are excluded: V21 refuses M-memory unit tags in software-unit blocks "
+                         "(nativeBoundaries). Encodings and effects are unobserved until captured; nothing here enables a profile.",
               "unit": UNIT, "archive": {"path": ARCHIVE, "sha256": ARCHIVE_SHA256}, "sources": sources,
               "argsFile": [row["path"] for row in sources], "command": command,
+              "nativeBoundaries": [{"inputs": ["fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl"],
+                                    "observed": "CompileFailed: Accessing this type of tag is not possible in software units (2 errors, Network 1)",
+                                    "report": "artifacts/cap-scoped/capture.json",
+                                    "reportSha256": "164b76eade701f1f8e8039e8c314a3c48d4229634fff92148b5410a02dec2ab6", "date": "2026-10-26",
+                                    "open": "Only %M tags were tried; %I/%Q unit tags are unobserved."}],
               "afterCapture": ["scripts/extract_typed_instance_effects.py <capture> <capture> --route softwareUnit --prefix TgpUnit_ --namespace TiaMcp_UnitA",
                                "scripts/extract_typed_instance_effects.py <capture> <capture> --route namespace --prefix TgpNamespace_ --namespace TiaMcp_UnitA.Alternate",
                                "Worker: select instance-effects[-<route>].v1.json by the change's route before route createMulti can pass.",

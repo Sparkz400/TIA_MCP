@@ -548,7 +548,10 @@ class RouteCapturePacketTests(unittest.TestCase):
             self.assertLess(order.index("Tgp" + label + "_TemplateFB_LAD.xml"), order.index("route-" + label + "-instance-effect-after.scl"))
             self.assertLess(order.index("route-" + label + "-instance-effect-before.scl"), order.index("route-" + label + "-instance-effect-after.scl"))
             self.assertLess(order.index("route-" + label + "-operand-db.scl"), order.index("route-" + label + "-operand-db-lad.s7dcl"))
-            self.assertLess(order.index("route-Unit-operand-tags.xml"), order.index("route-" + label + "-operand-tag-lad.s7dcl"))
+            self.assertNotIn("route-" + label + "-operand-tag-lad.s7dcl", order)  # native boundary, retained separately
+        boundary = packet["nativeBoundaries"][0]
+        self.assertIn("not possible in software units", boundary["observed"])
+        self.assertTrue((root / boundary["inputs"][0]).is_file())
 
     def test_change_declarations_bind_to_exactly_one_admitted_source(self):
         def specs():

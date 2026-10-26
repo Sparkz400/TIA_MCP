@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "authored-not-executed",
-  "purpose": "Native references for scoped dependent-DB effects (software-unit and namespace instance-effect pairs) and scoped global operand encodings: namespace-qualified global DB members and unit PLC tags read and written from LAD and FBD in both routes. Encodings and effects are unobserved until captured; nothing here enables a profile.",
+  "purpose": "Native references for scoped dependent-DB effects (software-unit and namespace instance-effect pairs) and scoped global operand encodings: namespace-qualified global DB members and unit PLC tags read and written from LAD and FBD in both routes. Unit tag operands are excluded: V21 refuses M-memory unit tags in software-unit blocks (nativeBoundaries). Encodings and effects are unobserved until captured; nothing here enables a profile.",
   "unit": "TiaMcp_UnitA",
   "archive": {
     "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
@@ -133,26 +133,6 @@
       "namespace": "TiaMcp_UnitA"
     },
     {
-      "path": "fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl",
-      "sha256": "41bc3bbc40da7dec1ef46dd14bc72edb859d4ff365fc89a5b1a86b5a536850af",
-      "route": "softwareUnit",
-      "authoredFormat": "SIMATIC_SD",
-      "names": [
-        "TgpUnit_OperandTag_LAD"
-      ],
-      "namespace": "TiaMcp_UnitA"
-    },
-    {
-      "path": "fixtures/typed-graphical/sources/route-Unit-operand-tag-fbd.s7dcl",
-      "sha256": "15baac2a4d768bf1acfc747faafb8b5c54e634a708034b12c7cad7397efaac74",
-      "route": "softwareUnit",
-      "authoredFormat": "SIMATIC_SD",
-      "names": [
-        "TgpUnit_OperandTag_FBD"
-      ],
-      "namespace": "TiaMcp_UnitA"
-    },
-    {
       "path": "fixtures/typed-graphical/sources/route-Namespace-operand-db-lad.s7dcl",
       "sha256": "3c3c96351c182746415b3a125719e036b6b9eede58b20ad4dde25cad5c0c7d37",
       "route": "namespace",
@@ -171,26 +151,6 @@
         "TgpNamespace_OperandDb_FBD"
       ],
       "namespace": "TiaMcp_UnitA.Alternate"
-    },
-    {
-      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-tag-lad.s7dcl",
-      "sha256": "dbc7ecd188dc6030c39da310affd0490a45ee19f881bacf5354ee43b4ede8316",
-      "route": "namespace",
-      "authoredFormat": "SIMATIC_SD",
-      "names": [
-        "TgpNamespace_OperandTag_LAD"
-      ],
-      "namespace": "TiaMcp_UnitA.Alternate"
-    },
-    {
-      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-tag-fbd.s7dcl",
-      "sha256": "c8ef10ab259f193b9680b7c88138ebadef375521e4ae262ed5bf3b027ef0dea7",
-      "route": "namespace",
-      "authoredFormat": "SIMATIC_SD",
-      "names": [
-        "TgpNamespace_OperandTag_FBD"
-      ],
-      "namespace": "TiaMcp_UnitA.Alternate"
     }
   ],
   "argsFile": [
@@ -205,12 +165,8 @@
     "fixtures/typed-graphical/sources/route-Namespace-operand-db.scl",
     "fixtures/typed-graphical/sources/route-Unit-operand-db-lad.s7dcl",
     "fixtures/typed-graphical/sources/route-Unit-operand-db-fbd.s7dcl",
-    "fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl",
-    "fixtures/typed-graphical/sources/route-Unit-operand-tag-fbd.s7dcl",
     "fixtures/typed-graphical/sources/route-Namespace-operand-db-lad.s7dcl",
-    "fixtures/typed-graphical/sources/route-Namespace-operand-db-fbd.s7dcl",
-    "fixtures/typed-graphical/sources/route-Namespace-operand-tag-lad.s7dcl",
-    "fixtures/typed-graphical/sources/route-Namespace-operand-tag-fbd.s7dcl"
+    "fixtures/typed-graphical/sources/route-Namespace-operand-db-fbd.s7dcl"
   ],
   "command": [
     "python",
@@ -235,6 +191,18 @@
     "route-Namespace-instance-effect-after.scl:TgpNamespace_InstanceEffect",
     "--observe",
     "route-Namespace-instance-effect-after.scl:TgpNamespace_InstanceEffect_DB"
+  ],
+  "nativeBoundaries": [
+    {
+      "inputs": [
+        "fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl"
+      ],
+      "observed": "CompileFailed: Accessing this type of tag is not possible in software units (2 errors, Network 1)",
+      "report": "artifacts/cap-scoped/capture.json",
+      "reportSha256": "164b76eade701f1f8e8039e8c314a3c48d4229634fff92148b5410a02dec2ab6",
+      "date": "2026-10-26",
+      "open": "Only %M tags were tried; %I/%Q unit tags are unobserved."
+    }
   ],
   "afterCapture": [
     "scripts/extract_typed_instance_effects.py <capture> <capture> --route softwareUnit --prefix TgpUnit_ --namespace TiaMcp_UnitA",
