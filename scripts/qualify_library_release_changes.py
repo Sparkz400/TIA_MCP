@@ -198,6 +198,8 @@ def body(h):
 
     # Authoring: three FB generations of one native type identity.
     plc = h.owned_scratch("authoring")
+    # Library blocks are not editable in a consumer, so simulation support must be compiled in where they are authored.
+    h.apply("project_simulation_enable", {"enabled": True})
     project_library = h.project_library()
     initial = {name: h.release(project_library, h.create_type(project_library, documents, name, composition, plc), "1.0.0")
                for name, composition in ((UDT, "types"), (FB, "blocks"))}
