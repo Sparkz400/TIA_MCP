@@ -10,7 +10,9 @@ from library_native_harness import Harness, require
 NAMES = ("SystemMemoryByte", "SystemMemoryByteAddress", "ClockMemoryByte", "ClockMemoryByteAddress")
 KIND = "hardware_cpu_memory_bytes"
 # Added next to the scratch CPU 1511-1 PN; newest catalog firmware of each exact type name.
-EXTRA_CPUS = ("CPU 1516-3 PN/DP", "CPU 1214C DC/DC/DC")
+EXTRA_CPUS = ("CPU 1516-3 PN/DP",)
+# V21 Openness declares no memory byte attributes on this S7-1200; it is added last, as the refused boundary.
+UNSUPPORTED_CPU = "CPU 1214C DC/DC/DC"
 ENABLED = {"SystemMemoryByte": True, "SystemMemoryByteAddress": 20, "ClockMemoryByte": True, "ClockMemoryByteAddress": 21}
 BLOCK = "TiaMcpMemoryBytes"
 
@@ -31,12 +33,22 @@ def tags(h, plc):
     """(table, name, address) of every PLC tag, from the unchanged native tag-table exports."""
     rows = []
     for table in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]:
-        xml = h.tool("tag_table_read", {"plcPath": plc, "tagTablePath": table["path"]})["xml"]
+        xml = h.tool("tag_table_read", {"plcPath": plc, "tagTablePath": table["path"]}).get("xml", "")
         for tag in re.findall(r"<SW\.Tags\.PlcTag\b.*?</SW\.Tags\.PlcTag>", xml, re.S):
             name = re.search(r"<Name>([^<]*)</Name>", tag).group(1)
             address = re.search(r"<LogicalAddress>([^<]*)</LogicalAddress>", tag)
             rows.append([table["path"], name, address.group(1) if address else None])
     return sorted(rows)
+
+
+def add_cpu(h, name):
+    entries = [e for e in h.tool("hardware_catalog_search", {"filter": name.replace("CPU ", ""), "maxItems": 200})["entries"] if e.get("typeName") == name]
+    require(entries, "No catalog entry for " + name)
+    selected = max(entries, key=version_key)
+    h.report.setdefault("addedCpus", []).append(selected)
+    station = "Station" + re.sub(r"\W", "", name)[3:]
+    # A new CPU needs its confidential-data password before it compiles.
+    return {"typeIdentifier": selected["typeIdentifier"], "deviceName": station, "itemName": "PLC" + station[7:], "configureScratchSecurity": True}
 
 
 def apply(h, label, kind, payload, scope=None):
@@ -52,13 +64,7 @@ def body(h):
     plc = h.owned_scratch("cpu memory bytes")
     scratch_cpu = h.tool("tia_session_status")
     for name in EXTRA_CPUS:
-        entries = [e for e in h.tool("hardware_catalog_search", {"filter": name.replace("CPU ", ""), "maxItems": 200})["entries"] if e.get("typeName") == name]
-        require(entries, "No catalog entry for " + name)
-        selected = max(entries, key=version_key)
-        h.report.setdefault("addedCpus", []).append(selected)
-        station = "Station" + re.sub(r"\W", "", name)[3:]
-        apply(h, "add " + name, "hardware_add", {"typeIdentifier": selected["typeIdentifier"], "deviceName": station, "itemName": "PLC" + station[7:],
-              "configureScratchSecurity": True})  # A new CPU needs its confidential-data password before it compiles.
+        apply(h, "add " + name, "hardware_add", add_cpu(h, name))
     plcs = [p["path"] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"]]
     require(len(plcs) == 1 + len(EXTRA_CPUS) and plc in plcs, "Expected the scratch PLC and every added CPU")
     cpus = {p: p.rsplit("/plc/", 1)[0] for p in plcs}  # A PLC path extends its CPU device item with /plc/<name>.
@@ -68,7 +74,7 @@ def body(h):
     for p, cpu in cpus.items():
         def discover(cpu=cpu):
             values, metadata = memory(h, cpu)
-            require(set(values) == set(NAMES), "CPU lacks the reviewed attributes; observed memory attributes: %s" % metadata)
+            require(values == {"SystemMemoryByte": False, "ClockMemoryByte": False}, "Expected both flags, disabled and without byte numbers: %s" % metadata)
             return {"values": values, "metadata": metadata}
         original[cpu] = h.stage("discover memory bytes on " + cpu, discover)["values"]
         observed[p] = tags(h, p)
@@ -76,12 +82,14 @@ def body(h):
 
     first = next(iter(cpus.values()))
     hardware = [x["path"] for x in h.tool("project_inventory", {"maxItems": 1000})["hardware"]]
-    non_cpu = next(x for x in hardware if x.startswith(first + "/") and set(memory(h, x)[0]) != set(NAMES))  # e.g. its PROFINET interface
+    non_cpu = next(x for x in sorted(hardware, key=lambda x: not x.startswith(first + "/")) if x not in cpus.values() and not memory(h, x)[0])
     h.refuse("refuse a non-CPU item", KIND, {"hardwarePath": non_cpu, "attributes": {"SystemMemoryByte": True}}, "UnsupportedCapability")
     h.refuse("refuse the same enabled byte", KIND, {"hardwarePath": first, "attributes": {**ENABLED, "ClockMemoryByteAddress": 20}}, "AddressConflict")
     h.refuse("refuse a byte above 65535", KIND, {"hardwarePath": first, "attributes": {"ClockMemoryByteAddress": 65536}}, "InvalidRequest")
     h.refuse("refuse a string flag", KIND, {"hardwarePath": first, "attributes": {"ClockMemoryByte": "true"}}, "InvalidRequest")
     h.refuse("refuse an unchanged request", KIND, {"hardwarePath": first, "attributes": {"SystemMemoryByte": original[first]["SystemMemoryByte"]}}, "InvalidRequest")
+    h.refuse("refuse enabling without a byte number", KIND, {"hardwarePath": first, "attributes": {"SystemMemoryByte": True}}, "InvalidRequest")
+    h.refuse("refuse a byte number of a disabled flag", KIND, {"hardwarePath": first, "attributes": {"ClockMemoryByteAddress": 5}}, "InvalidRequest")
     h.refuse("refuse an attribute outside the subset", KIND, {"hardwarePath": first, "attributes": {"Comment": "x"}}, "UnsupportedAttribute")
     require(all(original[c] != ENABLED for c in cpus.values()), "The scratch default already equals the requested setting")
 
@@ -146,6 +154,17 @@ def body(h):
         h.stage("read back original memory bytes on " + cpu, lambda cpu=cpu: require(memory(h, cpu)[0] == original[cpu], "Original settings not restored") or original[cpu])
     h.report["finalTags"] = {p: tags(h, p) for p in plcs}
 
+    # Boundary: an S7-1200 CPU is refused; recorded even when TIA cannot compile the added CPU.
+    prepared = h.prepare("hardware_add", add_cpu(h, UNSUPPORTED_CPU))
+    outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+    content = outcome.get("structuredContent") or {}
+    h.report["unsupportedCpu"] = {"typeName": UNSUPPORTED_CPU, "addError": content.get("error") if outcome.get("isError") else None}
+    if not outcome.get("isError"):
+        added = [p["path"].rsplit("/plc/", 1)[0] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if p["path"] not in plcs]
+        require(len(added) == 1, "Expected one added S7-1200 CPU")
+        h.report["unsupportedCpu"]["memoryAttributes"] = memory(h, added[0])[1]
+        h.refuse("refuse the S7-1200 CPU", KIND, {"hardwarePath": added[0], "attributes": {"SystemMemoryByte": True, "SystemMemoryByteAddress": 1}}, "UnsupportedCapability")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -157,6 +176,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "cm_", "CPU system and clock memory bytes on every CPU of an owned scratch project", [
-        "Qualified on the scratch CPU 1511-1 PN plus one CPU 1516-3 PN/DP and one CPU 1214C DC/DC/DC; other CPU families and firmware are not qualified.",
+        "Qualified on the scratch CPU 1511-1 PN and one added CPU 1516-3 PN/DP; V21 Openness exposes no memory byte attributes on CPU 1214C DC/DC/DC, which is refused. Other CPU families and firmware are not qualified.",
         "The DMC Siemens Open Library archive is not on this machine, so DMC FB compilation itself is not claimed; an authored block reading the bytes compiles instead.",
         "Runtime behavior of the memory bits is not observed."], []).run(body)

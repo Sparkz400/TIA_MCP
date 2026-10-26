@@ -17,22 +17,35 @@ namespace TiaMcp.Openness.V21
         {
             var item = ChangeHardware(project, change.Payload);
             var declared = new HashSet<string>(item.Item.GetAttributeInfos().Select(info => info.Name), StringComparer.Ordinal);
-            if (!CpuMemoryByteAttributes.All(declared.Contains))
-                throw new BridgeException("UnsupportedCapability", "The selected hardware item does not declare the native system and clock memory attributes; select a supported CPU device item.");
+            if (!HardwareEngineeringRules.CpuMemoryByteFlags.All(declared.Contains))
+                throw new BridgeException("UnsupportedCapability", "The selected hardware item does not declare the native SystemMemoryByte and ClockMemoryByte attributes; select a supported CPU device item.");
             var attributes = ChangeObject(change.Payload, "attributes");
-            var current = new JObject(HardwareEngineeringRules.CpuMemoryByteAttributes.Select(name => new JProperty(name, ChangeScalar(ReadAttributeValue(item.Item, name, CpuMemoryByteAttributes, false, out _)))));
+            var current = new JObject(HardwareEngineeringRules.CpuMemoryByteAttributes.Where(declared.Contains)
+                .Select(name => new JProperty(name, ChangeScalar(ReadAttributeValue(item.Item, name, CpuMemoryByteAttributes, false, out _)))));
             HardwareEngineeringRules.RequireCpuMemoryBytes(current, attributes);
-            var changes = PrepareAttributes(item.Item, attributes, CpuMemoryByteAttributes, out var converted);
+            // A byte number of a still-disabled flag is declared only after the flag write; it is converted then.
+            var changes = PrepareAttributes(item.Item, new JObject(attributes.Properties().Where(p => declared.Contains(p.Name))), CpuMemoryByteAttributes, out var converted);
             // Preservation compares native scalars, not the JSON input spelling.
-            foreach (var property in attributes.Properties().ToArray())
-                attributes[property.Name] = ChangeScalar(converted[property.Name]);
+            foreach (var name in converted.Keys) attributes[name] = ChangeScalar(converted[name]);
             if (preview != null)
             {
+                foreach (var pending in attributes.Properties().Where(p => !declared.Contains(p.Name)))
+                    changes.Add(new JObject { ["name"] = pending.Name, ["type"] = null, ["before"] = null, ["after"] = pending.Value.DeepClone() });
                 preview["attributeChanges"] = changes;
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["cpuMemoryBytesBefore"] = current });
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["cpuMemoryBytesBefore"] = current,
+                    ["cpuMemoryBytesAfter"] = HardwareEngineeringRules.CpuMemoryBytesAfter(current, attributes) });
                 ((JArray)preview["warnings"]).Add("TIA may add or update its own system/clock memory tags in the PLC tag tables; compilation and the recovery checkpoint remain mandatory.");
             }
             return item.Item;
+        }
+
+        private void ApplyCpuMemoryBytes(EngineeringChange change, Project project)
+        {
+            var target = PrepareCpuMemoryBytes(change, project, null);
+            var attributes = ChangeObject(change.Payload, "attributes");
+            // Flags first: enabling one makes Openness declare its byte number.
+            ApplyAttributes(target, new JObject(attributes.Properties().Where(p => HardwareEngineeringRules.CpuMemoryByteFlags.Contains(p.Name))), CpuMemoryByteAttributes);
+            ApplyAttributes(target, new JObject(attributes.Properties().Where(p => !HardwareEngineeringRules.CpuMemoryByteFlags.Contains(p.Name))), CpuMemoryByteAttributes);
         }
     }
 }

@@ -768,7 +768,7 @@ namespace TiaMcp.Openness.V21
                     ApplyAttributes(PrepareHardwareChannel(change, project, null), ChangeObject(payload, "attributes"), ChannelWriteAttributes);
                     break;
                 case "hardware_cpu_memory_bytes":
-                    ApplyAttributes(PrepareCpuMemoryBytes(change, project, null), ChangeObject(payload, "attributes"), CpuMemoryByteAttributes);
+                    ApplyCpuMemoryBytes(change, project);
                     break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
