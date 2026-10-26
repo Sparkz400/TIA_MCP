@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.failed-source-recovery.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T15:09:50+00:00",
+  "source": {
+    "commit": "5254031f27f516b492b8e42202ea33f2fce2efac",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_failed_source_recovery.py on the blocked scoped capture artifacts/cap-scoped (sha256 164b76ea...): its last source left the change recovery_required with an unknown after-state fingerprint and change_restore refused (FingerprintUnavailable). The retained SHA-bound recovery archive was retrieved into a fresh owned TIA V21 project and all 21 blocks, types and tag tables equal the failing source's pre-change snapshot; owned cleanup passed.",
+  "limitations": [
+    "Checkpoint retrieval into a new project is separate evidence; it is not a successful change_restore, and the stale/fingerprint guard is unchanged.",
+    "The original failed project was not opened, edited or released."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c77a33d410577a2950d8c4e3cce61bdfffce39970fae8a70910862eda70e7a60"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "dcda1757eb65289af77b4c4b282fb88bec30392a5477344950b306952d23cc26",
+      "bytes": 1347386,
+      "completed": true,
+      "steps": [
+        "checkpoint retrieved into a fresh owned project equals the pre-change snapshot (21 blocks/types/tag tables)"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

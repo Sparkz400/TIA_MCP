@@ -204,8 +204,10 @@ def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_i
         raise AssertionError("Inserted object IDs are not one consecutive range.")
     elements = children(objects)
     if after_id is None:
-        if any(node.tagName == "SW.Blocks.CompileUnit" for node in children(original_objects)) or elements[-1] is not inserted:
-            raise AssertionError("First-network insertion must append to a network-free caller.")
+        # Native exports list compile units before the block-level title, so a first network precedes it.
+        titles = [node for node in elements if node.tagName == "MultilingualText" and node.getAttribute("CompositionName") == "Title"]
+        if any(node.tagName == "SW.Blocks.CompileUnit" for node in children(original_objects)) or len(titles) != 1                 or elements.index(inserted) != elements.index(titles[0]) - 1:
+            raise AssertionError("First-network insertion must place the network directly before the network-free caller's block title.")
     else:
         anchors = [node for node in children(objects) if node.tagName == "SW.Blocks.CompileUnit" and node.getAttribute("ID") == after_id]
         if len(anchors) != 1 or elements.index(inserted) != elements.index(anchors[0]) + 1:

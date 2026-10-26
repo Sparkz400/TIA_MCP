@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-10-26T15:09:50.726537+00:00",
+  "scope": "Completed exact fixture attempts only. Historical binary lineages remain explicit; this ledger does not certify the current release, remote hosts, unexecuted assertions or broader instruction/type/route combinations.",
+  "counts": {
+    "attempts": 2,
+    "distinctCells": 2,
+    "allFourNativeGates": 2,
+    "allFiveGates": 0
+  },
+  "cells": [
+    {
+      "fixtureId": "typed-insert-first-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt7/typed-insert-first-fbd/result.json",
+      "latestAttempt": "artifacts/rt7/typed-insert-first-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt7/typed-insert-first-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-insert-first-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt7/typed-insert-first-lad/result.json",
+      "latestAttempt": "artifacts/rt7/typed-insert-first-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt7/typed-insert-first-lad/result.json"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "report": "artifacts/rt7/typed-insert-first-fbd/result.json",
+      "reportSha256": "d7319555f3aed0ba465309181358fa10c868e99fd7d3e1b8d64c63586d129561",
+      "fixtureId": "typed-insert-first-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T15:06:20.961331+00:00",
+      "completedAtUtc": "2026-10-26T15:08:05.970818+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "standard",
+        "tiaVersion": "V21"
+      },
+      "operation": "insertNetwork",
+      "profiles": [
+        "v21.fw41.fbd.and.v1",
+        "v21.fw41.fbd.assign.v1",
+        "v21.fw41.fbd.not.v1",
+        "v21.fw41.fbd.or.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "95793c401764e929efe33609c81cebb75938b7337873973be37d084edc4a209c",
+          "manifestSha256": "d568d1daf710d1b59c20a66d3841783f20c1a38849a10b6f8ec0def1e1a9a013"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "efb2c8879e209d7ad2edc0ea2d8c6bd55b9e15ed174922b5ace298a52151aa0a",
+          "manifestSha256": "cdb99a19cf037ebed4ecffe371bf7771884341d548c881cba4739d6d048ebe50"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt7/typed-insert-first-lad/result.json",
+      "reportSha256": "c95c075d1ebbb84373c1274552aa27ceca653dd94a4aa24b7eccfb78a03f4aae",
+      "fixtureId": "typed-insert-first-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T15:04:34.076697+00:00",
+      "completedAtUtc": "2026-10-26T15:06:20.920196+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "standard",
+        "tiaVersion": "V21"
+      },
+      "operation": "insertNetwork",
+      "profiles": [
+        "v21.fw41.lad.branch.v1",
+        "v21.fw41.lad.coil.v1",
+        "v21.fw41.lad.contact.v1",
+        "v21.fw41.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "95793c401764e929efe33609c81cebb75938b7337873973be37d084edc4a209c",
+          "manifestSha256": "d568d1daf710d1b59c20a66d3841783f20c1a38849a10b6f8ec0def1e1a9a013"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "efb2c8879e209d7ad2edc0ea2d8c6bd55b9e15ed174922b5ace298a52151aa0a",
+          "manifestSha256": "cdb99a19cf037ebed4ecffe371bf7771884341d548c881cba4739d6d048ebe50"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    }
+  ]
+}

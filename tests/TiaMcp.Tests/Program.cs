@@ -274,6 +274,7 @@ internal static partial class Program
             ("Typed multi-instance mapping preserves observed embedded defaults and direct DB starts", TypedGraphicalTests.MultiInstanceTemplatesPreserveObservedShapes),
             ("Typed dependent-instance effect manifest is selected by route", TypedGraphicalTests.DependentEffectManifestFollowsRoute),
             ("Typed IEC dependent effect appends only the captured member", TypedGraphicalTests.IecDependentEffectAppendsOnlyTheCapturedMember),
+            ("Typed first network goes before the block title of a network-free caller", TypedGraphicalTests.FirstNetworkGoesBeforeTheBlockTitle),
             ("Graphical patch failures are atomic", EngineeringSourcesTests.GraphicalPatchFailuresAreAtomic),
             ("Native readback detects collateral XML loss", EngineeringSourcesTests.NativeReadbackDetectsCollateralLoss),
             ("Protected native generated blocks do not request unavailable checksums", EngineeringFingerprintTests.ProtectedNativeGeneratedBlocksDoNotRequestChecksums),

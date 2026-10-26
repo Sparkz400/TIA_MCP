@@ -1,5 +1,7 @@
 # Current status
 
+**Typed plan reconciled — 26 October 2026:** Plan items already covered by evidence are ticked. First-network insertion into a network-free caller now places the network before the block title with a captured native envelope and passes the four engineering gates in LAD and FBD; a failed source's retained checkpoint was retrieved into a fresh project and matches its pre-change snapshot exactly, separate from the refused change_restore. Catalog `0.4.21`.
+
 **Namespaced DB operands enabled — 26 October 2026:** The typed builder now accepts global DB member operands owned by the caller's software unit, emitting the captured qualified-name encoding; four software-unit/namespace LAD/FBD cases pass the four engineering gates. Cross-unit DB owners stay refused; unit tag operands remain a native V21 boundary. Catalog `0.4.20`.
 
 **Scoped typed runtime complete — 26 October 2026:** IEC dependent-instance effect pairs were captured for both routes and the worker now appends the captured IEC member for created timer/counter storage. All 24 remaining created multi-instance cells pass, so all 140 software-unit and namespace typed route cells pass all five gates. Catalog `0.4.19`. [Ledger](verification/typed-lad-fbd-route-runtime-iec-createmulti-20261026.md).

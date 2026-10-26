@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "682c9f55a13fdcb507c8662b59a7a475d9ed7acc0b2474ccd0aab0e958f69e09",
-      "bytes": 766900
+      "sha256": "5e36785a2ca8ee12ab907775828d574f639bbd5734ce920687b1d1e63ff6b605",
+      "bytes": 769391
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2547,8 +2547,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
-      "sha256": "e3dc36a8131c45a73f3957692bf9b0ca65d78a7e310e3015dd60ba982ad212ca",
-      "bytes": 31996
+      "sha256": "d28f8d3905f57b8198bb14bc76e2fd38fe279f1228573261cf6cba1b3b21daa2",
+      "bytes": 32895
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
@@ -2682,8 +2682,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
-      "sha256": "5063307027d67b4945254b0b40d62880c41363c941d1f4b9ac02b853e44c8956",
-      "bytes": 53323
+      "sha256": "d33ef5e8037888a4eaad3c4f2493845013dcb2d79c8f2c9f3c0c91bf74b5b05e",
+      "bytes": 51768
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs",
@@ -2692,8 +2692,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.cs",
-      "sha256": "54edb75536715527b6b723277d729658f6d8cebf246d60e573b22d787a4ae0a4",
-      "bytes": 14555
+      "sha256": "2481908918c6647b9f7a1e419be754ef1dc81e7c3142fbb51d6da5042504fded",
+      "bytes": 15290
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalCapturedStorageTemplate.cs",
@@ -70287,8 +70287,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "PrepareTypedGraphical",
               "line": 62,
-              "endLine": 131,
-              "sha256": "994a3a8113f0afafe2b3a4cd94bef1197f8c24dee2441a69934819eb676f3246"
+              "endLine": 141,
+              "sha256": "e11de5ab46cd94b05a7e41eca3694d8548a3a1c3c877d61166bae5dc59f2c471"
             }
           ]
         },
@@ -71099,8 +71099,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 204,
-              "endLine": 214,
+              "line": 214,
+              "endLine": 224,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -71247,8 +71247,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "PrepareTypedGraphical",
               "line": 62,
-              "endLine": 131,
-              "sha256": "994a3a8113f0afafe2b3a4cd94bef1197f8c24dee2441a69934819eb676f3246"
+              "endLine": 141,
+              "sha256": "e11de5ab46cd94b05a7e41eca3694d8548a3a1c3c877d61166bae5dc59f2c471"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -73431,8 +73431,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 204,
-              "endLine": 214,
+              "line": 214,
+              "endLine": 224,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -73995,8 +73995,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 204,
-              "endLine": 214,
+              "line": 214,
+              "endLine": 224,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -74223,8 +74223,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 204,
-              "endLine": 214,
+              "line": 214,
+              "endLine": 224,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -74330,8 +74330,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
               "name": "Export",
-              "line": 204,
-              "endLine": 214,
+              "line": 214,
+              "endLine": 224,
               "sha256": "ea106c307e90bcfc4fc8cc1a3f4b24abb746ed61769487b7f79c4a698e0b32e4"
             },
             {
@@ -76491,6 +76491,20 @@
           "profileSha256": "e0d0948f86c526fa04f256b4d2d44b3807fb5a0f1b75dd99294554f20ad45c6c",
           "artifacts": [
             "evidence/local.typed.route-dboperand.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.insertion-first.20261026",
+          "profileSha256": "c022eb0ab95b4b39395cda2442944a6c969c9f08fe96bf2628af16da9162d7c4",
+          "artifacts": [
+            "evidence/local.typed.insertion-first.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.failed-source-recovery.20261026",
+          "profileSha256": "e8012c73cb2c6b1a207236035b53032dfc82b97af2cadeb5e8e6b50fc12a2fa9",
+          "artifacts": [
+            "evidence/local.typed.failed-source-recovery.20261026.json"
           ]
         }
       ],
@@ -94570,7 +94584,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "3d4959c2fb6f0c01d3b9f76b3c237541b35322c4de41e119fe7b9327b8a74fe4"
+      "sha256": "7285747bffb5606be78ab43b7e06bbbe82d4642406c36f8fd3cb36558024fada"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94773,9 +94787,19 @@
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
     },
     {
+      "path": "evidence/local.typed.failed-source-recovery.20261026.json",
+      "state": "observed",
+      "sha256": "5eef551b604a58574a6c137c910f9fa9531488c256a50ce2642a1f28fa17c84e"
+    },
+    {
       "path": "evidence/local.typed.iec-effect-capture.20261026.json",
       "state": "observed",
       "sha256": "373113012810fd63565a8d7c6d8a50d472db9dc956463e1e07df3bcd735430b8"
+    },
+    {
+      "path": "evidence/local.typed.insertion-first.20261026.json",
+      "state": "observed",
+      "sha256": "e2777a022fa65a9ebf191375176cfb720be72f532ef87ee855d22b2b4fcbbba3"
     },
     {
       "path": "evidence/local.typed.insertion.20261025.json",
@@ -95182,8 +95206,16 @@
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
     },
     {
+      "id": "local.typed.failed-source-recovery.20261026",
+      "profileSha256": "e8012c73cb2c6b1a207236035b53032dfc82b97af2cadeb5e8e6b50fc12a2fa9"
+    },
+    {
       "id": "local.typed.iec-effect-capture.20261026",
       "profileSha256": "dd3ebdd3146d0a06595926c2eedc18accb9906adf3ed247c5566c26a03eab3ff"
+    },
+    {
+      "id": "local.typed.insertion-first.20261026",
+      "profileSha256": "c022eb0ab95b4b39395cda2442944a6c969c9f08fe96bf2628af16da9162d7c4"
     },
     {
       "id": "local.typed.insertion.20261025",

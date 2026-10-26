@@ -1,0 +1,61 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.insertion-first.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T15:09:51+00:00",
+  "source": {
+    "commit": "e96ab94726a498d8141ffab08989028ea2a87f7c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-first-lad and typed-insert-first-fbd: a first network inserted into a network-free FB derived from the native Tgp_Boolean exports. The builder placed the compile unit, with a captured native network envelope, directly before the block title and shifted the title IDs by the inserted count; the independent check required that placement and the exact shift, and the topology matched the native Boolean network. Both passed import/compile, complete prepared-vs-native XML, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Engineering only; insertion combined with storage creation still needs its own composite effect contract.",
+    "An earlier attempt (artifacts/rt6-envelope-mismatch) failed NativePreservationMismatch with a bare envelope; it showed TIA adds the network's own comment/title objects."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c77a33d410577a2950d8c4e3cce61bdfffce39970fae8a70910862eda70e7a60"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-insertion-first.json",
+      "sha256": "33ac6d90e254ce5eaf666a6827ac66ba2865488cc30853cd729b5efc8826427e",
+      "bytes": 10242,
+      "completed": true,
+      "steps": [
+        "typed-insert-first-fbd: passed",
+        "typed-insert-first-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

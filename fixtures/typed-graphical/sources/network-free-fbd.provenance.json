@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "authoredFormat": "native_xml_template_derivation",
+  "requiresNativeAcceptance": true,
+  "references": [
+    {
+      "path": "fixtures/typed-graphical/native/Tgp_Boolean_FBD.xml",
+      "sha256": "46d326fc9095f8aa149b5851c0db5d7a6bdb8da5a6bc047253fb8fda994aa860"
+    }
+  ],
+  "adaptedFields": [
+    "CompileUnit removed",
+    "Title IDs 8/9 -> 3/4",
+    "Name"
+  ],
+  "sourceSha256": "ffec0237562e1c08b704c3f694284f1c8ec876e2fc5dd53cbae461eb97e2536e"
+}

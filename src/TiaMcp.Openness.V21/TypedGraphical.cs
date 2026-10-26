@@ -131,9 +131,17 @@ namespace TiaMcp.Openness.V21
             {
                 CanonicalizeNetworkIds(flgNet, null, model, pins, allocator, effects, networkId);
                 var unit = CreateCompileUnit(flgNet, networkId, model.Language, context.NetworkTemplateXml, allocator);
-                if (model.Operation == "insertNetwork" && target == null) RequireInsertionIdPreservation(document, block, target, unit);
-                else if (model.Operation == "insertNetwork") networkId = ShiftFollowingIdsForInsertion(document, target, unit, allocator, effects);
-                if (target != null) target.AddAfterSelf(unit); else block.Element("ObjectList").Add(unit);
+                if (model.Operation == "insertNetwork" && target == null)
+                {
+                    // Native exports always list compile units before the block-level title (174 of 174 observed blocks),
+                    // so a network-free block's first network precedes its title and the title IDs shift.
+                    var title = block.Element("ObjectList")?.Elements("MultilingualText").SingleOrDefault(e => (string)e.Attribute("CompositionName") == "Title");
+                    if (title == null) Fail("NativeIdPreservationUnsupported", "A network-free block without a native block title has no observed first-network placement.");
+                    networkId = ShiftFollowingIdsForInsertion(document, title, unit, allocator, effects, true);
+                    title.AddBeforeSelf(unit);
+                }
+                else if (model.Operation == "insertNetwork") { networkId = ShiftFollowingIdsForInsertion(document, target, unit, allocator, effects); target.AddAfterSelf(unit); }
+                else if (target != null) target.AddAfterSelf(unit); else block.Element("ObjectList").Add(unit);
             }
             effects.Insert(0, new TypedGraphicalEffect { Kind = model.Operation, Identity = networkId, Description = "Native " + model.Language + " network " + model.Operation + "; compilation and complete readback required." });
             return Result(document, original, networkId, allocator.Mapping, profiles, effects);

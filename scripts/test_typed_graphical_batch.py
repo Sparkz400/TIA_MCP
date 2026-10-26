@@ -282,6 +282,30 @@ class InsertionContractTests(unittest.TestCase):
         objects.insert(list(objects).index(unit) + 1, inserted)
         return before, after, objects, inserted, unit.get("ID")
 
+    def test_first_network_precedes_the_title_of_a_network_free_caller(self):
+        for language in ("LAD", "FBD"):
+            with self.subTest(language=language):
+                _, native, objects, _, _ = self.fixture(language)
+                unit = next(node for node in objects if node.tag == "SW.Blocks.CompileUnit")
+                objects.remove(next(node for node in objects if node.get("ID") == "100"))
+                count = len([node for node in unit.iter() if node.get("ID") is not None])
+                # Native network-free shape: the unit removed and the title IDs closed up behind the comment.
+                empty = copy.deepcopy(native)
+                empty_objects = next(node for node in empty if node.tag in ("SW.Blocks.FC", "SW.Blocks.FB")).find("ObjectList")
+                empty_objects.remove(next(node for node in empty_objects if node.tag == "SW.Blocks.CompileUnit"))
+                for node in empty.iter():
+                    if node.get("ID") is not None and int(node.get("ID"), 16) >= int(unit.get("ID"), 16) + count:
+                        node.set("ID", format(int(node.get("ID"), 16) - count, "X"))
+                before = ET.tostring(empty, encoding="unicode")
+                assert_existing_caller_insertion(before, ET.tostring(native, encoding="unicode"), unit.get("ID"), None)
+                appended = copy.deepcopy(native)
+                appended_objects = next(node for node in appended if node.tag in ("SW.Blocks.FC", "SW.Blocks.FB")).find("ObjectList")
+                moved = next(node for node in appended_objects if node.tag == "SW.Blocks.CompileUnit")
+                appended_objects.remove(moved)
+                appended_objects.append(moved)
+                with self.assertRaises(AssertionError):
+                    assert_existing_caller_insertion(before, ET.tostring(appended, encoding="unicode"), unit.get("ID"), None)
+
     def test_contract_retains_every_existing_object_in_both_languages(self):
         for language in ("LAD", "FBD"):
             before, after, _, inserted, anchor = self.fixture(language)
