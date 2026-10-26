@@ -263,8 +263,17 @@ def body(h):
 
     # Recovery: the checkpoint and the unsaved original both keep the exact 1.1.0 link.
     h.owned_portal("recovery")
-    h.reconcile_admission("reconcile the failed update's admission in a fresh session",
-                          ((h.report["breakingUpdate"]["error"].get("details") or {}).get("mutationAdmission") or {}).get("admissionId"))
+    admission = ((h.report["breakingUpdate"]["error"].get("details") or {}).get("mutationAdmission") or {}).get("admissionId")
+    # Lane C builds left a compile failure's admission outcomeUnknown; later builds return it. Reconcile only when unresolved.
+    if admission in h.unresolved_admissions():
+        h.reconcile_admission("reconcile the failed update's admission in a fresh session", admission)
+    else:
+        def returned():
+            records = sorted((h.directory / "engineering-admissions" / str(admission)).glob("*.json"))
+            state = json.loads(records[-1].read_text(encoding="utf-8")).get("state") if records else None
+            require(state == "returned" and not h.unresolved_admissions(), "The failed update's admission is %s, not returned" % state)
+            return {"admissionId": admission, "state": state}
+        h.stage("failed update's admission already returned", returned)
     restored = h.stage("restore breaking-update checkpoint", lambda: h.tool("change_restore", {"changeId": failed["changeId"], "previewHash": failed["previewHash"]}))
     require(restored["state"] == "restored_to_new_locations" and restored.get("originalsPreserved") is True, "Checkpoint was not restored")
     recovered = h.project_library()
