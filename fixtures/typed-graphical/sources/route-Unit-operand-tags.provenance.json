@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "authoredFormat": "native_tag_table_xml",
+  "requiresNativeAcceptance": true,
+  "observedLayout": {
+    "export": "artifacts/r1/n-lad/r9c971a/exports/tag-table-66a3669092ba47318511facdae2e8184.xml",
+    "table": "Tgp_ResolutionTags",
+    "sha256": "f96ad5ae11664fa3a9164627ab4a9447c4635309e17ac68f1677f7d14b85b0a1",
+    "retained": false
+  },
+  "adaptedFields": [
+    "DocumentInfo omitted",
+    "Name",
+    "Tags",
+    "LogicalAddress"
+  ],
+  "sourceSha256": "4547641ab0deb7337133f3171c13d9e57ff519c8f6d7675153c4e1e5fc06999a"
+}

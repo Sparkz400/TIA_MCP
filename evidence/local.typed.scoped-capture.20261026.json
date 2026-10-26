@@ -1,0 +1,43 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.scoped-capture.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T11:45:58+00:00",
+  "source": {
+    "commit": "db0622429da94fc29374909995c9d3098047c114",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py: the 13 inputs of route-capture-scoped-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline: software-unit and alternate-namespace instance-effect pairs (callee template, FB and instance DB with RetainedMarker 42, then the FB redeclared with a Child multi-instance while the dependent DB was observed), a unit tag table, namespace-qualified global operand DBs and LAD/FBD callers reading and writing a namespaced DB member in both routes. Every input compiled clean and saved; only declared additions, the declared redeclarations and their observed dependent DBs changed; the saved state matched a fresh-process reopen. The extracted route effect pairs keep the complete existing DB payload and append only Child.",
+  "limitations": [
+    "Native reference capture only; enabling route createMulti and global DB operand profiles needs builder qualification.",
+    "Unit tag operands are excluded: an earlier capture of the same packet (artifacts/cap-scoped, sha256 164b76ea...) compiled an M-memory unit tag caller with 'Accessing this type of tag is not possible in software units'; %I/%Q unit tags are unobserved."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f4d96b8674d9ed01553189bef57bff2e520c77b5bbc92d24a5333e0ac2f88dee"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "892552f83c6096237425ff28e902d3ba4603bcf4ab2756b4bbe1a7d4db9273b2",
+      "bytes": 32061727,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

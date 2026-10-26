@@ -11,6 +11,10 @@ namespace TiaMcp.Openness.V21
     {
         private static readonly string[] Persistent = { "Input", "Output", "InOut", "Static" };
 
+        // Each route carries its own independently captured dependent-instance effect pair.
+        internal static string EffectManifestName(string route) =>
+            route == "standard" ? "instance-effects.v1.json" : "instance-effects-" + route + ".v1.json";
+
         internal static XElement Create(string name, string dataType, XDocument callee, XDocument referenceCallee, XElement capturedDeclaration)
         {
             if (!Regex.IsMatch(name ?? "", @"^[A-Za-z_][A-Za-z0-9_]{0,79}$")) Fail("A simple explicit multi-instance name is required.");
