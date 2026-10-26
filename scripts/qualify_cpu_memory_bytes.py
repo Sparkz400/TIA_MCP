@@ -167,7 +167,10 @@ def body(h):
         h.stage("read back original memory bytes on " + cpu, lambda cpu=cpu: require(memory(h, cpu)[0] == original[cpu], "Original settings not restored") or original[cpu])
     h.report["finalTags"] = {p: tags(h, p) for p in plcs}
 
-    # Boundary: an S7-1200 CPU is refused; recorded even when TIA cannot compile the added CPU.
+    # Boundary: an S7-1200 CPU is refused; recorded even when TIA cannot compile the added CPU. Scratch security
+    # for a new CPU needs the worker's own scratch project, which the recovered copy no longer is.
+    h.stage("close recovered session", lambda: h.tool("tia_detach"))
+    plcs = [h.owned_scratch("s7-1200 boundary")]
     prepared = h.prepare("hardware_add", add_cpu(h, UNSUPPORTED_CPU))
     outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
     content = outcome.get("structuredContent") or {}
