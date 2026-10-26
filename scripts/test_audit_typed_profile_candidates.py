@@ -53,6 +53,21 @@ class CandidateAuditTests(unittest.TestCase):
             change(catalog, capture)
             self.assertFalse(self.run_audit(catalog, capture)["passed"])
 
+    def test_prerequisite_number_is_ignored_only_when_auto_numbered(self):
+        def db(number, auto):
+            return (f'<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><AutoNumber>{auto}</AutoNumber>'
+                    f'<Name>D</Name><Number>{number}</Number></AttributeList></SW.Blocks.GlobalDB></Document>')
+        (self.base / "catalog.json").write_text(json.dumps(self.catalog), encoding="utf-8")
+        (self.base / "capture.json").write_text(json.dumps(self.capture), encoding="utf-8")
+        committed = self.base / "committed" / "D.xml"
+        committed.parent.mkdir()
+        for auto, expected in (("true", True), ("false", False)):
+            with self.subTest(auto=auto):
+                committed.write_text(db(3, auto), encoding="utf-8")
+                (self.base / "native" / "D.xml").write_text(db(4, auto), encoding="utf-8")
+                result = audit(self.base / "catalog.json", self.base / "capture.json", [committed])
+                self.assertEqual(result["passed"], expected)
+
 
 if __name__ == "__main__":
     unittest.main()
