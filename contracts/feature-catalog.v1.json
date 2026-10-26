@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.14",
+  "catalogVersion": "0.4.15",
   "targetTiaVersions": [
     21
   ],
@@ -1891,6 +1891,40 @@
       "limitations": [
         "Engineering only; scoped runtime is not covered.",
         "TOF/TP/CTU/CTD/CTUD route cells are not covered; their native references are captured separately."
+      ]
+    },
+    {
+      "id": "local.typed.route-iec-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4f38d4837b20630dd18f92c728b685e15ba413ad",
+        "passedScope": "scripts/capture_typed_routes_owned.py: all 46 independently authored native reference inputs of route-capture-iec-packet.v1.json (6 storage/callee dependencies, then TOF/TP/CTU/CTD/CTUD in LAD and FBD for the software-unit and alternate-namespace routes, local and existing-global storage) imported one at a time into one owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...). Each input compiled clean, saved and added exactly its declared blocks while every existing native object's XML stayed unchanged; the final saved snapshot matched a fresh-process reopen; owned cleanup and Host exit passed."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-iec-capture.20261026.json"
+      ],
+      "limitations": [
+        "Native reference capture only: no typed builder, profile activation, changed-state recovery or runtime is established.",
+        "An earlier attempt in another worktree (cap-iec1) stopped after 37 inputs when TIA Portal terminated during an export; it is retained there and not part of this evidence."
+      ]
+    },
+    {
+      "id": "local.typed.route-iec.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4f38d4837b20630dd18f92c728b685e15ba413ad",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 20 audited TOF/TP/CTU/CTD/CTUD route profiles staged from local.typed.route-iec-capture.20261026: software-unit and alternate-namespace TOF, TP, CTU, CTD and CTUD with existing multi-instance and existing global-instance storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-iec.20261026.json"
+      ],
+      "limitations": [
+        "Engineering only; scoped runtime is not covered.",
+        "Created multi-instance or global-instance storage is not covered for these IEC route families."
       ]
     }
   ],
@@ -8803,7 +8837,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
-          "Software-unit and namespace routes are engineering-qualified for compare, TON, numeric FC/FB calls and storage variants (28 audited profiles, local.typed.route-profiles.20261025); TOF/TP and counters on those routes await their IEC capture, and scoped runtime is unqualified.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and storage variants (48 audited profiles, local.typed.route-profiles.20261025 and local.typed.route-iec.20261026); created storage for the IEC timer/counter routes and scoped runtime are unqualified.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8824,7 +8858,9 @@
           "local.typed.insertion.20261025",
           "local.typed.routes.engineering.20261025",
           "local.typed.route-capture.20261025",
-          "local.typed.route-profiles.20261025"
+          "local.typed.route-profiles.20261025",
+          "local.typed.route-iec-capture.20261026",
+          "local.typed.route-iec.20261026"
         ]
       },
       "availability": {

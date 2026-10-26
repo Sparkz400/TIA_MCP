@@ -1,0 +1,99 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-iec.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T02:03:27+00:00",
+  "source": {
+    "commit": "4f38d4837b20630dd18f92c728b685e15ba413ad",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 20 audited TOF/TP/CTU/CTD/CTUD route profiles staged from local.typed.route-iec-capture.20261026: software-unit and alternate-namespace TOF, TP, CTU, CTD and CTUD with existing multi-instance and existing global-instance storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Engineering only; scoped runtime is not covered.",
+    "Created multi-instance or global-instance storage is not covered for these IEC route families."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9b9e1a942d96d896ca36547bef40359a269aa59d3046f7005bde9b51f160b467"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "e46bd697aca87ff80c8ed501c9a8787f408b57789596e59069340ea5b4764c51"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-route-iec.json",
+      "sha256": "494ccb01f60461f4a81f64cbab8387b0e072b8a3802e4969ac61736e699e603b",
+      "bytes": 314657,
+      "completed": true,
+      "steps": [
+        "typed-namespace-ctd-fbd: passed",
+        "typed-namespace-ctd-lad: passed",
+        "typed-namespace-ctu-fbd: passed",
+        "typed-namespace-ctu-lad: passed",
+        "typed-namespace-ctud-fbd: passed",
+        "typed-namespace-ctud-lad: passed",
+        "typed-namespace-existingglobal-ctd-fbd: passed",
+        "typed-namespace-existingglobal-ctd-lad: passed",
+        "typed-namespace-existingglobal-ctu-fbd: passed",
+        "typed-namespace-existingglobal-ctu-lad: passed",
+        "typed-namespace-existingglobal-ctud-fbd: passed",
+        "typed-namespace-existingglobal-ctud-lad: passed",
+        "typed-namespace-existingglobal-tof-fbd: passed",
+        "typed-namespace-existingglobal-tof-lad: passed",
+        "typed-namespace-existingglobal-tp-fbd: passed",
+        "typed-namespace-existingglobal-tp-lad: passed",
+        "typed-namespace-tof-fbd: passed",
+        "typed-namespace-tof-lad: passed",
+        "typed-namespace-tp-fbd: passed",
+        "typed-namespace-tp-lad: passed",
+        "typed-unit-ctd-fbd: passed",
+        "typed-unit-ctd-lad: passed",
+        "typed-unit-ctu-fbd: passed",
+        "typed-unit-ctu-lad: passed",
+        "typed-unit-ctud-fbd: passed",
+        "typed-unit-ctud-lad: passed",
+        "typed-unit-existingglobal-ctd-fbd: passed",
+        "typed-unit-existingglobal-ctd-lad: passed",
+        "typed-unit-existingglobal-ctu-fbd: passed",
+        "typed-unit-existingglobal-ctu-lad: passed",
+        "typed-unit-existingglobal-ctud-fbd: passed",
+        "typed-unit-existingglobal-ctud-lad: passed",
+        "typed-unit-existingglobal-tof-fbd: passed",
+        "typed-unit-existingglobal-tof-lad: passed",
+        "typed-unit-existingglobal-tp-fbd: passed",
+        "typed-unit-existingglobal-tp-lad: passed",
+        "typed-unit-tof-fbd: passed",
+        "typed-unit-tof-lad: passed",
+        "typed-unit-tp-fbd: passed",
+        "typed-unit-tp-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
