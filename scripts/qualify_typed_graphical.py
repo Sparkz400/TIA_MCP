@@ -519,6 +519,7 @@ def main():
     parser.add_argument("--baseline-sha256")
     parser.add_argument("--provision-runtime-credential", action="store_true")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true")
+    parser.add_argument("--runtime", action="store_true", help="With --live: run the selected engineering-only cases with their runtime suites.")
     parser.add_argument("--unit-seeder", type=pathlib.Path, help="Guarded UnitSeeder binary: run a software-unit case live on a fresh seeded scratch instead of its archived baseline.")
     args = parser.parse_args()
     if bool(args.config) == bool(args.worker):
@@ -545,6 +546,11 @@ def main():
         parser.error("--live requires exactly one explicit diagnostic case; a runtime corpus is not admitted")
     if args.config and any(case.get("archivePath") for case in selected):
         parser.error("Selected case requires a client-local archive; configured deployment qualification requires fresh owned scratch cases")
+    if args.runtime:
+        if not args.live:
+            parser.error("--runtime requires --live")
+        for case in selected:
+            case["engineeringOnly"] = False
     if args.unit_seeder:
         if not args.live or not args.unit_seeder.is_file() or not all(case.get("unitName") for case in selected):
             parser.error("--unit-seeder requires --live, an existing binary and software-unit cases")
