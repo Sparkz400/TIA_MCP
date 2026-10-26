@@ -47,6 +47,10 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(program["expectedBlockNames"][-1], "TgpTest_Cycle")
         symbols = [b["symbol"] for b in program["bindings"]["dut"].values()] + [s["symbol"] for s in program["signals"].values()]
         self.assertTrue(symbols and all(s.startswith("TiaMcp_UnitA.Alternate.TgpTest_Data.") for s in symbols))
+        lines = program["source"].splitlines()
+        self.assertEqual(lines[3], "NAMESPACE TiaMcp_UnitA.Alternate")
+        self.assertEqual([line for line in lines if line][-1], "END_NAMESPACE")
+        self.assertNotIn("NAMESPACE", generate_program(interface)["source"])
         # Unqualified SCL references resolve inside the harness's own namespace.
         self.assertIn('"TgpTest_Data".dut.Enable', program["source"])
         for bad in ("Unit..A", "Unit A", ""):

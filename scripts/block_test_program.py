@@ -462,6 +462,9 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest", organiza
         lines.append(f"          {ref}.CallCount := {ref}.CallCount + UDINT#1;")
     lines.extend(["        ELSE", f"          {ref}.ErrorCode := UDINT#1;", "      END_CASE;", "    END_IF;",
                   f"    {ref}.AckId := {ref}.RequestId;", "  END_IF;", "END_ORGANIZATION_BLOCK", ""])
+    if symbol_namespace is not None:
+        # Declare the namespace in the source itself; the route payload must match it.
+        lines = lines[:3] + ["NAMESPACE " + symbol_namespace] + lines[3:] + ["END_NAMESPACE", ""]
     source = "\n".join(lines)
     signals = {name[0].lower() + name[1:]: {"symbol": f"{symbol_root}{db_name}.{name}", "type": "uint32"} for name in controls}
     limitations = ["Acknowledgement gates application calls only; other PLC scans and wall-clock timers continue.",
