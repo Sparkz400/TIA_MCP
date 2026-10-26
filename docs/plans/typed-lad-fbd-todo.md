@@ -16,8 +16,7 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 - Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
-- Still open: IEC (timer/counter) dependent-instance effect pairs for created multi-instance route storage,
-  and a builder operand profile for the captured namespaced global DB encodings.
+- Still open: a builder operand profile for the captured namespaced global DB encodings.
 
 ## Lane A — 26 October 2026
 
@@ -270,13 +269,16 @@ controller was modified.
   Unit tag operands are a native V21 boundary: an M-memory unit tag caller compiles with "Accessing this
   type of tag is not possible in software units" (packet `nativeBoundaries`; %I/%Q unobserved).
 - [ ] Enable a builder operand profile for namespaced global DB members from the captured encodings.
-- [ ] Capture IEC timer/counter dependent-instance effect pairs and let the worker profile carry
-  several member shapes; 24 created timer/counter route cells are refused until then
-  ([created-multi ledger](../verification/typed-lad-fbd-route-runtime-createmulti-20261026.md)).
+- [x] Capture IEC timer/counter dependent-instance effect pairs and let the worker profile carry
+  several member shapes. `local.typed.iec-effect-capture.20261026` captured one FB per route gaining a
+  member of each IEC type; `instance-effects-iec-<route>.v1.json` maps each type to its captured pair and
+  the worker appends the captured DB member only when the new declaration equals the captured caller
+  member. All 24 created timer/counter route cells pass all five gates
+  ([ledger](../verification/typed-lad-fbd-route-runtime-iec-createmulti-20261026.md)).
 - [x] Scoped runtime: `qualify_typed_graphical.py --live --unit-seeder` seeds the unit into a fresh
   scratch (keeping credential provenance) and generates the harness inside the DUT's unit and
   namespace (named cycle OB, `NAMESPACE` source, qualified references and PLCSIM symbols). 112 of 140
-  route cells pass all five gates, 116 with numeric FB created multi-instance storage
+  route cells pass all five gates, all 140 with the FB and IEC effect profiles
   ([ledger](../verification/typed-lad-fbd-route-runtime-20261026.md),
   reruns: [global numeric FB](../verification/typed-lad-fbd-route-runtime-reruns-20261026.md),
   [local numeric FB](../verification/typed-lad-fbd-route-runtime-local-fb-20261026.md)). The 28 created

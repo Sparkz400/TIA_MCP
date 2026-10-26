@@ -1,0 +1,42 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.iec-effect-capture.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T12:56:19+00:00",
+  "source": {
+    "commit": "0c9217dcf6a77fcea1a38566d30ef8370790e6c9",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py: the 4 inputs of route-capture-iec-effect-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline: per route (software unit, alternate namespace) an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type (TON_TIME, TOF_TIME, TP_TIME, CTU_INT, CTD_INT, CTUD_INT) while the dependent instance DB was observed. Every input compiled clean and saved; only the declared redeclarations and their observed DBs changed; the saved state matched a fresh-process reopen.",
+  "limitations": [
+    "Native reference capture only; route createMulti for timers and counters needs builder qualification with the extracted profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f4d96b8674d9ed01553189bef57bff2e520c77b5bbc92d24a5333e0ac2f88dee"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "2030e510964dbe86e6314a48f86dd5092fd05c7b05d8414d383ec9d104947c5d",
+      "bytes": 6599323,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

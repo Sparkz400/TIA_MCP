@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b2ab4179214478391d641ca7f33241fc7d2da3b8af4e62dd7a2ff5ea74416851",
-      "bytes": 763495
+      "sha256": "065939e6d645a8f749e9dfa2e7596dc380088310b9da937f4b0862098f1cd55a",
+      "bytes": 765568
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2542,8 +2542,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "97b7b384ce13879ef8d1e729da8939f0f6df7e388f62d21ff504e5253749f23f",
-      "bytes": 5787
+      "sha256": "6b8fcb691816b41eaefa044c5aefc8d341cbaf4705bad5e8a6b16eae8daa7f1e",
+      "bytes": 6499
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "8b3f682d7674a0e1a8bb87bc3225043d8491cf01891bee1639fe5faf3b7443e6",
-      "bytes": 10223
+      "sha256": "8820719156153203cd9c8fccdb2f385f9d4626e75d122b9344a1c0d57cfe8ea5",
+      "bytes": 12805
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
@@ -76471,6 +76471,20 @@
           "artifacts": [
             "evidence/local.typed.scoped-runtime.createmulti.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.iec-effect-capture.20261026",
+          "profileSha256": "dd3ebdd3146d0a06595926c2eedc18accb9906adf3ed247c5566c26a03eab3ff",
+          "artifacts": [
+            "evidence/local.typed.iec-effect-capture.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.scoped-runtime.iec-createmulti.20261026",
+          "profileSha256": "d1901db65e126df0d2f14e9d1dc79f2005ecef5de102e1ccaadca734cef92434",
+          "artifacts": [
+            "evidence/local.typed.scoped-runtime.iec-createmulti.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94549,7 +94563,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "ed3ebf70192f5ef6271c92516273af259a25ac8a6cf4d23036d3abdda2c1d698"
+      "sha256": "69b81563acca6200f10b2fece4b43207920bf71ce3833c7ec009e757904feffa"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94752,6 +94766,11 @@
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
     },
     {
+      "path": "evidence/local.typed.iec-effect-capture.20261026.json",
+      "state": "observed",
+      "sha256": "373113012810fd63565a8d7c6d8a50d472db9dc956463e1e07df3bcd735430b8"
+    },
+    {
       "path": "evidence/local.typed.insertion.20261025.json",
       "state": "observed",
       "sha256": "84e0c9b32b102424e013be03e0abc1db93d1ad1ceacbbeb1ff42a43da89543e2"
@@ -94820,6 +94839,11 @@
       "path": "evidence/local.typed.scoped-runtime.createmulti.20261026.json",
       "state": "observed",
       "sha256": "be7b7b720c1174777da3cd6c38825e07884154e3f9dc506a3f53f22141f8e28d"
+    },
+    {
+      "path": "evidence/local.typed.scoped-runtime.iec-createmulti.20261026.json",
+      "state": "observed",
+      "sha256": "ecb288199be418ad8042995d0bdb45e23c6347a241b113d599b68fc3510f8c98"
     },
     {
       "path": "evidence/local.typed.scoped-runtime.local-fb.20261026.json",
@@ -95146,6 +95170,10 @@
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
     },
     {
+      "id": "local.typed.iec-effect-capture.20261026",
+      "profileSha256": "dd3ebdd3146d0a06595926c2eedc18accb9906adf3ed247c5566c26a03eab3ff"
+    },
+    {
       "id": "local.typed.insertion.20261025",
       "profileSha256": "95b724bcd19db5af052c39e09f106f12d446d2c6de7afcec6f2f8cbd43d4bdd4"
     },
@@ -95200,6 +95228,10 @@
     {
       "id": "local.typed.scoped-runtime.createmulti.20261026",
       "profileSha256": "9a64b98cdc273799a4989d78927219ee45ed668c6cff313e2340ffa7bd09ffab"
+    },
+    {
+      "id": "local.typed.scoped-runtime.iec-createmulti.20261026",
+      "profileSha256": "d1901db65e126df0d2f14e9d1dc79f2005ecef5de102e1ccaadca734cef92434"
     },
     {
       "id": "local.typed.scoped-runtime.local-fb.20261026",
