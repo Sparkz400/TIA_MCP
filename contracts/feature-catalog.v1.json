@@ -9459,6 +9459,54 @@
       ]
     },
     {
+      "featureId": "change.hardware_cpu_memory_bytes",
+      "domain": "hardware",
+      "title": "Set CPU system and clock memory bytes",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_cpu_memory_bytes",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base typed API; native target qualification remains separate."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Only CPU device items that declare all four native V21 attributes SystemMemoryByte, SystemMemoryByteAddress, ClockMemoryByte and ClockMemoryByteAddress; other items are refused as UnsupportedCapability.",
+          "Enable flags must be booleans and byte numbers integers 0-65535; enabled system and clock memory must use different bytes (AddressConflict). The CPU-specific bit-memory size is validated by Siemens during the write and compilation.",
+          "Preservation covers observed identities, slots, reviewed hardware attributes including the four memory byte settings, address ranges/owners and configured network associations; TIA-owned system/clock memory tags and runtime behavior are recorded, not preserved."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "title": "Assign or disconnect one native remote-I/O connector",

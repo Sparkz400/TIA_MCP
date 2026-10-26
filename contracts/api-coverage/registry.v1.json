@@ -1630,6 +1630,12 @@
       ]
     },
     {
+      "featureId": "change.hardware_cpu_memory_bytes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "obligations": [
         "X10"
