@@ -1,5 +1,7 @@
 # Current status
 
+**Route storage creation engineering-qualified — 26 October 2026:** 48 software-unit and namespace TON/TOF/TP/CTU/CTD/CTUD cases that create a multi-instance member or a namespace-qualified global instance DB passed the four engineering gates. Typed routes now cover local, existing and created storage; scoped runtime remains open. Catalog `0.4.16`. [Ledger](verification/typed-lad-fbd-route-created-storage-20261026.md).
+
 **IEC route cells engineering-qualified — 26 October 2026:** A fresh owned capture of the 46-input IEC packet passed every import/compile/save and a fresh-process reopen; its 20 TOF/TP/CTU/CTD/CTUD software-unit and namespace profiles passed the binding audit and all 40 enabled cases passed the four engineering gates. All 80 reference route cells are now engineering-qualified; scoped runtime remains open. Catalog `0.4.15`. [Ledger](verification/typed-lad-fbd-route-iec-20261026.md), [typed TODO](plans/typed-lad-fbd-todo.md).
 
 **Release matrix frozen — 25 October 2026:** [`docs/plans/release-matrix.v1.json`](plans/release-matrix.v1.json) is generated from catalog `0.4.14` and the obligation ledger, with one row per feature and one cell per acceptance criterion. Rows: 35 shipped, 14 limited, 279 unqualified, 1 unavailable target, 10 deferred. Cells: 163 bound to evidence with artifact hashes, 1,379 open, each with an owning obligation. A test fails if the matrix goes stale. No native work ran.

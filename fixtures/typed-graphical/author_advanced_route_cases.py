@@ -10,10 +10,11 @@ from pathlib import Path
 from author_cases import cases as standard_cases
 from author_numeric_cases import cases as numeric_cases
 from author_existing_global_cases import cases as existing_global_cases
-from author_extended_cases import binding
+from author_extended_cases import binding, extended_cases
 from author_route_cases import ARCHIVE, ARCHIVE_SHA256
 
 ROOT = Path(__file__).resolve().parent
+IEC_FAMILIES = ("ton", "tof", "tp", "ctu", "ctd", "ctud")
 REPO = ROOT.parent.parent
 
 
@@ -33,12 +34,19 @@ def main():
         prefix = "Tgp" + route + "_"
         source_cases = [c for c in standard_cases() if c["family"] in ("eq", "ne", "lt", "le", "gt", "ge", "ton", "tof", "tp", "ctu", "ctd", "ctud")]
         source_cases += numeric_cases() + existing_global_cases()
+        source_cases += [c for c in extended_cases() if c["family"] in IEC_FAMILIES
+                         and c["payload"]["instances"][0]["kind"] in ("createMulti", "createGlobal")]
         scoped_cases = []
         for original in source_cases:
             case = replace_names(copy.deepcopy(original), prefix)
             case.update(fixtureId="typed-" + route.lower() + "-" + original["fixtureId"].removeprefix("typed-"),
                 engineeringOnly=True, archivePath=ARCHIVE, archiveSha256=ARCHIVE_SHA256,
                 unitName="TiaMcp_UnitA", namespace=namespace)
+            instance = (case["payload"].get("instances") or [{}])[0]
+            if case["family"] in IEC_FAMILIES and instance.get("kind") == "createGlobal":
+                # Scoped global instances are referenced by their namespace-qualified name.
+                system_db = case["dependencyXmls"][0]["names"][0]
+                case["referenceBindings"] = [binding("Instance", namespace + "." + system_db, namespace + "." + instance["name"], "GlobalVariable")]
             scoped_cases.append(case)
             if case["family"] == "numeric-fb":
                 global_case = copy.deepcopy(case)

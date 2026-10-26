@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c935e7e525955455fb29856e3025b30c2bb72e50fd001afe885330736a5ebe48",
-      "bytes": 755654
+      "sha256": "69347a797a403e28a89137b405bf9c238738363063e3c2afcb49cd81f17eba39",
+      "bytes": 756793
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -76429,6 +76429,13 @@
           "artifacts": [
             "evidence/local.typed.route-iec.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.route-created-storage.20261026",
+          "profileSha256": "246a8a1a9e1cb9f62f02605029077c116db9c9555b63112521fa7dfad8618ad8",
+          "artifacts": [
+            "evidence/local.typed.route-created-storage.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94507,7 +94514,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "a51489ff90caf48d56a062886b5b6024183a081283082347db27256dd0a41139"
+      "sha256": "aafa27bcb72a53ba04fba0708150127f320a546db38cc68f547b6c84dcaf46b0"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94730,6 +94737,11 @@
       "sha256": "658e34890a34f90e286ea5328b99a503514188ab02cabbf37b0f096c6c901bf4"
     },
     {
+      "path": "evidence/local.typed.route-created-storage.20261026.json",
+      "state": "observed",
+      "sha256": "953beb257a26ee91eba55c7ee1b1fbb070d0ad86a572814ac4e93f71b70f9a0f"
+    },
+    {
       "path": "evidence/local.typed.route-iec-capture.20261026.json",
       "state": "observed",
       "sha256": "8a88928136715e4112222557b34486ce609c676ba0444e5e6266bae383b3eca8"
@@ -94772,7 +94784,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "8229bea84dd8ece7d95d3f164a6c9e117f5d0faaf7c6b30c914d2df88a0a6ef7"
+      "sha256": "3bad4f5d43430c016d9275603153b23167d02c9ce252917d55d008a2ecd4e9fe"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",
@@ -95088,6 +95100,10 @@
     {
       "id": "local.typed.route-capture.20261025",
       "profileSha256": "91cf403536fbc12eb962404ed1cee4978dd2ed83c57ab80915674cb9724363f9"
+    },
+    {
+      "id": "local.typed.route-created-storage.20261026",
+      "profileSha256": "246a8a1a9e1cb9f62f02605029077c116db9c9555b63112521fa7dfad8618ad8"
     },
     {
       "id": "local.typed.route-iec-capture.20261026",
