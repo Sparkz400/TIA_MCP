@@ -58,7 +58,8 @@ def extended_cases():
         case = copy.deepcopy(boolean)
         name = "Tgp_NetworkFree_" + language
         case.update(fixtureId="typed-insert-first-" + language.lower(), engineeringOnly=True, blockName=name,
-            referenceXml=network_free_source(language, name))
+            referenceXml=network_free_source(language, name),
+            topologyXml="fixtures/typed-graphical/native/Tgp_Boolean_" + language + ".xml")
         case["payload"]["model"].pop("networkId")
         case["payload"]["model"].update(operation="insertNetwork")
         result.append(case)

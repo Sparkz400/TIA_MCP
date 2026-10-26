@@ -622,7 +622,8 @@
         },
         "instances": []
       },
-      "engineeringOnly": true
+      "engineeringOnly": true,
+      "topologyXml": "fixtures/typed-graphical/native/Tgp_Boolean_LAD.xml"
     },
     {
       "fixtureId": "typed-edit-lad",
@@ -3434,7 +3435,8 @@
         },
         "instances": []
       },
-      "engineeringOnly": true
+      "engineeringOnly": true,
+      "topologyXml": "fixtures/typed-graphical/native/Tgp_Boolean_FBD.xml"
     },
     {
       "fixtureId": "typed-edit-fbd",
