@@ -48,11 +48,12 @@ namespace TiaMcp.Openness.V21
         private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration)
         {
             string catalogPath = TypedCatalogPath();
-            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), "instance-effects.v1.json");
+            string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
+            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), TypedGraphicalMultiInstanceTemplate.EffectManifestName(route));
             if (!File.Exists(manifestPath)) throw new BridgeException("DependencyProfileUnavailable", "The deployed catalog lacks native dependent instance effects.");
             var profile = JObject.Parse(File.ReadAllText(manifestPath));
             if (profile.Value<int>("schemaVersion") != 1 || profile.Value<string>("tiaVersion") != "V21" || profile.Value<string>("cpuFamily") != TypedCpuIdentifier(capture.Plc)
-                || profile.Value<string>("route") != TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace))
+                || profile.Value<string>("route") != route)
                 throw new BridgeException("DependencyProfileUnavailable", "No exact target dependent instance layout profile exists.");
             capture.Change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(manifestPath) });
             var resources = (JObject)profile["artifacts"];

@@ -16,7 +16,7 @@ from typed_graphical_native_expectations import assert_existing_caller_insertion
 from qualify_typed_resolution import unqualified_outer_fixture, verify_untouched_caller, verify_tag_address_change
 from run_conformance import native_document, structural_xml
 from qualify_typed_tag_ambiguity import verify_native_setup
-from capture_typed_routes_owned import authored_reference, verify_reference_additions, require_clean_compile
+from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile
 from qualify_typed_multi_dependency import verify_append
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend, file_inventory, inventory_difference
 
@@ -524,6 +524,45 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertLessEqual(captured, used)
         self.assertTrue(all((root / "fixtures/typed-graphical/native" / (name + ".xml")).is_file() for name in captured))
 
+    def test_scoped_packet_inputs_parse_exactly_and_order_their_phases(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-scoped-packet.v1.json").read_bytes())
+        self.assertEqual("authored-not-executed", packet["status"])
+        self.assertEqual([entry["path"] for entry in packet["sources"]], packet["argsFile"])
+        names, declared = [], []
+        for entry in packet["sources"]:
+            observed, kind, _ = authored_reference(root / entry["path"], packet["unit"])
+            for key in ("names", "namespace", "route", "authoredFormat"):
+                self.assertEqual(entry[key], observed[key], entry["path"])
+            self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+            file = pathlib.Path(entry["path"]).name
+            declared += [("--modify", file + ":" + n) for n in entry.get("modifies", [])]
+            declared += [("--observe", file + ":" + n) for n in entry.get("observes", [])]
+            names.extend(name for name in entry["names"] if name not in entry.get("modifies", []))
+        self.assertEqual(len(names), len(set(names)))
+        command = packet["command"]
+        flags = [(command[i], command[i + 1]) for i in range(len(command) - 1) if command[i] in ("--modify", "--observe")]
+        self.assertEqual(sorted(declared), sorted(flags))
+        order = [pathlib.Path(entry["path"]).name for entry in packet["sources"]]
+        for label in ("Unit", "Namespace"):
+            self.assertLess(order.index("Tgp" + label + "_TemplateFB_LAD.xml"), order.index("route-" + label + "-instance-effect-after.scl"))
+            self.assertLess(order.index("route-" + label + "-instance-effect-before.scl"), order.index("route-" + label + "-instance-effect-after.scl"))
+            self.assertLess(order.index("route-" + label + "-operand-db.scl"), order.index("route-" + label + "-operand-db-lad.s7dcl"))
+            self.assertLess(order.index("route-Unit-operand-tags.xml"), order.index("route-" + label + "-operand-tag-lad.s7dcl"))
+
+    def test_change_declarations_bind_to_exactly_one_admitted_source(self):
+        def specs():
+            return [({"sourcePath": "/x/after.scl", "names": ["Effect"]}, "source_upsert", {}),
+                    ({"sourcePath": "/x/tags.xml", "names": ["Tags"]}, "tag_table_import_xml", {})]
+        rows = specs()
+        declare_changes(rows, ["after.scl:Effect"], ["after.scl:Effect_DB"])
+        self.assertEqual((["Effect"], ["Effect_DB"], [], []), (rows[0][0]["modifies"], rows[0][0]["observes"],
+                                                               rows[1][0]["modifies"], rows[1][0]["observes"]))
+        for modify, observe in ((["missing.scl:Effect"], []), (["after.scl"], []), (["after.scl:Other"], []),
+                                ([], ["after.scl:Effect"]), (["tags.xml:Tags"], [])):
+            with self.subTest(modify=modify, observe=observe), self.assertRaises(RuntimeError):
+                declare_changes(specs(), modify, observe)
+
     def test_source_parser_rejects_cross_unit_or_unscoped_reference(self):
         with tempfile.TemporaryDirectory() as directory:
             source = pathlib.Path(directory) / "source.scl"
@@ -549,6 +588,42 @@ class RouteCapturePacketTests(unittest.TestCase):
             if fault == "wrong-name": changed["objects"]["block:/new"]["name"] = "Unrequested"
             with self.subTest(fault=fault), self.assertRaises(RuntimeError):
                 verify_reference_additions(before, changed, ["Callee"], "/unit", "Unit.Alternate")
+
+    def test_declared_modification_may_update_only_its_observed_dependent(self):
+        blocks = {"block:/fb": ("Effect", "fb1"), "block:/db": ("Effect_DB", "db1"), "block:/peer": ("Peer", "p1")}
+        before = {"objects": {key: {"kind": "block", "name": name, "path": key[6:], "payloadSha256": payload}
+                              for key, (name, payload) in blocks.items()}}
+        inventory = {"blocks": [{"path": key[6:], "name": name, "scopePath": "/unit", "identity": {"namespace": "Unit"}}
+                                for key, (name, _) in blocks.items()]}
+        after = {"objects": copy.deepcopy(before["objects"]), "inventory": inventory}
+        after["objects"]["block:/fb"]["payloadSha256"] = "fb2"
+        after["objects"]["block:/db"]["payloadSha256"] = "db2"
+        added, changed = verify_reference_additions(before, after, ["Effect"], "/unit", "Unit", ["Effect"], ["Effect_DB"])
+        self.assertEqual(([], ["Effect", "Effect_DB"]), (added, [row["name"] for row in changed]))
+        for fault in ("undeclared-dependent", "unchanged-target", "peer-change", "dependent-scope"):
+            faulty, modifies, observes = copy.deepcopy(after), ["Effect"], ["Effect_DB"]
+            if fault == "undeclared-dependent": observes = []
+            if fault == "unchanged-target": faulty["objects"]["block:/fb"]["payloadSha256"] = "fb1"
+            if fault == "peer-change": faulty["objects"]["block:/peer"]["payloadSha256"] = "p2"
+            if fault == "dependent-scope": faulty["inventory"]["blocks"][1]["scopePath"] = "/other"
+            with self.subTest(fault=fault), self.assertRaises(RuntimeError):
+                verify_reference_additions(before, faulty, ["Effect"], "/unit", "Unit", modifies, observes)
+
+    def test_unit_tag_table_is_an_unnamespaced_scope_addition(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = pathlib.Path(directory) / "tags.xml"
+            source.write_text('<Document><SW.Tags.PlcTagTable ID="0"><AttributeList><Name>UnitTags</Name></AttributeList>'
+                              '</SW.Tags.PlcTagTable></Document>', encoding="utf-8")
+            entry, kind, payload = authored_reference(source, "TiaMcp_UnitA")
+            self.assertEqual(("tag_table_import_xml", ["UnitTags"], "softwareUnit"), (kind, entry["names"], entry["route"]))
+            self.assertNotIn("namespace", payload)
+        row = {"kind": "tagTable", "name": "UnitTags", "path": "/unit/tags/UnitTags", "payloadSha256": "t"}
+        after = {"objects": {"tagTable:/unit/tags/UnitTags": row},
+                 "inventory": {"blocks": [], "tagTables": [{"path": "/unit/tags/UnitTags", "scopePath": "/unit"}]}}
+        self.assertEqual(["UnitTags"], [r["name"] for r in verify_reference_additions({"objects": {}}, after, ["UnitTags"], "/unit", "TiaMcp_UnitA")[0]])
+        after["inventory"]["tagTables"][0]["scopePath"] = "/plc"
+        with self.assertRaises(RuntimeError):
+            verify_reference_additions({"objects": {}}, after, ["UnitTags"], "/unit", "TiaMcp_UnitA")
 
 
 class RuntimePreservationTests(unittest.TestCase):
