@@ -636,6 +636,29 @@ internal static class TypedGraphicalTests
             await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(Db(), "U.Effect", declaration, caller, dependent));
     }
 
+    internal static async Task TransitiveEffectReproducesTheCapturedParents()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "instance-effects-transitive.v1.json"))) root = root.Parent;
+        if (root == null) throw new InvalidOperationException("Missing captured transitive effect.");
+        XDocument Read(string name) => EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", "instance-effects-transitive", name + ".xml")));
+        string[] added = { "Child", "Timer_TON", "Timer_TOF", "Timer_TP", "Counter_CTU", "Counter_CTD", "Counter_CTUD" };
+        var members = Read("after-Tgp_NestEffect_DB").Descendants().Where(e => e.Name.LocalName == "Member" && added.Contains((string?)e.Attribute("Name"))
+            && e.Parent!.Attribute("Name")?.Value == "Static" && e.Parent.Parent!.Parent!.Name.LocalName == "Interface").ToArray();
+        Check.Equal(string.Join(",", added), string.Join(",", members.Select(m => (string?)m.Attribute("Name"))));
+        // Both depths, parent FBs and parent DBs: the captured direct members reproduce the native after state exactly.
+        foreach (var parent in new[] { "Tgp_NestParent", "Tgp_NestGrand", "Tgp_NestParent_DB", "Tgp_NestGrand_DB" })
+        {
+            var expected = Read("before-" + parent);
+            foreach (var member in members) expected = TypedGraphicalMultiInstanceTemplate.AppendNested(expected, "Tgp_NestEffect", member);
+            EngineeringSources.RequireNativePreservation(Read("after-" + parent), expected);
+        }
+        Check.Equal("instance-effects-transitive.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("standard"));
+        var once = TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestParent"), "Tgp_NestEffect", members[0]);
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(once, "Tgp_NestEffect", members[0]));
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestEffect_DB"), "Tgp_NestEffect", members[0]));
+    }
+
     internal static async Task MultiInstanceTemplatesPreserveObservedShapes()
     {
         DirectoryInfo? root = new(AppContext.BaseDirectory);

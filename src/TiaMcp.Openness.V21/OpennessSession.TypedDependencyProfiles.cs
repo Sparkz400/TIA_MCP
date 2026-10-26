@@ -45,19 +45,27 @@ namespace TiaMcp.Openness.V21
                 ?? throw new BridgeException("ProfileCatalogInvalid", "Captured storage member is missing or ambiguous.");
         }
 
-        private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration)
+        private JObject ReadTypedEffectManifest(TypedResolutionCapture capture, string catalogPath, string route, string name)
         {
-            string catalogPath = TypedCatalogPath();
-            string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
-            string type = (string)declaration.Attribute("Datatype");
-            bool system = TypedGraphicalMultiInstanceTemplate.SystemInstanceTypes.Contains(type);
-            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), TypedGraphicalMultiInstanceTemplate.EffectManifestName(route, system));
-            if (!File.Exists(manifestPath)) throw new BridgeException("DependencyProfileUnavailable", "The deployed catalog lacks native dependent instance effects.");
+            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), name);
+            if (!File.Exists(manifestPath)) throw new BridgeException("DependencyProfileUnavailable", "The deployed catalog lacks native dependent instance effects: " + name);
             var profile = JObject.Parse(File.ReadAllText(manifestPath));
             if (profile.Value<int>("schemaVersion") != 1 || profile.Value<string>("tiaVersion") != "V21" || profile.Value<string>("cpuFamily") != TypedCpuIdentifier(capture.Plc)
                 || profile.Value<string>("route") != route)
                 throw new BridgeException("DependencyProfileUnavailable", "No exact target dependent instance layout profile exists.");
             capture.Change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(manifestPath) });
+            return profile;
+        }
+
+        // transitive: the dependent is a parent FB or its InstanceDB that embeds the changed FB as a nested multi-instance.
+        private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration, bool transitive = false)
+        {
+            string catalogPath = TypedCatalogPath();
+            string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
+            string type = (string)declaration.Attribute("Datatype");
+            bool system = TypedGraphicalMultiInstanceTemplate.SystemInstanceTypes.Contains(type);
+            var profile = ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.EffectManifestName(route, system));
+            if (transitive) ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.TransitiveManifestName(route));
             var resources = (JObject)profile["artifacts"];
             var caller = ReadTypedProfileResource(capture, catalogPath, resources["afterCaller"].Value<string>("path"), resources["afterCaller"].Value<string>("sha256"));
             var instance = ReadTypedProfileResource(capture, catalogPath, resources["afterInstance"].Value<string>("path"), resources["afterInstance"].Value<string>("sha256"));
@@ -65,17 +73,18 @@ namespace TiaMcp.Openness.V21
             // native baseline remains immutable for stale/recovery checks.
             var prior = dependency["expectedArtifact"] ?? dependency["artifact"];
             var current = EngineeringSources.ReadXml(File.ReadAllText(prior.Value<string>("path")));
-            XDocument expected;
+            XElement member;
             if (system)
             {
-                string member = (profile["members"] as JObject)?.Value<string>(type)
+                string captured = (profile["members"] as JObject)?.Value<string>(type)
                     ?? throw new BridgeException("DependencyProfileUnavailable", "No captured IEC effect covers " + type + ".");
-                expected = TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(current, callerName, declaration,
-                    TypedTopStaticMember(caller, member), TypedTopStaticMember(instance, member));
+                member = TypedGraphicalMultiInstanceTemplate.SystemDependentMember(declaration, TypedTopStaticMember(caller, captured), TypedTopStaticMember(instance, captured));
             }
             else
-                expected = TypedGraphicalMultiInstanceTemplate.AppendDependent(current, callerName, declaration,
+                member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration,
                     TypedTopStaticMember(caller, profile.Value<string>("memberName")), TypedTopStaticMember(instance, profile.Value<string>("memberName")));
+            var expected = transitive ? TypedGraphicalMultiInstanceTemplate.AppendNested(current, callerName, member)
+                : TypedGraphicalMultiInstanceTemplate.AppendDirect(current, callerName, member);
             string output = Path.Combine(capture.Change.Directory, "dependent-effect-" + Guid.NewGuid().ToString("N") + ".xml");
             File.WriteAllText(output, expected.ToString(SaveOptions.DisableFormatting), new System.Text.UTF8Encoding(true));
             dependency["expectedArtifact"] = ChangeArtifact(output);

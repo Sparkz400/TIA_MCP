@@ -16,17 +16,18 @@ namespace TiaMcp.Openness.V21
         internal static readonly string[] SystemInstanceTypes = { "TON_TIME", "TOF_TIME", "TP_TIME", "CTU_INT", "CTD_INT", "CTUD_INT" };
         internal static string EffectManifestName(string route, bool systemType = false) =>
             (systemType ? "instance-effects-iec" : "instance-effects") + (route == "standard" ? "" : "-" + route) + ".v1.json";
+        internal static string TransitiveManifestName(string route) =>
+            "instance-effects-transitive" + (route == "standard" ? "" : "-" + route) + ".v1.json";
 
         // An IEC instance member has a fixed native shape: the new declaration must equal the captured
         // caller member exactly (name aside), and the dependent DB receives the captured DB member.
         internal static XDocument AppendSystemDependent(XDocument current, string exactCallerName, XElement declaration,
-            XElement capturedCallerDeclaration, XElement capturedDependentDeclaration)
+            XElement capturedCallerDeclaration, XElement capturedDependentDeclaration) =>
+            AppendDirect(current, exactCallerName, SystemDependentMember(declaration, capturedCallerDeclaration, capturedDependentDeclaration));
+
+        internal static XElement SystemDependentMember(XElement declaration, XElement capturedCallerDeclaration, XElement capturedDependentDeclaration)
         {
             const string code = "DependencyProfileUnavailable";
-            var db = current?.Root?.Elements("SW.Blocks.InstanceDB").SingleOrDefault();
-            var attributes = db?.Element("AttributeList");
-            if (attributes?.Element("InstanceOfName")?.Value != exactCallerName || attributes?.Element("InstanceOfType")?.Value != "FB")
-                Fail("Only an exact direct FB InstanceDB dependency is covered.", code);
             string type = (string)declaration?.Attribute("Datatype");
             if (!SystemInstanceTypes.Contains(type) || capturedCallerDeclaration == null || capturedDependentDeclaration?.Name.LocalName != "Member"
                 || (string)capturedCallerDeclaration.Attribute("Datatype") != type || (string)capturedDependentDeclaration.Attribute("Datatype") != type)
@@ -34,12 +35,45 @@ namespace TiaMcp.Openness.V21
             if (!SameDefaults(declaration, capturedCallerDeclaration)) Fail("The IEC caller declaration differs from the captured effect profile.", code);
             var mapped = new XElement(capturedDependentDeclaration);
             mapped.SetAttributeValue("Name", (string)declaration.Attribute("Name"));
+            return mapped;
+        }
+
+        // Appends a prepared dependent member to the exact direct InstanceDB of the changed FB.
+        internal static XDocument AppendDirect(XDocument current, string exactCallerName, XElement member)
+        {
+            const string code = "DependencyProfileUnavailable";
+            var attributes = current?.Root?.Elements("SW.Blocks.InstanceDB").SingleOrDefault()?.Element("AttributeList");
+            if (attributes?.Element("InstanceOfName")?.Value != exactCallerName || attributes?.Element("InstanceOfType")?.Value != "FB")
+                Fail("Only an exact direct FB InstanceDB dependency is covered.", code);
             var result = new XDocument(current);
             var sections = result.Root.Element("SW.Blocks.InstanceDB").Element("AttributeList").Element("Interface")?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
             ValidateSections(sections, code);
-            if (sections.Elements().SelectMany(s => s.Elements()).Any(m => (string)m.Attribute("Name") == (string)mapped.Attribute("Name")))
+            if (sections.Elements().SelectMany(s => s.Elements()).Any(m => (string)m.Attribute("Name") == (string)member.Attribute("Name")))
                 Fail("The proposed dependent storage name already exists.", code);
-            sections.Elements().Single(s => (string)s.Attribute("Name") == "Static").Add(mapped);
+            sections.Elements().Single(s => (string)s.Attribute("Name") == "Static").Add(new XElement(member));
+            return result;
+        }
+
+        // Captured transitive effect (instance-effects-transitive.v1.json): every member typed as the changed FB, at any
+        // depth of a parent FB or InstanceDB, gains the new member at the end of its nested Static section, in the direct
+        // InstanceDB shape without the top-level AttributeList, Remanence and Accessibility.
+        internal static XDocument AppendNested(XDocument current, string exactCallerName, XElement member)
+        {
+            const string code = "DependencyProfileUnavailable";
+            var nested = new XElement(member);
+            nested.Attribute("Remanence")?.Remove(); nested.Attribute("Accessibility")?.Remove();
+            nested.Elements().Where(e => e.Name.LocalName == "AttributeList").Remove();
+            var result = new XDocument(current);
+            var hosts = result.Descendants().Where(e => e.Name.LocalName == "Member" && (string)e.Attribute("Datatype") == "\"" + exactCallerName + "\"").ToArray();
+            if (hosts.Length == 0) Fail("The dependent embeds no multi-instance of the changed FB.", code);
+            foreach (var host in hosts)
+            {
+                var sections = host.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
+                ValidateSections(sections, code);
+                if (sections.Elements().SelectMany(s => s.Elements()).Any(m => (string)m.Attribute("Name") == (string)nested.Attribute("Name")))
+                    Fail("The proposed nested storage name already exists.", code);
+                sections.Elements().Single(s => (string)s.Attribute("Name") == "Static").Add(new XElement(nested));
+            }
             return result;
         }
 
@@ -67,13 +101,12 @@ namespace TiaMcp.Openness.V21
         // before/after dependency pair. The current DB is cloned in full; only the
         // explicitly new direct member is appended. Existing starts/attributes survive.
         internal static XDocument AppendDependent(XDocument current, string exactCallerName, XElement declaration,
-            XElement capturedCallerDeclaration, XElement capturedDependentDeclaration)
+            XElement capturedCallerDeclaration, XElement capturedDependentDeclaration) =>
+            AppendDirect(current, exactCallerName, DependentMember(declaration, capturedCallerDeclaration, capturedDependentDeclaration));
+
+        internal static XElement DependentMember(XElement declaration, XElement capturedCallerDeclaration, XElement capturedDependentDeclaration)
         {
             const string code = "DependencyProfileUnavailable";
-            var db = current?.Root?.Elements("SW.Blocks.InstanceDB").SingleOrDefault();
-            var attributes = db?.Element("AttributeList");
-            if (attributes?.Element("InstanceOfName")?.Value != exactCallerName || attributes?.Element("InstanceOfType")?.Value != "FB")
-                Fail("Only an exact direct FB InstanceDB dependency is covered.", code);
             var actualSections = declaration?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
             var referenceSections = capturedCallerDeclaration?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
             if (actualSections == null || referenceSections == null || capturedDependentDeclaration == null)
@@ -85,13 +118,7 @@ namespace TiaMcp.Openness.V21
             var mapped = MapDeclaration(actualSections, referenceSections, capturedDependentDeclaration, code);
             mapped.SetAttributeValue("Name", (string)declaration.Attribute("Name"));
             mapped.SetAttributeValue("Datatype", (string)declaration.Attribute("Datatype"));
-            var result = new XDocument(current);
-            var sections = result.Root.Element("SW.Blocks.InstanceDB").Element("AttributeList").Element("Interface")?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
-            ValidateSections(sections, code);
-            if (sections.Elements().SelectMany(s => s.Elements()).Any(m => (string)m.Attribute("Name") == (string)mapped.Attribute("Name")))
-                Fail("The proposed dependent storage name already exists.", code);
-            sections.Elements().Single(s => (string)s.Attribute("Name") == "Static").Add(mapped);
-            return result;
+            return mapped;
         }
 
         private static XElement FbSections(XDocument document)
