@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ac2256686e0a4e61d3bdbecadc3fe07aacef80646f7130724702bce9d56175f3",
-      "bytes": 775535
+      "sha256": "2d00520ff4eb88959af9d24ae3e7cdc1bc1335ac02c0852cefabb5ab586c08e7",
+      "bytes": 778265
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2542,8 +2542,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "6b8fcb691816b41eaefa044c5aefc8d341cbaf4705bad5e8a6b16eae8daa7f1e",
-      "bytes": 6499
+      "sha256": "b11e2dd2eedcc8635e3c39c8d632e51cf4ab105e2ce5e799ef737c954ba46289",
+      "bytes": 7220
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -2552,8 +2552,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
-      "sha256": "21b008f3dff4ef146e8e12cb19f4d09e6c437ee9298a852d602c9c97b6fd42e8",
-      "bytes": 35080
+      "sha256": "3fa66c585dda0bda66b20e2475220b7882bbebbc94577f09569d67279805b1fa",
+      "bytes": 35267
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -2722,8 +2722,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "8820719156153203cd9c8fccdb2f385f9d4626e75d122b9344a1c0d57cfe8ea5",
-      "bytes": 12805
+      "sha256": "d3a232886a3adab1b26fee643a3f323faa33348a44a0de026661ba7b319c1b32",
+      "bytes": 14574
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
@@ -70311,8 +70311,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 319,
-              "endLine": 337,
+              "line": 323,
+              "endLine": 341,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             }
           ]
@@ -71383,8 +71383,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 319,
-              "endLine": 337,
+              "line": 323,
+              "endLine": 341,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             },
             {
@@ -76531,6 +76531,20 @@
           "profileSha256": "2ae8775aa9046358808cf06d6b2bf4ad2677ccc89065edea62e84c9319f85d15",
           "artifacts": [
             "evidence/local.typed.insertion-storage.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.transitive-capture.20261026",
+          "profileSha256": "560611ed174d8a1baf449198e42ade7f00d433041304a12e4d3520c716186f76",
+          "artifacts": [
+            "evidence/local.typed.transitive-capture.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.transitive-effects.20261026",
+          "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693",
+          "artifacts": [
+            "evidence/local.typed.transitive-effects.20261026.json"
           ]
         }
       ],
@@ -94610,7 +94624,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "0213fad2917af5ab479146606622a9a95055107ca461c59fc86d1a3b72608b3c"
+      "sha256": "d22af9826c8aa6b7431405eb8795c29531704c4c9d4e75d53c7fd54a815a97b3"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94936,6 +94950,16 @@
       "path": "evidence/local.typed.standard-created-storage-runtime.20261026.json",
       "state": "observed",
       "sha256": "2328435d1bc0c3a5abaffc8d5bb8ad89f9c7dadbc75b6a5cc6718232fa16b14c"
+    },
+    {
+      "path": "evidence/local.typed.transitive-capture.20261026.json",
+      "state": "observed",
+      "sha256": "f6d75fb2ba009aa6e936f8ef45635e374c5e5ed080981ec91a08972cafa8bf02"
+    },
+    {
+      "path": "evidence/local.typed.transitive-effects.20261026.json",
+      "state": "observed",
+      "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
     },
     {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
@@ -95350,6 +95374,14 @@
     {
       "id": "local.typed.standard-created-storage-runtime.20261026",
       "profileSha256": "ac63de500032d68daf1dc25086669fbca1b79eea1953f36621d781f91e3d607b"
+    },
+    {
+      "id": "local.typed.transitive-capture.20261026",
+      "profileSha256": "560611ed174d8a1baf449198e42ade7f00d433041304a12e4d3520c716186f76"
+    },
+    {
+      "id": "local.typed.transitive-effects.20261026",
+      "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693"
     },
     {
       "id": "local.unit-recovery.v03",
