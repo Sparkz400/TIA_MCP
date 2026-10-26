@@ -382,6 +382,39 @@ internal static class TypedGraphicalTests
         }
     }
 
+    internal static async Task FirstNetworkGoesBeforeTheBlockTitle()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
+        if (root == null) throw new InvalidOperationException("Missing typed native template corpus.");
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            var native = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", "Tgp_Boolean_" + language + ".xml")));
+            var envelope = new XElement(native.Descendants("SW.Blocks.CompileUnit").Single());
+            foreach (var text in envelope.Descendants("Text")) text.Value = "";
+            // Network-free derivation of the native block: no compile unit, consecutive IDs (title 8/9 -> 3/4).
+            var empty = new XDocument(native);
+            empty.Descendants("SW.Blocks.CompileUnit").Single().Remove();
+            foreach (var id in empty.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            string unchanged = empty.ToString(SaveOptions.DisableFormatting);
+            var model = BooleanModel(language); model.InsertAfterNetworkId = null;
+            var context = Context(); context.NetworkTemplateXml = envelope.ToString(SaveOptions.DisableFormatting);
+            var inserted = TypedGraphical.Build(empty, model, context);
+            Check.Equal(unchanged, empty.ToString(SaveOptions.DisableFormatting));
+            Check.Equal("3", inserted.NetworkId);
+            var objects = inserted.Document.Root!.Elements().Single(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal)).Element("ObjectList")!.Elements().ToArray();
+            Check.Equal("Comment,CompileUnits,Title", string.Join(",", objects.Select(e => (string?)e.Attribute("CompositionName"))));
+            Check.Equal("3,4,5,6,7", string.Join(",", objects[1].DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
+            Check.Equal("8,9", string.Join(",", objects[2].DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
+            var restored = new XDocument(inserted.Document);
+            restored.Descendants("SW.Blocks.CompileUnit").Single().Remove();
+            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            Check.Equal(unchanged, restored.ToString(SaveOptions.DisableFormatting));
+            var untitled = new XDocument(empty); untitled.Descendants("MultilingualText").Single(e => (string?)e.Attribute("CompositionName") == "Title").Remove();
+            await Error("NativeIdPreservationUnsupported", () => TypedGraphical.Build(untitled, model, context));
+        }
+    }
+
     internal static async Task CreationRetainsCompleteNativeDefaultsAndRejectsMissingPrototypes()
     {
         foreach (var language in new[] { "LAD", "FBD" })

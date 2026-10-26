@@ -190,7 +190,7 @@ controller was modified.
   collision case on a binary containing that guard. Earlier FBD request fixtures
   used native `TRUE` instead of typed JSON `true`; the authored requests are fixed.
   Valid language-conversion rejection is `LanguageConversionNotSupported`.
-- [ ] Add actual MCP positive/negative resolution cases for exact tag-table and
+- [x] Add actual MCP positive/negative resolution cases for exact tag-table and
   DB/UDT ownership, duplicate names and nested UDT namespace selection. Pure or
   source review alone does not qualify these native paths. The executable fixture
   harness is implemented. All seven standard cases in both languages passed
@@ -203,6 +203,9 @@ controller was modified.
   `StaleRevision`, deliberate-change recovery and fresh reopen. Native
   duplicate-tag ambiguity, unqualified nested namespace propagation and runtime
   remain pending.
+  Closed 26 October: `local.typed.resolution.20261025` passes the standard, namespace and stale phases in
+  both languages, and duplicate tags and unqualified nested namespaces are native V21 refusals
+  (`local.typed.native-boundaries.20261025`). Resolution fixtures carry no behavior; typed runtime cells cover it.
   [Earlier evidence](../verification/parallel-third-20261012.md#typed-resolution).
 - [x] Exercise a typed `createMulti` change when a direct caller InstanceDB already
   exists, including a preserved nondefault start value. Both LAD/FBD p15 runs
@@ -214,28 +217,38 @@ controller was modified.
   `artifacts/p15/typed-multi-FBD-01/result.json` and their independent audits.
 - [ ] Keep unprofiled transitive parent multi-instance layout changes and custom
   declaration shapes rejected until their effects are captured and qualified.
+  Direct FB and IEC instance-DB effects are captured for the software-unit and namespace routes
+  (`local.typed.scoped-capture.20261026`, `local.typed.iec-effect-capture.20261026`); transitive parent and
+  custom-start shapes still have no captured effect and stay rejected.
 
 ### 3. Complete runtime assertions separately
 
-- [ ] Continue the 32 standard cases, retrying failed prerequisites in fresh owned
+- [x] Continue the 32 standard cases, retrying failed prerequisites in fresh owned
   instances. Six LAD cases are already runtime-qualified on their recorded builds;
   all FBD runtime cases, Boolean logic, FC/FB calls, TON and the remaining comparison/
   counter cells still need successful assertions on the intended final lineage.
-- [ ] Run numeric FC input/output/in-out/return checks and two-instance FB state
+- [x] Run numeric FC input/output/in-out/return checks and two-instance FB state
   independence. Engineering-only results do not prove parameter behavior.
-- [ ] Run the two `counter-limit-cases.v1.json` suites. Their independently authored
+- [x] Run the two `counter-limit-cases.v1.json` suites. Their independently authored
   bounded SCL drivers pulse the actual typed CTU FB at most 512 times per harness
   call, testing 32767 saturation, the 32768th attempted edge and reset through the
   existing executor. The vectors are authored; **no saturation assertion ran**.
-- [ ] Exercise CTD/CTUD signed limits, timer cancellation/restart/completion and
-  every advertised storage variant. Keep host timing/application-call limitations
-  explicit; they are not exact PLC scan measurements.
-- [ ] Diagnose prerequisite failures without weakening isolation: observed failures
+  Closed: `local.typed.runtime.20261024` (34 standard cells) and `local.typed.runtime.reruns.20261024`
+  (numeric FB two-instance independence, CTU 32767 saturation, the 32768th edge and reset) pass all five
+  gates in LAD and FBD; together all 38 standard-route cells pass.
+- [x] Exercise CTD/CTUD signed limits and timer cancellation/restart/completion
+  (`local.typed.runtime.20261024`). Host timing/application-call limitations stay explicit.
+- [ ] Run the standard-route created storage variants (`createMulti`/`createGlobal`) at runtime. Software-unit
+  and namespace routes pass them (`local.typed.scoped-runtime.*`); the standard route has engineering
+  evidence only, and a standard IEC dependent-instance effect pair is not captured.
+- [x] Diagnose prerequisite failures without weakening isolation: observed failures
   include another registered instance, protected-card filesystem access denial
   before credential access, and native power-on timeout. Owned cleanup passed in
   the completed runs. Later shared simulator code adds guarded filesystem retries;
   that newer binary still needs actual runtime evidence. Never stop an unrelated
   instance or replay uncertain credential/native operations.
+  Closed: none recurred in the frozen 65-case corpus, the 38 standard cells or the 208 scoped live cases on
+  current binaries. The single unexplained card-staging access denial stays tracked in `docs/TODO.md`.
 
 ### 4. Finish route profiles and qualification
 
@@ -321,7 +334,7 @@ controller was modified.
   native gates. The adapter verifies remote artifact chunks and complete hashes;
   local transport tests do not qualify the guest. Remote runtime remains unsupported
   by that qualification adapter and requires a separately bounded route.
-- [ ] Refresh the per-case ledger, feature evidence and documentation from completed
+- [x] Refresh the per-case ledger, feature evidence and documentation from completed
   reports. Keep all five gates separate and retain superseded/blocked attempts.
   Do not set broad profile or workstream qualification flags from partial results.
 - [x] Add a cooperative stop-between-cases option to the typed batch runner.

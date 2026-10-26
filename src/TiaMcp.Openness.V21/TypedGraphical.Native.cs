@@ -123,9 +123,12 @@ namespace TiaMcp.Openness.V21
         /// <summary>V21 numbers export object IDs consecutively in document order, so an inserted network takes the IDs of the
         /// objects after it and those shift up by its own count; that exact shift counts as preserved (scope decision of
         /// 25 October 2026, docs/plans/insertion-id-renumbering-decision-20261025.md). Returns the inserted network's ID.</summary>
-        private static string ShiftFollowingIdsForInsertion(XDocument document, XElement target, XElement insertedUnit, NativeIds ids, List<TypedGraphicalEffect> effects)
+        private static string ShiftFollowingIdsForInsertion(XDocument document, XElement target, XElement insertedUnit, NativeIds ids, List<TypedGraphicalEffect> effects, bool insertBeforeTarget = false)
         {
-            var following = document.Descendants().Where(e => XNode.DocumentOrderComparer.Compare(e, target) > 0 && !e.Ancestors().Contains(target)).Attributes("ID").ToArray();
+            // Inserting after a network shifts what follows it; inserting before the block title shifts the title too.
+            var following = document.Descendants().Where(e => insertBeforeTarget
+                ? e == target || XNode.DocumentOrderComparer.Compare(e, target) > 0
+                : XNode.DocumentOrderComparer.Compare(e, target) > 0 && !e.Ancestors().Contains(target)).Attributes("ID").ToArray();
             if (following.Length == 0) return (string)insertedUnit.Attribute("ID");
             var existing = document.Descendants().Attributes("ID").Select(a => ParseObjectId(a.Value)).ToArray();
             var inserted = insertedUnit.DescendantsAndSelf().Attributes("ID").ToArray();
@@ -148,25 +151,6 @@ namespace TiaMcp.Openness.V21
             int parsed;
             return value.Length > 0 && value.All(c => c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f')
                 && int.TryParse(value, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out parsed) && parsed >= 0 ? parsed : -1;
-        }
-
-        private static void RequireInsertionIdPreservation(XDocument document, XElement block, XElement target, XElement insertedUnit)
-        {
-            var following = target == null
-                ? block.Element("ObjectList").Elements().Where(e => (string)e.Attribute("CompositionName") == "Title").SelectMany(e => e.DescendantsAndSelf()).Attributes("ID").ToArray()
-                : document.Descendants().Where(e => XNode.DocumentOrderComparer.Compare(e, target) > 0 && !e.Ancestors().Contains(target)).Attributes("ID").ToArray();
-            if (following.Length == 0) return;
-            int insertedObjects = insertedUnit.DescendantsAndSelf().Attributes("ID").Count();
-            var changes = following.Take(24).Select(a =>
-            {
-                int current;
-                return int.TryParse(a.Value, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out current) && current >= 0 && current <= int.MaxValue - insertedObjects
-                    ? a.Value + "->" + (current + insertedObjects).ToString("X", CultureInfo.InvariantCulture) : a.Value + "->reallocated";
-            });
-            Fail("NativeIdPreservationUnsupported", "V21 native insertion renumbers existing following document objects, so the requested placement cannot preserve unrelated native IDs. "
-                + "Observed native behavior: insertion before block-title IDs 8/9 reallocated them to D/E despite successful compilation. "
-                + "This requested native envelope adds " + insertedObjects.ToString(CultureInfo.InvariantCulture) + " object IDs; affected existing IDs: " + string.Join(", ", changes)
-                + (following.Length > 24 ? " (and additional following IDs)" : "") + ". Insertion was rejected before apply; use a separately supported terminal boundary or new block.");
         }
 
         private static void PreserveMatchingIds(XElement before, XElement after, TypedGraphicalModel model, NativeIds ids)
