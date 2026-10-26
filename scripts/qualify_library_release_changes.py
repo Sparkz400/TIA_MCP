@@ -113,7 +113,9 @@ def body(h):
         instance = None
         row = h.report.setdefault("runtime", {})[number] = {}
         try:
-            created = h.tool("sim_create", {"cpuType": "CPU1511", "creationId": uuid.uuid4().hex})
+            # Provisioning requires the discovery baseline taken before the owned instance exists.
+            row["discoveryBaseline"] = h.tool("simulation_discovery_baseline", {})["baseline"]
+            created = h.tool("sim_create",{"cpuType": "CPU1511", "creationId": uuid.uuid4().hex})
             instance = verify_owned_instance(created["instance"])
             require(instance.get("operatingState") == "Off", "A fresh owned OFF instance is required")
             cpus = h.scratch["scratchSecurity"]["cpus"]
