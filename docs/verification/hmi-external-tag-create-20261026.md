@@ -44,12 +44,11 @@ composition, so HMI-owned UDTs have no public API route.
 | `dotnet run --project tests/TiaMcp.Hmi.Engineering.Tests/...` | 23 passed (4 new: request shape, field smuggling, readback, export delta) |
 | `python -B -m unittest test_hmi_qualification` (in `scripts/`) | 56 passed (3 new probe tests with a fake worker) |
 | V21 worker build against the installed SDK | succeeded, 0 warnings |
-| `scripts/Test-Offline.ps1` | exit 1. Contract, bindings, retained-evidence and all 2,021 Python tests pass (1 skipped). Managed suites up to `TiaMcp.Tests` pass. `TiaMcp.Tests` fails 2 of 249: simulation-checkpoint archive staging exceeds TIA's 143-character limit under this long worktree path. The script stops at that suite. |
-| `TiaMcp.Tests` and the 12 suites after it, run individually with a short `TEMP` | all pass (249/249 for `TiaMcp.Tests`) |
+| `scripts/Test-Offline.ps1 -OutputDirectory artifacts/od165aa` | passed (exit 0): 2,021 Python tests (1 skipped), every managed suite (`TiaMcp.Tests` 249/249), final aggregate 2,096 checks |
 
-A clean full `Test-Offline.ps1` rerun is still owed. It must wait until the TIA
-machine is free: its startup tests start mock `Siemens.Automation.Portal.exe`
-processes, which stop the live corpus.
+The first full run used the default output directory and failed 2 of 249 in
+`TiaMcp.Tests`. Under this long worktree path, simulation-checkpoint archive
+staging went past TIA's 143-character limit. A shorter output directory passes.
 
 The fake-worker tests check the probe's own logic only. They do not show what the
 native body does.
