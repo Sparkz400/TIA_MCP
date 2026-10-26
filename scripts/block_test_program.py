@@ -56,6 +56,14 @@ def _name(value, context="identifier", maximum=64):
     return value
 
 
+def _namespace(value):
+    if not isinstance(value, str) or not value or len(value) > 128:
+        raise InterfaceError(f"symbol namespace must be a dotted identifier path: {value!r}")
+    for part in value.split("."):
+        _name(part, "namespace component")
+    return value
+
+
 def _unique(names, context):
     folded = [name.casefold() for name in names]
     if len(set(folded)) != len(folded):
@@ -354,8 +362,11 @@ def _capture_type(descriptor):
     return descriptor
 
 
-def generate_program(interface, instances=("dut",), prefix="BlockTest"):
-    """Generate a Main OB, test-data DB and separate native FB instance DBs.
+def generate_program(interface, instances=("dut",), prefix="BlockTest", organization_block="Main", symbol_namespace=None):
+    """Generate a cycle OB (Main by default), test-data DB and separate native FB instance DBs.
+
+    A software-unit DUT cannot be called from the PLC-level Main: generate the harness
+    inside the DUT's unit with a distinct OB name and its namespace-qualified symbols.
 
     Write inputs and InstanceIndex while RequestId == AckId, then increment
     RequestId once. Await the matching AckId before reading outputs or modifying
@@ -369,6 +380,8 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
     if interface != verified:
         raise InterfaceError("Normalized interface changed after native inspection")
     prefix = _name(prefix, "prefix", 32)
+    organization_block = _name(organization_block, "organization block", 64)
+    symbol_root = "" if symbol_namespace is None else _namespace(symbol_namespace) + "."
     if isinstance(instances, (str, bytes)) or not isinstance(instances, (tuple, list)) or not 1 <= len(instances) <= 64:
         raise InterfaceError("Provide 1..64 distinct instance names")
     instances = [_name(name, "instance name", 20) for name in instances]
@@ -382,7 +395,7 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
         raise InterfaceError("Instance name conflicts with a handshake control")
     db_name = prefix + "_Data"
     instance_blocks = {name: prefix + "_" + name + "_Instance" for name in instances} if interface["kind"] == "FB" else {}
-    block_names = [db_name, *instance_blocks.values(), "Main"]
+    block_names = [db_name, *instance_blocks.values(), organization_block]
     _unique([interface["name"], *block_names, *interface["requiredTypes"]], "generated blocks and dependencies")
     parameters = interface["parameters"]
     capture = [(item, _capture_type(item["type"])) for item in interface["state"]]
@@ -399,7 +412,7 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
         for parameter in parameters:
             lines.extend(_declaration(parameter["name"], parameter["type"], "    "))
             for path, descriptor in _leaves(parameter["type"], parameter["name"]):
-                binding = {"symbol": f"{db_name}.{instance}.{path}", "dataType": descriptor["dataType"],
+                binding = {"symbol": f"{symbol_root}{db_name}.{instance}.{path}", "dataType": descriptor["dataType"],
                            "type": descriptor["signalType"], "direction": parameter["direction"],
                            "writable": parameter["direction"] in ("Input", "InOut")}
                 for metadata in ("unit", "capacity"):
@@ -412,7 +425,7 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
                 lines.extend(_declaration(item["name"], descriptor, "      "))
                 for path, scalar in _leaves(descriptor, item["name"]):
                     bindings[instance]["state." + path] = {
-                        "symbol": f"{db_name}.{instance}.State.{path}", "dataType": scalar["dataType"],
+                        "symbol": f"{symbol_root}{db_name}.{instance}.State.{path}", "dataType": scalar["dataType"],
                         "type": scalar["signalType"], "direction": "Static", "writable": False,
                         **({"unit": scalar["unit"]} if "unit" in scalar else {}),
                         **({"capacity": scalar["capacity"]} if "capacity" in scalar else {})}
@@ -425,7 +438,7 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
         lines.extend([f'DATA_BLOCK "{instance_db}"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
                       "NON_RETAIN", f'"{interface["name"]}"', "BEGIN", "END_DATA_BLOCK", ""])
     ref = f'"{db_name}"'
-    lines.extend(['ORGANIZATION_BLOCK "Main"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
+    lines.extend([f'ORGANIZATION_BLOCK "{organization_block}"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
                   "BEGIN", f"  IF {ref}.RequestId <> {ref}.AckId THEN", f"    {ref}.ErrorCode := UDINT#0;",
                   f"    IF {ref}.CallCount = UDINT#4294967295 THEN", f"      {ref}.ErrorCode := UDINT#2;",
                   "    ELSE", f"      CASE {ref}.InstanceIndex OF"])
@@ -450,10 +463,10 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest"):
     lines.extend(["        ELSE", f"          {ref}.ErrorCode := UDINT#1;", "      END_CASE;", "    END_IF;",
                   f"    {ref}.AckId := {ref}.RequestId;", "  END_IF;", "END_ORGANIZATION_BLOCK", ""])
     source = "\n".join(lines)
-    signals = {name[0].lower() + name[1:]: {"symbol": f"{db_name}.{name}", "type": "uint32"} for name in controls}
+    signals = {name[0].lower() + name[1:]: {"symbol": f"{symbol_root}{db_name}.{name}", "type": "uint32"} for name in controls}
     limitations = ["Acknowledgement gates application calls only; other PLC scans and wall-clock timers continue.",
                    "Polling/API latency bounds observations; elapsed PLC scan count and exact timer transitions are not measured.",
-                   "Stable snapshots require one serialized controller and an isolated Main with no other writers.",
+                   f"Stable snapshots require one serialized controller and an isolated {organization_block} with no other writers.",
                    "Native compilation, symbol access and timer behavior await runtime qualification."]
     return {"schemaVersion": 1, "source": source, "revision": hashlib.sha256(source.encode("utf-8")).hexdigest(),
             "nativeSha256": interface["nativeSha256"], "interfaceRevision": interface["declarationRevision"],
