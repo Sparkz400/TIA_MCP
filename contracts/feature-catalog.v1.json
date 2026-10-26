@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.25",
+  "catalogVersion": "0.4.26",
   "targetTiaVersions": [
     21
   ],
@@ -1490,6 +1490,24 @@
         "Behavior is asserted from native exports (body and interface), not executed on a CPU or PLCSIM.",
         "Caller migration together with a breaking update is not offered; the breaking case is qualified as an expected compile failure plus recovery.",
         "One PLC, standard groups; no software units, protected/F types or runtime."
+      ]
+    },
+    {
+      "id": "local.library_releases.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc974fce72e7ca769cc39a2e0257792e36a5368f",
+        "passedScope": "scripts/qualify_library_release_changes.py at bc974fc on build da24990 (frozen D:/lrc/b9, package tia-mcp-v21_20261026_183316_d73b436e), owned TIA V21 scratch projects and fresh owned PLCSIM Advanced V8 CPU1511 instances: FB type 1.0.0, implementation-changing 1.1.0 (negated output, same interface) and breaking 2.0.0 (output Active renamed Ready) in one native type identity with distinct version GUIDs, authored with simulation support; released exports and both instance DBs match independently authored expectations at every stage. Consumer at 1.0.0 runs the authored truth table on PLCSIM (probe output, probe instance output, Main's instance output and UDT field); updated to exactly 1.1.0 it compiles, keeps both instance DB interfaces and unrelated native exports, and runs the inverted truth table. The 2.0.0 update fails compilation at exactly the stale callers Main (OB1) and TiaMcpReleaseProbe_Cycle (OB123) ('The formal parameter Active is invalid'), reaches no unrelated block and is not saved; its admission is returned; the checkpoint restores to a new location and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged. A fresh consumer at exactly 2.0.0 with both callers adapted to Ready compiles clean, exposes no stale Active member and runs the 2.0.0 truth table. 105/105 steps; all 67 retained library observations (21 original-byte lock receipts) validate against the library schemas."
+      },
+      "artifacts": [
+        "evidence/local.library_releases.20261026.json"
+      ],
+      "limitations": [
+        "The FB is stateless: the truth table is asserted; instance data retention across an update and re-download is not.",
+        "Caller migration together with a breaking update is not offered (project-library updates require compile=true); adapted callers are qualified in a fresh 2.0.0 consumer, not by migrating the failed project.",
+        "One PLC, standard groups, PLCSIM only; no software units, protected/F types, physical CPU or crash injection."
       ]
     },
     {
@@ -5463,6 +5481,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024"
         ]
       },
@@ -6789,7 +6808,8 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_formats.20261025",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026"
         ]
       },
       "availability": {
@@ -6833,7 +6853,8 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026"
         ]
       },
       "availability": {
@@ -6877,7 +6898,8 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026"
         ]
       },
       "availability": {
@@ -6962,7 +6984,8 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026"
         ]
       },
       "availability": {
@@ -7475,6 +7498,7 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -7586,6 +7610,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -7645,6 +7670,7 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
@@ -7707,6 +7733,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
@@ -7819,6 +7846,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024"
@@ -7877,6 +7905,7 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
@@ -7935,6 +7964,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -7990,6 +8020,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8045,6 +8076,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8100,6 +8132,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8155,6 +8188,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8210,6 +8244,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8265,6 +8300,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8321,6 +8357,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8429,6 +8466,7 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3070fa5bc32f877de9f9d66ef8a20d6a5e3ee8e4090910ecd97ea23ab7ea76d6",
-      "bytes": 782503
+      "sha256": "b8f72e84720abfd94605bfa049760cfaa632d066445483422660b33ce8eb501c",
+      "bytes": 785685
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -77126,6 +77126,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77175,6 +77182,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77237,6 +77251,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77293,6 +77314,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77369,6 +77397,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77427,6 +77462,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77478,6 +77520,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77533,6 +77582,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77597,6 +77653,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77720,6 +77783,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77769,6 +77839,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77824,6 +77901,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -77912,6 +77996,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -77967,6 +78058,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -78016,6 +78114,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         },
         {
@@ -82967,6 +83072,13 @@
           ]
         },
         {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
+        },
+        {
           "id": "local.library_dependencies.20261024",
           "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
           "artifacts": [
@@ -83034,6 +83146,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         }
       ],
@@ -83144,6 +83263,13 @@
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
           ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -83215,6 +83341,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         }
       ],
@@ -83551,6 +83684,13 @@
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
             "evidence/local.library_releases.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.20261026",
+          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
+          "artifacts": [
+            "evidence/local.library_releases.20261026.json"
           ]
         }
       ],
@@ -94844,6 +94984,11 @@
       "sha256": "f0204c1b2ddc9372f53bd7721c7be7014a2342cc78f6276c97d93c3136d7b7e6"
     },
     {
+      "path": "evidence/local.library_releases.20261026.json",
+      "state": "observed",
+      "sha256": "e02e8f11fe5fc5be482960485df120d01451247be7aae743d9251f6255d345ca"
+    },
+    {
       "path": "evidence/local.library_scopes.20261025.json",
       "state": "observed",
       "sha256": "945ff2c877ee8518994152a1fb036a302ede85101559c04cf9c01f1e4367003f"
@@ -95282,6 +95427,10 @@
     {
       "id": "local.library_releases.20261024",
       "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa"
+    },
+    {
+      "id": "local.library_releases.20261026",
+      "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211"
     },
     {
       "id": "local.library_scopes.20261025",

@@ -100,3 +100,33 @@ After the user's elevated Openness grant, `scripts/native/LibraryUnitSeeder` see
 - The unit use survives a fresh reopen.
 
 `local.library_dependencies.20261025` repeats the dependency run on this build to confirm same-scope reuse is unaffected.
+
+## Release behavior on PLCSIM — 26 October 2026
+
+`local.library_releases.20261026` (`qualify_library_release_changes.py` at bc974fc, build da24990 frozen at `D:\lrc\b9`, raw
+report `D:\lrc\a\rc_e57871ae`, 105/105 steps) extends the release run above with behavior executed on fresh owned PLCSIM
+Advanced V8 CPU1511 instances. One instance per release is downloaded from the saved scratch.
+
+- **Oracles.** The runner's `INSTANCE` and `BEHAVIOR` tables are authored from the fixture SCL, not read back from the
+  builder. A runtime probe (`fixtures/libraries/release-changes/ReleaseProbe.scl`: global DB, second instance DB, own
+  program-cycle OB) writes `Enable`. `sim_test` asserts the probe output, the probe instance output, Main's instance output
+  and Main's UDT field.
+- **1.0.0 → 1.1.0 (implementation only).** 1.0.0 copies the input. After the update to exactly 1.1.0, both instance DBs keep
+  `Input: Enable`, `Output: Active`, the unrelated native exports are unchanged, and the inverted truth table passes.
+- **2.0.0 (breaking).** The update fails compilation at exactly `Main (OB1)` and `TiaMcpReleaseProbe_Cycle (OB123)`
+  ("The formal parameter 'Active' is invalid.") and nowhere else. It is not saved; the checkpoint restores to a new location
+  and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged.
+- **Adapted callers.** A fresh consumer at exactly 2.0.0 with the same two callers adapted to `Ready` compiles clean. Its
+  instance DBs expose `Ready` and no `Active`, and the 2.0.0 truth table passes.
+- All 67 retained library observations (21 original-byte lock receipts) validate against the library schemas.
+
+Native findings:
+
+- A consumer download refuses library blocks compiled without simulation support ("'TiaMcpLibraryGate [FB2]' cannot be
+  simulated … use a library with simulation support"). The consumer's project setting cannot reach non-editable library
+  blocks, so simulation support must be enabled in the authoring project before the types are created.
+- On this build a compile-failed library update returns its shared admission. The `outcomeUnknown` plus reconciliation
+  seen in lane C no longer occurs, and the runner reconciles only an unresolved admission.
+
+Not covered: instance data retention across update and re-download (the FB is stateless), caller migration within the
+failing update (project-library updates require `compile=true`), software units, protected/F types and physical CPUs.
