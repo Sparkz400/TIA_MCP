@@ -63,7 +63,7 @@ Downloads with receipts (URL, size, SHA-256, licence) are under `D:\lcq\vendor`.
 TIA V16 VCI export of 55 SimaticML files; V21 refuses its Engineering version (V16), so a native import needs an intermediate
 V17–V20 installation. DMC Siemens Open Library 19.0 (MIT, © DMC, Inc.) upgrades all five archives; one dependency-free data
 type instantiates with an exact link. DMC prerequisites (CPU system/clock memory bytes, "Open Library" tag-table master copy)
-are outside current MCP routes, so complete DMC PLC compilation is not claimed. HMI behavior is left to lane D.
+were outside MCP routes on 24 October, so complete DMC PLC compilation is not claimed; both are covered since 25/26 October ([CPU memory bytes](cpu-memory-bytes-20261026.md)). HMI behavior is left to lane D.
 
 ## Not covered
 
@@ -88,7 +88,7 @@ Build 041b0d8 (frozen `D:\lcq\b8`):
 - **Locked sources.** The library adapter refuses a locked source as `SourceLocked`; for `library_open` the shared admission scope hashes the source first, so the refusal surfaces there as an `IOException` naming the locked file.
 - **Inventory checks.** `project_inventory` lists blocks only; refusal and recovery checks now also compare PLC data types and tag tables through `software_inspect`. The vendor and formats runs were repeated under this check.
 
-Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory.
+Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory (since closed: [CPU memory bytes](cpu-memory-bytes-20261026.md)).
 
 ## Software units and namespaces — 25 October 2026
 

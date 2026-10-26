@@ -165,6 +165,7 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_plug", directApi, "partial", "Actual CanPlugNew/type/position validation occurs during prepare; child-slot compatibility is not inferred from metadata.");
                 AddTargetFeature(features, "change.hardware_move", directApi, "partial", "Same-rack pluggable-module slot moves require native CanPlugMove, compiled readback and configured hardware preservation.");
                 AddTargetFeature(features, "change.hardware_channel_attributes", directApi, "partial", "Exact native channel type/I-O-type/number plus reviewed scalar allowlist and native read/write metadata; compiled preservation and checkpoint required.");
+                AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
                 AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
                     blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
@@ -173,6 +174,7 @@ namespace TiaMcp.Openness.V21
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+                metadata["cpuMemoryByteAllowlist"] = new JArray(CpuMemoryByteAttributes.OrderBy(value => value, StringComparer.Ordinal));
             }
 
             // TechnologicalInstanceDB is also a PLC block. Its dedicated operations are

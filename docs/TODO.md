@@ -7,7 +7,7 @@ are retained in [history](history/todo-through-20261023.md) and [STATUS](STATUS.
 ## Resume and integration
 
 - [x] Independently review vendor receipts, licenses and prerequisites. All seven retained PAL/DMC ZIPs, recorded license hashes and inner-archive hashes match. Version-specific notices, older setup guides and the unreviewed toolbox dependency boundary are recorded in the [independent review](verification/vendor-intake-review-20261025.md). Native compatibility, DMC CPU setup and HMI/runtime gates remain separate.
-- [ ] Qualify DMC's remaining prerequisite: system and clock memory bytes on every CPU. They are outside the reviewed hardware write allowlist, so DMC FB compilation is not claimed.
+- [x] Qualify DMC's remaining prerequisite: system and clock memory bytes on every CPU. `change.hardware_cpu_memory_bytes` sets and reads back both bytes with preservation, reopen and checkpoint recovery on every S7-1500 CPU of an owned project; CPU 1214C is refused because V21 Openness exposes no such attributes. DMC FB compilation itself is not run (archive not on this PC). [Evidence](verification/cpu-memory-bytes-20261026.md).
 
 ## Native admission and runtime
 
