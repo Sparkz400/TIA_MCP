@@ -244,11 +244,12 @@ def run_case(case, args, output):
             report["runtimeBlockName"] = runtime_name
             definitions = {}
             for name in case.get("interfaceDependencies", []):
-                definitions[name] = call("block_interface", {"blockName": name})
+                # Scoped members reference their types by namespace-qualified name.
+                definitions[(case["namespace"] + "." if route else "") + name] = call("block_interface", {"blockName": name})
             instances = tuple(case.get("runtimeInstances", ["dut"]))
             scoped = {"organization_block": "TgpTest_Cycle", "symbol_namespace": case["namespace"]} if route else {}
             program = generate_program(inspect_interface(interface, definitions), instances=instances, prefix="TgpTest", **scoped)
-            suite = {"fixtureId": case["fixtureId"], "cases": independent_behavior(case["family"]), "instances": list(instances)}
+            suite = {"fixtureId": case["fixtureId"], "cases": independent_behavior(case.get("behaviorFamily", case["family"])), "instances": list(instances)}
             validate_suite(suite, program)
             if args.live:
                 assert len(suite["cases"]) == 1 and suite["cases"][0].get("repeat", 1) == 1, "Live qualification currently admits one fresh authored diagnostic only."

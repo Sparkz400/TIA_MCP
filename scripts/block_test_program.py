@@ -192,9 +192,10 @@ class _Types:
             self.limits.append(f"{name}: native instance internals and timer clock are not reset or reconstructed by the harness.")
             return {"kind": "instance" if children else "opaque", "dataType": name,
                     "members": self.members(children, direction, trail, depth + 1)}
-        quoted = re.fullmatch(r'"([A-Za-z_][A-Za-z0-9_]*)"', spelling)
+        # Software-unit and namespace members spell their types namespace-qualified ("Unit.Type").
+        quoted = re.fullmatch(r'"([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)"', spelling)
         if quoted:
-            type_name = _name(quoted[1], "type name")
+            type_name = ".".join(_name(part, "type name") for part in quoted[1].split("."))
         elif re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", spelling):
             type_name = _name(spelling, "type name")
         else:

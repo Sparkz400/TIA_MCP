@@ -64,6 +64,11 @@ class InterfaceTests(unittest.TestCase):
                 member("Grid", "Array[1..2, -1..0] of Real")]
         definition = {"objectKinds": ["SW.Types.PlcStruct"], "sections": [{"name": "None", "members": rows}],
                       "artifact": {"sha256": "a" * 64}}
+        scoped = inspect_interface(native(inouts=[member("Item", '"Unit_A.Alt.Payload"')]), {"Unit_A.Alt.Payload": definition})
+        self.assertEqual(scoped["requiredTypes"], ["Unit_A.Alt.Payload"])
+        for spelling in ('"Unit_A..Payload"', '"Unit_A.Payload."', '"Unit A.Payload"'):
+            with self.assertRaises(InterfaceError):
+                inspect_interface(native(inouts=[member("Item", spelling)]), {"Unit_A.Payload": definition})
         program = generate_program(inspect_interface(native(inouts=[member("Item", '"Payload"')]), {"Payload": definition}))
         bindings = program["bindings"]["dut"]
         self.assertEqual(len(bindings), 11)
