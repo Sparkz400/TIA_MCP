@@ -52,14 +52,22 @@ def page_all(h, library):
             "totalCaptured": result.get("totalCaptured")}
 
 
-def probe(h, library, label):
+def first_page(h, library):
+    """One page costs a full revision walk; complete paging costs about pages x this (measured in the 1,000-type dry run)."""
+    started = time.perf_counter()
+    result = h.tool("library_query", {"request": {"libraryId": library, "maxItems": 200}})
+    return {"pages": 1, "items": len(result["items"]), "seconds": round(time.perf_counter() - started, 3),
+            "completeness": result.get("completeness"), "totalCaptured": result.get("totalCaptured"), "nextOffset": result.get("nextOffset")}
+
+
+def probe(h, library, label, full=False):
     row = {"label": label, "memory": memory()}
     started = time.perf_counter()
     listed = h.tool("library_list")
     row["listSeconds"] = round(time.perf_counter() - started, 3)
     row["libraries"] = len(listed["libraries"])
     try:
-        row["query"] = page_all(h, library)
+        row["query"] = page_all(h, library) if full else first_page(h, library)
     except Exception as error:  # a traversal limit is a scale observation, not a harness failure
         row["queryRefusal"] = str(error)
     h.report["probes"].append(row)
@@ -112,8 +120,8 @@ def run(args):
             h.persist()
             print("BATCH " + json.dumps({k: v for k, v in row.items() if k != "memory"}), flush=True)
             if (start // BATCH + 1) % args.probe_every == 0:
-                probe(h, library, str(start + BATCH) + " types")
-        probe(h, library, "final")
+                probe(h, library, str(start + BATCH) + " types", args.full_paging)
+        probe(h, library, "final", args.full_paging)
         last = [x for x in page_all_items(h, library) if x.get("kind") == "version" and x.get("typeName") == names[-1]] if names[-1].startswith("Chain_") else []
         if last:
             started = time.perf_counter()
@@ -148,6 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("--types", type=int, default=10000)
     parser.add_argument("--chain", type=int, default=1000)
     parser.add_argument("--probe-every", type=int, default=10)
+    parser.add_argument("--full-paging", action="store_true", help="Page the complete library at each probe instead of one page.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))
     arguments = parser.parse_args()
     arguments.runner = __file__
