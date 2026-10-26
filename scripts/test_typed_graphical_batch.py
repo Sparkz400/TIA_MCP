@@ -282,6 +282,41 @@ class InsertionContractTests(unittest.TestCase):
         objects.insert(list(objects).index(unit) + 1, inserted)
         return before, after, objects, inserted, unit.get("ID")
 
+    def test_composite_insertion_admits_only_the_declared_template_member(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        for language in ("LAD", "FBD"):
+            before = (root / "fixtures/typed-graphical/native" / ("Tgp_TON_" + language + ".xml")).read_bytes().decode("utf-8-sig")
+            def build(fault=None):
+                after = ET.fromstring(before)
+                block = next(node for node in after if node.tag in ("SW.Blocks.FC", "SW.Blocks.FB"))
+                objects = block.find("ObjectList")
+                unit = next(node for node in objects if node.tag == "SW.Blocks.CompileUnit")
+                inserted = copy.deepcopy(unit)
+                for index, node in enumerate([n for n in inserted.iter() if n.get("ID") is not None]):
+                    node.set("ID", format(256 + index, "X"))
+                objects.insert(list(objects).index(unit) + 1, inserted)
+                static = next(node for node in block.iter() if node.tag.endswith("}Section") and node.get("Name") == "Static")
+                storage = next(node for node in static if node.get("Name") == "Storage")
+                fresh = copy.deepcopy(storage)
+                fresh.set("Name", "Fresh")
+                if fault == "type": fresh.set("Datatype", "TOF_TIME")
+                static.append(fresh)
+                if fault == "extra":
+                    extra = copy.deepcopy(storage); extra.set("Name", "Unrequested"); static.append(extra)
+                return ET.tostring(after, encoding="unicode"), inserted.get("ID"), unit.get("ID")
+            with self.subTest(language=language):
+                xml, inserted_id, anchor = build()
+                assert_existing_caller_insertion(before, xml, inserted_id, anchor, {"Fresh": "Storage"})
+                with self.assertRaises(AssertionError):
+                    assert_existing_caller_insertion(before, xml, inserted_id, anchor)
+                for fault in ("type", "extra"):
+                    xml, inserted_id, anchor = build(fault)
+                    with self.assertRaises(AssertionError):
+                        assert_existing_caller_insertion(before, xml, inserted_id, anchor, {"Fresh": "Storage"})
+                xml, inserted_id, anchor = build()
+                with self.assertRaises(AssertionError):
+                    assert_existing_caller_insertion(before, xml, inserted_id, anchor, {"Fresh": "Absent"})
+
     def test_first_network_precedes_the_title_of_a_network_free_caller(self):
         for language in ("LAD", "FBD"):
             with self.subTest(language=language):
