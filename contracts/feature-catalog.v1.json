@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.20",
+  "catalogVersion": "0.4.21",
   "targetTiaVersions": [
     21
   ],
@@ -1820,6 +1820,40 @@
       "limitations": [
         "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
         "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
+      ]
+    },
+    {
+      "id": "local.typed.insertion-first.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e96ab94726a498d8141ffab08989028ea2a87f7c",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-first-lad and typed-insert-first-fbd: a first network inserted into a network-free FB derived from the native Tgp_Boolean exports. The builder placed the compile unit, with a captured native network envelope, directly before the block title and shifted the title IDs by the inserted count; the independent check required that placement and the exact shift, and the topology matched the native Boolean network. Both passed import/compile, complete prepared-vs-native XML, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.insertion-first.20261026.json"
+      ],
+      "limitations": [
+        "Engineering only; insertion combined with storage creation still needs its own composite effect contract.",
+        "An earlier attempt (artifacts/rt6-envelope-mismatch) failed NativePreservationMismatch with a bare envelope; it showed TIA adds the network's own comment/title objects."
+      ]
+    },
+    {
+      "id": "local.typed.failed-source-recovery.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5254031f27f516b492b8e42202ea33f2fce2efac",
+        "passedScope": "scripts/qualify_failed_source_recovery.py on the blocked scoped capture artifacts/cap-scoped (sha256 164b76ea...): its last source left the change recovery_required with an unknown after-state fingerprint and change_restore refused (FingerprintUnavailable). The retained SHA-bound recovery archive was retrieved into a fresh owned TIA V21 project and all 21 blocks, types and tag tables equal the failing source's pre-change snapshot; owned cleanup passed."
+      },
+      "artifacts": [
+        "evidence/local.typed.failed-source-recovery.20261026.json"
+      ],
+      "limitations": [
+        "Checkpoint retrieval into a new project is separate evidence; it is not a successful change_restore, and the stale/fingerprint guard is unchanged.",
+        "The original failed project was not opened, edited or released."
       ]
     },
     {
@@ -9019,7 +9053,9 @@
           "local.typed.scoped-runtime.createmulti.20261026",
           "local.typed.iec-effect-capture.20261026",
           "local.typed.scoped-runtime.iec-createmulti.20261026",
-          "local.typed.route-dboperand.20261026"
+          "local.typed.route-dboperand.20261026",
+          "local.typed.insertion-first.20261026",
+          "local.typed.failed-source-recovery.20261026"
         ]
       },
       "availability": {

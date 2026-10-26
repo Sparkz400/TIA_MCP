@@ -301,11 +301,15 @@ controller was modified.
   [local numeric FB](../verification/typed-lad-fbd-route-runtime-local-fb-20261026.md)). The 28 created
   multi-instance cells are refused (`DependencyProfileUnavailable`) until a route effect pair exists.
   The seeder must be the Openness-allowlisted lane A binary; a rebuilt seeder needs a new allowlist entry.
-- [ ] Retain failed-source recovery evidence: some incomplete native exports leave
+- [x] Retain failed-source recovery evidence: some incomplete native exports leave
   `afterFingerprint` unknown, so `change_restore` correctly refuses with
   `StaleRevision`. Exact checkpoint retrieval into a new owned project was verified
   separately; it is **not** a successful `change_restore` qualification. Do not
   weaken the stale guard or merge these different recovery claims.
+  Retained 26 October (`local.typed.failed-source-recovery.20261026`): a compile-failed scoped source left
+  `recovery_required` with an unknown after-fingerprint and `change_restore` refused (`FingerprintUnavailable`);
+  `qualify_failed_source_recovery.py` retrieved its SHA-bound checkpoint into a fresh owned project and all 21
+  blocks/types/tag tables equal the pre-change snapshot. This stays separate from `change_restore`.
 
 ### 5. Existing-caller insertion
 
@@ -318,9 +322,11 @@ controller was modified.
 - [x] Native acceptance in both languages: `typed-insert-lad` and `typed-insert-fbd`
   passed all four engineering gates ([evidence](../verification/typed-lad-fbd-insertion-20261025.md),
   `evidence/local.typed.insertion.20261025.json`).
-- [ ] First-network insertion into a network-free caller still refuses (native placement
-  relative to the block title is unobserved); insertion combined with storage creation
-  needs its own composite effect contract.
+- [x] First-network insertion into a network-free caller. Native exports always place compile units
+  before the block title (174/174), so the builder inserts the first network there with a captured native
+  envelope and shifts the title IDs; both languages pass the four engineering gates
+  ([ledger](../verification/typed-lad-fbd-insertion-first-20261026.md), `local.typed.insertion-first.20261026`).
+- [ ] Insertion combined with storage creation needs its own composite effect contract.
 
 ### 6. Complete remote deployment and release reporting
 
