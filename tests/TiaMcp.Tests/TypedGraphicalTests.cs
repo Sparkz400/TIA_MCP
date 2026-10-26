@@ -575,6 +575,14 @@ internal static class TypedGraphicalTests
         return Task.CompletedTask;
     }
 
+    internal static Task DependentEffectManifestFollowsRoute()
+    {
+        Check.Equal("instance-effects.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("standard"));
+        Check.Equal("instance-effects-softwareUnit.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("softwareUnit"));
+        Check.Equal("instance-effects-namespace.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("namespace"));
+        return Task.CompletedTask;
+    }
+
     internal static async Task MultiInstanceTemplatesPreserveObservedShapes()
     {
         DirectoryInfo? root = new(AppContext.BaseDirectory);
