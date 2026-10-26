@@ -38,7 +38,7 @@ cables, ports or physical topology.
 
 ## Offline evidence
 
-Run at the branch's source commit with a clean tree:
+Run at source commit `75f0058` with a clean tree:
 
 - `dotnet run --project tests/TiaMcp.ProjectModel.Tests -c Release`: 15/15,
   including the two new checks. The authored oracle covers escaped paths,
@@ -48,17 +48,23 @@ Run at the branch's source commit with a clean tree:
 - `python -B tests/ProjectModelContracts.py`: 10/10; the new edge kinds validate and an unknown kind is rejected.
 - `python -B -m unittest test_project_explorer_relationships` (from `scripts/`): 5/5 qualifier-oracle tests.
 - `node --test` explorer model/client/relationship-scope tests: 30 passed, 2 skipped as before.
-- The Openness worker builds with zero warnings and errors.
+- The Openness worker, Host and `TiaMcp.Tests` build with zero errors.
+- `scripts/Test-Offline.ps1`: the Python phase passed (2,023 tests, 1 skipped). The run
+  was stopped while the managed phase was building, because its startup-lifecycle
+  checks launch mock processes named `Siemens.Automation.Portal.exe` while a live
+  native corpus was running on this machine. A complete `Test-Offline.ps1` run is
+  still owed; run it when no native corpus is active.
 
 ## Native qualification step (not run)
 
 Run only when the TIA machine is free. Package the committed branch, then point
-the qualifier at that immutable bundle:
+the qualifier at that immutable bundle. A separate release file leaves the
+default `artifacts/project-explorer-release.txt` of the other explorer qualifiers unchanged:
 
 ```powershell
-pwsh scripts/Package.ps1 | Select-Object -Last 1 | Set-Content artifacts/project-explorer-release.txt
-python scripts/qualify_project_explorer_relationships.py --report artifacts/project-explorer-native-relationships.json
-python scripts/qualify_project_explorer_relationships.py --verify-report artifacts/project-explorer-native-relationships.json --report artifacts/project-explorer-native-relationships-final.json
+pwsh scripts/Package.ps1 | Select-Object -Last 1 | Set-Content artifacts/explorer-relationships-release.txt
+python scripts/qualify_project_explorer_relationships.py --release-file artifacts/explorer-relationships-release.txt --report artifacts/project-explorer-native-relationships.json
+python scripts/qualify_project_explorer_relationships.py --release-file artifacts/explorer-relationships-release.txt --verify-report artifacts/project-explorer-native-relationships.json --report artifacts/project-explorer-native-relationships-final.json
 ```
 
 The first run creates a fresh owned scratch (CPU 1511-1PN plus the contracted
@@ -73,7 +79,7 @@ Technology and unit providers need fixtures that contain those objects. Audit an
 existing saved project read-only and require positive evidence explicitly:
 
 ```powershell
-python scripts/qualify_project_explorer_relationships.py --project <saved.ap21> --require technologyConnections softwareUnitRelations --report artifacts/project-explorer-native-relationships-units.json
+python scripts/qualify_project_explorer_relationships.py --release-file artifacts/explorer-relationships-release.txt --project <saved.ap21> --require technologyConnections softwareUnitRelations --report artifacts/project-explorer-native-relationships-units.json
 ```
 
 ## Still unqualified
