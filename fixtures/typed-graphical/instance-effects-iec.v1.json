@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "nativeImportCompileVerified": true,
+  "engineeringVerified": false,
+  "preservationVerified": false,
+  "persistenceVerified": false,
+  "recoveryVerified": false,
+  "runtimeVerified": false,
+  "tiaVersion": "V21",
+  "route": "standard",
+  "artifacts": {
+    "beforeCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec/before-caller.xml",
+      "sha256": "b6675eb38f073f1d8942a4df9d8dea199928a0a4f4f8228b6989938d2ec3f265",
+      "captureReport": "artifacts/cis/capture.json"
+    },
+    "beforeInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec/before-instance.xml",
+      "sha256": "20357a4fdf8b78d5862869357d86618b078e13969f25d3752f96c70f766aefe0",
+      "captureReport": "artifacts/cis/capture.json"
+    },
+    "afterCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec/after-caller.xml",
+      "sha256": "73668534e66f415e4d60314a8cb9811fc4fa9bf282d7f035f096a2b5efb3a050",
+      "captureReport": "artifacts/cis/capture.json"
+    },
+    "afterInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec/after-instance.xml",
+      "sha256": "6fb420caf951f524438d569455ada3c613d870ec1636fcf8a035f04dad8ba10b",
+      "captureReport": "artifacts/cis/capture.json"
+    }
+  },
+  "sources": {
+    "before": {
+      "path": "fixtures/typed-graphical/sources/iec-effect-before.scl",
+      "sha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489",
+      "transportSha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489",
+      "changeId": "e24bbdcaaada48a6b0a078807c325a3a"
+    },
+    "after": {
+      "path": "fixtures/typed-graphical/sources/iec-effect-after.scl",
+      "sha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
+      "transportSha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
+      "changeId": "badb25ab8cff4e10b47cd84b8151c421"
+    }
+  },
+  "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "nativeObservedEffect": {
+    "appendedStaticMembers": [
+      "Timer_TON",
+      "Timer_TOF",
+      "Timer_TP",
+      "Counter_CTU",
+      "Counter_CTD",
+      "Counter_CTUD"
+    ],
+    "existingFullDbPayloadPreserved": true,
+    "explicitStartValuePreserved": {
+      "RetainedMarker": "42"
+    }
+  },
+  "members": {
+    "TON_TIME": "Timer_TON",
+    "TOF_TIME": "Timer_TOF",
+    "TP_TIME": "Timer_TP",
+    "CTU_INT": "Counter_CTU",
+    "CTD_INT": "Counter_CTD",
+    "CTUD_INT": "Counter_CTUD"
+  }
+}

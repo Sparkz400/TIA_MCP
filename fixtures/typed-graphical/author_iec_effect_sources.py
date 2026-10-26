@@ -66,7 +66,7 @@ def packet(name, routes, unit, output, scope_text):
 
 def main():
     packet("route-capture-iec-effect-packet.v1.json", ROUTES, UNIT, "artifacts/cap-iec-effect", "in the software-unit and namespace routes")
-    packet("route-capture-iec-effect-standard-packet.v1.json", (("", ""),), "", "artifacts/cap-iec-effect-standard", "in the standard PLC program scope")
+    packet("route-capture-iec-effect-standard-packet.v1.json", (("", ""),), "", "artifacts/cis", "in the standard PLC program scope")  # short: TIA limits project paths to 143 characters
 
 
 if __name__ == "__main__":
