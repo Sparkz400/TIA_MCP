@@ -45,7 +45,7 @@ class Harness:
     def run(self, body):
         try:
             self.client = Client(self.args.host.resolve(), self.args.timeout, ["--worker", str(self.args.worker.resolve()),
-                                 "--artifacts", str(self.directory), "--sim-worker", str(self.directory / "sim-not-used.exe")])
+                                 "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe")])
             self.client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},
                                 "clientInfo": {"name": "native-library-qualification", "version": "1"}})
             self.client.notify("notifications/initialized")
@@ -165,6 +165,7 @@ class Harness:
         self.owned_portal(label)
         created = self.stage("create owned scratch " + label, lambda: self.tool("tia_create_scratch"))
         require(created.get("completed") is True and created.get("compile", {}).get("errorCount") == 0, "Scratch compile failed")
+        self.scratch = created  # Its generated credential metadata is needed for a simulator download.
         inventory = self.tool("project_inventory", {"maxItems": 1000})
         require(len(inventory.get("plcs", [])) == 1, "Expected one owned PLC")
         return inventory["plcs"][0]["path"]

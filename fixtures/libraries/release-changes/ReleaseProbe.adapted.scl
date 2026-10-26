@@ -1,0 +1,25 @@
+DATA_BLOCK "TiaMcpReleaseProbe"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+VAR
+    Enable : Bool;
+    Output : Bool;
+END_VAR
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpReleaseProbe_Gate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+"TiaMcpLibraryGate"
+BEGIN
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK "TiaMcpReleaseProbe_Cycle"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+    "TiaMcpReleaseProbe_Gate"(Enable := "TiaMcpReleaseProbe".Enable, Ready => "TiaMcpReleaseProbe".Output);
+END_ORGANIZATION_BLOCK
