@@ -590,6 +590,15 @@ class RouteCapturePacketTests(unittest.TestCase):
             with self.subTest(modify=modify, observe=observe), self.assertRaises(RuntimeError):
                 declare_changes(specs(), modify, observe)
 
+    def test_standard_route_admits_only_namespace_free_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = pathlib.Path(directory) / "source.scl"
+            source.write_text('FUNCTION_BLOCK "Tgp_X"\nEND_FUNCTION_BLOCK', encoding="utf-8")
+            entry, _, _ = authored_reference(source, "")
+            self.assertEqual(("standard", ""), (entry["route"], entry["namespace"]))
+            source.write_text('NAMESPACE TiaMcp_UnitA\nFUNCTION_BLOCK "Tgp_X"\nEND_FUNCTION_BLOCK\nEND_NAMESPACE', encoding="utf-8")
+            with self.assertRaises(RuntimeError): authored_reference(source, "")
+
     def test_source_parser_rejects_cross_unit_or_unscoped_reference(self):
         with tempfile.TemporaryDirectory() as directory:
             source = pathlib.Path(directory) / "source.scl"
