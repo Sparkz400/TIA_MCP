@@ -382,6 +382,39 @@ internal static class TypedGraphicalTests
         }
     }
 
+    internal static async Task FirstNetworkGoesBeforeTheBlockTitle()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
+        if (root == null) throw new InvalidOperationException("Missing typed native template corpus.");
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            var native = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", "Tgp_Boolean_" + language + ".xml")));
+            var envelope = new XElement(native.Descendants("SW.Blocks.CompileUnit").Single());
+            foreach (var text in envelope.Descendants("Text")) text.Value = "";
+            // Network-free derivation of the native block: no compile unit, consecutive IDs (title 8/9 -> 3/4).
+            var empty = new XDocument(native);
+            empty.Descendants("SW.Blocks.CompileUnit").Single().Remove();
+            foreach (var id in empty.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            string unchanged = empty.ToString(SaveOptions.DisableFormatting);
+            var model = BooleanModel(language); model.InsertAfterNetworkId = null;
+            var context = Context(); context.NetworkTemplateXml = envelope.ToString(SaveOptions.DisableFormatting);
+            var inserted = TypedGraphical.Build(empty, model, context);
+            Check.Equal(unchanged, empty.ToString(SaveOptions.DisableFormatting));
+            Check.Equal("3", inserted.NetworkId);
+            var objects = inserted.Document.Root!.Elements().Single(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal)).Element("ObjectList")!.Elements().ToArray();
+            Check.Equal("Comment,CompileUnits,Title", string.Join(",", objects.Select(e => (string?)e.Attribute("CompositionName"))));
+            Check.Equal("3,4,5,6,7", string.Join(",", objects[1].DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
+            Check.Equal("8,9", string.Join(",", objects[2].DescendantsAndSelf().Attributes("ID").Select(a => a.Value)));
+            var restored = new XDocument(inserted.Document);
+            restored.Descendants("SW.Blocks.CompileUnit").Single().Remove();
+            foreach (var id in restored.Descendants().Attributes("ID").Where(a => Convert.ToInt32(a.Value, 16) >= 8)) id.Value = (Convert.ToInt32(id.Value, 16) - 5).ToString("X");
+            Check.Equal(unchanged, restored.ToString(SaveOptions.DisableFormatting));
+            var untitled = new XDocument(empty); untitled.Descendants("MultilingualText").Single(e => (string?)e.Attribute("CompositionName") == "Title").Remove();
+            await Error("NativeIdPreservationUnsupported", () => TypedGraphical.Build(untitled, model, context));
+        }
+    }
+
     internal static async Task CreationRetainsCompleteNativeDefaultsAndRejectsMissingPrototypes()
     {
         foreach (var language in new[] { "LAD", "FBD" })
@@ -573,6 +606,34 @@ internal static class TypedGraphicalTests
         EngineeringSources.RequireNativePreservation(afterInstance, dependent);
         Check.Equal("42", dependent.Descendants().Single(e => e.Name.LocalName == "Member" && e.Attribute("Name")?.Value == "RetainedMarker").Elements().Single(e => e.Name.LocalName == "StartValue").Value);
         return Task.CompletedTask;
+    }
+
+    internal static Task DependentEffectManifestFollowsRoute()
+    {
+        Check.Equal("instance-effects.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("standard"));
+        Check.Equal("instance-effects-softwareUnit.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("softwareUnit"));
+        Check.Equal("instance-effects-namespace.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("namespace"));
+        return Task.CompletedTask;
+    }
+
+    internal static async Task IecDependentEffectAppendsOnlyTheCapturedMember()
+    {
+        XNamespace ns = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
+        XElement Iec(string name, string type, string extra = "") => XElement.Parse(
+            $"<Member xmlns='{ns}' Name='{name}' Datatype='{type}' Version='1.0' Remanence='NonRetain'{extra}><Sections><Section Name='None'>" +
+            "<Member Name='IN' Datatype='Bool'/><Member Name='Q' Datatype='Bool'/></Section></Sections></Member>");
+        XDocument Db() => XDocument.Parse("<Document><SW.Blocks.InstanceDB><AttributeList><InstanceOfName>U.Effect</InstanceOfName><InstanceOfType>FB</InstanceOfType>" +
+            $"<Interface><Sections xmlns='{ns}'><Section Name='Input'/><Section Name='Output'/><Section Name='InOut'/><Section Name='Static'>" +
+            "<Member Name='RetainedMarker' Datatype='Int'/></Section></Sections></Interface></AttributeList></SW.Blocks.InstanceDB></Document>");
+        var caller = Iec("Timer_TON", "TON_TIME"); var dependent = Iec("Timer_TON", "TON_TIME", " Accessibility='Public'");
+        var result = TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(Db(), "U.Effect", Iec("Fresh", "TON_TIME"), caller, dependent);
+        var statics = result.Descendants(ns + "Section").Single(s => (string)s.Attribute("Name") == "Static").Elements().ToArray();
+        Check.Equal("RetainedMarker,Fresh", string.Join(",", statics.Select(m => (string)m.Attribute("Name"))));
+        Check.Equal("Public", (string)statics[1].Attribute("Accessibility"));
+        Check.Equal("instance-effects-iec-namespace.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("namespace", true));
+        foreach (var (declaration, existing) in new[] { (Iec("Fresh", "TON_TIME", " Remanence2='Retain'"), "Fresh"), (Iec("Fresh", "TOF_TIME"), "Fresh"),
+                                                         (Iec("Fresh", "\"U.Other\""), "Fresh"), (Iec("RetainedMarker", "TON_TIME"), "RetainedMarker") })
+            await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(Db(), "U.Effect", declaration, caller, dependent));
     }
 
     internal static async Task MultiInstanceTemplatesPreserveObservedShapes()

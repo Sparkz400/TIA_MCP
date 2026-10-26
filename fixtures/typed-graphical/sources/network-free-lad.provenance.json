@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "authoredFormat": "native_xml_template_derivation",
+  "requiresNativeAcceptance": true,
+  "references": [
+    {
+      "path": "fixtures/typed-graphical/native/Tgp_Boolean_LAD.xml",
+      "sha256": "4748248b114d9d073d78d216a5e2c17ddb38a951fa7deb45da85960ba48eebe5"
+    }
+  ],
+  "adaptedFields": [
+    "CompileUnit removed",
+    "Title IDs 8/9 -> 3/4",
+    "Name"
+  ],
+  "sourceSha256": "5cb1901dbdfa6cad59bceabe07f90a99346f35389825ca7f52273aecabd8b92d"
+}

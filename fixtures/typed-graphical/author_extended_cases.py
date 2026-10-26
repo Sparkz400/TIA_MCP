@@ -1,6 +1,8 @@
 """Independent edit/creation/storage requests and explicit native binding oracles."""
 import copy
+import hashlib
 import json
+import re
 from pathlib import Path
 
 from author_cases import cases
@@ -11,6 +13,26 @@ ROOT = Path(__file__).resolve().parent
 def binding(element, source, target, scope="LocalVariable"):
     return {"element": element, "fromScope": scope, "toScope": scope,
             "fromComponents": [source], "toComponents": [target], "expectedCount": 1}
+
+
+def network_free_source(language, name):
+    """Derive a network-free caller from the native Boolean export: no compile unit, title IDs closed up."""
+    native = ROOT / "native" / ("Tgp_Boolean_" + language + ".xml")
+    text = native.read_bytes().decode("utf-8-sig")
+    units = re.findall(r"\s*<SW\.Blocks\.CompileUnit .*?</SW\.Blocks\.CompileUnit>", text, re.S)
+    assert len(units) == 1 and re.findall(r'ID="([0-9A-F]+)"', units[0]) == ["3", "4", "5", "6", "7"]
+    derived = text.replace(units[0], "", 1)
+    assert sorted(re.findall(r'ID="([0-9A-F]+)"', derived)) == ["0", "1", "2", "8", "9"]
+    derived = derived.replace('ID="8"', 'ID="3"').replace('ID="9"', 'ID="4"')
+    derived = derived.replace("<Name>Tgp_Boolean_" + language + "</Name>", "<Name>" + name + "</Name>", 1)
+    target = ROOT / "sources" / ("network-free-" + language.lower() + ".xml")
+    target.write_bytes(derived.encode("utf-8"))
+    (ROOT / "sources" / ("network-free-" + language.lower() + ".provenance.json")).write_bytes((json.dumps({
+        "schemaVersion": 1, "builderUsed": False, "authoredFormat": "native_xml_template_derivation", "requiresNativeAcceptance": True,
+        "references": [{"path": native.relative_to(ROOT.parent.parent).as_posix(), "sha256": hashlib.sha256(native.read_bytes()).hexdigest()}],
+        "adaptedFields": ["CompileUnit removed", "Title IDs 8/9 -> 3/4", "Name"],
+        "sourceSha256": hashlib.sha256(target.read_bytes()).hexdigest()}, indent=2) + "\n").encode("utf-8"))
+    return target.relative_to(ROOT.parent.parent).as_posix()
 
 
 def extended_cases():
@@ -32,6 +54,14 @@ def extended_cases():
         case.update(fixtureId="typed-insert-" + language.lower(), engineeringOnly=True)
         case["payload"]["model"].pop("networkId")
         case["payload"]["model"].update(operation="insertNetwork", insertAfterNetworkId="$first")
+        result.append(case)
+        case = copy.deepcopy(boolean)
+        name = "Tgp_NetworkFree_" + language
+        case.update(fixtureId="typed-insert-first-" + language.lower(), engineeringOnly=True, blockName=name,
+            referenceXml=network_free_source(language, name),
+            topologyXml="fixtures/typed-graphical/native/Tgp_Boolean_" + language + ".xml")
+        case["payload"]["model"].pop("networkId")
+        case["payload"]["model"].update(operation="insertNetwork")
         result.append(case)
         case = copy.deepcopy(boolean)
         case.update(fixtureId="typed-edit-" + language.lower(), engineeringOnly=True,

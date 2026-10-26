@@ -48,11 +48,14 @@ namespace TiaMcp.Openness.V21
         private void PrepareTypedDependentInstance(TypedResolutionCapture capture, JObject dependency, string callerName, XElement declaration)
         {
             string catalogPath = TypedCatalogPath();
-            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), "instance-effects.v1.json");
+            string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
+            string type = (string)declaration.Attribute("Datatype");
+            bool system = TypedGraphicalMultiInstanceTemplate.SystemInstanceTypes.Contains(type);
+            string manifestPath = Path.Combine(Path.GetDirectoryName(catalogPath), TypedGraphicalMultiInstanceTemplate.EffectManifestName(route, system));
             if (!File.Exists(manifestPath)) throw new BridgeException("DependencyProfileUnavailable", "The deployed catalog lacks native dependent instance effects.");
             var profile = JObject.Parse(File.ReadAllText(manifestPath));
             if (profile.Value<int>("schemaVersion") != 1 || profile.Value<string>("tiaVersion") != "V21" || profile.Value<string>("cpuFamily") != TypedCpuIdentifier(capture.Plc)
-                || profile.Value<string>("route") != TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace))
+                || profile.Value<string>("route") != route)
                 throw new BridgeException("DependencyProfileUnavailable", "No exact target dependent instance layout profile exists.");
             capture.Change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(manifestPath) });
             var resources = (JObject)profile["artifacts"];
@@ -62,8 +65,17 @@ namespace TiaMcp.Openness.V21
             // native baseline remains immutable for stale/recovery checks.
             var prior = dependency["expectedArtifact"] ?? dependency["artifact"];
             var current = EngineeringSources.ReadXml(File.ReadAllText(prior.Value<string>("path")));
-            var expected = TypedGraphicalMultiInstanceTemplate.AppendDependent(current, callerName, declaration,
-                TypedTopStaticMember(caller, profile.Value<string>("memberName")), TypedTopStaticMember(instance, profile.Value<string>("memberName")));
+            XDocument expected;
+            if (system)
+            {
+                string member = (profile["members"] as JObject)?.Value<string>(type)
+                    ?? throw new BridgeException("DependencyProfileUnavailable", "No captured IEC effect covers " + type + ".");
+                expected = TypedGraphicalMultiInstanceTemplate.AppendSystemDependent(current, callerName, declaration,
+                    TypedTopStaticMember(caller, member), TypedTopStaticMember(instance, member));
+            }
+            else
+                expected = TypedGraphicalMultiInstanceTemplate.AppendDependent(current, callerName, declaration,
+                    TypedTopStaticMember(caller, profile.Value<string>("memberName")), TypedTopStaticMember(instance, profile.Value<string>("memberName")));
             string output = Path.Combine(capture.Change.Directory, "dependent-effect-" + Guid.NewGuid().ToString("N") + ".xml");
             File.WriteAllText(output, expected.ToString(SaveOptions.DisableFormatting), new System.Text.UTF8Encoding(true));
             dependency["expectedArtifact"] = ChangeArtifact(output);

@@ -11,6 +11,38 @@ namespace TiaMcp.Openness.V21
     {
         private static readonly string[] Persistent = { "Input", "Output", "InOut", "Static" };
 
+        // Each route carries its own independently captured dependent-instance effect pair;
+        // IEC instance members have their own captured pair because their native shape differs.
+        internal static readonly string[] SystemInstanceTypes = { "TON_TIME", "TOF_TIME", "TP_TIME", "CTU_INT", "CTD_INT", "CTUD_INT" };
+        internal static string EffectManifestName(string route, bool systemType = false) =>
+            (systemType ? "instance-effects-iec" : "instance-effects") + (route == "standard" ? "" : "-" + route) + ".v1.json";
+
+        // An IEC instance member has a fixed native shape: the new declaration must equal the captured
+        // caller member exactly (name aside), and the dependent DB receives the captured DB member.
+        internal static XDocument AppendSystemDependent(XDocument current, string exactCallerName, XElement declaration,
+            XElement capturedCallerDeclaration, XElement capturedDependentDeclaration)
+        {
+            const string code = "DependencyProfileUnavailable";
+            var db = current?.Root?.Elements("SW.Blocks.InstanceDB").SingleOrDefault();
+            var attributes = db?.Element("AttributeList");
+            if (attributes?.Element("InstanceOfName")?.Value != exactCallerName || attributes?.Element("InstanceOfType")?.Value != "FB")
+                Fail("Only an exact direct FB InstanceDB dependency is covered.", code);
+            string type = (string)declaration?.Attribute("Datatype");
+            if (!SystemInstanceTypes.Contains(type) || capturedCallerDeclaration == null || capturedDependentDeclaration?.Name.LocalName != "Member"
+                || (string)capturedCallerDeclaration.Attribute("Datatype") != type || (string)capturedDependentDeclaration.Attribute("Datatype") != type)
+                Fail("An independently captured IEC caller/dependent member pair of the same type is required.", code);
+            if (!SameDefaults(declaration, capturedCallerDeclaration)) Fail("The IEC caller declaration differs from the captured effect profile.", code);
+            var mapped = new XElement(capturedDependentDeclaration);
+            mapped.SetAttributeValue("Name", (string)declaration.Attribute("Name"));
+            var result = new XDocument(current);
+            var sections = result.Root.Element("SW.Blocks.InstanceDB").Element("AttributeList").Element("Interface")?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
+            ValidateSections(sections, code);
+            if (sections.Elements().SelectMany(s => s.Elements()).Any(m => (string)m.Attribute("Name") == (string)mapped.Attribute("Name")))
+                Fail("The proposed dependent storage name already exists.", code);
+            sections.Elements().Single(s => (string)s.Attribute("Name") == "Static").Add(mapped);
+            return result;
+        }
+
         internal static XElement Create(string name, string dataType, XDocument callee, XDocument referenceCallee, XElement capturedDeclaration)
         {
             if (!Regex.IsMatch(name ?? "", @"^[A-Za-z_][A-Za-z0-9_]{0,79}$")) Fail("A simple explicit multi-instance name is required.");

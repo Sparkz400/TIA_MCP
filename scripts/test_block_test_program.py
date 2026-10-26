@@ -38,12 +38,37 @@ class InterfaceTests(unittest.TestCase):
         self.assertFalse(program["bindings"]["dut"]["Result"]["writable"])
         self.assertFalse(program["bindings"]["dut"]["Ret_Val"]["writable"])
 
+    def test_scoped_harness_names_its_ob_and_qualifies_every_symbol(self):
+        interface = inspect_interface(native("FB", inputs=[member("Enable", "Bool")], state=[member("Memory", "Int")]))
+        program = generate_program(interface, prefix="TgpTest", organization_block="TgpTest_Cycle",
+                                   symbol_namespace="TiaMcp_UnitA.Alternate")
+        self.assertIn('ORGANIZATION_BLOCK "TgpTest_Cycle"', program["source"])
+        self.assertNotIn('"Main"', program["source"])
+        self.assertEqual(program["expectedBlockNames"][-1], "TgpTest_Cycle")
+        symbols = [b["symbol"] for b in program["bindings"]["dut"].values()] + [s["symbol"] for s in program["signals"].values()]
+        self.assertTrue(symbols and all(s.startswith("TiaMcp_UnitA.Alternate.TgpTest_Data.") for s in symbols))
+        lines = program["source"].splitlines()
+        self.assertEqual(lines[3], "NAMESPACE TiaMcp_UnitA.Alternate")
+        self.assertEqual([line for line in lines if line][-1], "END_NAMESPACE")
+        self.assertNotIn("NAMESPACE", generate_program(interface)["source"])
+        self.assertIn('"TiaMcp_UnitA.Alternate.TgpTest_Data".dut.Enable', program["source"])
+        self.assertIn('"TiaMcp_UnitA.Alternate.TgpTest_dut_Instance"(', program["source"])
+        self.assertIn('"TiaMcp_UnitA.Alternate.UnitUnderTest"\nBEGIN', program["source"])
+        for bad in ("Unit..A", "Unit A", ""):
+            with self.assertRaises(InterfaceError):
+                generate_program(interface, symbol_namespace=bad)
+
     def test_nested_udt_signed_and_multidimensional_array_leaves(self):
         rows = [member("Samples", "Array[-2..2] of Int"),
                 member("Meta", "Struct", [member("Count", "DInt"), member("Label", "String[12]")]),
                 member("Grid", "Array[1..2, -1..0] of Real")]
         definition = {"objectKinds": ["SW.Types.PlcStruct"], "sections": [{"name": "None", "members": rows}],
                       "artifact": {"sha256": "a" * 64}}
+        scoped = inspect_interface(native(inouts=[member("Item", '"Unit_A.Alt.Payload"')]), {"Unit_A.Alt.Payload": definition})
+        self.assertEqual(scoped["requiredTypes"], ["Unit_A.Alt.Payload"])
+        for spelling in ('"Unit_A..Payload"', '"Unit_A.Payload."', '"Unit A.Payload"'):
+            with self.assertRaises(InterfaceError):
+                inspect_interface(native(inouts=[member("Item", spelling)]), {"Unit_A.Payload": definition})
         program = generate_program(inspect_interface(native(inouts=[member("Item", '"Payload"')]), {"Payload": definition}))
         bindings = program["bindings"]["dut"]
         self.assertEqual(len(bindings), 11)

@@ -24,6 +24,8 @@ internal static class Program
             ("Bounded graph and separate content freshness", ProjectModelTests.GraphsAndSeparateFreshness),
             ("Complete graph serialization remains bounded with unresolved evidence", ProjectModelTests.GraphSerializedByteLimit),
             ("Independent provider contracts", ProjectModelTests.ProviderContractIntegration),
+            ("Native network, technology and unit relationship providers", ProjectModelNativeProviderTests.NetworkTechnologyAndUnitProviders),
+            ("Every captured node kind declares its relationship scope", ProjectModelNativeProviderTests.EveryCapturedKindHasDeclaredScope),
             ("Typed preview preserves source, opacity and partial bounds", ProjectModelTypedPreviewTests.AdaptationAndBounds),
             ("Cached query performance", ProjectModelTests.CachedPerformance),
             ("Portable artifact manifest integrity and path ownership", ProjectExplorerArtifactTests.ManifestIntegrity),

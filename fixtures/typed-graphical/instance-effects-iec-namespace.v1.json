@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "nativeImportCompileVerified": true,
+  "engineeringVerified": false,
+  "preservationVerified": false,
+  "persistenceVerified": false,
+  "recoveryVerified": false,
+  "runtimeVerified": false,
+  "tiaVersion": "V21",
+  "route": "namespace",
+  "artifacts": {
+    "beforeCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec-namespace/before-caller.xml",
+      "sha256": "57a3fd55f8b5707de45cda79d9f212a41b92f8a8b0d7bdadc1f88483f22dd02d",
+      "captureReport": "artifacts/cap-iec-effect/capture.json"
+    },
+    "beforeInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec-namespace/before-instance.xml",
+      "sha256": "d8a61778b9936ca7741a36f9c6a8df46ba79fc37ac818ca9fda6a5148d4daad2",
+      "captureReport": "artifacts/cap-iec-effect/capture.json"
+    },
+    "afterCaller": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec-namespace/after-caller.xml",
+      "sha256": "e58838a83590d68bb2e73bbf4945c2a23cbb73e39f1414cc4f06c09dbeca1040",
+      "captureReport": "artifacts/cap-iec-effect/capture.json"
+    },
+    "afterInstance": {
+      "path": "fixtures/typed-graphical/native/instance-effects-iec-namespace/after-instance.xml",
+      "sha256": "84068dbab969ef62c8f5d5b870c6ee728094471908dd2aeefb22dd37b48939b2",
+      "captureReport": "artifacts/cap-iec-effect/capture.json"
+    }
+  },
+  "sources": {
+    "before": {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-iec-effect-before.scl",
+      "sha256": "fb4d7076ce421a237557efb31acac2e3641b30103f479b8a75db50c4c0595a8d",
+      "transportSha256": "fb4d7076ce421a237557efb31acac2e3641b30103f479b8a75db50c4c0595a8d",
+      "changeId": "f988bcc2f9e047559b5a565dd7ace26e"
+    },
+    "after": {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-iec-effect-after.scl",
+      "sha256": "1fec5e76896c92d0eb0b123bdc24b220dfa8a501e6edc9885288062546057a68",
+      "transportSha256": "1fec5e76896c92d0eb0b123bdc24b220dfa8a501e6edc9885288062546057a68",
+      "changeId": "b4d61df71506453fb26590b97f5db0b6"
+    }
+  },
+  "namespace": "TiaMcp_UnitA.Alternate",
+  "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "nativeObservedEffect": {
+    "appendedStaticMembers": [
+      "Timer_TON",
+      "Timer_TOF",
+      "Timer_TP",
+      "Counter_CTU",
+      "Counter_CTD",
+      "Counter_CTUD"
+    ],
+    "existingFullDbPayloadPreserved": true,
+    "explicitStartValuePreserved": {
+      "RetainedMarker": "42"
+    }
+  },
+  "members": {
+    "TON_TIME": "Timer_TON",
+    "TOF_TIME": "Timer_TOF",
+    "TP_TIME": "Timer_TP",
+    "CTU_INT": "Counter_CTU",
+    "CTD_INT": "Counter_CTD",
+    "CTUD_INT": "Counter_CTUD"
+  }
+}

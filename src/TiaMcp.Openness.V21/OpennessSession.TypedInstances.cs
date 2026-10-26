@@ -302,10 +302,9 @@ namespace TiaMcp.Openness.V21
                 {
                     var db = TypedGraphicalResolution.Exact(blocks, b => b.Path == dependency.Value<string>("path"),
                         "StaleDeclaration", "The exact DB symbol owner is unavailable or ambiguous.");
-                    if (!(db.Item is DataBlock) || !string.IsNullOrEmpty(db.Item.Namespace) ||
-                        ObjectIdentity.ScopePath(plc.Path, db.Path) != change.ScopePath || db.Item.Name != dependency.Value<string>("name"))
+                    if (!(db.Item is DataBlock) || ObjectIdentity.ScopePath(plc.Path, db.Path) != change.ScopePath || QualifiedName(db.Item) != dependency.Value<string>("name"))
                         throw new BridgeException("StaleDeclaration", "The selected DB symbol changed after preparation.");
-                    TypedGraphicalResolution.RequireUniqueSymbol(blocks.Where(b => b.Item is DataBlock).Select(b => b.Item.Name), db.Item.Name, "StaleDeclaration");
+                    TypedGraphicalResolution.RequireUniqueSymbol(blocks.Where(b => b.Item is DataBlock).Select(b => QualifiedName(b.Item)), QualifiedName(db.Item), "StaleDeclaration");
                 }
             }
             foreach (JObject creation in change.TypedInstanceCreations)

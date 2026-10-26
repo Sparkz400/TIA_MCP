@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.16",
+  "catalogVersion": "0.4.22",
   "targetTiaVersions": [
     21
   ],
@@ -1841,6 +1841,40 @@
       ]
     },
     {
+      "id": "local.typed.insertion-first.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e96ab94726a498d8141ffab08989028ea2a87f7c",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-first-lad and typed-insert-first-fbd: a first network inserted into a network-free FB derived from the native Tgp_Boolean exports. The builder placed the compile unit, with a captured native network envelope, directly before the block title and shifted the title IDs by the inserted count; the independent check required that placement and the exact shift, and the topology matched the native Boolean network. Both passed import/compile, complete prepared-vs-native XML, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.insertion-first.20261026.json"
+      ],
+      "limitations": [
+        "Engineering only; insertion combined with storage creation still needs its own composite effect contract.",
+        "An earlier attempt (artifacts/rt6-envelope-mismatch) failed NativePreservationMismatch with a bare envelope; it showed TIA adds the network's own comment/title objects."
+      ]
+    },
+    {
+      "id": "local.typed.failed-source-recovery.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5254031f27f516b492b8e42202ea33f2fce2efac",
+        "passedScope": "scripts/qualify_failed_source_recovery.py on the blocked scoped capture artifacts/cap-scoped (sha256 164b76ea...): its last source left the change recovery_required with an unknown after-state fingerprint and change_restore refused (FingerprintUnavailable). The retained SHA-bound recovery archive was retrieved into a fresh owned TIA V21 project and all 21 blocks, types and tag tables equal the failing source's pre-change snapshot; owned cleanup passed."
+      },
+      "artifacts": [
+        "evidence/local.typed.failed-source-recovery.20261026.json"
+      ],
+      "limitations": [
+        "Checkpoint retrieval into a new project is separate evidence; it is not a successful change_restore, and the stale/fingerprint guard is unchanged.",
+        "The original failed project was not opened, edited or released."
+      ]
+    },
+    {
       "id": "local.typed.routes.engineering.20261025",
       "status": "passed",
       "profile": {
@@ -1959,6 +1993,140 @@
       ],
       "limitations": [
         "Engineering only; scoped runtime is not covered."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "65fecaf17c04cbb594fc70bd62ef434b4a938f2e",
+        "passedScope": "scripts/qualify_typed_graphical.py --live --unit-seeder, one fresh owned TIA V21 scratch with a guarded UnitSeeder-seeded software unit and one owned PLCSIM Advanced V8 instance per case: 100 software-unit and alternate-namespace typed cells (see docs/verification/typed-lad-fbd-route-runtime-20261026.md) passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, checkpoint restore with recovered reopen, and every independent runtime assertion, with the test harness generated inside the DUT's unit and namespace."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.20261026.json"
+      ],
+      "limitations": [
+        "Created multi-instance storage is refused before runtime (DependencyProfileUnavailable: no route dependent-instance effect profile); the scoped instance-effect pair is authored but not captured.",
+        "Numeric FB local cases hit a harness type-resolution defect and global variants used an inapplicable two-instance oracle in this run; both are fixed and rerun separately (local.typed.scoped-runtime.reruns.20261026).",
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.reruns.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "00d54fc8d827327b9dcc1fb3d0e8d1656917aa28",
+        "passedScope": "Reruns on the fixed harness (namespace-qualified FB member types; single-instance oracle for shared global callee storage), live as in local.typed.scoped-runtime.20261026: software-unit and alternate-namespace numeric FB cells with existing-global and created-global storage, LAD and FBD (8 cells), each passing all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.reruns.20261026.json"
+      ],
+      "limitations": [
+        "Global and created-global variants assert the single-instance history steps; independent-instance behaviour does not apply to one shared callee DB.",
+        "Local numeric FB cells failed here on dependency identity (short block name versus qualified type) and are rerun separately."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.local-fb.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a61de1c05c59d6e517f9e5ec2938e76626023753",
+        "passedScope": "Software-unit and alternate-namespace numeric FB cells with local multi-instance callee storage, LAD and FBD (4 cells), live as in local.typed.scoped-runtime.20261026 after binding the scoped FB dependency to its namespace-qualified identity: each passed all five gates, including two independent harness instances keeping separate callee history."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.local-fb.20261026.json"
+      ],
+      "limitations": [
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "db0622429da94fc29374909995c9d3098047c114",
+        "passedScope": "scripts/capture_typed_routes_owned.py: the 13 inputs of route-capture-scoped-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline: software-unit and alternate-namespace instance-effect pairs (callee template, FB and instance DB with RetainedMarker 42, then the FB redeclared with a Child multi-instance while the dependent DB was observed), a unit tag table, namespace-qualified global operand DBs and LAD/FBD callers reading and writing a namespaced DB member in both routes. Every input compiled clean and saved; only declared additions, the declared redeclarations and their observed dependent DBs changed; the saved state matched a fresh-process reopen. The extracted route effect pairs keep the complete existing DB payload and append only Child."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-capture.20261026.json"
+      ],
+      "limitations": [
+        "Native reference capture only; enabling route createMulti and global DB operand profiles needs builder qualification.",
+        "Unit tag operands are excluded: an earlier capture of the same packet (artifacts/cap-scoped, sha256 164b76ea...) compiled an M-memory unit tag caller with 'Accessing this type of tag is not possible in software units'; %I/%Q unit tags are unobserved."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.createmulti.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "f205f10d66fc05c97c4da741bebb1f880454ca6b",
+        "passedScope": "Software-unit and alternate-namespace numeric FB cells creating a multi-instance member, LAD and FBD (4 cells), live as in local.typed.scoped-runtime.20261026 with the route dependent-instance effect profiles from local.typed.scoped-capture.20261026: the harness instance DB followed the profiled native effect and each cell passed all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.createmulti.20261026.json"
+      ],
+      "limitations": [
+        "Timer and counter created multi-instance members (24 cells) are refused: their IEC system-type declarations differ from the captured FB-member effect profile; IEC effect pairs are not captured.",
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.iec-effect-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0c9217dcf6a77fcea1a38566d30ef8370790e6c9",
+        "passedScope": "scripts/capture_typed_routes_owned.py: the 4 inputs of route-capture-iec-effect-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline: per route (software unit, alternate namespace) an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type (TON_TIME, TOF_TIME, TP_TIME, CTU_INT, CTD_INT, CTUD_INT) while the dependent instance DB was observed. Every input compiled clean and saved; only the declared redeclarations and their observed DBs changed; the saved state matched a fresh-process reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.iec-effect-capture.20261026.json"
+      ],
+      "limitations": [
+        "Native reference capture only; route createMulti for timers and counters needs builder qualification with the extracted profiles."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.iec-createmulti.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1194d3d05b278577325ed1a50c1387cf86932781",
+        "passedScope": "Software-unit and alternate-namespace TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member, LAD and FBD (24 cells), live as in local.typed.scoped-runtime.20261026 with the route IEC dependent-instance effect profiles from local.typed.iec-effect-capture.20261026: the harness instance DB followed the profiled native effect and each cell passed all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.iec-createmulti.20261026.json"
+      ],
+      "limitations": [
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.route-dboperand.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a8085690242c70ba85870d5f60475d84505196b6",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, 4 route builder cases using namespaced global DB member operands (scope db, owner in the caller's software scope): software-unit and alternate-namespace LAD contact/coil and FBD assign networks reading <DB>.Flag and writing <DB>.Target, rebuilt against the captured native callers from local.typed.scoped-capture.20261026. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-dboperand.20261026.json"
+      ],
+      "limitations": [
+        "Engineering only: the runtime harness drives the DUT interface, not external global DB members.",
+        "DB owners in other software units are refused (no unit-relation profile); unit tag operands remain a native V21 boundary."
       ]
     }
   ],
@@ -8872,7 +9040,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
-          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026); scoped runtime is unqualified.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8896,7 +9064,17 @@
           "local.typed.route-profiles.20261025",
           "local.typed.route-iec-capture.20261026",
           "local.typed.route-iec.20261026",
-          "local.typed.route-created-storage.20261026"
+          "local.typed.route-created-storage.20261026",
+          "local.typed.scoped-runtime.20261026",
+          "local.typed.scoped-runtime.reruns.20261026",
+          "local.typed.scoped-runtime.local-fb.20261026",
+          "local.typed.scoped-capture.20261026",
+          "local.typed.scoped-runtime.createmulti.20261026",
+          "local.typed.iec-effect-capture.20261026",
+          "local.typed.scoped-runtime.iec-createmulti.20261026",
+          "local.typed.route-dboperand.20261026",
+          "local.typed.insertion-first.20261026",
+          "local.typed.failed-source-recovery.20261026"
         ]
       },
       "availability": {

@@ -81,6 +81,14 @@ class ProjectModelContracts(unittest.TestCase):
         edge["unresolved"] = None
         self.invalid(fixture)
 
+    def test_native_provider_edge_kinds_are_explicit(self):
+        fixture = read("fixtures/project-explorer/representative.project-model.json")
+        for kind in ["connectedSubnet", "ioSystemController", "ioSystemDevice", "technologyConnection", "unitRelation"]:
+            fixture["edges"][0]["kind"] = kind
+            self.validate(fixture)
+        fixture["edges"][0]["kind"] = "physicalCable"
+        self.invalid(fixture)
+
     def test_provider_requires_exact_snapshot_reference(self):
         response = read("fixtures/project-explorer/unsupported-provider.json")
         for field in ["snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath"]:

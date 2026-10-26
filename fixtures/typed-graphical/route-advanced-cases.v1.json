@@ -3207,8 +3207,7 @@
         "TgpUnit_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -3340,7 +3339,8 @@
       "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
-      "namespace": "TiaMcp_UnitA"
+      "namespace": "TiaMcp_UnitA",
+      "behaviorFamily": "numeric-fb-single"
     },
     {
       "fixtureId": "typed-unit-numeric-fb-lad-createmulti",
@@ -3535,8 +3535,7 @@
         "TgpUnit_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -3669,6 +3668,7 @@
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
       "namespace": "TiaMcp_UnitA",
+      "behaviorFamily": "numeric-fb-single",
       "referenceBindings": [
         {
           "element": "Instance",
@@ -3996,8 +3996,7 @@
         "TgpUnit_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -4131,7 +4130,8 @@
       "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
-      "namespace": "TiaMcp_UnitA"
+      "namespace": "TiaMcp_UnitA",
+      "behaviorFamily": "numeric-fb-single"
     },
     {
       "fixtureId": "typed-unit-numeric-fb-fbd-createmulti",
@@ -4328,8 +4328,7 @@
         "TgpUnit_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -4464,6 +4463,7 @@
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
       "namespace": "TiaMcp_UnitA",
+      "behaviorFamily": "numeric-fb-single",
       "referenceBindings": [
         {
           "element": "Instance",
@@ -13307,8 +13307,7 @@
         "TgpNamespace_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -13440,7 +13439,8 @@
       "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
-      "namespace": "TiaMcp_UnitA.Alternate"
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "behaviorFamily": "numeric-fb-single"
     },
     {
       "fixtureId": "typed-namespace-numeric-fb-lad-createmulti",
@@ -13635,8 +13635,7 @@
         "TgpNamespace_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -13769,6 +13768,7 @@
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
       "namespace": "TiaMcp_UnitA.Alternate",
+      "behaviorFamily": "numeric-fb-single",
       "referenceBindings": [
         {
           "element": "Instance",
@@ -14096,8 +14096,7 @@
         "TgpNamespace_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -14231,7 +14230,8 @@
       "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
-      "namespace": "TiaMcp_UnitA.Alternate"
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "behaviorFamily": "numeric-fb-single"
     },
     {
       "fixtureId": "typed-namespace-numeric-fb-fbd-createmulti",
@@ -14428,8 +14428,7 @@
         "TgpNamespace_NumericFB"
       ],
       "runtimeInstances": [
-        "left",
-        "right"
+        "dut"
       ],
       "payload": {
         "model": {
@@ -14564,6 +14563,7 @@
       "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
       "unitName": "TiaMcp_UnitA",
       "namespace": "TiaMcp_UnitA.Alternate",
+      "behaviorFamily": "numeric-fb-single",
       "referenceBindings": [
         {
           "element": "Instance",

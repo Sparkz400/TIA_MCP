@@ -9,6 +9,7 @@ import copy
 import importlib.util
 import json
 import pathlib
+import subprocess
 import uuid
 import hashlib
 from xml.etree import ElementTree as ET
@@ -55,6 +56,35 @@ def independent_behavior(family):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.cases(family)
+
+
+def seed_unit(session, args, report, persist, case):
+    """One bounded guarded UnitSeeder run per mode; a timeout or uncertain result is never replayed."""
+    assert session is not None and args.unit_seeder, "Seeding a software unit needs a local owned session and --unit-seeder."
+    executable = args.unit_seeder.resolve()
+    modes = ["seed"] + (["add-alternate-namespace"] if case["namespace"] != case["unitName"] else [])
+    authorization = pathlib.Path(session.artifacts) / "unit-authorization.json"
+    authorization.write_text(canonical({"processId": session.session["processId"], "projectPath": session.current_project,
+        "ownsPortalProcess": True, "creationTool": "tia_create_scratch"}), encoding="utf-8")
+    for mode in modes:
+        session.guard()
+        row = {"path": str(executable), "sha256": hashlib.sha256(executable.read_bytes()).hexdigest(), "mode": mode, "dispatched": True}
+        report.setdefault("unitSeeder", []).append(row)
+        persist()
+        try:
+            result = subprocess.run([str(executable), mode, str(authorization)], cwd=ROOT, capture_output=True,
+                                    text=True, encoding="utf-8", timeout=args.timeout)
+        except subprocess.TimeoutExpired:
+            row.update(outcome="unknown_after_timeout", replayPermitted=False)
+            persist()
+            raise
+        row.update(exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
+        persist()
+        parsed = json.loads(result.stdout.strip().splitlines()[-1])
+        assert result.returncode == 0 and parsed.get("completed") is True and parsed.get("compileErrors") == 0, "Guarded unit seeding did not complete: " + mode
+        assert parsed.get("processId") == session.session["processId"] and             pathlib.Path(parsed["projectPath"]).resolve() == pathlib.Path(session.current_project).resolve(), "Seeder target receipt differs."
+        assert hashlib.sha256(executable.read_bytes()).hexdigest() == row["sha256"], "Seeder binary changed during fixture setup."
+    session.guard()
 
 
 def selected_blocks(call, case):
@@ -179,6 +209,9 @@ def run_case(case, args, output):
         else:
             scratch = call("tia_create_scratch", {"cpuTypeIdentifier": case["cpuTypeIdentifier"]})
             assert scratch["completed"] is True and scratch["compile"]["errorCount"] == 0
+            if case.get("unitName"):
+                # A fresh scratch keeps runtime credential provenance; seed its unit in place of the archived baseline.
+                seed_unit(session, args, report, persist, case)
         report["scratch"] = scratch
         _, scope = selected_blocks(call, case)
         route = {"scopePath": scope, "namespace": case["namespace"]} if scope else {}
@@ -211,16 +244,24 @@ def run_case(case, args, output):
             report["runtimeBlockName"] = runtime_name
             definitions = {}
             for name in case.get("interfaceDependencies", []):
-                definitions[name] = call("block_interface", {"blockName": name})
+                definition = call("block_interface", {"blockName": name})
+                if route:
+                    # Scoped members reference their types by namespace-qualified name; the native
+                    # identity carries that namespace only in its path.
+                    assert definition["block"]["path"].endswith("/namespaces/" + case["namespace"] + "/" + name),                         "Dependency is not in the case namespace: " + name
+                    name = case["namespace"] + "." + name
+                    definition = {**definition, "block": {**definition["block"], "name": name}}
+                definitions[name] = definition
             instances = tuple(case.get("runtimeInstances", ["dut"]))
-            program = generate_program(inspect_interface(interface, definitions), instances=instances, prefix="TgpTest")
-            suite = {"fixtureId": case["fixtureId"], "cases": independent_behavior(case["family"]), "instances": list(instances)}
+            scoped = {"organization_block": "TgpTest_Cycle", "symbol_namespace": case["namespace"]} if route else {}
+            program = generate_program(inspect_interface(interface, definitions), instances=instances, prefix="TgpTest", **scoped)
+            suite = {"fixtureId": case["fixtureId"], "cases": independent_behavior(case.get("behaviorFamily", case["family"])), "instances": list(instances)}
             validate_suite(suite, program)
             if args.live:
                 assert len(suite["cases"]) == 1 and suite["cases"][0].get("repeat", 1) == 1, "Live qualification currently admits one fresh authored diagnostic only."
             (output / "suite.json").write_text(canonical(suite), encoding="utf-8")
             (output / "program.json").write_text(canonical(program), encoding="utf-8")
-            apply_change(call, "source_upsert", {"language": "SCL", "source": program["source"], "expectedBlockNames": program["expectedBlockNames"]})
+            apply_change(call, "source_upsert", {**route, "language": "SCL", "source": program["source"], "expectedBlockNames": program["expectedBlockNames"]})
         if args.live and not engineering_only:
             apply_change(call, "project_simulation_enable", {"enabled": True})
         before = snapshot(call, None, output / "before", case)
@@ -241,6 +282,9 @@ def run_case(case, args, output):
                 _, kind, ordinal = node["nativeUid"].split(":")
                 matches = [e for e in document.iter() if e.tag.rsplit("}", 1)[-1] == "Part" and e.get("Name") == kind]
                 node["nativeUid"] = matches[int(ordinal)].get("UId")
+        for operand in payload["model"].get("operands", []):
+            if operand.get("ownerPath", "").startswith("$block:"):
+                operand["ownerPath"] = before[operand["ownerPath"][7:]]["block"]["path"]
         for instance in payload.get("instances", []):
             if instance.get("blockPath", "").startswith("$block:"):
                 instance["blockPath"] = before[instance["blockPath"][7:]]["block"]["path"]
@@ -255,7 +299,9 @@ def run_case(case, args, output):
             assert all(instance["kind"] in {"existingGlobal", "existingMulti"} for instance in payload.get("instances", [])), "Insertion plus storage changes requires a separately captured composite preservation contract."
             assert_existing_caller_insertion(target["xml"], expected_xml, prepared["preview"]["typed"]["networkId"], payload["model"].get("insertAfterNetworkId"))
             report["insertionPreservationContract"] = "network-only-additive-following-id-shift-v2"
-        oracle = adapt_reference_bindings(reference_xml, case.get("referenceBindings", []))
+        # A network-free caller has no network of its own; its case names the native export it was derived from.
+        topology_xml = adapt_reference_culture((ROOT / case["topologyXml"]).read_bytes().decode("utf-8-sig"), culture)[0] if case.get("topologyXml") else reference_xml
+        oracle = adapt_reference_bindings(topology_xml, case.get("referenceBindings", []))
         assert_independent_topology(oracle, expected_xml, prepared["preview"]["typed"]["networkId"])
         report["independentNativeTopologyVerified"] = True
         report["applyIntent"] = {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
@@ -473,6 +519,7 @@ def main():
     parser.add_argument("--baseline-sha256")
     parser.add_argument("--provision-runtime-credential", action="store_true")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true")
+    parser.add_argument("--unit-seeder", type=pathlib.Path, help="Guarded UnitSeeder binary: run a software-unit case live on a fresh seeded scratch instead of its archived baseline.")
     args = parser.parse_args()
     if bool(args.config) == bool(args.worker):
         parser.error("Select exactly one of --config or --worker")
@@ -498,6 +545,14 @@ def main():
         parser.error("--live requires exactly one explicit diagnostic case; a runtime corpus is not admitted")
     if args.config and any(case.get("archivePath") for case in selected):
         parser.error("Selected case requires a client-local archive; configured deployment qualification requires fresh owned scratch cases")
+    if args.unit_seeder:
+        if not args.live or not args.unit_seeder.is_file() or not all(case.get("unitName") for case in selected):
+            parser.error("--unit-seeder requires --live, an existing binary and software-unit cases")
+        for case in selected:
+            # Runtime needs the scratch's own credential provenance; the archive only stood in for the seeded unit.
+            case.pop("archivePath", None)
+            case.pop("archiveSha256", None)
+            case["engineeringOnly"] = False
     if args.baseline_archive:
         for case in selected:
             if case.get("archivePath"):
