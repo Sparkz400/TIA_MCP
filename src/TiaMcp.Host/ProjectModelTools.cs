@@ -34,7 +34,7 @@ public sealed partial class TiaTools
     public Task<CallToolResult> ProjectModelDetails(JsonElement request, CancellationToken cancellationToken) => ModelRead(request, "details", cancellationToken);
 
     [McpServerTool(Name = "project_model_relationships", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read evidence-backed relationships for request.reference; optional kinds, direction, depth (1..5), maxNodes (1..500), maxEdges (1..1000). Defaults 1/100/200. Calls, instances, reads, writes, type/dependency and configured I/O evidence remain distinct; unresolved endpoints and partial coverage remain explicit.")]
+    [Description("Read evidence-backed relationships for request.reference; optional kinds, direction, depth (1..5), maxNodes (1..500), maxEdges (1..1000). Defaults 1/100/200. Calls, instances, reads, writes, type/dependency, configured I/O, configured subnet/IO-system membership (connectedSubnet, ioSystemController, ioSystemDevice; maxNetworkVisited), technology-object hardware connections and software-unit relations remain distinct; providerScope names the providers for the node kind or why none applies. Unresolved endpoints and partial coverage remain explicit; configured network edges are not cables or physical topology.")]
     public Task<CallToolResult> ProjectModelRelationships(JsonElement request, CancellationToken cancellationToken) => ModelRead(request, "relationships", cancellationToken);
 
     [McpServerTool(Name = "project_model_verify", ReadOnly = true, Destructive = false, OpenWorld = false)]

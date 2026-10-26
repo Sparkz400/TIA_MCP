@@ -12,10 +12,12 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.ExternalSources;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Units;
+using Siemens.Engineering.SW.WatchAndForceTables;
 using TiaMcp.Analysis;
 using TiaMcp.Indexing;
 using TiaMcp.Model;
@@ -175,6 +177,7 @@ namespace TiaMcp.Openness.V21
                     string ungrouped = capture.Add(root + "/ungrouped", rootId, "deviceGroup", "Ungrouped devices", null, null);
                     if (ungrouped != null) CaptureModelDevices(project.UngroupedDevicesGroup.Devices, root + "/ungrouped", ungrouped, capture, 1, project);
                     CaptureModelDeviceGroups(project.DeviceGroups, root, rootId, capture, 1, project);
+                    if (capture.PlcPath == null) CaptureModelSubnets(project, root, rootId, capture);
                 }
             }
             timer.Stop();
@@ -196,7 +199,9 @@ namespace TiaMcp.Openness.V21
                 ModelCoverage("plcLibraryDependencies", root, "partial", capture.LibraryDependencyBudget.Used,
                     capture.Nodes.Count(n => n["metadata"]?["libraryInstance"]?["dependencies"]?.Value<string>("status") == "observed"),
                     new JArray("Direct version GUID lists only, limited to 1000 entries per observation and 20000 collection/iterator read operations across the capture. Duplicate observations remain distinct; unavailable lists never mean empty. No complete library or project-consumer closure is established.")),
-                ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables, port connectivity or electrical wiring.")));
+                ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables, port connectivity or electrical wiring.")),
+                ModelCoverage("plcAlarmTextLists", root, "unsupported", 0, 0, new JArray("PLC alarm text lists are not captured in the explorer tree.")),
+                ModelCoverage("libraries", root, "unsupported", 0, 0, new JArray("Project and global libraries are read through the library tools; the tree carries only per-object library-instance observations.")));
             foreach (var providerCoverage in capture.ProviderCoverage) coverage.Add(providerCoverage);
             var warnings = ModelWarnings(capture.Warnings);
             string revision = ProjectIndexStore.Hash(project.Path.FullName + "\n" + capture.Nodes.ToString(Formatting.None));
@@ -355,7 +360,7 @@ namespace TiaMcp.Openness.V21
                 int scopeDepth = scope.Unit == null ? depth : depth + 2;
                 if (!capture.Depth(scopeDepth) || scope.Unit != null && unitParent == null) break;
                 // SoftwareScopes already charged each native unit to this budget.
-                string id = scope.Unit == null ? parent : capture.Add(scope.Path, unitParent, scope.Kind, scope.Name, plc.Path, scope.Path, alreadyVisited: true);
+                string id = scope.Unit == null ? parent : capture.Add(scope.Path, unitParent, scope.Kind, scope.Name, plc.Path, scope.Path, ModelUnitMetadata(scope.Unit, capture), alreadyVisited: true);
                 if (id == null) break;
                 try { CaptureModelBlocks(scope.Blocks, scope.Path + "/blocks", id, plc.Path, scope.Path, capture, scopeDepth + 1); }
                 catch (Exception error) { capture.Unavailable(scope.Path + "/blocks", id, error); }
@@ -365,8 +370,76 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) { capture.Unavailable(scope.Path + "/tags", id, error); }
             }
             if (capture.ScopePath == null || capture.ScopePath == plc.Path)
+            {
                 try { CaptureModelTechnology(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", parent, plc.Path, capture, depth + 1); }
                 catch (Exception error) { capture.Unavailable(plc.Path + "/technology", parent, error); }
+                try { CaptureModelWatchTables(plc.Software.WatchAndForceTableGroup, plc.Path, "root", parent, capture, depth + 1); }
+                catch (Exception error) { capture.Unavailable(plc.Path + "/watchGroups/root", parent, error); }
+                try { CaptureModelExternalSources(plc.Software.ExternalSourceGroup, plc.Path + "/sources", parent, plc.Path, capture, depth + 1); }
+                catch (Exception error) { capture.Unavailable(plc.Path + "/sources", parent, error); }
+            }
+        }
+
+        private static JObject ModelUnitMetadata(PlcUnitBase unit, ModelCapture capture)
+        {
+            var relations = new JArray();
+            try
+            {
+                foreach (var relation in BoundedModelItems(unit.Relations, capture, null))
+                {
+                    capture.VisitSkipped();
+                    relations.Add(new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = relation.RelatedObject });
+                }
+                return new JObject { ["relationsStatus"] = capture.Budget.Truncated ? "partial" : "observed", ["relations"] = relations };
+            }
+            catch (Exception error) { return new JObject { ["relationsStatus"] = "unavailable", ["reason"] = error.Message }; }
+        }
+
+        private static void CaptureModelSubnets(Project project, string root, string rootId, ModelCapture capture)
+        {
+            string folder = capture.Add(root + "/subnets", rootId, "folder", "Subnets", null, null, null, false);
+            if (folder == null) return;
+            foreach (var subnet in BoundedModelItems(project.Subnets, capture, folder))
+            {
+                // Same canonical paths as hardware_inspect's resolved subnet and IO-system references.
+                string path = root + "/subnets/" + Segment(subnet.Name);
+                string id = capture.Add(path, folder, "subnet", subnet.Name, null, null,
+                    new JObject { ["netType"] = subnet.NetType.ToString(), ["typeIdentifier"] = subnet.TypeIdentifier, ["topologyVerified"] = false });
+                if (id == null) return;
+                try
+                {
+                    foreach (var system in BoundedModelItems(subnet.IoSystems, capture, id))
+                        if (capture.Add(path + "/ioSystems/" + Segment(system.Name), id, "ioSystem", system.Name, null, null, new JObject { ["number"] = system.Number }) == null) return;
+                }
+                catch (Exception error) { capture.Unavailable(path, id, error); }
+            }
+        }
+
+        // Tables keep the watch tools' object paths; groups use their own prefix so
+        // a table and a group of equal name in one parent remain distinct objects.
+        private static void CaptureModelWatchTables(PlcWatchAndForceTableGroup group, string plc, string groupPath, string parent, ModelCapture capture, int depth)
+        {
+            if (group == null || !capture.Depth(depth)) return;
+            string id = capture.Add(plc + "/watchGroups/" + groupPath, parent, "watchTableGroup", group.Name, plc, plc);
+            if (id == null) return;
+            foreach (var table in BoundedModelItems(group.WatchTables, capture, id))
+                if (capture.Add(plc + "/watch/" + groupPath + "/" + Segment(table.Name), id, "watchTable", table.Name, plc, plc,
+                    new JObject { ["valueSemantics"] = "Offline table declaration; no live monitoring" }) == null) return;
+            foreach (var table in BoundedModelItems(group.ForceTables, capture, id))
+                if (capture.Add(plc + "/forceTables/" + groupPath + "/" + Segment(table.Name), id, "forceTable", table.Name, plc, plc,
+                    new JObject { ["valueSemantics"] = "Offline table declaration; no active forcing state" }) == null) return;
+            foreach (var child in BoundedModelItems(group.Groups, capture, id)) CaptureModelWatchTables(child, plc, groupPath + "/" + Segment(child.Name), id, capture, depth + 1);
+        }
+
+        private static void CaptureModelExternalSources(PlcExternalSourceGroup group, string path, string parent, string plc, ModelCapture capture, int depth)
+        {
+            if (group == null || !capture.Depth(depth)) return;
+            string id = capture.Add(path, parent, "externalSourceGroup", group.Name, plc, plc);
+            if (id == null) return;
+            foreach (var source in BoundedModelItems(group.ExternalSources, capture, id))
+                if (capture.Add(path + "/" + Segment(source.Name), id, "externalSource", source.Name, plc, plc,
+                    new JObject { ["contentSemantics"] = "Name only; source text is not read" }) == null) return;
+            foreach (var child in BoundedModelItems(group.Groups, capture, id)) CaptureModelExternalSources(child, path + "/groups/" + Segment(child.Name), id, plc, capture, depth + 1);
         }
 
         private void CaptureModelBlocks(PlcBlockGroup group, string path, string parent, string plc, string scope, ModelCapture capture, int depth)
@@ -557,6 +630,8 @@ namespace TiaMcp.Openness.V21
             {
                 if (selected.Value<string>("kind") == "hardware")
                     return ProjectModelHardwareRelationships(id, document, selected, reference, request, kinds, direction, depth, maxNodes, maxEdges);
+                if (selected.Value<string>("kind") == "subnet" || selected.Value<string>("kind") == "ioSystem")
+                    return ProjectModelNetworkRelationships(id, document, selected, reference, request, kinds, direction, depth, maxNodes, maxEdges);
                 JObject providerResult = null;
                 ReadHmiProjectModelRelationships(document, reference, selected, request, ref providerResult);
                 if (providerResult != null)
@@ -573,8 +648,10 @@ namespace TiaMcp.Openness.V21
                     }
                     return BoundProjectModelGraphResponse(providerResult);
                 }
-                return new JObject { ["schemaVersion"] = "project-model.v1", ["reference"] = reference, ["status"] = "unsupported",
-                    ["nodes"] = new JArray(selected), ["edges"] = new JArray(), ["warnings"] = new JArray("Native cross-reference analysis requires a PLC object. Hardware composition is available in the tree; physical topology is unverified.") };
+                var scope = ProjectModelRelationshipProviders.Scope(selected.Value<string>("kind"));
+                return new JObject { ["schemaVersion"] = "project-model.v1", ["reference"] = reference, ["status"] = "unsupported", ["providerScope"] = scope,
+                    ["nodes"] = new JArray(selected), ["edges"] = new JArray(), ["warnings"] = new JArray(scope.Value<string>("reason") ?? "The registered provider returned no observation for this object.",
+                        "Hardware composition is available in the tree; physical topology is unverified.") };
             }
             var timer = Stopwatch.StartNew();
             var args = ModelInspectionArguments(id, selected, request);
@@ -637,10 +714,13 @@ namespace TiaMcp.Openness.V21
                             ["origin"] = verified ? "nativeConfirmed" : "unresolved", ["resolution"] = verified && hardware != null ? "resolved" : "unresolved", ["capturedAtUtc"] = captured,
                             ["contentRevision"] = new JObject { ["status"] = "unavailable", ["scope"] = "configuredAddressRange" }, ["native"] = match } });
                 }
+            var providerCoverage = ModelPlcProviderEdges(document, selected, args, edges, path => nodes.TryGetValue(path, out var node) ? node : null, captured);
             document["edges"] = edges;
             var result = ProjectModelStore.QueryRelationships(document, selected.Value<string>("nodeId"), kinds, direction, depth, maxNodes, maxEdges);
             result["reference"] = reference;
             result["freshness"] = "metadataVerifiedThenSeparateNativeRead";
+            result["providerScope"] = ProjectModelRelationshipProviders.Scope(selected.Value<string>("kind"));
+            result["providerCoverage"] = providerCoverage;
             result["nativeCoverage"] = AnalysisCoverage(analysis, "Native calls, instance, reads, writes, dependencies and configured address evidence; unresolved endpoints retain original native identities.");
             result["nativeCoverage"]["hardwareVisitedNativeItems"] = analysis.HardwareVisited;
             result["warnings"] = ModelWarnings(analysis.Warnings);
@@ -648,8 +728,10 @@ namespace TiaMcp.Openness.V21
             timer.Stop(); result["nativeAnalysisMilliseconds"] = timer.Elapsed.TotalMilliseconds; result["capturedAtUtc"] = captured;
             try
             {
-                _projectModels.RememberRelationships(id, (JArray)result["edges"], new JArray(ModelCoverage("nativeRelationships", selected.Value<string>("objectPath"),
-                    analysis.Budget.Truncated || analysis.IndexTruncated || analysis.Warnings.Count != 0 ? "partial" : "complete", analysis.Budget.Used, ((JArray)result["edges"]).Count, analysis.Warnings)), result);
+                var retainedCoverage = new JArray(ModelCoverage("nativeRelationships", selected.Value<string>("objectPath"),
+                    analysis.Budget.Truncated || analysis.IndexTruncated || analysis.Warnings.Count != 0 ? "partial" : "complete", analysis.Budget.Used, ((JArray)result["edges"]).Count, analysis.Warnings));
+                foreach (var row in providerCoverage) retainedCoverage.Add(row.DeepClone());
+                _projectModels.RememberRelationships(id, (JArray)result["edges"], retainedCoverage, result);
                 result["retainedForExport"] = true;
             }
             catch (ProjectModelStore.ModelException error) when (error.Code == "ModelCapacity")
@@ -750,9 +832,11 @@ namespace TiaMcp.Openness.V21
             warnings.Add("Only configured address ranges with controller evidence are compared. This view does not prove channels, terminals, cables or physical topology.");
             if (candidates.Length == 0) coverage.Add(ModelCoverage("configuredIo", hardware.Value<string>("objectPath"), "partial", 0, 0,
                 new JArray("No I/O-address tag declarations are present in the captured scope; this does not establish that the hardware is unused.")));
+            ReadModelNetworkEdges(document, hardware.Value<string>("objectPath"), IndexInteger(request, "maxNetworkVisited", 20000, 1, 50000), edges, coverage, warnings, captured);
             document["edges"] = edges;
             var result = ProjectModelStore.QueryRelationships(document, hardware.Value<string>("nodeId"), kinds, direction, depth, maxNodes, maxEdges);
             result["reference"] = reference; result["nativeCoverage"] = coverage; result["warnings"] = ModelWarnings(warnings);
+            result["providerScope"] = ProjectModelRelationshipProviders.Scope("hardware");
             result["freshness"] = "metadataVerifiedThenSeparateNativeRead";
             ((JArray)result["warnings"]).Add("Configured I/O evidence was read after metadata capture; no atomic configuration/content revision is asserted.");
             result["candidateBounds"] = new JObject { ["maxIoTags"] = maxTags, ["maxIoPlcs"] = maxPlcs, ["maxNativeItemsPerPlc"] = maximum,
@@ -763,6 +847,89 @@ namespace TiaMcp.Openness.V21
             catch (ProjectModelStore.ModelException error) when (error.Code == "ModelCapacity")
             { result["retainedForExport"] = false; ((JArray)result["warnings"]).Add("Query completed but snapshot observation retention is full: " + error.Message); }
             return BoundProjectModelGraphResponse(result);
+        }
+
+        // Subnet and IO-system edges are observed from the hardware side, so a
+        // selected network object scans every bounded project network interface.
+        private JObject ProjectModelNetworkRelationships(string id, JObject document, JObject selected, JObject reference, JObject request,
+            string[] kinds, string direction, int depth, int maxNodes, int maxEdges)
+        {
+            var timer = Stopwatch.StartNew();
+            var edges = new JArray(); var coverage = new JArray(); var warnings = new JArray();
+            string captured = DateTime.UtcNow.ToString("O");
+            ReadModelNetworkEdges(document, null, IndexInteger(request, "maxNetworkVisited", 20000, 1, 50000), edges, coverage, warnings, captured);
+            warnings.Add("Configured subnet and IO-system associations only; they do not prove cables, ports or physical topology.");
+            document["edges"] = edges;
+            var result = ProjectModelStore.QueryRelationships(document, selected.Value<string>("nodeId"), kinds, direction, depth, maxNodes, maxEdges);
+            result["reference"] = reference; result["nativeCoverage"] = coverage; result["warnings"] = ModelWarnings(warnings);
+            result["providerScope"] = ProjectModelRelationshipProviders.Scope(selected.Value<string>("kind"));
+            result["freshness"] = "metadataVerifiedThenSeparateNativeRead"; result["capturedAtUtc"] = captured;
+            timer.Stop(); result["nativeAnalysisMilliseconds"] = timer.Elapsed.TotalMilliseconds;
+            try { _projectModels.RememberRelationships(id, (JArray)result["edges"], coverage, result); result["retainedForExport"] = true; }
+            catch (ProjectModelStore.ModelException error) when (error.Code == "ModelCapacity")
+            { result["retainedForExport"] = false; ((JArray)result["warnings"]).Add("Query completed but snapshot observation retention is full: " + error.Message); }
+            return BoundProjectModelGraphResponse(result);
+        }
+
+        private void ReadModelNetworkEdges(JObject document, string hardwarePath, int maximum, JArray edges, JArray coverage, JArray warnings, string captured)
+        {
+            var nodes = ModelNodesByPath(document);
+            string scope = hardwarePath ?? "/projects/" + Segment(document["project"].Value<string>("name"));
+            try
+            {
+                var inspection = InspectModelNetworks(SelectProject(new JObject { ["projectName"] = document["project"]["name"] }), maximum, hardwarePath);
+                var observed = ProjectModelRelationshipProviders.NetworkEdges(inspection, path => nodes.TryGetValue(path, out var node) ? node : null, captured);
+                AddModelEdges(edges, observed);
+                var networkWarnings = (JArray)inspection["warnings"];
+                foreach (var warning in ModelWarnings(networkWarnings)) warnings.Add(warning);
+                coverage.Add(ModelCoverage("configuredNetwork", scope, inspection["completeness"].Value<bool>("scopeComplete") ? "complete" : "partial",
+                    inspection["completeness"].Value<int>("visitedItems"), observed.Count, networkWarnings));
+            }
+            catch (Exception error)
+            {
+                warnings.Add("Configured network inspection: " + error.Message);
+                coverage.Add(ModelCoverage("configuredNetwork", scope, "unavailable", 0, 0, new JArray(error.Message)));
+            }
+        }
+
+        // Unit relations come from the captured metadata; technology connections are a
+        // separate native read through the existing technology_read route.
+        private JArray ModelPlcProviderEdges(JObject document, JObject selected, JObject args, JArray edges, Func<string, JObject> node, string captured)
+        {
+            var coverage = new JArray();
+            string kind = selected.Value<string>("kind"), path = selected.Value<string>("objectPath");
+            if (kind == "softwareUnit" || kind == "safetyUnit")
+            {
+                string status = selected["metadata"]?.Value<string>("relationsStatus");
+                bool complete = document["coverage"].OfType<JObject>().FirstOrDefault(c => c.Value<string>("provider") == "nativeHierarchy")?.Value<string>("status") == "complete";
+                var observed = ProjectModelRelationshipProviders.UnitRelationEdges(selected, document["nodes"].OfType<JObject>(), complete, captured);
+                AddModelEdges(edges, observed);
+                coverage.Add(ModelCoverage("softwareUnitRelations", path, status == "observed" && complete ? "complete" : status == null ? "unavailable" : "partial",
+                    (selected["metadata"]?["relations"] as JArray)?.Count ?? 0, observed.Count,
+                    new JArray(status == null ? "This snapshot has no captured unit relations; recapture with the current worker." : selected["metadata"].Value<string>("reason") ?? "Relations are native names; only unique names of the documented type in a complete PLC capture resolve.")));
+            }
+            if (kind == "technologyObject")
+            {
+                try
+                {
+                    var read = TechnologyRead(args);
+                    var observed = ProjectModelRelationshipProviders.TechnologyEdges(read, selected, node, captured);
+                    AddModelEdges(edges, observed);
+                    coverage.Add(ModelCoverage("technologyConnections", path, read["hardwareConnectionCoverage"]?.Value<bool>("scopeComplete") == true ? "complete" : "partial",
+                        ((JArray)read["hardwareConnections"]).Count, observed.Count, (JArray)read["warnings"]));
+                }
+                catch (Exception error) { coverage.Add(ModelCoverage("technologyConnections", path, "unavailable", 0, 0, new JArray(error.Message))); }
+            }
+            return coverage;
+        }
+
+        private static Dictionary<string, JObject> ModelNodesByPath(JObject document) => document["nodes"].OfType<JObject>()
+            .Where(n => n.Value<string>("objectPath") != null).ToDictionary(n => n.Value<string>("objectPath"), StringComparer.Ordinal);
+
+        private static void AddModelEdges(JArray edges, JArray observed)
+        {
+            var ids = new HashSet<string>(edges.Select(e => e.Value<string>("edgeId")), StringComparer.Ordinal);
+            foreach (var edge in observed) if (ids.Add(edge.Value<string>("edgeId"))) edges.Add(edge);
         }
 
         private static JObject ModelCallTarget(NativeReference reference, NativeAnalysis analysis, Dictionary<string, JObject> nodes, JObject fallback)
