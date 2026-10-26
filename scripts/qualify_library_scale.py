@@ -94,7 +94,7 @@ def run(args):
             row = {"batch": start // BATCH, "first": batch[0], "last": batch[-1]}
             started = time.perf_counter()
             prepared = h.prepare("library_create_type", {"schemaVersion": 1, "destinationLibraryId": library, "documentDirectory": str(documents),
-                                 "documentNames": [n + ".scl" for n in batch], "targetEnvironment": "selectedPlc",
+                                 "documentNames": batch, "targetEnvironment": "selectedPlc",  # native document names omit the extension
                                  "destinationComposition": "blocks", "target": {"plcPath": plc}})
             row["prepareSeconds"] = round(time.perf_counter() - started, 3)
             started = time.perf_counter()
