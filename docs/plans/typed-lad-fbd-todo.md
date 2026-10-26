@@ -16,7 +16,8 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 - Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
-- Still open: a builder operand profile for the captured namespaced global DB encodings.
+- Scoped operand/storage work is complete except runtime for global DB member operands (the harness
+  drives only the DUT interface) and cross-unit DB owners (no unit-relation profile).
 
 ## Lane A — 26 October 2026
 
@@ -268,7 +269,10 @@ controller was modified.
   `instance-effects-{softwareUnit,namespace}.v1.json`) and namespaced global DB member operands in LAD/FBD.
   Unit tag operands are a native V21 boundary: an M-memory unit tag caller compiles with "Accessing this
   type of tag is not possible in software units" (packet `nativeBoundaries`; %I/%Q unobserved).
-- [ ] Enable a builder operand profile for namespaced global DB members from the captured encodings.
+- [x] Enable a builder operand profile for namespaced global DB members from the captured encodings.
+  The builder emits the captured shape (qualified DB name, then the member), accepts only DB owners in the
+  caller's software scope, and checks and revalidates uniqueness by qualified name. Four route cases pass
+  the four engineering gates ([ledger](../verification/typed-lad-fbd-route-dboperand-20261026.md)).
 - [x] Capture IEC timer/counter dependent-instance effect pairs and let the worker profile carry
   several member shapes. `local.typed.iec-effect-capture.20261026` captured one FB per route gaining a
   member of each IEC type; `instance-effects-iec-<route>.v1.json` maps each type to its captured pair and

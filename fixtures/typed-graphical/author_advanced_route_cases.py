@@ -78,6 +78,32 @@ def main():
     (ROOT / "route-advanced-cases.v1.json").write_text(json.dumps({"schemaVersion": 1, "cases": cases}, indent=2) + "\n", encoding="utf-8")
     (ROOT / "route-pending-references.v1.json").write_text(json.dumps({"schemaVersion": 1, "unqualifiedCases": missing}, indent=2) + "\n", encoding="utf-8")
     print(str(len(cases)) + " executable route cases; " + str(len(missing)) + " explicitly pending independent native references.")
+    (ROOT / "route-operand-cases.v1.json").write_text(json.dumps({"schemaVersion": 1, "cases": operand_cases()}, indent=2) + "\n", encoding="utf-8")
+
+
+def operand_cases():
+    """Namespaced global DB member operands: contact/assign reads <DB>.Flag, the coil writes <DB>.Target."""
+    result = []
+    for route, namespace in (("Unit", "TiaMcp_UnitA"), ("Namespace", "TiaMcp_UnitA.Alternate")):
+        prefix, db = "Tgp" + route + "_", "Tgp" + route + "_OperandDB"
+        for language in ("LAD", "FBD"):
+            name = prefix + "OperandDb_" + language
+            operands = [{"key": key, "scope": "db", "ownerPath": "$block:" + db, "components": [key], "dataType": "Bool"} for key in ("Flag", "Target")]
+            if language == "LAD":
+                nodes = [{"key": "rail", "kind": "powerrail"}, {"key": "flag", "kind": "contact", "operand": "Flag"}, {"key": "target", "kind": "coil", "operand": "Target"}]
+                connections = [{"from": {"node": "rail", "port": "out"}, "to": {"node": "flag", "port": "in"}},
+                               {"from": {"node": "flag", "port": "out"}, "to": {"node": "target", "port": "in"}}]
+            else:
+                nodes = [{"key": "target", "kind": "assign", "operand": "Target"}]
+                connections = [{"from": {"node": "$Flag", "port": "value"}, "to": {"node": "target", "port": "in"}}]
+            result.append({"fixtureId": "typed-" + route.lower() + "-dboperand-" + language.lower(), "family": "db-operand", "language": language,
+                "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1", "blockName": name,
+                "referenceXml": "fixtures/typed-graphical/native/" + name + ".xml", "interfaceDependencies": [],
+                "dependencyXmls": [{"path": "fixtures/typed-graphical/native/" + db + ".xml", "names": [db]}],
+                "payload": {"model": {"schemaVersion": 1, "language": language, "operation": "replaceNetwork", "networkId": "$first",
+                                      "operands": operands, "nodes": nodes, "connections": connections}},
+                "engineeringOnly": True, "archivePath": ARCHIVE, "archiveSha256": ARCHIVE_SHA256, "unitName": "TiaMcp_UnitA", "namespace": namespace})
+    return result
 
 
 if __name__ == "__main__":

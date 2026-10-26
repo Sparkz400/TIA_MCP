@@ -277,12 +277,15 @@ namespace TiaMcp.Openness.V21
                 {
                     var db = Block(request.OwnerPath);
                     if (!(db.Item is DataBlock)) throw new BridgeException("OperandOwnerMismatch", "DB operands require an exact data-block owner.");
-                    if (!string.IsNullOrEmpty(db.Item.Namespace)) throw new BridgeException("UnsupportedNamespaceReference", "Namespaced DB symbolic encoding needs its own native profile.");
-                    TypedGraphicalResolution.RequireUniqueSymbol(Blocks.Where(b => b.Item is DataBlock).Select(b => b.Item.Name), db.Item.Name);
+                    // A namespaced DB is encoded by its qualified name (local.typed.scoped-capture.20261026);
+                    // other software units would need a unit relation, which no profile covers.
+                    if (ObjectIdentity.ScopePath(Plc.Path, db.Path) != Change.ScopePath)
+                        throw new BridgeException("UnsupportedScopeReference", "DB operands must belong to the caller's exact software scope.");
+                    TypedGraphicalResolution.RequireUniqueSymbol(Blocks.Where(b => b.Item is DataBlock).Select(b => QualifiedName(b.Item)), QualifiedName(db.Item));
                     source = Export(db); identity = db.Path;
                     // XML alone cannot prove a symbolic binding remains unique at apply.
                     // Record uniqueness separately from the exported declaration dependency.
-                    Change.TypedDependencies.Add(new JObject { ["kind"] = "dbSymbol", ["path"] = db.Path, ["name"] = db.Item.Name });
+                    Change.TypedDependencies.Add(new JObject { ["kind"] = "dbSymbol", ["path"] = db.Path, ["name"] = QualifiedName(db.Item) });
                     native = new[] { QualifiedName(db.Item) }.Concat(components).ToArray();
                 }
                 else throw new BridgeException("InvalidOperandScope", "Operand scope must be local, tag, db or constant.");
