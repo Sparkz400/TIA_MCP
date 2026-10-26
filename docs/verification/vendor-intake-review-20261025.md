@@ -62,8 +62,9 @@ grant rights to Siemens products or SDK assemblies.
   different byte addresses because its accesses are symbolic; screenshot values
   are examples, not a universal address requirement. The tag-table route already
   has [native evidence](../../evidence/local.library_dmc_prerequisites.20261025.json).
-  System/clock-memory writes remain outside the reviewed allowlist, so full DMC
-  FB compilation and behavior stay open.
+  System and clock memory bytes are now set through `change.hardware_cpu_memory_bytes`
+  ([evidence](cpu-memory-bytes-20261026.md), 26 October). DMC FB compilation and
+  behavior stay open because the DMC archive is no longer on this PC.
 - **DMC product selection:** choose the actual archive and installed products.
   The V17/V18/V19 ZIPs share the same 2 September 2022 setup PDF, whose table names
   V17. Its PLC-only row has no HMI content; its Professional and Unified rows also

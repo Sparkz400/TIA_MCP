@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.24",
+  "catalogVersion": "0.4.25",
   "targetTiaVersions": [
     21
   ],
@@ -2210,6 +2210,24 @@
       "limitations": [
         "Engineering only: the runtime harness drives the DUT interface, not external global DB members.",
         "DB owners in other software units are refused (no unit-relation profile); unit tag operands remain a native V21 boundary."
+      ]
+    },
+    {
+      "id": "local.cpu_memory_bytes.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "65aa27868441d31d8c2efe0ca70e7208323d19b0",
+        "passedScope": "scripts\\qualify_cpu_memory_bytes.py on build 60afdc8 (frozen D;C:\\Program Files\\Git\\cmq\\b2) in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table."
+      },
+      "artifacts": [
+        "evidence/local.cpu_memory_bytes.20261026.json"
+      ],
+      "limitations": [
+        "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
+        "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
       ]
     }
   ],
@@ -9519,7 +9537,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hardware_cpu_memory_bytes",
@@ -9532,14 +9549,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Only CPU device items that declare all four native V21 attributes SystemMemoryByte, SystemMemoryByteAddress, ClockMemoryByte and ClockMemoryByteAddress; other items are refused as UnsupportedCapability.",
-          "Enable flags must be booleans and byte numbers integers 0-65535; enabled system and clock memory must use different bytes (AddressConflict). The CPU-specific bit-memory size is validated by Siemens during the write and compilation.",
-          "Preservation covers observed identities, slots, reviewed hardware attributes including the four memory byte settings, address ranges/owners and configured network associations; TIA-owned system/clock memory tags and runtime behavior are recorded, not preserved."
+          "Only CPU device items that declare the native V21 SystemMemoryByte and ClockMemoryByte attributes; other items, including CPU 1214C DC/DC/DC V4.7, are refused as UnsupportedCapability. Natively qualified on CPU 1511-1 PN and CPU 1516-3 PN/DP V4.1 only.",
+          "SystemMemoryByteAddress and ClockMemoryByteAddress (UInt64) exist only while their flag is enabled: enabling requires the byte number, a byte number of a disabled flag is refused, and flags are written first. Byte numbers are integers 0-65535; enabled bytes must differ (AddressConflict); Siemens checks the CPU's bit-memory size at compile (0..16383 on the qualified CPUs).",
+          "Preservation covers observed identities, slots, reviewed hardware attributes including the four memory byte settings, address ranges/owners and configured network associations. TIA's own system/clock memory tags are added to the default tag table and stay there when the bytes are disabled; runtime behavior is not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.cpu_memory_bytes.20261026"
+        ]
       },
       "availability": {
         "status": "conditional",

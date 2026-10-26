@@ -34,7 +34,7 @@ A read-only Openness probe (own Portal, unsaved temporary project) listed the at
 
 ## Native qualification
 
-`local.cpu_memory_bytes.20261026` (`scripts/qualify_cpu_memory_bytes.py`, frozen build `D:\cmq\b2`, owned scratch):
+[`local.cpu_memory_bytes.20261026`](../../evidence/local.cpu_memory_bytes.20261026.json) (`scripts/qualify_cpu_memory_bytes.py` at 65aa278, build 60afdc8 frozen at `D:\cmq\b2`, owned scratch, 51/51 steps):
 
 - **Every S7-1500 CPU in the project:** the scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP. On each, system
   memory at MB20 and clock memory at MB21 are written, compiled, preservation-verified and read back.
