@@ -1,0 +1,97 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.scoped-runtime.iec-createmulti.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T14:23:14+00:00",
+  "source": {
+    "commit": "1194d3d05b278577325ed1a50c1387cf86932781",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Software-unit and alternate-namespace TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member, LAD and FBD (24 cells), live as in local.typed.scoped-runtime.20261026 with the route IEC dependent-instance effect profiles from local.typed.iec-effect-capture.20261026: the harness instance DB followed the profiled native effect and each cell passed all five gates.",
+  "limitations": [
+    "Host application-call timing; not exact PLC scan timing."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "deda353919c845569edffa35e1e3442ef32fcb7b2902aa93e37c7093cb3df94b"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "0f7764b932db08793f5bce0b406930b3bb74b1bb5cc4f52c373ce3422c2eba12"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-scoped-runtime-iec-createmulti.json",
+      "sha256": "4c7b989f7dc791642c270d3e1efe7fbcc8879409a8c6535caf98ab16c02efbc5",
+      "bytes": 405674,
+      "completed": true,
+      "steps": [
+        "typed-namespace-createmulti-ctd-fbd: passed",
+        "typed-namespace-createmulti-ctd-lad: passed",
+        "typed-namespace-createmulti-ctu-fbd: passed",
+        "typed-namespace-createmulti-ctu-lad: passed",
+        "typed-namespace-createmulti-ctud-fbd: passed",
+        "typed-namespace-createmulti-ctud-lad: passed",
+        "typed-namespace-createmulti-tof-fbd: passed",
+        "typed-namespace-createmulti-tof-lad: passed",
+        "typed-namespace-createmulti-ton-fbd: passed",
+        "typed-namespace-createmulti-ton-lad: passed",
+        "typed-namespace-createmulti-tp-fbd: passed",
+        "typed-namespace-createmulti-tp-lad: passed",
+        "typed-unit-createmulti-ctd-fbd: passed",
+        "typed-unit-createmulti-ctd-lad: passed",
+        "typed-unit-createmulti-ctu-fbd: passed",
+        "typed-unit-createmulti-ctu-lad: passed",
+        "typed-unit-createmulti-ctud-fbd: passed",
+        "typed-unit-createmulti-ctud-lad: passed",
+        "typed-unit-createmulti-tof-fbd: passed",
+        "typed-unit-createmulti-tof-lad: passed",
+        "typed-unit-createmulti-ton-fbd: passed",
+        "typed-unit-createmulti-ton-lad: passed",
+        "typed-unit-createmulti-tp-fbd: passed",
+        "typed-unit-createmulti-tp-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

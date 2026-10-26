@@ -1,5 +1,7 @@
 # Current status
 
+**Scoped typed runtime complete — 26 October 2026:** IEC dependent-instance effect pairs were captured for both routes and the worker now appends the captured IEC member for created timer/counter storage. All 24 remaining created multi-instance cells pass, so all 140 software-unit and namespace typed route cells pass all five gates. Catalog `0.4.19`. [Ledger](verification/typed-lad-fbd-route-runtime-iec-createmulti-20261026.md).
+
 **Scoped effects and operands captured — 26 October 2026:** One owned capture recorded both route dependent-instance effect pairs (native DBs keep their payload and append only the new member) and namespaced global DB operands in LAD/FBD. With the new route profiles, numeric FB created multi-instance storage passes at runtime: 116 of 140 scoped cells. Created timer/counter members wait for IEC effect pairs; M-memory unit tags are a native V21 boundary in software units. Catalog `0.4.18`.
 
 **Scoped typed runtime — 26 October 2026:** Software-unit and alternate-namespace typed cells now run live: each case seeds the unit into a fresh scratch, generates the test harness inside the DUT's unit and namespace, and asserts on PLCSIM. 112 of 140 route cells pass all five gates (compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB with local, existing-global and created-global storage); the 28 created multi-instance cells are refused until a scoped dependent-instance effect pair is captured. Catalog `0.4.17`. [Ledger](verification/typed-lad-fbd-route-runtime-20261026.md).
