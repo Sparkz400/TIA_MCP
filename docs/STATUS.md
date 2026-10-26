@@ -1,5 +1,7 @@
 # Current status
 
+**Namespaced DB operands enabled — 26 October 2026:** The typed builder now accepts global DB member operands owned by the caller's software unit, emitting the captured qualified-name encoding; four software-unit/namespace LAD/FBD cases pass the four engineering gates. Cross-unit DB owners stay refused; unit tag operands remain a native V21 boundary. Catalog `0.4.20`.
+
 **Scoped typed runtime complete — 26 October 2026:** IEC dependent-instance effect pairs were captured for both routes and the worker now appends the captured IEC member for created timer/counter storage. All 24 remaining created multi-instance cells pass, so all 140 software-unit and namespace typed route cells pass all five gates. Catalog `0.4.19`. [Ledger](verification/typed-lad-fbd-route-runtime-iec-createmulti-20261026.md).
 
 **Scoped effects and operands captured — 26 October 2026:** One owned capture recorded both route dependent-instance effect pairs (native DBs keep their payload and append only the new member) and namespaced global DB operands in LAD/FBD. With the new route profiles, numeric FB created multi-instance storage passes at runtime: 116 of 140 scoped cells. Created timer/counter members wait for IEC effect pairs; M-memory unit tags are a native V21 boundary in software units. Catalog `0.4.18`.

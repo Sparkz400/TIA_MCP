@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-dboperand.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T14:45:32+00:00",
+  "source": {
+    "commit": "a8085690242c70ba85870d5f60475d84505196b6",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py, engineering-only, 4 route builder cases using namespaced global DB member operands (scope db, owner in the caller's software scope): software-unit and alternate-namespace LAD contact/coil and FBD assign networks reading <DB>.Flag and writing <DB>.Target, rebuilt against the captured native callers from local.typed.scoped-capture.20261026. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Engineering only: the runtime harness drives the DUT interface, not external global DB members.",
+    "DB owners in other software units are refused (no unit-relation profile); unit tag operands remain a native V21 boundary."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "09c09afd1c6bb0f15d68916f48f2feba729500e703d8e71d44ef0e0b96a45221"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-route-dboperand.json",
+      "sha256": "512bf6084c77c065e9e8309c336411b397d1a39fc389d122990a628411e69f25",
+      "bytes": 32920,
+      "completed": true,
+      "steps": [
+        "typed-namespace-dboperand-fbd: passed",
+        "typed-namespace-dboperand-lad: passed",
+        "typed-unit-dboperand-fbd: passed",
+        "typed-unit-dboperand-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
