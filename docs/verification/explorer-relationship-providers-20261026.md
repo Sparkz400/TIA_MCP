@@ -49,11 +49,16 @@ Run at source commit `75f0058` with a clean tree:
 - `python -B -m unittest test_project_explorer_relationships` (from `scripts/`): 5/5 qualifier-oracle tests.
 - `node --test` explorer model/client/relationship-scope tests: 30 passed, 2 skipped as before.
 - The Openness worker, Host and `TiaMcp.Tests` build with zero errors.
-- `scripts/Test-Offline.ps1`: the Python phase passed (2,023 tests, 1 skipped). The run
-  was stopped while the managed phase was building, because its startup-lifecycle
-  checks launch mock processes named `Siemens.Automation.Portal.exe` while a live
-  native corpus was running on this machine. A complete `Test-Offline.ps1` run is
-  still owed; run it when no native corpus is active.
+- `scripts/Test-Offline.ps1` at `56ad925` passed every
+  suite from a short detached checkout (`D:\tx`): the Python phase ran 2,023 tests
+  (1 skipped), the managed and host checks reported zero failures, and the script
+  ended `PASS Offline validation (All)`. Log SHA-256
+  `6c7bd3289f6fab78910b28b1b00544454bd2a7a72bcc2ebdbfbade448af395a3`.
+  From this worktree's long path, two `TiaMcp.Tests` checkpoint checks hit TIA's
+  143-character archive staging limit; that is the known long-checkout boundary,
+  not a code failure. An earlier run was stopped on purpose because its
+  startup-lifecycle checks start mock `Siemens.Automation.Portal.exe` processes
+  while a live native corpus was running.
 
 ## Native qualification step (not run)
 
