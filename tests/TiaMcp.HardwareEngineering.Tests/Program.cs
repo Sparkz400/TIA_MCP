@@ -132,4 +132,32 @@ var undeclaredCaptured = (JObject)captured["payload"].DeepClone(); undeclaredCap
 try { HardwareEngineeringRules.RequirePreserved(captured.Value<string>("kind"), undeclaredCaptured, (JArray)captured["before"], (JArray)captured["after"]); throw new Exception("Undeclared native companion accepted"); }
 catch (BridgeException error) when (error.Code == "MutationVerificationFailed") { }
 count++; Console.WriteLine("PASS captured V21 native failure without explicit contract");
+var memory = new JObject { ["hardwarePath"] = controller, ["attributes"] = new JObject { ["SystemMemoryByte"] = true, ["SystemMemoryByteAddress"] = 1 } };
+void MemoryRows(JArray rows) => rows[2]["attributes"] = new JObject { ["ClockMemoryByte"] = false, ["ClockMemoryByteAddress"] = 0, ["Comment"] = "keep", ["SystemMemoryByte"] = false, ["SystemMemoryByteAddress"] = 1 };
+Check("cpu memory bytes on the selected CPU", "hardware_cpu_memory_bytes", memory, rows => rows[2]["attributes"]["SystemMemoryByte"] = true, true, MemoryRows);
+Check("cpu memory request not applied rejected", "hardware_cpu_memory_bytes", memory, _ => { }, false, MemoryRows);
+Check("cpu memory collateral clock byte rejected", "hardware_cpu_memory_bytes", memory, rows => { rows[2]["attributes"]["SystemMemoryByte"] = true; rows[2]["attributes"]["ClockMemoryByte"] = true; }, false, MemoryRows);
+Check("cpu memory on another item rejected", "hardware_cpu_memory_bytes", memory, rows => { rows[2]["attributes"]["SystemMemoryByte"] = true; rows[0]["attributes"]["Comment"] = "lost"; }, false, MemoryRows);
+var memoryCurrent = new JObject { ["SystemMemoryByte"] = false, ["SystemMemoryByteAddress"] = 1, ["ClockMemoryByte"] = false, ["ClockMemoryByteAddress"] = 0 };
+void Memory(string name, JObject requested, string code)
+{
+    try { HardwareEngineeringRules.RequireCpuMemoryBytes(memoryCurrent, requested); if (code != null) throw new Exception("Unexpected memory byte acceptance: " + name); }
+    catch (BridgeException error) when (error.Code == code) { }
+    count++; Console.WriteLine("PASS " + name);
+}
+Memory("enable both distinct bytes", new JObject { ["SystemMemoryByte"] = true, ["ClockMemoryByte"] = true }, null);
+Memory("move and enable clock byte", new JObject { ["ClockMemoryByte"] = true, ["ClockMemoryByteAddress"] = 100 }, null);
+Memory("empty request refused", new JObject(), "InvalidRequest");
+Memory("unchanged request refused", new JObject { ["SystemMemoryByteAddress"] = 1 }, "InvalidRequest");
+Memory("other attribute refused", new JObject { ["Comment"] = "x" }, "UnsupportedAttribute");
+Memory("case-variant name refused", new JObject { ["systemMemoryByte"] = true }, "UnsupportedAttribute");
+Memory("string flag refused", new JObject { ["SystemMemoryByte"] = "true" }, "InvalidRequest");
+Memory("numeric flag refused", new JObject { ["ClockMemoryByte"] = 1 }, "InvalidRequest");
+Memory("negative byte refused", new JObject { ["ClockMemoryByteAddress"] = -1 }, "InvalidRequest");
+Memory("byte above 65535 refused", new JObject { ["ClockMemoryByteAddress"] = 65536 }, "InvalidRequest");
+Memory("fractional byte refused", new JObject { ["ClockMemoryByteAddress"] = 1.5 }, "InvalidRequest");
+Memory("string byte refused", new JObject { ["ClockMemoryByteAddress"] = "10" }, "InvalidRequest");
+Memory("same enabled byte refused", new JObject { ["SystemMemoryByte"] = true, ["ClockMemoryByte"] = true, ["ClockMemoryByteAddress"] = 1 }, "AddressConflict");
+Memory("moving onto an enabled byte refused", new JObject { ["SystemMemoryByte"] = true, ["SystemMemoryByteAddress"] = 0, ["ClockMemoryByte"] = true }, "AddressConflict");
+Memory("same byte while one is disabled allowed", new JObject { ["ClockMemoryByteAddress"] = 1 }, null);
 Console.WriteLine($"{count} hardware preservation checks passed.");

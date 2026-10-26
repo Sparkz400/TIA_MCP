@@ -9,7 +9,31 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
-        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign" }.Contains(kind);
+        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes" }.Contains(kind);
+
+        // Exact V21 dynamic attribute names on a CPU device item (enable flags and bit-memory byte numbers).
+        internal static readonly string[] CpuMemoryByteAttributes = { "SystemMemoryByte", "SystemMemoryByteAddress", "ClockMemoryByte", "ClockMemoryByteAddress" };
+
+        // Checks the requested values against the CPU's current native values. The CPU-specific
+        // bit-memory size is validated by Siemens during SetAttribute and compilation.
+        internal static void RequireCpuMemoryBytes(JObject current, JObject requested)
+        {
+            if (requested == null || requested.Count == 0) throw new BridgeException("InvalidRequest", "At least one system or clock memory attribute is required.");
+            var effective = (JObject)current.DeepClone();
+            foreach (var property in requested.Properties())
+            {
+                if (Array.IndexOf(CpuMemoryByteAttributes, property.Name) < 0)
+                    throw new BridgeException("UnsupportedAttribute", "Attribute is outside the reviewed CPU memory byte subset: " + property.Name);
+                bool address = property.Name.EndsWith("Address", StringComparison.Ordinal);
+                if (address ? property.Value.Type != JTokenType.Integer || property.Value.Value<long>() < 0 || property.Value.Value<long>() > ushort.MaxValue : property.Value.Type != JTokenType.Boolean)
+                    throw new BridgeException("InvalidRequest", property.Name + (address ? " must be a byte number from 0 to 65535." : " must be a boolean."));
+                effective[property.Name] = property.Value.DeepClone();
+            }
+            if (JToken.DeepEquals(effective, current)) throw new BridgeException("InvalidRequest", "The requested system and clock memory settings are unchanged.");
+            if (effective.Value<bool>("SystemMemoryByte") && effective.Value<bool>("ClockMemoryByte") &&
+                effective.Value<long>("SystemMemoryByteAddress") == effective.Value<long>("ClockMemoryByteAddress"))
+                throw new BridgeException("AddressConflict", "System memory and clock memory must use different bit-memory bytes.");
+        }
 
         // Newtonsoft's implicit string conversion keeps a String token for a
         // null native string, although its JSON text is null. Capture the actual
@@ -45,6 +69,8 @@ namespace TiaMcp.Openness.V21
                 var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
                 foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
             }
+            else if (kind == "hardware_cpu_memory_bytes")
+                foreach (var property in ((JObject)payload["attributes"]).Properties()) selected["attributes"][property.Name] = property.Value.DeepClone();
             else if (kind == "hardware_address_set")
             {
                 var address = ((JArray)selected["addresses"]).OfType<JObject>().Single(row => row.Value<string>("ioType") == payload.Value<string>("ioType") && row.Value<int>("startAddress") == payload.Value<int>("oldStartAddress"));
