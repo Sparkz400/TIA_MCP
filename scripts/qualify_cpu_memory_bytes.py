@@ -116,9 +116,10 @@ def body(h):
 
     # A block that reads one system memory bit and one clock memory bit compiles in every PLC.
     for p in plcs:
-        system = [r for r in observed[p] if (r[2] or "").startswith("%M20.")]
-        clock = [r for r in observed[p] if (r[2] or "").startswith("%M21.")]
-        operands = ('"%s" OR "%s"' % (system[0][1], clock[0][1])) if system and clock else "%M20.0 OR %M21.5"
+        # TIA adds its system/clock memory tags to the default tag table when the bytes are enabled.
+        names = {r[1]: r[2] for r in observed[p]}
+        require(names.get("FirstScan") == "%M20.0" and names.get("Clock_1Hz") == "%M21.5", "TIA's memory byte tags are absent or misplaced")
+        operands = '"FirstScan" OR "Clock_1Hz"'
         h.report.setdefault("blockOperands", {})[p] = operands
         source = 'FUNCTION "%s" : Bool\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nBEGIN\n\t#%s := %s;\nEND_FUNCTION\n' % (BLOCK, BLOCK, operands)
         apply(h, "compile a memory byte consumer in " + p, "source_upsert", {"scopePath": p, "language": "SCL", "source": source, "expectedBlockNames": [BLOCK]})
