@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "436bdcdf6768e2412d0d332403680d423f9fcb2665db8861afb320ee8d57cf14",
-      "bytes": 773250
+      "sha256": "ac2256686e0a4e61d3bdbecadc3fe07aacef80646f7130724702bce9d56175f3",
+      "bytes": 775535
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -307,8 +307,8 @@
     },
     {
       "path": "contracts/hmi-engineering.v1.schema.json",
-      "sha256": "95a09fc5180a56a953623593e6f672aa2bf9bf0faa43a3fd7d13dc6ac9120482",
-      "bytes": 3724
+      "sha256": "03beee759e01c41ac37db583f8e6fa3260c1dc6ed89c2fa8693021c94b4fefe3",
+      "bytes": 4973
     },
     {
       "path": "contracts/hmi-identity.v2.schema.json",
@@ -2162,8 +2162,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiEngineeringRules.cs",
-      "sha256": "055a5f7c1ef54930ab493a7b081fc72bfc11c6cc356345ba80075de3f7adb437",
-      "bytes": 11124
+      "sha256": "bf1a13342c3f666b31b10f88a4f30bf950d31ddcdf41d9abf4c1f99b8c62a6b7",
+      "bytes": 14141
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiInspectionRules.cs",
@@ -2182,8 +2182,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiPreservationRules.cs",
-      "sha256": "6c56b05b7f1f733c9ea1a85f2171e298a9b29148e65595dd29fb6c401fc72c7a",
-      "bytes": 9185
+      "sha256": "612bf06175f275d90d53da80485109afe923cf68869e9d1be5e01d78c264a4a1",
+      "bytes": 10171
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiProjectModelRules.cs",
@@ -2192,8 +2192,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiRecipeRules.cs",
-      "sha256": "5b9a41da1e8283087bb723e3b2dc20d589776a96443ec9a24513639692b9002d",
-      "bytes": 4733
+      "sha256": "374e4dc063bfb7260012499048387d94970483cbba8bbb1737e6ca8acef32d34",
+      "bytes": 6190
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs",
@@ -2307,13 +2307,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiBindings.cs",
-      "sha256": "1c7940b88da4643e41c9b16132592e1a8a56d43cd83ab1c6bda8d6d69245eba4",
-      "bytes": 14657
+      "sha256": "7580592483df1ccdf80d6db7d56638b78a456a53375fad7c956dd79bcdc6a374",
+      "bytes": 19301
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
-      "sha256": "31bca680e9920b191f9c9d88af759761412d9931b43260de04747e710812add2",
-      "bytes": 37588
+      "sha256": "5a5f977b5477021782eea3b07e7d0f13a2301b10b6f65629cea7a9835d6dd51e",
+      "bytes": 41639
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiExports.cs",
@@ -71348,8 +71348,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 290,
-              "endLine": 301,
+              "line": 308,
+              "endLine": 319,
               "sha256": "a470ac29cf4b4907d46bb586cd9acfae2400d04b0b93563d3259c656e685097e"
             },
             {
@@ -94658,6 +94658,11 @@
       "sha256": "b8848c8e802a583d09362a0bb5cb7bcaf55d5bca2b981566a7cbaffdbff3ef1c"
     },
     {
+      "path": "evidence/local.hmi.external-tag-prepare.20261026.json",
+      "state": "observed",
+      "sha256": "27eaa59935f950cc47d01fc9925ede4d5cf73d2b48e83799aa05383449038eb0"
+    },
+    {
       "path": "evidence/local.library_dependencies.20261024.json",
       "state": "observed",
       "sha256": "e083d70b8b7a6cc94638d7699383904fbcc82d80fc9d91e5940c9f22befc9c3a"
@@ -95021,6 +95026,10 @@
     {
       "id": "local.hmi.bridge.20261025",
       "profileSha256": "ba645834e17782240bb7f17e3f750f31f591cbb64de4002d226ff77ab8c00be3"
+    },
+    {
+      "id": "local.hmi.external-tag-prepare.20261026",
+      "profileSha256": "1df1d87d104f139bd5d1e87ca097dbdb61f1bd6461b78b5d6fca3e3be813fbcb"
     },
     {
       "id": "local.index_paging.v03",
