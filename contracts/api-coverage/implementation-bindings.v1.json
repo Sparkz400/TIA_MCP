@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4299bca27e4d74d96e48b72d991f49f34cd51761497d9be558b9e77c4365fc37",
-      "bytes": 753076
+      "sha256": "c935e7e525955455fb29856e3025b30c2bb72e50fd001afe885330736a5ebe48",
+      "bytes": 755654
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -76415,6 +76415,20 @@
           "artifacts": [
             "evidence/local.typed.route-profiles.20261025.json"
           ]
+        },
+        {
+          "id": "local.typed.route-iec-capture.20261026",
+          "profileSha256": "2bdd929bdfb443e67e5c67c9fec61a2dab89f908253fe10e9964bf2b6f096fda",
+          "artifacts": [
+            "evidence/local.typed.route-iec-capture.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.route-iec.20261026",
+          "profileSha256": "f4fcc4796fae73f1553a110832319282c2be3902221fa90c8567f1c5e60648ee",
+          "artifacts": [
+            "evidence/local.typed.route-iec.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94493,7 +94507,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "1ee6fc20079e9a2c6b3bdec577186a8cd1f4d652feea506ffde00ef856ed76bc"
+      "sha256": "a51489ff90caf48d56a062886b5b6024183a081283082347db27256dd0a41139"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94716,6 +94730,16 @@
       "sha256": "658e34890a34f90e286ea5328b99a503514188ab02cabbf37b0f096c6c901bf4"
     },
     {
+      "path": "evidence/local.typed.route-iec-capture.20261026.json",
+      "state": "observed",
+      "sha256": "8a88928136715e4112222557b34486ce609c676ba0444e5e6266bae383b3eca8"
+    },
+    {
+      "path": "evidence/local.typed.route-iec.20261026.json",
+      "state": "observed",
+      "sha256": "7ca0c50825d77286371d171b1e353bfe4dc4588f9bc2f7451c9eafa0406a4c40"
+    },
+    {
       "path": "evidence/local.typed.route-profiles.20261025.json",
       "state": "observed",
       "sha256": "3f429ec3f401afb098bec8ebe9a782d524c948af857c3f73e77ce731b48ba1e0"
@@ -94748,7 +94772,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "6fcde6b9f54d0fb4bca9fe82367c7e70e848b09bdbbdaa64ff75fd04ba99cb3b"
+      "sha256": "8229bea84dd8ece7d95d3f164a6c9e117f5d0faaf7c6b30c914d2df88a0a6ef7"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",
@@ -95064,6 +95088,14 @@
     {
       "id": "local.typed.route-capture.20261025",
       "profileSha256": "91cf403536fbc12eb962404ed1cee4978dd2ed83c57ab80915674cb9724363f9"
+    },
+    {
+      "id": "local.typed.route-iec-capture.20261026",
+      "profileSha256": "2bdd929bdfb443e67e5c67c9fec61a2dab89f908253fe10e9964bf2b6f096fda"
+    },
+    {
+      "id": "local.typed.route-iec.20261026",
+      "profileSha256": "f4fcc4796fae73f1553a110832319282c2be3902221fa90c8567f1c5e60648ee"
     },
     {
       "id": "local.typed.route-profiles.20261025",

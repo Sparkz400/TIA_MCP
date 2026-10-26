@@ -37,6 +37,17 @@ def parse(path):
     return safe_xml(pathlib.Path(path).read_text(encoding="utf-8-sig"))
 
 
+def without_auto_numbers(document):
+    """Drop a block's Number only where the block lets TIA allocate it (AutoNumber true)."""
+    for attributes in document.iter():
+        if local(attributes.tag) != "AttributeList":
+            continue
+        children = {local(child.tag): child for child in attributes}
+        if "Number" in children and (children.get("AutoNumber") is not None and children["AutoNumber"].text == "true"):
+            attributes.remove(children["Number"])
+    return document
+
+
 def elements(document):
     return {shape(node) for node in document.iter()}
 
@@ -95,8 +106,9 @@ def audit(catalog_path, capture_path, prerequisites=()):
     equivalence = []
     for committed in prerequisites:
         staged = base / "native" / pathlib.Path(committed).name
-        # Re-export differs only in culture of empty text items and export metadata.
-        same = shape(parse(staged), ignore=("DocumentInfo", "Culture")) == shape(parse(committed), ignore=("DocumentInfo", "Culture"))
+        # Re-export differs only in culture of empty text items, export metadata and TIA-allocated block numbers.
+        same = (shape(without_auto_numbers(parse(staged)), ignore=("DocumentInfo", "Culture"))
+                == shape(without_auto_numbers(parse(committed)), ignore=("DocumentInfo", "Culture")))
         check(same, "prerequisite re-export differs from committed export: " + str(committed))
         equivalence.append({"committed": str(pathlib.Path(committed).as_posix()), "committedSha256": sha(committed),
                             "reexport": str(staged.relative_to(ROOT).as_posix()), "reexportSha256": sha(staged), "equivalent": same})

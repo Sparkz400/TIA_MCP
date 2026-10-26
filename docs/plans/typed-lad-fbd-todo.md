@@ -16,8 +16,24 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 - Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
-- Still open: candidate extraction/review and activation for the captured routes, the 80 pending
-  route cells, scoped runtime (the runtime harness cannot call a software-unit DUT from `Main`).
+- Still open: scoped runtime (the runtime harness cannot call a software-unit DUT from `Main`),
+  created storage for the IEC route families, scoped global operand encodings and dependent-DB effects.
+
+## Lane A — 26 October 2026
+
+- The 46-input IEC packet (`route-capture-iec-packet.v1.json`) was captured in one owned TIA lifetime
+  from the SHA-bound baseline: every input compiled clean, saved and added exactly its blocks, and the
+  saved state matched a fresh-process reopen (`evidence/local.typed.route-iec-capture.20261026.json`).
+  An earlier attempt stopped after 37 inputs when TIA Portal terminated during an export; a rerun of
+  the failing input passed, so it was not input-specific.
+- 20 TOF/TP/CTU/CTD/CTUD candidates for both routes passed the binding audit
+  (`route-candidates-iec-20261026.audit.json`). The audit now ignores a re-exported block's own
+  `Number` only when both exports declare `AutoNumber` true: capture order shifts TIA-allocated DB
+  numbers. 13 re-exported prerequisites keep lineage files under `native/routes-20261026/`.
+- All 40 enabled cases (local multi-instance and existing global storage, LAD and FBD) passed the
+  four engineering gates ([ledger](../verification/typed-lad-fbd-route-iec-20261026.md),
+  `evidence/local.typed.route-iec.20261026.json`). With the 25 October cases, all 80 reference route
+  cells are engineering-qualified; `route-pending-references.v1.json` is empty.
 
 ## Lane A — 24 October 2026
 
@@ -232,13 +248,17 @@ controller was modified.
   **38 authored reference inputs** and 45 blocks. c01 stopped-prefix and c03
   saved-source evidence use separate copied-project readbacks; c03's original
   failed cleanup remains failed. See [p17 evidence](../verification/typed-p17-qualification.md).
-- [ ] Enable only independently accepted instruction/target combinations after
-  candidate lineage and builder qualification. The pending-reference
-  manifest records **80 unqualified route cells**; it is not a support promise.
-- [ ] Diagnose scoped IEC `Missing instance DB` errors with the independently
-  authored native XML probes. They are not enabled profiles. SIMATIC SD import
+- [x] Enable only independently accepted instruction/target combinations after
+  candidate lineage and builder qualification. All 80 former pending route cells are
+  activated after their binding audits and pass the four engineering gates; the
+  pending-reference manifest is empty. Runtime remains unqualified.
+- [x] Diagnose scoped IEC `Missing instance DB` errors with the independently
+  authored native XML probes. SIMATIC SD import
   failure does not prove that the native software-unit target cannot use IEC
   timers/counters.
+  The native XML probes import, compile and persist in both routes with local and existing
+  global storage (`local.typed.route-iec-capture.20261026`), so the target supports scoped IEC
+  timers/counters; the SIMATIC SD import failure itself was not pursued.
 - [ ] Capture scoped global operand encodings and scoped dependent-DB effects
   before enabling them. No scoped runtime assertions have run.
 - [ ] Retain failed-source recovery evidence: some incomplete native exports leave

@@ -1,0 +1,43 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-iec-capture.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T02:03:13+00:00",
+  "source": {
+    "commit": "4f38d4837b20630dd18f92c728b685e15ba413ad",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py: all 46 independently authored native reference inputs of route-capture-iec-packet.v1.json (6 storage/callee dependencies, then TOF/TP/CTU/CTD/CTUD in LAD and FBD for the software-unit and alternate-namespace routes, local and existing-global storage) imported one at a time into one owned TIA V21 project retrieved from the SHA-bound software-unit baseline (sha256 39cea56a...). Each input compiled clean, saved and added exactly its declared blocks while every existing native object's XML stayed unchanged; the final saved snapshot matched a fresh-process reopen; owned cleanup and Host exit passed.",
+  "limitations": [
+    "Native reference capture only: no typed builder, profile activation, changed-state recovery or runtime is established.",
+    "An earlier attempt in another worktree (cap-iec1) stopped after 37 inputs when TIA Portal terminated during an export; it is retained there and not part of this evidence."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9b9e1a942d96d896ca36547bef40359a269aa59d3046f7005bde9b51f160b467"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "e46bd697aca87ff80c8ed501c9a8787f408b57789596e59069340ea5b4764c51"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "0cf64d506028be01ebbd45488ffbc978c56e6b0b001bc868571fe268a9ee6f17",
+      "bytes": 267905849,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

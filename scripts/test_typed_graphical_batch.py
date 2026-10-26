@@ -502,7 +502,7 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertEqual(["TgpUnit_GlobalTimer", "TgpNamespace_TemplateFB_LAD", "TgpNamespace_TemplateFB_FBD"], names)
         self.assertFalse(set(names) & {name for entry in main["sources"] for name in entry["names"]})
 
-    def test_iec_route_packet_covers_exactly_the_pending_route_references(self):
+    def test_iec_route_packet_covers_exactly_its_captured_route_references(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         packet = json.loads((root / "fixtures/typed-graphical/route-capture-iec-packet.v1.json").read_bytes())
         names = []
@@ -513,10 +513,16 @@ class RouteCapturePacketTests(unittest.TestCase):
             self.assertEqual(entry["sha256"], observed["fileSha256"])
             names.extend(entry["names"])
         self.assertEqual(len(names), len(set(names)))
+        # Captured 26 October (local.typed.route-iec-capture.20261026): nothing stays pending, and
+        # every packet output is a committed native reference that an executable route case uses.
         pending = json.loads((root / "fixtures/typed-graphical/route-pending-references.v1.json").read_bytes())["unqualifiedCases"]
-        required = {pathlib.Path(path).stem for case in pending for path in case["missingIndependentNativeReferences"]}
+        self.assertEqual([], pending)
+        cases = json.loads((root / "fixtures/typed-graphical/route-advanced-cases.v1.json").read_bytes())["cases"]
+        used = {pathlib.Path(path).stem for case in cases
+                for path in [case["referenceXml"]] + [d["path"] for d in case.get("dependencyXmls", [])]}
         captured = {name for entry in packet["sources"][packet["dependencyCount"]:] for name in entry["names"]}
-        self.assertEqual(required, captured)
+        self.assertLessEqual(captured, used)
+        self.assertTrue(all((root / "fixtures/typed-graphical/native" / (name + ".xml")).is_file() for name in captured))
 
     def test_source_parser_rejects_cross_unit_or_unscoped_reference(self):
         with tempfile.TemporaryDirectory() as directory:
