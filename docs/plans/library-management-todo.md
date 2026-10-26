@@ -26,7 +26,7 @@ The [main TODO](../TODO.md) sets priorities; the [release ledger](release-obliga
 
 - [ ] Qualify exact production-bridge retrieval/inspection of the configured owned fixture, including independent process/lock release and complete preservation. [Native boundary](../verification/native-resume-20261023.md).
 - [ ] Build/qualify a preserving Classic faceplate XML adapter from independent native exports, covering exact versions, placement, interfaces, bindings, resources and missing dependencies.
-- [ ] Qualify Unified faceplate creation/binding through the MCP worker with exact GUID readback. Add HMI-owned UDTs, external PLC connections/tags and explicit UDT/interface mappings.
+- [ ] Qualify Unified faceplate creation/binding through the MCP worker with exact GUID readback. Add HMI-owned UDTs, external PLC connections/tags and explicit UDT/interface mappings. External tags on an existing integrated connection (root PLC scalar tags) are implemented as `hmi_engineering` `external_tag_create`; they are not natively qualified. Connection creation, DB members and UDT mappings remain open. V21 exposes no HMI-owned UDT API ([verification](../verification/hmi-external-tag-create-20261026.md)).
 - [ ] Exercise eligible HMI create/edit/test/release/publish/fresh-consumer lifecycles for each advertised category. Unsupported API routes must remain explicitly unsupported.
 - [ ] Add combined PLC/UDT/HMI recipes, including a field-changing update and broken-binding failure with a precise impact report.
 - [ ] Qualify screen/resource/event/script/multilingual preservation, compiler scope, save/reopen, recovery, and visual/runtime assertions for layout, navigation, values and PLC communication.

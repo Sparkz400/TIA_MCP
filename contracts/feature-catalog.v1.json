@@ -8800,7 +8800,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Classic BackColor scalar and Unified tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Classic BackColor scalar and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. Offline rule/readback/delta tests and an SDK build pass; the native prepare-only probe has not run, apply stays behind the closed Unified preservation gate, and DB members, arrays, UDTs, software-unit tags, connection creation and Classic external tags are not mapped.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
           "Library lifecycle stays in the library subsystem; HMI receives an exact source/destination/dependency/binding handoff.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8814,7 +8815,7 @@
       "availability": {
         "status": "blocked",
         "reasons": [
-          "Classic BackColor scalar and Unified tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
+          "Classic BackColor scalar and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
         ]
       },
       "prerequisites": [

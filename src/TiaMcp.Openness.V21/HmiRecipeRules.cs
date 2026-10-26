@@ -76,5 +76,20 @@ namespace TiaMcp.Model
                 || !string.IsNullOrEmpty(plcTag) || resolvesNativeConnection)
                 throw new ArgumentException("A newly-created internal tag unexpectedly changed connection or acquired a PLC binding.");
         }
+
+        internal static void RequireExternalTagReadback(string name, string dataType, string connection, string plcTag, string plcName,
+            string observedName, string observedDataType, string observedConnection, string observedPlcTag, string observedAccessMode, string observedPlcName)
+        {
+            // The symbolic setter derives DataType/PlcName natively; never write them, only verify them.
+            if (!string.Equals(name, observedName, StringComparison.Ordinal) || !string.Equals(connection, observedConnection, StringComparison.Ordinal)
+                || !string.Equals(plcTag, observedPlcTag, StringComparison.Ordinal))
+                throw new ArgumentException("Created external HMI tag name, connection or PLC tag differs from the request.");
+            if (!string.Equals(dataType, observedDataType, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("The natively derived HMI data type differs from the exact PLC declaration type.");
+            if (observedAccessMode != "SymbolicAccess")
+                throw new ArgumentException("The created tag is not symbolically addressed; absolute access cannot identify the declaration.");
+            if (!string.IsNullOrEmpty(observedPlcName) && !string.Equals(plcName, observedPlcName, StringComparison.Ordinal))
+                throw new ArgumentException("The natively derived PLC name differs from the proven connection owner.");
+        }
     }
 }
