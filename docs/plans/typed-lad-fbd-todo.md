@@ -17,7 +17,7 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
 - Still open: scoped runtime (the runtime harness cannot call a software-unit DUT from `Main`),
-  created storage for the IEC route families, scoped global operand encodings and dependent-DB effects.
+  scoped global operand encodings and dependent-DB effects.
 
 ## Lane A — 26 October 2026
 
@@ -34,6 +34,10 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   four engineering gates ([ledger](../verification/typed-lad-fbd-route-iec-20261026.md),
   `evidence/local.typed.route-iec.20261026.json`). With the 25 October cases, all 80 reference route
   cells are engineering-qualified; `route-pending-references.v1.json` is empty.
+- 48 created-storage route cases (TON/TOF/TP/CTU/CTD/CTUD, created multi-instance member or created
+  namespace-qualified global DB, both routes, LAD and FBD) passed the four engineering gates
+  ([ledger](../verification/typed-lad-fbd-route-created-storage-20261026.md),
+  `evidence/local.typed.route-created-storage.20261026.json`).
 
 ## Lane A — 24 October 2026
 

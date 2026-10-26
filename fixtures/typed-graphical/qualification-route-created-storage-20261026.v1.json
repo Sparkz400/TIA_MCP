@@ -1,0 +1,3519 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-10-26T03:32:15.199985+00:00",
+  "scope": "Completed exact fixture attempts only. Historical binary lineages remain explicit; this ledger does not certify the current release, remote hosts, unexecuted assertions or broader instruction/type/route combinations.",
+  "counts": {
+    "attempts": 48,
+    "distinctCells": 48,
+    "allFourNativeGates": 48,
+    "allFiveGates": 0
+  },
+  "cells": [
+    {
+      "fixtureId": "typed-namespace-createglobal-ctd-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctd-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctd-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctd-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ctd-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctd-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctd-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctd-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ctu-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctu-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctu-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctu-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ctu-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctu-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctu-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctu-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ctud-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctud-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctud-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctud-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ctud-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ctud-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ctud-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ctud-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-tof-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-tof-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-tof-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-tof-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-tof-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-tof-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-tof-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-tof-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ton-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ton-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ton-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ton-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-ton-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-ton-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-ton-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-ton-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-tp-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-tp-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-tp-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-tp-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createglobal-tp-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createglobal-tp-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createglobal-tp-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createglobal-tp-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctd-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctd-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctd-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctd-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctd-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctd-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctd-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctd-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctu-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctu-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctu-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctu-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctu-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctu-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctu-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctu-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctud-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctud-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctud-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctud-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ctud-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ctud-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ctud-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ctud-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-tof-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-tof-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-tof-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-tof-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-tof-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-tof-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-tof-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-tof-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ton-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ton-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ton-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ton-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-ton-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-ton-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-ton-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-ton-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-tp-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-tp-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-tp-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-tp-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-namespace-createmulti-tp-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-namespace-createmulti-tp-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-namespace-createmulti-tp-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-namespace-createmulti-tp-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctd-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctd-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctd-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctd-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctd-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctd-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctd-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctd-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctu-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctu-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctu-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctu-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctu-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctu-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctu-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctu-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctud-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctud-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctud-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctud-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ctud-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ctud-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ctud-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ctud-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-tof-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-tof-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-tof-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-tof-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-tof-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-tof-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-tof-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-tof-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ton-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ton-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ton-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ton-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-ton-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-ton-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-ton-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-ton-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-tp-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-tp-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-tp-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-tp-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createglobal-tp-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createglobal-tp-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createglobal-tp-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createglobal-tp-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctd-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctd-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctd-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctd-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctd-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctd-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctd-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctd-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctu-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctu-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctu-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctu-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctu-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctu-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctu-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctu-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctud-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctud-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctud-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctud-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ctud-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ctud-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ctud-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ctud-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-tof-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-tof-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-tof-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-tof-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-tof-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-tof-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-tof-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-tof-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ton-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ton-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ton-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ton-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-ton-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-ton-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-ton-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-ton-lad/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-tp-fbd",
+      "language": "FBD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-tp-fbd/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-tp-fbd/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-tp-fbd/result.json"
+      ]
+    },
+    {
+      "fixtureId": "typed-unit-createmulti-tp-lad",
+      "language": "LAD",
+      "selectedEvidence": "artifacts/rt4/typed-unit-createmulti-tp-lad/result.json",
+      "latestAttempt": "artifacts/rt4/typed-unit-createmulti-tp-lad/result.json",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "attempts": [
+        "artifacts/rt4/typed-unit-createmulti-tp-lad/result.json"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctd-fbd/result.json",
+      "reportSha256": "adeded65d6e6caa6f11c2c040f4b1368df79ddeebe1b9069acc94e8251efe724",
+      "fixtureId": "typed-namespace-createglobal-ctd-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:27:44.350655+00:00",
+      "completedAtUtc": "2026-10-26T03:29:05.365011+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctd-lad/result.json",
+      "reportSha256": "2721c36f6d8f6981402e31b2c23f756ebe37e67b708a440d6d1af3822d50b65b",
+      "fixtureId": "typed-namespace-createglobal-ctd-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:11:49.887097+00:00",
+      "completedAtUtc": "2026-10-26T03:13:10.881107+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTD.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctu-fbd/result.json",
+      "reportSha256": "a828eb6dc613f9a6fb7801de468a24d56e6b35aa5fd40e5aa4b28373845b21e0",
+      "fixtureId": "typed-namespace-createglobal-ctu-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:25:05.081812+00:00",
+      "completedAtUtc": "2026-10-26T03:26:25.684671+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTU.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctu-lad/result.json",
+      "reportSha256": "cfef2e1f94d3bbe303c7bd11c4e0a35e8bfa0c269c368e0a85c49205876f5914",
+      "fixtureId": "typed-namespace-createglobal-ctu-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:09:11.464223+00:00",
+      "completedAtUtc": "2026-10-26T03:10:31.911023+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTU.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctud-fbd/result.json",
+      "reportSha256": "83800a4c6e66260c46bd61b7d1b0db0d24099ccf9661cceab3ba243fd6ff0aa8",
+      "fixtureId": "typed-namespace-createglobal-ctud-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:30:24.725578+00:00",
+      "completedAtUtc": "2026-10-26T03:31:45.234540+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTUD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ctud-lad/result.json",
+      "reportSha256": "07867b20763559ae59c0ddaabc1cd9aae732a77ed7c712be00d0423d0a0f8c86",
+      "fixtureId": "typed-namespace-createglobal-ctud-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:14:29.517031+00:00",
+      "completedAtUtc": "2026-10-26T03:15:50.065648+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTUD.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-tof-fbd/result.json",
+      "reportSha256": "c42655d9b90591daa956c004362d799ac5e026ea315832b0abe11ab2283fce9d",
+      "fixtureId": "typed-namespace-createglobal-tof-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:19:47.299561+00:00",
+      "completedAtUtc": "2026-10-26T03:21:07.368637+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-tof-lad/result.json",
+      "reportSha256": "5bb136571766ad457c6cab26ca03e89915d4e5674ecd424f148dbefbf0f2262e",
+      "fixtureId": "typed-namespace-createglobal-tof-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:03:52.889915+00:00",
+      "completedAtUtc": "2026-10-26T03:05:13.851130+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ton-fbd/result.json",
+      "reportSha256": "dcb4ebcdc5e977714f609e2b5024888cf17984f577168c711c31e8601d4bd133",
+      "fixtureId": "typed-namespace-createglobal-ton-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:17:08.452444+00:00",
+      "completedAtUtc": "2026-10-26T03:18:29.156799+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-ton-lad/result.json",
+      "reportSha256": "1146f624287318920ec2406d1496f30169d745b89303eb08a2bbfd1ecc1fc8de",
+      "fixtureId": "typed-namespace-createglobal-ton-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:01:14.683253+00:00",
+      "completedAtUtc": "2026-10-26T03:02:35.695871+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-tp-fbd/result.json",
+      "reportSha256": "94e8387cf54ad71fdbacbea1264003da6e1e1fb43e04351e73c113e78ffa5431",
+      "fixtureId": "typed-namespace-createglobal-tp-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:22:25.778267+00:00",
+      "completedAtUtc": "2026-10-26T03:23:46.098845+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createglobal-tp-lad/result.json",
+      "reportSha256": "09404e7e05f1582842327165b6fa44a2c9f34ea8e5fe7c883b976eb7e5842f16",
+      "fixtureId": "typed-namespace-createglobal-tp-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:06:31.690466+00:00",
+      "completedAtUtc": "2026-10-26T03:07:51.548397+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctd-fbd/result.json",
+      "reportSha256": "67f295a6d8c4d2c1c5135fc7ba32332e39bc1ec360fdede68876c963cfea1211",
+      "fixtureId": "typed-namespace-createmulti-ctd-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:26:26.929522+00:00",
+      "completedAtUtc": "2026-10-26T03:27:42.996597+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctd-lad/result.json",
+      "reportSha256": "d3f549493b0129949f02d41bbbd054c7851a0a0a65703b4ce537441162a453e3",
+      "fixtureId": "typed-namespace-createmulti-ctd-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:10:32.832833+00:00",
+      "completedAtUtc": "2026-10-26T03:11:48.951665+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTD.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctu-fbd/result.json",
+      "reportSha256": "ce1bd575cf79f2ddaac1695e20d5096fdbbf9ec71ac5ebd5530e49edcda85026",
+      "fixtureId": "typed-namespace-createmulti-ctu-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:23:47.318367+00:00",
+      "completedAtUtc": "2026-10-26T03:25:03.838575+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTU.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctu-lad/result.json",
+      "reportSha256": "59abc6997c781bc842fd9bda19f5136156eb086323191607372706de61490e8b",
+      "fixtureId": "typed-namespace-createmulti-ctu-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:07:52.534848+00:00",
+      "completedAtUtc": "2026-10-26T03:09:10.582232+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTU.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctud-fbd/result.json",
+      "reportSha256": "8cb2536883debc85e88df3ec338642a7dbc86cc708b04930f99d0686e1ec277f",
+      "fixtureId": "typed-namespace-createmulti-ctud-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:29:06.685724+00:00",
+      "completedAtUtc": "2026-10-26T03:30:23.361608+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.counter.CTUD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ctud-lad/result.json",
+      "reportSha256": "46f9104fd5b777585b16bce262dce4c3224e4f0a689051834b8cdb06618e5546",
+      "fixtureId": "typed-namespace-createmulti-ctud-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:13:11.902534+00:00",
+      "completedAtUtc": "2026-10-26T03:14:28.507187+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.counter.CTUD.int.v1",
+        "v21.fw41.namespace.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-tof-fbd/result.json",
+      "reportSha256": "163892527f568e6611341e85370ab51a211178a2b7100f47b37d09b0f865905c",
+      "fixtureId": "typed-namespace-createmulti-tof-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:18:30.275392+00:00",
+      "completedAtUtc": "2026-10-26T03:19:46.129613+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-tof-lad/result.json",
+      "reportSha256": "21cdf96445e586bbec4db61a81474512c7bb573b3c86d711ea5905350f5b08b3",
+      "fixtureId": "typed-namespace-createmulti-tof-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:02:36.449255+00:00",
+      "completedAtUtc": "2026-10-26T03:03:52.075417+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ton-fbd/result.json",
+      "reportSha256": "3ede93b9a47816eb00e0bca5e5c56362427421fe7c40f5662a81340103540698",
+      "fixtureId": "typed-namespace-createmulti-ton-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:15:51.111832+00:00",
+      "completedAtUtc": "2026-10-26T03:17:07.312737+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-ton-lad/result.json",
+      "reportSha256": "24c40f927db9f134fad884dc2d3814edc211608671a8d855b5ea4d5954abe19d",
+      "fixtureId": "typed-namespace-createmulti-ton-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:59:57.364611+00:00",
+      "completedAtUtc": "2026-10-26T03:01:13.906181+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-tp-fbd/result.json",
+      "reportSha256": "ead5b420f61f2e0d796b5f66eb17f62336867bb6f6339ce522de1f1967f3d2d3",
+      "fixtureId": "typed-namespace-createmulti-tp-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:21:08.632783+00:00",
+      "completedAtUtc": "2026-10-26T03:22:24.610909+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.fbd.assign.v1",
+        "v21.fw41.namespace.fbd.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-namespace-createmulti-tp-lad/result.json",
+      "reportSha256": "676897de5afc5af63c7a6896a037d5f767d82a0c454fbcf546720fdc1214b280",
+      "fixtureId": "typed-namespace-createmulti-tp-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T03:05:14.659886+00:00",
+      "completedAtUtc": "2026-10-26T03:06:30.820610+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "namespace",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.namespace.lad.coil.v1",
+        "v21.fw41.namespace.lad.contact.v1",
+        "v21.fw41.namespace.lad.powerrail.v1",
+        "v21.fw41.namespace.lad.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctd-fbd/result.json",
+      "reportSha256": "c3749ed51d3f221a0d1c9c68d6bf983aeab33ef10a205c8a8e744f76340af7cb",
+      "fixtureId": "typed-unit-createglobal-ctd-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:55:57.750029+00:00",
+      "completedAtUtc": "2026-10-26T02:57:18.132507+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctd-lad/result.json",
+      "reportSha256": "0d6bbd31712b8550ad3a39facc41f8c27ad1801406919e0281a383ba24a69991",
+      "fixtureId": "typed-unit-createglobal-ctd-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:40:09.732459+00:00",
+      "completedAtUtc": "2026-10-26T02:41:30.665666+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTD.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctu-fbd/result.json",
+      "reportSha256": "c8abaf0a72d620594c702b02b12271c4895f290ab2e416419d8d93f84d324afa",
+      "fixtureId": "typed-unit-createglobal-ctu-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:53:18.723846+00:00",
+      "completedAtUtc": "2026-10-26T02:54:39.798030+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTU.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctu-lad/result.json",
+      "reportSha256": "9473ca028ea078a3621c7a076227cc2a50afda079923a4e932ea51ca087d766e",
+      "fixtureId": "typed-unit-createglobal-ctu-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:37:32.522392+00:00",
+      "completedAtUtc": "2026-10-26T02:38:53.180466+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTU.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctud-fbd/result.json",
+      "reportSha256": "62cae35e8586029707cf45eb465cee1ebdb37caac7e4c6b8204f9412261f9fc6",
+      "fixtureId": "typed-unit-createglobal-ctud-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:58:36.106092+00:00",
+      "completedAtUtc": "2026-10-26T02:59:56.672283+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTUD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ctud-lad/result.json",
+      "reportSha256": "a579eac0569f42a49bd63bb12e4eaba97bb34e1d17a570c96b36956fd1ddf0ee",
+      "fixtureId": "typed-unit-createglobal-ctud-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:42:47.471555+00:00",
+      "completedAtUtc": "2026-10-26T02:44:08.081078+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTUD.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-tof-fbd/result.json",
+      "reportSha256": "4616ff708662df5c714052ccb062b9d323bce8f83733dd783ba1704ffd2a5c7d",
+      "fixtureId": "typed-unit-createglobal-tof-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:48:02.335895+00:00",
+      "completedAtUtc": "2026-10-26T02:49:22.943213+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-tof-lad/result.json",
+      "reportSha256": "28fbcf54884b410acb87a77e9907d70234989516b7de8da623e2f37fc9df3dbb",
+      "fixtureId": "typed-unit-createglobal-tof-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:32:14.903587+00:00",
+      "completedAtUtc": "2026-10-26T02:33:37.226986+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ton-fbd/result.json",
+      "reportSha256": "a4965b993772e4c3ca84ab7ac8bf734f25e0bc053a71a2dc9f25efdc0a0291b1",
+      "fixtureId": "typed-unit-createglobal-ton-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:45:25.330442+00:00",
+      "completedAtUtc": "2026-10-26T02:46:45.582832+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-ton-lad/result.json",
+      "reportSha256": "d7749aaf1976865c5eafd83fec20073e3850276c4c07c63b9ef1285e50c832bf",
+      "fixtureId": "typed-unit-createglobal-ton-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:29:36.110160+00:00",
+      "completedAtUtc": "2026-10-26T02:30:57.256315+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-tp-fbd/result.json",
+      "reportSha256": "e65e4c8b645ffbd3018a389d5fa2e4a9b88dd9ecfc73ec983186d97b6b1fc2dd",
+      "fixtureId": "typed-unit-createglobal-tp-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:50:40.684511+00:00",
+      "completedAtUtc": "2026-10-26T02:52:01.114478+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createglobal-tp-lad/result.json",
+      "reportSha256": "4712625c46c1a58019d09f924ba2cc0949542ef96bd735b43aea278bcb1fd6fa",
+      "fixtureId": "typed-unit-createglobal-tp-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:34:54.336161+00:00",
+      "completedAtUtc": "2026-10-26T02:36:15.365007+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctd-fbd/result.json",
+      "reportSha256": "7190ef06ce92642d2041e9c08aff781c68b7a367d21a299c97cf94f6ea383097",
+      "fixtureId": "typed-unit-createmulti-ctd-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:54:40.372365+00:00",
+      "completedAtUtc": "2026-10-26T02:55:57.122473+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctd-lad/result.json",
+      "reportSha256": "efaf44e69d47f036783769b6aa7c1498d2002cef0d9d1c7c4378c2c5b8b06075",
+      "fixtureId": "typed-unit-createmulti-ctd-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:38:53.408896+00:00",
+      "completedAtUtc": "2026-10-26T02:40:09.472595+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTD.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctu-fbd/result.json",
+      "reportSha256": "ae3cd20d275a935550bfa353b75ae289f49e7fae914b0996485a1dc56756143a",
+      "fixtureId": "typed-unit-createmulti-ctu-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:52:01.633327+00:00",
+      "completedAtUtc": "2026-10-26T02:53:18.108531+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTU.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctu-lad/result.json",
+      "reportSha256": "31925a93dac594bc068e2d6cdcd9da808896a59dd73dee19fde6ccaeb0893afd",
+      "fixtureId": "typed-unit-createmulti-ctu-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:36:15.532652+00:00",
+      "completedAtUtc": "2026-10-26T02:37:32.330449+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTU.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctud-fbd/result.json",
+      "reportSha256": "e671f8f60d18f7eb4f9a4f32bf3db55471bb02e443aa392a9b8b7089846c17f2",
+      "fixtureId": "typed-unit-createmulti-ctud-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:57:18.749537+00:00",
+      "completedAtUtc": "2026-10-26T02:58:35.451658+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.counter.CTUD.int.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ctud-lad/result.json",
+      "reportSha256": "c2ea799086cf7769427ab433f251c8ec4e4c6382dad324f5282257ab232abbf7",
+      "fixtureId": "typed-unit-createmulti-ctud-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:41:30.957297+00:00",
+      "completedAtUtc": "2026-10-26T02:42:47.103274+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.counter.CTUD.int.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-tof-fbd/result.json",
+      "reportSha256": "bed8e5f52919eb19f766b0390fd94725a217247fc67edecc4d33182d19c67720",
+      "fixtureId": "typed-unit-createmulti-tof-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:46:45.997370+00:00",
+      "completedAtUtc": "2026-10-26T02:48:01.831907+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-tof-lad/result.json",
+      "reportSha256": "7e4efc385512af3a8dbc97158528daabf156069607a68a9a96b4685611b2cff0",
+      "fixtureId": "typed-unit-createmulti-tof-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:30:57.320181+00:00",
+      "completedAtUtc": "2026-10-26T02:32:14.808995+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TOF.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ton-fbd/result.json",
+      "reportSha256": "8aab767e7a484f87729909e88922fd7060a0a9628314613abf235532460a23c8",
+      "fixtureId": "typed-unit-createmulti-ton-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:44:08.475476+00:00",
+      "completedAtUtc": "2026-10-26T02:45:24.932929+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-ton-lad/result.json",
+      "reportSha256": "18d4edeea15f2d3d48fbb259532c5de0373cfab28fd2e8540c919a84399268f0",
+      "fixtureId": "typed-unit-createmulti-ton-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:28:18.330394+00:00",
+      "completedAtUtc": "2026-10-26T02:29:36.063948+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TON.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-tp-fbd/result.json",
+      "reportSha256": "b736e4a22bc329a936e5b7871eb79294d4c0125bdb7b3171040398629101da17",
+      "fixtureId": "typed-unit-createmulti-tp-fbd",
+      "language": "FBD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:49:23.411716+00:00",
+      "completedAtUtc": "2026-10-26T02:50:40.170826+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.fbd.assign.v1",
+        "v21.fw41.softwareUnit.fbd.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    },
+    {
+      "report": "artifacts/rt4/typed-unit-createmulti-tp-lad/result.json",
+      "reportSha256": "dd308c3f1bdbc45f3e0b9a0371fb91a13eaa48f56698fc086a4606966a3ba96d",
+      "fixtureId": "typed-unit-createmulti-tp-lad",
+      "language": "LAD",
+      "status": "passed",
+      "sourceReport": null,
+      "sourceReportSha256": null,
+      "sourceReportHashBasis": null,
+      "startedAtUtc": "2026-10-26T02:33:37.340566+00:00",
+      "completedAtUtc": "2026-10-26T02:34:54.187198+00:00",
+      "gates": {
+        "engineeringVerified": true,
+        "preservationVerified": true,
+        "persistenceVerified": true,
+        "recoveryVerified": true,
+        "runtimeVerified": false
+      },
+      "allFourNativeGates": true,
+      "allFiveGates": false,
+      "passedAssertionCount": 0,
+      "assertionCount": 0,
+      "target": {
+        "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "route": "softwareUnit",
+        "tiaVersion": "V21"
+      },
+      "operation": "replaceNetwork",
+      "profiles": [
+        "v21.fw41.softwareUnit.lad.coil.v1",
+        "v21.fw41.softwareUnit.lad.contact.v1",
+        "v21.fw41.softwareUnit.lad.powerrail.v1",
+        "v21.fw41.softwareUnit.lad.timer.TP.time.v1"
+      ],
+      "binaries": {
+        "host": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Host\\bin\\Debug\\net10.0-windows\\TiaMcp.Host.exe",
+          "sha256": "451ef56e0c2e7f97b1999df059bf7d8cd082895f6e81a52a23e3b43d0cc77320",
+          "manifestSha256": "3871feb4d4e73be8c5c00c625ae2191b4409ff744d9518718b4827d0d78ac6f6"
+        },
+        "worker": {
+          "path": "D:\\Entwicklung\\TIA_MCP-public\\src\\TiaMcp.Openness.V21\\bin\\Debug\\net48\\TiaMcp.Openness.V21.exe",
+          "sha256": "fa67c057360716bb2698b9064611fedabce8c3bcf134fa3babea1b1be98353fc",
+          "manifestSha256": "af0494a04cafd7a08822afb15622f11b93118e1315a6c4f30cac89e226ae7d56"
+        }
+      },
+      "failure": null,
+      "runtimeStatus": "not_run",
+      "runtimeFailures": [],
+      "runtimeVerifiedBasis": null,
+      "semanticRuntimePreservation": null,
+      "compileObservedSuccess": false,
+      "failedChangeOriginalRecovered": false,
+      "failureRecoveryError": null
+    }
+  ]
+}

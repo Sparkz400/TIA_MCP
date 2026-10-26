@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.15",
+  "catalogVersion": "0.4.16",
   "targetTiaVersions": [
     21
   ],
@@ -1925,6 +1925,22 @@
       "limitations": [
         "Engineering only; scoped runtime is not covered.",
         "Created multi-instance or global-instance storage is not covered for these IEC route families."
+      ]
+    },
+    {
+      "id": "local.typed.route-created-storage.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ecda48a5dc375671d71487ea02829db93c964aad",
+        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, 48 route builder cases creating new storage: software-unit and alternate-namespace TON, TOF, TP, CTU, CTD and CTUD with a created multi-instance member or a created namespace-qualified global instance DB, LAD and FBD, from the active route profiles' captured declaration and global-instance templates. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers (references renamed only through explicit instance bindings), save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-created-storage.20261026.json"
+      ],
+      "limitations": [
+        "Engineering only; scoped runtime is not covered."
       ]
     }
   ],
@@ -8837,7 +8853,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
-          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and storage variants (48 audited profiles, local.typed.route-profiles.20261025 and local.typed.route-iec.20261026); created storage for the IEC timer/counter routes and scoped runtime are unqualified.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026); scoped runtime is unqualified.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8860,7 +8876,8 @@
           "local.typed.route-capture.20261025",
           "local.typed.route-profiles.20261025",
           "local.typed.route-iec-capture.20261026",
-          "local.typed.route-iec.20261026"
+          "local.typed.route-iec.20261026",
+          "local.typed.route-created-storage.20261026"
         ]
       },
       "availability": {
