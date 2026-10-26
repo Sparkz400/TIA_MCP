@@ -22,7 +22,10 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     for phase, report_path in (("before", before_path), ("after", after_path)):
         report = json.loads(report_path.read_text())
         assert report["completed"] and report["builderUsed"] is False
-        reference = next(e for e in report["fixtures"] if prefix + "InstanceEffect" in e["names"])
+        # One owned capture may hold both phases: the before source first, the redeclaring after source last.
+        entries = [e for e in report["fixtures"] if prefix + "InstanceEffect" in e["names"]]
+        assert len(entries) == (2 if before_path == after_path else 1), "Ambiguous instance-effect phases in one report."
+        reference = entries[0] if phase == "before" else entries[-1]
         authored_path = Path(reference["sourcePath"])
         assert hashlib.sha256(authored_path.read_text(encoding="utf-8-sig").encode()).hexdigest() == reference["sha256"]
         result["sources"][phase] = {"path": authored_path.relative_to(ROOT).as_posix(),

@@ -26,7 +26,13 @@ from typed_graphical_native_expectations import adapt_reference_culture, project
 
 def authored_reference(path, unit):
     text = path.read_text(encoding="utf-8-sig")
-    if path.suffix.lower() == ".xml":
+    if path.suffix.lower() == ".xml" and safe_xml(text).find("SW.Tags.PlcTagTable") is not None:
+        # Unit tag tables carry no namespace; they belong to the selected unit's scope.
+        tables = safe_xml(text).findall("SW.Tags.PlcTagTable")
+        require(len(tables) == 1, "One independently authored native tag table is required.")
+        names, namespace = [tables[0].findtext("AttributeList/Name")], unit
+        kind, payload, form = "tag_table_import_xml", {"xml": text}, "native_tag_table_xml"
+    elif path.suffix.lower() == ".xml":
         document = safe_xml(text)
         blocks = [node for node in document if node.tag in ("SW.Blocks.FC", "SW.Blocks.FB")]
         require(len(blocks) == 1, "One independently derived native caller is required.")
@@ -49,19 +55,46 @@ def authored_reference(path, unit):
         "engineeringVerified": False, "runtimeVerified": False}, kind, payload
 
 
-def verify_reference_additions(before, after, names, scope, namespace):
+def declare_changes(specifications, modify, observe):
+    """Bind each SOURCE:BLOCK declaration to exactly one admitted source file."""
+    declared = {"modifies": modify, "observes": observe}
+    for field, values in declared.items():
+        for value in values:
+            source, _, name = value.partition(":")
+            require(name and sum(pathlib.Path(entry["sourcePath"]).name == source for entry, _, _ in specifications) == 1,
+                    "--modify/--observe must name one admitted source file and one block: " + value)
+    for entry, kind, _ in specifications:
+        source = pathlib.Path(entry["sourcePath"]).name
+        for field, values in declared.items():
+            entry[field] = sorted(v.partition(":")[2] for v in values if v.partition(":")[0] == source)
+        require(set(entry["modifies"]) <= set(entry["names"]) and not set(entry["observes"]) & set(entry["names"]),
+                "A modification must be declared by its source; observed dependents must not be.")
+        require(kind != "tag_table_import_xml" or not entry["modifies"] + entry["observes"], "Tag tables are captured as additions only.")
+
+
+def verify_reference_additions(before, after, names, scope, namespace, modifies=(), observes=()):
+    """Exactly the declared additions; only explicitly declared existing blocks of this scope may change."""
     old, new = before["objects"], after["objects"]
     require(set(old) <= set(new), "Reference capture deleted an existing native object.")
-    require(all(old[key]["payloadSha256"] == new[key]["payloadSha256"] for key in old), "Reference capture changed existing native XML.")
+    allowed = set(modifies) | set(observes)
+    changed = [new[key] for key in old if old[key]["payloadSha256"] != new[key]["payloadSha256"]]
+    require(all(row.get("kind") == "block" and row.get("name") in allowed for row in changed), "Reference capture changed existing native XML.")
+    require({row["name"] for row in changed} >= set(modifies), "A declared modification left its native block unchanged.")
     added = [new[key] for key in set(new) - set(old)]
-    require(len(added) == len(names) and all(row["kind"] == "block" for row in added)
-        and {row["name"] for row in added} == set(names), "Reference capture did not add exactly the declared blocks.")
-    inventory = after["inventory"]["blocks"]
-    for row in added:
-        match = [block for block in inventory if block["path"] == row["path"]]
-        require(len(match) == 1 and match[0]["scopePath"] == scope and match[0]["identity"]["namespace"] == namespace,
+    expected = set(names) - set(modifies)
+    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable") for row in added)
+        and {row["name"] for row in added} == expected, "Reference capture did not add exactly the declared objects.")
+    blocks, tables = after["inventory"]["blocks"], after["inventory"].get("tagTables", [])
+    for row in added + changed:
+        if row["kind"] == "tagTable":
+            match = [table for table in tables if table["path"] == row["path"]]
+            require(len(match) == 1 and match[0]["scopePath"] == scope, "Reference tag table belongs to the wrong exact scope.")
+            continue
+        match = [block for block in blocks if block["path"] == row["path"]]
+        require(len(match) == 1 and match[0]["scopePath"] == scope
+            and (row in changed or match[0]["identity"]["namespace"] == namespace),
             "Reference block belongs to the wrong exact scope/namespace.")
-    return sorted(added, key=lambda row: row["name"])
+    return sorted(added, key=lambda row: row["name"]), sorted(changed, key=lambda row: row["name"])
 
 
 def capture(args):
@@ -72,6 +105,7 @@ def capture(args):
             "Source archive must be under repository artifacts.")
     require(hashlib.sha256(archive.read_bytes()).hexdigest() == args.sha256, "Source archive hash differs.")
     specifications = [authored_reference(path, args.unit) for path in args.sources]
+    declare_changes(specifications, args.modify, args.observe)
     require(len({row[0]["sourcePath"] for row in specifications}) == len(specifications), "Sources may be admitted only once.")
     report = {"schemaVersion": 1, "origin": "independently_authored_native_references", "builderUsed": False,
         "startedAtUtc": utc_now(), "completed": False, "runtimeVerified": False, "physicalPlcAccess": False,
@@ -118,10 +152,13 @@ def capture(args):
             report["fixtures"].append(entry)
             baseline = snapshot(session.invoke, folder / "before")
             require(not any(block["scopePath"] == scope and block["identity"]["namespace"] == entry["namespace"]
-                    and block["name"] in entry["names"] for block in baseline["inventory"]["blocks"]),
+                    and block["name"] in set(entry["names"]) - set(entry["modifies"]) for block in baseline["inventory"]["blocks"]),
                     "New independent capture cannot overwrite an existing native reference.")
-            prepared = session.invoke("change_prepare", {"kind": kind, "payload": {**payload,
-                "scopePath": scope, "namespace": entry["namespace"], "expectedBlockNames": entry["names"]}})
+            require(all(any(block["scopePath"] == scope and block["identity"]["namespace"] == entry["namespace"] and block["name"] == name
+                    for block in baseline["inventory"]["blocks"]) for name in entry["modifies"]), "A declared modification target does not exist.")
+            target = ({"expectedTableNames": entry["names"]} if kind == "tag_table_import_xml"
+                      else {"namespace": entry["namespace"], "expectedBlockNames": entry["names"]})
+            prepared = session.invoke("change_prepare", {"kind": kind, "payload": {**payload, "scopePath": scope, **target}})
             pending = prepared
             entry["changeId"] = prepared["changeId"]
             entry["applyIntent"] = {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
@@ -132,14 +169,18 @@ def capture(args):
             require(applied.get("state") == "applied" and applied.get("compile", {}).get("errorCount") == 0
                 and "changed_project_saved" in applied.get("stages", []), "Independent source import/compile/save failed.")
             after = snapshot(session.invoke, folder / "after")
-            additions = verify_reference_additions(baseline, after, entry["names"], scope, entry["namespace"])
+            additions, changes = verify_reference_additions(baseline, after, entry["names"], scope, entry["namespace"],
+                entry["modifies"], entry["observes"])
             entry["compile"], entry["exports"] = applied["compile"], []
-            for row in additions:
-                target = output / (row["name"] + ".xml")
+            for row in additions + changes:
+                # A changed block keeps its earlier export; its new state is named by this source's ordinal.
+                target = output / (row["name"] + (".xml" if row in additions else ".source-" + str(ordinal).zfill(2) + ".xml"))
                 require(not target.exists(), "Native export destination already exists.")
                 shutil.copyfile(row["file"], target)
-                block = next(block for block in after["inventory"]["blocks"] if block["path"] == row["path"])
-                entry["exports"].append({"name": row["name"], "path": str(target), "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), "block": block})
+                rows = after["inventory"]["blocks" if row["kind"] == "block" else "tagTables"]
+                identity = next(item for item in rows if item["path"] == row["path"])
+                entry["exports"].append({"name": row["name"], "kind": row["kind"], "changedExisting": row in changes,
+                    "path": str(target), "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), row["kind"]: identity})
             entry["engineeringVerified"] = entry["unrelatedPreserved"] = True
             pending = None
             report["remainingSources"].remove(entry["sourcePath"])
@@ -191,6 +232,10 @@ if __name__ == "__main__":
     parser.add_argument("--unit", default="TiaMcp_UnitA")
     parser.add_argument("--stop-file", type=pathlib.Path)
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument("--modify", action="append", default=[], metavar="SOURCE:BLOCK",
+        help="Existing block of the selected scope that this source file explicitly redeclares.")
+    parser.add_argument("--observe", action="append", default=[], metavar="SOURCE:BLOCK",
+        help="Existing dependent block this source file's change may update natively (exported, not authored).")
     options = parser.parse_args()
     if not 5 <= options.timeout <= 930:
         parser.error("--timeout must be within 5..930 seconds.")

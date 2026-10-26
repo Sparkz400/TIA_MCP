@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Native references for scoped dependent-DB effects (software-unit and namespace instance-effect pairs) and scoped global operand encodings: namespace-qualified global DB members and unit PLC tags read and written from LAD and FBD in both routes. Encodings and effects are unobserved until captured; nothing here enables a profile.",
+  "unit": "TiaMcp_UnitA",
+  "archive": {
+    "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "sha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
+  },
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_TemplateFB_LAD.xml",
+      "sha256": "38f4b13c74ba63cddc705ac2b24ffb3e66128532571b1bba17c1d130e15c7dbc",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TemplateFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+      "sha256": "08d2398a78317c919f4ec61ebe1e1e8318638f6227521e5639bce211919e339c",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TemplateFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-instance-effect-before.scl",
+      "sha256": "df107d3cd56973062ba224c35d268aa9869c08964abdea8c9a03ddc0b8ce33d2",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_InstanceEffect",
+        "TgpUnit_InstanceEffect_DB"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-instance-effect-before.scl",
+      "sha256": "d48927b100997f85bc86dc187bd77721c655c716acb33914521965be0dd6428c",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_InstanceEffect",
+        "TgpNamespace_InstanceEffect_DB"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-instance-effect-after.scl",
+      "sha256": "12e70f5a3c93e0baf5302dd82abecd0d318fb705452580b924ae51d0735959f6",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_InstanceEffect"
+      ],
+      "namespace": "TiaMcp_UnitA",
+      "modifies": [
+        "TgpUnit_InstanceEffect"
+      ],
+      "observes": [
+        "TgpUnit_InstanceEffect_DB"
+      ]
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-instance-effect-after.scl",
+      "sha256": "363352cca474d5a2e318c99cee7753b738fb2f67ec6a2bb934a2c633fd5693a8",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_InstanceEffect"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "modifies": [
+        "TgpNamespace_InstanceEffect"
+      ],
+      "observes": [
+        "TgpNamespace_InstanceEffect_DB"
+      ]
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-tags.xml",
+      "sha256": "4547641ab0deb7337133f3171c13d9e57ff519c8f6d7675153c4e1e5fc06999a",
+      "route": "softwareUnit",
+      "authoredFormat": "native_tag_table_xml",
+      "names": [
+        "TgpUnit_OperandTags"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-db.scl",
+      "sha256": "c31416b7a7b5a4c30b29fc01276278acd7ea21889cade90b3b81727ec51b1275",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_OperandDB"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-db.scl",
+      "sha256": "239a7b02ea82f4dd04526e5884414d89b573726201a365728831303ffd730a7a",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_OperandDB"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-db-lad.s7dcl",
+      "sha256": "b2e21a31c469b002f9571fc71f2fa4c9f55641a8e17499dd3b1a0632c309d4a8",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_OperandDb_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-db-fbd.s7dcl",
+      "sha256": "7115dae481a60f9ee9344bc29ec90d38e8ba6e4ff8482b9cd325833369895f73",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_OperandDb_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl",
+      "sha256": "41bc3bbc40da7dec1ef46dd14bc72edb859d4ff365fc89a5b1a86b5a536850af",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_OperandTag_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-operand-tag-fbd.s7dcl",
+      "sha256": "15baac2a4d768bf1acfc747faafb8b5c54e634a708034b12c7cad7397efaac74",
+      "route": "softwareUnit",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpUnit_OperandTag_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-db-lad.s7dcl",
+      "sha256": "3c3c96351c182746415b3a125719e036b6b9eede58b20ad4dde25cad5c0c7d37",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_OperandDb_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-db-fbd.s7dcl",
+      "sha256": "f04b84fa2ff8eb124958f97e1cd71842263a0039c2085b56ec57f77027feed5e",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_OperandDb_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-tag-lad.s7dcl",
+      "sha256": "dbc7ecd188dc6030c39da310affd0490a45ee19f881bacf5354ee43b4ede8316",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_OperandTag_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-operand-tag-fbd.s7dcl",
+      "sha256": "c8ef10ab259f193b9680b7c88138ebadef375521e4ae262ed5bf3b027ef0dea7",
+      "route": "namespace",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "TgpNamespace_OperandTag_FBD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    }
+  ],
+  "argsFile": [
+    "fixtures/typed-graphical/native/TgpUnit_TemplateFB_LAD.xml",
+    "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+    "fixtures/typed-graphical/sources/route-Unit-instance-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-instance-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Unit-instance-effect-after.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-instance-effect-after.scl",
+    "fixtures/typed-graphical/sources/route-Unit-operand-tags.xml",
+    "fixtures/typed-graphical/sources/route-Unit-operand-db.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-operand-db.scl",
+    "fixtures/typed-graphical/sources/route-Unit-operand-db-lad.s7dcl",
+    "fixtures/typed-graphical/sources/route-Unit-operand-db-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/route-Unit-operand-tag-lad.s7dcl",
+    "fixtures/typed-graphical/sources/route-Unit-operand-tag-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/route-Namespace-operand-db-lad.s7dcl",
+    "fixtures/typed-graphical/sources/route-Namespace-operand-db-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/route-Namespace-operand-tag-lad.s7dcl",
+    "fixtures/typed-graphical/sources/route-Namespace-operand-tag-fbd.s7dcl"
+  ],
+  "command": [
+    "python",
+    "-B",
+    "scripts/capture_typed_routes_owned.py",
+    "@artifacts/cap-scoped.args",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/cap-scoped",
+    "--archive",
+    "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "--sha256",
+    "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+    "--modify",
+    "route-Unit-instance-effect-after.scl:TgpUnit_InstanceEffect",
+    "--observe",
+    "route-Unit-instance-effect-after.scl:TgpUnit_InstanceEffect_DB",
+    "--modify",
+    "route-Namespace-instance-effect-after.scl:TgpNamespace_InstanceEffect",
+    "--observe",
+    "route-Namespace-instance-effect-after.scl:TgpNamespace_InstanceEffect_DB"
+  ],
+  "afterCapture": [
+    "scripts/extract_typed_instance_effects.py <capture> <capture> --route softwareUnit --prefix TgpUnit_ --namespace TiaMcp_UnitA",
+    "scripts/extract_typed_instance_effects.py <capture> <capture> --route namespace --prefix TgpNamespace_ --namespace TiaMcp_UnitA.Alternate",
+    "Worker: select instance-effects[-<route>].v1.json by the change's route before route createMulti can pass.",
+    "Review the captured operand Access/Component encodings before any builder operand profile is enabled."
+  ]
+}
