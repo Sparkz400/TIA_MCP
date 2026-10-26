@@ -56,6 +56,8 @@ def main():
                 global_case["referenceXml"] = "fixtures/typed-graphical/native/" + global_case["blockName"] + ".xml"
                 global_case["dependencyXmls"].append({"path": "fixtures/typed-graphical/native/" + global_name + ".xml", "names": [global_name]})
                 global_case["payload"]["instances"] = [{"key": "child", "kind": "existingGlobal", "blockPath": "$block:" + global_name}]
+                # Both harness callers would share the one global callee DB; use the single-instance oracle.
+                global_case.update(runtimeInstances=["dut"], behaviorFamily="numeric-fb-single")
                 scoped_cases.append(global_case)
                 for storage, reference in (("createMulti", case), ("createGlobal", global_case)):
                     created = copy.deepcopy(reference)

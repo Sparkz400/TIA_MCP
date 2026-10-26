@@ -1,0 +1,77 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.scoped-runtime.local-fb.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T11:25:25+00:00",
+  "source": {
+    "commit": "a61de1c05c59d6e517f9e5ec2938e76626023753",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Software-unit and alternate-namespace numeric FB cells with local multi-instance callee storage, LAD and FBD (4 cells), live as in local.typed.scoped-runtime.20261026 after binding the scoped FB dependency to its namespace-qualified identity: each passed all five gates, including two independent harness instances keeping separate callee history.",
+  "limitations": [
+    "Host application-call timing; not exact PLC scan timing."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9b9e1a942d96d896ca36547bef40359a269aa59d3046f7005bde9b51f160b467"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "e46bd697aca87ff80c8ed501c9a8787f408b57789596e59069340ea5b4764c51"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "0f7764b932db08793f5bce0b406930b3bb74b1bb5cc4f52c373ce3422c2eba12"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-scoped-runtime-local-fb.json",
+      "sha256": "cff3124f38d4f0829ceb3c77ad6a509ddb734468351fbc37ecb24116332c390b",
+      "bytes": 69192,
+      "completed": true,
+      "steps": [
+        "typed-namespace-numeric-fb-fbd: passed",
+        "typed-namespace-numeric-fb-lad: passed",
+        "typed-unit-numeric-fb-fbd: passed",
+        "typed-unit-numeric-fb-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

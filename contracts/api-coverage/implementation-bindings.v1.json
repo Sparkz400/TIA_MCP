@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "69347a797a403e28a89137b405bf9c238738363063e3c2afcb49cd81f17eba39",
-      "bytes": 756793
+      "sha256": "b23a9302ad54b68cbfa04420ee2255912e37acb77cfddda0f070c1d86cf0f1bf",
+      "bytes": 760494
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -76436,6 +76436,27 @@
           "artifacts": [
             "evidence/local.typed.route-created-storage.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.scoped-runtime.20261026",
+          "profileSha256": "2ad93dbfc739a33dece6a6291690a42ad29333ab1290f10dec837fe8f6516030",
+          "artifacts": [
+            "evidence/local.typed.scoped-runtime.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.scoped-runtime.reruns.20261026",
+          "profileSha256": "be071e4a2215c25faba4336a6adcf8f8ab25715091054d0ca96a07cc560472cf",
+          "artifacts": [
+            "evidence/local.typed.scoped-runtime.reruns.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.scoped-runtime.local-fb.20261026",
+          "profileSha256": "e8cc08d500f184202520300e4b8dbaa07effb2714595250e3f496ebd17be6b96",
+          "artifacts": [
+            "evidence/local.typed.scoped-runtime.local-fb.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94514,7 +94535,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "aafa27bcb72a53ba04fba0708150127f320a546db38cc68f547b6c84dcaf46b0"
+      "sha256": "7abe2dc41ba80e3ce02c9b0b1eea537f63cc24ab159be0b36d8d24713b903d2c"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94772,6 +94793,21 @@
       "sha256": "3431938646f70bf798985dda6465c07b46b77a77a36adeb68f7f148ff1b5466d"
     },
     {
+      "path": "evidence/local.typed.scoped-runtime.20261026.json",
+      "state": "observed",
+      "sha256": "12e970a267b4b93533b831ee691dd5fbfd45f0ed9439db5539158a87f19253a5"
+    },
+    {
+      "path": "evidence/local.typed.scoped-runtime.local-fb.20261026.json",
+      "state": "observed",
+      "sha256": "3f3d35f1e658a0600af45591b0f97eb672dcf590c839807975c65be4d264c8e3"
+    },
+    {
+      "path": "evidence/local.typed.scoped-runtime.reruns.20261026.json",
+      "state": "observed",
+      "sha256": "c0579b65060f1562ca3a464458478c27475ae397e25022104ed400f71bd7f0b1"
+    },
+    {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
       "state": "observed",
       "sha256": "566204adf0d5fcb175beec54a7a72ee338372f4f4741d2c204290a5f291a3e0d"
@@ -94784,7 +94820,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "3bad4f5d43430c016d9275603153b23167d02c9ce252917d55d008a2ecd4e9fe"
+      "sha256": "e1edfda36eaaf7622e1b92e0e264313c71f997e05a6f58c1736a2926c0196b9c"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",
@@ -95128,6 +95164,18 @@
     {
       "id": "local.typed.runtime.reruns.20261024",
       "profileSha256": "5f5b40cd450da0dae2e4233c7a8a2be1571baeed9b9c7871af755f46c9552d33"
+    },
+    {
+      "id": "local.typed.scoped-runtime.20261026",
+      "profileSha256": "2ad93dbfc739a33dece6a6291690a42ad29333ab1290f10dec837fe8f6516030"
+    },
+    {
+      "id": "local.typed.scoped-runtime.local-fb.20261026",
+      "profileSha256": "e8cc08d500f184202520300e4b8dbaa07effb2714595250e3f496ebd17be6b96"
+    },
+    {
+      "id": "local.typed.scoped-runtime.reruns.20261026",
+      "profileSha256": "be071e4a2215c25faba4336a6adcf8f8ab25715091054d0ca96a07cc560472cf"
     },
     {
       "id": "local.unit-recovery.v03",
