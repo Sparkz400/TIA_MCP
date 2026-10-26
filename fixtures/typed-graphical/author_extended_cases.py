@@ -95,6 +95,13 @@ def extended_cases():
                         dependencyXmls=[{"path": "fixtures/typed-graphical/native/" + system_db + ".xml", "names": [system_db]}])
                     case["referenceBindings"] = [binding("Instance", system_db, name, "GlobalVariable")]
                 result.append(case)
+                if family == "ton":
+                    # Composite: the same storage creation, inserted as a new network after the first one.
+                    composite = copy.deepcopy(case)
+                    composite["fixtureId"] = "typed-insert-" + storage.lower() + "-ton-" + language.lower()
+                    composite["payload"]["model"].pop("networkId")
+                    composite["payload"]["model"].update(operation="insertNetwork", insertAfterNetworkId="$first")
+                    result.append(composite)
     return result
 
 

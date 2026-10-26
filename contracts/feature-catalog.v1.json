@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.21",
+  "catalogVersion": "0.4.22",
   "targetTiaVersions": [
     21
   ],
@@ -1854,6 +1854,56 @@
       "limitations": [
         "Checkpoint retrieval into a new project is separate evidence; it is not a successful change_restore, and the stale/fingerprint guard is unchanged.",
         "The original failed project was not opened, edited or released."
+      ]
+    },
+    {
+      "id": "local.typed.iec-effect-standard.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9a937d4d7424526f06f4f9eb1c8e23feaee90185",
+        "passedScope": "scripts/capture_typed_routes_owned.py --unit '' (standard PLC program scope): the 2 inputs of route-capture-iec-effect-standard-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound baseline: an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type while the dependent DB was observed. Both inputs compiled clean and saved; only the declared redeclaration and its observed DB changed; the saved state matched a fresh-process reopen. The extracted standard IEC effect profile keeps the full DB payload and appends exactly the six members."
+      },
+      "artifacts": [
+        "evidence/local.typed.iec-effect-standard.20261026.json"
+      ],
+      "limitations": [
+        "Native reference capture only; standard createMulti for timers and counters needs builder runtime qualification.",
+        "An earlier attempt (artifacts/cap-iec-effect-standard-pathlimit) was refused before retrieval by TIA's 143-character project path limit."
+      ]
+    },
+    {
+      "id": "local.typed.standard-created-storage-runtime.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b7811e9cd885ff6d20c074b0c00411ecd0c3e398",
+        "passedScope": "Standard-route FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member or a global instance DB, LAD and FBD (28 cells), live through an owned PLCSIM Advanced V8 runtime with the standard IEC dependent-instance effect profile from local.typed.iec-effect-standard.20261026: each cell passed all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.standard-created-storage-runtime.20261026.json"
+      ],
+      "limitations": [
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.insertion-storage.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b8ad6fe3c2469b776177c445bdc5ba1394e1cb7b",
+        "passedScope": "Standard-route TON caller: one change inserts a new network after the first network and creates its instance storage, as a multi-instance member (createMulti) or a global instance DB (createGlobal), LAD and FBD (4 cells). Each passed the four engineering gates under the network-plus-storage-creation-v1 composite contract: the inserted network follows the renumbering decision, a created multi-instance member is new and shaped exactly like its native template, and the rest of the caller matches its before export exactly."
+      },
+      "artifacts": [
+        "evidence/local.typed.insertion-storage.20261026.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior of the composite change is not claimed.",
+        "Qualified for the standard-route TON family; other families and the software-unit/namespace routes still rely on separate insertion and storage-creation evidence."
       ]
     },
     {
@@ -9023,7 +9073,7 @@
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9055,7 +9105,10 @@
           "local.typed.scoped-runtime.iec-createmulti.20261026",
           "local.typed.route-dboperand.20261026",
           "local.typed.insertion-first.20261026",
-          "local.typed.failed-source-recovery.20261026"
+          "local.typed.failed-source-recovery.20261026",
+          "local.typed.iec-effect-standard.20261026",
+          "local.typed.standard-created-storage-runtime.20261026",
+          "local.typed.insertion-storage.20261026"
         ]
       },
       "availability": {

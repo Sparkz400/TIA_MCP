@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Native dependent-instance effects of adding one static member of each IEC instance type to an FB with an instance DB, in the standard PLC program scope. Unobserved until captured; enables nothing.",
+  "unit": "",
+  "archive": {
+    "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "sha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
+  },
+  "members": [
+    {
+      "name": "Timer_TON",
+      "datatype": "TON_TIME"
+    },
+    {
+      "name": "Timer_TOF",
+      "datatype": "TOF_TIME"
+    },
+    {
+      "name": "Timer_TP",
+      "datatype": "TP_TIME"
+    },
+    {
+      "name": "Counter_CTU",
+      "datatype": "CTU_INT"
+    },
+    {
+      "name": "Counter_CTD",
+      "datatype": "CTD_INT"
+    },
+    {
+      "name": "Counter_CTUD",
+      "datatype": "CTUD_INT"
+    }
+  ],
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/iec-effect-before.scl",
+      "sha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489",
+      "route": "standard",
+      "authoredFormat": "SCL",
+      "names": [
+        "Tgp_IecEffect",
+        "Tgp_IecEffect_DB"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/iec-effect-after.scl",
+      "sha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
+      "route": "standard",
+      "authoredFormat": "SCL",
+      "names": [
+        "Tgp_IecEffect"
+      ],
+      "namespace": "",
+      "modifies": [
+        "Tgp_IecEffect"
+      ],
+      "observes": [
+        "Tgp_IecEffect_DB"
+      ]
+    }
+  ],
+  "argsFile": [
+    "fixtures/typed-graphical/sources/iec-effect-before.scl",
+    "fixtures/typed-graphical/sources/iec-effect-after.scl"
+  ],
+  "command": [
+    "python",
+    "-B",
+    "scripts/capture_typed_routes_owned.py",
+    "@artifacts/cis.args",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/cis",
+    "--archive",
+    "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "--sha256",
+    "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+    "--unit",
+    "",
+    "--modify",
+    "iec-effect-after.scl:Tgp_IecEffect",
+    "--observe",
+    "iec-effect-after.scl:Tgp_IecEffect_DB"
+  ],
+  "afterCapture": [
+    "scripts/extract_typed_instance_effects.py <capture> <capture> --iec --route standard --prefix Tgp_"
+  ]
+}

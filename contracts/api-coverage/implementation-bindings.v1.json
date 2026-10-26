@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5e36785a2ca8ee12ab907775828d574f639bbd5734ce920687b1d1e63ff6b605",
-      "bytes": 769391
+      "sha256": "436bdcdf6768e2412d0d332403680d423f9fcb2665db8861afb320ee8d57cf14",
+      "bytes": 773250
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -76511,6 +76511,27 @@
           "artifacts": [
             "evidence/local.typed.failed-source-recovery.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.iec-effect-standard.20261026",
+          "profileSha256": "5c21adf92e1c44f54fe4c31f697c7a45a27b37ad98b778e99ba535496058e696",
+          "artifacts": [
+            "evidence/local.typed.iec-effect-standard.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.standard-created-storage-runtime.20261026",
+          "profileSha256": "ac63de500032d68daf1dc25086669fbca1b79eea1953f36621d781f91e3d607b",
+          "artifacts": [
+            "evidence/local.typed.standard-created-storage-runtime.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.insertion-storage.20261026",
+          "profileSha256": "2ae8775aa9046358808cf06d6b2bf4ad2677ccc89065edea62e84c9319f85d15",
+          "artifacts": [
+            "evidence/local.typed.insertion-storage.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94589,7 +94610,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "7285747bffb5606be78ab43b7e06bbbe82d4642406c36f8fd3cb36558024fada"
+      "sha256": "0213fad2917af5ab479146606622a9a95055107ca461c59fc86d1a3b72608b3c"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94802,9 +94823,19 @@
       "sha256": "373113012810fd63565a8d7c6d8a50d472db9dc956463e1e07df3bcd735430b8"
     },
     {
+      "path": "evidence/local.typed.iec-effect-standard.20261026.json",
+      "state": "observed",
+      "sha256": "adf64bbd709074b3c47750d051789e8213385e55c8c966046d14218d7526a025"
+    },
+    {
       "path": "evidence/local.typed.insertion-first.20261026.json",
       "state": "observed",
       "sha256": "e2777a022fa65a9ebf191375176cfb720be72f532ef87ee855d22b2b4fcbbba3"
+    },
+    {
+      "path": "evidence/local.typed.insertion-storage.20261026.json",
+      "state": "observed",
+      "sha256": "36baae15904cfaf0765c1489da9cbb44cdf87a1233475e9548009efc8c22371b"
     },
     {
       "path": "evidence/local.typed.insertion.20261025.json",
@@ -94895,6 +94926,11 @@
       "path": "evidence/local.typed.scoped-runtime.reruns.20261026.json",
       "state": "observed",
       "sha256": "c0579b65060f1562ca3a464458478c27475ae397e25022104ed400f71bd7f0b1"
+    },
+    {
+      "path": "evidence/local.typed.standard-created-storage-runtime.20261026.json",
+      "state": "observed",
+      "sha256": "2328435d1bc0c3a5abaffc8d5bb8ad89f9c7dadbc75b6a5cc6718232fa16b14c"
     },
     {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
@@ -95219,8 +95255,16 @@
       "profileSha256": "dd3ebdd3146d0a06595926c2eedc18accb9906adf3ed247c5566c26a03eab3ff"
     },
     {
+      "id": "local.typed.iec-effect-standard.20261026",
+      "profileSha256": "5c21adf92e1c44f54fe4c31f697c7a45a27b37ad98b778e99ba535496058e696"
+    },
+    {
       "id": "local.typed.insertion-first.20261026",
       "profileSha256": "c022eb0ab95b4b39395cda2442944a6c969c9f08fe96bf2628af16da9162d7c4"
+    },
+    {
+      "id": "local.typed.insertion-storage.20261026",
+      "profileSha256": "2ae8775aa9046358808cf06d6b2bf4ad2677ccc89065edea62e84c9319f85d15"
     },
     {
       "id": "local.typed.insertion.20261025",
@@ -95293,6 +95337,10 @@
     {
       "id": "local.typed.scoped-runtime.reruns.20261026",
       "profileSha256": "be071e4a2215c25faba4336a6adcf8f8ab25715091054d0ca96a07cc560472cf"
+    },
+    {
+      "id": "local.typed.standard-created-storage-runtime.20261026",
+      "profileSha256": "ac63de500032d68daf1dc25086669fbca1b79eea1953f36621d781f91e3d607b"
     },
     {
       "id": "local.unit-recovery.v03",

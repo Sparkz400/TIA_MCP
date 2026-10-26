@@ -37,21 +37,22 @@ def authored_reference(path, unit):
         blocks = [node for node in document if node.tag in ("SW.Blocks.FC", "SW.Blocks.FB")]
         require(len(blocks) == 1, "One independently derived native caller is required.")
         names = [blocks[0].findtext("AttributeList/Name")]
-        namespace = blocks[0].findtext("AttributeList/Namespace")
+        namespace = blocks[0].findtext("AttributeList/Namespace") or ""
         kind, payload, form = "block_import_xml", {"xml": text}, "native_xml_template_derivation"
     else:
         require(path.suffix.lower() in {".scl", ".s7dcl"}, "Unsupported authored source format.")
         names = re.findall(r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^\"]+)"', text)
         namespaces = re.findall(r'^NAMESPACE\s+([A-Za-z0-9_.]+)', text, re.MULTILINE)
-        require(len(namespaces) == 1, "Exactly one explicit authored namespace is required.")
-        namespace = namespaces[0]
+        # The standard route (no unit) admits only namespace-free sources; a unit route requires exactly one.
+        require(len(namespaces) == (1 if unit else 0), "A unit source declares exactly one namespace; a standard source declares none.")
+        namespace = namespaces[0] if unit else ""
         form = "SCL" if path.suffix.lower() == ".scl" else "SIMATIC_SD"
         kind, payload = "source_upsert", {"language": form, "source": text}
     require(names and all(names) and len(names) == len(set(names)), "Authored exact block names are missing or duplicated.")
-    require(namespace == unit or isinstance(namespace, str) and namespace.startswith(unit + "."), "Source namespace escapes the selected software unit.")
+    require(namespace == unit or unit and isinstance(namespace, str) and namespace.startswith(unit + "."), "Source namespace escapes the selected software scope.")
     return {"sourcePath": str(path.resolve()), "sha256": hashlib.sha256(text.encode()).hexdigest(),
         "fileSha256": hashlib.sha256(path.read_bytes()).hexdigest(), "names": names, "namespace": namespace,
-        "route": "softwareUnit" if namespace == unit else "namespace", "authoredFormat": form,
+        "route": "standard" if not unit else "softwareUnit" if namespace == unit else "namespace", "authoredFormat": form,
         "engineeringVerified": False, "runtimeVerified": False}, kind, payload
 
 
@@ -134,8 +135,9 @@ def capture(args):
         report["currentProject"] = report["retrieved"]["project"]
         report["hardware"] = session.invoke("hardware_inspect", {"maxItems": 2000})
         report["inventory"] = complete_inventory(session.invoke)
-        units = [row for row in report["inventory"]["softwareScopes"] if row["kind"] == "softwareUnit" and row["name"] == args.unit]
-        require(len(units) == 1, "Exact software-unit selection is missing or ambiguous.")
+        selected = (lambda row: row["kind"] == "softwareUnit" and row["name"] == args.unit) if args.unit else (lambda row: row["kind"] == "plc")
+        units = [row for row in report["inventory"]["softwareScopes"] if selected(row)]
+        require(len(units) == 1, "Exact software scope selection is missing or ambiguous.")
         scope = units[0]["path"]
         # Native XML inputs were derived in a de-DE project; only empty text items follow the observed project culture.
         report["projectCulture"] = project_culture(session.invoke("block_read", {"blockName": "Main"})["xml"])
@@ -158,7 +160,9 @@ def capture(args):
                     for block in baseline["inventory"]["blocks"]) for name in entry["modifies"]), "A declared modification target does not exist.")
             target = ({"expectedTableNames": entry["names"]} if kind == "tag_table_import_xml"
                       else {"namespace": entry["namespace"], "expectedBlockNames": entry["names"]})
-            prepared = session.invoke("change_prepare", {"kind": kind, "payload": {**payload, "scopePath": scope, **target}})
+            if not args.unit:
+                target.pop("namespace", None)  # standard route: the PLC program scope, no namespace or scope path
+            prepared = session.invoke("change_prepare", {"kind": kind, "payload": {**payload, **({"scopePath": scope} if args.unit else {}), **target}})
             pending = prepared
             entry["changeId"] = prepared["changeId"]
             entry["applyIntent"] = {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
@@ -229,7 +233,7 @@ if __name__ == "__main__":
     for name in ("host", "worker", "output", "archive"):
         parser.add_argument("--" + name, type=pathlib.Path, required=True)
     parser.add_argument("--sha256", required=True)
-    parser.add_argument("--unit", default="TiaMcp_UnitA")
+    parser.add_argument("--unit", default="TiaMcp_UnitA", help="Software unit to capture into; an empty value selects the standard PLC program scope.")
     parser.add_argument("--stop-file", type=pathlib.Path)
     parser.add_argument("--timeout", type=int, default=300)
     parser.add_argument("--modify", action="append", default=[], metavar="SOURCE:BLOCK",
