@@ -1,8 +1,9 @@
 # Explorer relationship providers and collection scope — 2026-10-26
 
-This record covers offline implementation and tests only. No TIA Portal or
-PLCSIM process was started; the native step below is prepared but not run.
-Nothing here is native, desktop-host or release qualification.
+The configured-network provider and the new collections passed one native V21
+fixture (see [Native result](#native-result)). The technology-connection and
+software-unit-relation providers have offline evidence only. Nothing here is
+desktop-host or release qualification.
 
 ## Implemented
 
@@ -60,7 +61,30 @@ Run at source commit `75f0058` with a clean tree:
   startup-lifecycle checks start mock `Siemens.Automation.Portal.exe` processes
   while a live native corpus was running.
 
-## Native qualification step (not run)
+## Native result
+
+Evidence: [`evidence/local.explorer.native-providers.20261026.json`](../../evidence/local.explorer.native-providers.20261026.json)
+(source `7f1492d`, clean tree; release `tia-mcp-v21_20261026_124042_240b4494`).
+
+- The fixture run created a fresh owned scratch (CPU 1511-1PN plus an IM 155-6AU02
+  V6.4 head) and made 8 prepared changes: one subnet, one IO system and one IO
+  device. All 56 steps passed, and the owned session detached with host exit 0.
+- The explorer's `connectedSubnet`, `ioSystemController` and `ioSystemDevice` edges
+  exactly matched the 4 associations derived from independent `hardware_inspect`
+  reads. This held for outgoing queries from both interfaces, for incoming queries
+  from the subnet and IO system, and in the portable export.
+- The 95-node capture had a complete `nativeHierarchy` and contained the new
+  `subnet`, `ioSystem`, `watchTableGroup`, `forceTable`, `externalSourceGroup` and
+  `externalSource` nodes.
+- The `--verify-report` rerun reopened the saved fixture with zero prepared changes
+  (30 steps, all passed) and reproduced every edge.
+- Native capture took 337 and 499 ms; relationship queries took 325–476 ms. One
+  machine and one small fixture; this is not a latency guarantee.
+
+The fixture had no technology objects and no unit relations, so those providers
+still need a `--project` audit of a fixture that contains them.
+
+## Native qualification step
 
 Run only when the TIA machine is free. Package the committed branch, then point
 the qualifier at that immutable bundle. A separate release file leaves the
@@ -89,7 +113,9 @@ python scripts/qualify_project_explorer_relationships.py --release-file artifact
 
 ## Still unqualified
 
-- All three providers and the new collections on a native V21 project.
-- Positive technology-connection and unit-relation fixtures.
+- Technology-connection and software-unit-relation providers on a native project with such objects.
+- Broader network topologies: several subnets, shared devices, redundancy and couplers.
+- Populated watch tables and external sources against an independent oracle.
+- The evidence is not yet cited from the feature catalog.
 - Fresh desktop/native transport acceptance ([checklist](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual-open)).
 - Alarm text lists and libraries remain outside the tree; physical topology stays unsupported.

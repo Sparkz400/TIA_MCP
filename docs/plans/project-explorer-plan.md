@@ -8,17 +8,17 @@ Build one queryable project model for agents and a read-only visual explorer for
 
 ## Relationship providers and collection scope — 26 October 2026
 
-Implemented offline, **not natively qualified** ([record](../verification/explorer-relationship-providers-20261026.md)):
+Implemented and tested offline. Only the configured-network provider and the collections have native evidence, from one fixture ([record](../verification/explorer-relationship-providers-20261026.md)):
 
 | Area | Implemented | Still unqualified or out of scope |
 | --- | --- | --- |
-| Configured network | Subnet and IO-system nodes; `connectedSubnet`, `ioSystemController`, `ioSystemDevice` edges from hardware network interfaces | Native fixture run; cables, ports and physical topology stay unsupported |
+| Configured network | Subnet and IO-system nodes; `connectedSubnet`, `ioSystemController`, `ioSystemDevice` edges. One native fixture passed (one subnet, IO system and device) | Broader topologies; cables, ports and physical topology stay unsupported |
 | Technology objects | `technologyConnection` edges to exact hardware paths from `technology_read` | Native run on a fixture with connected technology objects; tag/block targets stay unresolved |
 | Software units | `unitRelation` edges from captured unit relations; unique typed names in a complete capture resolve | Native run on a unit fixture with relations |
-| PLC collections | Watch/force tables and groups, external sources and groups | Native capture of populated tables/sources |
+| PLC collections | Watch/force tables and groups, external sources and groups; captured natively on the fixture | Independent oracle for populated tables/sources |
 | Scope | Every node kind declares its providers or an `unsupported` reason (`providerScope`) | PLC alarm text lists and project/global libraries are reported unsupported, not captured |
 
-The native step is `scripts/qualify_project_explorer_relationships.py`. It must run only when the TIA machine is free.
+The native step is `scripts/qualify_project_explorer_relationships.py`. Run it only when the TIA machine is free; use `--project` to audit fixtures with technology objects or unit relations.
 
 ## Intended experience
 
