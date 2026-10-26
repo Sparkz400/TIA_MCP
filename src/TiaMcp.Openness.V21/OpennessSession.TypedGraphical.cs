@@ -86,6 +86,16 @@ namespace TiaMcp.Openness.V21
             var capture = new TypedResolutionCapture(this, plc, change, callerPath, original);
             var context = capture.Resolve(model);
             var templateUnit = original.Descendants("SW.Blocks.CompileUnit").FirstOrDefault(unit => unit.Element("AttributeList")?.Element("ProgrammingLanguage")?.Value == model.Language);
+            if (templateUnit == null && model.Operation == "insertNetwork")
+            {
+                // A network-free caller has no own envelope: use a natively captured compile unit of this language,
+                // route and CPU, whose network comment/title objects TIA adds to every network.
+                var profile = context.Profiles.FirstOrDefault(p => p.Language == model.Language && p.Route == context.Route && p.CpuFamily == context.CpuFamily && !string.IsNullOrEmpty(p.NetworkTemplateXml))
+                    ?? throw new BridgeException("GraphicalProfileUnavailable", "No captured native network envelope exists for this language, route and CPU.");
+                var observed = new XDocument(EngineeringSources.ReadXml(profile.NetworkTemplateXml).Root);
+                UseProjectCultures(observed, plc.Project);
+                templateUnit = observed.Root;
+            }
             if (templateUnit != null)
             {
                 var envelope = new XElement(templateUnit);
