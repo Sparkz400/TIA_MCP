@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "local.typed.scoped-capture.20261026",
+  "captureReport": "artifacts/cap-scoped2/capture.json",
+  "captureSha256": "892552f83c6096237425ff28e902d3ba4603bcf4ab2756b4bbe1a7d4db9273b2",
+  "references": [
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_OperandDB.xml",
+      "sha256": "d38c7bf9efb7b2122e27bde84e69754539d7468c3ca154d963920757b37d037f",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Unit-operand-db.scl",
+      "changeId": "f2c12fd9db074741b761ab29ac953e9a",
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_OperandDB.xml",
+      "sha256": "320983361d950095d62e475e2dd9ccd8f1c8b19f36ab4ac416ef2b462f6f1514",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Namespace-operand-db.scl",
+      "changeId": "8ccd2e1385c24c79803b484fec14431e",
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_OperandDb_LAD.xml",
+      "sha256": "46420e3704fcd17e8307d85f95b233167f8dba3a876536648cb83fea57d84a30",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Unit-operand-db-lad.s7dcl",
+      "changeId": "14c4747ea58a41b98165d8f773558e3e",
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_OperandDb_FBD.xml",
+      "sha256": "2d13d9260fc1c83ccc5e3f5f0e0efbf63a3fb94fd8c49dd08bc0d4186bf8b461",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Unit-operand-db-fbd.s7dcl",
+      "changeId": "bdddcfacdead449b8d1adbbbdb98e30a",
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_OperandDb_LAD.xml",
+      "sha256": "fe2300b4d8877607fdb447c7537370341f2d869fa0d84f1556be6bdbb52db95d",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Namespace-operand-db-lad.s7dcl",
+      "changeId": "bbf43df73fe14fdcbef78a08b389fae0",
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_OperandDb_FBD.xml",
+      "sha256": "6eb57f47aecce6113cff2a9fcdbe8923e3154a018699ed67c0bf4a590611d70f",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Namespace-operand-db-fbd.s7dcl",
+      "changeId": "d2184a37cc70493dade04f9bb6098f91",
+      "builderUsed": false,
+      "runtimeVerified": false
+    }
+  ]
+}

@@ -282,6 +282,9 @@ def run_case(case, args, output):
                 _, kind, ordinal = node["nativeUid"].split(":")
                 matches = [e for e in document.iter() if e.tag.rsplit("}", 1)[-1] == "Part" and e.get("Name") == kind]
                 node["nativeUid"] = matches[int(ordinal)].get("UId")
+        for operand in payload["model"].get("operands", []):
+            if operand.get("ownerPath", "").startswith("$block:"):
+                operand["ownerPath"] = before[operand["ownerPath"][7:]]["block"]["path"]
         for instance in payload.get("instances", []):
             if instance.get("blockPath", "").startswith("$block:"):
                 instance["blockPath"] = before[instance["blockPath"][7:]]["block"]["path"]
