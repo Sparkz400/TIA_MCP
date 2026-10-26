@@ -244,8 +244,14 @@ def run_case(case, args, output):
             report["runtimeBlockName"] = runtime_name
             definitions = {}
             for name in case.get("interfaceDependencies", []):
-                # Scoped members reference their types by namespace-qualified name.
-                definitions[(case["namespace"] + "." if route else "") + name] = call("block_interface", {"blockName": name})
+                definition = call("block_interface", {"blockName": name})
+                if route:
+                    # Scoped members reference their types by namespace-qualified name; the native
+                    # identity carries that namespace only in its path.
+                    assert definition["block"]["path"].endswith("/namespaces/" + case["namespace"] + "/" + name),                         "Dependency is not in the case namespace: " + name
+                    name = case["namespace"] + "." + name
+                    definition = {**definition, "block": {**definition["block"], "name": name}}
+                definitions[name] = definition
             instances = tuple(case.get("runtimeInstances", ["dut"]))
             scoped = {"organization_block": "TgpTest_Cycle", "symbol_namespace": case["namespace"]} if route else {}
             program = generate_program(inspect_interface(interface, definitions), instances=instances, prefix="TgpTest", **scoped)
