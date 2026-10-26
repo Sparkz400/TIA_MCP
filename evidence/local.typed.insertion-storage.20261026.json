@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.insertion-storage.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T17:54:30+00:00",
+  "source": {
+    "commit": "b8ad6fe3c2469b776177c445bdc5ba1394e1cb7b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Standard-route TON caller: one change inserts a new network after the first network and creates its instance storage, as a multi-instance member (createMulti) or a global instance DB (createGlobal), LAD and FBD (4 cells). Each passed the four engineering gates under the network-plus-storage-creation-v1 composite contract: the inserted network follows the renumbering decision, a created multi-instance member is new and shaped exactly like its native template, and the rest of the caller matches its before export exactly.",
+  "limitations": [
+    "Engineering-only; runtime behavior of the composite change is not claimed.",
+    "Qualified for the standard-route TON family; other families and the software-unit/namespace routes still rely on separate insertion and storage-creation evidence."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c77a33d410577a2950d8c4e3cce61bdfffce39970fae8a70910862eda70e7a60"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-insertion-storage.json",
+      "sha256": "18a0c8b6c17127496639a0651337076b445f718a2fe13f66d468623499adc0bf",
+      "bytes": 21852,
+      "completed": true,
+      "steps": [
+        "typed-insert-createglobal-ton-fbd: passed",
+        "typed-insert-createglobal-ton-lad: passed",
+        "typed-insert-createmulti-ton-fbd: passed",
+        "typed-insert-createmulti-ton-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

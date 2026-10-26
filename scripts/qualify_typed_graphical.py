@@ -296,9 +296,20 @@ def run_case(case, args, output):
         expected_xml = read_artifact(prepared["preview"]["typed"]["nativeArtifact"], call if configuration_path else None)
         (output / "prepared.xml").write_bytes(expected_xml.encode("utf-8"))
         if payload["model"]["operation"] == "insertNetwork":
-            assert all(instance["kind"] in {"existingGlobal", "existingMulti"} for instance in payload.get("instances", [])), "Insertion plus storage changes requires a separately captured composite preservation contract."
-            assert_existing_caller_insertion(target["xml"], expected_xml, prepared["preview"]["typed"]["networkId"], payload["model"].get("insertAfterNetworkId"))
-            report["insertionPreservationContract"] = "network-only-additive-following-id-shift-v2"
+            # Composite contract: a created multi-instance member must equal the existing member its reference binding
+            # renames (the independent oracle); created global storage leaves the caller interface unchanged.
+            created = {}
+            for instance in payload.get("instances", []):
+                assert instance["kind"] in {"existingGlobal", "existingMulti", "createGlobal", "createMulti"}, "Unprofiled insertion storage kind."
+                if instance["kind"] == "createMulti":
+                    templates = [b["fromComponents"][0] for b in case.get("referenceBindings", [])
+                                 if b["element"] == "Instance" and b["toComponents"] == [instance["name"]] and b["fromScope"] == "LocalVariable"]
+                    assert len(templates) == 1, "A created member needs exactly one independent template binding."
+                    created[instance["name"]] = templates[0]
+            assert_existing_caller_insertion(target["xml"], expected_xml, prepared["preview"]["typed"]["networkId"],
+                                             payload["model"].get("insertAfterNetworkId"), created)
+            report["insertionPreservationContract"] = ("network-plus-storage-creation-v1" if any(i["kind"].startswith("create") for i in payload.get("instances", []))
+                                                       else "network-only-additive-following-id-shift-v2")
         # A network-free caller has no network of its own; its case names the native export it was derived from.
         topology_xml = adapt_reference_culture((ROOT / case["topologyXml"]).read_bytes().decode("utf-8-sig"), culture)[0] if case.get("topologyXml") else reference_xml
         oracle = adapt_reference_bindings(topology_xml, case.get("referenceBindings", []))
@@ -519,6 +530,7 @@ def main():
     parser.add_argument("--baseline-sha256")
     parser.add_argument("--provision-runtime-credential", action="store_true")
     parser.add_argument("--trust-owned-empty-cpu-certificate", action="store_true")
+    parser.add_argument("--runtime", action="store_true", help="With --live: run the selected engineering-only cases with their runtime suites.")
     parser.add_argument("--unit-seeder", type=pathlib.Path, help="Guarded UnitSeeder binary: run a software-unit case live on a fresh seeded scratch instead of its archived baseline.")
     args = parser.parse_args()
     if bool(args.config) == bool(args.worker):
@@ -545,6 +557,11 @@ def main():
         parser.error("--live requires exactly one explicit diagnostic case; a runtime corpus is not admitted")
     if args.config and any(case.get("archivePath") for case in selected):
         parser.error("Selected case requires a client-local archive; configured deployment qualification requires fresh owned scratch cases")
+    if args.runtime:
+        if not args.live:
+            parser.error("--runtime requires --live")
+        for case in selected:
+            case["engineeringOnly"] = False
     if args.unit_seeder:
         if not args.live or not args.unit_seeder.is_file() or not all(case.get("unitName") for case in selected):
             parser.error("--unit-seeder requires --live, an existing binary and software-unit cases")

@@ -1,0 +1,101 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.standard-created-storage-runtime.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T17:46:58+00:00",
+  "source": {
+    "commit": "b7811e9cd885ff6d20c074b0c00411ecd0c3e398",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Standard-route FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member or a global instance DB, LAD and FBD (28 cells), live through an owned PLCSIM Advanced V8 runtime with the standard IEC dependent-instance effect profile from local.typed.iec-effect-standard.20261026: each cell passed all five gates.",
+  "limitations": [
+    "Host application-call timing; not exact PLC scan timing."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c77a33d410577a2950d8c4e3cce61bdfffce39970fae8a70910862eda70e7a60"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "0f7764b932db08793f5bce0b406930b3bb74b1bb5cc4f52c373ce3422c2eba12"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-standard-created-storage-runtime.json",
+      "sha256": "eab68c6d437327e003fc5a7fdae1b4aa061650959f08993d22c036ceab4eaa2c",
+      "bytes": 368420,
+      "completed": true,
+      "steps": [
+        "typed-createglobal-ctd-fbd: passed",
+        "typed-createglobal-ctd-lad: passed",
+        "typed-createglobal-ctu-fbd: passed",
+        "typed-createglobal-ctu-lad: passed",
+        "typed-createglobal-ctud-fbd: passed",
+        "typed-createglobal-ctud-lad: passed",
+        "typed-createglobal-fb-multi-fbd: passed",
+        "typed-createglobal-fb-multi-lad: passed",
+        "typed-createglobal-tof-fbd: passed",
+        "typed-createglobal-tof-lad: passed",
+        "typed-createglobal-ton-fbd: passed",
+        "typed-createglobal-ton-lad: passed",
+        "typed-createglobal-tp-fbd: passed",
+        "typed-createglobal-tp-lad: passed",
+        "typed-createmulti-ctd-fbd: passed",
+        "typed-createmulti-ctd-lad: passed",
+        "typed-createmulti-ctu-fbd: passed",
+        "typed-createmulti-ctu-lad: passed",
+        "typed-createmulti-ctud-fbd: passed",
+        "typed-createmulti-ctud-lad: passed",
+        "typed-createmulti-fb-multi-fbd: passed",
+        "typed-createmulti-fb-multi-lad: passed",
+        "typed-createmulti-tof-fbd: passed",
+        "typed-createmulti-tof-lad: passed",
+        "typed-createmulti-ton-fbd: passed",
+        "typed-createmulti-ton-lad: passed",
+        "typed-createmulti-tp-fbd: passed",
+        "typed-createmulti-tp-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "sim_write",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
