@@ -162,14 +162,37 @@ def assert_independent_topology(reference_xml, prepared_xml, network_id):
         raise AssertionError("Prepared native instruction/operand/wire topology differs from the independently authored native reference.")
 
 
-def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_id):
+def _shape(node):
+    """Local names, non-namespace attributes, text and children, in document order."""
+    if node.nodeType == Node.TEXT_NODE:
+        return node.data.strip() or None
+    if node.nodeType != Node.ELEMENT_NODE:
+        return None
+    attributes = sorted((name.split(":")[-1], value) for name, value in node.attributes.items() if not name.startswith("xmlns"))
+    return (node.localName or node.tagName.split(":")[-1], attributes, [s for s in (_shape(child) for child in node.childNodes) if s is not None])
+
+
+def _static_member(block, name):
+    """Direct member of the block interface's own Static section (not nested instance sections)."""
+    interfaces = [node for node in block.getElementsByTagName("Interface")]
+    sections = [node for node in interfaces[0].childNodes if node.nodeType == Node.ELEMENT_NODE and node.tagName.endswith("Sections")] if interfaces else []
+    statics = [node for node in sections[0].childNodes if node.nodeType == Node.ELEMENT_NODE and node.getAttribute("Name") == "Static"] if sections else []
+    members = [node for node in statics[0].childNodes if node.nodeType == Node.ELEMENT_NODE and node.getAttribute("Name") == name] if statics else []
+    if len(members) > 1:
+        raise AssertionError("Duplicate static member: " + name)
+    return members[0] if members else None
+
+
+def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_id, created_members=None):
     """Additive-network contract; the only accepted ID change is V21's renumbering.
 
     Per the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md),
     existing IDs after the insertion point may rise by exactly the inserted ID count,
     keeping their order; undoing that shift must recover the original exactly.
     Storage/declaration mutation needs its own independently captured effect
-    contract. This checks network-only insertion into an existing caller.
+    contract. This checks network-only insertion into an existing caller; created_members
+    ({new name: existing template member}) adds the composite storage-creation contract: each new
+    static member appears once, equals its template apart from the name, and is the only other change.
     """
     # Parse for selection without discarding comment/PI nodes or namespace
     # declarations that may bind QName values inside opaque native payloads.
@@ -218,6 +241,15 @@ def assert_existing_caller_insertion(before_xml, after_xml, inserted_id, after_i
         if previous is not anchors[0]:
             raise AssertionError("Insertion crossed a retained opaque comment or processing instruction at the selected boundary.")
     objects.removeChild(inserted)
+    for name, template in (created_members or {}).items():
+        before_member, created = _static_member(before_blocks[0], template), _static_member(after_blocks[0], name)
+        if _static_member(before_blocks[0], name) is not None or before_member is None or created is None:
+            raise AssertionError("A created storage member must be new and have an existing template declaration: " + name)
+        renamed = created.cloneNode(True)
+        renamed.setAttribute("Name", template)
+        if _shape(renamed) != _shape(before_member):
+            raise AssertionError("A created storage member differs from its template declaration apart from the name: " + name)
+        created.parentNode.removeChild(created)
     following = [node for node in after.getElementsByTagName("*") if node.hasAttribute("ID") and int(node.getAttribute("ID"), 16) >= start]
     for node in following:  # Undo the one accepted shift; any other ID change stays in the exact comparison below.
         node.setAttribute("ID", format(int(node.getAttribute("ID"), 16) - count, "X"))
