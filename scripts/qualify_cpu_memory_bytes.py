@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import re
+import time
 
 from library_native_harness import Harness, require
 
@@ -49,6 +50,17 @@ def add_cpu(h, name):
     station = "Station" + re.sub(r"\W", "", name)[3:]
     # A new CPU needs its confidential-data password before it compiles.
     return {"typeIdentifier": selected["typeIdentifier"], "deviceName": station, "itemName": "PLC" + station[7:], "configureScratchSecurity": True}
+
+
+def reopen(h, path):
+    """TIA keeps a closed instance's project lock for about two minutes; only that refusal is retried."""
+    for attempt in range(13):
+        result = h.client.request("tools/call", {"name": "project_open", "arguments": {"path": path}})
+        message = ((result.get("structuredContent") or {}).get("error") or {}).get("message") or ""
+        if not result.get("isError") or "already been opened" not in message or attempt == 12:
+            require(not result.get("isError"), "project_open failed: " + message)
+            return {"attempts": attempt + 1}
+        time.sleep(15)
 
 
 def apply(h, label, kind, payload, scope=None):
@@ -115,7 +127,7 @@ def body(h):
     software = h.inventory()
     h.stage("close changed session", lambda: h.tool("tia_detach"))
     h.owned_portal("reopen")
-    h.stage("reopen saved project", lambda: h.tool("project_open", {"path": project_path}))
+    h.stage("reopen saved project", lambda: reopen(h, project_path))
 
     def reopened():
         require({c: memory(h, c)[0] for c in cpus.values()} == configured, "Reopened memory bytes differ")
