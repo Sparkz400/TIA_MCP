@@ -12,7 +12,7 @@ from unittest.mock import patch
 from probe_hmi_api import inspect_api
 from hmi_fixture_copy import copy_project, project_tree, safe_path, verify_source_preserved
 from qualify_hmi import (GATES, blocking_startup_failure, block_pending_profiles, compare_device_profile, compare_explorer_relationships, compare_resource_sources, compare_section, compare_screen_items, gate, import_native_evidence,
-                         native_compile_gate, native_payload, native_section_entries, prepare_owned_inspection_copy, qualify_alarm_references, qualify_bridge, qualify_relationships, reassess_captured, semantic_snapshot, summarize_gates, validate_fixture, validate_native_copy_directory, validate_owned_derived_project, verify_copied_project_identity)
+                         native_compile_gate, native_payload, native_section_entries, prepare_owned_inspection_copy, probe_external_tag_create, qualify_alarm_references, qualify_bridge, qualify_relationships, reassess_captured, semantic_snapshot, summarize_gates, validate_fixture, validate_native_copy_directory, validate_owned_derived_project, verify_copied_project_identity)
 
 
 class HmiQualificationTests(unittest.TestCase):
@@ -690,6 +690,79 @@ class HmiQualificationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             profile = {"profile": "classic-comfort", "selectedTarget": {"typeIdentifier": "actual"}, "archive": {"path": str(Path(directory).parent / "outside.zap21")}}
             with self.assertRaisesRegex(AssertionError, "escapes"): validate_fixture(profile, Path(directory) / "report.json")
+
+
+class ExternalTagProbeTests(unittest.TestCase):
+    """Fake-worker semantics only; the native body's real behavior needs the native run."""
+    HMI = "/devices/HMI_{0}/items/HMI_{0}/hmi/HMI_{0}"
+    PLC = "/devices/PLC_{0}/items/PLC_{0}/plc/PLC_{0}"
+
+    def fixture(self):
+        inspections, proofs = [], []
+        for n in (1, 2):
+            hmi, plc = self.HMI.format(n), self.PLC.format(n)
+            owner = {"name": "HMI_%d" % n, "objectPath": hmi, "hmiPath": hmi, "family": "unified", "kind": "hmiDevice"}
+            connection = {"objectPath": hmi + "/connections/HMI_Connection_1", "kind": "hmiConnection", "hmiPath": hmi}
+            table = {"objectPath": hmi + "/tagTables/Default", "kind": "hmiTagTable", "hmiPath": hmi}
+            linked = {"objectPath": table["objectPath"] + "/tags/LinkedSignal", "kind": "hmiTag", "hmiPath": hmi}
+            inspections += [{"target": owner, "section": "connections", "result": {"items": [{"identity": connection, "name": "HMI_Connection_1"}]}},
+                            {"target": owner, "section": "tags", "result": {"items": [{"identity": table, "name": "Default"},
+                                {"identity": linked, "name": "LinkedSignal", "properties": {"DataType": "Int"}}]}}]
+            declaration = {"plcPath": plc, "scopePath": plc, "objectPath": plc + "/tags/Default/tags/SharedSignal", "kind": "tag", "name": "SharedSignal"}
+            proofs.append({"hmiSoftware": owner["name"], "plcOwner": {"objectPath": plc},
+                           "connection": {"sourcePath": connection["objectPath"]}, "declaration": {"sourcePath": linked["objectPath"], "target": declaration}})
+        return inspections, proofs
+
+    def client(self, inspections, accept=False, mutate=False):
+        calls = []
+        class Fake:
+            def request(_, method, params):
+                arguments = params["arguments"]; calls.append(arguments)
+                payload = arguments["payload"]
+                if accept: return {"structuredContent": {"changeId": "x"}}
+                hmi = payload["target"]["hmiPath"]
+                plc = self.PLC.format(hmi[-1])
+                if payload["name"] == "LinkedSignal": code, details = "HmiNameConflict", {}
+                elif payload["plcTag"]["plcPath"] != plc: code, details = "DependencyUnresolved", {}
+                elif payload["dataType"] != "Int": code, details = "TargetIncompatible", {}
+                else:
+                    code = "HmiPreservationUnavailable"
+                    details = {"gate": {"operation": "external_tag_create", "available": False},
+                               "proposedEffect": {"scope": "external", "plcTag": "SharedSignal", "plcPath": plc, "plcDataType": "Int",
+                                                  "connectionOwnership": {"isValid": True, "partnerCount": 1, "plcPath": plc}}}
+                return {"isError": True, "structuredContent": {"error": {"code": code, "details": details}}}
+            def tool(_, name, arguments):
+                owner = arguments["request"]["target"]["objectPath"]
+                items = copy.deepcopy(next(e["result"]["items"] for e in inspections if e["target"]["objectPath"] == owner and e["section"] == "tags"))
+                if mutate: items.append({"identity": {"objectPath": owner + "/tagTables/Default/tags/QualificationExternal"}})
+                return {"coverage": {"status": "complete"}, "items": items}
+        return Fake(), calls
+
+    def test_refused_prepares_pass_with_exact_native_proof(self):
+        inspections, proofs = self.fixture()
+        client, calls = self.client(inspections)
+        result = probe_external_tag_create(client, inspections, proofs)
+        self.assertEqual(result["status"], "passed"); self.assertFalse(result["applyQualified"])
+        self.assertEqual(len(calls), 8)
+        self.assertTrue(all(c["kind"] == "hmi_engineering" and c["payload"]["operation"] == "external_tag_create" for c in calls))
+        self.assertEqual({r["foreignPlc"]["code"] for r in result["observations"]}, {"DependencyUnresolved"})
+
+    def test_accepted_prepare_or_changed_inventory_fails(self):
+        inspections, proofs = self.fixture()
+        with self.assertRaisesRegex(AssertionError, "must be refused"):
+            probe_external_tag_create(self.client(inspections, accept=True)[0], inspections, proofs)
+        with self.assertRaisesRegex(AssertionError, "inventory"):
+            probe_external_tag_create(self.client(inspections, mutate=True)[0], inspections, proofs)
+
+    def test_unproven_ownership_or_missing_declaration_refuses_probe(self):
+        inspections, proofs = self.fixture()
+        del proofs[0]["declaration"]
+        with self.assertRaisesRegex(AssertionError, "declaration proofs"):
+            probe_external_tag_create(self.client(inspections)[0], inspections, proofs)
+        inspections, proofs = self.fixture()
+        proofs[0]["plcOwner"]["objectPath"] = self.PLC.format(2)
+        with self.assertRaisesRegex(AssertionError, "exact connection owner"):
+            probe_external_tag_create(self.client(inspections)[0], inspections, proofs)
 
 
 if __name__ == "__main__":

@@ -54,6 +54,63 @@ Check("Operation shapes cannot smuggle external bindings into internal tag creat
     HmiEngineeringRules.RequireRequest(r); r["connection"] = "PLC"; Reject(() => HmiEngineeringRules.RequireRequest(r));
     r.Remove("connection"); r["bindings"] = new JArray(); Reject(() => HmiEngineeringRules.RequireRequest(r));
 });
+JObject External() {
+    var connection = Identity("/devices/HMI/hmi/Runtime/connections/HMI_Connection_1"); connection["kind"] = "hmiConnection";
+    var target = Identity("/devices/HMI/hmi/Runtime/tagTables/Default"); target["kind"] = "hmiTagTable";
+    return new JObject { ["schemaVersion"] = 1, ["operation"] = "external_tag_create", ["target"] = target, ["expectedContentHash"] = new string('a', 64),
+        ["name"] = "Linked", ["dataType"] = "Bool", ["connection"] = connection,
+        ["plcTag"] = new JObject { ["projectPath"] = "C:/p.ap21", ["plcPath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1", ["scopePath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1",
+            ["objectPath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1/tags/Default/tags/SharedSignal", ["kind"] = "tag", ["name"] = "SharedSignal", ["namespace"] = null } };
+}
+Check("External tag creation requires exact same-HMI connection and exact root PLC tag identities", () => {
+    HmiEngineeringRules.RequireRequest(External());
+    var classic = External(); classic["target"]["family"] = "classic"; classic["connection"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    foreach (string key in new[] { "family", "projectCopyId", "sessionGeneration", "hmiPath" }) {
+        var r = External(); r["connection"][key] = "other-owner"; Reject(() => HmiEngineeringRules.RequireRequest(r));
+    }
+    var nameOnly = External(); nameOnly["connection"] = "HMI_Connection_1"; Reject(() => HmiEngineeringRules.RequireRequest(nameOnly));
+    var wrongKind = External(); wrongKind["connection"]["kind"] = "hmiTag"; Reject(() => HmiEngineeringRules.RequireRequest(wrongKind));
+    var symbolOnly = External(); symbolOnly["plcTag"] = "SharedSignal"; Reject(() => HmiEngineeringRules.RequireRequest(symbolOnly));
+    var evidence = External(); evidence["plcTag"]["nativeConfirmed"] = true; Reject(() => HmiEngineeringRules.RequireRequest(evidence));
+    var block = External(); block["plcTag"]["kind"] = "block"; Reject(() => HmiEngineeringRules.RequireRequest(block));
+    var unit = External(); unit["plcTag"]["scopePath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1/units/U"; Reject(() => HmiEngineeringRules.RequireRequest(unit));
+    var noScope = External(); ((JObject)noScope["plcTag"]).Remove("scopePath"); HmiEngineeringRules.RequireRequest(noScope);
+    foreach (string type in new[] { "String", "Array[0..1] of Bool", "UDT_Motor", "bool" }) {
+        var r = External(); r["dataType"] = type; Reject(() => HmiEngineeringRules.RequireRequest(r));
+    }
+    foreach (string field in new[] { "properties", "placement", "bindings" }) {
+        var r = External(); r[field] = new JObject(); Reject(() => HmiEngineeringRules.RequireRequest(r));
+    }
+});
+Check("Other operations cannot smuggle external connection or PLC tag fields", () => {
+    foreach (string field in new[] { "connection", "plcTag" }) {
+        var internalTag = Scalar(); internalTag.Remove("properties"); internalTag["operation"] = "tag_create"; internalTag["name"] = "Internal"; internalTag["dataType"] = "Bool";
+        internalTag[field] = External()[field].DeepClone(); Reject(() => HmiEngineeringRules.RequireRequest(internalTag));
+        var scalar = Scalar(); scalar[field] = External()[field].DeepClone(); Reject(() => HmiEngineeringRules.RequireRequest(scalar));
+    }
+});
+Check("External tag readback verifies native derivation without writing derived fields", () => {
+    void Readback(string name = "Linked", string type = "Bool", string connection = "HMI_Connection_1", string plcTag = "SharedSignal", string access = "SymbolicAccess", string plcName = "PLC_1") =>
+        HmiRecipeRules.RequireExternalTagReadback("Linked", "Bool", "HMI_Connection_1", "SharedSignal", "PLC_1", name, type, connection, plcTag, access, plcName);
+    Readback(); Readback(plcName: ""); Readback(plcName: null);
+    Reject(() => Readback(name: "Other")); Reject(() => Readback(type: "Int")); Reject(() => Readback(connection: "HMI_Connection_2"));
+    Reject(() => Readback(plcTag: "\"SharedSignal\"")); Reject(() => Readback(access: "AbsoluteAccess")); Reject(() => Readback(plcName: "PLC_2"));
+});
+Check("Tag-table preservation delta admits only the changed table's export files", () => {
+    const string prefix = "/hmi/tagTables/Default/export/";
+    var before = new Dictionary<string, string> { [prefix + "Tags.xml"] = "1", ["/hmi/tagTables/Other/export/Tags.xml"] = "2" };
+    var after = new Dictionary<string, string>(before) { [prefix + "Tags.xml"] = "3", [prefix + "Linked.xml"] = "4" };
+    HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix);
+    var unrelated = new Dictionary<string, string>(after) { ["/hmi/tagTables/Other/export/Tags.xml"] = "5" };
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, unrelated, prefix));
+    var removed = new Dictionary<string, string>(after); removed.Remove("/hmi/tagTables/Other/export/Tags.xml");
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, removed, prefix));
+    var added = new Dictionary<string, string>(after) { ["/hmi/tagTables/New/export/Tags.xml"] = "6" };
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, added, prefix));
+    var emptied = new Dictionary<string, string> { ["/hmi/tagTables/Other/export/Tags.xml"] = "2" };
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, emptied, prefix));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, "/hmi/tagTables/Default"));
+});
 Check("Classic scalar patch selects export-local owner, preserving duplicate member names", () => {
     var before = HmiPreservationRules.ReadXml(xml);
     var expected = HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "0", "BackColor", "204, 204, 204", "128, 128, 128");
@@ -117,7 +174,8 @@ Check("Operation prerequisites include independent recovery and precise operatio
         ["tag_create"] = new[] { "newTagNamespaceUnique", "internalTagIsolation" },
         ["item_place"] = new[] { "exactRectangleWithinScreen", "faceplateTypeIdentityPreserved" },
         ["existing_binding_set"] = new[] { "existingBindingGuard", "exactTypedBindingOwnership" },
-        ["explicit_binding_set"] = new[] { "exactTypedBindingOwnership", "bindingDependencyClosure" } };
+        ["explicit_binding_set"] = new[] { "exactTypedBindingOwnership", "bindingDependencyClosure" },
+        ["external_tag_create"] = new[] { "newTagNamespaceUnique", "exactConnectionOwnership", "exactPlcDeclarationType" } };
     foreach (var operation in expected) {
         var gates = HmiEngineeringRules.RequiredGates(operation.Key).Values<string>().ToArray();
         Assert(gates.Distinct().Count() == gates.Length && operation.Value.All(gates.Contains));

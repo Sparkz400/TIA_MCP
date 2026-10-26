@@ -44,6 +44,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/CapabilityRules.cs" Link="CapabilityRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelStore.cs" Link="ProjectModelStore.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelRelationshipProviders.cs" Link="ProjectModelRelationshipProviders.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
   </ItemGroup>
 </Project>
