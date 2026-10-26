@@ -229,7 +229,8 @@ def run_case(case, args, output):
             report["referenceCultureAdaptation"]["dependencyItems"] += retargeted
             apply_change(call, "block_import_xml", {**route, "xml": xml, "expectedBlockNames": dependency["names"]})
         apply_change(call, "block_import_xml", {**route, "xml": reference_xml, "expectedBlockNames": [case["blockName"]]})
-        for specification in case.get("runtimeSources", []):
+        # dependentSources embed the case block (e.g. parent multi-instance hosts), so they follow its import like runtime sources.
+        for specification in case.get("dependentSources", []) + case.get("runtimeSources", []):
             source_payload = copy.deepcopy(specification)
             if "sourcePath" in source_payload:
                 assert "source" not in source_payload, "An authored runtime source must select exactly one source representation."

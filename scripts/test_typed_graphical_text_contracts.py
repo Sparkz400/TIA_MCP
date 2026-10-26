@@ -62,7 +62,7 @@ class TypedGraphicalTextContracts(unittest.TestCase):
                         node["nativeUid"]=nodes[int(ordinal)].attrib["UId"]
                 with self.subTest(fixture=case["fixtureId"]):check.validate(value)
                 count+=1
-        self.assertEqual(90,count)  # + typed-insert-first-* and typed-insert-create*-ton-*
+        self.assertEqual(104,count)  # + typed-insert-first-*, typed-insert-create*-ton-* and typed-transitive-createmulti-*
 
     def test_free_text_and_symbol_components_are_not_normalized_by_this_contract(self):
         model=schemas()["typed-graphical-model.schema.json"]["$defs"]

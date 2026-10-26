@@ -792,6 +792,63 @@ def qualify_relationships(profile, references, inspections, gates):
     if script_count: gates["scriptBehaviorInspection"] = gate("passed", "Nonempty native event/global script text matched independent readback without execution or invented semantic bindings", count=script_count)
 
 
+def probe_external_tag_create(client, inspections, proofs):
+    """Prepare-only native probe of the guarded Unified external_tag_create body.
+
+    Every prepare must be refused: the positive request at the preservation gate
+    after the body has proven ownership/declaration/type, the negatives in the body.
+    The owner's tag inventory must be unchanged afterwards. Never applies.
+    """
+    require(proofs and all("declaration" in proof for proof in proofs), "External tag probe needs passed connection and declaration proofs")
+    def rows(owner, section):
+        return [item for entry in inspections if entry["target"]["objectPath"] == owner["objectPath"] and entry["section"] == section for item in entry["result"]["items"]]
+    def prepare(payload):
+        raw = client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": "hmi_engineering", "payload": payload}})
+        observed = decode(raw)
+        require(raw.get("isError") is True, "external_tag_create prepare must be refused: " + json.dumps(observed, ensure_ascii=False))
+        return observed.get("error", {})
+    observations = []
+    for index, proof in enumerate(proofs):
+        owner = next(entry["target"] for entry in inspections if entry["target"]["name"] == proof["hmiSoftware"] and entry["section"] == "tags")
+        connection = next(row["identity"] for row in rows(owner, "connections") if row["identity"]["objectPath"] == proof["connection"]["sourcePath"])
+        linked = next(row for row in rows(owner, "tags") if row["identity"]["objectPath"] == proof["declaration"]["sourcePath"])
+        table_path = linked["identity"]["objectPath"].rsplit("/tags/", 1)[0]
+        table = next(row["identity"] for row in rows(owner, "tags") if row["identity"]["kind"] == "hmiTagTable" and row["identity"]["objectPath"] == table_path)
+        data_type = linked.get("properties", {}).get("DataType")
+        require(isinstance(data_type, str) and data_type, "LinkedSignal native DataType readback required")
+        names_before = sorted(row["identity"]["objectPath"] for row in rows(owner, "tags"))
+        def payload(**changes):
+            body = {"schemaVersion": 1, "operation": "external_tag_create", "target": table, "expectedContentHash": "0" * 64,
+                    "name": "QualificationExternal", "dataType": data_type, "connection": connection, "plcTag": proof["declaration"]["target"]}
+            body.update(changes)
+            return body
+        row = {"hmiSoftware": proof["hmiSoftware"], "connection": connection["objectPath"], "plcTag": proof["declaration"]["target"]["objectPath"]}
+        refused = row["positive"] = prepare(payload())
+        effect = refused.get("details", {}).get("proposedEffect", {})
+        ownership = effect.get("connectionOwnership", {})
+        require(refused.get("code") == "HmiPreservationUnavailable" and refused["details"].get("gate", {}).get("operation") == "external_tag_create"
+                and refused["details"]["gate"].get("available") is False, "Positive prepare must reach and stop at the server preservation gate")
+        require(effect.get("scope") == "external" and effect.get("plcTag") == proof["declaration"]["target"]["name"]
+                and effect.get("plcPath") == proof["plcOwner"]["objectPath"] and effect.get("plcDataType") == data_type
+                and ownership.get("isValid") is True and ownership.get("partnerCount") == 1 and ownership.get("plcPath") == proof["plcOwner"]["objectPath"],
+                "Native body did not prove the exact connection owner, PLC declaration and type")
+        conflict = row["nameConflict"] = prepare(payload(name=linked["name"]))
+        require(conflict.get("code") == "HmiNameConflict", "Existing HMI tag name must be refused")
+        other_type = "Bool" if data_type != "Bool" else "Int"
+        mismatch = row["typeMismatch"] = prepare(payload(dataType=other_type))
+        require(mismatch.get("code") == "TargetIncompatible", "PLC/HMI data-type mismatch must be refused")
+        if len(proofs) > 1:
+            foreign = proofs[(index + 1) % len(proofs)]["declaration"]["target"]
+            require(foreign["plcPath"] != proof["declaration"]["target"]["plcPath"], "Cross-owner probe needs a distinct PLC")
+            crossed = row["foreignPlc"] = prepare(payload(plcTag=foreign))
+            require(crossed.get("code") == "DependencyUnresolved", "A PLC tag outside the connection's native partner must be refused")
+        after = inspect_all(client, {"section": "tags", "target": owner})
+        require(sorted(item["identity"]["objectPath"] for item in after["items"]) == names_before, "Refused prepares must not change the HMI tag inventory")
+        observations.append(row)
+    return gate("passed", "Prepare-only: native ownership/declaration/type proof reached the closed preservation gate; name, type and foreign-PLC requests refused; tag inventory unchanged. No apply, compile or save.",
+                observations=observations, applyQualified=False)
+
+
 def reassess_captured(native, captured):
     """Re-evaluate immutable native observations; never invoke the bridge."""
     results = []
@@ -1052,6 +1109,14 @@ def qualify_bridge(args, native, report, persist):
                     qualify_relationships(profile, result["references"], inspections, result["gates"])
                 except Exception as error:
                     result["gates"]["plcDeclarationMapping"] = gate("failed", str(error))
+                if getattr(args, "probe_external_tag_create", False) and expected_family == "unified":
+                    # Separate from GATES: a refused prepare is evidence, never an acceptance criterion.
+                    try:
+                        result["externalTagCreatePrepare"] = probe_external_tag_create(
+                            client, inspections, result["gates"]["integratedConnectionMapping"].get("proofs", []))
+                    except Exception as error:
+                        result["externalTagCreatePrepare"] = gate("failed", str(error))
+                    persist()
                 try:
                     qualify_alarm_references(profile, result["references"], inspections, result["gates"])
                 except Exception as error:
@@ -1130,6 +1195,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=300)
     parser.add_argument("--allow-owned-derived-open", action="store_true", help="After a known failed retrieval in the same owned empty session, allow read-only inspection of the exact independently recovered positive seeder project; preserves the failed bridge recovery result")
     parser.add_argument("--inspect-owned-recovered-copy", action="store_true", help="Inspect a hash-verified fresh copy of the exact independently recovered fixture project; no bridge retrieval/compile/save, and existing failed compile gates remain failed")
+    parser.add_argument("--probe-external-tag-create", action="store_true", help="For Unified profiles, also send refused prepare-only hmi_engineering external_tag_create requests; never applies")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     require(bool(args.host) == bool(args.worker), "Pass both exact host and worker binaries")

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "builderUsed": false,
+  "nativeImportCompileVerified": true,
+  "engineeringVerified": false,
+  "preservationVerified": false,
+  "persistenceVerified": false,
+  "recoveryVerified": false,
+  "runtimeVerified": false,
+  "tiaVersion": "V21",
+  "route": "standard",
+  "changedFb": "Tgp_NestEffect",
+  "chain": [
+    {
+      "fb": "Tgp_NestEffect"
+    },
+    {
+      "fb": "Tgp_NestParent",
+      "member": "Inner"
+    },
+    {
+      "fb": "Tgp_NestGrand",
+      "member": "Middle"
+    }
+  ],
+  "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "artifacts": {
+    "before:Tgp_NestEffect": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestEffect.xml",
+      "sha256": "cde66c36a5fb2060462536478e1296272cb84c33e2d90c3bba3d768e2899dce2",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "before:Tgp_NestEffect_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestEffect_DB.xml",
+      "sha256": "71069d34f4c646fc0155f7c640ec732bd752ae6e2aba6cacade65d0e5f207c0f",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "before:Tgp_NestGrand": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestGrand.xml",
+      "sha256": "c4470222aefccfc4527bf016daf4c79a4feb7665169af49d45da78aaaf5fc862",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "before:Tgp_NestGrand_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestGrand_DB.xml",
+      "sha256": "8480586bf502e4e425561739ffa0fb715ff305d5e0cb8f00ef22adaa43155490",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "before:Tgp_NestParent": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestParent.xml",
+      "sha256": "c6359ca4d2dbf4a7a48fc68a9d024795a028a17df4ffb6bf9dec72ce24146413",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "before:Tgp_NestParent_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/before-Tgp_NestParent_DB.xml",
+      "sha256": "e075ee065220ad80589c133d63ca672bcf37ac20f3aaeb84149dedd486d44ae6",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestEffect": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestEffect.xml",
+      "sha256": "b54fe6b7cb2af5908d97032243f01c66032c355deab1bc77b334c05dc84d490e",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestEffect_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestEffect_DB.xml",
+      "sha256": "df58e76eecc98e62a1108e2e2bf69a226cc642ccd9fd421a79a1d827cd7e7172",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestGrand": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestGrand.xml",
+      "sha256": "33fbef1854040b2923b8b10d1048b6c6f9093bf98713435e8d10ae9e94051c28",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestGrand_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestGrand_DB.xml",
+      "sha256": "dc0aa1753ed3830bc697b23ad755c2062acc4ae6d82364beb905a6dd4ed0866d",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestParent": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestParent.xml",
+      "sha256": "476aaa9dc77cd5575d63ee99a980a73c0005616eab458d15f66a640bbf7a62fd",
+      "captureReport": "artifacts/cte/capture.json"
+    },
+    "after:Tgp_NestParent_DB": {
+      "path": "fixtures/typed-graphical/native/instance-effects-transitive/after-Tgp_NestParent_DB.xml",
+      "sha256": "e71aa5f64da565bc4f978b6f64d4776e9dd8222cdc215a54f2d0472aa7e8a411",
+      "captureReport": "artifacts/cte/capture.json"
+    }
+  },
+  "sources": {
+    "before": {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-before.scl",
+      "sha256": "e1216e18cf2b20cab1b2adf5da717e3860af20fcc7ddaf9439297f13f82f392c",
+      "transportSha256": "e1216e18cf2b20cab1b2adf5da717e3860af20fcc7ddaf9439297f13f82f392c",
+      "changeId": "98e209f340bb491ba6ae7ea35372053e"
+    },
+    "after": {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-after.scl",
+      "sha256": "a386707c119f4039286f41c3f76d439a7abbb109fe043116e98b400e7e8a124d",
+      "transportSha256": "a386707c119f4039286f41c3f76d439a7abbb109fe043116e98b400e7e8a124d",
+      "changeId": "3d8a0650852b4bdaa2fbb88eae27becd"
+    }
+  },
+  "nativeObservedEffect": {
+    "appendedMembers": [
+      {
+        "name": "Child",
+        "datatype": "\"TiaMcp_EnableGate\""
+      },
+      {
+        "name": "Timer_TON",
+        "datatype": "TON_TIME"
+      },
+      {
+        "name": "Timer_TOF",
+        "datatype": "TOF_TIME"
+      },
+      {
+        "name": "Timer_TP",
+        "datatype": "TP_TIME"
+      },
+      {
+        "name": "Counter_CTU",
+        "datatype": "CTU_INT"
+      },
+      {
+        "name": "Counter_CTD",
+        "datatype": "CTD_INT"
+      },
+      {
+        "name": "Counter_CTUD",
+        "datatype": "CTUD_INT"
+      }
+    ],
+    "nestedHostsPerDependent": {
+      "Tgp_NestParent": 1,
+      "Tgp_NestGrand": 1,
+      "Tgp_NestParent_DB": 1,
+      "Tgp_NestGrand_DB": 1
+    },
+    "rule": "Each member typed as the changed FB, at any depth of a parent FB or instance DB, appends every new member to its nested Static section in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility.",
+    "existingFullPayloadPreserved": true
+  }
+}

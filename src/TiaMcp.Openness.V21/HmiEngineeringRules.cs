@@ -7,13 +7,13 @@ namespace TiaMcp.Model
 {
     internal static class HmiEngineeringRules
     {
-        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set" };
+        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create" };
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
 
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag" }, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
@@ -28,6 +28,26 @@ namespace TiaMcp.Model
                 HmiRecipeRules.RequireName(Text(payload, "name"), "name");
                 if (!PrimitiveTypes.Contains(Text(payload, "dataType"), StringComparer.Ordinal))
                     throw new ArgumentException("Only primitive internal HMI tags have a creation body; external PLC/UDT mappings require a separately qualified operation.");
+                RejectFields(payload, "properties", "placement", "bindings", "connection", "plcTag");
+            }
+            else if (operation == "external_tag_create")
+            {
+                if (Text(target, "family") != "unified")
+                    throw new ArgumentException("Only Unified documents symbolic PlcTag access on integrated connections; Classic external tags need a separately qualified preserving XML adapter.");
+                HmiRecipeRules.RequireName(Text(payload, "name"), "name");
+                if (!PrimitiveTypes.Contains(Text(payload, "dataType"), StringComparer.Ordinal))
+                    throw new ArgumentException("External tag creation is limited to primitive scalar PLC tags; arrays, strings, UDTs and DB members are not mapped.");
+                var connection = payload["connection"] as JObject ?? throw new ArgumentException("An exact HMI connection identity is required, never only a name.");
+                RequireSameHmi(target, connection, "connection");
+                if (Text(connection, "kind") != "hmiConnection") throw new ArgumentException("connection must identify an hmiConnection.");
+                var plcTag = payload["plcTag"] as JObject ?? throw new ArgumentException("An exact PLC tag identity is required, never only a symbol name.");
+                if (plcTag.Properties().Any(p => !new[] { "projectPath", "plcPath", "scopePath", "objectPath", "kind", "name", "namespace" }.Contains(p.Name, StringComparer.Ordinal)))
+                    throw new ArgumentException("plcTag contains unsupported fields; caller-provided evidence cannot authorize a PLC binding.");
+                if (Text(plcTag, "kind") != "tag") throw new ArgumentException("plcTag must identify a PLC tag-table tag.");
+                string plcPath = Text(plcTag, "plcPath", 4096);
+                Text(plcTag, "objectPath", 4096);
+                if (plcTag["scopePath"] != null && Text(plcTag, "scopePath", 4096) != plcPath)
+                    throw new ArgumentException("Only root PLC tag tables have a documented symbolic HMI spelling; software-unit tags are not mapped.");
                 RejectFields(payload, "properties", "placement", "bindings");
             }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
@@ -48,7 +68,7 @@ namespace TiaMcp.Model
                     { if (p.Value.Type != JTokenType.Integer || (long)p.Value < 0 || (long)p.Value > uint.MaxValue) throw new ArgumentException("TabIndex must be a bounded nonnegative integer."); }
                     else throw new ArgumentException("Property is outside the family-specific allowlist: " + p.Name);
                 }
-                RejectFields(payload, "name", "dataType", "placement", "bindings");
+                RejectFields(payload, "name", "dataType", "placement", "bindings", "connection", "plcTag");
             }
             else if (operation == "item_place")
             {
@@ -56,7 +76,7 @@ namespace TiaMcp.Model
                 if (placement.Count != 4) throw new ArgumentException("Placement requires exactly left, top, width and height.");
                 foreach (string key in new[] { "left", "top", "width", "height" })
                     if (placement[key]?.Type != JTokenType.Integer) throw new ArgumentException("Placement requires integer " + key + ".");
-                RejectFields(payload, "name", "dataType", "properties", "bindings");
+                RejectFields(payload, "name", "dataType", "properties", "bindings", "connection", "plcTag");
             }
             else
             {
@@ -71,13 +91,10 @@ namespace TiaMcp.Model
                     if (!seen.Add(Text(binding, "property"))) throw new ArgumentException("Duplicate binding property.");
                     Text(binding, "dataType");
                     var tag = binding["tagIdentity"] as JObject ?? throw new ArgumentException("Binding requires an exact HMI tag identity, never only a name.");
-                    if (Text(tag, "family") != Text(target, "family")) throw new ArgumentException("The binding target belongs to a different HMI family.");
-                    foreach (string key in new[] { "projectCopyId", "sessionGeneration", "hmiPath", "objectPath" })
-                        if (key == "objectPath") Text(tag, key, 4096);
-                        else if (Text(tag, key, 4096) != Text(target, key, 4096)) throw new ArgumentException("A binding must belong to the exact same HMI/project/session.");
+                    RequireSameHmi(target, tag, "binding");
                     if (operation == "existing_binding_set" && binding["expectedValue"] == null) throw new ArgumentException("Changing an existing binding requires its observed expectedValue.");
                 }
-                RejectFields(payload, "name", "dataType", "properties", "placement");
+                RejectFields(payload, "name", "dataType", "properties", "placement", "connection", "plcTag");
             }
         }
 
@@ -86,7 +103,9 @@ namespace TiaMcp.Model
             HmiRecipeRules.RequireFamily(family);
             if (!Operations.Contains(operation, StringComparer.Ordinal)) throw new ArgumentException("Unknown HMI operation.");
             bool classicScalar = family == "classic" && operation == "scalar_property_set";
-            string reason = family == "unified" && operation == "tag_create"
+            string reason = family == "unified" && operation == "external_tag_create"
+                ? "The Unified external-tag body proves the integrated connection's PLC owner through native CommunicationManagement endpoints and the exact root PLC tag/type before writing. Tag-table export dependency closure, unrelated-resource preservation, compiler, save/reopen, archive-recovery and PLC communication gates have not passed for this exact device/runtime profile."
+                : family == "unified" && operation == "tag_create"
                 ? "Unified tag export is documented, but the native export/readback dependency closure and unrelated-resource preservation, compiler, save/reopen and archive-recovery gates have not passed for this exact device/runtime profile."
                 : family == "unified"
                     ? "Installed V21 Unified APIs expose typed properties/placement/bindings, but no screen Export method was found; a complete readback of events, dynamics, translations, resources and unknown payloads has not been established."
@@ -115,6 +134,7 @@ namespace TiaMcp.Model
                 case "item_place": gates.Add("exactRectangleWithinScreen"); gates.Add("faceplateTypeIdentityPreserved"); break;
                 case "existing_binding_set": gates.Add("existingBindingGuard"); gates.Add("exactTypedBindingOwnership"); break;
                 case "explicit_binding_set": gates.Add("exactTypedBindingOwnership"); gates.Add("bindingDependencyClosure"); break;
+                case "external_tag_create": gates.Add("newTagNamespaceUnique"); gates.Add("exactConnectionOwnership"); gates.Add("exactPlcDeclarationType"); break;
             }
             return gates;
         }
@@ -125,6 +145,13 @@ namespace TiaMcp.Model
             string result = (string)value[key];
             if (string.IsNullOrWhiteSpace(result) || result.Length > max || result.Any(char.IsControl)) throw new ArgumentException("Invalid " + key + ".");
             return result;
+        }
+        private static void RequireSameHmi(JObject target, JObject other, string role)
+        {
+            if (Text(other, "family") != Text(target, "family")) throw new ArgumentException("The " + role + " belongs to a different HMI family.");
+            foreach (string key in new[] { "projectCopyId", "sessionGeneration", "hmiPath", "objectPath" })
+                if (key == "objectPath") Text(other, key, 4096);
+                else if (Text(other, key, 4096) != Text(target, key, 4096)) throw new ArgumentException("A " + role + " must belong to the exact same HMI/project/session.");
         }
         private static void RejectFields(JObject payload, params string[] fields)
         { foreach (string field in fields) if (payload[field] != null) throw new ArgumentException(field + " is not applicable to this operation."); }

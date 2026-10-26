@@ -242,6 +242,24 @@ namespace TiaMcp.Openness.V21
                 result["name"] = payload["name"].DeepClone(); result["dataType"] = payload["dataType"].DeepClone(); result["scope"] = "internal";
                 return result;
             }
+            if (operation == "external_tag_create")
+            {
+                if (!(native is Siemens.Engineering.HmiUnified.HmiTags.HmiTagTable)) throw new BridgeException("HmiTargetMismatch", "external_tag_create requires an exact native Unified tag-table identity.");
+                var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)ResolveHmiTarget(project, (JObject)payload["target"]).Software;
+                if (hmi.Tags.Find(payload.Value<string>("name")) != null) throw new BridgeException("HmiNameConflict", "The requested tag already exists in the HMI namespace.");
+                var connection = HmiResolveNativeObject(project, (JObject)payload["connection"]).Native as Siemens.Engineering.HmiUnified.HmiConnections.HmiConnection
+                    ?? throw new BridgeException("DependencyUnresolved", "The connection identity is not an exact native Unified HMI connection.");
+                var ownership = new JObject { ["connection"] = connection.Name };
+                var plc = HmiProveIntegratedOwner(project, HmiResolveNativeTarget(project, (JObject)payload["target"]), connection.Name, ownership);
+                var plcTag = HmiRootPlcTag(project, plc, (JObject)payload["plcTag"]);
+                if (!HmiScalarTypesAgree(payload.Value<string>("dataType"), plcTag.DataTypeName))
+                    throw new BridgeException("TargetIncompatible", "The requested HMI data type does not exactly match the PLC declaration type; implicit conversions are not inferred.",
+                        new JObject { ["requested"] = payload["dataType"].DeepClone(), ["plcDataType"] = plcTag.DataTypeName });
+                result["name"] = payload["name"].DeepClone(); result["dataType"] = payload["dataType"].DeepClone(); result["scope"] = "external";
+                result["connection"] = connection.Name; result["plcTag"] = plcTag.Name; result["plcName"] = plc.Software.Name; result["plcPath"] = plc.Path;
+                result["plcDataType"] = plcTag.DataTypeName; result["accessMode"] = "SymbolicAccess"; result["connectionOwnership"] = ownership;
+                return result;
+            }
             var item = native as Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase ?? throw new BridgeException("HmiTargetMismatch", "The operation requires an exact native Unified screen-item identity.");
             if (operation == "scalar_property_set" || operation == "item_properties_set")
             {
@@ -332,10 +350,26 @@ namespace TiaMcp.Openness.V21
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void ApplyUnifiedEngineeringBody(EngineeringChange change, Project project, IEngineeringObject native)
         {
-            PrepareUnifiedEngineeringBody(change, project, native);
+            var effect = PrepareUnifiedEngineeringBody(change, project, native);
             var payload = change.Payload;
             string operation = payload.Value<string>("operation");
-            if (operation == "tag_create")
+            if (operation == "external_tag_create")
+            {
+                var tag = ((Siemens.Engineering.HmiUnified.HmiTags.HmiTagTable)native).Tags.Create(payload.Value<string>("name"));
+                // Order observed natively by HmiSeeder: Connection, then PlcTag; the symbolic
+                // setter derives DataType/PlcName and later DataType writes are refused.
+                tag.Connection = effect.Value<string>("connection");
+                tag.PlcTag = effect.Value<string>("plcTag");
+                try
+                {
+                    HmiRecipeRules.RequireExternalTagReadback(payload.Value<string>("name"), payload.Value<string>("dataType"), effect.Value<string>("connection"),
+                        effect.Value<string>("plcTag"), effect.Value<string>("plcName"), tag.Name, tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName);
+                }
+                catch (ArgumentException error) { throw new BridgeException("PreservationMismatch", error.Message); }
+                change.HmiEvidence["createdTagReadback"] = new JObject { ["name"] = tag.Name, ["dataType"] = tag.DataType, ["connection"] = tag.Connection,
+                    ["plcTag"] = tag.PlcTag, ["plcName"] = tag.PlcName, ["accessMode"] = tag.AccessMode.ToString(), ["address"] = tag.Address, ["runtimeVerified"] = false };
+            }
+            else if (operation == "tag_create")
             {
                 var tag = ((Siemens.Engineering.HmiUnified.HmiTags.HmiTagTable)native).Tags.Create(payload.Value<string>("name"));
                 // Native internal defaults are localized (e.g. a nonempty German
@@ -402,7 +436,14 @@ namespace TiaMcp.Openness.V21
             // Until an operation-specific artifact delta has native qualification,
             // every other artifact is required to be identical, including unknowns.
             string changed = change.Payload["target"].Value<string>("objectPath");
-            HmiPreservationRules.RequireUnrelatedPreserved(beforeHashes, afterHashes, new[] { changed }, Array.Empty<string>());
+            string operation = change.Payload.Value<string>("operation");
+            try
+            {
+                // Tag creation changes the table's export files, keyed below its objectPath.
+                if (operation == "tag_create" || operation == "external_tag_create") HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/");
+                else HmiPreservationRules.RequireUnrelatedPreserved(beforeHashes, afterHashes, new[] { changed }, Array.Empty<string>());
+            }
+            catch (ArgumentException error) { throw new BridgeException("PreservationMismatch", error.Message, after); }
             change.HmiEvidence["after"] = after;
             change.HmiEvidence["preservationVerified"] = true;
             change.Stages.Add("hmi_unrelated_content_preserved");

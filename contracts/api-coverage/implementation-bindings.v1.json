@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5cdbc908917c0d10b48e28e04b1377eafa3c244ba404fe9435f7ea9ef5f63863",
-      "bytes": 776432
+      "sha256": "aafd0fda4b1aa6eb1f087563b0fded59183616350799dd8eee847671cdf34b2e",
+      "bytes": 781447
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -307,8 +307,8 @@
     },
     {
       "path": "contracts/hmi-engineering.v1.schema.json",
-      "sha256": "95a09fc5180a56a953623593e6f672aa2bf9bf0faa43a3fd7d13dc6ac9120482",
-      "bytes": 3724
+      "sha256": "03beee759e01c41ac37db583f8e6fa3260c1dc6ed89c2fa8693021c94b4fefe3",
+      "bytes": 4973
     },
     {
       "path": "contracts/hmi-identity.v2.schema.json",
@@ -2162,8 +2162,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiEngineeringRules.cs",
-      "sha256": "055a5f7c1ef54930ab493a7b081fc72bfc11c6cc356345ba80075de3f7adb437",
-      "bytes": 11124
+      "sha256": "bf1a13342c3f666b31b10f88a4f30bf950d31ddcdf41d9abf4c1f99b8c62a6b7",
+      "bytes": 14141
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiInspectionRules.cs",
@@ -2182,8 +2182,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiPreservationRules.cs",
-      "sha256": "6c56b05b7f1f733c9ea1a85f2171e298a9b29148e65595dd29fb6c401fc72c7a",
-      "bytes": 9185
+      "sha256": "612bf06175f275d90d53da80485109afe923cf68869e9d1be5e01d78c264a4a1",
+      "bytes": 10171
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiProjectModelRules.cs",
@@ -2192,8 +2192,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiRecipeRules.cs",
-      "sha256": "5b9a41da1e8283087bb723e3b2dc20d589776a96443ec9a24513639692b9002d",
-      "bytes": 4733
+      "sha256": "374e4dc063bfb7260012499048387d94970483cbba8bbb1737e6ca8acef32d34",
+      "bytes": 6190
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs",
@@ -2307,13 +2307,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiBindings.cs",
-      "sha256": "1c7940b88da4643e41c9b16132592e1a8a56d43cd83ab1c6bda8d6d69245eba4",
-      "bytes": 14657
+      "sha256": "7580592483df1ccdf80d6db7d56638b78a456a53375fad7c956dd79bcdc6a374",
+      "bytes": 19301
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
-      "sha256": "31bca680e9920b191f9c9d88af759761412d9931b43260de04747e710812add2",
-      "bytes": 37588
+      "sha256": "5a5f977b5477021782eea3b07e7d0f13a2301b10b6f65629cea7a9835d6dd51e",
+      "bytes": 41639
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiExports.cs",
@@ -2542,8 +2542,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "6b8fcb691816b41eaefa044c5aefc8d341cbaf4705bad5e8a6b16eae8daa7f1e",
-      "bytes": 6499
+      "sha256": "b11e2dd2eedcc8635e3c39c8d632e51cf4ab105e2ce5e799ef737c954ba46289",
+      "bytes": 7220
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -2552,8 +2552,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
-      "sha256": "21b008f3dff4ef146e8e12cb19f4d09e6c437ee9298a852d602c9c97b6fd42e8",
-      "bytes": 35080
+      "sha256": "3fa66c585dda0bda66b20e2475220b7882bbebbc94577f09569d67279805b1fa",
+      "bytes": 35267
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -2722,8 +2722,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "8820719156153203cd9c8fccdb2f385f9d4626e75d122b9344a1c0d57cfe8ea5",
-      "bytes": 12805
+      "sha256": "d3a232886a3adab1b26fee643a3f323faa33348a44a0de026661ba7b319c1b32",
+      "bytes": 14574
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
@@ -70311,8 +70311,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 319,
-              "endLine": 337,
+              "line": 323,
+              "endLine": 341,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             }
           ]
@@ -71348,8 +71348,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 290,
-              "endLine": 301,
+              "line": 308,
+              "endLine": 319,
               "sha256": "a470ac29cf4b4907d46bb586cd9acfae2400d04b0b93563d3259c656e685097e"
             },
             {
@@ -71383,8 +71383,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 319,
-              "endLine": 337,
+              "line": 323,
+              "endLine": 341,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             },
             {
@@ -76531,6 +76531,20 @@
           "profileSha256": "2ae8775aa9046358808cf06d6b2bf4ad2677ccc89065edea62e84c9319f85d15",
           "artifacts": [
             "evidence/local.typed.insertion-storage.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.transitive-capture.20261026",
+          "profileSha256": "560611ed174d8a1baf449198e42ade7f00d433041304a12e4d3520c716186f76",
+          "artifacts": [
+            "evidence/local.typed.transitive-capture.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.transitive-effects.20261026",
+          "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693",
+          "artifacts": [
+            "evidence/local.typed.transitive-effects.20261026.json"
           ]
         }
       ],
@@ -94750,7 +94764,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "0213fad2917af5ab479146606622a9a95055107ca461c59fc86d1a3b72608b3c"
+      "sha256": "d22af9826c8aa6b7431405eb8795c29531704c4c9d4e75d53c7fd54a815a97b3"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94796,6 +94810,11 @@
       "path": "evidence/local.hmi.bridge.20261025.json",
       "state": "observed",
       "sha256": "b8848c8e802a583d09362a0bb5cb7bcaf55d5bca2b981566a7cbaffdbff3ef1c"
+    },
+    {
+      "path": "evidence/local.hmi.external-tag-prepare.20261026.json",
+      "state": "observed",
+      "sha256": "27eaa59935f950cc47d01fc9925ede4d5cf73d2b48e83799aa05383449038eb0"
     },
     {
       "path": "evidence/local.library_dependencies.20261024.json",
@@ -95078,6 +95097,16 @@
       "sha256": "2328435d1bc0c3a5abaffc8d5bb8ad89f9c7dadbc75b6a5cc6718232fa16b14c"
     },
     {
+      "path": "evidence/local.typed.transitive-capture.20261026.json",
+      "state": "observed",
+      "sha256": "f6d75fb2ba009aa6e936f8ef45635e374c5e5ed080981ec91a08972cafa8bf02"
+    },
+    {
+      "path": "evidence/local.typed.transitive-effects.20261026.json",
+      "state": "observed",
+      "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
+    },
+    {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
       "state": "observed",
       "sha256": "566204adf0d5fcb175beec54a7a72ee338372f4f4741d2c204290a5f291a3e0d"
@@ -95166,6 +95195,10 @@
     {
       "id": "local.hmi.bridge.20261025",
       "profileSha256": "ba645834e17782240bb7f17e3f750f31f591cbb64de4002d226ff77ab8c00be3"
+    },
+    {
+      "id": "local.hmi.external-tag-prepare.20261026",
+      "profileSha256": "1df1d87d104f139bd5d1e87ca097dbdb61f1bd6461b78b5d6fca3e3be813fbcb"
     },
     {
       "id": "local.index_paging.v03",
@@ -95490,6 +95523,14 @@
     {
       "id": "local.typed.standard-created-storage-runtime.20261026",
       "profileSha256": "ac63de500032d68daf1dc25086669fbca1b79eea1953f36621d781f91e3d607b"
+    },
+    {
+      "id": "local.typed.transitive-capture.20261026",
+      "profileSha256": "560611ed174d8a1baf449198e42ade7f00d433041304a12e4d3520c716186f76"
+    },
+    {
+      "id": "local.typed.transitive-effects.20261026",
+      "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693"
     },
     {
       "id": "local.unit-recovery.v03",

@@ -35,6 +35,18 @@ def network_free_source(language, name):
     return target.relative_to(ROOT.parent.parent).as_posix()
 
 
+def transitive_hosts(block):
+    """Two-level parent chain embedding the caller as a multi-instance, each instance DB with explicit start values."""
+    def fb(name, member):
+        return (f'FUNCTION_BLOCK "{name}"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\n'
+                f'VAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n {member};\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\n')
+    def db(name, starts):
+        return f'DATA_BLOCK "{name}_DB"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\n"{name}"\nBEGIN\n{starts}END_DATA_BLOCK\n\n'
+    source = (fb("Tgp_Host", f'Inner : "{block}"') + fb("Tgp_HostGrand", 'Middle : "Tgp_Host"')
+              + db("Tgp_Host", " RetainedMarker := 42;\n") + db("Tgp_HostGrand", " RetainedMarker := 42;\n Middle.RetainedMarker := 42;\n"))
+    return [{"language": "SCL", "source": source, "expectedBlockNames": ["Tgp_Host", "Tgp_HostGrand", "Tgp_Host_DB", "Tgp_HostGrand_DB"]}]
+
+
 def extended_cases():
     baseline = cases()
     result = []
@@ -84,6 +96,11 @@ def extended_cases():
                 case["payload"]["instances"] = [{"key": instance["key"], "kind": storage, "name": name}]
                 if storage == "createMulti":
                     case["referenceBindings"] = [binding("Instance", "Child" if family == "fb-multi" else "Storage", name)]
+                    # The same change with the caller embedded two levels deep: parents follow the captured transitive effect.
+                    nested = copy.deepcopy(case)
+                    nested.update(fixtureId="typed-transitive-createmulti-" + family + "-" + language.lower(),
+                                  dependentSources=transitive_hosts(case["blockName"]))
+                    result.append(nested)
                 elif family == "fb-multi":
                     case.update(blockName="Tgp_FB_global_" + language,
                         referenceXml="fixtures/typed-graphical/native/Tgp_FB_global_" + language + ".xml")

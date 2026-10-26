@@ -1,0 +1,42 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.transitive-capture.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T18:39:13+00:00",
+  "source": {
+    "commit": "59a85e3d4b2a69605a1c978400384decc00d4e9b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Native transitive dependent-instance effect in the standard PLC program scope: adding one FB member and one static member of each IEC instance type to Tgp_NestEffect, embedded as Inner in Tgp_NestParent and as Middle.Inner in Tgp_NestGrand, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py).",
+  "limitations": [
+    "Captured for the standard route at nesting depths 1 and 2; other routes are not captured."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "a2496c88d510fc18dbc28da16bd26c469549d538dfd0cc587ecb2dfe5f08fccc"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6acfc324e7938187f09257435156b2acaa232d2263fa6dfd16d0bc6ea0469a29"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "b78ec2d03607e6ed8bb2b78d86fbb9bec64cf31af29045c3f041ee70376473dd",
+      "bytes": 4930791,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}
