@@ -1806,6 +1806,24 @@
       ]
     },
     {
+      "id": "local.hmi.external-tag-prepare.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "14ab1177dee87c7edd047ced55bbb1958a1ea594",
+        "passedScope": "Prepare-only native probe of hmi_engineering external_tag_create on a fresh positive Unified MTP700 Comfort HmiSeeder fixture (two HMI owners, two PLCs, integrated connections), through the production Host and V21 worker after project_retrieve: for both owners the valid request reached the closed preservation gate (HmiPreservationUnavailable) carrying native CommunicationManagement owner proof (valid, single partner, exact PLC path), the exact root PLC tag SharedSignal and its Int type; an existing name was refused (HmiNameConflict), a different type (TargetIncompatible) and the other PLC's tag (DependencyUnresolved); the HMI tag inventory was unchanged; owned Portal, host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.external-tag-prepare.20261026.json"
+      ],
+      "limitations": [
+        "No apply, compile, save/reopen, recovery, preservation or PLC communication of an external tag is covered; production apply stays behind the closed Unified preservation gate.",
+        "Native HMI compile fails on this fixture (Unified encrypted-transfer password), as in local.hmi.bridge.20261025.",
+        "Unified Comfort only; Unified PC, DB members, arrays, UDTs, software-unit tags and connection creation are not exercised."
+      ]
+    },
+    {
       "id": "local.typed.insertion.20261025",
       "status": "passed",
       "profile": {
@@ -8801,7 +8819,7 @@
         "status": "partial",
         "limitations": [
           "Classic BackColor scalar and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
-          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. Offline rule/readback/delta tests and an SDK build pass; the native prepare-only probe has not run, apply stays behind the closed Unified preservation gate, and DB members, arrays, UDTs, software-unit tags, connection creation and Classic external tags are not mapped.",
+          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, DB members, arrays, UDTs, software-unit tags, connection creation and Classic external tags are not covered.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
           "Library lifecycle stays in the library subsystem; HMI receives an exact source/destination/dependency/binding handoff.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",

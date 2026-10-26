@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "0034a4781274ef54d4943ebb2b18f40b06babde8608079d82d9f26d0c7a576ee",
-      "bytes": 757404
+      "sha256": "4b7bc6a2b30fb55f48bd0d71be26c1bd558c1154dfc5d5f2abcaa21519b4c5e7",
+      "bytes": 759078
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -94562,6 +94562,11 @@
       "sha256": "b8848c8e802a583d09362a0bb5cb7bcaf55d5bca2b981566a7cbaffdbff3ef1c"
     },
     {
+      "path": "evidence/local.hmi.external-tag-prepare.20261026.json",
+      "state": "observed",
+      "sha256": "27eaa59935f950cc47d01fc9925ede4d5cf73d2b48e83799aa05383449038eb0"
+    },
+    {
       "path": "evidence/local.library_dependencies.20261024.json",
       "state": "observed",
       "sha256": "e083d70b8b7a6cc94638d7699383904fbcc82d80fc9d91e5940c9f22befc9c3a"
@@ -94860,6 +94865,10 @@
     {
       "id": "local.hmi.bridge.20261025",
       "profileSha256": "ba645834e17782240bb7f17e3f750f31f591cbb64de4002d226ff77ab8c00be3"
+    },
+    {
+      "id": "local.hmi.external-tag-prepare.20261026",
+      "profileSha256": "1df1d87d104f139bd5d1e87ca097dbdb61f1bd6461b78b5d6fca3e3be813fbcb"
     },
     {
       "id": "local.index_paging.v03",

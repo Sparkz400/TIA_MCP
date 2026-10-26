@@ -1,6 +1,6 @@
 # Current status
 
-**Unified external PLC tag creation implemented — 26 October 2026:** `hmi_engineering` `external_tag_create` proves the native connection owner, PLC tag and type before writing, and verifies the natively derived readback. It is offline-tested and builds against the V21 SDK. It is not natively qualified; its prepare-only probe is ready, and apply stays behind the closed Unified preservation gate. [Verification](verification/hmi-external-tag-create-20261026.md).
+**Unified external PLC tag creation implemented — 26 October 2026:** `hmi_engineering` `external_tag_create` proves the native connection owner, PLC tag and type before writing, and verifies the natively derived readback. Its prepare-only native probe passed on Unified Comfort for both owners (`local.hmi.external-tag-prepare.20261026`). Apply is unqualified and stays behind the closed Unified preservation gate. [Verification](verification/hmi-external-tag-create-20261026.md).
 
 **Route storage creation engineering-qualified — 26 October 2026:** 48 software-unit and namespace TON/TOF/TP/CTU/CTD/CTUD cases that create a multi-instance member or a namespace-qualified global instance DB passed the four engineering gates. Typed routes now cover local, existing and created storage; scoped runtime remains open. Catalog `0.4.16`. [Ledger](verification/typed-lad-fbd-route-created-storage-20261026.md).
 

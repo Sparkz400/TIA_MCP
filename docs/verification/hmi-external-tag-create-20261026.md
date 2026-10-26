@@ -1,7 +1,9 @@
 # Unified external PLC tag creation — 26 October 2026
 
-**Status:** implemented and offline-tested. Not natively qualified. Production
-apply stays unavailable behind the Unified preservation gate.
+**Status:** implemented. The prepare-only native probe passed on Unified Comfort
+([`local.hmi.external-tag-prepare.20261026`](../../evidence/local.hmi.external-tag-prepare.20261026.json)).
+Apply is not qualified. Production apply stays unavailable behind the Unified
+preservation gate.
 
 ## What was added
 
@@ -53,10 +55,37 @@ staging went past TIA's 143-character limit. A shorter output directory passes.
 The fake-worker tests check the probe's own logic only. They do not show what the
 native body does.
 
-## Native qualification step (not run)
+## Native prepare probe — passed, 26 October 2026
 
-The TIA machine was busy with the lane A corpus. Run this after the machine is
-free, on a commit with no uncommitted changes:
+Evidence: [`local.hmi.external-tag-prepare.20261026`](../../evidence/local.hmi.external-tag-prepare.20261026.json)
+(source `14ab117`, clean tree).
+
+The run used a fresh positive Unified MTP700 Comfort fixture from the
+allow-listed `HmiSeeder` at `D:\h4\seeder`. It had two HMI owners and two PLCs,
+each owner linked to its PLC by a valid integrated connection. The production
+Host and V21 worker retrieved the archive and ran the probe.
+
+| HMI owner | Valid request | Existing name | Other type | Other PLC's tag |
+| --- | --- | --- | --- | --- |
+| `HMI_RT_1` | `HmiPreservationUnavailable`: `HMI_Connection_1` → `PLC_A`, `SharedSignal`, `Int`, one valid partner | `HmiNameConflict` | `TargetIncompatible` | `DependencyUnresolved` |
+| `HMI_RT_2` | `HmiPreservationUnavailable`: `HMI_Connection_2` → `PLC_B`, `SharedSignal`, `Int`, one valid partner | `HmiNameConflict` | `TargetIncompatible` | `DependencyUnresolved` |
+
+Both PLCs declare `SharedSignal`. Each request resolved only to its own
+connection's partner. The HMI tag inventories were unchanged. Cleanup was
+verified: the host exited 0, the worker exited, and the owned Portal exited
+without forced termination.
+
+The same run also passed the existing read-only gates for this profile:
+inspection, Explorer, connection/declaration/DB/screen chains, save/reopen and
+archive recovery. Native HMI compile failed again on the known encrypted-transfer
+password prerequisite. The report's overall exit is therefore 1, with no
+accepted profile.
+
+This qualifies the prepare-time ownership, declaration and type proof on Unified
+Comfort only. Not covered: apply, compile, save/reopen and recovery of a created
+tag, preservation, PLC communication, and Unified PC.
+
+To repeat the run, use a commit with no uncommitted changes:
 
 ```powershell
 python -B scripts/qualify_hmi.py --native-report <fresh-unified-seeder-report.json> `

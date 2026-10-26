@@ -1,0 +1,58 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.external-tag-prepare.20261026",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-26T12:38:18+00:00",
+  "source": {
+    "commit": "14ab1177dee87c7edd047ced55bbb1958a1ea594",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Prepare-only native probe of hmi_engineering external_tag_create on a fresh positive Unified MTP700 Comfort HmiSeeder fixture (two HMI owners, two PLCs, integrated connections), through the production Host and V21 worker after project_retrieve: for both owners the valid request reached the closed preservation gate (HmiPreservationUnavailable) carrying native CommunicationManagement owner proof (valid, single partner, exact PLC path), the exact root PLC tag SharedSignal and its Int type; an existing name was refused (HmiNameConflict), a different type (TargetIncompatible) and the other PLC's tag (DependencyUnresolved); the HMI tag inventory was unchanged; owned Portal, host and worker cleanup verified.",
+  "limitations": [
+    "No apply, compile, save/reopen, recovery, preservation or PLC communication of an external tag is covered; production apply stays behind the closed Unified preservation gate.",
+    "Native HMI compile fails on this fixture (Unified encrypted-transfer password), as in local.hmi.bridge.20261025.",
+    "Unified Comfort only; Unified PC, DB members, arrays, UDTs, software-unit tags and connection creation are not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "2c8dfb29fa25632a45d1672f955721c679530d7fd88877bfc4bf7fb7ab21b144"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "514d1d27b7f5e54ea0ac5c2c3a0574429cae75eae224e6be5a317911bf1bda9a"
+    },
+    {
+      "name": "seeder",
+      "files": 6,
+      "sha256": "8eb60f176564388fa0e10d7ac0c0b6fe482e5feb487fb0a1d7f6f972ba6e7b92"
+    }
+  ],
+  "runs": [
+    {
+      "report": "hmi-bridge-external-tag.json",
+      "sha256": "a65818717610cbe3c80b55ef4a230e0f6cb419435fbd4f2b32740e87ffc4c497",
+      "bytes": 1588159,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "seeder-native-report.json",
+      "sha256": "a34af39e8fb954ba82fbb1754445ca15777d24968a5c66d6107608e929d62877",
+      "bytes": 306937,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}
