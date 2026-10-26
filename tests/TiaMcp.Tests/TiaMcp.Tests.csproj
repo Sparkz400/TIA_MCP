@@ -11,6 +11,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/OfflineEvidence.cs" Link="OfflineEvidence.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/DependencyRules.cs" Link="DependencyRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryJournalStore.cs" Link="LibraryJournalStore.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDocumentNames.cs" Link="LibraryDocumentNames.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringSources.cs" Link="EngineeringSources.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologySelection.cs" Link="OpennessSession.TechnologySelection.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.TechnologyReferences.cs" Link="OpennessSession.TechnologyReferences.cs" />

@@ -1076,10 +1076,14 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "library_create_type":
                     VerifyLibraryDocumentSnapshot(change);
-                    var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
-                        ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
-                        : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), LibraryImportOptions.None);
-                    rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() }); break;
+                    foreach (string documentName in LibraryDocumentNames.Read(payload))
+                    {
+                        var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
+                            ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
+                            : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, LibraryImportOptions.None);
+                        rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() });
+                    }
+                    break;
                 case "library_create_master_copy":
                     var selector = (JObject)change.Selector.DeepClone(); foreach (var property in ((JObject)payload["object"]).Properties()) selector[property.Name] = property.Value.DeepClone();
                     var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)ResolveObjectTarget(selector).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;

@@ -381,8 +381,9 @@ namespace TiaMcp.Openness.V21
 
         private static string LibraryRevision(ManagedLibrary library)
         {
-            var budget = new ScanBudget(10000); var metadata = LibraryMetadata(library, budget);
-            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Library exceeds the 10000-entry revision budget. Split or filter the source library before preparing a mutation.");
+            // Folders, types and versions each take entries, so a 10,000-type library needs more than 10,000 (scale plan).
+            var budget = new ScanBudget(50000); var metadata = LibraryMetadata(library, budget);
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Library exceeds the 50000-entry revision budget. Split or filter the source library before preparing a mutation.");
             return ChangeHash(metadata.ToString(Formatting.None));
         }
 
