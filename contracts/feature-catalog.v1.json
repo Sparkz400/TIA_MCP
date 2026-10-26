@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.22",
+  "catalogVersion": "0.4.24",
   "targetTiaVersions": [
     21
   ],
@@ -1806,6 +1806,24 @@
       ]
     },
     {
+      "id": "local.hmi.external-tag-prepare.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "14ab1177dee87c7edd047ced55bbb1958a1ea594",
+        "passedScope": "Prepare-only native probe of hmi_engineering external_tag_create on a fresh positive Unified MTP700 Comfort HmiSeeder fixture (two HMI owners, two PLCs, integrated connections), through the production Host and V21 worker after project_retrieve: for both owners the valid request reached the closed preservation gate (HmiPreservationUnavailable) carrying native CommunicationManagement owner proof (valid, single partner, exact PLC path), the exact root PLC tag SharedSignal and its Int type; an existing name was refused (HmiNameConflict), a different type (TargetIncompatible) and the other PLC's tag (DependencyUnresolved); the HMI tag inventory was unchanged; owned Portal, host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.external-tag-prepare.20261026.json"
+      ],
+      "limitations": [
+        "No apply, compile, save/reopen, recovery, preservation or PLC communication of an external tag is covered; production apply stays behind the closed Unified preservation gate.",
+        "Native HMI compile fails on this fixture (Unified encrypted-transfer password), as in local.hmi.bridge.20261025.",
+        "Unified Comfort only; Unified PC, DB members, arrays, UDTs, software-unit tags and connection creation are not exercised."
+      ]
+    },
+    {
       "id": "local.typed.insertion.20261025",
       "status": "passed",
       "profile": {
@@ -1904,6 +1922,39 @@
       "limitations": [
         "Engineering-only; runtime behavior of the composite change is not claimed.",
         "Qualified for the standard-route TON family; other families and the software-unit/namespace routes still rely on separate insertion and storage-creation evidence."
+      ]
+    },
+    {
+      "id": "local.typed.transitive-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "59a85e3d4b2a69605a1c978400384decc00d4e9b",
+        "passedScope": "Native transitive dependent-instance effect in the standard PLC program scope: adding one FB member and one static member of each IEC instance type to Tgp_NestEffect, embedded as Inner in Tgp_NestParent and as Middle.Inner in Tgp_NestGrand, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py)."
+      },
+      "artifacts": [
+        "evidence/local.typed.transitive-capture.20261026.json"
+      ],
+      "limitations": [
+        "Captured for the standard route at nesting depths 1 and 2; other routes are not captured."
+      ]
+    },
+    {
+      "id": "local.typed.transitive-effects.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "607736cdda783d68024a74c4df07bb7386d49545",
+        "passedScope": "Standard-route FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep (Tgp_Host.Inner, Tgp_HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (14 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured transitive effect (local.typed.transitive-capture.20261026); native readback matched every prediction exactly and each cell passed the four engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.transitive-effects.20261026.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+        "Standard route only; software-unit and namespace parents remain refused until their transitive effect is captured."
       ]
     },
     {
@@ -9018,7 +9069,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Classic BackColor scalar and Unified tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Classic BackColor scalar and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, DB members, arrays, UDTs, software-unit tags, connection creation and Classic external tags are not covered.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
           "Library lifecycle stays in the library subsystem; HMI receives an exact source/destination/dependency/binding handoff.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9032,7 +9084,7 @@
       "availability": {
         "status": "blocked",
         "reasons": [
-          "Classic BackColor scalar and Unified tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
+          "Classic BackColor scalar and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
         ]
       },
       "prerequisites": [
@@ -9073,7 +9125,7 @@
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. On the standard route, parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect (local.typed.transitive-capture.20261026) and are engineering-qualified for created multi-instance storage (local.typed.transitive-effects.20261026); software-unit and namespace parents and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9108,7 +9160,9 @@
           "local.typed.failed-source-recovery.20261026",
           "local.typed.iec-effect-standard.20261026",
           "local.typed.standard-created-storage-runtime.20261026",
-          "local.typed.insertion-storage.20261026"
+          "local.typed.insertion-storage.20261026",
+          "local.typed.transitive-capture.20261026",
+          "local.typed.transitive-effects.20261026"
         ]
       },
       "availability": {

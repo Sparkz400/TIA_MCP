@@ -151,6 +151,57 @@ namespace TiaMcp.Openness.V21
             }
         }
 
+        // Same proof as HmiIntegratedRelationships, for one connection before a write: exactly one
+        // valid native endpoint pair whose partner is exactly one PLC in a completely traversed project.
+        private PlcSelection HmiProveIntegratedOwner(Project project, HmiDiscoveredTarget target, string connectionName, JObject evidence)
+        {
+            var management = target.Hardware.GetService<CommunicationManagement>()
+                ?? throw new BridgeException("DependencyUnresolved", "Native CommunicationManagement is not exposed on this HMI runtime device item; connection ownership cannot be proven.", evidence);
+            var budget = new ScanBudget(50000);
+            var plcs = new List<Tuple<DeviceItem, PlcSelection>>();
+            foreach (var hardware in DeviceItems(project, budget))
+                if (hardware.Item.GetService<SoftwareContainer>()?.Software is PlcSoftware software)
+                    plcs.Add(Tuple.Create(hardware.Item, new PlcSelection { Project = project, Software = software, Path = hardware.Path + "/plc/" + Segment(software.Name) }));
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC owner traversal is incomplete; connection ownership cannot be proven unique.", evidence);
+            var matches = new List<NativeHmiConnection>();
+            foreach (var native in management.Connections)
+            {
+                if (!(native is NativeHmiConnection connection) || connection.LocalConnectionName != connectionName) continue;
+                var localSoftware = connection.LocalTarget?.GetService<SoftwareContainer>()?.Software;
+                if (Equals(connection.LocalTarget, target.Hardware) || localSoftware != null && Equals(localSoftware, target.Software)) matches.Add(connection);
+            }
+            if (matches.Count != 1 || !matches[0].IsValid)
+                throw new BridgeException("DependencyUnresolved", "The HMI connection has no single valid native integrated endpoint pair on this HMI owner.", evidence);
+            var partnerSoftware = matches[0].PartnerTarget?.GetService<SoftwareContainer>()?.Software as PlcSoftware;
+            var partners = plcs.Where(p => Equals(p.Item1, matches[0].PartnerTarget) || partnerSoftware != null && Equals(p.Item2.Software, partnerSoftware)).ToList();
+            evidence["provider"] = "Siemens.Engineering.HW.Features.CommunicationManagement";
+            evidence["localConnectionName"] = matches[0].LocalConnectionName; evidence["isValid"] = matches[0].IsValid;
+            evidence["partnerTargetMatchedBy"] = "Native DeviceItem/Software object equality"; evidence["partnerCount"] = partners.Count;
+            if (partners.Count != 1) throw new BridgeException("DependencyUnresolved", "The integrated connection partner is not exactly one PLC in this project.", evidence);
+            evidence["plcPath"] = partners[0].Item2.Path;
+            return partners[0].Item2;
+        }
+
+        // Root tag tables only: the reader resolves an unquoted single-component PlcTag there.
+        private PlcTag HmiRootPlcTag(Project project, PlcSelection plc, JObject identity)
+        {
+            HmiValidateIdentity(project, identity);
+            if (identity.Value<string>("plcPath") != plc.Path)
+                throw new BridgeException("DependencyUnresolved", "The PLC tag belongs to a different PLC than the connection's native partner.");
+            var budget = new ScanBudget(50000);
+            var matches = new List<PlcTag>();
+            foreach (var table in TagTables(plc.Software.TagTableGroup, plc.Path + "/tags", budget))
+                foreach (var tag in table.Item.Tags)
+                    if (budget.Take() && table.Path + "/tags/" + Segment(tag.Name) == identity.Value<string>("objectPath")) matches.Add(tag);
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC tag lookup is incomplete; uniqueness is not established.");
+            if (matches.Count != 1) throw new BridgeException(matches.Count == 0 ? "ObjectNotFound" : "AmbiguousTarget", "No unique root PLC tag matches the exact identity.");
+            if (identity.Value<string>("name") is string name && name != matches[0].Name) throw new BridgeException("StaleRevision", "The PLC tag identity name changed.");
+            var symbol = HmiInspectionRules.ScalarSymbolPath(matches[0].Name);
+            if (symbol == null || symbol.Length != 1 || symbol[0] != matches[0].Name)
+                throw new BridgeException("DependencyUnresolved", "The PLC tag name has no unquoted single-component symbolic spelling.");
+            return matches[0];
+        }
+
         private static IEnumerable<OfflineEvidence.InterfaceMember> HmiExplicitMembers(IEnumerable<OfflineEvidence.InterfaceMember> members, ScanBudget budget, int depth = 0)
         {
             if (depth > 64) { budget.Truncated = true; yield break; }

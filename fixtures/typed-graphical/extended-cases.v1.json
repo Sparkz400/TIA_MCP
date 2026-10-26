@@ -677,6 +677,119 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-fb-multi-lad",
+      "family": "fb-multi",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_multi_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_multi_LAD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createMulti",
+            "name": "Fresh_fb_multi_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_FB_multi_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-fb-multi-lad",
       "family": "fb-multi",
       "language": "LAD",
@@ -875,6 +988,162 @@
             "Fresh_fb_multi_LAD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ton-lad",
+      "family": "ton",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ton_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ton_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TON_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
@@ -1471,6 +1740,162 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-tof-lad",
+      "family": "tof",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tof_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tof_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TOF_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-tof-lad",
       "family": "tof",
       "language": "LAD",
@@ -1767,6 +2192,162 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-tp-lad",
+      "family": "tp",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tp_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tp_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TP_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-tp-lad",
       "family": "tp",
       "language": "LAD",
@@ -2059,6 +2640,179 @@
             "Fresh_tp_LAD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ctu-lad",
+      "family": "ctu",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctu_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctu_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTU_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
@@ -2393,6 +3147,179 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-ctd-lad",
+      "family": "ctd",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctd_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctd_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTD_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-ctd-lad",
       "family": "ctd",
       "language": "LAD",
@@ -2719,6 +3646,230 @@
             "Fresh_ctd_LAD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ctud-lad",
+      "family": "ctud",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctud_LAD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctud_LAD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTUD_LAD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
@@ -3786,6 +4937,121 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-fb-multi-fbd",
+      "family": "fb-multi",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_FB_multi_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_FB_multi_FBD.xml",
+      "interfaceDependencies": [
+        "TiaMcp_EnableGate"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Active",
+              "scope": "local",
+              "components": [
+                "Active"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_EnableGate",
+              "instance": "instance"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Enable"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Active"
+              },
+              "to": {
+                "node": "$Active",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "instance",
+            "kind": "createMulti",
+            "name": "Fresh_fb_multi_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Child"
+          ],
+          "toComponents": [
+            "Fresh_fb_multi_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_FB_multi_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-fb-multi-fbd",
       "family": "fb-multi",
       "language": "FBD",
@@ -3988,6 +5254,143 @@
             "Fresh_fb_multi_FBD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ton-fbd",
+      "family": "ton",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TON_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TON_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TON",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ton_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ton_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TON_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
@@ -4508,6 +5911,143 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-tof-fbd",
+      "family": "tof",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TOF_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TOF_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TOF",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tof_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tof_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TOF_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-tof-fbd",
       "family": "tof",
       "language": "FBD",
@@ -4766,6 +6306,143 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-tp-fbd",
+      "family": "tp",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TP_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TP_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TP",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_tp_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_tp_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_TP_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-tp-fbd",
       "family": "tp",
       "language": "FBD",
@@ -5020,6 +6697,160 @@
             "Fresh_tp_FBD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ctu-fbd",
+      "family": "ctu",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTU_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTU_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTU",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctu_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctu_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTU_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
@@ -5316,6 +7147,160 @@
       ]
     },
     {
+      "fixtureId": "typed-transitive-createmulti-ctd-fbd",
+      "family": "ctd",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTD_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTD_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctd_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctd_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTD_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
+        }
+      ]
+    },
+    {
       "fixtureId": "typed-createmulti-ctd-fbd",
       "family": "ctd",
       "language": "FBD",
@@ -5604,6 +7589,211 @@
             "Fresh_ctd_FBD"
           ],
           "expectedCount": 1
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-transitive-createmulti-ctud-fbd",
+      "family": "ctud",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_CTUD_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_CTUD_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Count",
+              "scope": "local",
+              "components": [
+                "Count"
+              ]
+            },
+            {
+              "key": "Down",
+              "scope": "local",
+              "components": [
+                "Down"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Load",
+              "scope": "local",
+              "components": [
+                "Load"
+              ]
+            },
+            {
+              "key": "Lower",
+              "scope": "local",
+              "components": [
+                "Lower"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "counter",
+              "instruction": "CTUD",
+              "dataType": "Int",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CU"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PV"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QU"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "CV"
+              },
+              "to": {
+                "node": "$Count",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Down",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CD"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Load",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "LD"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "QD"
+              },
+              "to": {
+                "node": "$Lower",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "createMulti",
+            "name": "Fresh_ctud_FBD"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "referenceBindings": [
+        {
+          "element": "Instance",
+          "fromScope": "LocalVariable",
+          "toScope": "LocalVariable",
+          "fromComponents": [
+            "Storage"
+          ],
+          "toComponents": [
+            "Fresh_ctud_FBD"
+          ],
+          "expectedCount": 1
+        }
+      ],
+      "dependentSources": [
+        {
+          "language": "SCL",
+          "source": "FUNCTION_BLOCK \"Tgp_Host\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Inner : \"Tgp_CTUD_FBD\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK \"Tgp_HostGrand\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\nVAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n Middle : \"Tgp_Host\";\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\nDATA_BLOCK \"Tgp_Host_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_Host\"\nBEGIN\n RetainedMarker := 42;\nEND_DATA_BLOCK\n\nDATA_BLOCK \"Tgp_HostGrand_DB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"Tgp_HostGrand\"\nBEGIN\n RetainedMarker := 42;\n Middle.RetainedMarker := 42;\nEND_DATA_BLOCK\n\n",
+          "expectedBlockNames": [
+            "Tgp_Host",
+            "Tgp_HostGrand",
+            "Tgp_Host_DB",
+            "Tgp_HostGrand_DB"
+          ]
         }
       ]
     },
