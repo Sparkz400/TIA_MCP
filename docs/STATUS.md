@@ -1,5 +1,7 @@
 # Current status
 
+**Standard created storage at runtime and insertion-plus-storage — 26 October 2026:** The standard IEC dependent-instance effect pair is captured and all 12 standard timer/counter profile declarations match it. All 28 standard-route created-storage cells (FB multi-instance and the six IEC types, multi-instance member and global DB, LAD and FBD) pass all five gates live. A new `network-plus-storage-creation-v1` contract qualifies inserting a network together with its created storage: standard-route TON `createMulti`/`createGlobal` passes the four engineering gates in LAD and FBD. Catalog `0.4.22`.
+
 **Typed plan reconciled — 26 October 2026:** Plan items already covered by evidence are ticked. First-network insertion into a network-free caller now places the network before the block title with a captured native envelope and passes the four engineering gates in LAD and FBD; a failed source's retained checkpoint was retrieved into a fresh project and matches its pre-change snapshot exactly, separate from the refused change_restore. Catalog `0.4.21`.
 
 **Namespaced DB operands enabled — 26 October 2026:** The typed builder now accepts global DB member operands owned by the caller's software unit, emitting the captured qualified-name encoding; four software-unit/namespace LAD/FBD cases pass the four engineering gates. Cross-unit DB owners stay refused; unit tag operands remain a native V21 boundary. Catalog `0.4.20`.

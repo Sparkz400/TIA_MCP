@@ -238,9 +238,11 @@ controller was modified.
   gates in LAD and FBD; together all 38 standard-route cells pass.
 - [x] Exercise CTD/CTUD signed limits and timer cancellation/restart/completion
   (`local.typed.runtime.20261024`). Host timing/application-call limitations stay explicit.
-- [ ] Run the standard-route created storage variants (`createMulti`/`createGlobal`) at runtime. Software-unit
-  and namespace routes pass them (`local.typed.scoped-runtime.*`); the standard route has engineering
-  evidence only, and a standard IEC dependent-instance effect pair is not captured.
+- [x] Run the standard-route created storage variants (`createMulti`/`createGlobal`) at runtime. The standard
+  IEC dependent-instance effect pair is captured (`local.typed.iec-effect-standard.20261026`; all 12 standard
+  timer/counter profile declarations match), and all 28 standard created-storage cells (FB multi-instance and
+  the six IEC types, both storage kinds, LAD and FBD) pass all five gates
+  (`local.typed.standard-created-storage-runtime.20261026`).
 - [x] Diagnose prerequisite failures without weakening isolation: observed failures
   include another registered instance, protected-card filesystem access denial
   before credential access, and native power-on timeout. Owned cleanup passed in
@@ -326,7 +328,10 @@ controller was modified.
   before the block title (174/174), so the builder inserts the first network there with a captured native
   envelope and shifts the title IDs; both languages pass the four engineering gates
   ([ledger](../verification/typed-lad-fbd-insertion-first-20261026.md), `local.typed.insertion-first.20261026`).
-- [ ] Insertion combined with storage creation needs its own composite effect contract.
+- [x] Insertion combined with storage creation needs its own composite effect contract. The
+  `network-plus-storage-creation-v1` contract admits only the declared created member (new, shaped exactly like its
+  native template) next to the inserted network; standard-route TON `createMulti`/`createGlobal` insertion passes the
+  four engineering gates in LAD and FBD (`local.typed.insertion-storage.20261026`). Runtime is not claimed.
 
 ### 6. Complete remote deployment and release reporting
 
