@@ -382,6 +382,8 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest", organiza
     prefix = _name(prefix, "prefix", 32)
     organization_block = _name(organization_block, "organization block", 64)
     symbol_root = "" if symbol_namespace is None else _namespace(symbol_namespace) + "."
+    # Inside a namespace, TIA resolves block and type references only by their qualified name.
+    block = lambda name: f'"{symbol_root}{name}"'
     if isinstance(instances, (str, bytes)) or not isinstance(instances, (tuple, list)) or not 1 <= len(instances) <= 64:
         raise InterfaceError("Provide 1..64 distinct instance names")
     instances = [_name(name, "instance name", 20) for name in instances]
@@ -436,15 +438,15 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest", organiza
     lines.extend(["END_VAR", "BEGIN", "END_DATA_BLOCK", ""])
     for instance_db in instance_blocks.values():
         lines.extend([f'DATA_BLOCK "{instance_db}"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
-                      "NON_RETAIN", f'"{interface["name"]}"', "BEGIN", "END_DATA_BLOCK", ""])
-    ref = f'"{db_name}"'
+                      "NON_RETAIN", block(interface["name"]), "BEGIN", "END_DATA_BLOCK", ""])
+    ref = block(db_name)
     lines.extend([f'ORGANIZATION_BLOCK "{organization_block}"', "{ S7_Optimized_Access := 'TRUE' }", "VERSION : 0.1",
                   "BEGIN", f"  IF {ref}.RequestId <> {ref}.AckId THEN", f"    {ref}.ErrorCode := UDINT#0;",
                   f"    IF {ref}.CallCount = UDINT#4294967295 THEN", f"      {ref}.ErrorCode := UDINT#2;",
                   "    ELSE", f"      CASE {ref}.InstanceIndex OF"])
     for index, instance in enumerate(instances):
         lines.append(f"        {index}:")
-        call = f'"{instance_blocks.get(instance, interface["name"])}"'
+        call = block(instance_blocks.get(instance, interface["name"]))
         arguments = []
         returns = []
         for parameter in parameters:
@@ -458,7 +460,7 @@ def generate_program(interface, instances=("dut",), prefix="BlockTest", organiza
         lines.append("          " + call_line)
         for item, descriptor in capture:
             for path, _ in _leaves(descriptor, item["name"]):
-                lines.append(f'          {ref}.{instance}.State.{path} := "{instance_blocks[instance]}".{path};')
+                lines.append(f'          {ref}.{instance}.State.{path} := {block(instance_blocks[instance])}.{path};')
         lines.append(f"          {ref}.CallCount := {ref}.CallCount + UDINT#1;")
     lines.extend(["        ELSE", f"          {ref}.ErrorCode := UDINT#1;", "      END_CASE;", "    END_IF;",
                   f"    {ref}.AckId := {ref}.RequestId;", "  END_IF;", "END_ORGANIZATION_BLOCK", ""])
