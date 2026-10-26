@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.17",
+  "catalogVersion": "0.4.18",
   "targetTiaVersions": [
     21
   ],
@@ -1991,6 +1991,40 @@
         "evidence/local.typed.scoped-runtime.local-fb.20261026.json"
       ],
       "limitations": [
+        "Host application-call timing; not exact PLC scan timing."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "db0622429da94fc29374909995c9d3098047c114",
+        "passedScope": "scripts/capture_typed_routes_owned.py: the 13 inputs of route-capture-scoped-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline: software-unit and alternate-namespace instance-effect pairs (callee template, FB and instance DB with RetainedMarker 42, then the FB redeclared with a Child multi-instance while the dependent DB was observed), a unit tag table, namespace-qualified global operand DBs and LAD/FBD callers reading and writing a namespaced DB member in both routes. Every input compiled clean and saved; only declared additions, the declared redeclarations and their observed dependent DBs changed; the saved state matched a fresh-process reopen. The extracted route effect pairs keep the complete existing DB payload and append only Child."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-capture.20261026.json"
+      ],
+      "limitations": [
+        "Native reference capture only; enabling route createMulti and global DB operand profiles needs builder qualification.",
+        "Unit tag operands are excluded: an earlier capture of the same packet (artifacts/cap-scoped, sha256 164b76ea...) compiled an M-memory unit tag caller with 'Accessing this type of tag is not possible in software units'; %I/%Q unit tags are unobserved."
+      ]
+    },
+    {
+      "id": "local.typed.scoped-runtime.createmulti.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "f205f10d66fc05c97c4da741bebb1f880454ca6b",
+        "passedScope": "Software-unit and alternate-namespace numeric FB cells creating a multi-instance member, LAD and FBD (4 cells), live as in local.typed.scoped-runtime.20261026 with the route dependent-instance effect profiles from local.typed.scoped-capture.20261026: the harness instance DB followed the profiled native effect and each cell passed all five gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.scoped-runtime.createmulti.20261026.json"
+      ],
+      "limitations": [
+        "Timer and counter created multi-instance members (24 cells) are refused: their IEC system-type declarations differ from the captured FB-member effect profile; IEC effect pairs are not captured.",
         "Host application-call timing; not exact PLC scan timing."
       ]
     }
@@ -8904,7 +8938,7 @@
         "limitations": [
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
-          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes for 112 of 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb); created multi-instance storage is refused before runtime until a route dependent-instance effect pair is captured.",
+          "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes for 116 of 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti), using route dependent-instance effect profiles (local.typed.scoped-capture.20261026). Created timer/counter multi-instance members (24 cells) are refused until IEC effect pairs are captured. Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB operand encodings are captured but no builder operand profile is enabled.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates.",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -8931,7 +8965,9 @@
           "local.typed.route-created-storage.20261026",
           "local.typed.scoped-runtime.20261026",
           "local.typed.scoped-runtime.reruns.20261026",
-          "local.typed.scoped-runtime.local-fb.20261026"
+          "local.typed.scoped-runtime.local-fb.20261026",
+          "local.typed.scoped-capture.20261026",
+          "local.typed.scoped-runtime.createmulti.20261026"
         ]
       },
       "availability": {

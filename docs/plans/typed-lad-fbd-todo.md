@@ -16,8 +16,8 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
 - Native V21 boundaries: duplicate PLC tag names and unqualified nested-namespace UDT references are
   refused by TIA itself (`evidence/local.typed.native-boundaries.20261025.json`).
 - Existing-caller insertion is qualified under the 25 October scope decision (section 5).
-- Still open: scoped global operand encodings and dependent-DB effects (packet authored, not captured),
-  and runtime for created multi-instance route storage.
+- Still open: IEC (timer/counter) dependent-instance effect pairs for created multi-instance route storage,
+  and a builder operand profile for the captured namespaced global DB encodings.
 
 ## Lane A — 26 October 2026
 
@@ -263,13 +263,21 @@ controller was modified.
   The native XML probes import, compile and persist in both routes with local and existing
   global storage (`local.typed.route-iec-capture.20261026`), so the target supports scoped IEC
   timers/counters; the SIMATIC SD import failure itself was not pursued.
-- [ ] Capture scoped global operand encodings and scoped dependent-DB effects
-  before enabling them. The capture packet is authored (`route-capture-scoped-packet.v1.json`,
-  17 inputs) but not executed.
+- [x] Capture scoped global operand encodings and scoped dependent-DB effects
+  before enabling them. `local.typed.scoped-capture.20261026` captured the 13-input packet: both
+  route instance-effect pairs (the DB keeps its full payload and appends only `Child`; profiles in
+  `instance-effects-{softwareUnit,namespace}.v1.json`) and namespaced global DB member operands in LAD/FBD.
+  Unit tag operands are a native V21 boundary: an M-memory unit tag caller compiles with "Accessing this
+  type of tag is not possible in software units" (packet `nativeBoundaries`; %I/%Q unobserved).
+- [ ] Enable a builder operand profile for namespaced global DB members from the captured encodings.
+- [ ] Capture IEC timer/counter dependent-instance effect pairs and let the worker profile carry
+  several member shapes; 24 created timer/counter route cells are refused until then
+  ([created-multi ledger](../verification/typed-lad-fbd-route-runtime-createmulti-20261026.md)).
 - [x] Scoped runtime: `qualify_typed_graphical.py --live --unit-seeder` seeds the unit into a fresh
   scratch (keeping credential provenance) and generates the harness inside the DUT's unit and
   namespace (named cycle OB, `NAMESPACE` source, qualified references and PLCSIM symbols). 112 of 140
-  route cells pass all five gates ([ledger](../verification/typed-lad-fbd-route-runtime-20261026.md),
+  route cells pass all five gates, 116 with numeric FB created multi-instance storage
+  ([ledger](../verification/typed-lad-fbd-route-runtime-20261026.md),
   reruns: [global numeric FB](../verification/typed-lad-fbd-route-runtime-reruns-20261026.md),
   [local numeric FB](../verification/typed-lad-fbd-route-runtime-local-fb-20261026.md)). The 28 created
   multi-instance cells are refused (`DependencyProfileUnavailable`) until a route effect pair exists.

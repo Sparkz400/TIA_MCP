@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b23a9302ad54b68cbfa04420ee2255912e37acb77cfddda0f070c1d86cf0f1bf",
-      "bytes": 760494
+      "sha256": "b2ab4179214478391d641ca7f33241fc7d2da3b8af4e62dd7a2ff5ea74416851",
+      "bytes": 763495
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2542,8 +2542,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "a72d76ce6c333e10167b15dea1368006f1ef3e0f2ab5e4a04fc0b27bb08b6967",
-      "bytes": 5718
+      "sha256": "97b7b384ce13879ef8d1e729da8939f0f6df7e388f62d21ff504e5253749f23f",
+      "bytes": 5787
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "8d85b450b88194035319a9266209734169db3aa0b2e80c0e179cf5d20ca30dd8",
-      "bytes": 9957
+      "sha256": "8b3f682d7674a0e1a8bb87bc3225043d8491cf01891bee1639fe5faf3b7443e6",
+      "bytes": 10223
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
@@ -76457,6 +76457,20 @@
           "artifacts": [
             "evidence/local.typed.scoped-runtime.local-fb.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.scoped-capture.20261026",
+          "profileSha256": "67e384e9bd2879e40a58a49a830c210ac270e9ce0852e1ab554a1538eefe6ec5",
+          "artifacts": [
+            "evidence/local.typed.scoped-capture.20261026.json"
+          ]
+        },
+        {
+          "id": "local.typed.scoped-runtime.createmulti.20261026",
+          "profileSha256": "9a64b98cdc273799a4989d78927219ee45ed668c6cff313e2340ffa7bd09ffab",
+          "artifacts": [
+            "evidence/local.typed.scoped-runtime.createmulti.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94535,7 +94549,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "7abe2dc41ba80e3ce02c9b0b1eea537f63cc24ab159be0b36d8d24713b903d2c"
+      "sha256": "ed3ebf70192f5ef6271c92516273af259a25ac8a6cf4d23036d3abdda2c1d698"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -94793,9 +94807,19 @@
       "sha256": "3431938646f70bf798985dda6465c07b46b77a77a36adeb68f7f148ff1b5466d"
     },
     {
+      "path": "evidence/local.typed.scoped-capture.20261026.json",
+      "state": "observed",
+      "sha256": "2b5dccd152715d7f644bdd86bd7bb78975ea93048d05fa6fc2894567dc518b8c"
+    },
+    {
       "path": "evidence/local.typed.scoped-runtime.20261026.json",
       "state": "observed",
       "sha256": "12e970a267b4b93533b831ee691dd5fbfd45f0ed9439db5539158a87f19253a5"
+    },
+    {
+      "path": "evidence/local.typed.scoped-runtime.createmulti.20261026.json",
+      "state": "observed",
+      "sha256": "be7b7b720c1174777da3cd6c38825e07884154e3f9dc506a3f53f22141f8e28d"
     },
     {
       "path": "evidence/local.typed.scoped-runtime.local-fb.20261026.json",
@@ -95166,8 +95190,16 @@
       "profileSha256": "5f5b40cd450da0dae2e4233c7a8a2be1571baeed9b9c7871af755f46c9552d33"
     },
     {
+      "id": "local.typed.scoped-capture.20261026",
+      "profileSha256": "67e384e9bd2879e40a58a49a830c210ac270e9ce0852e1ab554a1538eefe6ec5"
+    },
+    {
       "id": "local.typed.scoped-runtime.20261026",
       "profileSha256": "2ad93dbfc739a33dece6a6291690a42ad29333ab1290f10dec837fe8f6516030"
+    },
+    {
+      "id": "local.typed.scoped-runtime.createmulti.20261026",
+      "profileSha256": "9a64b98cdc273799a4989d78927219ee45ed668c6cff313e2340ffa7bd09ffab"
     },
     {
       "id": "local.typed.scoped-runtime.local-fb.20261026",
