@@ -9,6 +9,30 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        // Explorer network scan: network interfaces only, without channel/address
+        // attributes. hardwarePath selects one exact item; null scans all hardware.
+        private JObject InspectModelNetworks(Project project, int maximum, string hardwarePath)
+        {
+            var lookup = new ScanBudget(50000); var budget = new ScanBudget(maximum);
+            var warnings = new JArray(); var items = new JArray();
+            var hardware = DeviceItems(project, lookup).ToArray();
+            if (lookup.Truncated) warnings.Add("Hardware lookup reached its 50000-item traversal bound.");
+            foreach (var entry in hardware)
+            {
+                if (hardwarePath != null && !string.Equals(entry.Path, hardwarePath, StringComparison.Ordinal)) continue;
+                if (!budget.Take()) break;
+                try
+                {
+                    var network = entry.Item.GetService<NetworkInterface>();
+                    if (network != null) items.Add(new JObject { ["path"] = entry.Path, ["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings) });
+                }
+                catch (Exception error) { warnings.Add(InspectionWarning(entry.Path, error)); }
+            }
+            return new JObject { ["items"] = items, ["warnings"] = warnings,
+                ["completeness"] = InspectionCoverage(budget, warnings, "Configured network interfaces, subnet memberships and IO-system associations of bounded project hardware.",
+                    "No cables, ports or physical topology") };
+        }
+
         private JObject InspectConfiguredNetwork(Project project, HardwareEntry owner, NetworkInterface network,
             HardwareEntry[] hardware, ScanBudget budget, JArray warnings)
         {
@@ -83,8 +107,12 @@ namespace TiaMcp.Openness.V21
         private static JObject InspectIoSystemReference(Project project, IoSystem system, HardwareEntry[] hardware)
         {
             if (system == null) return new JObject { ["state"] = "notAssigned" };
+            var subnet = InspectSubnetReference(project, system.Subnet);
+            // Explorer identity of a native IO system below its resolved global subnet.
+            string path = subnet.Value<string>("path");
             return new JObject { ["state"] = "assigned", ["name"] = system.Name, ["number"] = system.Number,
-                ["controllerOwner"] = NetworkOwnerReference(system, hardware), ["subnet"] = InspectSubnetReference(project, system.Subnet) };
+                ["path"] = path == null ? null : path + "/ioSystems/" + Segment(system.Name),
+                ["controllerOwner"] = NetworkOwnerReference(system, hardware), ["subnet"] = subnet };
         }
 
         private static JObject InspectSubnetReference(Project project, Subnet subnet)

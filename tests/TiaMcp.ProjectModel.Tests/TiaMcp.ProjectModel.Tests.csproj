@@ -13,6 +13,8 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/BridgeException.cs" Link="BridgeException.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.ScanBudget.cs" Link="OpennessSession.ScanBudget.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelRelationshipProviders.cs" Link="ProjectModelRelationshipProviders.cs" />
+    <Compile Include="../TiaMcp.Tests/ProjectModelNativeProviderTests.cs" Link="ProjectModelNativeProviderTests.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
     <Compile Include="../TiaMcp.Tests/ProjectModelTypedPreviewTests.cs" Link="ProjectModelTypedPreviewTests.cs" />
     <Compile Include="../TiaMcp.Tests/ProjectModelRelationshipTests.cs" Link="ProjectModelRelationshipTests.cs" />

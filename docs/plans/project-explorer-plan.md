@@ -6,6 +6,20 @@ Status: E0–E4 implementation delivered and locally qualified within the record
 
 Build one queryable project model for agents and a read-only visual explorer for people. The first delivery covers exposed PLC software and hardware inventory. HMI coverage arrives through the separate [HMI integration plan](hmi-integration-plan.md); graphical network previews arrive through the [typed LAD/FBD builder plan](typed-lad-fbd-builders-plan.md). The shared contract milestone belongs to these three streams, not a fourth project.
 
+## Relationship providers and collection scope — 26 October 2026
+
+Implemented offline, **not natively qualified** ([record](../verification/explorer-relationship-providers-20261026.md)):
+
+| Area | Implemented | Still unqualified or out of scope |
+| --- | --- | --- |
+| Configured network | Subnet and IO-system nodes; `connectedSubnet`, `ioSystemController`, `ioSystemDevice` edges from hardware network interfaces | Native fixture run; cables, ports and physical topology stay unsupported |
+| Technology objects | `technologyConnection` edges to exact hardware paths from `technology_read` | Native run on a fixture with connected technology objects; tag/block targets stay unresolved |
+| Software units | `unitRelation` edges from captured unit relations; unique typed names in a complete capture resolve | Native run on a unit fixture with relations |
+| PLC collections | Watch/force tables and groups, external sources and groups | Native capture of populated tables/sources |
+| Scope | Every node kind declares its providers or an `unsupported` reason (`providerScope`) | PLC alarm text lists and project/global libraries are reported unsupported, not captured |
+
+The native step is `scripts/qualify_project_explorer_relationships.py`. It must run only when the TIA machine is free.
+
 ## Intended experience
 
 A user selects a project and sees a searchable tree of devices, PLCs, software units, groups, blocks, data types, tags and technology objects. Selecting an item opens its details and supported relationships. Breadcrumbs and exact object references let the user tell the agent precisely which object to inspect or change. The agent can answer the same questions through structured tools without reading screenshots.
