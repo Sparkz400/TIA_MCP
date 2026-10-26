@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Native dependent-instance effects of adding one static member of each IEC instance type to an FB with an instance DB, in the software-unit and namespace routes. Unobserved until captured; enables nothing.",
+  "unit": "TiaMcp_UnitA",
+  "archive": {
+    "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "sha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
+  },
+  "members": [
+    {
+      "name": "Timer_TON",
+      "datatype": "TON_TIME"
+    },
+    {
+      "name": "Timer_TOF",
+      "datatype": "TOF_TIME"
+    },
+    {
+      "name": "Timer_TP",
+      "datatype": "TP_TIME"
+    },
+    {
+      "name": "Counter_CTU",
+      "datatype": "CTU_INT"
+    },
+    {
+      "name": "Counter_CTD",
+      "datatype": "CTD_INT"
+    },
+    {
+      "name": "Counter_CTUD",
+      "datatype": "CTUD_INT"
+    }
+  ],
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-iec-effect-before.scl",
+      "sha256": "8ead721c971b4e0ca0eefb989e25c62bb4b8b6c5555f12da52d7bd5860d7d503",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_IecEffect",
+        "TgpUnit_IecEffect_DB"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-iec-effect-before.scl",
+      "sha256": "fb4d7076ce421a237557efb31acac2e3641b30103f479b8a75db50c4c0595a8d",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_IecEffect",
+        "TgpNamespace_IecEffect_DB"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-iec-effect-after.scl",
+      "sha256": "b53302b9d7bdb52d6b56baf393c4ed29d101ef92189ea7cf5251fa146f1e2355",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_IecEffect"
+      ],
+      "namespace": "TiaMcp_UnitA",
+      "modifies": [
+        "TgpUnit_IecEffect"
+      ],
+      "observes": [
+        "TgpUnit_IecEffect_DB"
+      ]
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-iec-effect-after.scl",
+      "sha256": "1fec5e76896c92d0eb0b123bdc24b220dfa8a501e6edc9885288062546057a68",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_IecEffect"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "modifies": [
+        "TgpNamespace_IecEffect"
+      ],
+      "observes": [
+        "TgpNamespace_IecEffect_DB"
+      ]
+    }
+  ],
+  "argsFile": [
+    "fixtures/typed-graphical/sources/route-Unit-iec-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-iec-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Unit-iec-effect-after.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-iec-effect-after.scl"
+  ],
+  "command": [
+    "python",
+    "-B",
+    "scripts/capture_typed_routes_owned.py",
+    "@artifacts/cap-iec-effect.args",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/cap-iec-effect",
+    "--archive",
+    "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "--sha256",
+    "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+    "--modify",
+    "route-Unit-iec-effect-after.scl:TgpUnit_IecEffect",
+    "--observe",
+    "route-Unit-iec-effect-after.scl:TgpUnit_IecEffect_DB",
+    "--modify",
+    "route-Namespace-iec-effect-after.scl:TgpNamespace_IecEffect",
+    "--observe",
+    "route-Namespace-iec-effect-after.scl:TgpNamespace_IecEffect_DB"
+  ],
+  "afterCapture": [
+    "scripts/extract_typed_instance_effects.py <capture> <capture> --iec --route softwareUnit --prefix TgpUnit_ --namespace TiaMcp_UnitA",
+    "scripts/extract_typed_instance_effects.py <capture> <capture> --iec --route namespace --prefix TgpNamespace_ --namespace TiaMcp_UnitA.Alternate"
+  ]
+}
