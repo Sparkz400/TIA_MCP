@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.36",
-    "catalogSha256": "f4ad35ab374e63dde5d306ae85a4f67afd8d1d91b772baff3c12bfe31ae3c1f8",
+    "catalogSha256": "923b428af45cbcad237bf2b13ed0fe0bd405ad1494447d193169dbbcaa2a4354",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -4632,7 +4632,8 @@
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
-        "local.library_unit_relations.20261027"
+        "local.library_unit_relations.20261027",
+        "local.library.native-traversal.20261027"
       ],
       "cells": [
         {
@@ -4669,7 +4670,8 @@
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
-        "local.library_unit_relations.20261027"
+        "local.library_unit_relations.20261027",
+        "local.library.native-traversal.20261027"
       ],
       "cells": [
         {
@@ -16364,6 +16366,21 @@
         "artifacts/object-model-expanded.json",
         "artifacts/object-model-expanded-tag-name-collision.json"
       ]
+    },
+    {
+      "id": "local.library.native-traversal.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9da66939f90d5f0976d0fdef4cc44f7d8c4f529b",
+      "retained": [
+        {
+          "path": "evidence/local.library.native-traversal.20261027.json",
+          "sha256": "47c959cfaf7232654fc7c44578236570ff045ddd3886253602237205e99193aa"
+        }
+      ],
+      "notRetained": []
     },
     {
       "id": "local.library_compatibility.20261027",
