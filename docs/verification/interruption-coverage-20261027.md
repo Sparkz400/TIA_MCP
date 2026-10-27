@@ -39,8 +39,14 @@ The trusted reconciler and its proof rules are described in
   while held) and an independent fresh read of the original project.
   `scripts/test_qualify_interruption.py` keeps every catalog change kind mapped to a
   route and the kind sets equal to the worker's.
+- **Native run.** All 15 cases passed in one batch at `e44f77e`
+  (`local.engineering.interruption-matrix.20261027`). The only rejected tool calls
+  are the expected `ResourceBusy` checkpoint retrievals of held admissions.
 
 ## Interruption points of `change_apply`
+
+Each row passed natively for `source_upsert`, `hardware_plug` and `to_create`
+(`local.engineering.interruption-matrix.20261027`).
 
 | Point | Trigger (journal) | Interruption | Exact outcome | Original project |
 | --- | --- | --- | --- | --- |
@@ -59,9 +65,9 @@ until a human decides. Nothing is ever replayed.
 
 | Route | Kinds | Representative | Status |
 | --- | --- | --- | --- |
-| Project fingerprint | `source_upsert`, `type_source_upsert`, `block_import_xml`, `plc_type_import_xml`, `tag_table_import_xml`, `block_rename`, `block_delete`, `graphical_operand_set`, `graphical_network_patch`, `graphical_network_insert`, `graphical_typed_edit`, `call_parameter_set`, `call_connection_set`, `type_rename`, `type_delete`, `tag_delete`, `constant_delete`, `group_create`, `group_rename`, `group_delete`, `hardware_add`, `hardware_delete`, `safety_import_xml`, `project_simulation_enable`, `plc_compile` | `source_upsert` | **qualified** at `ckpt`, `mut`, `host`, cancellation and restore ([24 October](admission-reconciliation-20261024.md#native-qualification)); `comp`, `save` and checkpoint recovery **prepared** (`su-*`) |
-| Project + configured hardware | `hardware_plug`, `hardware_move`, `hardware_address_set`, `hardware_channel_attributes`, `hardware_cpu_memory_bytes`, `network_io_assign` | `hardware_plug` | **prepared** (`hw-*`); the remote-I/O route's own checkpoint restore is qualified (`local.remote-io.lifecycle.20261024`) |
-| Target-dependent | `to_create`, `to_parameters`, `to_delete`, `tag_set`, `constant_set`, `hardware_attributes`, `network_configure` | `to_create` | **prepared** (`to-*`): unsaved interruption now releases; **refused** after a save or on transport loss — the outcome fingerprint needs prepared in-memory targets that a fresh session cannot rebuild, so the admission stays held for a human decision |
+| Project fingerprint | `source_upsert`, `type_source_upsert`, `block_import_xml`, `plc_type_import_xml`, `tag_table_import_xml`, `block_rename`, `block_delete`, `graphical_operand_set`, `graphical_network_patch`, `graphical_network_insert`, `graphical_typed_edit`, `call_parameter_set`, `call_connection_set`, `type_rename`, `type_delete`, `tag_delete`, `constant_delete`, `group_create`, `group_rename`, `group_delete`, `hardware_add`, `hardware_delete`, `safety_import_xml`, `project_simulation_enable`, `plc_compile` | `source_upsert` | **qualified** at all five points with checkpoint recovery (`su-*`); cancellation and restore on [24 October](admission-reconciliation-20261024.md#native-qualification) |
+| Project + configured hardware | `hardware_plug`, `hardware_move`, `hardware_address_set`, `hardware_channel_attributes`, `hardware_cpu_memory_bytes`, `network_io_assign` | `hardware_plug` | **qualified** at all five points with checkpoint recovery (`hw-*`); the remote-I/O route's own checkpoint restore is qualified (`local.remote-io.lifecycle.20261024`) |
+| Target-dependent | `to_create`, `to_parameters`, `to_delete`, `tag_set`, `constant_set`, `hardware_attributes`, `network_configure` | `to_create` | **qualified** (`to-*`): unsaved interruption releases with checkpoint recovery; **refused** (qualified as held) after a save or on transport loss — the outcome fingerprint needs prepared in-memory targets that a fresh session cannot rebuild, so the admission stays held for a human decision |
 | | `hmi_engineering` | — | **refused**: no eligible target (catalog `unavailable_target`); same held rule as above |
 
 Within a route, kinds differ only in the native call between `applying` and
