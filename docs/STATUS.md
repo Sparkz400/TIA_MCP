@@ -1,5 +1,18 @@
 # Current status
 
+**Project texts, explorer libraries and ports, composite capture, OPC UA engineering changes, PLC alarm imports — 27 October 2026:** All compiled against the V21 PublicAPI; none run natively. Everything is catalog `partial`/`unverified`.
+- **Project texts:**
+  - `project_text_export` exports per target culture, or one workbook for explicit owners. Filtered category exports are always compared with a full export by native key, and leaked or dropped rows are reported.
+  - The native import route now accepts any active culture pair, several PLC owners and approved source-text mode. Production import stays disabled.
+- **Explorer:** unscoped captures add project-library nodes with `libraryVersion` edges from matching instance GUIDs. A selected port adds `connectedPort` edges.
+- **Composite engineering:**
+  - `composite_engineering_capture` builds a review phase from `cax_export`, `connection_inspect`, `drive_observe` and `technology_read`, marking each native, unavailable or failed.
+  - `composite_engineering_rebind_plan` proposes `to_connect` payloads for broken technology-object connections. It applies nothing.
+- **OPC UA:** prepared kinds `opcua_server_interface_import`/`delete`/`enable`, `opcua_reference_namespace_import`/`delete` and `opcua_role_mapping_set`. The server-interface group enters the fingerprint.
+- **PLC alarms:** prepared kinds `plc_alarm_text_list_import`, `plc_alarm_instance_text_import`, `plc_supervision_import`, `plc_alarm_class_import` and `plc_supervision_settings_import`. Their fingerprint hashes a fresh native export.
+
+[Engineering workflows](guides/engineering-workflows.md), [project explorer](guides/project-explorer.md), [OPC UA](reference/opc-ua-workflow.md), [translation import](reference/translation-native-import.md).
+
 **Unified and Classic HMI, online compare and upload, Test Suite application tests, block protection — 27 October 2026:** All implemented and compiled against the V21 PublicAPI. Nothing has run natively; all of it is catalog `partial`/`unverified`, or `blocked` where noted.
 - **Unified HMI:** `hmi_inspect` gains an opt-in `model` section: one bounded typed walker over 20 Unified `HmiSoftware` collections. The Unified preservation manifest now compares that walker's per-object hashes, not only tag tables. V21 still has no `Screen.Export`, so the manifest remains incomplete, and every HMI write stays gated.
 - **Classic HMI:** `hmi_engineering` gains a gated `classic_xml_import` operation for screens, templates, popups, slide-ins, global elements, overview, tag tables, text/graphic lists, VB scripts, cycles and connections. The re-export must equal the supplied document. The Classic preservation capture no longer reads `Name`/`Folders` on slide-ins, which lack them.
