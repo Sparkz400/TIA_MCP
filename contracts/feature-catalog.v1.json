@@ -12284,7 +12284,8 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "2026-10-27: forceTable=true reads the exact force table with typed Name/Address/DisplayFormat/ForceValue/ForceIntention rows; every force table in the manifest now carries its typed rows and consistency."
         ]
       },
       "qualification": {
@@ -12330,7 +12331,8 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "2026-10-27: editKind=field (Name, Address, DisplayFormat, ModifyValue) joins the qualification-only expanded edits, and forceTable=true targets the existing force table; see watch_table_force_document_edit."
         ]
       },
       "qualification": {
@@ -12347,6 +12349,65 @@
         "TIA V21 authorized user and exact offline target for native reads",
         "One configured artifact store for cooperating Hosts",
         "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_force_document_edit",
+      "domain": "watch_tables",
+      "title": "Prepare reviewed offline force-table document edits",
+      "mcpTools": [
+        "watch_table_read",
+        "watch_table_prepare",
+        "watch_table_apply",
+        "watch_table_verify_reopen",
+        "watch_table_recover",
+        "watch_table_reconcile_recovery",
+        "watch_table_reconcile_interrupted"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableGroup.ForceTables, M:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTableComposition.Import(System.IO.FileInfo,Siemens.Engineering.ImportOptions) with ImportOptions.Override, M:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTable.Export(System.IO.FileInfo,Siemens.Engineering.ExportOptions) with WithDefaults, P:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTable.Entries/IsConsistent/Name and read-only P:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTableEntry.Name/Address/DisplayFormat/ForceValue/ForceIntention; durable checkpoint/journal state is a Host service, not a vendor transaction.",
+          "Installed metadata has no setter on any PlcForceTableEntry property or on PlcForceTable.Name, and no force-table Create or Delete, so entries change only through the reviewed exported document and Import(Override). The installed metadata does not state that a PLC has exactly one force table; the manual does."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "2026-10-27: watch_table_prepare with forceTable=true edits the existing force table document through the watch preserving editor: field (Name, Address, DisplayFormat, ForceValue), comment (existing culture), clone, delete and reorder, one reviewed edit per operation. Only fields already present as plain text in the captured export can be set; no row grammar is synthesized.",
+          "ForceIntention is never set. A captured or imported force table with any typed or serialized ForceIntention other than false refuses preparation, import and save. Nothing is forced, monitored or written online.",
+          "Typed/XML readback compares a field the export omits as empty, so rows with omitted fields (for example an Undef display format) are refused until a native profile settles the omission rules. Document ID reindexing is not offered for force rows.",
+          "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
+          "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
+          "Worker-owned saved offline scratch only; prepare and apply are refused outside the isolated qualification harness, like the other expanded document edits, until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires --component-qualification and --watch-qualification (allowUnqualifiedDocumentEdits); production Hosts refuse force-table edits with UnsupportedProfile until native lifecycle evidence exists."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch",
+        "An existing force table in the selected PLC whose rows are all unselected (ForceIntention false)"
       ],
       "acceptanceCriteria": [
         "AC-identity",

@@ -218,7 +218,8 @@ internal static class ProductionRecoveryChecks
                     rows = Enumerable.Range(0, new WatchTableDocument(current).Count).Select(i => new {
                         kind = new WatchTableDocument(current).RowKind(i), name = new WatchTableDocument(current).Field(i, "Name"),
                         address = new WatchTableDocument(current).Field(i, "Address"), displayFormat = new WatchTableDocument(current).Field(i, "DisplayFormat"),
-                        modifyValue = new WatchTableDocument(current).Field(i, "ModifyValue") }).ToArray() } }, BridgeProtocol.Json)!.AsObject();
+                        modifyValue = new WatchTableDocument(current).Field(i, "ModifyValue"), forceValue = new WatchTableDocument(current).Field(i, "ForceValue"),
+                        forceIntention = false }).ToArray() } }, BridgeProtocol.Json)!.AsObject();
             return TransformSnapshot?.Invoke(snapshot) ?? snapshot;
         }
     }

@@ -1990,6 +1990,12 @@
       ]
     },
     {
+      "featureId": "watch_table_force_document_edit",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
       "featureId": "watch_table_apply",
       "obligations": [
         "D02"
