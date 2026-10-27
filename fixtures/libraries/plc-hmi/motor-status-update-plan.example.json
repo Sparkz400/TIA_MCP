@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "action": "plc_hmi_update_plan",
+  "planOnly": true,
+  "source": {
+    "libraryId": "replace-with-session-library-id",
+    "revision": "replace-with-current-revision"
+  },
+  "selection": [
+    {
+      "typeGuid": "cccccccc-3333-3333-3333-333333333333",
+      "versionGuid": "eeeeeeee-5555-5555-5555-555555555555"
+    }
+  ],
+  "target": {
+    "projectName": "OwnedMotorFixture",
+    "plcPath": "/devices/PLC_1/DeviceItems/CPU"
+  },
+  "hmi": {
+    "family": "unified",
+    "profile": "unified-comfort"
+  },
+  "expectedCompilerOutcomes": {
+    "plc": {
+      "errors": 0,
+      "maxWarnings": 0
+    },
+    "hmi": {
+      "errors": 0,
+      "maxWarnings": 0
+    }
+  }
+}
