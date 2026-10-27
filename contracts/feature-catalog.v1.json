@@ -14795,6 +14795,199 @@
       ]
     },
     {
+      "featureId": "connection_inspect",
+      "domain": "connections",
+      "title": "Inspect configured communication connections and native endpoints",
+      "mcpTools": [
+        "connection_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: DeviceItem.GetService<CommunicationManagement>(), CommunicationManagement.Connections/OwnedBy, Connection.ConnectionType/IsValid/LocalTarget/LocalInterface/PartnerTarget/PartnerInterface/LocalSubnetName/PartnerSubnetName, the typed S7/TCP/UDP/ISO/ISO-on-TCP/FDL/PtP/HMI connection properties, and Node.Parent/NetworkInterface.OwnedBy for interface owners."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Enumerates CommunicationManagement.Connections of all bounded hardware (50000-item lookup, maxItems rows) or one exact hardwarePath; owners are deduplicated by CommunicationManagement.OwnedBy. Which device items expose the service and whether a bilateral connection appears in both owners' tables are not natively observed.",
+          "Typed properties are read by reflection over the public V21 CommunicationConnections members. Endpoint targets and interfaces resolve to hardware paths by native object equality only; unset, unreadable or unresolved endpoints carry an explicit reason.",
+          "reviewSnapshot uses the connection_review snapshot and row shape (id = owner path + /connections/ + LocalConnectionName). Program-created connection descriptions, HMI software connection objects, consumers, resource/capacity rules and runtime communication are not covered."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_create",
+      "domain": "connections",
+      "title": "Create one configured communication connection between exact endpoints",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: CommunicationManagement.Connections and ConnectionComposition.Create<T>(Node localInterface, DeviceItem partnerTarget, Node partnerInterface) for the eight CommunicationConnections types; readback through Connection.ConnectionType/LocalInterface/PartnerTarget/PartnerInterface."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Explicit connectionType (S7Connection, TcpConnection, UdpConnection, IsoConnection, IsoOnTcpConnection, FdlConnection, PtpConnection or HmiConnection), exact owner hardwarePath, local interface node, partner target and partner interface node. Unspecified partners are not supported. Siemens decides type/endpoint compatibility; generated names, IDs and parameters are kept.",
+          "Verifies native type and endpoint equality and that every other connection of the owner reads back unchanged. Partner-side counterparts, program instructions and HMI tags are covered only by the mandatory whole-project device compile; resource/capacity rules are not assessed."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_delete",
+      "domain": "connections",
+      "title": "Delete exactly one configured communication connection",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: CommunicationManagement.Connections and Connection.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exactly one connection of the exact owner by LocalConnectionName and optional LocalConnectionId; missing or ambiguous matches are rejected.",
+          "No dependency scan of program instructions or HMI tags: the mandatory whole-project device compile is the only consumer check. Verifies the owner's remaining connections read back exactly as before; partner-side counterparts are not checked."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_set",
+      "domain": "connections",
+      "title": "Set allowlisted attributes of one configured communication connection",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: Connection.GetAttributeInfos/GetAttribute/SetAttribute with EngineeringAttributeAccessMode on one connection of CommunicationManagement.Connections."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Allowlist LocalActiveEstablishment, PartnerActiveEstablishment, LocalPort, PartnerPort, PartnerAddress, LocalTsap, PartnerTsap, LocalLsap, PartnerLsap; each must also be declared native read/write on the selected connection. Names, IDs and resource IDs are excluded. Whether the typed properties are exposed through the attribute route is not natively observed.",
+          "Native readback of each requested value and unchanged readback of every other connection of the owner. Dependent changes on the selected connection itself are reported, not restricted; partner-side counterparts are covered only by the mandatory device compile."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "db_snapshot_review",
       "domain": "online-diagnostics",
       "title": "Inspect and compare supplied DB snapshot XML",

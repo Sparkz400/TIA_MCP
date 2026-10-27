@@ -125,7 +125,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
@@ -540,6 +540,11 @@ namespace TiaMcp.Openness.V21
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
+                case "connection_create":
+                case "connection_delete":
+                case "connection_set":
+                    ConnectionEdit(change, project, preview);
+                    break;
                 case "hardware_plug":
                 {
                     var item = ChangeHardware(project, payload);
@@ -773,6 +778,11 @@ namespace TiaMcp.Openness.V21
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
                     break;
+                case "connection_create":
+                case "connection_delete":
+                case "connection_set":
+                    ConnectionEdit(change, project, null);
+                    break;
                 case "hardware_delete":
                 {
                     var item = ChangeHardware(project, payload).Item;
@@ -848,7 +858,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1076,22 +1086,22 @@ namespace TiaMcp.Openness.V21
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish complete offline state.");
         }
 
-        private HardwareEntry ChangeHardware(Project project, JObject payload)
+        private HardwareEntry ChangeHardware(Project project, JObject payload, string pathKey = "hardwarePath")
         {
-            string path = ChangeText(payload, "hardwarePath", 4096);
+            string path = ChangeText(payload, pathKey, 4096);
             var budget = new ScanBudget(50000);
             var entry = DeviceItems(project, budget).FirstOrDefault(item => item.Path == path);
-            if (entry == null) throw new BridgeException("HardwareNotFound", "No hardware item matches hardwarePath.");
+            if (entry == null) throw new BridgeException("HardwareNotFound", "No hardware item matches " + pathKey + ".");
             return entry;
         }
 
-        private Node ChangeNode(Project project, JObject payload)
+        private Node ChangeNode(Project project, JObject payload, string pathKey = "hardwarePath", string nameKey = "nodeName")
         {
-            var item = ChangeHardware(project, payload).Item;
+            var item = ChangeHardware(project, payload, pathKey).Item;
             var network = item.GetService<NetworkInterface>() ?? throw new BridgeException("UnsupportedCapability", "Selected hardware item has no network interface service.");
-            string name = payload.Value<string>("nodeName");
+            string name = payload.Value<string>(nameKey);
             var nodes = network.Nodes.Where(node => name == null || node.Name == name).Take(2).ToArray();
-            if (nodes.Length != 1) throw new BridgeException(nodes.Length == 0 ? "NodeNotFound" : "AmbiguousTarget", "Specify an exact nodeName from engineering_read.");
+            if (nodes.Length != 1) throw new BridgeException(nodes.Length == 0 ? "NodeNotFound" : "AmbiguousTarget", "Specify an exact " + nameKey + " from engineering_read.");
             return nodes[0];
         }
 

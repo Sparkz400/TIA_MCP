@@ -171,6 +171,12 @@ namespace TiaMcp.Openness.V21
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
                 AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
                 AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; shared-device/multi-controller assignments are rejected.");
+                var communication = ProbeCapabilityService<CommunicationManagement>(hardware, "hardware", probes);
+                AddTargetFeature(features, "connection_inspect", communication, "partial", "Configured CommunicationManagement connections of this owner with typed properties and native endpoint owners; no consumers, resources or runtime communication.");
+                AddTargetFeature(features, "change.connection_create", communication, "partial", "One connection of an explicit V21 ConnectionType between exact local/partner nodes and partner target; type/endpoint readback, owner-table preservation, device compile and checkpoint required.");
+                AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
+                AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
+                metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
