@@ -179,7 +179,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "co_", "V21 library compatibility: unsaved edits, inherited inconsistent types, V13 libraries and S7-1200 targets", [
-        "No V14-V20 library exists on this PC; upgrades of those versions are covered by local.library_upgrades.20261024 (V14 SP1-V18) and V19/V20 stay open.",
+        "No V20 library input exists on this PC; V20 upgrades stay open. V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) are covered separately.",
         "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
         "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced.",
         "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); firmware-version mismatches are not exercised.",
