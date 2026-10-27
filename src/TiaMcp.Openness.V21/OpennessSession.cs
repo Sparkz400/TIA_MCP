@@ -155,6 +155,7 @@ namespace TiaMcp.Openness.V21
                 case "library_list": return LibraryList(arguments);
                 case "library_query": return LibraryQuery(arguments);
                 case "library_compare": return LibraryCompare(arguments);
+                case "library_update_check": return LibraryUpdateCheck(arguments);
                 case "library_export": return LibraryExport(arguments);
                 case "library_close": return LibraryClose(arguments);
                 case "library_capabilities": return LibraryCapabilities(arguments);

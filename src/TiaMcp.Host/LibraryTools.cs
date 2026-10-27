@@ -82,6 +82,10 @@ public sealed partial class TiaTools
     [Description("Compare two native libraries using leftLibraryId/rightLibraryId, or exact selected versions using left/right objects with typeGuid/versionGuid. Returns bounded Siemens comparison results. Comparison does not establish runtime compatibility.")]
     public Task<CallToolResult> LibraryCompare(JsonElement request, CancellationToken cancellationToken) => Call("library_compare", ObjectArguments(request), cancellationToken);
 
+    [McpServerTool(Name = "library_update_check", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Run the native Siemens update check of libraryId against an open project (projectName) and return its log messages depth-first with depth, description and message parts. mode outOfDateOnly (default) or outOfDateAndUpToDate; maxItems 1..1000 (default 200), truncation is reported in completeness. Performs no update; use change_prepare library_update_project or library_harmonize to change the project.")]
+    public Task<CallToolResult> LibraryUpdateCheck(JsonElement request, CancellationToken cancellationToken) => Call("library_update_check", ObjectArguments(request), cancellationToken);
+
     [McpServerTool(Name = "library_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Export the exact project-library typeGuid/versionGuid as native documents into a unique managed directory, with SHA-256 manifest and version info. Requires libraryId, typeGuid, versionGuid and one supportedExportFormats value as format. No native library/project modification; global versions must first be copied to a project library. Returns documentDirectory and documentName for prepared authoring.")]
     public Task<CallToolResult> LibraryExport(JsonElement request, CancellationToken cancellationToken)
