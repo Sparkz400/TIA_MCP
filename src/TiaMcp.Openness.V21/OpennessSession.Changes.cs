@@ -127,7 +127,7 @@ namespace TiaMcp.Openness.V21
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
             if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
-                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Contains(change.Kind)))
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Concat(BlockProtectionKinds).Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
@@ -140,6 +140,8 @@ namespace TiaMcp.Openness.V21
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
+                // An unopenable credential must refuse before the checkpoint save, not after it.
+                if (BlockProtectionKinds.Contains(change.Kind)) OpenBlockProtectionCredential(change.Payload, "credential").Dispose();
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;
@@ -538,6 +540,11 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Callers, instance references and interfaces may be affected. Compile the complete PLC after applying.");
                     break;
                 }
+                case "block_protect":
+                case "block_unprotect":
+                case "block_write_protection_set":
+                    PrepareBlockProtection(change, preview);
+                    break;
                 case "hardware_add":
                 {
                     string identifier = ChangeText(payload, "typeIdentifier", 256);
@@ -812,6 +819,11 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("MutationVerificationFailed", "Block rename did not produce the expected names.");
                     break;
                 }
+                case "block_protect":
+                case "block_unprotect":
+                case "block_write_protection_set":
+                    ApplyBlockProtection(change);
+                    break;
                 case "hardware_add":
                 {
                     var device = project.Devices.CreateWithItem(payload.Value<string>("typeIdentifier"), payload.Value<string>("itemName"), payload.Value<string>("deviceName"));
