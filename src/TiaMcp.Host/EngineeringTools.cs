@@ -123,7 +123,7 @@ public sealed partial class TiaTools
     [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply. Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
-        object request = ObjectArguments(payload);
+        object request = kind == "cax_import" ? CaxImportPayload(payload) : ObjectArguments(payload);
         // TiaMcp.Graph targets net10 and cannot load in the net48 worker, so GRAPH documents are validated here before native preparation.
         if (kind == "graph_import")
             try { request = new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).ImportPayload(payload); }

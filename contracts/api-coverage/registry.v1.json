@@ -3097,6 +3097,18 @@
         "D17",
         "C04"
       ]
+    },
+    {
+      "featureId": "change.cax_import",
+      "obligations": [
+        "D05"
+      ]
+    },
+    {
+      "featureId": "cax_export",
+      "obligations": [
+        "D05"
+      ]
     }
   ],
   "manualResiduals": [

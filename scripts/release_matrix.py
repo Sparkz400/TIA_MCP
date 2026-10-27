@@ -20,7 +20,7 @@ PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simul
 
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
-    "access_inspect": ["X03", "D12"], "access_review": ["X03"], "certificate_inspect": ["X03"], "change.graph_import": ["X06"], "plc_alarm_inspect": ["D11", "L04"], "web_inspect": ["D12"], "addin_": ["X04"], "automationml_": ["D05"],
+    "access_inspect": ["X03", "D12"], "access_review": ["X03"], "certificate_inspect": ["X03"], "change.graph_import": ["X06"], "plc_alarm_inspect": ["D11", "L04"], "web_inspect": ["D12"], "addin_": ["X04"], "automationml_": ["D05"], "cax_export": ["D05"], "change.cax_import": ["D05"],
     "change.block_attributes_set": ["X11"], "change.block_number_set": ["X11"], "change.connection_": ["D08"], "change.constant_create": ["X11"],
     "change.project_attributes_set": ["X01"], "change.project_languages_set": ["X01", "D03"], "change.tag_create": ["X11"],
     "change.hardware_cpu_memory_bytes": ["X10"], "change.hardware_port_": ["X10"], "change.hardware_replace": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_inspect": ["D08"], "connection_review": ["D08"],

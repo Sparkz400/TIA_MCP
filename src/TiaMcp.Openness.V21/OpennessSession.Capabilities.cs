@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.Cax;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Download;
@@ -56,6 +57,10 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
                 AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
                 AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");
+                var cax = ProbeCapabilityService<CaxProvider>(project, "project", probes);
+                AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
+                AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
+                    blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
             }
 
             if (selected.Plc != null)

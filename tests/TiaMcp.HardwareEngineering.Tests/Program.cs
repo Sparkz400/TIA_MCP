@@ -62,6 +62,16 @@ Check("plug physical rack with logical sibling", "hardware_plug", plug, rows => 
 Check("wrong physical container rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["containerPath"] = "/another/rack"; rows.Add(row); }, false);
 Check("wrong plug type rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["typeIdentifier"] = "Wrong"; rows.Add(row); }, false);
 Check("unrelated addition rejected", "hardware_plug", plug, rows => { rows.Add(Row(station + "/items/DO", 3)); rows.Add(Row(station + "/items/Stranger", 4)); }, false);
+var retain = new JObject { ["importOption"] = "RetainTiaDevice" };
+const string parked = "/projects/P/groups/Parking/devices/Remote/items/Rack";
+Check("CAx import adds devices", "cax_import", retain, rows => rows.Add(Row(parked)), true);
+Check("CAx retain rejects a changed existing row", "cax_import", retain, rows => rows[0]["attributes"]["Comment"] = "imported", false);
+Check("CAx parking lot rejects a removed existing row", "cax_import", new JObject { ["importOption"] = "MoveToParkingLot" }, rows => rows.RemoveAt(1), false);
+Check("CAx overwrite is recorded, not matched", "cax_import", new JObject { ["importOption"] = "OverwriteTiaDevice" }, rows => { rows.RemoveAt(1); rows[0]["attributes"]["Comment"] = "imported"; }, true);
+var caxAfter = Baseline(); caxAfter.RemoveAt(1); caxAfter[0]["attributes"]["Comment"] = "imported"; caxAfter.Add(Row(parked));
+if (HardwareEngineeringRules.Difference(Baseline(), caxAfter).ToString() != new JObject { ["added"] = new JArray(parked), ["removed"] = new JArray(module), ["changed"] = new JArray(station) }.ToString())
+    throw new Exception("CAx hardware difference differs.");
+count++; Console.WriteLine("PASS CAx hardware difference by exact path");
 var assign = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 0, ["controllerHardwarePath"] = controller, ["controllerIndex"] = 0, ["addressControllerOwnerPath"] = controller };
 void Assigned(JArray rows) { rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray(controller); }
 Check("exact assignment plus ownership", "network_io_assign", assign, Assigned, true);

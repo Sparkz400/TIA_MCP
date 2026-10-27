@@ -125,6 +125,7 @@ namespace TiaMcp.Openness.V21
                 case "hardware_inspect": return HardwareInspect(arguments);
                 case "connection_inspect": return ConnectionInspect(arguments);
                 case "hardware_gsd_export": return HardwareGsdExport(arguments);
+                case "cax_export": return CaxExport(arguments);
                 case "technology_read": return TechnologyRead(arguments);
                 case "plc_alarm_inspect": return PlcAlarmInspect(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
