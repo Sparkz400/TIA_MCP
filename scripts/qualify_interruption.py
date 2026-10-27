@@ -20,6 +20,7 @@ import subprocess
 import time
 import uuid
 
+from qualify_hardware_families import FAMILIES, candidates
 from qualify_reliability import ReliabilityClient, decoded, require, terminate_owned_test_worker
 from smoke_mcp import ROOT
 
@@ -49,6 +50,94 @@ SCENARIOS = {
     # A completed two-checkpoint recovery, then both recovered copies reopened in a fresh Host.
     "library-restore-complete": ("change_restore", "none", None, None),
 }
+
+# Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
+# Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
+# Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
+TARGET_KINDS = {"hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set"}
+HARDWARE_RULE_KINDS = {"hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes"}
+PROBE, HW_NAME, TO_NAME = "LaneEProbe", "TiaMcp_DI_Fixture", "TiaMcp_PID_Fixture"
+
+
+def reconciliation_class(kind):
+    """The reconciler route a change kind takes; scripts/test_qualify_interruption.py keeps every catalog kind mapped."""
+    if kind.startswith("library_"):
+        return "library"
+    if kind in TARGET_KINDS or kind.startswith("to_"):
+        return "target"
+    return "hardware" if kind in HARDWARE_RULE_KINDS else "software"
+
+
+def stages(journal):
+    return journal.get("stages") or []
+
+
+# point: (journal trigger, interruption mode)
+POINTS = {
+    "ckpt": (lambda j: j.get("state") == "checkpointing", "worker"),
+    "mut": (lambda j: j.get("state") == "applying" and "mutation_applied" not in stages(j), "worker"),
+    "comp": (lambda j: j.get("state") == "applying" and "mutation_applied" in stages(j) and "changed_project_saved" not in stages(j), "worker"),
+    "save": (lambda j: j.get("state") == "applying" and "changed_project_saved" in stages(j), "worker"),
+    "host": (lambda j: j.get("state") == "applying", "host"),
+}
+
+
+def expected_outcome(kind, point):
+    """Exact reconciliation and the effect an independent fresh read must find in the original project."""
+    if point == "ckpt":
+        return {"released": False, "effectPersisted": False}  # No complete hash-recorded checkpoint.
+    if point in ("mut", "comp"):
+        return {"released": True, "project": "unchanged", "effectPersisted": False}  # Never saved after the checkpoint.
+    if point == "save":
+        return {"released": False, "effectPersisted": True}  # Saved, but no applied outcome was journaled.
+    # Transport loss: the worker finishes and journals the applied outcome; target kinds cannot recompute it.
+    if reconciliation_class(kind) == "target":
+        return {"released": False, "effectPersisted": True}
+    return {"released": True, "project": "verifiedApplied", "effectPersisted": True}
+
+
+def prepare_source(scenario, client):
+    return scenario.prepare(client)
+
+
+def prepare_hardware(scenario, client):
+    rails = [i for i in client.tool("project_inventory", {"maxItems": 2000})["hardware"]
+             if i["positionNumber"] == 0 and i["path"].count("/items/") == 1]
+    require(len(rails) == 1, "Owned fixture requires one central rail")
+    catalog = client.tool("hardware_catalog_search", {"filter": FAMILIES["DI"]["filter"], "maxItems": 500})
+    for entry in candidates(catalog, "DI"):
+        prepared = decoded(client.raw_tool("change_prepare", {"kind": "hardware_plug", "payload": {
+            "hardwarePath": rails[0]["path"], "typeIdentifier": entry["typeIdentifier"], "name": HW_NAME, "positionNumber": 2}}))
+        if prepared.get("changeId"):
+            return scenario.step("change_prepare hardware_plug", prepared)
+        require(prepared.get("error", {}).get("code") == "IncompatibleHardware", f"Unexpected hardware preparation failure: {prepared}")
+    raise RuntimeError("No compatible central DI module; no type identifier is guessed")
+
+
+def prepare_technology(scenario, client):
+    example = client.tool("engineering_read", {"selectors": {"scope": "technology", "maxItems": 2000}})["creationMetadata"]["documentedExample"]
+    return scenario.step("change_prepare to_create", client.tool("change_prepare", {"kind": "to_create", "payload": {
+        "name": TO_NAME, "typeIdentifier": example["typeIdentifier"], "version": example["version"]}}))
+
+
+def source_present(client):
+    return PROBE in {b["name"] for b in client.tool("project_inventory", {"maxItems": 1000})["blocks"]}
+
+
+def hardware_present(client):
+    return HW_NAME in {i["name"] for i in client.tool("project_inventory", {"maxItems": 2000})["hardware"]}
+
+
+def technology_present(client):
+    read = client.tool("engineering_read", {"selectors": {"scope": "technology", "maxItems": 2000}})
+    return TO_NAME in {o["name"] for o in read["technologyObjects"]}
+
+
+# Short scenario prefix (TIA limits project paths): kind, fixture, independent effect oracle.
+KINDS = {"su": ("source_upsert", prepare_source, source_present),
+         "hw": ("hardware_plug", prepare_hardware, hardware_present),
+         "to": ("to_create", prepare_technology, technology_present)}
+KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix in KINDS for point in POINTS}
 
 
 def alive(pid):
@@ -177,6 +266,76 @@ class Scenario:
             terminate_owned_test_worker(tia_pid, TIA_EXE)
         return {"terminated": "host", "workerPid": workers[0], "workerExitedAfterHostLoss": worker_exited,
                 "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited}
+
+    def run_kind(self, prefix, point):
+        """Interrupt one change kind at one journal boundary, reconcile once, then check the exact outcome,
+        no replay and recovery from the checkpoint against independent fresh reads."""
+        kind, prepare, present = KINDS[prefix]
+        trigger, mode = POINTS[point]
+        expected = self.report["expected"] = expected_outcome(kind, point)
+        self.report.update({"kind": kind, "point": point, "reconciliationClass": reconciliation_class(kind)})
+        client = self.client()
+        try:
+            client.initialize()
+            tia = self.start(client)
+            self.step("tia_create_scratch", client.tool("tia_create_scratch"))
+            require(not present(client), "The fixture effect must be absent before the change")
+            prepared = prepare(self, client)
+            project = pathlib.Path(prepared["preview"]["project"]["path"])
+            journal = pathlib.Path(prepared["journalPath"])
+            request = client.begin("tools/call", {"name": "change_apply", "arguments": self.apply_arguments(prepared)})
+
+            def reached():
+                current = read_json(journal) or {}
+                require(current.get("state") not in ("applied", "recovery_required"),
+                        "The apply ended before the interruption boundary: " + str(current.get("state")))
+                return trigger(current)
+            wait_until(reached, "Journal never reached the interruption boundary", 900, 0.005)
+            reconciled = self.finish(client, request, tia, "change_apply", mode, journal, "released" if expected["released"] else "held")
+        finally:
+            client.close()
+        self.report["passed"] = False  # finish() checked reconciliation only; recovery and the oracle follow.
+        rows = {r["effect"]: r for r in reconciled["dispositions"]}
+        if "project" in expected:
+            require(rows["checkpointMutationCompileSave"]["disposition"] == expected["project"], f"Expected project {expected['project']}")
+        final = read_json(journal)
+        archive, archive_hash = final.get("recoveryArchive"), final.get("recoveryArchiveSha256")
+        every = admissions(self.root, "change_apply")
+        unresolved = [a["id"] for a in every if a["state"] in ("dispatchIntent", "outcomeUnknown")]
+        self.step("admissions after reconcile", {"unresolved": unresolved, "total": len(every)})
+        require(len(every) == 1, "Reconciliation must not dispatch another apply")
+        require(len(unresolved) == (0 if expected["released"] else 1), "A held admission stays unresolved; a released one is reconciled")
+        # Recovery from the checkpoint: retrieval of the hash-recorded archive into a new directory. A held
+        # admission keeps reserving its checkpoint, so retrieval is refused until a human decides.
+        recovery = self.client()
+        try:
+            recovery.initialize()
+            self.start(recovery, "recovery tia_start")
+            if archive_hash:
+                retrieved = decoded(recovery.raw_tool("project_retrieve", {"archivePath": archive, "expectedSha256": archive_hash}))
+                self.step("project_retrieve checkpoint", retrieved)
+                if expected["released"]:
+                    require("error" not in retrieved, "A released admission must allow checkpoint recovery")
+                    require(not present(recovery), "The recovered checkpoint must not contain the change")
+                    recovery.tool("tia_detach")
+                    recovery.close()
+                    recovery = self.client()
+                    recovery.initialize()
+                    self.start(recovery, "original tia_start")
+                else:
+                    require(retrieved.get("error", {}).get("code") == "ResourceBusy", "A held admission must keep its checkpoint reserved")
+            else:
+                require(point == "ckpt", "Only a checkpoint-stage kill may leave no recorded archive")
+            self.step("project_open original", recovery.tool("project_open", {"path": str(project)}))
+            persisted = self.step("effect persisted in original", present(recovery))
+            recovery.tool("tia_detach")
+        finally:
+            recovery.close()
+        require(persisted == expected["effectPersisted"], f"Independent read found effectPersisted={persisted}")
+        self.report.update({"effectPersisted": persisted, "checkpointRecovered": bool(archive_hash) and expected["released"],
+                            "journalStagesAtEnd": stages(final), "journalStateAtEnd": final.get("state")})
+        self.report["passed"] = True
+        return self.report
 
     def run(self, operation, mode, trigger, expected):
         if self.name.startswith("library-"):
@@ -463,7 +622,7 @@ def main():
     parser.add_argument("--host", type=pathlib.Path, default=ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=pathlib.Path, default=ROOT / "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe")
     parser.add_argument("--base", type=pathlib.Path, required=True, help="Short new artifact base; TIA limits project path length.")
-    parser.add_argument("--scenarios", nargs="*", choices=list(SCENARIOS), default=[])
+    parser.add_argument("--scenarios", nargs="*", choices=list(SCENARIOS) + list(KIND_SCENARIOS), default=[])
     parser.add_argument("--existing", nargs=2, action="append", default=[], metavar=("ARTIFACTS", "ADMISSION_ID"))
     parser.add_argument("--report", type=pathlib.Path, required=True)
     args = parser.parse_args()
@@ -478,7 +637,10 @@ def main():
         print("RUN " + name, flush=True)
         scenario = Scenario(name, host, worker, args.base)
         try:
-            scenario.run(*SCENARIOS[name])
+            if name in KIND_SCENARIOS:
+                scenario.run_kind(*KIND_SCENARIOS[name])
+            else:
+                scenario.run(*SCENARIOS[name])
         except Exception as error:
             scenario.report["failure"] = str(error)
         report["cases"].append(scenario.report)
