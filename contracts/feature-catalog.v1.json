@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.29",
+  "catalogVersion": "0.4.30",
   "targetTiaVersions": [
     21
   ],
@@ -2316,6 +2316,148 @@
       "limitations": [
         "One small fixture: one external encoder connected to one TM PosInput channel and one SoftwareUnit relation between two empty units. Axis, measuring-input and output-cam connections, tag/block/address targets, NonUnitDB and TODB relations and unresolved/ambiguous names were not exercised natively (they keep their offline oracle tests).",
         "Unit relations and the TO connection are authored by the native UnitSeeder fixture tool, not by an MCP route; neither has a prepared change kind. Configured associations only, never cables, ports or physical topology; single-machine timings are not a latency guarantee."
+      ]
+    },
+    {
+      "id": "local.hostonly.vci.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_vci_host_mcp.py on the Release Host with real Git: 72 stdio checks across several Host lifetimes. Every VCI response validates against its JSON contract; exact BOM/CRLF/binary/Unicode bytes, empty files, explicit deletion, parent history, branches, package capture/compare, old-revision materialization, wrong/stale review refusal, an owned Host interruption after the durable dispatch callback, fresh-Host replay refusal and receipt-only reconciliation."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.vci.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native VCI workspace, mapping, export/import, project reconstruction or remote Git publication."
+      ]
+    },
+    {
+      "id": "local.hostonly.graph.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_graph_host_mcp.py on the Release Host: 43 stdio checks. GRAPH v6 inspect/compare/reopen/report pages/artifact reads/list against the JSON contract, exact source download, tampered-record refusal that survives a Host restart, restored-source revalidation, incomplete-publication visibility and no native engineering operation."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.graph.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native GRAPH schema, import, compilation, rendering or runtime behavior."
+      ]
+    },
+    {
+      "id": "local.hostonly.automationml.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_automationml_host_mcp.py on the Release Host: 69 stdio checks. CAEX 2.15/3.0 inspect/compare/reopen/report pages/artifact reads/list against pinned XSDs and the JSON contract, exact retained bytes, plain text/CDATA/absent/empty distinctions, ID/name collisions, tamper refusal; nativeQualified, importabilityCertified and impactScopeComplete stay false."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.automationml.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native AML import/export, inheritance expansion, device identity, catalog, compile or runtime."
+      ]
+    },
+    {
+      "id": "local.hostonly.opcua.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_opcua_host_mcp.py on the Release Host: 53 stdio checks. NodeSet inspect/compare/dependencies/dependency compare/report pages/reopen/list/artifact reads against the JSON contract, stale consumer refusal, bounded pages over 4,000 references, upload retries and no target probe."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.opcua.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Offline NodeSet documents only; no native OPC UA engineering, endpoint, runtime, security or compatibility certification."
+      ]
+    },
+    {
+      "id": "local.hostonly.translation.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_translation_host_mcp.py on the Release Host: offline capture/inspect/prepare/review pages/digest-bound approval/candidate/reconcile/reopen/list/artifact reads, blocked batches, the instance-inheritance alarm-text policy and normal Host exits; native import is not allowed."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.translation.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Synthetic workbook profiles; no Siemens export/import, language activation, category leakage resolution or translation_native_* route."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostics.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/qualify_trace_diagnostics_offline.py on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests (47/47 groups): saved-review import, diagnostic case/watch plans, manual trace handoff, v1/v2 measurement import with quality and clock epochs, analysis, comparison, report export, replanning and offline readback checks, contract validation of every envelope, stale/changed-artifact and tamper refusals with exact restoration."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostics.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, SIMATIC AX or device is involved and none is qualified.",
+        "Synthetic and independently authored measurements and reviews; no native trace acquisition, device-validated trace settings, live observability, causal diagnosis or fix proof.",
+        "trace_capabilities reports documented routes without a target probe; trace_prepare is a manual handoff and creates no native trace configuration."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-experiments.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/qualify_diagnostic_experiments_offline.py (57 MCP checks) and scripts/qualify_repeated_diagnostic_experiments_offline.py (78 MCP checks) on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests: experiment planning from exact saved cases, review with original-evidence and replan-lineage revalidation, 2..8 before/after pair comparison with explicit mappings and windows, JSON/Markdown/escaped HTML report export after rederivation, and stale/tampered input refusals."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, OPC UA server or device is involved and none is qualified.",
+        "Synthetic measurements only; no native or runtime acquisition (diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export are not covered), causal diagnosis or fix proof."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-ua.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ff5a75550925857916b229058c1ecc7ae4a49de8",
+        "passedScope": "scripts/qualify_diagnostic_ua_binding.py (with its observation and comparison qualifiers) on the Release Host against the owned encrypted OPC Foundation loopback fixture server from tests/TiaMcp.OpcUa.Runtime.Tests: 2,102 checks. Prebound diagnostic_ua_binding_plan on polling and subscriptions, diagnostic_ua_observe, diagnostic_ua_compare and diagnostic_ua_report_export, with mapping/session/node refusals, derived-document tamper, exact scalar retention, restart readback and no network replay."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-ua.20261027.json"
+      ],
+      "limitations": [
+        "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
+        "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
       ]
     }
   ],
@@ -7158,7 +7300,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7199,7 +7342,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7281,7 +7425,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7321,9 +7466,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -9802,8 +9947,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9843,8 +9990,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9884,8 +10033,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9924,8 +10075,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9966,8 +10119,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -10007,8 +10162,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -10048,8 +10205,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -10092,8 +10251,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -10135,8 +10296,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -10175,8 +10338,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11269,8 +11434,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11314,8 +11481,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11359,8 +11528,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11404,8 +11575,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11449,8 +11622,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11494,8 +11669,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11539,8 +11716,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11584,8 +11763,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11628,8 +11809,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11672,8 +11855,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12510,8 +12695,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12552,8 +12739,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12594,8 +12783,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12636,8 +12827,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12678,8 +12871,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12720,8 +12915,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12762,8 +12959,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12804,8 +13003,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13207,8 +13408,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13250,8 +13453,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13293,8 +13498,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13336,8 +13543,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13379,8 +13588,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13422,8 +13633,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13465,8 +13678,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13508,8 +13723,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13551,8 +13768,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13594,8 +13813,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13637,8 +13858,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13680,8 +13903,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13722,8 +13947,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13764,8 +13991,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13806,8 +14035,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13848,8 +14079,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13890,8 +14123,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13932,8 +14167,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13974,8 +14211,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14014,8 +14253,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14056,8 +14297,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14098,8 +14341,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14140,8 +14385,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14182,8 +14429,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14224,8 +14473,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16603,8 +16854,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16645,8 +16898,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16687,8 +16942,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16729,8 +16986,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17611,8 +17870,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17652,8 +17913,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17693,8 +17956,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17734,8 +17999,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",

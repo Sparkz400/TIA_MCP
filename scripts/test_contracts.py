@@ -15,6 +15,11 @@ from api_coverage import validate_feature_obligations
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
+# Evidence IDs containing HOST_ONLY ran the Host with native workers deliberately absent.
+HOST_ONLY = ".hostonly."
+NATIVE_GATES = {"AC-native", "AC-recovery", "AC-runtime", "AC-simulator-lifecycle", "AC-simulation-download"}
+
+
 def claim_errors(features, evidence, root=ROOT):
     """Return catalog claims that outrun the evidence retained in this checkout."""
     def retained(artifact):
@@ -41,6 +46,9 @@ def claim_errors(features, evidence, root=ROOT):
             exercised = {tool for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
             if set(feature["mcpTools"]) - exercised:
                 errors.append(f"{identifier}: verified tools not exercised {sorted(set(feature['mcpTools']) - exercised)}")
+            native_gates = NATIVE_GATES & set(feature.get("acceptanceCriteria", []))
+            if proofs and all(HOST_ONLY in proof for proof in proofs) and native_gates:
+                errors.append(f"{identifier}: Host-only evidence cannot close {sorted(native_gates)}")
         if feature["availability"]["status"] == "available" and status != "verified":
             errors.append(f"{identifier}: available without verified qualification")
     return errors
@@ -154,6 +162,17 @@ class ClaimErrorTests(unittest.TestCase):
 
     def test_verified_tools_must_be_exercised(self):
         self.assertEqual(len(self.errors("verified", ["kept"], tools=("block_read", "xref_query"))), 1)
+
+    def test_host_only_evidence_cannot_close_native_gates(self):
+        (self.root / "evidence/hostonly.json").write_text(json.dumps({
+            "schema": "tia-mcp.evidence-summary.v1", "evidenceId": "local.hostonly.x", "outcome": "passed",
+            "runs": [{"completed": True, "toolsPassed": ["block_read"]}]}), encoding="utf-8")
+        self.evidence["local.hostonly.x"] = {"artifacts": ["evidence/hostonly.json"]}
+        hosted = self.feature("verified", ["local.hostonly.x"])
+        hosted["x"]["acceptanceCriteria"] = ["AC-identity", "AC-recovery"]
+        self.assertEqual(len(claim_errors(hosted, self.evidence, self.root)), 1)
+        hosted["x"]["acceptanceCriteria"] = ["AC-identity", "AC-preserve"]
+        self.assertEqual(claim_errors(hosted, self.evidence, self.root), [])
 
     def test_unverified_may_keep_historical_evidence_but_not_claim_available(self):
         self.assertEqual(self.errors("unverified", ["ignored"]), [])
