@@ -125,7 +125,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "to_connect", "to_disconnect" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
@@ -606,8 +606,13 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Type/version availability is validated by Siemens during creation; a successful create can still require parameter configuration before compile succeeds.");
                     break;
                 }
+                case "to_child_create":
+                    PrepareTechnologyChildCreate(change, effects);
+                    break;
                 case "to_parameters":
                 case "to_delete":
+                case "to_connect":
+                case "to_disconnect":
                 {
                     var plc = SelectPlc(change.Selector);
                     var entry = BindTechnologySelection(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", payload);
@@ -619,6 +624,7 @@ namespace TiaMcp.Openness.V21
                     {
                         preview["parameterChanges"] = PrepareTechnologyParameters(technology, ChangeObject(payload, "parameters"), out _);
                     }
+                    else if (change.Kind != "to_delete") PrepareTechnologyConnection(change, project, plc, entry, preview);
                     effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
                     break;
                 }
@@ -815,12 +821,19 @@ namespace TiaMcp.Openness.V21
                     ApplyTechnologyParameters(technology, ChangeObject(payload, "parameters"));
                     break;
                 }
+                case "to_connect":
+                case "to_disconnect":
+                    ApplyTechnologyConnection(change, project);
+                    break;
+                case "to_child_create":
+                    ApplyTechnologyChildCreate(change);
+                    break;
             }
         }
 
         private void CaptureTechnologyEvidence(EngineeringChange change)
         {
-            if (change.Kind != "to_create" && change.Kind != "to_parameters") return;
+            if (!new[] { "to_create", "to_parameters", "to_connect", "to_disconnect", "to_child_create" }.Contains(change.Kind)) return;
             try
             {
                 var plc = SelectPlc(change.Selector);
@@ -1023,6 +1036,15 @@ namespace TiaMcp.Openness.V21
                     values[p.Name] = new JObject { ["type"] = type.FullName, ["value"] = ChangeScalar(value) };
                 }
                 snapshot["technologyParameters"] = values;
+            }
+            if (change.Kind == "to_connect" || change.Kind == "to_disconnect")
+            {
+                // The identity rows below do not prove connection state; compare the selected TO's resolved connection observation.
+                var plc = SelectPlc(change.Selector);
+                var entry = RequiredTechnologyEntry(plc, change.Payload);
+                var connectionBudget = new ScanBudget(500);
+                snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
+                if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
             {

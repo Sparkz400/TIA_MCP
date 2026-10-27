@@ -106,6 +106,9 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `to_create` | `name`, `typeIdentifier`, `version`, optional `parameters: {...}` | Creates a native technology object and applies requested initial scalar parameters within the same recovery checkpoint before its first compile. Siemens validates CPU/type/version; parameter names, native types and exposed write access can be checked only after creation. |
 | `to_parameters` | `technologyPath` or unique `name`, `parameters: {...}` | Up to 500 scalar TO parameters with known read/write access and explicit native types; see the scalar-write boundary below. |
 | `to_delete` | `technologyPath` or unique `name` | Deletes an existing technology object after an XML backup and project checkpoint. |
+| `to_connect` | `technologyPath` or unique `name`, `role` (`actor`, `sensor` + `sensorIndex`, `torque`, `encoder`, `measuringInput`, `outputCam`), one target: `hardwarePath` (module or PROFIdrive telegram), `hardwarePath` + `channelType`/`channelIoType`/`channelNumber`, `hardwarePath` + `channelIndex` (measuring input) or `tagName` | Connects one slot through the matching V21 `Connect` overload; unsupported role/target pairs refuse at prepare. Apply reads back `IsConnected` and the reported module/channel/tag; the preview, fingerprint and `technologyAfter` reuse the `technology_read` connection rows. Requires `compile=true`. Not natively qualified. |
+| `to_disconnect` | `technologyPath` or unique `name`, `role` (+ `sensorIndex`) | Disconnects one connected slot and verifies `IsConnected=false`. Requires `compile=true`; a TO that is invalid unconnected fails compilation and needs recovery. Not natively qualified. |
+| `to_child_create` | `ownerPath`, `composition` (`OutputCams` or `MeasuringInputs`), `name`, `typeIdentifier`, `version` | Creates one output cam/cam track or measuring input under an existing owner and verifies it at its child path. Not natively qualified. |
 | `safety_import_xml` | `xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true` | Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state. |
 
 Source declarations are parsed outside comments, literals and quoted symbols, including multiple declarations on one line. Their names must match the explicit expected set. Block and type source changes are separate. Number-addressed declarations such as `FUNCTION FC 10` are rejected; use explicit symbolic names. Name collisions are compared without case. Import XML cannot use DTDs, import unlisted top-level object kinds, repeat object IDs, change an existing block's language, or collide with an unpreviewed block number.
@@ -300,7 +303,7 @@ complete/readable flags; older observations cannot silently qualify a fresh run.
 
 ### Technology object selection
 
-For `to_parameters` and `to_delete`, use the exact `technologyPath` returned by
+For `to_parameters`, `to_delete`, `to_connect` and `to_disconnect`, use the exact `technologyPath` returned by
 `technology_read` or the technology scope of `engineering_read`. Matching is
 ordinal and includes escaped group/name segments. A supplied `name` must exactly
 match that path's object. A missing path never falls back to a name. Legacy
@@ -342,8 +345,9 @@ The same paths reach software inspection, engineering reads, object/capability
 lookup, project index, Explorer capture/details, mutation previews and fingerprints.
 Legacy name-only selection refuses ambiguity across owners/compositions. Exact
 edit/delete selection can address an observed child; root `to_create` does not
-create a service-owned child or accept an inferred owner. Child creation, connection
-and full-effect recovery recipes remain separate work.
+create a service-owned child or accept an inferred owner; `to_child_create` takes an
+exact `ownerPath` instead. Child creation and `to_connect`/`to_disconnect` are not
+natively qualified, and full-effect recovery recipes remain separate work.
 
 The shared 50,000-object/group and 64-level bounds include descendants. Failed
 service/collection discovery cannot certify selection, absence or a complete

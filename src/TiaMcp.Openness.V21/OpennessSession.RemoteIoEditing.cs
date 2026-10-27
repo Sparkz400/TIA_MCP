@@ -55,22 +55,28 @@ namespace TiaMcp.Openness.V21
             return item.Item;
         }
 
-        private Channel PrepareHardwareChannel(EngineeringChange change, Project project, JObject preview)
+        private Channel HardwareChannel(Project project, JObject payload)
         {
-            var item = ChangeHardware(project, change.Payload);
-            string type = ChangeText(change.Payload, "channelType", 64), ioType = ChangeText(change.Payload, "channelIoType", 64);
-            int number = HardwareIndex(change.Payload, "channelNumber");
+            var item = ChangeHardware(project, payload);
+            string type = ChangeText(payload, "channelType", 64), ioType = ChangeText(payload, "channelIoType", 64);
+            int number = HardwareIndex(payload, "channelNumber");
             var matches = item.Item.Channels.Where(channel => channel.Number == number && channel.Type.ToString() == type && channel.IoType.ToString() == ioType).Take(2).ToArray();
             if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ChannelNotFound" : "AmbiguousTarget", "hardwarePath, channelType, channelIoType and channelNumber must select one native channel.");
+            return matches[0];
+        }
+
+        private Channel PrepareHardwareChannel(EngineeringChange change, Project project, JObject preview)
+        {
+            var channel = HardwareChannel(project, change.Payload);
             var attributes = ChangeObject(change.Payload, "attributes");
             if (attributes.Count == 0 || attributes.Count > ChannelWriteAttributes.Count) throw new BridgeException("InvalidRequest", "At least one reviewed channel attribute is required.");
-            var changes = PrepareAttributes(matches[0], attributes, ChannelWriteAttributes, out var converted);
+            var changes = PrepareAttributes(channel, attributes, ChannelWriteAttributes, out var converted);
             // Store native scalar representations so the preservation comparison
             // matches native numeric/enum values rather than JSON input spelling.
             foreach (var property in attributes.Properties().ToArray())
                 attributes[property.Name] = ChangeScalar(converted[property.Name]);
             if (preview != null) preview["attributeChanges"] = changes;
-            return matches[0];
+            return channel;
         }
 
         private IoConnector PrepareIoAssignment(EngineeringChange change, Project project, JObject preview, out IoController controller)
