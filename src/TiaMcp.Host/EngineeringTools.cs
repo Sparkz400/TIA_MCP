@@ -66,6 +66,11 @@ public sealed partial class TiaTools
     public Task<CallToolResult> HardwareInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
         => Call("hardware_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
+    [McpServerTool(Name = "connection_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("List configured communication connections (S7, TCP, UDP, ISO, ISO-on-TCP, FDL, PtP, HMI) from native CommunicationManagement of all hardware or one exact hardwarePath. Each row has type, name, ID, typed properties and local/partner target and interface paths resolved by native object equality. reviewSnapshot is a connection_review before/after snapshot; maxItems bounds rows and truncation is explicit. Offline configuration only; no consumers, resource checks or communication.")]
+    public Task<CallToolResult> ConnectionInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
+        => Call("connection_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
+
     [McpServerTool(Name = "technology_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect offline technology objects and exposed parameters. Select technologyName or technologyPath to inspect a specific object; absent selectors enumerate the PLC's objects.")]
     public Task<CallToolResult> TechnologyRead(CancellationToken cancellationToken, string? technologyName = null, string? technologyPath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? parameterPrefix = null, bool exportXml = false)

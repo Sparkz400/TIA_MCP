@@ -50,7 +50,7 @@ public sealed partial class WatchTableDispatcher
             throw new BridgeException("PreservationFailed", "Original native peers and target consistency must match the retained baseline.");
         string content = snapshot["target"]!["semanticSha256"]!.GetValue<string>();
         string originalDisposition = content == record.Plan.Target.Reference.ContentSha256 ? "unchanged" :
-            content == Text(review, "expectedSemanticSha256") ? "verifiedApplied" :
+            Applied(review, snapshot) ? "verifiedApplied" :
             throw new BridgeException("ReconciliationIncomplete", "The original contains an unreviewed outcome; interruption cannot release its reservation.");
         if (observation.Reference.ContentSha256 != content)
             throw new BridgeException("ArtifactChanged", "Native observation and exported target content disagree.");

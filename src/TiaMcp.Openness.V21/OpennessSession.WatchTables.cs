@@ -33,14 +33,18 @@ namespace TiaMcp.Openness.V21
             var selected = SelectPlc(args); EnsureProjectOffline(selected.Project);
             if (args.Value<string>("projectPath") != null && !string.Equals(args.Value<string>("projectPath"), selected.Project.Path.FullName, StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("IdentityMismatch", "Exact physical destination project required.");
-            string groupPath = args.Value<string>("group") ?? "root", tableName = ChangeText(args, "tableName", 128);
-            bool foundGroup = false;
+            // A group target is the selected group's whole subtree; peers keep everything outside it.
+            bool groupTarget = args.Value<string>("targetKind") == "watchTableGroup", subtreeConsistent = true;
+            string groupPath = args.Value<string>("group") ?? "root", tableName = groupTarget ? null : ChangeText(args, "tableName", 128);
+            bool foundGroup = false; var subtree = new List<string>();
             var directory = Path.Combine(ArtifactDirectory(args), "w_" + Guid.NewGuid().ToString("N").Substring(0, 12)); Directory.CreateDirectory(directory);
             var tables = new JArray(); var peers = new JObject();
             PlcWatchTable target = null;
             foreach (var group in WatchGroups(selected.Software.WatchAndForceTableGroup, "root", 0))
             {
                 if (group.Item2 == groupPath) foundGroup = true;
+                string rel = groupTarget && (group.Item2 == groupPath || group.Item2.StartsWith(groupPath + "/", StringComparison.Ordinal)) ? group.Item2.Substring(groupPath.Length).TrimStart('/') : null;
+                string prefix = string.IsNullOrEmpty(rel) ? "" : rel + "/";
                 if (peers.Count > 1000 || tables.Count + group.Item1.WatchTables.Count + group.Item1.ForceTables.Count > 1000)
                     throw new BridgeException("TraversalLimit", "Watch table/group count exceeds 1000.");
                 foreach (var watch in group.Item1.WatchTables)
@@ -50,7 +54,8 @@ namespace TiaMcp.Openness.V21
                         ["semanticSha256"] = WatchTableDocument.SemanticHash(File.ReadAllBytes(path)), ["isConsistent"] = watch.IsConsistent,
                         ["rows"] = new JArray(watch.Entries.Select(WatchRow)) };
                     tables.Add(entry);
-                    if (group.Item2 == (args.Value<string>("group") ?? "root") && watch.Name == args.Value<string>("tableName")) target = watch;
+                    if (rel != null) { subtree.Add("watch\t" + prefix + Segment(watch.Name) + "\t" + (string)entry["semanticSha256"] + "\t" + ((JArray)entry["rows"]).Count); subtreeConsistent &= watch.IsConsistent; }
+                    else if (group.Item2 == (args.Value<string>("group") ?? "root") && watch.Name == args.Value<string>("tableName")) target = watch;
                     else peers["watch:" + group.Item2 + "/" + watch.Name] = entry["semanticSha256"].DeepClone();
                 }
                 foreach (var force in group.Item1.ForceTables)
@@ -58,12 +63,12 @@ namespace TiaMcp.Openness.V21
                     string path = Path.Combine(directory, "force-" + tables.Count + ".xml"); force.Export(new FileInfo(path), ExportOptions.WithDefaults);
                     string hash = WatchTableDocument.SemanticHash(File.ReadAllBytes(path));
                     tables.Add(new JObject { ["kind"] = "force", ["group"] = group.Item2, ["name"] = force.Name, ["artifact"] = FileArtifact(new FileInfo(path)), ["semanticSha256"] = hash });
-                    peers["force:" + group.Item2 + "/" + force.Name] = hash;
+                    if (rel != null) subtree.Add("force\t" + prefix + Segment(force.Name) + "\t" + hash); else peers["force:" + group.Item2 + "/" + force.Name] = hash;
                 }
-                peers["group:" + group.Item2] = group.Item1.Name;
+                if (!string.IsNullOrEmpty(rel)) subtree.Add("group\t" + rel); else peers["group:" + group.Item2] = group.Item1.Name;
             }
             if (!foundGroup) throw new BridgeException("WatchGroupNotFound", "The exact existing destination group is required.");
-            if (target == null && args.Value<bool?>("allowAbsent") != true) throw new BridgeException("WatchTableNotFound", "Exact watch table/group is required.");
+            if (!groupTarget && target == null && args.Value<bool?>("allowAbsent") != true) throw new BridgeException("WatchTableNotFound", "Exact watch table/group is required.");
             if (target == null && tables.Any(t => string.Equals(t.Value<string>("name"), tableName, StringComparison.OrdinalIgnoreCase)))
                 throw new BridgeException("WatchTableCollision", "A watch or force table already occupies this name in the selected PLC.");
             var budget = new ScanBudget(10000);
@@ -103,7 +108,13 @@ namespace TiaMcp.Openness.V21
             }
             peers["access"] = access;
             JToken selectedTable;
-            if (target != null) selectedTable = tables.Single(t => t.Value<string>("kind") == "watch" && t.Value<string>("name") == tableName && t.Value<string>("group") == groupPath);
+            if (groupTarget)
+            {
+                string manifest = Path.Combine(directory, "group.txt"); File.WriteAllBytes(manifest, WatchGroupManifest.Build(subtree));
+                selectedTable = new JObject { ["kind"] = "watchGroup", ["exists"] = true, ["group"] = groupPath, ["name"] = groupPath, ["artifact"] = FileArtifact(new FileInfo(manifest)),
+                    ["semanticSha256"] = ChangeFileHash(manifest), ["isConsistent"] = subtreeConsistent, ["rows"] = new JArray() };
+            }
+            else if (target != null) selectedTable = tables.Single(t => t.Value<string>("kind") == "watch" && t.Value<string>("name") == tableName && t.Value<string>("group") == groupPath);
             else
             {
                 string absent = Path.Combine(directory, "absent.txt"); File.WriteAllBytes(absent, WatchTableDocument.AbsentBytes(groupPath, tableName));
@@ -117,7 +128,7 @@ namespace TiaMcp.Openness.V21
             string profileIdentity = ChangeHash(WatchTableDocument.Profile + "|" + ChangeFileHash(typeof(TiaPortal).Assembly.Location) + "|" + ChangeFileHash(typeof(PlcWatchTable).Assembly.Location));
             var observation = new JObject {
                 ["reference"] = new JObject { ["object"] = new JObject { ["projectPath"] = selected.Project.Path.FullName, ["plcPath"] = selected.Path, ["scopePath"] = selected.Path,
-                    ["objectPath"] = selected.Path + "/watch/" + groupPath + "/" + Segment(tableName), ["kind"] = "watchTable" },
+                    ["objectPath"] = selected.Path + "/watch/" + groupPath + (groupTarget ? "" : "/" + Segment(tableName)), ["kind"] = groupTarget ? "watchTableGroup" : "watchTable" },
                     ["snapshot"] = new JObject { ["observationId"] = Guid.NewGuid().ToString("N"), ["sourceSha256"] = source, ["tiaVersion"] = 21 }, ["contentSha256"] = content },
                 ["projectFilePath"] = selected.Project.Path.FullName, ["sessionEpoch"] = _watchEpoch, ["adapterSha256"] = ChangeFileHash(Assembly.GetExecutingAssembly().Location),
                 ["profileSha256"] = profileIdentity, ["hardwareIdentity"] = ownerIdentity, ["nativeIdentity"] = null, ["offline"] = true,
@@ -160,6 +171,7 @@ namespace TiaMcp.Openness.V21
             VerifyWatchSource(_watchSelector);
             var current = WatchSnapshot(_watchSelector);
             EnsureWatchTargetFresh(_watchBefore, current);
+            if (args["lifecycle"] is JObject lifecycle) return WatchLifecycleApply(args, lifecycle);
             string path = args.Value<string>("inputPath");
             if (ChangeFileHash(path) != args.Value<string>("inputSha256")) throw new BridgeException("ArtifactChanged", "Prepared XML bytes changed.");
             var input = new WatchTableDocument(File.ReadAllBytes(path));

@@ -10,7 +10,8 @@ namespace TiaMcp.Openness.V21
     {
         // Kinds whose change fingerprint needs prepared in-memory targets; a fresh session cannot recompute their outcome.
         private static readonly HashSet<string> TargetKinds = new HashSet<string>(new[] {
-            "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set" }, StringComparer.Ordinal);
+            "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set",
+            "block_attributes_set", "project_attributes_set", "connection_set" }, StringComparer.Ordinal);
 
         internal static bool OutcomeRecomputable(string kind) => !TargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
 

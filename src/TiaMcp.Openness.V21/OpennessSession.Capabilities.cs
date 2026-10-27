@@ -53,6 +53,9 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
                 var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
                 AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; no simulator is started.");
+                AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
+                AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
+                AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");
             }
 
             if (selected.Plc != null)
@@ -108,7 +111,7 @@ namespace TiaMcp.Openness.V21
                         feature == "block_interface" ? "Native XML is retained with normalized explicit array-element starts and nested declarations. Implicit array values are not expanded; unknown native elements remain explicit. Generated system blocks can reject export."
                             : "Native export eligibility is determined by Siemens; generated system blocks can reject export.",
                         blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent; native export eligibility is not established.");
-                foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml" })
+                foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml", "block_number_set", "block_attributes_set" })
                     AddTargetFeature(features, "change." + feature, directApi, "partial", "Prepare/apply enforce explicit scope, protection and recovery checkpoints. Generated/system objects may be rejected by the native API."
                         + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
                         blocked: protectedBlock || safetyBlock || safetyScope || generated,
@@ -155,6 +158,9 @@ namespace TiaMcp.Openness.V21
                 foreach (string feature in new[] { "tag_set", "constant_set", "tag_delete", "constant_delete" })
                     AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact existing table member with an explicit attribute allowlist. Deletion requires rejectReferenced dependency policy; incomplete dependency evidence is rejected. Native compilation and recovery checkpoints are required; recorded fixture evidence does not qualify the current target.",
                         blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
+                foreach (string feature in new[] { "tag_create", "constant_create" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Creates one member in this table after a scope-wide tag/constant name collision check; created safety tags are rejected. Native compilation and recovery checkpoints are required.",
+                        blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
             }
             else if (selected.Target is DeviceItem hardware)
             {
@@ -171,6 +177,12 @@ namespace TiaMcp.Openness.V21
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
                 AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
                 AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; shared-device/multi-controller assignments are rejected.");
+                var communication = ProbeCapabilityService<CommunicationManagement>(hardware, "hardware", probes);
+                AddTargetFeature(features, "connection_inspect", communication, "partial", "Configured CommunicationManagement connections of this owner with typed properties and native endpoint owners; no consumers, resources or runtime communication.");
+                AddTargetFeature(features, "change.connection_create", communication, "partial", "One connection of an explicit V21 ConnectionType between exact local/partner nodes and partner target; type/endpoint readback, owner-table preservation, device compile and checkpoint required.");
+                AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
+                AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
+                metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
