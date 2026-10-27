@@ -345,6 +345,7 @@ Test("CLI usage, help, malformed XML and missing files", () =>
 });
 
 NativeFixtureChecks.Register(Test, generated);
+EditChecks.Register(Test);
 
 if (args.Length == 2 && args[0] == "--schema-dir")
 {
@@ -372,6 +373,15 @@ if (args.Length == 2 && args[0] == "--schema-dir")
             if (profile == "empty-condition") True(failures.Count > 0, "Expected native empty-module XSD mismatch");
             else True(failures.Count == 0, profile + ": " + string.Join(" | ", failures));
         }
+        // Typed edits must keep a native chart schema-valid, including a new step, a contact series and new texts.
+        var edited = GraphEditor.Apply(GraphDocument.Parse(Fixture("native-v21/alternative/baseline.xml")), [
+            new GraphEdit("addStep", Number: 5, Name: "Wait", AfterTransition: 5),
+            new GraphEdit("addTransition", Number: 6, Name: "Resume", FromStep: 5, ToStep: 1, Jump: true, Condition: [new("StartCommand"), new("ResetCommand", true)]),
+            new GraphEdit("setStepComment", Number: 5, Lang: "en-US", Text: "Wait"), new GraphEdit("setTransitionCondition", Number: 1, Condition: [new("GuardClosed")]),
+            new GraphEdit("removeStep", Number: 2), new GraphEdit("removeTransition", Number: 3)]);
+        var editedChart = new XDocument(new XElement(XDocument.Load(new MemoryStream(edited)).Descendants(XName.Get("Graph", GraphDocument.V6Namespace)).Single()));
+        var editFailures = new List<string>(); editedChart.Validate(schemas, (_, e) => editFailures.Add(e.Message));
+        True(editFailures.Count == 0, "edited: " + string.Join(" | ", editFailures));
     });
 }
 else if (args.Length != 0) { Console.Error.WriteLine("Usage: [--schema-dir installed-schema-directory]"); return 2; }

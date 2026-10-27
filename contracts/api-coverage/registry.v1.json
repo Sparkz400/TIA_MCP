@@ -2457,6 +2457,12 @@
       ]
     },
     {
+      "featureId": "graph_edit",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
       "featureId": "graph_reopen",
       "obligations": [
         "X06"

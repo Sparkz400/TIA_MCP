@@ -5404,7 +5404,7 @@
         "status": "partial",
         "limitations": [
           "Payload is graphRef (retained GRAPH document) or path (inside the Host artifact directory) plus expectedBlockNames. The Host validates it with the net10 TiaMcp.Graph reader, which the net48 worker cannot load; structural errors, unsupported grammar outside the opaque envelope/embedded-logic boundaries, more than one chart and empty Interlock/Supervision modules without FlgNet (EmptyNativeCondition, rejected by TIA V21) are refused before native preparation.",
-          "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. No typed GRAPH edit is synthesized; the document is imported as supplied.",
+          "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. The worker synthesizes no GRAPH edit; typed edits are made beforehand with graph_edit and the document is imported as supplied.",
           "Apply requires compile=true. After compilation the block is re-exported and must equal the imported document beyond DocumentInfo and formatting (the existing native preservation comparer) before saving; otherwise the change is recovery_required. Documents exported without defaults can fail this check.",
           "The GraphComparer does not run inside the worker; review the declared change beforehand with graph_export and graph_compare.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
@@ -16362,6 +16362,53 @@
         "AC-identity",
         "AC-completeness",
         "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "graph_edit",
+      "domain": "language",
+      "title": "Typed GRAPH sequence edits into a new retained document",
+      "mcpTools": [
+        "graph_edit"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Pure managed GRAPH v6 editor in TiaMcp.Graph over the offline reader; no Siemens service. The result is applied natively only through the graph_import change kind."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Ops: addStep after an existing transition, addTransition from a step without successor to a step (direct or jump), removeStep/removeTransition of a linear-chain element (predecessor spliced to successor), renameStep/renameTransition, setStepComment, setSequenceTitle and setTransitionCondition; 1..32 operations per call, applied in order. Branches are never created or removed.",
+          "Edits splice the source text, so unedited bytes stay identical; only UTF-8/UTF-16 sources whose GRAPH namespace is the default namespace at the edit position are edited. The result is retained as a new document whose only input is the source, plus a comparison record.",
+          "Refused unless source and result read without errors, step/transition numbers are unique, names are unique (case-insensitive, also against declared block-interface members), connections alternate steps and transitions through branches, every transition has exactly one incoming and one outgoing connection and every step is reachable from an initial step.",
+          "Transition conditions are only series LAD contacts (normally open or closed) on exact top-level Bool members of the block interface in the same document; global tags, comparisons, FBD and other logic are not synthesized, and documents without a block interface cannot receive a condition.",
+          "Generated FB step/transition structures (G7_StepPlus_V6/G7_TransitionPlus_V6) are renamed or removed with their element; none is synthesized for added elements, whose empty LAD supervision/interlock modules use the recorded seed shape. TIA V21 generates such members and re-exports empty modules without FlgNet, so graph_import's exact readback can report NativePreservationMismatch (recovery_required) for added elements.",
+          "Uses no Siemens API and is not natively qualified. An edited native fixture validates against the installed V21 SW.PlcBlocks.Graph_v6.xsd in the offline tests; results are not schema-validated at run time, and import, compile and runtime behavior are unqualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a retained GRAPH document with exactly one chart and no reader errors, and available bounded Host storage."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host runtime",
+        "Retained GRAPH document record (graph_export or graph_inspect)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-preview",
         "AC-evidence"
       ]
     },
