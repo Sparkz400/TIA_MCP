@@ -152,6 +152,15 @@ namespace TiaMcp.Model
                     throw new ArgumentException("PreservationMismatch: unrelated HMI content changed: " + pair.Key);
         }
 
+        // A created object may add only its own typed-readback subtree, which must appear and never pre-exist.
+        internal static void RequireOnlyCreatedSubtree(IDictionary<string, string> before, IDictionary<string, string> after, string createdObjectPath)
+        {
+            Func<string, bool> created = path => path == createdObjectPath || path.StartsWith(createdObjectPath + "/", StringComparison.Ordinal);
+            if (string.IsNullOrEmpty(createdObjectPath) || before.Keys.Any(created)) throw new ArgumentException("The prepared preservation delta is contradictory.");
+            if (!after.ContainsKey(createdObjectPath)) throw new ArgumentException("PreservationMismatch: the created HMI object is absent from the typed readback.");
+            RequireUnrelatedPreserved(before, after, Array.Empty<string>(), after.Keys.Where(created));
+        }
+
         // A tag-table export directory has no qualified per-file layout: every file under the
         // created tag's table export may change or appear; any other artifact must stay identical.
         // The created object's own typed-readback subtree may appear, but never pre-exist.

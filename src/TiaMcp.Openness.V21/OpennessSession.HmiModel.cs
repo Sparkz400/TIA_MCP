@@ -200,7 +200,7 @@ namespace TiaMcp.Openness.V21
                 return parts.Count == 0 ? null : string.Join(".", parts);
             }
 
-            private static string CompositionSegment(string name)
+            internal static string CompositionSegment(string name)
             {
                 switch (name)
                 {
