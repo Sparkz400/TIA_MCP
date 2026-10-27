@@ -35,6 +35,8 @@ class LibraryOperationObservations(unittest.TestCase):
             payload = {'schemaVersion': 1}
         elif kind in ('library_organize', 'library_save', 'library_archive'):
             payload.pop('selection')
+        elif kind in ('library_cleanup', 'library_harmonize'):
+            payload.pop('selection'); payload['types'] = [self.pin['typeGuid']]
         elif kind in ('library_create_type', 'library_create_master_copy'):
             payload = {'schemaVersion': 1, 'destinationLibraryId': self.destination}
         if kind == 'library_create': payload['name'] = 'Synthetic'
@@ -47,6 +49,8 @@ class LibraryOperationObservations(unittest.TestCase):
         elif kind == 'library_release_version': payload.update(versionNumber='1.0.0', author='Author', comment='Release')
         elif kind == 'library_type_policy': payload['doNotUse'] = False
         elif kind == 'library_organize': payload.update(action='create', folderKind='types', name='Synthetic')
+        elif kind == 'library_cleanup': payload['cleanUpMode'] = 'DeleteUnusedTypes'
+        elif kind == 'library_harmonize': payload.update(target={'projectName': 'Synthetic', 'plcPath': '/PLC'}, harmonizeNames=True)
         elif kind == 'library_integrate':
             payload.update(action='plc_component_plan', planOnly=True, target={'projectName': 'Synthetic', 'plcPath': '/PLC'},
                            integration={'dependencyPins': [], 'instanceDb': {'name': 'Instance', 'numberPolicy': 'firstAvailable'},
@@ -81,6 +85,8 @@ class LibraryOperationObservations(unittest.TestCase):
         elif kind == 'library_discard_version': result.update(discardedVersionGuid=self.pin['versionGuid'], remainingType=None)
         elif kind in ('library_update_project', 'library_edit_version', 'library_release_version', 'library_set_default', 'library_type_policy'):
             result['objects'] = [self.version]
+        elif kind == 'library_cleanup': result.update(removedVersionGuids=[self.pin['versionGuid']], candidatesRetainedByNative=[], removedTypeGuids=[])
+        elif kind == 'library_harmonize': result['objects'] = [{'objectPath': '/PLC/blocks/Synthetic', 'name': 'Synthetic', 'groupPath': '', 'versionGuid': self.pin['versionGuid']}]
         elif kind == 'library_archive': result['archive'] = {'path': 'D:/Synthetic/published.zal21', 'bytes': 12, 'sha256': 'a' * 64, 'mediaType': 'application/octet-stream'}
         return copy.deepcopy(result)
 
