@@ -285,7 +285,11 @@ def body(h):
         timed_change(h, "library_instantiate", h.selected(reopened, [version], target={"plcPath": separate}), "separate import " + version["typeName"])
     h.stage("close separate import session", lambda: h.tool("tia_detach"))
     # Applied changes' recovery journals keep the package as their source of record.
-    h.refuse("keep the applied package retained", "library_package_release", {"packageId": staged["packageId"]}, "PackageInUse")
+    def retained():
+        error = h.call_error("library_package_release", {"packageId": staged["packageId"]})
+        require(error.get("code") == "PackageInUse", "Expected PackageInUse, observed %s" % error)
+        return error
+    h.stage("keep the applied package retained", retained)
 
 
 if __name__ == "__main__":
