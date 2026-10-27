@@ -39,8 +39,8 @@ namespace TiaMcp.Openness.V21
 #endif
         }
 
-        internal OpennessSession(string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification) : this(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification)
-        { _translationQualification = translationQualification; }
+        internal OpennessSession(string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply = false) : this(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification)
+        { _translationQualification = translationQualification; _libraryIntegrateApplyEnabled = libraryIntegrateApply; }
 
         internal JObject Execute(string operation, JObject arguments)
         {

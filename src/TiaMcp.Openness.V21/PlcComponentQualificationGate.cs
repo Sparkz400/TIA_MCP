@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
@@ -37,5 +39,27 @@ namespace TiaMcp.Openness.V21
             if (string.IsNullOrWhiteSpace(args.Value<string>("idempotencyKey")))
                 throw new PlcComponentException("InvalidRequest", "An explicit caller idempotencyKey is required for the review request.");
         }
+
+        // Production combined apply (--enable-library-integrate-apply) runs only the shapes the component route
+        // verified natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
+        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport)
+        {
+            var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
+            if (payload == null || caller == null || PlcHmiIntegrationPlanner.IsRecipe(payload)) return "Only a prepared PLC component plan is eligible; HMI targets and PLC/HMI recipes stay plan-only.";
+            if (caller.Value<bool?>("obCallAdded") != false || caller.Value<string>("kind") == "OB") return "OB insertion is refused; add the OB call as its own reviewed change.";
+            if (caller.Value<string>("kind") != "FC" || caller.Value<string>("language") != "FBD")
+                return "Only a new or existing FBD FC caller is verified; " + caller.Value<string>("language") + " " + caller.Value<string>("kind") + " callers stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") != false || (plan["reuse"]?["versions"] as JArray)?.Count != 0 || plan["instanceDb"] == null || plan["instanceDb"].Value<bool?>("reused") == true)
+                return "Only a fresh FB/dependency import with a new global instance DB is verified; reuse and multi-instances stay plan-only.";
+            if (!(plan["blockers"] is JArray blockers) || blockers.Count != 0 || !(plan["steps"] is JArray steps) || steps.Any(s => s["planOnly"] != null))
+                return "Resolve every planner blocker and planOnly step first.";
+            if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
+                (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
+                return "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
+            return null;
+        }
+        internal static string CombinedApplyStep(string state) =>
+            state == "created" ? "prepare_library_instantiate" : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
+            state == "import_verified" ? "prepare_graphical_typed_edit" : state == "graphical_prepared" ? "apply_graphical_typed_edit" : state == "graphical_applied" ? "verify_installation_readback" : state;
     }
 }

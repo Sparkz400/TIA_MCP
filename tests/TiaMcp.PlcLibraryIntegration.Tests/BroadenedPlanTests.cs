@@ -95,6 +95,31 @@ internal static class BroadenedPlanTests
             try { PlcHmiIntegrationPlanner.BuildInstall(payload, plan, observed); } catch (PlcIntegrationPlanException e) when (e.Code == "UnsupportedIntegrationType") { return; }
             throw new Exception("Expected UnsupportedIntegrationType");
         });
+
+        // Production combined apply (--enable-library-integrate-apply) admits only the natively verified shapes.
+        static string Refusal(Fixture f) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller);
+        static Fixture Titled(string networks, int title) { var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList>" + networks + "<MultilingualText ID=\"" + title + "\" CompositionName=\"Title\" /></ObjectList></SW.Blocks.FC></Document>"); f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; return f; }
+        static Fixture Ob() { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; return f; }
+        test("combined apply admits the verified existing FBD FC caller", () => Equal(null, Refusal(new Fixture())));
+        test("combined apply admits the verified standalone FBD FC", () => { var f = new Fixture(); f.Standalone("FBD"); Equal(null, Refusal(f)); });
+        const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
+        test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
+        test("combined apply refuses insertion before another network", () => Equal(true, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)).StartsWith("Only insertion after", StringComparison.Ordinal)));
+        test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
+        foreach (var (name, shape) in new (string, Func<Fixture>)[] {
+            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }),
+            ("existing LAD FC", () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; }),
+            ("FB caller", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; }),
+            ("multi-instance", Multi), ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember), ("reused FB", ReusedRoot),
+            ("reused dependency", () => { var f = new Fixture(); f.AddDependency(); Add(f, "MotorState", "/plc/types/MotorState", "UDT"); Prove(f, 1); return f; }),
+            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }) })
+            test("combined apply refuses " + name, () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
+        test("combined apply refuses PLC/HMI recipes and missing plans", () => {
+            var f = new Fixture(); var preview = new JObject { ["payload"] = f.Payload.DeepClone(), ["integrationPlan"] = f.Build() };
+            preview["payload"]["action"] = PlcHmiIntegrationPlanner.InstallAction;
+            Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(preview, f.Caller) == null); Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject(), null) == null);
+        });
+        test("combined apply names each coordinator step", () => Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared")));
     }
 
     private static Fixture Unit()
