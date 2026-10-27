@@ -18958,8 +18958,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Payload: systemWebPages {expected, value} and/or defaultApplication {expected, value} with an application name or null for none. expected must equal the current value at prepare (StaleRevision otherwise); any other field is refused.",
-          "Refused unless the CPU owning plcPath exposes a Boolean WebserverActivate attribute that is true (attribute name not verified on a native CPU); web serving is never activated here.",
+          "Payload: webServerActive {expected, value} (the CPU's Boolean WebserverActivate attribute, only where it is writable), systemWebPages {expected, value} and/or defaultApplication {expected, value} with an application name or null for none. expected must equal the current value at prepare (StaleRevision otherwise); any other field is refused.",
+          "Page settings are refused unless the CPU owning plcPath has its Boolean WebserverActivate attribute true, now or through webServerActive in the same change; the native probe local.wave-kinds.probe.20261027 observed the attribute false on a scratch CPU 1511-1 PN. Web users, rights and certificates are never changed here.",
           "Apply sets the requested application's IsDefault, then clears any other default. Read-back must equal preview.webServerAfter exactly: the flag and every application's name, type and default flag. V21 exposes no web application create, delete or rename.",
           "Watch-table and display assignments, legacy and UMAC web user rights, certificates and online deployment are not covered; nothing is downloaded.",
           "compile=true is mandatory and compiles all project devices. The change fingerprint adds every web-capable CPU's WebserverActivate value and page settings; interruption reconciliation holds the outcome for review.",

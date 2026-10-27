@@ -17,7 +17,7 @@ namespace TiaMcp.Openness.V21
         // Exact payload fields per kind; passwords, aliases, activation and authentication settings are never accepted.
         private static readonly Dictionary<string, string[]> WebAccessPayloadFields = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
-            ["webserver_page_set"] = new[] { "systemWebPages", "defaultApplication" },
+            ["webserver_page_set"] = new[] { "webServerActive", "systemWebPages", "defaultApplication" },
             ["webserver_user_pages_generate"] = new[] { "htmlDirectory", "defaultPage", "applicationName", "override", "overrideBlocks" },
             ["umac_role_set"] = new[] { "action", "roleName", "userName", "engineeringRights", "deviceRights" }
         };
@@ -37,11 +37,14 @@ namespace TiaMcp.Openness.V21
             throw new BridgeException("UnsupportedCapability", "The selected PLC's CPU exposes no web server page service.");
         }
 
+        private static bool? WebServerActive(DeviceItem cpu)
+        {
+            try { return cpu.GetAttribute("WebserverActivate") is bool on ? on : (bool?)null; } catch (Exception) { return null; }
+        }
+
         private static void RequireWebServerActive(DeviceItem cpu)
         {
-            object active = null;
-            try { active = cpu.GetAttribute("WebserverActivate"); } catch (Exception) { }
-            if (!(active is bool on && on)) throw new BridgeException("WebServerNotActivated", "Web serving is not activated on this CPU (Boolean WebserverActivate attribute); this kind never activates it.");
+            if (WebServerActive(cpu) != true) throw new BridgeException("WebServerNotActivated", "Web serving is not activated on this CPU (Boolean WebserverActivate attribute); activate it with webServerActive in the same or an earlier change.");
         }
 
         private static JObject WebServerPages(DeviceItem cpu)
@@ -89,11 +92,23 @@ namespace TiaMcp.Openness.V21
         {
             RequireWebAccessFields(change);
             var payload = change.Payload;
-            if (payload.Count == 0) throw new BridgeException("InvalidRequest", "Name systemWebPages and/or defaultApplication.");
+            if (payload.Count == 0) throw new BridgeException("InvalidRequest", "Name webServerActive, systemWebPages and/or defaultApplication.");
             var plc = SelectPlc(change.Selector); var cpu = WebServerCpu(plc.Software);
-            RequireWebServerActive(cpu);
-            var before = WebServerPages(cpu); var after = (JObject)before.DeepClone();
+            var before = WebServerPages(cpu); before["webserverActivate"] = WebServerActive(cpu); var after = (JObject)before.DeepClone();
             var effects = (JArray)preview["effects"];
+            if (payload["webServerActive"] != null)
+            {
+                var setting = WebSetting(payload, "webServerActive");
+                bool expected = ExplicitChangeBool(setting, "expected"), value = ExplicitChangeBool(setting, "value");
+                if (before["webserverActivate"].Type != JTokenType.Boolean || !cpu.GetAttributeInfos().Any(i => i.Name == "WebserverActivate" && (i.AccessMode & EngineeringAttributeAccessMode.Write) != 0))
+                    throw new BridgeException("UnsupportedCapability", "The CPU exposes no writable Boolean WebserverActivate attribute.");
+                if (before.Value<bool>("webserverActivate") != expected) throw new BridgeException("StaleRevision", "webServerActive.expected differs from the current WebserverActivate value.");
+                after["webserverActivate"] = value;
+                effects.Add(new JObject { ["plcPath"] = plc.Path, ["setting"] = "WebserverActivate", ["before"] = expected, ["after"] = value });
+                ((JArray)preview["warnings"]).Add("WebserverActivate changes whether the CPU serves web pages once this configuration is downloaded; web users, rights and certificates are not changed.");
+            }
+            if ((payload["systemWebPages"] != null || payload["defaultApplication"] != null) && after.Value<bool?>("webserverActivate") != true)
+                throw new BridgeException("WebServerNotActivated", "Page settings require web serving to be active on this CPU, now or through webServerActive in this change.");
             if (payload["systemWebPages"] != null)
             {
                 var setting = WebSetting(payload, "systemWebPages");
@@ -120,7 +135,8 @@ namespace TiaMcp.Openness.V21
         private void ApplyWebServerPageSet(EngineeringChange change)
         {
             var payload = change.Payload; var cpu = WebServerCpu(SelectPlc(change.Selector).Software);
-            RequireWebServerActive(cpu);
+            if (payload["webServerActive"] is JObject activation) cpu.SetAttribute("WebserverActivate", activation.Value<bool>("value"));
+            if (payload["systemWebPages"] != null || payload["defaultApplication"] != null) RequireWebServerActive(cpu);
             if (payload["systemWebPages"] is JObject pages)
                 (cpu.GetService<SystemWebPagesFeature>() ?? throw new BridgeException("UnsupportedCapability", "SystemWebPagesFeature is no longer exposed.")).EnableSystemWebPages = pages.Value<bool>("value");
             if (payload["defaultApplication"] is JObject selection)
@@ -131,7 +147,7 @@ namespace TiaMcp.Openness.V21
                 // Clear any other default the native setter left in place, so exactly the requested selection remains.
                 foreach (var application in applications.Where(a => a.Name != value && a.IsDefault)) application.IsDefault = false;
             }
-            var after = WebServerPages(cpu);
+            var after = WebServerPages(cpu); after["webserverActivate"] = WebServerActive(cpu);
             change.Readbacks.Add(new JObject { ["role"] = "webserver-pages-readback", ["after"] = after });
             if (!JToken.DeepEquals(after, change.Preview["webServerAfter"])) throw new BridgeException("MutationVerificationFailed", "Web page read-back differs from the previewed webServerAfter.");
         }

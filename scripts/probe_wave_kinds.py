@@ -83,11 +83,14 @@ def body(h):
         inspected = h.tool("web_inspect", {"hardwarePath": cpu})
         rows = [r for r in inspected.get("cpus", inspected.get("items", [])) if isinstance(r, dict)]
         enabled = next((r.get("webEnabled") for r in rows if r.get("webEnabled") is not None), None)
-        system = {"expected": False, "value": True}
-        outcome = attempt(h, "webserver_page_set", {"systemWebPages": system}, {"plcPath": plc})
+        refused = attempt(h, "webserver_page_set", {"systemWebPages": {"expected": False, "value": True}}, {"plcPath": plc})
+        result = {"webEnabled": enabled, "inspect": inspected, "pagesWhileInactive": refused}
         if enabled is not True:
-            require(not outcome["prepared"] and outcome["error"].get("code") == "WebServerNotActivated", "Expected WebServerNotActivated: %s" % outcome)
-        return {"webEnabled": enabled, "inspect": inspected, "pageSet": outcome}
+            require(not refused["prepared"] and refused["error"].get("code") == "WebServerNotActivated", "Expected WebServerNotActivated: %s" % refused)
+            result["activateWithPages"] = attempt(h, "webserver_page_set", {"webServerActive": {"expected": False, "value": True},
+                                                  "systemWebPages": {"expected": False, "value": True}}, {"plcPath": plc})
+            result["deactivate"] = attempt(h, "webserver_page_set", {"webServerActive": {"expected": True, "value": False}}, {"plcPath": plc})
+        return result
     probe(h, "web server inspect and page set", web)
 
     def umac():
