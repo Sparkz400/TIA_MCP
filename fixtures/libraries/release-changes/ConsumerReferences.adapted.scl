@@ -1,0 +1,23 @@
+DATA_BLOCK "TiaMcpLibraryGate_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcpLibraryGate"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpLibraryState_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR
+    State : "TiaMcpLibraryState";
+END_VAR
+BEGIN
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK "Main"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+    "TiaMcp_EnableGate_DB"(Enable := TRUE);
+    "TiaMcpLibraryGate_DB"(Enable := TRUE, Ready => "TiaMcpLibraryState_DB".State.Active);
+END_ORGANIZATION_BLOCK

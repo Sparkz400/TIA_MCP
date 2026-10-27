@@ -534,6 +534,9 @@ namespace TiaMcp.Openness.V21
                 case "hardware_channel_attributes":
                     PrepareHardwareChannel(change, project, preview);
                     break;
+                case "hardware_cpu_memory_bytes":
+                    PrepareCpuMemoryBytes(change, project, preview);
+                    break;
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
@@ -763,6 +766,9 @@ namespace TiaMcp.Openness.V21
                 }
                 case "hardware_channel_attributes":
                     ApplyAttributes(PrepareHardwareChannel(change, project, null), ChangeObject(payload, "attributes"), ChannelWriteAttributes);
+                    break;
+                case "hardware_cpu_memory_bytes":
+                    ApplyCpuMemoryBytes(change, project);
                     break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
@@ -1001,7 +1007,7 @@ namespace TiaMcp.Openness.V21
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project);
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();

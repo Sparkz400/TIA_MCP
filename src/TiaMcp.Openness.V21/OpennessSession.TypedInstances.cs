@@ -229,18 +229,22 @@ namespace TiaMcp.Openness.V21
                 var block = capture.Blocks.SingleOrDefault(b => b.Path == path) ?? throw new BridgeException("DependencyUnresolved", "A dependent native block lacks exact identity.");
                 capture.Export(block);
                 var dependency = capture.Change.TypedDependencies.OfType<JObject>().Single(d => d.Value<string>("kind") == "block" && d.Value<string>("path") == path);
+                var caller = capture.Blocks.Single(b => b.Path == capture.CallerPath);
+                string callerName = QualifiedName(caller.Item);
+                // A parent FB or its InstanceDB embedding the changed caller at any depth follows the captured transitive effect.
+                bool embeds = capture.Documents[path].Descendants().Any(e => e.Name.LocalName == "Member" && (string)e.Attribute("Datatype") == "\"" + callerName + "\"");
                 if (block.Item is InstanceDB instance)
                 {
-                    var caller = capture.Blocks.Single(b => b.Path == capture.CallerPath);
-                    if (instance.InstanceOfName != QualifiedName(caller.Item) || instance.Namespace != caller.Item.Namespace)
+                    bool direct = instance.InstanceOfName == callerName && instance.Namespace == caller.Item.Namespace;
+                    if (!direct && !embeds)
                         throw new BridgeException("DependencyProfileUnavailable", "Transitive dependent instance layout changes require an independently captured profile.");
-                    PrepareTypedDependentInstance(capture, dependency, QualifiedName(caller.Item), declaration);
+                    PrepareTypedDependentInstance(capture, dependency, callerName, declaration, transitive: !direct);
                 }
-                else if (block.Item is FB && TypedResolutionCapture.Members(capture.Documents[path]).Any(m => m.Section == "Static" && SameDeclaredType(m.DataType, QualifiedName(capture.Blocks.Single(b => b.Path == capture.CallerPath).Item))))
-                    throw new BridgeException("DependencyProfileUnavailable", "A parent multi-instance embeds the changed caller; transitive declaration propagation needs a captured dependency profile.");
+                else if (block.Item is FB && embeds)
+                    PrepareTypedDependentInstance(capture, dependency, callerName, declaration, transitive: true);
                 ((JArray)preview["effects"]).Add(new JObject { ["action"] = "nativeDependentRecompile", ["path"] = path, ["declarationHash"] = capture.Hashes[path],
                     ["expectedArtifact"] = dependency["expectedArtifact"]?.DeepClone(),
-                    ["startValueImpact"] = block.Item is InstanceDB ? "Only the explicit new storage member is added using captured native defaults; existing full XML and start values must match the prepared document." : "Dependent type/call consistency is compiled; complete native XML must remain unchanged." });
+                    ["startValueImpact"] = block.Item is InstanceDB || embeds ? "Only the explicit new storage member is added (nested in each embedded multi-instance for a parent) using captured native effects; existing full XML and start values must match the prepared document." : "Dependent type/call consistency is compiled; complete native XML must remain unchanged." });
             }
         }
 

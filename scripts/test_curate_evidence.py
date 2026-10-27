@@ -27,6 +27,28 @@ class CurateEvidenceTests(unittest.TestCase):
             summary = run(path)
         self.assertEqual((["change_apply"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_host_lifetime_receipts_and_checks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "verification.json")
+            path.write_text(json.dumps({"completed": True, "checks": ["inspect", "reopen"], "hostExits": [
+                {"hostExitCode": 0, "toolCalls": [{"name": "vci_prepare", "isError": False}]},
+                {"hostExitCode": 0, "toolCalls": [{"name": "vci_commit", "isError": True}]}]}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual(["inspect", "reopen"], summary["steps"])
+        self.assertEqual((["vci_prepare"], ["vci_commit"]), (summary["toolsPassed"], summary["toolsRejected"]))
+
+    def test_run_accepts_passed_status_and_string_steps(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "result.json")
+            path.write_text(json.dumps({"status": "passed", "steps": ["tool refusal kept"], "cleanups": [
+                {"toolCalls": [{"name": "trace_analyze", "isError": False}]}]}), encoding="utf-8")
+            summary = run(path)
+            path.write_text(json.dumps({"status": "failed", "steps": []}), encoding="utf-8")
+            failed = run(path)
+        self.assertEqual((True, ["tool refusal kept"], ["trace_analyze"]),
+                         (summary["completed"], summary["steps"], summary["toolsPassed"]))
+        self.assertFalse(failed["completed"])
+
     def test_tree_hash_changes_with_any_binary(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

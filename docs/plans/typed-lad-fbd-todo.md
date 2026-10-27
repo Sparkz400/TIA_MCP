@@ -218,8 +218,12 @@ controller was modified.
 - [ ] Keep unprofiled transitive parent multi-instance layout changes and custom
   declaration shapes rejected until their effects are captured and qualified.
   Direct FB and IEC instance-DB effects are captured for the software-unit and namespace routes
-  (`local.typed.scoped-capture.20261026`, `local.typed.iec-effect-capture.20261026`); transitive parent and
-  custom-start shapes still have no captured effect and stay rejected.
+  (`local.typed.scoped-capture.20261026`, `local.typed.iec-effect-capture.20261026`). Standard-route transitive
+  parents are captured (`local.typed.transitive-capture.20261026`: every embedded multi-instance of the changed FB,
+  at depth 1 and 2, in parent FBs and their DBs, gains the member in the direct DB shape without its top-level
+  attributes) and the worker follows it; all 14 created multi-instance cells with a two-level parent chain pass the
+  four engineering gates (`local.typed.transitive-effects.20261026`). Software-unit/namespace transitive parents
+  and custom-start/structured shapes still have no captured effect and stay rejected.
 
 ### 3. Complete runtime assertions separately
 

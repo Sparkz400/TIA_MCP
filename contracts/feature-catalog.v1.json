@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.23",
+  "catalogVersion": "0.4.30",
   "targetTiaVersions": [
     21
   ],
@@ -1493,6 +1493,24 @@
       ]
     },
     {
+      "id": "local.library_releases.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc974fce72e7ca769cc39a2e0257792e36a5368f",
+        "passedScope": "scripts/qualify_library_release_changes.py at bc974fc on build da24990 (frozen D:/lrc/b9, package tia-mcp-v21_20261026_183316_d73b436e), owned TIA V21 scratch projects and fresh owned PLCSIM Advanced V8 CPU1511 instances: FB type 1.0.0, implementation-changing 1.1.0 (negated output, same interface) and breaking 2.0.0 (output Active renamed Ready) in one native type identity with distinct version GUIDs, authored with simulation support; released exports and both instance DBs match independently authored expectations at every stage. Consumer at 1.0.0 runs the authored truth table on PLCSIM (probe output, probe instance output, Main's instance output and UDT field); updated to exactly 1.1.0 it compiles, keeps both instance DB interfaces and unrelated native exports, and runs the inverted truth table. The 2.0.0 update fails compilation at exactly the stale callers Main (OB1) and TiaMcpReleaseProbe_Cycle (OB123) ('The formal parameter Active is invalid'), reaches no unrelated block and is not saved; its admission is returned; the checkpoint restores to a new location and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged. A fresh consumer at exactly 2.0.0 with both callers adapted to Ready compiles clean, exposes no stale Active member and runs the 2.0.0 truth table. 105/105 steps; all 67 retained library observations (21 original-byte lock receipts) validate against the library schemas."
+      },
+      "artifacts": [
+        "evidence/local.library_releases.20261026.json"
+      ],
+      "limitations": [
+        "The FB is stateless: the truth table is asserted; instance data retention across an update and re-download is not.",
+        "Caller migration together with a breaking update is not offered (project-library updates require compile=true); adapted callers are qualified in a fresh 2.0.0 consumer, not by migrating the failed project.",
+        "One PLC, standard groups, PLCSIM only; no software units, protected/F types, physical CPU or crash injection."
+      ]
+    },
+    {
       "id": "local.library_dependencies.20261024",
       "status": "passed",
       "profile": {
@@ -1737,6 +1755,42 @@
       ]
     },
     {
+      "id": "local.library_protected.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
+        "passedScope": "scripts/qualify_library_protected.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool (protect mode, random password never stored), owned TIA V21 scratch projects: a plain FB is know-how protected; block_read refuses it (ProtectedObject); library_create_master_copy copies it into a global library. An FB type's in-work test instance is protected and its release to 1.0.0 applies (the in-work content pin uses the block's native fingerprints because Openness cannot export protected content); library_publish copies the protected type; a metadata-only edit/release of the still-protected test instance gives 1.1.0, published as the new default. Native document export of the protected version is refused by Openness (ExportAsDocuments: 'The block is know-how-protected and cannot be exported', surfaced as EngineeringError). In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected (block_read refuses the instance), Main calls both, the PLC-wide update to exactly 1.1.0 applies while the cleanup guard reads the cross-references of every block, protected ones included, and proves Main reaches the protected FB, and a fresh reopen keeps both protected. 60/60 steps; all 41 retained library observations (15 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_protected.20261027.json"
+      ],
+      "limitations": [
+        "V21 Openness has no know-how protection service for PLC data types; protected UDTs are not exercised.",
+        "Protected type versions cannot be exported as documents, so library_edit_version from documents (content changes) is unavailable for them; 1.1.0 is a metadata-only release.",
+        "Protection is applied by a registered fixture tool, not an MCP route. One PLC, standard groups, no runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_unit_relations.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
+        "passedScope": "scripts/qualify_library_unit_relations.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool, owned TIA V21 scratch projects: software units TiaMcp_LibProvider and TiaMcp_LibConsumer with one SoftwareUnit relation consumer->provider. Library FB and UDT 1.0.0 instantiate into the provider; instantiating either in the related consumer unit is refused before any write (LibraryConflict, one instance of a library type per device, relations included). The seeder sets the provider instances' Access attribute Unpublished->Published (TIA accepts it on typed instances); a consumer-unit cycle OB, instance DB and UDT DB call them through the relation and compile. The PLC-wide update to exactly FB 1.1.0 applies: the cleanup guard proves the provider uses through native cross-unit references from the consumer OB; the UDT stays at 1.0.0 and every path is unchanged. A fresh reopen keeps the relation, FB 1.1.0 and placement. 58/58 steps; all 49 retained library observations (16 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_unit_relations.20261027.json"
+      ],
+      "limitations": [
+        "Units, the relation and the Access flag are set by a registered fixture tool, not by MCP routes.",
+        "One SoftwareUnit relation; NonUnitDB and TODB relations, namespaces on library instances and safety units are not exercised.",
+        "One PLC, no runtime execution."
+      ]
+    },
+    {
       "id": "local.library_dependencies.20261025",
       "status": "passed",
       "profile": {
@@ -1922,6 +1976,39 @@
       "limitations": [
         "Engineering-only; runtime behavior of the composite change is not claimed.",
         "Qualified for the standard-route TON family; other families and the software-unit/namespace routes still rely on separate insertion and storage-creation evidence."
+      ]
+    },
+    {
+      "id": "local.typed.transitive-capture.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "59a85e3d4b2a69605a1c978400384decc00d4e9b",
+        "passedScope": "Native transitive dependent-instance effect in the standard PLC program scope: adding one FB member and one static member of each IEC instance type to Tgp_NestEffect, embedded as Inner in Tgp_NestParent and as Middle.Inner in Tgp_NestGrand, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py)."
+      },
+      "artifacts": [
+        "evidence/local.typed.transitive-capture.20261026.json"
+      ],
+      "limitations": [
+        "Captured for the standard route at nesting depths 1 and 2; other routes are not captured."
+      ]
+    },
+    {
+      "id": "local.typed.transitive-effects.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "607736cdda783d68024a74c4df07bb7386d49545",
+        "passedScope": "Standard-route FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep (Tgp_Host.Inner, Tgp_HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (14 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured transitive effect (local.typed.transitive-capture.20261026); native readback matched every prediction exactly and each cell passed the four engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.transitive-effects.20261026.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+        "Standard route only; software-unit and namespace parents remain refused until their transitive effect is captured."
       ]
     },
     {
@@ -2177,6 +2264,200 @@
       "limitations": [
         "Engineering only: the runtime harness drives the DUT interface, not external global DB members.",
         "DB owners in other software units are refused (no unit-relation profile); unit tag operands remain a native V21 boundary."
+      ]
+    },
+    {
+      "id": "local.cpu_memory_bytes.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "65aa27868441d31d8c2efe0ca70e7208323d19b0",
+        "passedScope": "scripts\\qualify_cpu_memory_bytes.py on build 60afdc8 (frozen D;C:\\Program Files\\Git\\cmq\\b2) in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table."
+      },
+      "artifacts": [
+        "evidence/local.cpu_memory_bytes.20261026.json"
+      ],
+      "limitations": [
+        "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
+        "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
+      ]
+    },
+    {
+      "id": "local.explorer.native-providers.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7f1492d6992810fb6febd4057940987f34e2f742",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py on release tia-mcp-v21_20261026_124042_240b4494 (source 7f1492d). Fresh owned TIA V21 scratch (CPU 1511-1PN) plus IM 155-6AU02 V6.4 head, one subnet and one IO system created through prepared hardware_add, network_configure and network_io_assign. The explorer's connectedSubnet, ioSystemController and ioSystemDevice edges matched exactly the 4 associations derived from independent hardware_inspect reads, from both the hardware side (outgoing) and the subnet/IO-system side (incoming), and the portable export retained them. Capture of 95 nodes included the new subnet, ioSystem, watchTableGroup, forceTable, externalSourceGroup and externalSource nodes with a complete nativeHierarchy. The --verify-report rerun reopened the saved fixture with zero prepared changes and reproduced every edge. Capture 337/499 ms, relationship queries 325-476 ms."
+      },
+      "artifacts": [
+        "evidence/local.explorer.native-providers.20261026.json"
+      ],
+      "limitations": [
+        "One small fixture with one subnet, one IO system and one IO device; no multi-subnet, shared-device, redundant or IE/PB-coupler topologies. Configured associations only, never cables, ports or physical topology.",
+        "No technology objects or software-unit relations existed in the fixture, so the technologyConnections and softwareUnitRelations providers remain natively unqualified; watch-table and populated external-source captures were not compared against an independent oracle."
+      ]
+    },
+    {
+      "id": "local.explorer.native-providers.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "97ba3183c266ebe4ab07535dcd8401929ffcc002",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py (source 97ba318) on release tia-mcp-v21_20261027_064910_1e3d1e2a (built from 09b0e30; host and worker sources are identical at 97ba318) with scripts/native/UnitSeeder explorer-relations as the registered fixture tool. Fresh owned TIA V21 scratch (CPU 1511-1PN) with the subnet/IO-system fixture of local.explorer.native-providers.20261026 plus a TM PosInput 2 V2.0 module plugged through prepared hardware_plug; the seeder then created software units ExplorerUnitA and ExplorerUnitB with the SoftwareUnit relation A -> B and a TO_ExternalEncoder V10.0 whose sensor interface is connected to the module's technology channel, and compiled with 0 errors. The explorer's technologyConnection edges from ExplorerEncoder resolve only to the TM PosInput module, matching the hardware paths of technology_read; the unitRelation edge from ExplorerUnitA resolves to unit B and unit B has none, matching software_inspect relations; both providers report complete providerCoverage and are declared in providerScope. The configured-network edges again matched their 4 hardware_inspect associations. The --verify-report rerun reopened the saved fixture with zero prepared changes and reproduced every edge. Capture 398/1,730 ms, relationship queries 470-2,097 ms."
+      },
+      "artifacts": [
+        "evidence/local.explorer.native-providers.20261027.json"
+      ],
+      "limitations": [
+        "One small fixture: one external encoder connected to one TM PosInput channel and one SoftwareUnit relation between two empty units. Axis, measuring-input and output-cam connections, tag/block/address targets, NonUnitDB and TODB relations and unresolved/ambiguous names were not exercised natively (they keep their offline oracle tests).",
+        "Unit relations and the TO connection are authored by the native UnitSeeder fixture tool, not by an MCP route; neither has a prepared change kind. Configured associations only, never cables, ports or physical topology; single-machine timings are not a latency guarantee."
+      ]
+    },
+    {
+      "id": "local.hostonly.vci.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_vci_host_mcp.py on the Release Host with real Git: 72 stdio checks across several Host lifetimes. Every VCI response validates against its JSON contract; exact BOM/CRLF/binary/Unicode bytes, empty files, explicit deletion, parent history, branches, package capture/compare, old-revision materialization, wrong/stale review refusal, an owned Host interruption after the durable dispatch callback, fresh-Host replay refusal and receipt-only reconciliation."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.vci.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native VCI workspace, mapping, export/import, project reconstruction or remote Git publication."
+      ]
+    },
+    {
+      "id": "local.hostonly.graph.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_graph_host_mcp.py on the Release Host: 43 stdio checks. GRAPH v6 inspect/compare/reopen/report pages/artifact reads/list against the JSON contract, exact source download, tampered-record refusal that survives a Host restart, restored-source revalidation, incomplete-publication visibility and no native engineering operation."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.graph.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native GRAPH schema, import, compilation, rendering or runtime behavior."
+      ]
+    },
+    {
+      "id": "local.hostonly.automationml.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_automationml_host_mcp.py on the Release Host: 69 stdio checks. CAEX 2.15/3.0 inspect/compare/reopen/report pages/artifact reads/list against pinned XSDs and the JSON contract, exact retained bytes, plain text/CDATA/absent/empty distinctions, ID/name collisions, tamper refusal; nativeQualified, importabilityCertified and impactScopeComplete stay false."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.automationml.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native AML import/export, inheritance expansion, device identity, catalog, compile or runtime."
+      ]
+    },
+    {
+      "id": "local.hostonly.opcua.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_opcua_host_mcp.py on the Release Host: 53 stdio checks. NodeSet inspect/compare/dependencies/dependency compare/report pages/reopen/list/artifact reads against the JSON contract, stale consumer refusal, bounded pages over 4,000 references, upload retries and no target probe."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.opcua.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Offline NodeSet documents only; no native OPC UA engineering, endpoint, runtime, security or compatibility certification."
+      ]
+    },
+    {
+      "id": "local.hostonly.translation.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/test_translation_host_mcp.py on the Release Host: offline capture/inspect/prepare/review pages/digest-bound approval/candidate/reconcile/reopen/list/artifact reads, blocked batches, the instance-inheritance alarm-text policy and normal Host exits; native import is not allowed."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.translation.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Synthetic workbook profiles; no Siemens export/import, language activation, category leakage resolution or translation_native_* route."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostics.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/qualify_trace_diagnostics_offline.py on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests (47/47 groups): saved-review import, diagnostic case/watch plans, manual trace handoff, v1/v2 measurement import with quality and clock epochs, analysis, comparison, report export, replanning and offline readback checks, contract validation of every envelope, stale/changed-artifact and tamper refusals with exact restoration."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostics.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, SIMATIC AX or device is involved and none is qualified.",
+        "Synthetic and independently authored measurements and reviews; no native trace acquisition, device-validated trace settings, live observability, causal diagnosis or fix proof.",
+        "trace_capabilities reports documented routes without a target probe; trace_prepare is a manual handoff and creates no native trace configuration."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-experiments.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+        "passedScope": "scripts/qualify_diagnostic_experiments_offline.py (57 MCP checks) and scripts/qualify_repeated_diagnostic_experiments_offline.py (78 MCP checks) on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests: experiment planning from exact saved cases, review with original-evidence and replan-lineage revalidation, 2..8 before/after pair comparison with explicit mappings and windows, JSON/Markdown/escaped HTML report export after rederivation, and stale/tampered input refusals."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, OPC UA server or device is involved and none is qualified.",
+        "Synthetic measurements only; no native or runtime acquisition (diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export are not covered), causal diagnosis or fix proof."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-ua.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ff5a75550925857916b229058c1ecc7ae4a49de8",
+        "passedScope": "scripts/qualify_diagnostic_ua_binding.py (with its observation and comparison qualifiers) on the Release Host against the owned encrypted OPC Foundation loopback fixture server from tests/TiaMcp.OpcUa.Runtime.Tests: 2,102 checks. Prebound diagnostic_ua_binding_plan on polling and subscriptions, diagnostic_ua_observe, diagnostic_ua_compare and diagnostic_ua_report_export, with mapping/session/node refusals, derived-document tamper, exact scalar retention, restart readback and no network replay."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-ua.20261027.json"
+      ],
+      "limitations": [
+        "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
+        "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
       ]
     }
   ],
@@ -3777,12 +4058,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Qualified for owned local PLCSIM Advanced V8 CPU1511 instances: refusal to a second Host until the creator exits, adoption after verified exit, and OFF confirmed through a fresh interface.",
           "Bounded public-API coverage; see target_capabilities and operation documentation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.creation.20261024",
+          "local.sim.state.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3989,12 +4274,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.state.20261024",
+          "local.sim.provision.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4707,6 +4996,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for creating one ET 200SP DI 8x24VDC ST (6ES7 131-6BF01-0BA0) or AI 4xU/I 2-wire ST (6ES7 134-6HD01-0BA1 V2.0) in a vacant slot of the IM 155-6 PN ST V6.4 rack on CPU 1511-1 PN V4.1; recovery is shown by the route's whole-project checkpoint, as for change.hardware_move. Central racks and other module families are unqualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -4714,10 +5004,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
         ]
       },
       "availability": {
@@ -5412,7 +5702,10 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
-          "local.library_dependencies.20261024"
+          "local.library_releases.20261026",
+          "local.library_dependencies.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6627,6 +6920,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for the input start address of one ET 200SP DI 8x24VDC ST or AI 4xU/I 2-wire ST module under IM 155-6 PN ST V6.4 on CPU 1511-1 PN V4.1, including checkpoint recovery and fresh reopen; central modules, output ranges and other families are unqualified.",
           "Exact hardwarePath, ioType, oldStartAddress and startAddress select one exposed native I/O address; native controller ownership and address overlap are checked before mutation.",
           "Unknown controller ownership or conflicting ranges are rejected; native write access, mandatory compilation and a recovery checkpoint are required.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
@@ -6637,10 +6931,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.hardware.20261008",
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
         ]
       },
       "availability": {
@@ -6728,7 +7022,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
           "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
         ]
@@ -6738,7 +7032,10 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_formats.20261025",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6775,14 +7072,17 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6819,14 +7119,17 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6863,7 +7166,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -6904,14 +7207,17 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
           "local.library_formats.20261024",
-          "local.library_releases.20261024"
+          "local.library_releases.20261024",
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6948,7 +7254,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -6988,14 +7294,14 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7030,14 +7336,14 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7113,14 +7419,14 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024",
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7160,9 +7466,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.hostonly.diagnostics.20261027"
         ]
       },
       "availability": {
@@ -7238,14 +7544,13 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008",
+          "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024"
         ]
@@ -7411,7 +7716,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7424,8 +7729,11 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7468,7 +7776,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7523,7 +7831,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7535,6 +7843,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -7578,9 +7887,9 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7594,13 +7903,16 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_dmc_prerequisites.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025"
+          "local.library_dependencies.20261025",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7642,9 +7954,9 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7656,12 +7968,15 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025"
+          "local.library_dependencies.20261025",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7704,7 +8019,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, a new global instance DB, an existing LAD/FBD caller and scalar existing-tag bindings. Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
@@ -7757,7 +8072,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7768,9 +8083,12 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
-          "local.library_interruption.20261024"
+          "local.library_interruption.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7813,7 +8131,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7826,11 +8144,13 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025"
+          "local.library_interruption.20261025",
+          "local.library_protected.20261027"
         ]
       },
       "availability": {
@@ -7873,7 +8193,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7884,8 +8204,11 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7928,7 +8251,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7939,8 +8262,11 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7983,7 +8309,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7994,6 +8320,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8038,7 +8365,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8049,8 +8376,11 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8093,7 +8423,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8104,6 +8434,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8148,7 +8479,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8159,6 +8490,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8203,7 +8535,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8214,6 +8546,7 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024"
         ]
@@ -8258,7 +8591,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8270,8 +8603,11 @@
         "status": "unverified",
         "evidenceIds": [
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8314,7 +8650,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8365,7 +8701,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -8378,8 +8714,11 @@
         "evidenceIds": [
           "local.library_plc_master.20261008",
           "local.library_releases.20261024",
+          "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8485,7 +8824,8 @@
         "evidenceIds": [
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.native-providers.20261026"
         ]
       },
       "availability": {
@@ -8682,7 +9022,9 @@
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
           "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.native-providers.20261026",
+          "local.explorer.native-providers.20261027"
         ]
       },
       "availability": {
@@ -9092,7 +9434,7 @@
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. On the standard route, parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect (local.typed.transitive-capture.20261026) and are engineering-qualified for created multi-instance storage (local.typed.transitive-effects.20261026); software-unit and namespace parents and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9127,7 +9469,9 @@
           "local.typed.failed-source-recovery.20261026",
           "local.typed.iec-effect-standard.20261026",
           "local.typed.standard-created-storage-runtime.20261026",
-          "local.typed.insertion-storage.20261026"
+          "local.typed.insertion-storage.20261026",
+          "local.typed.transitive-capture.20261026",
+          "local.typed.transitive-effects.20261026"
         ]
       },
       "availability": {
@@ -9218,10 +9562,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "reviews.native.20261009",
-          "reviews.native.diamond.20261012"
+          "local.reviews.20261024"
         ]
       },
       "availability": {
@@ -9478,6 +9821,55 @@
       ]
     },
     {
+      "featureId": "change.hardware_cpu_memory_bytes",
+      "domain": "hardware",
+      "title": "Set CPU system and clock memory bytes",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hardware_cpu_memory_bytes",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base typed API; native target qualification remains separate."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Only CPU device items that declare the native V21 SystemMemoryByte and ClockMemoryByte attributes; other items, including CPU 1214C DC/DC/DC V4.7, are refused as UnsupportedCapability. Natively qualified on CPU 1511-1 PN and CPU 1516-3 PN/DP V4.1 only.",
+          "SystemMemoryByteAddress and ClockMemoryByteAddress (UInt64) exist only while their flag is enabled: enabling requires the byte number, a byte number of a disabled flag is refused, and flags are written first. Byte numbers are integers 0-65535; enabled bytes must differ (AddressConflict); Siemens checks the CPU's bit-memory size at compile (0..16383 on the qualified CPUs).",
+          "Preservation covers observed identities, slots, reviewed hardware attributes including the four memory byte settings, address ranges/owners and configured network associations. TIA's own system/clock memory tags are added to the default tag table and stay there when the bytes are disabled; runtime behavior is not qualified."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.cpu_memory_bytes.20261026"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "title": "Assign or disconnect one native remote-I/O connector",
@@ -9555,8 +9947,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9596,8 +9990,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9637,8 +10033,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9677,8 +10075,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9719,8 +10119,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9760,8 +10162,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9801,8 +10205,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9845,8 +10251,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9888,8 +10296,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9928,8 +10338,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11022,8 +11434,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11067,8 +11481,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11112,8 +11528,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11157,8 +11575,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11202,8 +11622,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11247,8 +11669,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11292,8 +11716,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11337,8 +11763,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11381,8 +11809,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11425,8 +11855,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.translation.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12263,8 +12695,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12305,8 +12739,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12347,8 +12783,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12389,8 +12827,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12431,8 +12871,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12473,8 +12915,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12515,8 +12959,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12557,8 +13003,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.opcua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12960,8 +13408,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13003,8 +13453,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13046,8 +13498,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13089,8 +13543,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13132,8 +13588,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13175,8 +13633,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13218,8 +13678,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13261,8 +13723,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13304,8 +13768,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13347,8 +13813,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13390,8 +13858,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13433,8 +13903,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13475,8 +13947,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13517,8 +13991,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13559,8 +14035,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13601,8 +14079,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13643,8 +14123,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.graph.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13685,8 +14167,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13727,8 +14211,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostics.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13767,8 +14253,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13809,8 +14297,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13851,8 +14341,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13893,8 +14385,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13935,8 +14429,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13977,8 +14473,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.automationml.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16356,8 +16854,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16398,8 +16898,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16440,8 +16942,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16482,8 +16986,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-experiments.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17364,8 +17870,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17405,8 +17913,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17446,8 +17956,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17487,8 +17999,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.diagnostic-ua.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",

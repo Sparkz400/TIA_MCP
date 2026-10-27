@@ -179,7 +179,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("MutationVerificationFailed", "The previous I/O system still contains the moved or disconnected connector.");
         }
 
-        private JArray CaptureHardwareEngineering(Project project)
+        private JArray CaptureHardwareEngineering(Project project, bool cpuMemoryBytes = false)
         {
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
@@ -223,7 +223,7 @@ namespace TiaMcp.Openness.V21
                 var item = entry.Item;
                 var row = new JObject { ["path"] = entry.Path, ["name"] = item.Name, ["typeIdentifier"] = HardwareEngineeringRules.MetadataString(item.TypeIdentifier), ["positionNumber"] = item.PositionNumber,
                     ["containerPath"] = HardwareEngineeringRules.MetadataString(item.Container is DeviceItem container ? Owner(container) : null),
-                    ["attributes"] = Attributes(item, HardwareWriteAttributes),
+                    ["attributes"] = Attributes(item, cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : HardwareWriteAttributes),
                     ["channels"] = new JArray(item.Channels.OrderBy(channel => channel.Type).ThenBy(channel => channel.IoType).ThenBy(channel => channel.Number).Select(channel => new JObject { ["number"] = channel.Number, ["type"] = channel.Type.ToString(), ["ioType"] = channel.IoType.ToString(), ["attributes"] = Attributes(channel, ChannelWriteAttributes) })),
                     ["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["ioType"] = address.IoType.ToString(), ["startAddress"] = address.StartAddress, ["lengthBits"] = address.Length,
                         ["owners"] = new JArray(address.AddressControllers.Select(owner => Owner(owner)).OrderBy(value => value, StringComparer.Ordinal)) })) };
@@ -239,7 +239,7 @@ namespace TiaMcp.Openness.V21
         private void PrepareHardwarePreservation(EngineeringChange change, Project project, JObject preview)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            change.HardwareBeforeManifest = CaptureHardwareEngineering(project);
+            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
             string path = Path.Combine(change.Directory, "hardware-before.json");
             File.WriteAllText(path, change.HardwareBeforeManifest.ToString(Formatting.Indented));
             change.Backups.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -251,7 +251,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHardwarePreservation(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var after = CaptureHardwareEngineering(project);
+            var after = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -262,7 +262,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHardwareRecovery(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var restored = CaptureHardwareEngineering(project);
+            var restored = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
             string path = Path.Combine(change.Directory, "hardware-restored.json");
             File.WriteAllText(path, restored.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-recovery", ["artifact"] = ChangeArtifact(path) });

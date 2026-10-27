@@ -63,12 +63,12 @@ Downloads with receipts (URL, size, SHA-256, licence) are under `D:\lcq\vendor`.
 TIA V16 VCI export of 55 SimaticML files; V21 refuses its Engineering version (V16), so a native import needs an intermediate
 V17–V20 installation. DMC Siemens Open Library 19.0 (MIT, © DMC, Inc.) upgrades all five archives; one dependency-free data
 type instantiates with an exact link. DMC prerequisites (CPU system/clock memory bytes, "Open Library" tag-table master copy)
-are outside current MCP routes, so complete DMC PLC compilation is not claimed. HMI behavior is left to lane D.
+were outside MCP routes on 24 October, so complete DMC PLC compilation is not claimed; both are covered since 25/26 October ([CPU memory bytes](cpu-memory-bytes-20261026.md)). HMI behavior is left to lane D.
 
 ## Not covered
 
 Multiple PLCs and software units, namespaces, protected/know-how objects, runtime behavior, a V20 library, kills during native
-mutation or save, and PAL native import.
+mutation or save, and PAL native import. (Protected objects and unit relations since covered: [27 October](#protected-objects-and-related-software-units--27-october-2026).)
 
 ## Follow-up slice — 25 October 2026
 
@@ -88,7 +88,7 @@ Build 041b0d8 (frozen `D:\lcq\b8`):
 - **Locked sources.** The library adapter refuses a locked source as `SourceLocked`; for `library_open` the shared admission scope hashes the source first, so the refusal surfaces there as an `IOException` naming the locked file.
 - **Inventory checks.** `project_inventory` lists blocks only; refusal and recovery checks now also compare PLC data types and tag tables through `software_inspect`. The vendor and formats runs were repeated under this check.
 
-Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory.
+Still not covered: software units and namespaces (unit creation needs a native fixture tool whose Openness AllowList key requires an elevated `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`), protected objects, runtime behavior, a V20 library, PAL native import and DMC CPU clock memory (since closed: [CPU memory bytes](cpu-memory-bytes-20261026.md)).
 
 ## Software units and namespaces — 25 October 2026
 
@@ -100,3 +100,69 @@ After the user's elevated Openness grant, `scripts/native/LibraryUnitSeeder` see
 - The unit use survives a fresh reopen.
 
 `local.library_dependencies.20261025` repeats the dependency run on this build to confirm same-scope reuse is unaffected.
+
+## Release behavior on PLCSIM — 26 October 2026
+
+`local.library_releases.20261026` (`qualify_library_release_changes.py` at bc974fc, build da24990 frozen at `D:\lrc\b9`, raw
+report `D:\lrc\a\rc_e57871ae`, 105/105 steps) extends the release run above with behavior executed on fresh owned PLCSIM
+Advanced V8 CPU1511 instances. One instance per release is downloaded from the saved scratch.
+
+- **Oracles.** The runner's `INSTANCE` and `BEHAVIOR` tables are authored from the fixture SCL, not read back from the
+  builder. A runtime probe (`fixtures/libraries/release-changes/ReleaseProbe.scl`: global DB, second instance DB, own
+  program-cycle OB) writes `Enable`. `sim_test` asserts the probe output, the probe instance output, Main's instance output
+  and Main's UDT field.
+- **1.0.0 → 1.1.0 (implementation only).** 1.0.0 copies the input. After the update to exactly 1.1.0, both instance DBs keep
+  `Input: Enable`, `Output: Active`, the unrelated native exports are unchanged, and the inverted truth table passes.
+- **2.0.0 (breaking).** The update fails compilation at exactly `Main (OB1)` and `TiaMcpReleaseProbe_Cycle (OB123)`
+  ("The formal parameter 'Active' is invalid.") and nowhere else. It is not saved; the checkpoint restores to a new location
+  and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged.
+- **Adapted callers.** A fresh consumer at exactly 2.0.0 with the same two callers adapted to `Ready` compiles clean. Its
+  instance DBs expose `Ready` and no `Active`, and the 2.0.0 truth table passes.
+- All 67 retained library observations (21 original-byte lock receipts) validate against the library schemas.
+
+Native findings:
+
+- A consumer download refuses library blocks compiled without simulation support ("'TiaMcpLibraryGate [FB2]' cannot be
+  simulated … use a library with simulation support"). The consumer's project setting cannot reach non-editable library
+  blocks, so simulation support must be enabled in the authoring project before the types are created.
+- On this build a compile-failed library update returns its shared admission. The `outcomeUnknown` plus reconciliation
+  seen in lane C no longer occurs, and the runner reconciles only an unresolved admission.
+
+Not covered: instance data retention across update and re-download (the FB is stateless), caller migration within the
+failing update (project-library updates require `compile=true`), software units, protected/F types and physical CPUs.
+(Protected FB types and related units since covered: [27 October](#protected-objects-and-related-software-units--27-october-2026).)
+
+## Protected objects and related software units — 27 October 2026
+
+Build 51d1d9e (frozen `D:\lpr\b1`, package `tia-mcp-v21_20261027_065357_c5960a43`), owned scratch projects, no runtime.
+`scripts/native/LibraryUnitSeeder` gains three fixture modes: `protect` (know-how protection with a random password
+that is never stored), `related` (two units with one `SoftwareUnit` relation) and `publish` (sets a unit object's
+`Access` attribute to `Published`).
+
+| Evidence | Runner | Result |
+| --- | --- | --- |
+| [`local.library_protected.20261027`](../../evidence/local.library_protected.20261027.json) | `qualify_library_protected.py` | 60/60 steps, 41 observations valid |
+| [`local.library_unit_relations.20261027`](../../evidence/local.library_unit_relations.20261027.json) | `qualify_library_unit_relations.py` | 58/58 steps, 49 observations valid |
+
+**Protected objects.**
+
+- **Create.** A protected plain FB becomes a global-library master copy. An FB type's in-work test instance is protected and released as 1.0.0.
+  Worker fix: the in-work content pin previously refused protected test instances, because Openness cannot export them. It now uses the block's native fingerprints, the same values the project fingerprint already uses for protected user blocks.
+- **Copy.** `library_publish` copies the protected type into the global library. A metadata-only edit and release of the still-protected test instance gives 1.1.0, published as the new default.
+- **Instantiate.** In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected, and Main calls both.
+- **Update.** The PLC-wide update to exactly 1.1.0 applies. The cleanup guard reads cross-references of every block, protected ones included. A fresh reopen keeps both blocks protected.
+- **Exact refusals.**
+  - `block_read` refuses every protected block with `ProtectedObject`.
+  - Openness refuses `ExportAsDocuments` of a protected type version ("The block is know-how-protected and cannot be exported"). The worker returns this as `EngineeringError`. As a result, `library_edit_version` from documents (a content change) is unavailable for protected versions.
+  - V21 Openness has no protection service for PLC data types, so protected UDTs cannot be produced.
+
+**Related software units.** `TiaMcp_LibConsumer` has a `SoftwareUnit` relation to `TiaMcp_LibProvider`.
+
+- FB and UDT 1.0.0 instantiate into the provider.
+- Instantiating either one in the related consumer is refused before any write (`LibraryConflict`). The one-instance-per-device rule holds across relations.
+- TIA accepts `Published` on the typed provider instances. A consumer-unit cycle OB, instance DB and UDT DB then call them through the relation and compile.
+- The PLC-wide update to exactly FB 1.1.0 applies. The cleanup guard proves both provider uses through native cross-unit edges from the consumer OB: OB → instance DB → FB, and UDT DB → UDT. The UDT stays at 1.0.0 and every path is unchanged.
+- A fresh reopen keeps the relation, FB 1.1.0 and the placement.
+
+Not covered: `NonUnitDB`/`TODB` relations, namespaces on library instances, safety units, protected UDTs, content
+changes of protected versions, MCP routes for units/relations/protection, and runtime behavior.
