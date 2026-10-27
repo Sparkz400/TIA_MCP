@@ -81,7 +81,8 @@ def verify_reference_additions(before, after, names, scope, namespace, modifies=
     changed = [new[key] for key in old if old[key]["payloadSha256"] != new[key]["payloadSha256"]]
     require(all(row.get("kind") == "block" and row.get("name") in allowed for row in changed), "Reference capture changed existing native XML.")
     require({row["name"] for row in changed} >= set(modifies), "A declared modification left its native block unchanged.")
-    added = [new[key] for key in set(new) - set(old)]
+    # Protected system FBs that TIA copies into System blocks on first use (R_TRIG, F_TRIG) are generated, not authored.
+    added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock"]
     expected = set(names) - set(modifies)
     require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable") for row in added)
         and {row["name"] for row in added} == expected, "Reference capture did not add exactly the declared objects.")

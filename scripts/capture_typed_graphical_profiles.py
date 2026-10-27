@@ -70,12 +70,22 @@ def capture(args):
             assert applied["state"] == "applied" and applied["compile"]["errorCount"] == 0
             entry["compile"] = applied["compile"]
             entry["exports"] = []
+            missing = []
             for name in dict.fromkeys([*names, *args.observe_block]):
-                exported = call("block_read", {"blockName": name})
+                try:
+                    exported = call("block_read", {"blockName": name})
+                except Exception as error:  # An applied source whose block cannot be read back is recorded, not captured.
+                    missing.append({"name": name, "message": str(error)})
+                    continue
                 target = output / (name + ".xml")
                 target.write_text(exported["xml"], encoding="utf-8")
                 entry["exports"].append({"name": name, "path": str(target),
                     "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), "block": exported["block"]})
+            if missing:
+                entry["exportFailures"] = missing
+                persist()
+                print("UNREADABLE " + source_path.name, flush=True)
+                continue
             entry["engineeringVerified"] = True
             persist()
             print("CAPTURED " + source_path.name, flush=True)
