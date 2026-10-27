@@ -11,7 +11,9 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Safety;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Alarm;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Supervision;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.TechnologicalObjects.Motion;
@@ -63,6 +65,8 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
                     blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
                 AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
+                AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
+                AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
             }
 
             if (selected.Plc != null)
@@ -97,6 +101,13 @@ namespace TiaMcp.Openness.V21
                             blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
                     AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog; Siemens validates the requested pair during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
                         blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
+                    const string alarmBlocker = "Safety units are excluded from PLC alarm and ProDiag imports.";
+                    AddTargetFeature(features, "change.plc_alarm_text_list_import", ProbeCapabilityService<PlcAlarmTextListProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX with explicit None/Override and expected list names; native result/log, fresh-export readback and list-name verification. The workbook layout is not interpreted.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_alarm_instance_text_import", ProbeCapabilityService<PlcAlarmTextProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX updating existing alarm instance texts; native result/log and fresh-export readback only.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
+                        blocked: safetyScope, blocker: alarmBlocker);
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
                     AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
                 }

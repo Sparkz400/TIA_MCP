@@ -20850,6 +20850,264 @@
         "AC-completeness",
         "AC-evidence"
       ]
+    },
+    {
+      "featureId": "change.plc_alarm_text_list_import",
+      "domain": "engineering",
+      "title": "Import PLC alarm user text lists from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_text_list_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Alarm.PlcAlarmTextListProvider>() on PlcSoftware or PlcUnitBase; ImportFromXlsx(FileInfo, ImportOptions.None|Override) returning TextListXlsxResult (State, LogFilePath); ExportToXlsx(FileInfo) for preimage, readback and fingerprint (TextListNotFoundException = no lists); PlcAlarmTextlistGroup.PlcAlarmUserTextlists (Name, ID, ListRange) for name readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The supplied workbook is imported as hash-bound opaque bytes; its layout and list entries are not interpreted. expectedTextListNames must name every imported list: None refuses existing names at prepare, Override replaces each supplied list's complete entry set. Readback verifies list names; entries, ranges, comments and languages are covered only by the retained fresh export and its content hash.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Safety units, system text lists and the text-list library lifecycle (CreateFrom, delete, rename, master copies) are not covered.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256 and expectedTextListNames"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "domain": "engineering",
+      "title": "Import PLC alarm instance texts from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_instance_text_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Alarm.PlcAlarmTextProvider>() on PlcSoftware or PlcUnitBase; ImportInstanceTextsFromXlsx(FileInfo, languages: null) returning PlcAlarmTextXlsxResult (State, LogFilePath); ExportInstanceTextsToXlsx(FileInfo, null, PlcAlarmTextXlsxExportOption.All) for preimage, readback and fingerprint."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Updates texts of existing alarm instances in all workbook languages; instance creation and language activation are not part of this route. Workbook keys and inherited-text markers are not interpreted.",
+          "Readback is the native result/log and a fresh All-option export; individual alarm texts are not verified.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "domain": "engineering",
+      "title": "Import project alarm classes from a supplied DAT",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_class_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: Project.GetService<Siemens.Engineering.SW.Alarm.AlarmClassDataProvider>(); Import(FileInfo) and Export(FileInfo) returning AlarmClassExportImportResult (State, ErrorCount, WarningCount, Messages[State, Message])."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Project-wide opaque DAT: schema, class limits and active-language overlap are left to the native import. Every PLC/HMI consumer of the classes is affected; apply compiles every device in the project.",
+          "Readback is the native result, counts, first 500 messages and a fresh DAT export.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Supplied absolute .dat artifactPath with expectedSha256; no plcPath/scopePath owner"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "domain": "engineering",
+      "title": "Import project ProDiag supervision settings from a supplied DAT",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_supervision_settings_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: Project.GetService<Siemens.Engineering.SW.Supervision.SupervisionSettingsProvider>(); Import(FileInfo) and Export(FileInfo) returning SupervisionSettingsExportImportResult (State Success|ErrorRollback, ErrorCount, WarningCount, Messages[Message])."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Project-wide opaque ProDiag settings DAT. A missing provider, LicenseNotFoundException or MissingProductsException refuses at prepare with the native message. ErrorRollback fails apply; the rollback itself is not trusted and the checkpoint remains the recovery route.",
+          "Readback is the native result, counts, first 500 messages and a fresh DAT export; apply compiles every device in the project.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "ProDiag product/license where the native provider requires it",
+        "Supplied absolute .dat artifactPath with expectedSha256; no plcPath/scopePath owner"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "domain": "engineering",
+      "title": "Import ProDiag supervisions from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_supervision_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Supervision.SupervisionProvider>() on PlcSoftware or PlcUnitBase; ImportSupervisionsFromXlsx(FileInfo, ImportOptions.None|Override) returning SupervisionXlsxResult (State Success|Failure, LogFilePath); ExportSupervisionsToXlsx(FileInfo) for preimage, readback and fingerprint."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Global supervision workbook of one PLC or software unit; the per-ProDiag-FB provider and ImportSupervisionSettingsFromXlsx are not called. Workbook schema, supervision IDs and generated ProDiag objects are not interpreted. A missing provider or license/product error refuses at prepare with the native message.",
+          "Failure fails apply; readback is the native result/log and a fresh supervision export.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "ProDiag product/license where the native provider requires it",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
     }
   ]
 }
