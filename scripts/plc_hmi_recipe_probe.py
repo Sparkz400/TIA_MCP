@@ -16,8 +16,13 @@ def _require(condition, message):
 
 def _call(client, name, arguments):
     raw = client.request("tools/call", {"name": name, "arguments": arguments})
-    body = raw.get("structuredContent") or json.loads("\n".join(i["text"] for i in raw.get("content", []) if i.get("type") == "text"))
-    return raw.get("isError") is True, body
+    if raw.get("structuredContent"):
+        return raw.get("isError") is True, raw["structuredContent"]
+    text = "\n".join(i["text"] for i in raw.get("content", []) if i.get("type") == "text")
+    try:
+        return raw.get("isError") is True, json.loads(text)
+    except ValueError:  # SDK argument errors are plain text
+        return raw.get("isError") is True, {"error": {"code": None, "message": text}}
 
 
 def _pin(version):
@@ -68,8 +73,9 @@ def probe_plc_hmi_recipe(client, profile, inspections, proofs):
              and [s["kind"] for s in plan["steps"]] == ["library_instantiate", "graphical_typed_edit", "hmi_engineering"]
              and plan["hmi"]["tags"][0]["plcSymbol"] == "MotorDrive_1.status.speed"
              and plan["hmi"]["target"]["connection"]["plcPath"] == plc_b, "Combined install plan differs from the native fixture")
-    refused, applied = _call(client, "change_apply", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "idempotencyKey": "plchmi-probe-install"})
-    _require(refused and applied.get("error", {}).get("code") == "PlcIntegrationNotQualified", "Combined apply must stay refused")
+    refused, applied = _call(client, "change_apply", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "idempotencyKey": "plchmi-probe-install",
+                                              "checkpointSave": False, "compile": False, "save": False})
+    _require(refused and applied.get("error", {}).get("code") == "PlcIntegrationNotQualified", "Combined apply must stay refused: " + json.dumps(applied, ensure_ascii=False)[:2000])
     update = {"schemaVersion": 1, "action": "plc_hmi_update_plan", "planOnly": True, "source": source,
               "selection": [_pin({**fixture["motorStatus"], **fixture["motorStatus"]["v2"]})],
               "target": {"projectName": project_name, "plcPath": a["plcOwner"]["objectPath"]},

@@ -39,6 +39,7 @@ class Fake:
     def request(self, method, params):
         arguments = params["arguments"]; self.calls.append(arguments)
         if params["name"] == "change_apply":
+            assert {"checkpointSave", "compile", "save"} <= arguments.keys(), "Host change_apply requires checkpointSave"
             return {"structuredContent": {"state": "applied"}} if not self.apply_refused else {"isError": True, "structuredContent": {"error": {"code": "PlcIntegrationNotQualified"}}}
         payload = arguments["payload"]
         if payload["hmi"]["family"] == "classic": return {"isError": True, "structuredContent": {"error": {"code": "HmiFamilyNotQualified"}}}
