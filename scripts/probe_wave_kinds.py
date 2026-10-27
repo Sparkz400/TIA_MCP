@@ -112,15 +112,16 @@ def body(h):
                           "validFromUtc": now.isoformat().replace("+00:00", "Z"), "validUntilUtc": (now + timedelta(days=365)).isoformat().replace("+00:00", "Z")})
         result = {"before": before, "create": created}
         if created["prepared"]:
-            after = h.tool("certificate_inspect", {"hardwarePath": cpu})
-            result["after"] = after
-            ids = lambda r: {c.get("id") for s in r.get("stores", r.get("cpus", [])) for c in s.get("certificates", [])}
-            new = sorted(i for i in ids(after) - ids(before) if i is not None)
-            result["newIds"] = new
-            if len(new) == 1:
-                result["delete"] = attempt(h, "certificate_delete", {"hardwarePath": cpu, "certificateId": new[0]})
+            new = created["applied"]["readbacks"][0]["certificate"]["certificateId"]
+            old = created["preview"]["effects"][0]["storeCertificateIds"]
+            result["newId"] = new
+            if old == [1]:  # The scratch's PLC communication certificate is the store's only certificate.
+                swap = {"hardwarePath": cpu, "targetPath": cpu, "attributeName": "PlcCommunicationCertificate"}
+                result["assign"] = attempt(h, "certificate_assign", {**swap, "certificateId": new, "expectedCertificateId": 1})
+                result["assignBack"] = attempt(h, "certificate_assign", {**swap, "certificateId": 1, "expectedCertificateId": new})
+            result["delete"] = attempt(h, "certificate_delete", {"hardwarePath": cpu, "certificateId": new})
         return result
-    probe(h, "certificate create and delete", certificates)
+    probe(h, "certificate create, assign and delete", certificates)
 
     def instances():
         upsert = attempt(h, "source_upsert", {"scopePath": plc, "language": "SCL", "source": PROBE_SOURCE,

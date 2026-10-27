@@ -91,7 +91,8 @@ namespace TiaMcp.Openness.V21
                 var request = CertificateCreateRequest(payload);
                 var template = store.GetCertificateTemplate((CertificateUsage)Enum.Parse(typeof(CertificateUsage), (string)request["usage"]));
                 template.SubjectCommonName = (string)request["subjectCommonName"];
-                template.ValidFrom = CertificateTime(payload, "validFromUtc"); template.ValidUntil = CertificateTime(payload, "validUntilUtc");
+                // TIA reads template times as local wall-clock time whatever their Kind (native probe wp_86e4e508), so pass local time.
+                template.ValidFrom = CertificateTime(payload, "validFromUtc").ToLocalTime(); template.ValidUntil = CertificateTime(payload, "validUntilUtc").ToLocalTime();
                 // The template's default alternative names are replaced by exactly the requested ones.
                 foreach (var name in template.SubjectAlternativeNames.ToArray()) name.Delete();
                 foreach (JObject name in request["subjectAlternativeNames"])

@@ -2377,8 +2377,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
-      "sha256": "fe7c853845c59c66e39f034454a4a40e5033c671a30112e20abacf4def2e529c",
-      "bytes": 23541
+      "sha256": "4920119b14e1b7696c03682ec03f1f6da094d8fce2d5f682a034c051133afed0",
+      "bytes": 23706
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -81125,8 +81125,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
               "line": 83,
-              "endLine": 143,
-              "sha256": "6d6060ace0592c2b0f12063f8a76b5fc6c18323012c38e73a0bc36bc741aed80"
+              "endLine": 144,
+              "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
         }
@@ -81183,8 +81183,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
               "line": 83,
-              "endLine": 143,
-              "sha256": "6d6060ace0592c2b0f12063f8a76b5fc6c18323012c38e73a0bc36bc741aed80"
+              "endLine": 144,
+              "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
         }
@@ -81241,8 +81241,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
               "line": 83,
-              "endLine": 143,
-              "sha256": "6d6060ace0592c2b0f12063f8a76b5fc6c18323012c38e73a0bc36bc741aed80"
+              "endLine": 144,
+              "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
         }
@@ -81299,8 +81299,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
               "line": 83,
-              "endLine": 143,
-              "sha256": "6d6060ace0592c2b0f12063f8a76b5fc6c18323012c38e73a0bc36bc741aed80"
+              "endLine": 144,
+              "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
         }
@@ -83954,8 +83954,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
               "line": 83,
-              "endLine": 143,
-              "sha256": "6d6060ace0592c2b0f12063f8a76b5fc6c18323012c38e73a0bc36bc741aed80"
+              "endLine": 144,
+              "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuMemoryBytes.cs",
