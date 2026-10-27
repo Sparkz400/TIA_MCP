@@ -6,7 +6,7 @@
     "catalogVersion": "0.4.31",
     "catalogSha256": "7ad3e4edb6f416ecbb32d7708c6c7778c4a75759cb96f4c316d90bdc65c56bbf",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "7a519d6a5f5cc3df5e4e7f715ea68e232647ffc435d0b7a1d1d39c77bc1ebc3f"
+    "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
   "targetTiaVersions": [
     21
