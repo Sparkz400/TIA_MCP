@@ -21,7 +21,7 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsSharedMutation(string operation) => operation == "change_apply" || operation == "change_restore" ||
             operation == "simulation_download" || operation == "simulation_provision_scratch_credential" || operation == "library_open" ||
-            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step", "plc_station_upload";
+            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step" || operation == "plc_station_upload";
 
         private JObject SharedMutationBegin(JObject args)
         {
