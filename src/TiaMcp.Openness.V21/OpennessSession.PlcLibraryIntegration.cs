@@ -133,6 +133,86 @@ namespace TiaMcp.Openness.V21
             catch (PlcComponentException error) { throw new BridgeException(error.Code, error.Message); }
         }
 
+        private readonly bool _libraryIntegrateApplyEnabled;
+
+        private string PlcCombinedApplyRefusal(LibraryChange change)
+        {
+            var caller = change.Preview["integrationPlan"]?["callerArtifact"] as JObject; System.Xml.Linq.XDocument export;
+            try { export = caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))); }
+            catch (PlcComponentException error) { return "The retained caller export is unusable: " + error.Message; }
+            return PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export) ??
+                (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
+                    ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
+        }
+
+        // Only an enabled Host changes the preview, so the reviewed hash always states whether change_apply installs.
+        private void PreparePlcCombinedApply(LibraryChange change)
+        {
+            if (!_libraryIntegrateApplyEnabled) return;
+            string refusal = PlcCombinedApplyRefusal(change);
+            change.Preview["applySupported"] = refusal == null;
+            change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal,
+                ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate, then graphical_typed_edit. Not atomic.",
+                ["checkpoint"] = "The import step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
+                ["qualification"] = "Compiled against the V21 PublicAPI only; not natively qualified as a production route." };
+            if (refusal != null) return;
+            var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
+            coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Host-gated combined change_apply; not natively qualified as a production route.";
+            ((JArray)change.Preview["effects"]).Add(new JObject { ["action"] = "applyPlcComponentSteps", ["nativeMutation"] = true, ["steps"] = ((JArray)change.Preview["integrationPlan"]["steps"]).Count });
+            var warnings = (JArray)change.Preview["warnings"];
+            warnings.Where(w => ((string)w).StartsWith("Planning only.", StringComparison.Ordinal)).ToList().ForEach(w => w.Remove());
+            warnings.Add("Combined apply is enabled: change_apply installs these steps in order. They are not atomic; a failure stops at that step and leaves recovery_required.");
+        }
+
+        // Fresh preconditions under the apply lease, before any durable claim; the coordinator revalidates the exact hashed plan.
+        private PlcComponentCoordinator PlcComponentApplyCoordinator(LibraryChange change)
+        {
+            if (_sharedMutationLease == null) throw new BridgeException("MutationScopeIncomplete", "Combined library_integrate apply runs only under the Host's shared-mutation admission, which holds one exclusive lease across every step.");
+            try { return CreatePlcComponentProductionCoordinator(change, Path.Combine(change.Directory, "c")); }
+            catch (PlcComponentException error) { throw new BridgeException(error.Code, error.Message, LibraryChangeView(change)); }
+        }
+
+        // The reviewed plan hash approves both steps: the coordinator binds each freshly prepared step preview to the plan,
+        // verifies each step by readback and adopts the import step's project archive as the single recovery checkpoint.
+        private JObject ApplyPlcComponentIntegration(LibraryChange change, PlcComponentCoordinator coordinator)
+        {
+            JObject record = null; string step = null, journal = null;
+            change.State = "applying"; LibraryJournal(change, "claim", "completed");
+            try
+            {
+                record = coordinator.Status(); journal = Path.Combine(change.Directory, "c", record.Value<string>("operationId"), "component-journal.json");
+                change.Journal["combinedApply"] = CombinedApplySummary(journal, record, null); LibraryJournal(change, "component_steps", "dispatching");
+                for (int i = 0; i < 6 && record.Value<string>("state") != "installation_verified"; i++)
+                {
+                    string state = record.Value<string>("state"); step = PlcComponentQualificationGate.CombinedApplyStep(state);
+                    record = coordinator.Advance(state.EndsWith("_prepared", StringComparison.Ordinal) ? record[state.Split('_')[0]]["prepared"].Value<string>("previewHash") : null);
+                }
+                if (record.Value<string>("state") != "installation_verified") throw new BridgeException("ComponentOutcomeUnknown", "The component sequence did not reach verified installation.");
+                ((JArray)change.Journal["checkpoints"]).Add(record["initialCheckpoint"].DeepClone());
+                change.Journal["combinedApply"] = CombinedApplySummary(journal, record, null);
+                change.State = "applied"; change.Journal["engineeringVerified"] = true; change.Journal["persistenceVerified"] = false; change.Journal["runtimeVerified"] = false;
+                LibraryJournal(change, "transaction", "completed");
+                return LibraryChangeView(change);
+            }
+            catch (Exception exception)
+            {
+                // Read-only: an uncertain step is reconciled from its own journal, never replayed. The primary error is reported either way.
+                try { record = coordinator.Reconcile(); } catch { try { record = coordinator.Status(); } catch { } }
+                if (record?["initialCheckpoint"] is JObject checkpoint && ((JArray)change.Journal["checkpoints"]).Count == 0) ((JArray)change.Journal["checkpoints"]).Add(checkpoint.DeepClone());
+                string code = (exception as BridgeException)?.Code ?? (exception as PlcComponentException)?.Code ?? "NativeLibraryError";
+                change.State = "recovery_required"; change.Journal["combinedApply"] = CombinedApplySummary(journal, record, step ?? "start");
+                change.Journal["failure"] = new JObject { ["code"] = code, ["message"] = exception.Message, ["failedStep"] = step ?? "start", ["details"] = (exception as BridgeException)?.Details };
+                LibraryJournal(change, "transaction", "failed");
+                throw new BridgeException(code, "Combined apply failed at " + (step ?? "start") + ": " + exception.Message, LibraryChangeView(change));
+            }
+        }
+
+        private static JObject CombinedApplySummary(string journal, JObject record, string failedStep) => new JObject {
+            ["coordinatorJournal"] = journal, ["state"] = record?["state"]?.DeepClone(), ["failedStep"] = failedStep,
+            ["libraryChangeId"] = record?["library"]?["prepared"]?["changeId"]?.DeepClone(), ["typedChangeId"] = record?["graphical"]?["prepared"]?["changeId"]?.DeepClone(),
+            ["libraryStepDispatched"] = record?["library"]?["dispatch"] != null, ["initialCheckpointRecorded"] = record?["initialCheckpoint"] != null,
+            ["recovery"] = "change_restore on this changeId retrieves the single initial checkpoint into a new location in an empty owned Portal. Originals are never overwritten and no step is replayed." };
+
         // Other blocks using an existing instance DB; null when the native cross-reference read is incomplete (the planner then refuses reuse).
         private JArray PlcIntegrationInstanceUsers(PlcSelection plc, string path)
         {

@@ -1577,6 +1577,13 @@
       ]
     },
     {
+      "featureId": "library.integrate_combined_apply",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
       "featureId": "change.library_create_type",
       "obligations": [
         "X02",

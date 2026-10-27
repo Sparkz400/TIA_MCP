@@ -24,6 +24,7 @@ namespace TiaMcp.Openness.V21
                 bool testSuiteScopeProbe = false;
                 bool testSuiteQualification = false;
                 bool translationQualification = false;
+                bool libraryIntegrateApply = false;
                 string apiDirectory = InstalledApiDirectory();
                 string simulatorApiDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "Siemens", "PLCSIMADV", "API", "8.0");
                 string discoveryProbe = null;
@@ -54,6 +55,7 @@ namespace TiaMcp.Openness.V21
                     else if (args[i] == "--component-qualification") componentQualification = true;
                     else if (args[i] == "--testsuite-scope-probe") testSuiteScopeProbe = true;
                     else if (args[i] == "--translation-qualification") translationQualification = true;
+                    else if (args[i] == "--enable-library-integrate-apply") libraryIntegrateApply = true;
 #if TESTSUITE_QUALIFICATION
                     else if (args[i] == "--testsuite-qualification") testSuiteQualification = true;
 #endif
@@ -76,7 +78,7 @@ namespace TiaMcp.Openness.V21
                 if (testSuiteScopeProbe && componentQualification) throw new ArgumentException("Separate qualification modes required.");
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
-                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification);
+                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply);
             }
             catch (Exception exception)
             {
@@ -118,14 +120,14 @@ namespace TiaMcp.Openness.V21
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification)
+        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply)
         {
             using (var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.None))
             {
                 pipe.Connect(30000);
                 using (var reader = new StreamReader(pipe, new UTF8Encoding(false, true), false, 4096, true))
                 using (var writer = new TiaMcp.Transport.WorkerPipeWriter(pipe))
-            using (var session = new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification))
+            using (var session = new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply))
                 {
                     while (true)
                     {

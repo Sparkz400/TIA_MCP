@@ -130,11 +130,13 @@ foreach (string language in new[] { "LAD", "FBD" })
 // source-boundary check, not a substitute for the explicitly unrun native harness.
 Test("native apply gate is before idempotency claims and checkpoints", () => {
     string path = Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs");
-    string source = File.ReadAllText(path); int apply = source.IndexOf("private JObject LibraryChangeApply", StringComparison.Ordinal); int gate = source.IndexOf("PlcIntegrationNotQualified", apply, StringComparison.Ordinal);
-    // The code uses the shared constant, not a duplicated literal.
-    gate = source.IndexOf("PlcLibraryIntegrationPlanner.ApplyError", apply, StringComparison.Ordinal);
+    string source = File.ReadAllText(path); int apply = source.IndexOf("private JObject LibraryChangeApply", StringComparison.Ordinal);
+    // Flag off: the unchanged plan-only refusal (shared constant, not a duplicated literal). Flag on: the combined preconditions.
+    int flag = source.IndexOf("if (component && !_libraryIntegrateApplyEnabled)", apply, StringComparison.Ordinal);
+    int gate = source.IndexOf("PlcLibraryIntegrationPlanner.ApplyError, \"This PLC integration is a plan only.", apply, StringComparison.Ordinal);
+    int combined = source.IndexOf("PlcComponentApplyCoordinator(change)", apply, StringComparison.Ordinal);
     int claim = source.IndexOf("LibraryJournalStore.Claim", apply, StringComparison.Ordinal);
-    if (apply < 0 || gate < apply || claim <= gate) throw new Exception("Guard must precede durable claim.");
+    if (apply < 0 || flag < apply || gate <= flag || combined <= gate || claim <= combined) throw new Exception("Guards must precede durable claim.");
 });
 TextBoundaryTests.Run(Test);
 CoordinatorTests.Run(Test);
