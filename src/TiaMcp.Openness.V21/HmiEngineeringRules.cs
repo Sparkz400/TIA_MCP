@@ -7,17 +7,18 @@ namespace TiaMcp.Model
 {
     internal static class HmiEngineeringRules
     {
-        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create" };
+        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import" };
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
 
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml" }, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
             if (!Operations.Contains(operation, StringComparer.Ordinal)) throw new ArgumentException("Unknown HMI engineering operation.");
+            if (operation != "classic_xml_import" && payload["xml"] != null) throw new ArgumentException("xml is not applicable to this operation.");
             var target = payload["target"] as JObject ?? throw new ArgumentException("An exact HMI target identity is required.");
             HmiRecipeRules.RequireFamily(Text(target, "family"));
             foreach (string key in new[] { "projectCopyId", "sessionGeneration", "hmiPath", "objectPath" }) Text(target, key, 4096);
@@ -70,6 +71,14 @@ namespace TiaMcp.Model
                 }
                 RejectFields(payload, "name", "dataType", "placement", "bindings", "connection", "plcTag");
             }
+            else if (operation == "classic_xml_import")
+            {
+                if (Text(target, "family") != "classic") throw new ArgumentException("classic_xml_import is the Classic preserving XML route; Unified has no documented screen export to verify it.");
+                if (payload["xml"]?.Type != JTokenType.String) throw new ArgumentException("xml must be the complete supplied or edited native export document.");
+                try { HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml((string)payload["xml"])); }
+                catch (System.Xml.XmlException error) { throw new ArgumentException("xml is not a well-formed native export: " + error.Message); }
+                RejectFields(payload, "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag");
+            }
             else if (operation == "item_place")
             {
                 var placement = payload["placement"] as JObject ?? throw new ArgumentException("An explicit placement rectangle is required.");
@@ -103,7 +112,12 @@ namespace TiaMcp.Model
             HmiRecipeRules.RequireFamily(family);
             if (!Operations.Contains(operation, StringComparer.Ordinal)) throw new ArgumentException("Unknown HMI operation.");
             bool classicScalar = family == "classic" && operation == "scalar_property_set";
-            string reason = family == "unified" && operation == "external_tag_create"
+            bool classicXml = operation == "classic_xml_import", body = family == "unified" ? !classicXml : classicScalar || classicXml;
+            string reason = classicXml
+                ? family == "classic"
+                    ? "Classic per-object export and owning-composition Import(Override) are documented. Exact supplied-document readback, whole-HMI unrelated-content preservation, import dependency closure, compile, save/reopen and recovered-project equality have not passed for this exact device/runtime profile."
+                    : "Document import is the Classic route; installed V21 Unified exposes no screen export to verify a preserving import."
+                : family == "unified" && operation == "external_tag_create"
                 ? "The Unified external-tag body proves the integrated connection's PLC owner through native CommunicationManagement endpoints and the exact root PLC tag/type before writing. Tag-table export dependency closure, unrelated-resource preservation, compiler, save/reopen, archive-recovery and PLC communication gates have not passed for this exact device/runtime profile."
                 : family == "unified" && operation == "tag_create"
                 ? "Unified tag export is documented, but the native export/readback dependency closure and unrelated-resource preservation, compiler, save/reopen and archive-recovery gates have not passed for this exact device/runtime profile."
@@ -113,8 +127,8 @@ namespace TiaMcp.Model
                         ? "Classic screen export is documented. Exact BackColor property readback, full export/dependency coverage, unrelated-content preservation, compile, save/reopen and recovered-project equality have not passed for this exact device/runtime profile."
                         : "Classic has no typed screen-item or primitive tag Create route in the inspected V21 assembly; a family-specific preserving XML creation/binding adapter and its dependency closure remain required.";
             return new JObject { ["family"] = family, ["targetProfile"] = profile ?? "unknown", ["operation"] = operation,
-                ["apiAvailability"] = family == "unified" || classicScalar ? "available" : "partial",
-                ["bridgeImplementation"] = family == "unified" || classicScalar ? "guarded_body" : "unavailable",
+                ["apiAvailability"] = body ? "available" : family == "unified" ? "unavailable" : "partial",
+                ["bridgeImplementation"] = body ? "guarded_body" : "unavailable",
                 ["nativeQualification"] = "unverified", ["available"] = false, ["reasonCode"] = "HmiPreservationUnavailable", ["reason"] = reason,
                 ["requiredGates"] = RequiredGates(operation),
                 ["engineeringVerified"] = false, ["preservationVerified"] = false, ["persistenceVerified"] = false, ["recoveryVerified"] = false, ["runtimeVerified"] = false };
@@ -135,6 +149,7 @@ namespace TiaMcp.Model
                 case "existing_binding_set": gates.Add("existingBindingGuard"); gates.Add("exactTypedBindingOwnership"); break;
                 case "explicit_binding_set": gates.Add("exactTypedBindingOwnership"); gates.Add("bindingDependencyClosure"); break;
                 case "external_tag_create": gates.Add("newTagNamespaceUnique"); gates.Add("exactConnectionOwnership"); gates.Add("exactPlcDeclarationType"); break;
+                case "classic_xml_import": gates.Add("exactDocumentDelta"); gates.Add("objectIdentityPreserved"); break;
             }
             return gates;
         }

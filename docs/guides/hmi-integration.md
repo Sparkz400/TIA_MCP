@@ -32,7 +32,7 @@ The tree, details and relationships use the same exact references as agent queri
 
 ## Engineering and library integration
 
-The allowlist is exposed through `change_prepare` kind `hmi_engineering`, using the existing apply/status/restore workflow. Classic standalone-screen `BackColor` and Unified internal tag creation, selected item properties, existing faceplate placement and explicit interface binding have family-specific guarded bodies. The server rejects a request before project mutation if complete preservation, exact dependencies or the operation's native qualification are missing. There is no client flag to bypass a blocked gate.
+The allowlist is exposed through `change_prepare` kind `hmi_engineering`, using the existing apply/status/restore workflow. Classic standalone-screen `BackColor`, Classic whole-object XML import (`classic_xml_import`) and Unified internal tag creation, selected item properties, existing faceplate placement and explicit interface binding have family-specific guarded bodies. The server rejects a request before project mutation if complete preservation, exact dependencies or the operation's native qualification are missing. There is no client flag to bypass a blocked gate.
 
 `contracts/hmi-engineering.v1.schema.json` defines operation payloads. Scalar types, rectangles, names and explicit binding ownership are validated before dispatch; a metadata revision cannot replace the required native content fingerprint. Raw exports, the narrow qualified export-time normalization, baseline/after manifests, native compiler diagnostics and recovery evidence remain in the existing change journal. Unknown write outcomes are not replayed.
 
