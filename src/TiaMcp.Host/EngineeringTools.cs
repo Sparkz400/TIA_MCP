@@ -167,6 +167,11 @@ public sealed partial class TiaTools
         if (kind == "graph_import")
             try { request = new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).ImportPayload(payload); }
             catch (BridgeException error) { return Failure(error); }
+        // The worker cannot read Host review records, so the reviewed DB identity and snapshot hash are bound here.
+        if (kind == "db_snapshot_load_actual")
+            try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
+            catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
+            { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 

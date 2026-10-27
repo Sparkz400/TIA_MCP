@@ -17392,6 +17392,157 @@
       ]
     },
     {
+      "featureId": "db_snapshot_capture",
+      "domain": "online-diagnostics",
+      "title": "Capture the stored snapshot of one exact DB into a snapshot review",
+      "mcpTools": [
+        "db_snapshot_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.SW.Blocks.InterfaceSnapshot.Export(FileInfo, ExportOptions), obtained through PlcBlock.GetService<InterfaceSnapshot>() with DataBlock.Interface.GetService<InterfaceSnapshot>() as fallback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
+          "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
+          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Open project containing the exact saved DB with a stored snapshot; bounded writable artifact storage."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Saved project review whose exact GlobalDB/InstanceDB/ArrayDB and project path match the open project",
+        "A snapshot stored on that DB"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_create",
+      "domain": "simulation",
+      "title": "Store an owned PLCSIM instance's DB actual values as the DB snapshot",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "db_snapshot_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DataBlock.Interface.GetService<ValueService>().CreateSnapshot() online through OnlineProvider.GoOnline()/GoOffline() on the plc_online_compare route; InterfaceSnapshot.Export for backup and readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
+          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
+          "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM online route must pass runtime checks; the DB must be consistent with the instance's program."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus",
+        "Selected PLC offline with a PN/IE / PLCSIM (1) connection exposing one target interface",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_load_actual",
+      "domain": "simulation",
+      "title": "Load a reviewed DB snapshot as actual values into an owned PLCSIM instance",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "db_snapshot_load_actual",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DataBlock.Interface.GetService<ValueService>().LoadSnapshotAsActualValues() online through OnlineProvider.GoOnline()/GoOffline() on the plc_online_compare route; InterfaceSnapshot.Export for the pre-load hash check."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
+          "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
+          "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
+          "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM online route must pass runtime checks; the reviewed snapshot must still be stored unchanged on the DB."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus",
+        "Selected PLC offline with a PN/IE / PLCSIM (1) connection exposing one target interface",
+        "A db_snapshot_capture record of the same DB and an explicit acknowledgeActualValueWrite=true"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "drive_profile_review",
       "domain": "drive-profiles",
       "title": "Compare supplied drive parameters and typed telegrams",

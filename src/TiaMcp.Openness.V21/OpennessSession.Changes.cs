@@ -126,6 +126,8 @@ namespace TiaMcp.Openness.V21
             if (save && !compile) throw new BridgeException("InvalidRequest", "Saving applied changes requires compile=true.");
             if (change.Kind == "hmi_engineering" && (!compile || !save))
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
+            if (change.Kind == "db_snapshot_load_actual" && (compile || save))
+                throw new BridgeException("InvalidRequest", "Actual-value loads change no project content; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
             if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
@@ -698,6 +700,10 @@ namespace TiaMcp.Openness.V21
                     effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
                     break;
                 }
+                case "db_snapshot_create":
+                case "db_snapshot_load_actual":
+                    PrepareDbSnapshotChange(change, preview);
+                    break;
                 case "drive_parameter_set":
                     preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
                     effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(), ["action"] = change.Kind });
@@ -968,6 +974,10 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "drive_parameter_set":
                     change.Readbacks.Add(new JObject { ["role"] = "drive-parameter-readback", ["parameters"] = Startdrive(() => DriveParameterSet(change, project, true)) });
+                    break;
+                case "db_snapshot_create":
+                case "db_snapshot_load_actual":
+                    ApplyDbSnapshotChange(change);
                     break;
             }
         }

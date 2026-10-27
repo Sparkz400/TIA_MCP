@@ -2631,6 +2631,30 @@
       ]
     },
     {
+      "featureId": "db_snapshot_capture",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_create",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_load_actual",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
       "featureId": "drive_profile_review",
       "obligations": [
         "D10",

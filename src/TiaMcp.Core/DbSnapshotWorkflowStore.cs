@@ -18,11 +18,44 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
             var upload = new ArtifactUploadStore(artifactsRoot).ResolveCommitted(reference);
             return ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = upload.Path, ["sha256"] = upload.Sha256 }, DbSnapshotReview.InputLimit);
         }
-        byte[] before = ReadUpload(uploadRef); byte[]? after = comparisonUploadRef is null ? null : ReadUpload(comparisonUploadRef);
-        var report = DbSnapshotReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), objectPath, before, after);
+        return Record(reviewId, objectPath, ReadUpload(uploadRef), comparisonUploadRef is null ? null : ReadUpload(comparisonUploadRef), null);
+    }
+
+    /// <summary>Reviews a worker db_snapshot_export result; the record keeps its native project/PLC/DB identity as the input source.</summary>
+    public JsonObject Capture(string reviewId, string objectPath, JsonObject export)
+    {
+        var identity = export["identity"] as JsonObject ?? throw new BridgeException("InvalidDbSnapshot", "The native export returned no identity.");
+        var source = new JsonObject { ["kind"] = "nativeInterfaceSnapshotExport", ["projectPath"] = identity["projectPath"]?.DeepClone(),
+            ["plcPath"] = identity["plcPath"]?.DeepClone(), ["objectPath"] = identity["objectPath"]?.DeepClone() };
+        var artifact = export["artifact"] as JsonObject ?? throw new BridgeException("InvalidDbSnapshot", "The native export returned no artifact.");
+        return Record(reviewId, objectPath, ProjectReviewStore.ReadArtifact(artifactsRoot, new() { ["path"] = artifact["path"]?.DeepClone(), ["sha256"] = artifact["sha256"]?.DeepClone() },
+            DbSnapshotReview.InputLimit), null, source);
+    }
+
+    /// <summary>change_prepare db_snapshot_load_actual: binds the load to a reopened captured review, never to a caller-supplied DB or hash.</summary>
+    public JsonObject LoadPayload(JsonElement payload)
+    {
+        var request = JsonNode.Parse(payload.GetRawText()) as JsonObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
+        if (request["snapshotRecordId"] is not JsonValue id || !id.TryGetValue<string>(out string? recordId))
+            throw new BridgeException("InvalidRequest", "snapshotRecordId from db_snapshot_capture is required.");
+        var record = Page(recordId);
+        var source = record["inputSource"] as JsonObject
+            ?? throw new BridgeException("DbSnapshotSourceRequired", "Actual-value loads need a db_snapshot_capture record; a supplied upload has no native DB identity.");
+        if (request["blockPath"] is not null && !JsonNode.DeepEquals(request["blockPath"], record["objectPath"]))
+            throw new BridgeException("DbSnapshotIdentityMismatch", "blockPath differs from the reviewed DB.");
+        request["blockPath"] = record["objectPath"]!.DeepClone();
+        request["projectPath"] = source["projectPath"]!.DeepClone();
+        request["snapshotSha256"] = record["input"]!["sha256"]!.DeepClone();
+        return request;
+    }
+
+    private JsonObject Record(string reviewId, string objectPath, byte[] before, byte[]? after, JsonObject? source)
+    {
+        var report = DbSnapshotReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), objectPath, before, after, source);
         var envelope = new JsonObject { ["schemaVersion"] = "db-snapshot-review-record.v1", ["reviewId"] = reviewId, ["objectPath"] = objectPath,
             ["input"] = Publish(before, ".xml", DbSnapshotReview.InputLimit),
             ["comparisonInput"] = after is null ? null : Publish(after, ".xml", DbSnapshotReview.InputLimit), ["report"] = report };
+        if (source is not null) envelope["source"] = source.DeepClone();
         var artifact = Publish(JsonSerializer.SerializeToUtf8Bytes(envelope, BridgeProtocol.Json), ".json", ReportLimit);
         return Summary(envelope, artifact);
     }
@@ -34,8 +67,9 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
         var artifact = Reference(recordId, ".json");
         var envelope = JsonNode.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, ReportLimit)) as JsonObject
             ?? throw new BridgeException("InvalidDbSnapshot", "Expected a record object.");
-        if (envelope.Count != 6 || (string?)envelope["schemaVersion"] != "db-snapshot-review-record.v1" || envelope["reviewId"] is not JsonValue ||
-            envelope["objectPath"] is not JsonValue || !envelope.ContainsKey("comparisonInput") || envelope["report"] is not JsonObject)
+        if (envelope.Count != (envelope.ContainsKey("source") ? 7 : 6) || (string?)envelope["schemaVersion"] != "db-snapshot-review-record.v1" || envelope["reviewId"] is not JsonValue ||
+            envelope["objectPath"] is not JsonValue || !envelope.ContainsKey("comparisonInput") || envelope["report"] is not JsonObject ||
+            envelope.ContainsKey("source") && envelope["source"] is not JsonObject)
             throw new BridgeException("InvalidDbSnapshot", "Unexpected record schema.");
         byte[] ReadInput(JsonNode? value)
         {
@@ -47,7 +81,7 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
         }
         string reviewId = (string)envelope["reviewId"]!, objectPath = (string)envelope["objectPath"]!;
         var expected = DbSnapshotReview.Build(reviewId, new ProjectReviewStore(artifactsRoot).Read(reviewId), objectPath,
-            ReadInput(envelope["input"]), envelope["comparisonInput"] is null ? null : ReadInput(envelope["comparisonInput"]));
+            ReadInput(envelope["input"]), envelope["comparisonInput"] is null ? null : ReadInput(envelope["comparisonInput"]), envelope["source"] as JsonObject);
         if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input and saved review.");
         var result = Summary(envelope, artifact);
         if (section == "summary") return result;
@@ -86,9 +120,14 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
         _ = ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, limit);
         return artifact;
     }
-    private static JsonObject Summary(JsonObject record, JsonObject artifact) => new() {
-        ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["comparisonInput"] = record["comparisonInput"]?.DeepClone(), ["objectPath"] = record["objectPath"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
-        ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
-        ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["programIdentityVerified"] = false, ["structureCompatibilityVerified"] = false,
-        ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+    private static JsonObject Summary(JsonObject record, JsonObject artifact)
+    {
+        var summary = new JsonObject {
+            ["recordId"] = artifact["sha256"]!.DeepClone(), ["reviewId"] = record["reviewId"]!.DeepClone(), ["input"] = record["input"]!.DeepClone(), ["comparisonInput"] = record["comparisonInput"]?.DeepClone(), ["objectPath"] = record["objectPath"]!.DeepClone(), ["reportArtifact"] = artifact.DeepClone(),
+            ["summary"] = record["report"]!["summary"]!.DeepClone(), ["nativeExecutable"] = false, ["nativeQualified"] = false,
+            ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false, ["programIdentityVerified"] = false, ["structureCompatibilityVerified"] = false,
+            ["sourceEvidencePolicy"] = ProjectReviewStore.SourceEvidencePolicy };
+        if (record["source"] is not null) summary["inputSource"] = record["source"]!.DeepClone();
+        return summary;
+    }
 }

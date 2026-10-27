@@ -162,6 +162,7 @@ namespace TiaMcp.Openness.V21
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
                 case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
                 case "plc_online_compare": return PlcOnlineCompare(arguments);
+                case "db_snapshot_export": return DbSnapshotExport(arguments);
                 case "plc_station_upload": return PlcStationUpload(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);

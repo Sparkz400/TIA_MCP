@@ -4,7 +4,8 @@ This offline workflow inspects one supplied InterfaceSnapshot XML export or
 compares two. It works without Siemens products. It retains the original bytes,
 including encoding, and associates them with one explicitly selected DB in a
 saved review. That association is supplied by the caller: XML block names do not
-prove the originating CPU or program. No network connection or worker is used.
+prove the originating CPU or program. Supplied XML uses no network connection or
+worker; [native capture](#native-capture-and-owned-simulation-value-loads) uses the worker.
 
 1. Import a saved `project-review.v1` with `project_snapshot_import`, or reuse an
    existing review. Select its exact nonvirtual block `objectPath`; captured
@@ -54,6 +55,28 @@ Bounds: 4 MiB and 20,000 values per XML, XML depth 32 and 200,000 reader events;
 omitted there and remains downloadable in the complete report and original.
 Failure during publication may retain an input without a final receipt; it never
 replays native work. Unavailable/corrupted inputs or saved source prevent reopen.
+
+## Native capture and owned-simulation value loads
+
+`db_snapshot_capture(reviewId, objectPath, projectName?)` replaces steps 2–3 for
+the open project: the worker exports the snapshot stored on that exact DB with
+`InterfaceSnapshot.Export` (read-only, no online access) and the Host reviews it as
+above. The record and receipt add `inputSource`
+(`nativeInterfaceSnapshotExport` with the export's project path, PLC path and DB
+path), which must match the saved review's DB and `model.project.projectPath`;
+the report's `association` becomes `nativeExportOfSelectedDB`. All verification
+flags stay false: stored snapshot values are not current CPU values. A DB without
+a stored snapshot refuses with `DbSnapshotUnavailable`.
+
+Two prepared change kinds work only against a ticket-bound owned PLCSIM instance,
+online through the `plc_online_compare` route; without a `downloadTicket` they
+refuse with `PhysicalPlcRefused`. `db_snapshot_create` stores the instance's
+actual values as the DB snapshot (a checkpointed project change).
+`db_snapshot_load_actual` needs the `recordId` of a capture and
+`acknowledgeActualValueWrite: true`; it writes the stored snapshot as actual
+values only while the DB's stored snapshot still hashes equal to the reviewed
+capture. Supplied-upload records cannot authorize a load. Payloads and limits are
+in the [kind table](../guides/engineering-workflows.md).
 
 The [D09 plan](../plans/expansion-plans/online-compare-snapshots-upload.md) covers
 the remaining CPU/program identity, comparison, capture, upload and mutation work.

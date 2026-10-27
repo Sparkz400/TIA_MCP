@@ -87,6 +87,20 @@ foreach (string section in new[] { "beforeValues", "afterValues", "changes" }) C
 Reject(() => store.Page(record, "changes", 99), "Bad offset refused", "InvalidRequest");
 Reject(() => store.Page(record, "changes", 0, 201), "Page count bounded", "InvalidRequest");
 var single = store.Review(id, path, left.Ref); Check((int)store.Page((string)single["recordId"]!, "afterValues")["total"]! == 0, "Single inspection has no comparison rows");
+var native = new JsonObject { ["kind"] = "nativeInterfaceSnapshotExport", ["projectPath"] = "SYNTHETIC.ap21", ["plcPath"] = plc, ["objectPath"] = path };
+var nativeReport = DbSnapshotReview.Build(id, review, path, before, null, native);
+Check((string)nativeReport["association"]! == "nativeExportOfSelectedDB" && !(bool)nativeReport["sourceAuthenticityVerified"]!, "Captured source recorded without an authenticity claim");
+foreach (var (key, value) in new[] { ("objectPath", path + "2"), ("plcPath", plc + "2"), ("projectPath", "other.ap21"), ("kind", "suppliedUpload") })
+{ var wrong = native.DeepClone().AsObject(); wrong[key] = value; Reject(() => DbSnapshotReview.Build(id, review, path, before, null, wrong), "Captured " + key + " mismatch refused"); }
+string exported = Path.Combine(root, "exports", "db-snapshot.xml"); Directory.CreateDirectory(Path.GetDirectoryName(exported)!); File.WriteAllBytes(exported, before);
+var capture = store.Capture(id, path, new JsonObject { ["identity"] = new JsonObject { ["projectPath"] = "synthetic.ap21", ["plcPath"] = plc, ["objectPath"] = path, ["kind"] = "block", ["name"] = "Data" },
+    ["artifact"] = new JsonObject { ["path"] = exported, ["sha256"] = Hash(before) } });
+Check(capture["inputSource"] is JsonObject && !single.ContainsKey("inputSource") && JsonNode.DeepEquals(capture, store.Page((string)capture["recordId"]!)), "Captured record reopens with its native source; supplied receipts unchanged");
+JsonElement Payload(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
+var bound = store.LoadPayload(Payload(new { snapshotRecordId = (string)capture["recordId"]!, snapshotSha256 = new string('0', 64), projectPath = "forged.ap21" }));
+Check((string)bound["snapshotSha256"]! == Hash(before) && (string)bound["blockPath"]! == path && (string)bound["projectPath"]! == "synthetic.ap21", "Load binds the reviewed DB and snapshot hash over caller values");
+Reject(() => store.LoadPayload(Payload(new { snapshotRecordId = (string)capture["recordId"]!, blockPath = path + "2" })), "Load on another DB refused", "DbSnapshotIdentityMismatch");
+Reject(() => store.LoadPayload(Payload(new { snapshotRecordId = record })), "Supplied review cannot authorize a load", "DbSnapshotSourceRequired");
 uploads.Release(left.Id); uploads.Release(right.Id); Check(JsonNode.DeepEquals(receipt, new DbSnapshotWorkflowStore(root).Page(record)), "Release and restart preserve references");
 foreach (string key in new[] { "input", "comparisonInput", "reportArtifact" })
 { string file = Path.Combine(root, (string)receipt[key]!["path"]!); byte[] original = File.ReadAllBytes(file); File.WriteAllText(file, "tampered"); Reject(() => store.Page(record), "Corrupted " + key + " refused", "ArtifactChanged"); File.WriteAllBytes(file, original); }

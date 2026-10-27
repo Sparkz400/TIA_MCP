@@ -50,7 +50,8 @@ public static class DbSnapshotReview
             ["metadataPolicy"] = "Dates, types and values remain exact XML text. Other content is retained in the original artifact, without interpretation." };
     }
 
-    public static JsonObject Build(string reviewId, JsonObject review, string objectPath, byte[] beforeBytes, byte[]? afterBytes)
+    /// <param name="source">Worker export identity of a captured input (db_snapshot_capture); null for supplied uploads.</param>
+    public static JsonObject Build(string reviewId, JsonObject review, string objectPath, byte[] beforeBytes, byte[]? afterBytes, JsonObject? source = null)
     {
         Selector(objectPath);
         var matches = review["model"]!["nodes"]!.AsArray().Where(n => (string?)n?["objectPath"] == objectPath && (string?)n?["origin"] != "virtual").ToArray();
@@ -59,6 +60,9 @@ public static class DbSnapshotReview
             throw Error("Select an exact captured GlobalDB, InstanceDB or ArrayDB block.");
         var selected = matches[0]!;
         string plcPath = Selector((string?)selected["plcPath"]);
+        if (source is not null && (source.Count != 4 || (string?)source["kind"] != "nativeInterfaceSnapshotExport" || (string?)source["objectPath"] != objectPath ||
+            (string?)source["plcPath"] != plcPath || !string.Equals((string?)source["projectPath"], (string?)review["model"]!["project"]?["projectPath"], StringComparison.OrdinalIgnoreCase)))
+            throw Error("The native export's project, PLC or DB differs from the selected saved DB.");
         var before = Parse(beforeBytes); var after = afterBytes is null ? null : Parse(afterBytes);
         if ((string?)before["name"] != (string?)selected["name"] || after is not null && (string?)after["name"] != (string?)selected["name"])
             throw Error("Export name contradicts the selected captured DB. A name match still does not prove native origin.");
@@ -80,11 +84,17 @@ public static class DbSnapshotReview
             ["originalBytesEqual"] = afterBytes is null ? null : beforeBytes.AsSpan().SequenceEqual(afterBytes),
             ["structureTimestampComparison"] = after is null ? "notCompared" : before["structureModified"] is null || after["structureModified"] is null ? "unknown" :
                 JsonNode.DeepEquals(before["structureModified"], after["structureModified"]) ? "sameReportedText" : "differentReportedText" };
-        return new JsonObject { ["schemaVersion"] = "db-snapshot-review.v1", ["reviewId"] = reviewId, ["objectPath"] = objectPath, ["plcPath"] = plcPath,
+        var report = new JsonObject { ["schemaVersion"] = "db-snapshot-review.v1", ["reviewId"] = reviewId, ["objectPath"] = objectPath, ["plcPath"] = plcPath,
             ["association"] = "userSelectedCapturedDB", ["before"] = before, ["after"] = after, ["changes"] = changes, ["summary"] = summary,
             ["nativeExecutable"] = false, ["nativeQualified"] = false, ["sourceAuthenticityVerified"] = false, ["liveFreshnessVerified"] = false,
             ["programIdentityVerified"] = false, ["structureCompatibilityVerified"] = false,
             ["limits"] = "Supplied documents only. Equal names, timestamps or text do not prove CPU/program identity, freshness, structural compatibility or equal runtime values. No start/actual value conversion, snapshot import, engineering change or online access." };
+        // Supplied reports keep their earlier shape so retained records still reopen.
+        if (source is null) return report;
+        report["association"] = "nativeExportOfSelectedDB";
+        report["inputSource"] = source.DeepClone();
+        report["limits"] = "The before input is a worker InterfaceSnapshot.Export of the snapshot stored on the selected DB in the saved review's project path. Stored snapshot values are not current CPU values; the retained record proves neither CPU/program identity nor freshness or structural compatibility.";
+        return report;
     }
     private static XElement One(XElement parent, string name)
     {

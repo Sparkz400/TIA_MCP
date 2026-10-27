@@ -48,6 +48,30 @@ namespace TiaMcp.Openness.V21
             report["project"] = ProjectInfo(plc.Project);
             report["plcPath"] = plc.Path;
             report["projectModifiedBefore"] = plc.Project.IsModified;
+            var failure = OwnedSimulationOnline(marker, plc, hardware, observerDirectory, report, "PlcOnlineCompareFailed",
+                (address, challenges) => { report["stage"] = "fingerprint"; report["fingerprint"] = OwnedSimulationFingerprint(address, challenges, maxItems, expected); },
+                challenges =>
+                {
+                    report["stage"] = "compareToOnline";
+                    var compared = plc.Software.CompareToOnline();
+                    if (challenges.Failure != null) throw challenges.Failure;
+                    if (compared?.RootElement == null) throw new BridgeException("PlcOnlineCompareFailed", "CompareToOnline returned no result tree.");
+                    var budget = new ScanBudget(maxItems);
+                    report["compare"] = OnlineCompareElement(compared.RootElement, budget, 0);
+                    report["compareTruncated"] = budget.Truncated;
+                    report["compareBasis"] = "PlcSoftware.CompareToOnline LeftName/RightName, CompareResultState and DetailedInformation as returned by Siemens; names alone do not establish object identity.";
+                });
+            if (failure != null) throw new BridgeException(failure.Code, failure.Message, report);
+            report["completed"] = true;
+            return report;
+        }
+
+        // Owned-PLCSIM online session shared by online compare and DB snapshot changes: identify the sole endpoint, run
+        // the optional pre-route step, apply the PLC's sole PN/IE / PLCSIM (1) target interface, go online, run the online
+        // step, then always go offline, detach and release. Returns the first failure; the report records every stage.
+        private BridgeException OwnedSimulationOnline(JObject marker, PlcSelection plc, DeviceItem hardware, string observerDirectory, JObject report, string failureCode,
+            Action<string, OwnedSimulationChallenges> identified, Action<OwnedSimulationChallenges> online)
+        {
             var challenges = new OwnedSimulationChallenges();
             report["onlineChallenges"] = challenges.Observed;
             var cleanup = (JArray)report["cleanup"];
@@ -67,8 +91,7 @@ namespace TiaMcp.Openness.V21
                 provider = hardware.GetService<OnlineProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected PLC has no OnlineProvider service.");
                 if (provider.State != OnlineState.Offline)
                     throw new BridgeException("OfflineRequired", "The selected PLC must be offline before the owned PLCSIM route is configured.");
-                report["stage"] = "fingerprint";
-                report["fingerprint"] = OwnedSimulationFingerprint(address, challenges, maxItems, expected);
+                identified?.Invoke(address, challenges);
                 report["stage"] = "configureRoute";
                 configuration = provider.Configuration;
                 var pc = configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
@@ -89,23 +112,16 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("SimulationProvisionRouteUnavailable", "The sole PLCSIM target interface could not be applied to the PLC connection.");
                 report["stage"] = "goOnline";
                 connectAttempted = true;
-                var online = provider.GoOnline();
+                var state = provider.GoOnline();
                 if (challenges.Failure != null) throw challenges.Failure;
-                if (online != OnlineState.Online || provider.State != OnlineState.Online)
+                if (state != OnlineState.Online || provider.State != OnlineState.Online)
                     throw new BridgeException("SimulationOnlineRequired", "The owned PLCSIM connection did not reach Online.");
                 VerifyOwnedPoweredSimulation(instance, marker, address);
                 if (OwnedSimulationEndpoint(ips, observer, report) != address)
                     throw new BridgeException("SimulationProvisionTargetAmbiguous", "The owned PLCSIM endpoint changed while connecting.");
-                report["stage"] = "compareToOnline";
-                var compared = plc.Software.CompareToOnline();
-                if (challenges.Failure != null) throw challenges.Failure;
-                if (compared?.RootElement == null) throw new BridgeException("PlcOnlineCompareFailed", "CompareToOnline returned no result tree.");
-                var budget = new ScanBudget(maxItems);
-                report["compare"] = OnlineCompareElement(compared.RootElement, budget, 0);
-                report["compareTruncated"] = budget.Truncated;
-                report["compareBasis"] = "PlcSoftware.CompareToOnline LeftName/RightName, CompareResultState and DetailedInformation as returned by Siemens; names alone do not establish object identity.";
+                online(challenges);
             }
-            catch (Exception ex) { failure = OwnedSimulationFailure(report, challenges, ex, "PlcOnlineCompareFailed"); }
+            catch (Exception ex) { failure = OwnedSimulationFailure(report, challenges, ex, failureCode); }
             finally
             {
                 if (connectAttempted)
@@ -127,9 +143,7 @@ namespace TiaMcp.Openness.V21
                 failure = OwnedSimulationRelease(observer, instance, report, failure);
                 report["projectModifiedAfter"] = plc.Project.IsModified;
             }
-            if (failure != null) throw new BridgeException(failure.Code, failure.Message, report);
-            report["completed"] = true;
-            return report;
+            return failure;
         }
 
         private JObject PlcStationUpload(JObject args)

@@ -152,6 +152,12 @@ namespace TiaMcp.Openness.V21
                     AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
                         applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
                         blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
+                AddTargetFeature(features, "db_snapshot_capture", directApi, "partial", "Exports the snapshot stored on this DB (InterfaceSnapshot.Export) into a db_snapshot_review record bound to its project/PLC/DB identity; a DB without a stored snapshot refuses. Not a current CPU read.",
+                    applicable: block is DataBlock, blocked: protectedBlock, blocker: "The selected block is know-how protected.");
+                foreach (string feature in new[] { "db_snapshot_create", "db_snapshot_load_actual" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "ValueService on a ticket-bound owned PLCSIM Advanced instance only, online through the plc_online_compare route; physical PLCs are refused. Loads need an acknowledged captured snapshot review whose stored snapshot is unchanged. Not natively qualified.",
+                        applicable: block is DataBlock, blocked: protectedBlock || safetyBlock || safetyScope || generated,
+                        blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-DBs and safety-unit objects are excluded.");
                 AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
                     applicable: language == "SCL" || language == "STL" || block is DataBlock,
                     blocked: protectedBlock || safetyBlock || safetyScope || generated,
