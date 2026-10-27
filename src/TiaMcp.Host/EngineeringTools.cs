@@ -33,9 +33,20 @@ public sealed partial class TiaTools
         => Call("simulation_discovery_baseline", new { projectName, plcPath }, cancellationToken);
 
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
-    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
-    public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken)
-        => Call("project_open", new { path }, cancellationToken);
+    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: reads work, every mutation is refused with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
+    public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
+        => Call("project_open", new { path, readOnly }, cancellationToken);
+
+    [McpServerTool(Name = "project_copy", Destructive = false, OpenWorld = false)]
+    [Description("Copy the saved state of an open project into a new unique directory under the host's copies artifacts, in a worker-owned instance started with tia_start: archive, retrieve as a secondary project, verify name and location, close the copy. The source stays open and is never saved or changed; unsaved source edits are refused. Returns the copy's path and identity plus the archive hash; open it with project_open in a fresh instance.")]
+    public Task<CallToolResult> ProjectCopy(CancellationToken cancellationToken, string? projectName = null)
+        => Call("project_copy", new { projectName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies") }, cancellationToken);
+
+    [McpServerTool(Name = "plc_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Offline compare of one PLC's software with exactly one target: another PLC in the same project (targetPlcPath) or a library (libraryId from library_list/library_open). Returns the bounded native compare tree (left/right names, state, detail, children) with explicit truncation. No online compare; states are not runtime equivalence.")]
+    public Task<CallToolResult> PlcCompare(CancellationToken cancellationToken, string? plcPath = null, string? targetPlcPath = null, string? libraryId = null,
+        string? projectName = null, int maxItems = 500)
+        => Call("plc_compare", new { projectName, plcPath, targetPlcPath, libraryId, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "project_retrieve", Destructive = false, OpenWorld = false)]
     [Description("Retrieve an exact .zap21 archive with a required SHA-256 into a new unique directory in an empty worker-owned TIA instance. Supports explicit checkpoint recovery after a restart. Never overwrites an existing project.")]

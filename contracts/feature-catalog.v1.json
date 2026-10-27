@@ -2826,7 +2826,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "Qualification covers the default primary open only; readOnly=true is the separate unverified feature project_open.read_only."
         ]
       },
       "qualification": {
@@ -2848,6 +2849,50 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_open.read_only",
+      "domain": "project",
+      "title": "Open an exact V21 project read-only and refuse every mutation on it",
+      "mcpTools": [
+        "project_open"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectComposition.Open(FileInfo, UmacDelegate, ProjectOpenMode) with ProjectOpenMode.Secondary; ProjectBase.IsPrimary readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "readOnly=true opens the project as a secondary project; if TIA reports it as primary the worker closes it unsaved and fails with ReadOnlyOpenUnverified.",
+          "The worker refuses mutations on any non-primary project through its shared offline-engineering precondition (ReadOnlyProject): change_prepare/apply/restore, library changes, simulation, translation, watch and component routes. Read tools, including watch reads, remain available.",
+          "That Siemens itself write-protects secondary projects is not established; the refusal is the worker's own guard. tia_session_status reports readOnly per open project.",
+          "No UMAC delegate is passed; protected projects that require login are not opened read-only.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "An empty worker-owned instance started with tia_start"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
         "AC-evidence"
       ]
     },
@@ -2877,6 +2922,94 @@
           "local.reliability.20261024",
           "local.hmi.bridge.20261025"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_copy",
+      "domain": "project",
+      "title": "Copy an open project's saved state to a new owned directory",
+      "mcpTools": [
+        "project_copy"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.Archive(DirectoryInfo, string, ProjectArchivationMode.Compressed) and ProjectComposition.Retrieve(FileInfo, DirectoryInfo, UmacDelegate, ProjectOpenMode.Secondary), then Project.Close on the copy. Project.SaveAs is not used because it saves unsaved edits and moves the open project to the new location."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Requires a worker-owned instance; unsaved source edits are refused (UnsavedProject) because the source is never saved.",
+          "Runs through shared mutation admission: the source project path, the new archive and the new destination are reserved; an unknown outcome is reconciled by engineering_admission_reconcile (source not saved since admission, archive and destination absent or fingerprint-equal to the source).",
+          "The copy is verified by project name and new location only; its content is not compared to the source in the success path. The copy is closed after retrieval; open it with project_open in a fresh instance.",
+          "Retrieving a secondary copy while the source is open, archiving a read-only source and protected (UMAC) projects are unprobed.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "A saved project open in a worker-owned instance started with tia_start",
+        "Short artifacts root for TIA's 143-character project directory limit"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_compare",
+      "domain": "analysis",
+      "title": "Compare PLC software offline with another PLC or a library",
+      "mcpTools": [
+        "plc_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcSoftware.CompareTo(ISoftwareCompareTarget) with PlcSoftware, ProjectLibrary or GlobalLibrary targets; CompareResult.RootElement and CompareResultElement LeftName/RightName/ComparisonResult/DetailedInformation/Elements."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exactly one target: another PLC in the same project (targetPlcPath) or a library handle from library_list/library_open (libraryId). Cross-project PLC targets and master-copy targets are not exposed.",
+          "The tree is bounded by maxItems (default 500, max 2000) and depth 64 with explicit truncation; names and states are Siemens output, not object identities or runtime equivalence.",
+          "PlcSoftware.CompareToOnline is deliberately not exposed.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",

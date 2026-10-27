@@ -118,6 +118,7 @@ namespace TiaMcp.Openness.V21
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_open": return ProjectOpen(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
+                case "plc_compare": return PlcCompare(arguments);
                 case "software_inspect": return SoftwareInspect(arguments);
                 case "type_read": return TypeRead(arguments);
                 case "tag_table_read": return TagTableRead(arguments);
@@ -191,7 +192,9 @@ namespace TiaMcp.Openness.V21
                 Capability("start", "conditional", "Explicitly starts a worker-owned TIA instance without UI; disposal requests connection release. Siemens closes the instance when no other Openness client remains."),
                 Capability("catalog_query", "conditional", "Queries the installed hardware catalog of the attached V21 instance; an open project is required."),
                 Capability("scratch_create", "conditional", "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."),
-                Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade."),
+                Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade. readOnly opens a secondary project on which every mutation is refused."),
+                Capability("project_copy", "conditional", "Archives the saved open project and retrieves it into a new owned directory as a closed copy; the source is never saved or changed."),
+                Capability("plc_compare", "conditional", "Bounded offline PlcSoftware.CompareTo tree against another PLC in the project or an open library; no online compare."),
                 Capability("software_inspect", "conditional", "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."),
                 Capability("hardware_inspect", "conditional", "Offline hardware attributes, configured address ranges, network and exposed channel metadata; coverage varies by module."),
                 Capability("drive_observe", "conditional", "Offline SINAMICS drive objects, parameters, BICO references and telegrams through the optional Startdrive Openness assembly; absent Startdrive reports UnsupportedCapability."),
@@ -259,7 +262,7 @@ namespace TiaMcp.Openness.V21
             result["disconnectBehavior"] = _ownsPortal ? "Dispose this connection. Siemens closes the headless instance when this is its last attached Openness client; process exit is not verified. Only explicitly saved scratch data is retained." : "Dispose only this Openness attachment; the user-owned TIA instance remains open.";
             if ((_testSuiteScopeProbe || _testSuiteQualification) && _ownsPortal)
                 result["disconnectBehavior"] = "Dispose this connection and publicly close its exact worker-created scope-probe UI process. The qualification controller must independently verify its exit through the original retained handle.";
-            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(ProjectInfo));
+            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(p => { var info = ProjectInfo(p); info["readOnly"] = !p.IsPrimary; return info; }));
             result["capabilities"] = Capabilities();
             return result;
         }

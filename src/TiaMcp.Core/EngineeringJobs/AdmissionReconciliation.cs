@@ -11,7 +11,7 @@ namespace TiaMcp.Core.EngineeringJobs;
 public sealed record AdmissionReconciliation(EngineeringMutationAdmission Record, DateTimeOffset AdmittedAt)
 {
     public static readonly IReadOnlyList<string> Operations =
-        ["simulation_download", "change_apply", "change_restore", "scratch_create", "project_retrieve", "library_open"];
+        ["simulation_download", "change_apply", "change_restore", "scratch_create", "project_retrieve", "project_copy", "library_open"];
 
     public static AdmissionReconciliation Plan(EngineeringMutationAdmission record, DateTimeOffset admittedAt)
     {
