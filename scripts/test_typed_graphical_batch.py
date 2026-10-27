@@ -612,6 +612,46 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertIn("not possible in software units", boundary["observed"])
         self.assertTrue((root / boundary["inputs"][0]).is_file())
 
+    def test_transitive_packets_parse_exactly_and_order_their_phases(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        for name, labels in (("route-capture-transitive-effect-packet.v1.json", ("Unit", "Namespace")),
+                             ("route-capture-transitive-effect-standard-packet.v1.json", ("",))):
+            packet = json.loads((root / "fixtures/typed-graphical" / name).read_bytes())
+            self.assertEqual([entry["path"] for entry in packet["sources"]], packet["argsFile"])
+            declared = []
+            for entry in packet["sources"]:
+                observed, _, _ = authored_reference(root / entry["path"], packet["unit"])
+                for key in ("names", "namespace", "route", "authoredFormat"):
+                    self.assertEqual(entry[key], observed[key], entry["path"])
+                self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+                file = pathlib.Path(entry["path"]).name
+                declared += [("--modify", file + ":" + n) for n in entry.get("modifies", [])]
+                declared += [("--observe", file + ":" + n) for n in entry.get("observes", [])]
+            command = packet["command"]
+            self.assertEqual(sorted(declared), sorted((command[i], command[i + 1]) for i in range(len(command) - 1) if command[i] in ("--modify", "--observe")))
+            order = [pathlib.Path(entry["path"]).name for entry in packet["sources"]]
+            for label in labels:
+                stem = ("route-" + label + "-" if label else "") + "transitive-effect-"
+                self.assertLess(order.index(stem + "before.scl"), order.index(stem + "after.scl"))
+                if label:  # the after phase declares a Child of the route's own template FB
+                    self.assertLess(order.index("Tgp" + label + "_TemplateFB_LAD.xml"), order.index(stem + "after.scl"))
+
+    def test_transitive_route_cases_embed_the_caller_in_its_own_namespace(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        cases = [c for c in json.loads((root / "fixtures/typed-graphical/route-advanced-cases.v1.json").read_bytes())["cases"]
+                 if "-transitive-" in c["fixtureId"]]
+        self.assertEqual(28, len(cases))
+        with tempfile.TemporaryDirectory() as directory:
+            source = pathlib.Path(directory) / "hosts.scl"
+            for case in cases:
+                with self.subTest(case=case["fixtureId"]):
+                    self.assertEqual("createMulti", case["payload"]["instances"][0]["kind"])
+                    [dependent] = case["dependentSources"]
+                    source.write_text(dependent["source"], encoding="utf-8")
+                    entry, _, _ = authored_reference(source, case["unitName"])
+                    self.assertEqual((sorted(dependent["expectedBlockNames"]), case["namespace"]), (sorted(entry["names"]), entry["namespace"]))
+                    self.assertIn('Inner : "' + case["namespace"] + "." + case["blockName"] + '"', dependent["source"])
+
     def test_change_declarations_bind_to_exactly_one_admitted_source(self):
         def specs():
             return [({"sourcePath": "/x/after.scl", "names": ["Effect"]}, "source_upsert", {}),

@@ -1,0 +1,79 @@
+NAMESPACE TiaMcp_UnitA
+FUNCTION_BLOCK "TgpUnit_NestEffect"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK "TgpUnit_NestParent"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+ Inner : "TiaMcp_UnitA.TgpUnit_NestEffect";
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK "TgpUnit_NestGrand"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+ Enable : Bool;
+END_VAR
+VAR_OUTPUT
+ Active : Bool;
+END_VAR
+VAR
+ RetainedMarker : Int := 17;
+ Middle : "TiaMcp_UnitA.TgpUnit_NestParent";
+END_VAR
+BEGIN
+ #Active := #Enable;
+END_FUNCTION_BLOCK
+
+DATA_BLOCK "TgpUnit_NestEffect_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.TgpUnit_NestEffect"
+BEGIN
+ RetainedMarker := 42;
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpUnit_NestParent_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.TgpUnit_NestParent"
+BEGIN
+ RetainedMarker := 42;
+ Inner.RetainedMarker := 42;
+END_DATA_BLOCK
+
+DATA_BLOCK "TgpUnit_NestGrand_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.TgpUnit_NestGrand"
+BEGIN
+ RetainedMarker := 42;
+ Middle.RetainedMarker := 42;
+ Middle.Inner.RetainedMarker := 42;
+END_DATA_BLOCK
+
+END_NAMESPACE

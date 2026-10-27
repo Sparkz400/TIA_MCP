@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Native transitive dependent-instance effects of adding one FB member and one static member of each IEC instance type to an FB embedded two levels deep as a multi-instance, in the software-unit and namespace routes. Unobserved until captured; enables nothing.",
+  "unit": "TiaMcp_UnitA",
+  "archive": {
+    "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "sha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
+  },
+  "routes": [
+    {
+      "route": "softwareUnit",
+      "namespace": "TiaMcp_UnitA",
+      "prefix": "TgpUnit_",
+      "chain": [
+        {
+          "fb": "TiaMcp_UnitA.TgpUnit_NestEffect"
+        },
+        {
+          "fb": "TiaMcp_UnitA.TgpUnit_NestParent",
+          "member": "Inner"
+        },
+        {
+          "fb": "TiaMcp_UnitA.TgpUnit_NestGrand",
+          "member": "Middle"
+        }
+      ],
+      "members": [
+        {
+          "name": "Child",
+          "datatype": "\"TiaMcp_UnitA.TgpUnit_TemplateFB_LAD\""
+        },
+        {
+          "name": "Timer_TON",
+          "datatype": "TON_TIME"
+        },
+        {
+          "name": "Timer_TOF",
+          "datatype": "TOF_TIME"
+        },
+        {
+          "name": "Timer_TP",
+          "datatype": "TP_TIME"
+        },
+        {
+          "name": "Counter_CTU",
+          "datatype": "CTU_INT"
+        },
+        {
+          "name": "Counter_CTD",
+          "datatype": "CTD_INT"
+        },
+        {
+          "name": "Counter_CTUD",
+          "datatype": "CTUD_INT"
+        }
+      ]
+    },
+    {
+      "route": "namespace",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "prefix": "TgpNamespace_",
+      "chain": [
+        {
+          "fb": "TiaMcp_UnitA.Alternate.TgpNamespace_NestEffect"
+        },
+        {
+          "fb": "TiaMcp_UnitA.Alternate.TgpNamespace_NestParent",
+          "member": "Inner"
+        },
+        {
+          "fb": "TiaMcp_UnitA.Alternate.TgpNamespace_NestGrand",
+          "member": "Middle"
+        }
+      ],
+      "members": [
+        {
+          "name": "Child",
+          "datatype": "\"TiaMcp_UnitA.Alternate.TgpNamespace_TemplateFB_LAD\""
+        },
+        {
+          "name": "Timer_TON",
+          "datatype": "TON_TIME"
+        },
+        {
+          "name": "Timer_TOF",
+          "datatype": "TOF_TIME"
+        },
+        {
+          "name": "Timer_TP",
+          "datatype": "TP_TIME"
+        },
+        {
+          "name": "Counter_CTU",
+          "datatype": "CTU_INT"
+        },
+        {
+          "name": "Counter_CTD",
+          "datatype": "CTD_INT"
+        },
+        {
+          "name": "Counter_CTUD",
+          "datatype": "CTUD_INT"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/native/TgpUnit_TemplateFB_LAD.xml",
+      "sha256": "38f4b13c74ba63cddc705ac2b24ffb3e66128532571b1bba17c1d130e15c7dbc",
+      "route": "softwareUnit",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpUnit_TemplateFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+      "sha256": "08d2398a78317c919f4ec61ebe1e1e8318638f6227521e5639bce211919e339c",
+      "route": "namespace",
+      "authoredFormat": "native_xml_template_derivation",
+      "names": [
+        "TgpNamespace_TemplateFB_LAD"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-transitive-effect-before.scl",
+      "sha256": "40f216477689f92878dcc42eb4587b4e55e395e829b1b66eae7d28c16f5405f4",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_NestEffect",
+        "TgpUnit_NestParent",
+        "TgpUnit_NestGrand",
+        "TgpUnit_NestEffect_DB",
+        "TgpUnit_NestParent_DB",
+        "TgpUnit_NestGrand_DB"
+      ],
+      "namespace": "TiaMcp_UnitA"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-transitive-effect-before.scl",
+      "sha256": "d58625238b699f7e552c3221c257573e623c02a3dbb9aa03fdf0e40485808ee2",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_NestEffect",
+        "TgpNamespace_NestParent",
+        "TgpNamespace_NestGrand",
+        "TgpNamespace_NestEffect_DB",
+        "TgpNamespace_NestParent_DB",
+        "TgpNamespace_NestGrand_DB"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Unit-transitive-effect-after.scl",
+      "sha256": "5a9d91bb295d4bc4835e0a8609b35d31252b0596957828fe87dda82171b04972",
+      "route": "softwareUnit",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpUnit_NestEffect"
+      ],
+      "namespace": "TiaMcp_UnitA",
+      "modifies": [
+        "TgpUnit_NestEffect"
+      ],
+      "observes": [
+        "TgpUnit_NestParent",
+        "TgpUnit_NestGrand",
+        "TgpUnit_NestEffect_DB",
+        "TgpUnit_NestParent_DB",
+        "TgpUnit_NestGrand_DB"
+      ]
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/route-Namespace-transitive-effect-after.scl",
+      "sha256": "457cadd9f71298bf50f9f68fdcc3095cfe3c75bf614d4d536efe4ec758159920",
+      "route": "namespace",
+      "authoredFormat": "SCL",
+      "names": [
+        "TgpNamespace_NestEffect"
+      ],
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "modifies": [
+        "TgpNamespace_NestEffect"
+      ],
+      "observes": [
+        "TgpNamespace_NestParent",
+        "TgpNamespace_NestGrand",
+        "TgpNamespace_NestEffect_DB",
+        "TgpNamespace_NestParent_DB",
+        "TgpNamespace_NestGrand_DB"
+      ]
+    }
+  ],
+  "argsFile": [
+    "fixtures/typed-graphical/native/TgpUnit_TemplateFB_LAD.xml",
+    "fixtures/typed-graphical/native/TgpNamespace_TemplateFB_LAD.xml",
+    "fixtures/typed-graphical/sources/route-Unit-transitive-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-transitive-effect-before.scl",
+    "fixtures/typed-graphical/sources/route-Unit-transitive-effect-after.scl",
+    "fixtures/typed-graphical/sources/route-Namespace-transitive-effect-after.scl"
+  ],
+  "command": [
+    "python",
+    "-B",
+    "scripts/capture_typed_routes_owned.py",
+    "@artifacts/ctr.args",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/ctr",
+    "--archive",
+    "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "--sha256",
+    "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+    "--modify",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestEffect",
+    "--observe",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestParent",
+    "--observe",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestGrand",
+    "--observe",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestEffect_DB",
+    "--observe",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestParent_DB",
+    "--observe",
+    "route-Unit-transitive-effect-after.scl:TgpUnit_NestGrand_DB",
+    "--modify",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestEffect",
+    "--observe",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestParent",
+    "--observe",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestGrand",
+    "--observe",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestEffect_DB",
+    "--observe",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestParent_DB",
+    "--observe",
+    "route-Namespace-transitive-effect-after.scl:TgpNamespace_NestGrand_DB"
+  ],
+  "afterCapture": [
+    "scripts/extract_typed_transitive_effects.py <capture> --route softwareUnit",
+    "scripts/extract_typed_transitive_effects.py <capture> --route namespace"
+  ]
+}
