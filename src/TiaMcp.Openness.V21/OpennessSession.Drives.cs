@@ -10,6 +10,8 @@ using Siemens.Engineering;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.MC.Drives;
 using Siemens.Engineering.MC.Drives.DFI;
+using Siemens.Engineering.MC.Drives.Enums;
+using TiaMcp.Analysis;
 
 namespace TiaMcp.Openness.V21
 {
@@ -325,6 +327,135 @@ namespace TiaMcp.Openness.V21
             }
             return result;
         }
+
+        // Telegram rows of one drive object exactly as drive_observe reports them; a capture drive_observe would truncate refuses.
+        private static JArray DriveTelegramRows(DriveObject driveObject)
+        {
+            var rows = new JArray(); var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var telegram in driveObject.Telegrams)
+            {
+                if (rows.Count == 128) throw new BridgeException("TraversalLimit", "The drive object has more than 128 telegrams.");
+                var row = DriveTelegram(telegram, ids);
+                if (!row.Value<bool>("addressesComplete")) throw new BridgeException("TraversalLimit", "A drive telegram has more than 16 addresses.");
+                rows.Add(row);
+            }
+            return rows;
+        }
+
+        private static int DriveTelegramInteger(JObject payload, string name)
+        {
+            var token = payload[name];
+            if (token?.Type != JTokenType.Integer || token.Value<long>() < 0 || token.Value<long>() > int.MaxValue) throw new BridgeException("InvalidRequest", name + " must be a nonnegative Int32.");
+            return token.Value<int>();
+        }
+
+        // Prepare (write=false) returns the preview; apply (write=true) rechecks expected rows, writes once, then verifies telegram readback and address collisions.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private JObject DriveTelegramSet(EngineeringChange change, Project project, bool write)
+        {
+            var payload = change.Payload;
+            var driveObject = ChangeDriveObject(project, payload);
+            string operation = ChangeText(payload, "operation", 16), typeName = ChangeText(payload, "telegramType", 32);
+            if (Array.IndexOf(new[] { "change", "insert", "erase" }, operation) < 0) throw new BridgeException("InvalidRequest", "operation must be change, insert or erase.");
+            if (typeName == "SafetyTelegram") throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow.");
+            var allowed = operation == "change" ? new[] { "MainTelegram", "SupplementaryTelegram" } : new[] { "SupplementaryTelegram", "AdditionalTelegram" };
+            if (Array.IndexOf(allowed, typeName) < 0) throw new BridgeException("UnsupportedCapability", operation + " supports telegramType " + string.Join(" or ", allowed) + ".");
+            var type = (TelegramType)Enum.Parse(typeof(TelegramType), typeName);
+            bool sized = type == TelegramType.AdditionalTelegram;
+            var keys = new List<string> { "hardwarePath", "driveObjectNumber", "operation", "telegramType", "expectedTelegrams" };
+            if (operation != "erase") keys.AddRange(sized ? new[] { "inputSize", "outputSize" } : new[] { "telegramNumber" });
+            if (payload.Count != keys.Count || keys.Any(key => payload[key] == null)) throw new BridgeException("InvalidRequest", operation + " " + typeName + " needs exactly: " + string.Join(", ", keys) + ".");
+            int number = keys.Contains("telegramNumber") ? DriveTelegramInteger(payload, "telegramNumber") : 0;
+            int inputSize = sized && operation == "insert" ? DriveTelegramInteger(payload, "inputSize") : 0, outputSize = sized && operation == "insert" ? DriveTelegramInteger(payload, "outputSize") : 0;
+            var before = DriveTelegramRows(driveObject);
+            if (!JToken.DeepEquals(before, payload["expectedTelegrams"]))
+                throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The drive object's telegram rows differ from expectedTelegrams; nothing was written.", new JObject { ["current"] = before });
+            var composition = driveObject.Telegrams;
+            var targets = composition.Where(telegram => telegram.Type == type).ToArray();
+            if (operation == "insert" ? targets.Length != 0 : targets.Length != 1)
+                throw new BridgeException("AmbiguousTarget", operation == "insert" ? "insert requires that the drive object has no " + typeName + "." : operation + " requires exactly one " + typeName + " on the drive object.");
+            if (operation == "change" && targets[0].TelegramNumber == number) throw new BridgeException("InvalidRequest", "telegramNumber equals the current number; nothing would change.");
+            bool possible = operation == "erase" || (operation == "change" ? targets[0].CanChangeTelegram(number)
+                : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : composition.CanInsertSupplementaryTelegram(number));
+            if (!possible) throw new BridgeException("TelegramChangeRefused", "Startdrive reports that this telegram " + operation + " is not possible on the drive object; nothing was written.");
+            // Existing overlaps refuse before the checkpoint; the same check after the write then attributes any overlap to this change.
+            var conflicts = DriveAddressConflicts(project, driveObject);
+            if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The drive object's telegram addresses already overlap configured I/O; resolve that first. Nothing was written.", new JObject { ["conflicts"] = conflicts });
+            if (!write) return new JObject { ["before"] = before, ["after"] = null,
+                ["afterReason"] = "Startdrive assigns telegram addresses during the write; apply reads back every telegram row of the drive object and reports the address shift." };
+            if (operation == "change") targets[0].TelegramNumber = number;
+            else if (operation == "erase") composition.EraseTelegram(type);
+            else if (sized) composition.InsertAdditionalTelegram(inputSize, outputSize);
+            else composition.InsertSupplementaryTelegram(number);
+            var after = DriveTelegramRows(driveObject);
+            conflicts = DriveAddressConflicts(project, driveObject);
+            var readback = new JObject { ["before"] = before, ["after"] = after, ["addressShift"] = DriveAddressShift(before, after), ["conflicts"] = conflicts };
+            change.Readbacks.Add(new JObject { ["role"] = "drive-telegram-readback", ["telegrams"] = readback });
+            var found = composition.Where(telegram => telegram.Type == type).ToArray();
+            Func<JArray, string> others = rows => string.Join("|", rows.Where(row => row.Value<string>("type") != typeName).Select(row => row.Value<string>("type") + ":" + row["number"]).OrderBy(text => text, StringComparer.Ordinal));
+            bool applied = operation == "erase" ? found.Length == 0 : found.Length == 1
+                && (sized ? found[0].GetSize(AddressIoType.Input) == inputSize && found[0].GetSize(AddressIoType.Output) == outputSize : found[0].TelegramNumber == number);
+            if (!applied || others(before) != others(after))
+                throw new BridgeException("MutationVerificationFailed", "Telegram readback differs from the request or another telegram changed type or number. Restore the checkpoint before further changes.");
+            if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The changed telegram addresses overlap configured I/O. Restore the checkpoint before further changes.");
+            return readback;
+        }
+
+        // Before/after start and length of every telegram address, keyed by telegram and address id; only differences are listed.
+        private static JArray DriveAddressShift(JArray before, JArray after)
+        {
+            Func<JArray, Dictionary<string, JObject>> map = rows => rows.SelectMany(row => row["addresses"].Select(address => new { Key = row.Value<string>("id") + "/" + address.Value<string>("id"),
+                Value = new JObject { ["startAddress"] = address["startAddress"].DeepClone(), ["length"] = address["length"].DeepClone() } })).ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
+            var old = map(before); var current = map(after); var shift = new JArray();
+            foreach (string key in old.Keys.Union(current.Keys).OrderBy(key => key, StringComparer.Ordinal))
+            {
+                old.TryGetValue(key, out var x); current.TryGetValue(key, out var y);
+                if (JToken.DeepEquals(x, y)) continue;
+                int? from = x?.Value<int?>("startAddress"), to = y?.Value<int?>("startAddress");
+                shift.Add(new JObject { ["address"] = key, ["before"] = x, ["after"] = y, ["startShiftBytes"] = from.HasValue && to.HasValue ? (long?)to.Value - from.Value : null });
+            }
+            return shift;
+        }
+
+        // Same-IoType byte overlaps between the drive object's telegram ranges and every configured range; ranges sharing a
+        // controller, or with no resolved controller, conflict. Unassigned (negative) or empty ranges occupy no I/O bytes.
+        private JArray DriveAddressConflicts(Project project, DriveObject driveObject)
+        {
+            var own = driveObject.Telegrams.SelectMany(telegram => telegram.Addresses).ToArray();
+            var budget = new ScanBudget(50000);
+            var others = new List<KeyValuePair<string, Address>>();
+            foreach (var entry in DeviceItems(project, budget))
+                foreach (var address in entry.Item.Addresses) { if (!budget.Take()) break; others.Add(new KeyValuePair<string, Address>(entry.Path, address)); }
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Address collision lookup is incomplete.");
+            others.AddRange(own.Select(address => new KeyValuePair<string, Address>("DO" + driveObject.DriveObjectNumber + "/telegrams", address)));
+            var conflicts = new JArray();
+            foreach (var mine in own)
+            {
+                int length = OfflineEvidence.IoBitLengthToByteLength(mine.Length);
+                if (!OfflineEvidence.ValidIoByteRange(mine.StartAddress, length)) continue;
+                var controllers = mine.AddressControllers.ToArray();
+                foreach (var other in others)
+                {
+                    var address = other.Value;
+                    int otherLength = OfflineEvidence.IoBitLengthToByteLength(address.Length);
+                    if (address.IoType != mine.IoType || !OfflineEvidence.ValidIoByteRange(address.StartAddress, otherLength) || DriveSameAddress(mine, address)
+                        || !OfflineEvidence.IoByteRangesOverlap(mine.StartAddress, length, address.StartAddress, otherLength)) continue;
+                    var otherControllers = address.AddressControllers.ToArray();
+                    if (controllers.Length != 0 && otherControllers.Length != 0 && !controllers.Any(controller => otherControllers.Any(controller.Equals))) continue;
+                    conflicts.Add(new JObject { ["ioType"] = mine.IoType.ToString(), ["startAddress"] = mine.StartAddress, ["length"] = mine.Length,
+                        ["otherPath"] = other.Key, ["otherStartAddress"] = address.StartAddress, ["otherLength"] = address.Length, ["lengthUnit"] = "bit",
+                        ["ownerResolved"] = controllers.Length != 0 && otherControllers.Length != 0 });
+                }
+            }
+            return conflicts;
+        }
+
+        // Telegram and device-item compositions may wrap one native range separately; equal parent, type, start and length identify it.
+        private static bool DriveSameAddress(Address first, Address second) => first.Equals(second)
+            || Equals(first.Parent, second.Parent) && first.IoType == second.IoType && first.StartAddress == second.StartAddress && first.Length == second.Length;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private JArray DriveTelegramFingerprint(EngineeringChange change, Project project) => DriveTelegramRows(ChangeDriveObject(project, change.Payload));
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private JObject DriveParameterFingerprint(EngineeringChange change, Project project)

@@ -75,6 +75,7 @@ namespace TiaMcp.Openness.V21
 #endif
                 case "testsuite_style_prerequisites": return TestSuitePrerequisites(arguments);
                 case "testsuite_application_inventory": return TestSuiteApplicationInventory(arguments);
+                case "testsuite_system_inventory": return TestSuiteSystemInventory(arguments);
                 case "testsuite_style_observe": return TestSuiteStage("observe", arguments);
                 case "testsuite_style_checkpoint": return TestSuiteStage("checkpoint", arguments);
                 case "testsuite_style_run": return TestSuiteStage("run", arguments);
@@ -141,6 +142,7 @@ namespace TiaMcp.Openness.V21
                 case "vci_workspace_inspect": return VciWorkspaceInspect(arguments);
                 case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
                 case "call_graph": return CallGraph(arguments);
+                case "instance_lookup": return InstanceLookup(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);
                 case "engineering_read": return EngineeringRead(arguments);
@@ -155,6 +157,7 @@ namespace TiaMcp.Openness.V21
                 case "library_list": return LibraryList(arguments);
                 case "library_query": return LibraryQuery(arguments);
                 case "library_compare": return LibraryCompare(arguments);
+                case "library_update_check": return LibraryUpdateCheck(arguments);
                 case "library_export": return LibraryExport(arguments);
                 case "library_close": return LibraryClose(arguments);
                 case "library_capabilities": return LibraryCapabilities(arguments);
@@ -162,6 +165,7 @@ namespace TiaMcp.Openness.V21
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
                 case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
                 case "plc_online_compare": return PlcOnlineCompare(arguments);
+                case "db_snapshot_export": return DbSnapshotExport(arguments);
                 case "plc_station_upload": return PlcStationUpload(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);

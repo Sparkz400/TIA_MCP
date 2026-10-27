@@ -4,6 +4,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcLibraryIntegrationPlanner.cs" Link="PlcLibraryIntegrationPlanner.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs" Link="PlcHmiIntegrationPlanner.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ObjectIdentity.cs" Link="ObjectIdentity.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiRecipeRules.cs" Link="HmiRecipeRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs" Link="LibraryDependencyCapture.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs" Link="PlcComponentCoordinator.cs" />

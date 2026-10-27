@@ -236,7 +236,10 @@
           "type": "string"
         },
         "association": {
-          "const": "userSelectedCapturedDB"
+          "enum": [
+            "userSelectedCapturedDB",
+            "nativeExportOfSelectedDB"
+          ]
         },
         "before": {
           "$ref": "#/$defs/document"
@@ -280,6 +283,9 @@
         },
         "limits": {
           "type": "string"
+        },
+        "inputSource": {
+          "$ref": "#/$defs/source"
         }
       }
     },
@@ -320,6 +326,9 @@
         },
         "report": {
           "$ref": "#/$defs/report"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
         }
       }
     },
@@ -393,6 +402,9 @@
         },
         "sourceEvidencePolicy": {
           "type": "string"
+        },
+        "inputSource": {
+          "$ref": "#/$defs/source"
         }
       }
     },
@@ -549,6 +561,33 @@
               "type": "null"
             }
           ]
+        },
+        "inputSource": {
+          "$ref": "#/$defs/source"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "projectPath",
+        "plcPath",
+        "objectPath"
+      ],
+      "properties": {
+        "kind": {
+          "const": "nativeInterfaceSnapshotExport"
+        },
+        "projectPath": {
+          "type": "string"
+        },
+        "plcPath": {
+          "type": "string"
+        },
+        "objectPath": {
+          "type": "string"
         }
       }
     }

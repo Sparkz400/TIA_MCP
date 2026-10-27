@@ -152,14 +152,101 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             {
                 string[] permissions = entry.Client.PermissionsAsync(cancellationToken).GetAwaiter().GetResult();
                 if (entry.Client.Profile.HasNoPermissions == true || WebRuntimeProtocol.ReadAvailability(entry.Client.Methods, permissions) != "permittedAtObservation") throw Error("RuntimePermissionDenied");
-                var current = entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken).GetAwaiter().GetResult();
-                var refreshed = WebRuntimeProtocol.Symbol(entry.Client.Context, selection.Symbol, representation, current[0]);
-                if (refreshed.MetadataSha256 != selection.MetadataSha256) throw Error("RuntimeSymbolMetadataChanged");
-                value = entry.Client.ReadAsync(refreshed, cancellationToken).GetAwaiter().GetResult();
+                value = Current(entry, selection, representation, cancellationToken);
             }, cancellationToken);
             return value!;
         }
         finally { gate.Release(); }
+    }
+
+    /// <summary>Owned-PLCSIM writes after the caller verified the binding: every exact precondition holds before the first write; each write is read back.</summary>
+    public async Task<object> Write(string attemptId, WebRuntimeWriteItem[] writes, CancellationToken cancellationToken)
+    {
+        if (writes is not { Length: >= 1 and <= 16 } || writes.Any(w => w is null) || writes.Select(w => w.SelectionId).Distinct(StringComparer.Ordinal).Count() != writes.Length)
+            throw Error("RuntimeWriteLimit");
+        foreach (var write in writes) Id(write.SelectionId);
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            Live entry = Active(attemptId);
+            var selections = writes.Select(w => entry.Selections.TryGetValue(w.SelectionId, out var s) ? s : throw Error("RuntimeSelectionUnavailable")).ToArray();
+            object? result = null;
+            Use(entry, () =>
+            {
+                Permitted(entry, "write_value", cancellationToken);
+                var before = selections.Select(s => Current(entry, s, "simple", cancellationToken)).ToArray();
+                if (before.Where((read, i) => !Holds(read, writes[i].Expected)).Any())
+                { result = new { attemptId, state = "preconditionMismatch", dispatched = 0, before }; return; }
+                var items = new List<object>(); bool complete = true;
+                for (int i = 0; i < writes.Length && complete; i++)
+                {
+                    string dispatch = "unknown"; int? code = null; string? errorCode = null; WebRuntimeReadResult? after = null;
+                    try
+                    {
+                        (dispatch, code) = entry.Client.MutateAsync(WebRuntimeProtocol.Write(Guid.NewGuid().ToString("N"), before[i].Selection, writes[i].Value), cancellationToken).GetAwaiter().GetResult();
+                        if (dispatch == "accepted") after = Current(entry, selections[i], "simple", cancellationToken);
+                    }
+                    // A lost response leaves the outcome unknown and a failed readback unobserved; both are reported, never retried.
+                    catch (BridgeException error) { errorCode = error.Code; }
+                    bool matches = Holds(after, writes[i].Value);
+                    items.Add(new { selectionId = writes[i].SelectionId, symbol = selections[i].Symbol, dispatch, providerErrorCode = code, errorCode, readback = after, readbackMatches = matches });
+                    complete = dispatch == "accepted" && matches;
+                }
+                result = new { attemptId, state = complete ? "written" : "incomplete", dispatched = items.Count, before, items,
+                    note = "Readback is one later observation; the PLCSIM program scan may overwrite assigned values. Assignment is not forcing." };
+            }, cancellationToken);
+            return result!;
+        }
+        finally { gate.Release(); }
+    }
+
+    /// <summary>Owned-PLCSIM RUN/STOP request after the caller verified the binding; the exact current mode must hold first and the result is observed.</summary>
+    public async Task<object> ChangeOperatingMode(string attemptId, string expectedMode, string mode, CancellationToken cancellationToken)
+    {
+        _ = WebRuntimeProtocol.ChangeOperatingMode(new('0',32), mode); // Refuse a bad selection before session or credential use.
+        if (expectedMode is not ("run" or "stop") || expectedMode == mode) throw Error("RuntimeOperatingModeInvalid");
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            Live entry = Active(attemptId);
+            object? result = null;
+            Use(entry, () =>
+            {
+                Permitted(entry, "change_operating_mode", cancellationToken);
+                WebRuntimeDiagnosticResult Observe() => entry.Client.DiagnosticAsync("operatingMode", null, null, cancellationToken).GetAwaiter().GetResult();
+                bool Is(WebRuntimeDiagnosticResult? read, string wanted) => read is { Status: "read", Value: { ValueKind: JsonValueKind.String } v } && v.GetString() == wanted;
+                var before = Observe();
+                if (!Is(before, expectedMode)) { result = new { attemptId, state = "preconditionMismatch", dispatched = false, before }; return; }
+                string dispatch; int? code; WebRuntimeDiagnosticResult? after = null;
+                try { (dispatch, code) = entry.Client.MutateAsync(WebRuntimeProtocol.ChangeOperatingMode(Guid.NewGuid().ToString("N"), mode), cancellationToken).GetAwaiter().GetResult(); }
+                catch (BridgeException error) { result = new { attemptId, state = "unknown", dispatched = true, before, errorCode = error.Code }; return; }
+                // Boolean success only acknowledges the request; observe Plc.ReadOperatingMode for a bounded time.
+                for (int i = 0; dispatch == "accepted" && i < 20 && !Is(after, mode); i++)
+                {
+                    if (i > 0) Task.Delay(250, cancellationToken).GetAwaiter().GetResult();
+                    after = Observe();
+                }
+                result = new { attemptId, state = Is(after, mode) ? "changed" : "incomplete", dispatched = true, expectedMode, requestedMode = mode,
+                    dispatch, providerErrorCode = code, before, readback = after, readbackMatches = Is(after, mode) };
+            }, cancellationToken);
+            return result!;
+        }
+        finally { gate.Release(); }
+    }
+
+    private static bool Holds(WebRuntimeReadResult? read, JsonElement wanted) =>
+        read is { Status: "read", Value: { } value } && JsonElement.DeepEquals(value, wanted);
+    private static void Permitted(Live entry, string permission, CancellationToken cancellationToken)
+    {
+        string[] permissions = entry.Client.PermissionsAsync(cancellationToken).GetAwaiter().GetResult();
+        if (entry.Client.Profile.HasNoPermissions == true || !permissions.Contains(permission, StringComparer.Ordinal)) throw Error("RuntimePermissionDenied");
+    }
+    private static WebRuntimeReadResult Current(Live entry, WebRuntimeSymbol selection, string representation, CancellationToken cancellationToken)
+    {
+        var current = entry.Client.BrowseAsync(selection.Symbol, false, cancellationToken).GetAwaiter().GetResult();
+        var refreshed = WebRuntimeProtocol.Symbol(entry.Client.Context, selection.Symbol, representation, current[0]);
+        if (refreshed.MetadataSha256 != selection.MetadataSha256) throw Error("RuntimeSymbolMetadataChanged");
+        return entry.Client.ReadAsync(refreshed, cancellationToken).GetAwaiter().GetResult();
     }
 
     public async Task<WebRuntimeDiagnosticResult> Diagnostics(string attemptId, string kind, string? language, int? count, CancellationToken cancellationToken)

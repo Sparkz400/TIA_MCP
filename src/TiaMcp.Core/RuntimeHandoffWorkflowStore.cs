@@ -188,6 +188,7 @@ public sealed class RuntimeHandoffWorkflowStore
             requestSha256 = record.Receipt.Artifacts[0].Sha256, reportSha256 = record.Receipt.Artifacts[1].Sha256,
             reviewId = (string)report["reviewId"]!, accessRecordId = (string)report["accessRecordId"]!, accessPhase = (string)report["accessPhase"]!,
             summary = report["summary"]!.DeepClone(), artifacts = record.Receipt.Artifacts, receiptName = "receipt.json",
+            targetBinding = (string?)report["targetBinding"]?["state"] ?? "unbound",
             nativeExecutable = false, nativeQualified = false, sourceAuthenticityVerified = false, liveFreshnessVerified = false,
             operationAdmitted = false, assertionsAdmitted = false, admission = "unavailableWithoutQualifiedNativeEvidence" };
     }

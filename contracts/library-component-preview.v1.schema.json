@@ -338,24 +338,32 @@
                     "pattern": "\\S"
                   },
                   "dataType": {
-                    "enum": [
-                      "Bool",
-                      "Byte",
-                      "Word",
-                      "DWord",
-                      "LWord",
-                      "SInt",
-                      "USInt",
-                      "Int",
-                      "UInt",
-                      "DInt",
-                      "UDInt",
-                      "LInt",
-                      "ULInt",
-                      "Real",
-                      "LReal",
-                      "Time",
-                      "LTime"
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "Bool",
+                          "Byte",
+                          "Word",
+                          "DWord",
+                          "LWord",
+                          "SInt",
+                          "USInt",
+                          "Int",
+                          "UInt",
+                          "DInt",
+                          "UDInt",
+                          "LInt",
+                          "ULInt",
+                          "Real",
+                          "LReal",
+                          "Time",
+                          "LTime"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^\"[^\"]{1,256}\"(?![\\s\\S])"
+                      }
                     ]
                   },
                   "logicalAddress": {
@@ -377,16 +385,146 @@
                   "isSafety"
                 ],
                 "additionalProperties": false
+              },
+              "dbPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "members": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 16,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+                }
+              },
+              "nativeBlock": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "path",
+                  "kind",
+                  "number",
+                  "language",
+                  "protected",
+                  "namespace"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "kind": {
+                    "const": "DB"
+                  },
+                  "number": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "language": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "protected": {
+                    "const": false
+                  },
+                  "namespace": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 4096
+                  },
+                  "instanceOfName": {
+                    "type": "string",
+                    "maxLength": 4096
+                  },
+                  "users": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "\\S"
+                    }
+                  }
+                }
+              },
+              "nativeMember": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "dataType",
+                  "scalar"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 16,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+                    }
+                  },
+                  "dataType": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "scalar": {
+                    "const": true
+                  }
+                }
               }
             },
             "required": [
               "parameter",
               "direction",
-              "dataType",
-              "tagPath",
-              "nativeTag"
+              "dataType"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "required": [
+                  "tagPath",
+                  "nativeTag"
+                ]
+              },
+              {
+                "required": [
+                  "dbPath",
+                  "members",
+                  "nativeBlock",
+                  "nativeMember"
+                ]
+              }
+            ],
+            "dependentRequired": {
+              "members": [
+                "nativeMember"
+              ]
+            }
           },
           "minItems": 1,
           "maxItems": 128
@@ -416,7 +554,18 @@
               ]
             },
             "obCallAdded": {
-              "const": false
+              "type": "boolean"
+            },
+            "kind": {
+              "enum": [
+                "FC",
+                "FB",
+                "OB"
+              ]
+            },
+            "namespace": {
+              "type": "string",
+              "maxLength": 4096
             }
           },
           "required": [
@@ -426,41 +575,121 @@
             "language",
             "obCallAdded"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "obCallAdded"
+                ],
+                "properties": {
+                  "obCallAdded": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "OB"
+                  },
+                  "mode": {
+                    "const": "existing"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "OB"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "obCallAdded": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
         },
         "instanceDb": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "\\S"
+                },
+                "numberPolicy": {
+                  "const": "firstAvailable"
+                },
+                "provisionalNumber": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "numberMustBeRecheckedAfterInstantiation": {
+                  "const": true
+                }
+              },
+              "required": [
+                "name",
+                "path",
+                "numberPolicy",
+                "provisionalNumber",
+                "numberMustBeRecheckedAfterInstantiation"
+              ],
+              "additionalProperties": false
             },
-            "path": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 4096,
-              "pattern": "\\S"
-            },
-            "numberPolicy": {
-              "const": "firstAvailable"
-            },
-            "provisionalNumber": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 65535
-            },
-            "numberMustBeRecheckedAfterInstantiation": {
-              "const": true
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "path",
+                "number",
+                "reused"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "\\S"
+                },
+                "number": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "reused": {
+                  "const": true
+                }
+              }
             }
-          },
-          "required": [
-            "name",
-            "path",
-            "numberPolicy",
-            "provisionalNumber",
-            "numberMustBeRecheckedAfterInstantiation"
-          ],
-          "additionalProperties": false
+          ]
         },
         "blockers": {
           "type": "array",
@@ -509,7 +738,44 @@
                 "const": true
               },
               "mustWaitFor": {
-                "const": "Exact imported FB/dependency identity and content readback; new native project fingerprint."
+                "enum": [
+                  "Exact imported FB/dependency identity and content readback; new native project fingerprint.",
+                  "Fresh typed preparation against the reused FB and the current caller."
+                ]
+              },
+              "planOnly": {
+                "const": true
+              },
+              "planOnlyReasons": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 6,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ComponentScopeUnqualified",
+                        "ComponentRecoveryAnchorUnavailable",
+                        "ComponentMultiInstanceUnqualified",
+                        "ComponentReadbackUnavailable",
+                        "UnsupportedOperandRoute",
+                        "UnsupportedScopeReference"
+                      ]
+                    },
+                    "message": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096,
+                      "pattern": "\\S"
+                    }
+                  }
+                }
               }
             },
             "required": [
@@ -518,9 +784,17 @@
               "prepareArguments",
               "requiresFreshPreparation"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "dependentRequired": {
+              "planOnly": [
+                "planOnlyReasons"
+              ],
+              "planOnlyReasons": [
+                "planOnly"
+              ]
+            }
           },
-          "minItems": 2,
+          "minItems": 1,
           "maxItems": 2
         },
         "recoveryPlan": {
@@ -583,6 +857,123 @@
             "sha256"
           ],
           "additionalProperties": false
+        },
+        "fb": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "namespace",
+            "scopePath",
+            "path",
+            "reused"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+            },
+            "namespace": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "scopePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "reused": {
+              "type": "boolean"
+            }
+          }
+        },
+        "reuse": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "versions",
+            "instanceDbPath",
+            "duplicatesCreated"
+          ],
+          "properties": {
+            "versions": {
+              "type": "array",
+              "maxItems": 1000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "typeName",
+                  "typeGuid",
+                  "versionGuid"
+                ],
+                "properties": {
+                  "typeName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "typeGuid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  },
+                  "versionGuid": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            },
+            "instanceDbPath": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 4096
+            },
+            "duplicatesCreated": {
+              "const": false
+            }
+          }
+        },
+        "multiInstance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "callerPath",
+            "dataType"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+            },
+            "callerPath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            },
+            "dataType": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "\\S"
+            }
+          }
         }
       },
       "required": [
@@ -596,7 +987,6 @@
         "interface",
         "mappings",
         "caller",
-        "instanceDb",
         "blockers",
         "steps",
         "recoveryPlan",

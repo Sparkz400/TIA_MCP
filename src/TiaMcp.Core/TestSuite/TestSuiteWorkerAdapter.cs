@@ -16,7 +16,7 @@ internal sealed class TestSuiteWorkerAdapter(IBridgeClient bridge, Action<TestSu
             context.ArtifactRoot, context.Run, context.Operation, context.ExecutionProfile,
             definitionBundle = context.Definitions.Bytes,
             application = context.Application is null ? null : new { context.Application.ExecutionMode, context.Application.SimulatorTicket,
-                route = TestSuiteApplicationRun.Route(context.Run, context.Application.WholeGroup) }
+                context.Application.ServerAddress, route = TestSuiteApplicationRun.Route(context.Run, context.Application.WholeGroup) }
         }, token);
         var opened = TestSuiteStyleJobs.Parse<Opened>(JsonSerializer.SerializeToUtf8Bytes(response));
         if (string.IsNullOrWhiteSpace(opened.LeaseToken) || opened.OperationId != context.Operation.Id ||

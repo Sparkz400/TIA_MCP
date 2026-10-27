@@ -10,8 +10,18 @@ using TiaMcp.OpcUa.Runtime;
 namespace TiaMcp.Host;
 
 [McpServerToolType]
-public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions options)
+public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions options, PlcsimTargets targets)
 {
+    [McpServerTool(Name = "runtime_ua_write", ReadOnly = false, Destructive = true, OpenWorld = true)]
+    [Description("Write 1..16 scalar Value attributes through this Host's owned UA session whose opc.tcp endpoint is a controller address of a runtime_plcsim_bind binding (bindingSha256); the simulator worker must still observe that exact owned instance. Physical PLCs and unbound endpoints are refused with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite=true and no running acquisition on the session. writes:[{node,encoding,expected,value}] use runtime_ua_read's exact encoding and value forms (boolean, decimalInteger, roundTripFloat/Double, string); every expected must equal the current read or nothing is written (preconditionMismatch). Values convert to the node's observed built-in type, one Write call is sent, then an independent read reports per-item status codes and readbackMatches. Unknown outcomes are never retried. No arrays, structures, forcing, method calls or credentials in results.")]
+    public Task<CallToolResult> Write(string attemptId, string bindingSha256, OpcUaRuntimeWriteItem[] writes, bool acknowledgeWrite, CancellationToken cancellationToken) =>
+        Run(async () =>
+        {
+            if (!acknowledgeWrite) throw new BridgeException("RuntimeAcknowledgementRequired", "Set the explicit acknowledgement flag; nothing was sent.");
+            await targets.Require(bindingSha256, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
+            return await sessions.Store.Write(attemptId, writes, cancellationToken);
+        });
+
     [McpServerTool(Name = "diagnostic_ua_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Compare two exact prebound UA polling/subscription prefixes offline. Supply beforeSnapshotRef, afterSnapshotRef and request:{reason,beforeAnchorSeconds,afterAnchorSeconds,windowStartSeconds,windowEndSeconds,signalMap:[{before,after}],allowChangedSource?:boolean}. Windows are inclusive on each capture's Host elapsed clock, +/-1000000 seconds at millisecond resolution. Mappings must be one-to-one with equal saved datatypes and unit labels. Changed saved reviews require explicit admission. Revalidates and retains both original chains/bindings/experiments, quality-aware scalar ranges and Boolean counts, recorded event type/source/severity counts, gaps/duplicates/overflow, original timestamps and incomplete prefixes. Arrays remain exact evidence, not scalar statistics. Returns a hashed artifact, at most 8 MiB, without truncation. No services, replay, clock synchronization, causal or fixed-fault verdict. Export with diagnostic_ua_report_export.")]
     public Task<CallToolResult> CompareDiagnostic(string beforeSnapshotRef, string afterSnapshotRef, JsonElement request) => Run(() => Task.FromResult<object>(

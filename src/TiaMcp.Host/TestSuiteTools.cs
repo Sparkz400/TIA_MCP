@@ -18,6 +18,8 @@ public sealed partial class TiaTools
         StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
     private sealed record ApplicationPlanRequest(NativeTargetObservation Target, string ExecutionProfile, string ExecutionMode,
         string SimulatorTicket, bool WholeGroup, StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
+    private sealed record SystemPlanRequest(NativeTargetObservation Target, string ExecutionProfile, string SimulatorTicket,
+        string ServerAddress, bool WholeGroup, StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
     private TestSuiteStyleJobs StyleJobs() => new(options.ArtifactsDirectory);
     private static CallToolResult StyleResult(Func<object> action)
     {
@@ -57,6 +59,23 @@ public sealed partial class TiaTools
     [Description("List the project's Test Suite application group: test cases with their GetScope target, test sets and counts, bounded by maxItems with explicit truncation. export=true also saves each listed case as .tat (TestCase.SaveToFile) under the Host export directory with SHA-256; sets have no Openness export route. No import, SetScope or execution.")]
     public Task<CallToolResult> TestSuiteApplicationInventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, bool export = false)
         => Call("testsuite_application_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "testsuite_system_plan_prepare", Destructive = false, OpenWorld = false)]
+    [Description("Retain a complete bounded system-test review (TS-06). request is the style plan request plus simulatorTicket: the downloadTicket of an owned sim_create instance, serverAddress: the canonical opc.tcp://<IPv4>:<port>/ address of that instance, wholeGroup: true to run the project's whole system group. Definitions use the system (.tst) family. Each run dispatches one native SystemTestCaseExecutor.Run: one case, a case list or the whole group. Use the testsuite_style_job_* tools with the returned review. The worker verifies the ticket-owned PLCSIM instance and that serverAddress is one of its controller addresses before SetScope(StandardSIMATIC) and Run. Native execution stays disabled until qualified.")]
+    public CallToolResult TestSuiteSystemPlanPrepare(JsonElement request) => StyleResult(() =>
+    {
+        var input = TestSuiteStyleJobs.Parse<SystemPlanRequest>(Encoding.UTF8.GetBytes(request.GetRawText()));
+        var definitions = StyleCaptures(input.Definitions);
+        var jobs = StyleJobs();
+        var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
+            new TestSuiteApplicationBinding("endpoint", input.SimulatorTicket, input.WholeGroup) { ServerAddress = input.ServerAddress });
+        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+    });
+
+    [McpServerTool(Name = "testsuite_system_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("List the project's Test Suite system group: test cases with their OPC UA server address, interface type and interface folder, and the count, bounded by maxItems with explicit truncation. export=true also saves each listed case as .tst (SystemTestCase.SaveToFile) under the Host export directory with SHA-256. No import, SetScope or execution.")]
+    public Task<CallToolResult> TestSuiteSystemInventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, bool export = false)
+        => Call("testsuite_system_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);
 
     private TestSuiteDefinitionCapture[] StyleCaptures(StyleDefinitionInput[] inputs)
     {

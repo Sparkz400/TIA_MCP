@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.40",
+  "catalogVersion": "0.4.42",
   "targetTiaVersions": [
     21
   ],
@@ -3977,6 +3977,51 @@
       ]
     },
     {
+      "featureId": "instance_lookup",
+      "domain": "analysis",
+      "title": "Look up exact FB/FC instances, call sites and bindings",
+      "mcpTools": [
+        "instance_lookup"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base CrossReferenceService.GetCrossReferences(CrossReferenceFilter) with SourceObject.References, ReferenceObject.Locations and Location.Access/ReferenceType/ReferenceLocation; Siemens.Engineering.Step7 PlcBlock.Export(FileInfo, ExportOptions), InstanceDB.InstanceOfName, PlcBlock.ProgrammingLanguage/IsKnowHowProtected; SimaticML SCL_v4, LADFBD_v5, STL_v5 and Graph_v6 Access/CallInfo schemas."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exact FB or FC in one PLC. Instance DBs resolve through the shared native InstanceType/TypeInstance or unnamespaced InstanceOfName resolver; multi-instance owners are FBs the native xref reports as users, confirmed by an exact same-scope Static declaration (including arrays with literal bounds) in their exported interface, up to maxDepth 8.",
+          "Call sites list native xref call locations plus exported SCL/LAD/FBD CallInfo with compile-unit ordinal, instance components and simple symbolic actual operands; expressions, wired logic and indirect operands stay unresolved.",
+          "STL and GRAPH are an unqualified symbolic scan of exported Access/CallInfo per the V21 schemas with no binding reader; native xref Open/Actions/Transition/Interlock/Supervision rows are retained. Other languages are reported unsupported and skipped.",
+          "maxItems bounds rows, a 2000-item native scan budget bounds xref traversal, maxXmlBlocks (max 50) bounds exports; every truncation and unresolved candidate is explicit. No runtime call context, dataflow or online address is inferred."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Writable Host artifact directory for SimaticML exports"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "engineering_read",
       "domain": "engineering",
       "title": "Describe typed engineering targets and change metadata",
@@ -7237,7 +7282,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog for the remaining Startdrive adapters (drive creation, telegram edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation and scalar parameter writes are tracked as drive_observe and change.drive_parameter_set."
+          "Backlog for the remaining Startdrive adapters (drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation, scalar parameter writes and telegram number/insert/erase edits are tracked as drive_observe, change.drive_parameter_set and change.drive_telegram_set."
         ]
       },
       "qualification": {
@@ -7384,7 +7429,7 @@
         "limitations": [
           "Web API connect/browse/read/status/disconnect, retained polling captures and sequential analyses preserve observed profiles and original evidence.",
           "The isolated OPC UA client provides explicit secure connect, bounded browse/typed read and owned status/disconnect, exercised against local servers only; no catalog qualification evidence is recorded.",
-          "Physical CPU/firmware qualification, independent online program/address association, broader runtime profiles and write/control remain open.",
+          "Physical CPU/firmware qualification, independent online program/address association, broader runtime profiles and physical write/control remain open; gated writes and RUN/STOP exist only for bound owned PLCSIM endpoints (runtime_web_write, runtime_web_operating_mode, runtime_ua_write).",
           "Explicit OPC UA polling captures reuse durable bounded capture storage, preserve per-item quality/time/type metadata and reopen after Host interruption without resuming acquisition. Physical-device qualification remains open.",
           "Separate bounded UA subscription acquisition retains requested/revised settings, item failures, sequence/gap/overflow/duplicate/retransmission observations and unknown cleanup/loss. Restart only reopens committed evidence; automatic reconnect and transfer remain unsupported."
         ]
@@ -8730,6 +8775,48 @@
       ]
     },
     {
+      "featureId": "library_update_check",
+      "domain": "libraries",
+      "title": "Library update check",
+      "mcpTools": [
+        "library_update_check"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ILibrary.UpdateCheck(Project, UpdateCheckMode) returning UpdateCheckResult.Messages (UpdateCheckResultMessage.Description, MessageParts, Messages)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Depth-first walk of native log messages bounded by maxItems (1..1000), depth 64 and 50 message parts, with explicit truncation. Message text is Siemens output and is not interpreted.",
+          "Read-only by intent; the response reports projectModifiedByCheck if the native check marked a clean project modified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "A registered libraryId and an open project."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "library_close",
       "domain": "libraries",
       "title": "Library close",
@@ -9574,7 +9661,8 @@
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
-          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, a new global instance DB, an existing LAD/FBD caller and scalar existing-tag bindings. Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
+          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
+          "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -9690,7 +9778,8 @@
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "object.groupKind (blocks, types or tags) with groupPath and optional scopePath selects a native PLC user group as one composite master-copy source (MasterCopyComposition.Create(IMasterCopySource)); compiled against the V21 PublicAPI only, not natively qualified. Several unrelated objects in one master copy have no V21 API."
         ]
       },
       "qualification": {
@@ -10115,6 +10204,105 @@
       "prerequisites": [
         "TIA V21, matching optional HMI modules when applicable, and an authorized engineering session.",
         "Review exact identities and prepare preview before any mutation."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.library_cleanup",
+      "domain": "libraries",
+      "title": "Library cleanup of unused type versions",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "library_cleanup",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ProjectLibrary.CleanUpLibrary(IEnumerable<ILibraryTypeOrFolderSelection>, CleanUpMode) with CleanUpMode.PreserveDefaultVersionOfUnusedTypes or DeleteUnusedTypes."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Project libraries only: UserGlobalLibrary.CleanUpLibrary is not used because consumers of a global library in other projects cannot be enumerated.",
+          "The preview lists the maximum deletion set: committed versions of the selected types/folders with no native use in any project software (LibraryTypeVersion.FindInstances), no master-copy embedding and no retained dependent. Incomplete use search, in-work versions or more than 1000 scope versions refuse.",
+          "Under PreserveDefaultVersionOfUnusedTypes the default and highest version of a fully unused type are kept. Native retention rules are inferred from the API documentation, not qualified.",
+          "Apply verifies by readback that every library version outside the previewed set remains and none was added; previewed candidates that native kept are reported, not treated as failure."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "A project library from library_list or library_open kind=project, offline project, compile=true, save=true and checkpointSave=true."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.library_harmonize",
+      "domain": "libraries",
+      "title": "Library harmonize project names and paths",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "library_harmonize",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ILibrary.HarmonizeProject(IEnumerable<ILibraryTypeOrFolderSelection>, IEnumerable<IUpdateProjectScope>, HarmonizeProjectOptions) on ProjectLibrary or GlobalLibrary, with the selected PlcSoftware as the only scope and HarmonizeNames and/or HarmonizePaths."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "PLC code-block and PLC data types only; the scope is exactly one selected PLC. HMI scopes are not offered.",
+          "The preview lists every affected instance with its current and expected name and user-group path; the expected group path mirrors the type's library folder and is inferred, not natively qualified. Name collisions in the same software scope refuse.",
+          "Apply verifies by readback the exact instance names, group paths and version links, and that every other PLC block/type path is unchanged; other PLCs and object content are not compared."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "Source library and an exact target projectName/plcPath; offline project, compile=true, save=true and checkpointSave=true."
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -10933,14 +11121,16 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct."
+          "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct.",
+          "27 October Unified additions verified against Siemens.Engineering.WinCCUnified.xml and its assembly: HmiConnectionComposition.Create(String)/Find; HmiConnection.Partner/Station/Node (read-only) and CommunicationDriver; HmiDiscreteAlarmComposition, HmiAnalogAlarmComposition, HmiDataLogComposition and HmiAlarmLogComposition Create(String)/Find; typed setters AlarmBase.RaisedStateTag/AlarmClass/Priority/Origin/Area, HmiDiscreteAlarm.RaisedStateTagBitNumber/TriggerMode, HmiAnalogAlarm.Condition, LoggingBase.Settings with LogSettings.LogMaxSize/StorageFolder, HmiRuntimeSetting.StartScreen/ScreenResolution; reference lookups HmiTagComposition/HmiAlarmClassComposition/HmiScreenComposition.Find; GlobalDB.Export for DB member declarations. HmiTextListComposition, HmiGraphicListComposition and HmiScriptModuleComposition expose no Create and their items no writable typed property (Name is read-only), only directory Import/Export."
         ]
       },
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
-          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, DB members, arrays, UDTs, software-unit tags, connection creation and Classic external tags are not covered.",
+          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, arrays, whole UDT values, software-unit tags and Classic external tags are not covered; global DB members and connection creation follow (27 October).",
+          "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21 (only paired-file directory Import/Export, whose formats are unqualified), so no write is offered; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Classic classic_xml_import (27 October): imports a supplied or edited native export of one exact Classic object with ImportOptions.Override through its owning composition: ScreenComposition, ScreenTemplateComposition, ScreenPopupComposition, ScreenSlideinComposition, HmiTarget.ImportScreenGlobalElements/ImportScreenOverview, TagTableComposition, TextListComposition, GraphicListComposition, VBScriptComposition, CycleComposition and ConnectionComposition. Prepare requires one exported Hmi.* root of the same native type and Name, refuses library-linked screens/scripts and retains the current export as backup; apply re-exports the re-found object and requires equality with the supplied document apart from DocumentInfo/formatting, then the whole-HMI preservation check requires every other export unchanged. Cycles have no inspection kind and are addressed as kind hmiCycle by their preservation-capture path; the capture now keys slide-ins by SlideinType, matching inventory paths. The operation has its own unverified gate and stays refused for every profile. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
           "The Unified preservation manifest adds a per-node SHA-256 of the same typed object-model readback as hmi_inspect section=model (keyed by hmi_inspect paths, bounded to 45000 nodes/64 MiB, typed-model.json retained) next to the tag-table exports, so unrelated-content comparison spans screens, items, dynamizations, events, parts, translations, tags, alarms, logs and runtime settings. tag_create may add only the created tag's subtree and binding operations only the bound interface entries. V21 has no Screen.Export; payloads without a public getter stay uncompared, so the manifest remains incomplete and the per-operation gates stay closed. Compiled against the V21 PublicAPI only; not natively qualified.",
@@ -10956,7 +11146,7 @@
       "availability": {
         "status": "blocked",
         "reasons": [
-          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
+          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
         ]
       },
       "prerequisites": [
@@ -16396,7 +16586,7 @@
         "limitations": [
           "Read-only bounded traversal (maxItems shared by groups, workspaces, mapped objects and supported formats; group depth 32) with explicit truncation and per-workspace/per-mapping warnings.",
           "Mapped-object identity is the native ancestor type/Name/Number chain, not a stable GUID. CompareState, IndividualObjectCompareDetails and child MappingState are native observations, not preservation, import or synchronization qualification.",
-          "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation, mapping edits and synchronization are not implemented.",
+          "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation/deletion, mapping add/remove and directed synchronization are separate prepared change kinds (change.vci_*), not part of this read-only tool.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
@@ -16417,6 +16607,272 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_create",
+      "domain": "version_control",
+      "title": "Create a native VCI workspace with an explicit root and language",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_workspace_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: WorkspaceComposition.Create(string, DirectoryInfo, CultureInfo) on the exact WorkspaceSystemGroup/WorkspaceUserGroup from VersionControlInterface.WorkspaceGroup; WorkspaceComposition.Find(string) and Workspace.Name/RootPath/WorkspaceLanguage readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: groupPath, name (unused in that group), rootPath (absolute, absent or an empty directory, not overlapping another workspace root), language (exact active project culture). The root directory is created if absent.",
+          "Workspace.WorkspaceLanguage has no public setter, so the language is fixed at creation. Rename, root relocation, library policy (GlobalLibraryPath, DeleteUnusedTypeVersionFromLibrary) and user group create/delete are not implemented.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_delete",
+      "domain": "version_control",
+      "title": "Delete one native VCI workspace and its mappings",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_workspace_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: Workspace.Delete() on the exact workspace; WorkspaceComposition enumeration readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath. The preview lists every mapping (with GetStatus/GetChildStatus) removed with the workspace; the mapped engineering objects stay.",
+          "Whether TIA deletes files below the root is not established: every root file is backed up first and the observed file effect is reported, not required.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_add",
+      "domain": "version_control",
+      "title": "Map one exact object into a VCI workspace by export or by connecting existing files",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_mapping_add",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: Workspace.GetSupportedFileFormats(IEngineeringObject), Workspace.ExportObject(IEngineeringObject, DirectoryInfo, string, string) or Workspace.ConnectObject(IEngineeringObject, DirectoryInfo, string, string); MappedObjectComposition.Find(IEngineeringObject) and MappedObject.DirectoryPath/FileNameWithoutExtension/FileFormat/GetStatus/GetChildStatus readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, objectPath, mode (export or connect), directory (relative to the root, empty for the root), fileName (without extension), format (exact native token from GetSupportedFileFormats).",
+          "An object already mapped in any workspace and a package already owned by another mapping are refused. export refuses existing package files and must read back Equal; connect requires existing package files and only reports the native status.",
+          "The directory is passed as the absolute path below the root: the 15 October V21 probe rejected a relative DirectoryInfo for this parameter. Package completeness (for example SIMATIC SD .s7res companions) is not checked.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_remove",
+      "domain": "version_control",
+      "title": "Remove one object's VCI mapping",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_mapping_remove",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: MappedObjectComposition.Find(IEngineeringObject) and MappedObject.Delete(); Find readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, objectPath. Removes only the mapping; the engineering object stays. Package files are backed up first; any native file effect within the package is reported.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_synchronize",
+      "domain": "version_control",
+      "title": "Synchronize mapped VCI objects in one explicit direction",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_synchronize",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: MappedObject.GetStatus()/GetChildStatus() before and after, MappedObject.Synchronize(SynchronizationMode.ProjectToWorkspace or SynchronizationMode.WorkspaceToProject)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, direction (ProjectToWorkspace or WorkspaceToProject), and either objectPath or allMappedObjects=true (1..200 mappings, ProjectToWorkspace only). Mappings with both ProjectObjectChanged and WorkspaceFileChanged are refused as VciConflict; WorkspaceToProject refuses WorkspaceFileMissing.",
+          "Each synchronized mapping must read back CompareState Equal. A whole-workspace sync is a journaled sequence of per-mapping calls, not a transaction.",
+          "ProjectToWorkspace overwrites the previewed package files (backed up first); every other workspace file must stay byte-identical. WorkspaceToProject keeps the workspace files byte-identical, applies the guards of direct mutations (safety-unit, F-block, know-how protected objects refused) and requires compile=true.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
@@ -16957,6 +17413,150 @@
       ]
     },
     {
+      "featureId": "testsuite_system_inventory",
+      "domain": "test_suite",
+      "title": "List and export Test Suite system test cases",
+      "mcpTools": [
+        "testsuite_system_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 TestSuiteService.SystemTestGroup, SystemTestSystemGroup.SystemTestCases, SystemTestCase.Name/OPCUAServerAddress/OPCUAServerInterfaceType/OPCUAServerInterfaceFolderPath and SystemTestCase.SaveToFile(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Bounded by maxItems with explicit truncation; per-case scope/export failures such as LicenseNotFoundException are reported per row.",
+          "Exported .tst bytes are retained with SHA-256 but not parsed; an interface folder referenced by the case is not exported."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product in the attached TIA instance; service or adapter absence is reported, never replaced by an empty inventory."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "An open project"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "testsuite_system_plan_prepare",
+      "domain": "test_suite",
+      "title": "Retain a bounded system-test run review against an owned PLCSIM endpoint",
+      "mcpTools": [
+        "testsuite_system_plan_prepare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Local durable Host workflow; the optional V21 boundary compiles SystemTestCase.SetScope(String, ServerInterfaces.StandardSIMATIC), SystemTestSystemGroup.GetService<SystemTestCaseExecutor>() and SystemTestCaseExecutor.Run(SystemTestCase / IEnumerable<SystemTestCase> / SystemTestSystemGroup), returning TestResults with State and Messages."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
+          "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses before SetScope and Run. Physical or unowned endpoints are refused.",
+          "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
+          "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Offline retained workflow is available. Native actions require an accepted system-test profile, an owned PLCSIM instance in RUN with its OPC UA server enabled and independent current observations."
+        ]
+      },
+      "prerequisites": [
+        "One shared artifact root across cooperating Hosts",
+        "An owned PLCSIM Advanced V8 instance from sim_create, its downloadTicket and its opc.tcp controller address",
+        "Native actions require a qualified adapter, product/license, simulator, endpoint and scope evidence"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preview",
+        "AC-evidence",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-native",
+        "AC-runtime",
+        "AC-simulator-lifecycle"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_system_import",
+      "domain": "test_suite",
+      "title": "Strictly import Test Suite system test cases from a file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "testsuite_system_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 SystemTestCaseComposition.LoadFromFile(FileInfo, ImportOptions.None, TCLoadOptions.None) for .tst, with SystemTestCaseComposition.Find readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Strict only: collisions and invalid objects refuse; no Override or IgnoreInvalidObject route. The .tst grammar is not parsed; reviewed names are verified against the native return value and Find readback.",
+          "sourcePath is copied byte-exact into the change directory. No OPC UA scope is set and nothing executes. An interface folder referenced by the case is not imported.",
+          "Saving requires compile=true with a plcPath, as for every prepared change; compilation does not cover Test Suite objects. The project fingerprint does not cover Test Suite objects, so an interrupted apply is never reconciled as applied from it."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product and its definition license in the attached TIA instance; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "A verified recovery checkpoint",
+        "An existing absolute .tst file and the exact expected names"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "software_unit_review",
       "domain": "software_units",
       "title": "Review supplied software-unit prerequisites and proposed edits",
@@ -17411,6 +18011,157 @@
         "AC-recovery",
         "AC-preserve",
         "AC-native"
+      ]
+    },
+    {
+      "featureId": "db_snapshot_capture",
+      "domain": "online-diagnostics",
+      "title": "Capture the stored snapshot of one exact DB into a snapshot review",
+      "mcpTools": [
+        "db_snapshot_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.SW.Blocks.InterfaceSnapshot.Export(FileInfo, ExportOptions), obtained through PlcBlock.GetService<InterfaceSnapshot>() with DataBlock.Interface.GetService<InterfaceSnapshot>() as fallback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
+          "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
+          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Open project containing the exact saved DB with a stored snapshot; bounded writable artifact storage."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Saved project review whose exact GlobalDB/InstanceDB/ArrayDB and project path match the open project",
+        "A snapshot stored on that DB"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_create",
+      "domain": "simulation",
+      "title": "Store an owned PLCSIM instance's DB actual values as the DB snapshot",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "db_snapshot_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DataBlock.Interface.GetService<ValueService>().CreateSnapshot() online through OnlineProvider.GoOnline()/GoOffline() on the plc_online_compare route; InterfaceSnapshot.Export for backup and readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
+          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
+          "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM online route must pass runtime checks; the DB must be consistent with the instance's program."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus",
+        "Selected PLC offline with a PN/IE / PLCSIM (1) connection exposing one target interface",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_load_actual",
+      "domain": "simulation",
+      "title": "Load a reviewed DB snapshot as actual values into an owned PLCSIM instance",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "db_snapshot_load_actual",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DataBlock.Interface.GetService<ValueService>().LoadSnapshotAsActualValues() online through OnlineProvider.GoOnline()/GoOffline() on the plc_online_compare route; InterfaceSnapshot.Export for the pre-load hash check."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
+          "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
+          "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
+          "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM online route must pass runtime checks; the reviewed snapshot must still be stored unchanged on the DB."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus",
+        "Selected PLC offline with a PN/IE / PLCSIM (1) connection exposing one target interface",
+        "A db_snapshot_capture record of the same DB and an explicit acknowledgeActualValueWrite=true"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
       ]
     },
     {
@@ -18441,6 +19192,133 @@
       ]
     },
     {
+      "featureId": "runtime_plcsim_bind",
+      "domain": "runtime",
+      "title": "Bind runtime endpoints to an owned PLCSIM instance",
+      "mcpTools": [
+        "runtime_plcsim_bind"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "PLCSIM Advanced V8 runtime API IInstance identity, StoragePath and ControllerIP through the simulator worker (sim_identity); optional Openness FingerprintDataProvider hash from plc_online_compare."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Retains a content-addressed plcsim-target-binding.v1 record of an instance this Host created or adopted: instance name, storage path, SHA-256 of its ownership marker and usable controller IPv4 addresses. The online program fingerprint is recorded only when a current downloadTicket is supplied and plc_online_compare of the same instance exposes one; otherwise it stays notObserved.",
+          "The binding is the gate for runtime_web_write, runtime_web_operating_mode and runtime_ua_write and the bound identity for runtime_handoff_review. A controller address match does not prove the program loaded in the instance beyond the recorded fingerprint. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Owned PLCSIM Advanced V8 instance selected with its creationId in the simulator worker; a fingerprint additionally needs a worker-owned TIA instance and a current downloadTicket."
+        ]
+      },
+      "prerequisites": [
+        "Installed PLCSIM Advanced V8 and an instance this Host created or adopted",
+        "Optional: TIA V21 worker-owned instance and current sim_create downloadTicket for the fingerprint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_write",
+      "domain": "runtime",
+      "title": "Write values to an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API PlcProgram.Write (write_value permission), sent only when the session advertised it; precondition and readback through PlcProgram.Read."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 host-owned selections and an exact expected simple-mode value for each; any mismatch writes nothing.",
+          "Each write is sent once in order, stops the sequence on a provider error, unknown outcome or readback mismatch, and is read back once; the PLCSIM scan may overwrite assignments. No forcing, raw mode, batch atomicity, durable intent journal or automatic retry. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises PlcProgram.Write and grants write_value."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_operating_mode",
+      "domain": "runtime",
+      "title": "Request RUN or STOP on an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_operating_mode"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API Plc.RequestChangeOperatingMode (mode run/stop, change_operating_mode permission), sent only when advertised; precondition and outcome through Plc.ReadOperatingMode."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeModeChange and an exact expected current mode (run/stop) different from the requested mode; otherwise nothing is sent.",
+          "Boolean success only acknowledges the request; Plc.ReadOperatingMode is observed for about 5 s and readbackMatches reports the outcome. Never retried; selector or CPU conditions may refuse. HOLD, STARTUP and R/H redundancy_id are not exposed. Web API alarm acknowledgment (Alarms.Acknowledge) is not implemented: its parameters and alarm acknowledgment state are not represented in the verified protocol. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises Plc.RequestChangeOperatingMode and grants change_operating_mode."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "domain": "runtime",
       "title": "Inspect retained runtime session state",
@@ -19417,7 +20295,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
+          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity beyond an optional owned-PLCSIM binding, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified.",
+          "Optional plcsimBinding selects a runtime_plcsim_bind record: target identity is then matched against the bound owned PLCSIM instance (and program identity against its online fingerprint where one was recorded) instead of the supplied expectation, the expected endpoint must be one of its controller addresses, and the report and receipt state boundOwnedPlcsim. Without a binding the receipt states unbound and identities stay supplied declarations."
         ]
       },
       "qualification": {
@@ -20187,6 +21066,49 @@
         "AC-completeness",
         "AC-evidence",
         "AC-recovery"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_write",
+      "domain": "runtime",
+      "title": "Write scalar values to an owned PLCSIM instance through OPC UA",
+      "mcpTools": [
+        "runtime_ua_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public OPC UA Write service on the Value attribute through the isolated pinned SDK; precondition and readback through the Read service."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 distinct nodes, no running acquisition on the session and an exact expected value in runtime_ua_read encoding for each; any mismatch writes nothing.",
+          "Boolean, integer, Float/Double and String scalars only, converted to the observed built-in type with exact round-trip; one Write call, then an independent read reports per-item status codes and readbackMatches. Any failure inside the session call, including a value that does not convert, marks the session remoteSessionUnknown; nothing is retried. No arrays, structures, method calls, forcing or durable intent journal. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Current owned connected UA session to a bound owned PLCSIM endpoint whose server grants write access to the selected nodes."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Explicit endpoint, server certificate pin and application URI"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
       ]
     },
     {
@@ -20999,6 +21921,59 @@
         "SINAMICS Startdrive V21 installed with its Openness assembly",
         "Applicable native services and project protection state",
         "A verified recovery checkpoint; compile=true to save"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.drive_telegram_set",
+      "domain": "drives",
+      "title": "Change, insert or erase one telegram of an offline drive object",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_telegram_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness offline writes: Telegram.TelegramNumber setter after Telegram.CanChangeTelegram(int); TelegramComposition.CanInsertSupplementaryTelegram/InsertSupplementaryTelegram(int), CanInsertAdditionalTelegram/InsertAdditionalTelegram(int, int) and EraseTelegram(TelegramType). Readback through DriveObject.Telegrams, Telegram.Type/TelegramNumber/GetSize/GetSizeInBytes/Addresses and HW Address.IoType/StartAddress/Length/AddressControllers/Parent."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exact hardwarePath and driveObjectNumber; expectedTelegrams must equal the drive object's complete telegram rows exactly as drive_observe reports them (at most 128 telegrams with 16 addresses each). Prepare and apply refuse any difference before the write; the rows are also part of the change fingerprint.",
+          "Operations: change the TelegramNumber of the only MainTelegram or SupplementaryTelegram; insert a SupplementaryTelegram (telegramNumber) or an AdditionalTelegram (inputSize/outputSize in native Telegram.GetSize units, read back through GetSize) when none of that type exists; erase the only SupplementaryTelegram or AdditionalTelegram. Startdrive's CanChangeTelegram/CanInsert* must agree; Openness has no erase check. Safety telegrams are refused as a safety boundary; torque/edge telegrams, main-telegram insert/erase, ChangeSize and PKW are not supported.",
+          "Startdrive assigns addresses only during the write, so the preview shows the current rows and the request. Apply reads back every telegram row, reports the address shift, and fails after the write (checkpoint recovery) on a collateral telegram type/number change or an I/O overlap. Overlaps that already exist refuse at prepare.",
+          "Overlap check: same-IoType byte ranges against every configured project address; ranges sharing an address controller, or with unresolved controllers, conflict. Matching a telegram range to its own device-item range uses native object equality or equal parent/type/start/length, which is unqualified.",
+          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles all project devices). No online write, download or RAM-to-ROM."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object exposed through DriveObjectContainer."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state",
+        "A verified recovery checkpoint; compile=true"
       ],
       "acceptanceCriteria": [
         "AC-identity",

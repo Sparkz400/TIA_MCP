@@ -23,7 +23,7 @@ namespace TiaMcp.Openness.V21
     {
         private readonly Dictionary<string, LibraryChange> _libraryChanges = new Dictionary<string, LibraryChange>(StringComparer.Ordinal);
         private static readonly HashSet<string> LibraryPolicyAttributes = new HashSet<string>(new[] { "DoNotUse", "SetForUpdate" }, StringComparer.Ordinal);
-        private static readonly string[] LibraryChangeKinds = { "library_create", "library_upgrade", "library_copy_elements", "library_instantiate", "library_update_project", "library_integrate", "library_create_type", "library_create_master_copy", "library_edit_version", "library_release_version", "library_discard_version", "library_set_default", "library_type_policy", "library_organize", "library_delete", "library_publish", "library_save", "library_archive" };
+        private static readonly string[] LibraryChangeKinds = { "library_create", "library_upgrade", "library_copy_elements", "library_instantiate", "library_update_project", "library_integrate", "library_create_type", "library_create_master_copy", "library_edit_version", "library_release_version", "library_discard_version", "library_set_default", "library_type_policy", "library_organize", "library_delete", "library_publish", "library_save", "library_archive", "library_cleanup", "library_harmonize" };
 
         private sealed class LibraryChange
         {
@@ -48,7 +48,7 @@ namespace TiaMcp.Openness.V21
             result["qualification"] = "implementation_present_native_qualification_required";
             result["hmi"] = LibraryHmiCapabilities();
             result["limits"] = new JObject { ["libraries"] = 32, ["metadataEntries"] = 10000, ["pageSize"] = 200, ["dependencyNodes"] = 1000, ["selectedComponents"] = 100 };
-            result["plcIntegration"] = new JObject { ["action"] = "plc_component_plan", ["planOnly"] = true, ["applySupported"] = false, ["applyError"] = PlcLibraryIntegrationPlanner.ApplyError, ["schema"] = "contracts/plc-library-integration-recipe.v1.schema.json", ["scope"] = "One exact FB with pinned PLC dependencies, explicit new global DB, standard LAD/FBD caller and existing scalar PLC tags. Returns concrete separate preparation steps and a recovery/qualification packet." };
+            result["plcIntegration"] = new JObject { ["action"] = "plc_component_plan", ["planOnly"] = true, ["applySupported"] = false, ["applyError"] = PlcLibraryIntegrationPlanner.ApplyError, ["schema"] = "contracts/plc-library-integration-recipe.v1.schema.json", ["scope"] = "One exact FB with pinned PLC dependencies in the PLC or a software unit; a new or exactly reused global instance DB, or a new multi-instance in an existing FB caller; an existing LAD/FBD FC, FB or OB caller or a new FC; scalar tags, UDT-tag members or DB members. Exact installed versions are reused with native proofs. Returns concrete separate preparation steps, planOnly reasons for steps the component route cannot apply, and a recovery/qualification packet." };
             result["limitations"] = new JArray("Type authoring uses documented CreateFromDocuments; direct block-to-type creation is not exposed by the installed public API.", "PLC library_integrate prepares an explicit plan-only recipe. Combined apply is unavailable; proposed existing engineering operations require fresh preparation and are not atomic.", "Library copy/publication can initialize a default or promote a newer source default, with exact effects pinned in preview. Arbitrary default changes and project updates require separate prepared actions.", "Full document/preservation/runtime qualification must be retained for each target profile.");
             return result;
         }
@@ -83,7 +83,7 @@ namespace TiaMcp.Openness.V21
                 if (ChangeText(source, "revision", 64) != LibraryRevision(change.Source)) throw new BridgeException("PreviewStale", "Source library metadata differs from the requested revision.");
             }
             if (payload["destinationLibraryId"] != null) change.Destination = ResolveLibrary(ChangeText(payload, "destinationLibraryId", 64));
-            if (kind == "library_instantiate" || kind == "library_update_project" || kind == "library_integrate" || kind == "library_create_master_copy") change.Project = SelectProject(change.Selector);
+            if (kind == "library_instantiate" || kind == "library_update_project" || kind == "library_integrate" || kind == "library_create_master_copy" || kind == "library_harmonize") change.Project = SelectProject(change.Selector);
             if (change.Destination?.Project != null)
             {
                 if (change.Project != null && !change.Project.Equals(change.Destination.Project)) throw new BridgeException("TargetIncompatible", "Cross-project authoring requires an explicit separate publication/import workflow.");
@@ -184,7 +184,7 @@ namespace TiaMcp.Openness.V21
             return LibraryChangeView(change);
         }
 
-        private static bool IsLibraryMaintenance(string kind) => new[] { "library_edit_version", "library_release_version", "library_discard_version", "library_set_default", "library_type_policy", "library_organize", "library_delete", "library_save", "library_archive" }.Contains(kind);
+        private static bool IsLibraryMaintenance(string kind) => new[] { "library_edit_version", "library_release_version", "library_discard_version", "library_set_default", "library_type_policy", "library_organize", "library_delete", "library_save", "library_archive", "library_cleanup" }.Contains(kind);
 
         private void PrepareLibraryAction(LibraryChange change)
         {
@@ -296,15 +296,16 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "library_create_master_copy":
                     if (change.Destination == null) throw new BridgeException("InvalidRequest", "destinationLibraryId is required.");
-                    var objectSelector = payload["object"] as JObject ?? throw new BridgeException("InvalidRequest", "An exact object selector is required.");
-                    var objectArgs = (JObject)change.Selector.DeepClone(); foreach (var property in objectSelector.Properties()) objectArgs[property.Name] = property.Value.DeepClone();
-                    var native = ResolveObjectTarget(objectArgs);
+                    var native = LibraryMasterCopySource(change);
                     if (!(native.Target is IMasterCopySource)) throw new BridgeException("TargetIncompatible", "Selected engineering object is not a native master-copy source.");
                     change.Preview["sourceObject"] = native.Identity.DeepClone();
                     if (change.Destination.Native.MasterCopyFolder.MasterCopies.Any(x => x.Name == native.Identity.Value<string>("name"))) throw new BridgeException("LibraryConflict", "Destination already contains a master copy with this name.");
                     break;
                 case "library_organize":
                     PrepareLibraryFolderOperation(change);
+                    break;
+                case "library_cleanup": case "library_harmonize":
+                    PrepareLibraryMaintenance(change);
                     break;
                 case "library_delete":
                     if (change.Versions.Count + change.Masters.Count != 1) throw new BridgeException("InvalidRequest", "Select exactly one version or master copy for deletion.");
@@ -637,6 +638,7 @@ namespace TiaMcp.Openness.V21
                 }
             }
             if (change.Kind == "library_create_type") state["documents"] = VerifyLibraryDocumentSnapshot(change);
+            if (change.Kind == "library_cleanup" || change.Kind == "library_harmonize") state["maintenancePlan"] = LibraryMaintenancePlan(change);
             if (change.Kind == "library_upgrade")
             {
                 string path = change.Payload.Value<string>("path");
@@ -1098,8 +1100,7 @@ namespace TiaMcp.Openness.V21
                     }
                     break;
                 case "library_create_master_copy":
-                    var selector = (JObject)change.Selector.DeepClone(); foreach (var property in ((JObject)payload["object"]).Properties()) selector[property.Name] = property.Value.DeepClone();
-                    var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)ResolveObjectTarget(selector).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;
+                    var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)LibraryMasterCopySource(change).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;
                 case "library_edit_version":
                     LibraryTypeVersion edited;
                     if (change.DocumentDirectory != null) edited = ApplyLibraryVersionDocuments(change, result);
@@ -1127,6 +1128,7 @@ namespace TiaMcp.Openness.V21
                     rows.Add(LibraryVersionInfo(change.Versions[0]));
                     break;
                 case "library_organize": ApplyLibraryFolderOperation(change); break;
+                case "library_cleanup": case "library_harmonize": return ApplyLibraryMaintenance(change);
                 case "library_delete": if (change.Versions.Count == 1) change.Versions[0].Delete(); else change.Masters[0].Delete(); break;
                 case "library_save": break; // Save is the durable transaction's separately journaled final stage.
                 case "library_archive":

@@ -808,6 +808,14 @@
       ]
     },
     {
+      "featureId": "instance_lookup",
+      "obligations": [
+        "D17",
+        "L04",
+        "X11"
+      ]
+    },
+    {
       "featureId": "engineering_read",
       "obligations": [
         "X11"
@@ -1424,6 +1432,13 @@
       ]
     },
     {
+      "featureId": "library_update_check",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
       "featureId": "library_close",
       "obligations": [
         "X02",
@@ -1607,6 +1622,20 @@
     },
     {
       "featureId": "change.library_delete",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_cleanup",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_harmonize",
       "obligations": [
         "X02",
         "L02"
@@ -2470,6 +2499,36 @@
       ]
     },
     {
+      "featureId": "change.vci_workspace_create",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_delete",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_add",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_remove",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_synchronize",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
       "featureId": "project_snapshot_import",
       "obligations": [
         "L04",
@@ -2561,6 +2620,24 @@
       ]
     },
     {
+      "featureId": "testsuite_system_inventory",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_system_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_system_import",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
       "featureId": "software_unit_review",
       "obligations": [
         "D07",
@@ -2624,6 +2701,30 @@
     },
     {
       "featureId": "db_snapshot_review_page",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "db_snapshot_capture",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_create",
+      "obligations": [
+        "D09",
+        "F02",
+        "L05"
+      ]
+    },
+    {
+      "featureId": "change.db_snapshot_load_actual",
       "obligations": [
         "D09",
         "F02",
@@ -2818,6 +2919,28 @@
       "featureId": "runtime_web_diagnostics",
       "obligations": [
         "D16"
+      ]
+    },
+    {
+      "featureId": "runtime_plcsim_bind",
+      "obligations": [
+        "D16",
+        "C03",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_write",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_operating_mode",
+      "obligations": [
+        "D16",
+        "L03"
       ]
     },
     {
@@ -3136,6 +3259,14 @@
       ]
     },
     {
+      "featureId": "runtime_ua_write",
+      "obligations": [
+        "D16",
+        "C03",
+        "L03"
+      ]
+    },
+    {
       "featureId": "runtime_ua_status",
       "obligations": [
         "D16",
@@ -3275,6 +3406,12 @@
     },
     {
       "featureId": "change.drive_parameter_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "change.drive_telegram_set",
       "obligations": [
         "D10"
       ]

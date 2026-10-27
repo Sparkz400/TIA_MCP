@@ -66,8 +66,12 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
                     blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
                 AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
+                AddTargetFeature(features, "change.testsuite_system_import", directApi, "partial", "Strict .tst import into the optional Test Suite system group; the Test Suite service and license are not probed here. Names are verified by readback; no OPC UA scope is set and nothing executes.");
                 AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
                 AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
+                var vci = ProbeCapabilityService<Siemens.Engineering.VersionControl.VersionControlInterface>(project, "project", probes);
+                foreach (string feature in VciChangeKinds)
+                    AddTargetFeature(features, "change." + feature, vci, "partial", "Exact workspace/group paths from vci_workspace_inspect and exact objectPath targets. Roots overlapping the project or artifact store, links and non-empty new roots are refused; a bounded root file inventory is pinned at prepare, rechecked before the checkpoint and verified after apply. Not natively qualified.");
             }
 
             if (selected.Plc != null)
@@ -80,7 +84,7 @@ namespace TiaMcp.Openness.V21
                 if (!blockTarget && xref.Status == "unavailable")
                     analysisApi = ApiObservation.Unknown("No PLC-level CrossReferenceService. Analysis can fall back to individual block services, which were not recursively probed by this bounded target inspection.");
                 AddTargetFeature(features, "xref_query", xref, "implemented", "Native cross-references are queried only by a separate operation; current consistency and result completeness are not tested here.");
-                foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact" })
+                foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact", "instance_lookup" })
                     AddTargetFeature(features, feature, analysisApi, "partial", "Static native reference analysis; indirect/runtime aliases and unresolved propagation remain explicit gaps.");
                 var unit = ProbeCapabilityService<PlcUnitProvider>(plc.Software, "plc", probes);
                 metadata["softwareUnitService"] = unit.ToJson();
@@ -152,6 +156,12 @@ namespace TiaMcp.Openness.V21
                     AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
                         applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
                         blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
+                AddTargetFeature(features, "db_snapshot_capture", directApi, "partial", "Exports the snapshot stored on this DB (InterfaceSnapshot.Export) into a db_snapshot_review record bound to its project/PLC/DB identity; a DB without a stored snapshot refuses. Not a current CPU read.",
+                    applicable: block is DataBlock, blocked: protectedBlock, blocker: "The selected block is know-how protected.");
+                foreach (string feature in new[] { "db_snapshot_create", "db_snapshot_load_actual" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "ValueService on a ticket-bound owned PLCSIM Advanced instance only, online through the plc_online_compare route; physical PLCs are refused. Loads need an acknowledged captured snapshot review whose stored snapshot is unchanged. Not natively qualified.",
+                        applicable: block is DataBlock, blocked: protectedBlock || safetyBlock || safetyScope || generated,
+                        blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-DBs and safety-unit objects are excluded.");
                 AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
                     applicable: language == "SCL" || language == "STL" || block is DataBlock,
                     blocked: protectedBlock || safetyBlock || safetyScope || generated,
@@ -230,6 +240,7 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
                 AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
                 AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
+                AddTargetFeature(features, "change.drive_telegram_set", drive, "partial", "Changes the number of the one main or supplementary telegram, or inserts/erases the one supplementary or additional telegram, after Startdrive's own feasibility check. Exact expected telegram rows, readback, address-shift report and overlap refusal; safety telegrams are refused; device compile required.");
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));

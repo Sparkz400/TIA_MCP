@@ -82,6 +82,70 @@ Check("External tag creation requires exact same-HMI connection and exact root P
         var r = External(); r[field] = new JObject(); Reject(() => HmiEngineeringRules.RequireRequest(r));
     }
 });
+Check("External tags map exact unquoted global DB member paths and refuse indexed or quoted spellings", () => {
+    JObject Member(JToken path) { var r = External(); r["plcTag"]["kind"] = "block"; r["plcTag"]["objectPath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1/blocks/QualificationDB"; r["plcTag"]["name"] = "QualificationDB"; r["plcTag"]["memberPath"] = path; return r; }
+    HmiEngineeringRules.RequireRequest(Member(new JArray("Value")));
+    HmiEngineeringRules.RequireRequest(Member(new JArray("Motor", "Speed")));
+    foreach (var path in new JToken[] { null, new JArray(), "Value", new JArray("Arr[1]"), new JArray("\"Quoted\""), new JArray("Motor.Speed"), new JArray(1), new JArray(Enumerable.Repeat("M", 33)) })
+        Reject(() => HmiEngineeringRules.RequireRequest(Member(path)));
+    var rootWithMember = External(); rootWithMember["plcTag"]["memberPath"] = new JArray("Value"); Reject(() => HmiEngineeringRules.RequireRequest(rootWithMember));
+    var unitDb = Member(new JArray("Value")); unitDb["plcTag"]["scopePath"] = "/devices/PLC_1/items/PLC_1/plc/PLC_1/units/U"; Reject(() => HmiEngineeringRules.RequireRequest(unitDb));
+    var wholeUdt = Member(new JArray("Motor")); wholeUdt["dataType"] = "UDT_Motor"; Reject(() => HmiEngineeringRules.RequireRequest(wholeUdt));
+});
+JObject Device(string operation) {
+    var r = Scalar(); r.Remove("properties"); r["operation"] = operation; r["target"] = Identity("/devices/HMI/hmi/Runtime"); r["target"]["kind"] = "hmiDevice"; return r;
+}
+Check("Connection creation is Unified-only and takes only an exact new name", () => {
+    var r = Device("connection_create"); r["name"] = "HMI_Connection_2"; HmiEngineeringRules.RequireRequest(r);
+    var classic = (JObject)r.DeepClone(); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var unnamed = (JObject)r.DeepClone(); unnamed.Remove("name"); Reject(() => HmiEngineeringRules.RequireRequest(unnamed));
+    foreach (string field in new[] { "properties", "dataType", "connection", "plcTag", "composition", "bindings" }) {
+        var smuggled = (JObject)r.DeepClone(); smuggled[field] = field == "dataType" || field == "composition" ? "Bool" : External()[field]?.DeepClone() ?? new JObject { ["Partner"] = "PLC_1" };
+        Reject(() => HmiEngineeringRules.RequireRequest(smuggled));
+    }
+});
+Check("Object creation accepts only documented Create compositions and their family allowlists", () => {
+    JObject Create(string composition, JObject properties = null) { var r = Device("object_create"); r["composition"] = composition; r["name"] = "New_1"; if (properties != null) r["properties"] = properties; return r; }
+    foreach (string composition in new[] { "DiscreteAlarms", "AnalogAlarms", "DataLogs", "AlarmLogs" }) HmiEngineeringRules.RequireRequest(Create(composition));
+    HmiEngineeringRules.RequireRequest(Create("DiscreteAlarms", new JObject { ["RaisedStateTag"] = "Alarm_Word", ["RaisedStateTagBitNumber"] = 3, ["TriggerMode"] = "OnRisingEdge", ["Priority"] = 255 }));
+    HmiEngineeringRules.RequireRequest(Create("DataLogs", new JObject { ["Settings.LogMaxSize"] = 4294967295L, ["Settings.StorageFolder"] = "Logs" }));
+    foreach (string composition in new[] { "RuntimeSettings", "HmiTextLists", "HmiGraphicLists", "Scripts", "Connections", "Screens" }) Reject(() => HmiEngineeringRules.RequireRequest(Create(composition)));
+    Reject(() => HmiEngineeringRules.RequireRequest(Create("DiscreteAlarms", new JObject { ["Condition"] = "UpperLimit" })));
+    Reject(() => HmiEngineeringRules.RequireRequest(Create("AnalogAlarms", new JObject { ["ConditionValue"] = 10 })));
+    Reject(() => HmiEngineeringRules.RequireRequest(Create("DataLogs", new JObject { ["StartScreen"] = "Main" })));
+    foreach (JToken bad in new JToken[] { 256, -1, 1.5, "1", new JValue(new System.Numerics.BigInteger(ulong.MaxValue) * 2) })
+        Reject(() => HmiEngineeringRules.RequireRequest(Create("DiscreteAlarms", new JObject { ["Priority"] = bad })));
+    Reject(() => HmiEngineeringRules.RequireRequest(Create("DiscreteAlarms", new JObject { ["Origin"] = "" })));
+    Reject(() => HmiEngineeringRules.RequireRequest(Create("DiscreteAlarms", new JObject())));
+    var unnamed = Create("DataLogs"); unnamed.Remove("name"); Reject(() => HmiEngineeringRules.RequireRequest(unnamed));
+    var classic = Create("DataLogs"); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var typed = Create("DataLogs"); typed["dataType"] = "Bool"; Reject(() => HmiEngineeringRules.RequireRequest(typed));
+});
+Check("Object property edits require an allowlisted property set and never a name or composition", () => {
+    JObject Edit(JObject properties) { var r = Scalar(); r["operation"] = "object_properties_set"; r["target"] = Identity("/devices/HMI/hmi/Runtime/runtimeSettings"); r["target"]["kind"] = "hmiModelNode"; r["properties"] = properties; return r; }
+    HmiEngineeringRules.RequireRequest(Edit(new JObject { ["StartScreen"] = "Overview" }));
+    HmiEngineeringRules.RequireRequest(Edit(new JObject { ["AlarmClass"] = "Warning", ["Priority"] = 2 }));
+    foreach (string key in new[] { "Name", "EventText", "ConditionValue", "AlarmParameterTags", "Settings", "Settings.LogTimePeriod", "Id", "TriggerBitAddress" })
+        Reject(() => HmiEngineeringRules.RequireRequest(Edit(new JObject { [key] = "x" })));
+    var none = Edit(null); none.Remove("properties"); Reject(() => HmiEngineeringRules.RequireRequest(none));
+    var many = new JObject(); foreach (string key in HmiEngineeringRules.FamilyProperties["DiscreteAlarms"].Concat(new[] { "Condition", "StartScreen" })) many[key] = "x";
+    Reject(() => HmiEngineeringRules.RequireRequest(Edit(many)));
+    var named = Edit(new JObject { ["StartScreen"] = "Overview" }); named["name"] = "Renamed"; Reject(() => HmiEngineeringRules.RequireRequest(named));
+    var composed = Edit(new JObject { ["StartScreen"] = "Overview" }); composed["composition"] = "DataLogs"; Reject(() => HmiEngineeringRules.RequireRequest(composed));
+    var classic = Edit(new JObject { ["StartScreen"] = "Overview" }); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+});
+Check("Created objects admit only their own new typed-readback subtree", () => {
+    const string created = "/hmi/discreteAlarms/New_1";
+    var before = new Dictionary<string, string> { ["/hmi/discreteAlarms/Old"] = "1", ["/hmi/runtimeSettings"] = "2" };
+    var after = new Dictionary<string, string>(before) { [created] = "3", [created + "/parts/#1"] = "4" };
+    HmiPreservationRules.RequireOnlyCreatedSubtree(before, after, created);
+    Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(before, before, created));
+    Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(new Dictionary<string, string>(after), after, created));
+    Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(before, new Dictionary<string, string>(after) { ["/hmi/runtimeSettings"] = "5" }, created));
+    Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(before, new Dictionary<string, string>(after) { [created + "Suffix"] = "6" }, created));
+    var removed = new Dictionary<string, string>(after); removed.Remove("/hmi/discreteAlarms/Old"); Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(before, removed, created));
+    Reject(() => HmiPreservationRules.RequireOnlyCreatedSubtree(before, after, ""));
+});
 Check("Other operations cannot smuggle external connection or PLC tag fields", () => {
     foreach (string field in new[] { "connection", "plcTag" }) {
         var internalTag = Scalar(); internalTag.Remove("properties"); internalTag["operation"] = "tag_create"; internalTag["name"] = "Internal"; internalTag["dataType"] = "Bool";
@@ -185,7 +249,10 @@ Check("Operation prerequisites include independent recovery and precise operatio
         ["item_place"] = new[] { "exactRectangleWithinScreen", "faceplateTypeIdentityPreserved" },
         ["existing_binding_set"] = new[] { "existingBindingGuard", "exactTypedBindingOwnership" },
         ["explicit_binding_set"] = new[] { "exactTypedBindingOwnership", "bindingDependencyClosure" },
-        ["external_tag_create"] = new[] { "newTagNamespaceUnique", "exactConnectionOwnership", "exactPlcDeclarationType" } };
+        ["external_tag_create"] = new[] { "newTagNamespaceUnique", "exactConnectionOwnership", "exactPlcDeclarationType" },
+        ["connection_create"] = new[] { "newConnectionNamespaceUnique", "exactConnectionOwnership" },
+        ["object_create"] = new[] { "newObjectNamespaceUnique", "exactObjectPropertyDelta", "referenceDependencyClosure" },
+        ["object_properties_set"] = new[] { "exactObjectPropertyDelta", "referenceDependencyClosure" } };
     foreach (var operation in expected) {
         var gates = HmiEngineeringRules.RequiredGates(operation.Key).Values<string>().ToArray();
         Assert(gates.Distinct().Count() == gates.Length && operation.Value.All(gates.Contains));

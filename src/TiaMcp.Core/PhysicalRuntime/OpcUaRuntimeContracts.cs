@@ -1,3 +1,4 @@
+using System.Text.Json;
 using TiaMcp.Core.Security;
 
 namespace TiaMcp.Core.PhysicalRuntime;
@@ -6,6 +7,8 @@ namespace TiaMcp.Core.PhysicalRuntime;
 public sealed record OpcUaRuntimeSelection(string Endpoint, string ApplicationUri, string CertificateSha256,
     string Authentication = "anonymous", string? User = null, string? VaultName = null, CredentialReference? Credential = null);
 public sealed record OpcUaRuntimeNode(string NamespaceUri, string IdentifierType, string Identifier);
+/// <summary>One gated owned-PLCSIM scalar write. Encoding, Expected and Value use runtime_ua_read's exact encoding and value forms.</summary>
+public sealed record OpcUaRuntimeWriteItem(OpcUaRuntimeNode Node, string Encoding, JsonElement Expected, JsonElement Value);
 public sealed record OpcUaRuntimeStatus(string SchemaVersion, string AttemptId, string HostId, OpcUaRuntimeSelection Selection,
     string State, string? ErrorCode, bool PeerVerified, DateTimeOffset UpdatedAt)
 {

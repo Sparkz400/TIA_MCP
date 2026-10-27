@@ -341,6 +341,7 @@ namespace TiaMcp.Openness.V21
             if (prepared?.Value<string>("state") != "prepared" || preview?.Value<string>("kind") != "library_integrate" || plan?.Value<bool?>("applySupported") != false || prepared.Value<string>("previewHash") != LibraryJournalStore.Hash(preview.ToString(Formatting.None)))
                 Fail("InvalidComponentContract", "Coordinator requires the exact hashed plan-only prepared library integration response.");
             if (plan["blockers"] is not JArray blockers || blockers.Count != 0) Fail("ComponentPlanBlocked", "Resolve every planner blocker before preparing a qualification sequence.");
+            if (plan["steps"] is JArray proposed && proposed.Any(s => s.Value<bool?>("planOnly") != null)) Fail("ComponentPlanBlocked", "The plan has planOnly steps (see planOnlyReasons); the coordinator cannot dispatch or read them back.");
             if (plan["steps"] is not JArray steps || steps.Count != 2 || steps[0].Value<string>("kind") != "library_instantiate" || steps[1].Value<string>("kind") != "graphical_typed_edit") Fail("InvalidComponentContract", "Exactly the existing library import and fresh typed edit are allowed.");
             if (!Path.IsPathRooted(preview.Value<string>("projectPath") ?? "")) Fail("InvalidComponentContract", "An exact native target project path is required.");
             PlcLibraryIntegrationPlanner.ValidatePayload((JObject)preview["payload"]);

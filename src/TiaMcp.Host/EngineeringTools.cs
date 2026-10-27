@@ -132,6 +132,12 @@ public sealed partial class TiaTools
         int maxItems = 500, bool includeXmlEvidence = true, int maxXmlBlocks = 10, string? blockName = null, string? blockPath = null, string? scopePath = null)
         => Call("call_graph", new { projectName, plcPath, blockName, blockPath, scopePath, maxItems = Limit(maxItems), includeXmlEvidence, maxXmlBlocks, artifactDirectory = ExportDirectory }, cancellationToken);
 
+    [McpServerTool(Name = "instance_lookup", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Find where one exact FB or FC is stored and called in one PLC, from native cross-references and exported SimaticML. Returns typed rows: single-instance DBs, multi-instance static members and arrays of instances with bounds and the owning instance DB chain, call sites with network and instance, actual operand per formal parameter, and operand references into the instance DBs. Each row names its source (nativeXref, interface or simaticMlExport). Per-language support is explicit; STL/GRAPH are an unqualified schema scan and unsupported languages are listed, not skipped silently. maxItems bounds rows, maxXmlBlocks exports, maxDepth nesting; truncation is explicit. An instance row's diagnosticInstanceSelector can be passed to diagnostic_plan as instance. Static evidence only; no runtime call context.")]
+    public Task<CallToolResult> InstanceLookup(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? blockPath = null, string? blockName = null,
+        string? scopePath = null, int maxItems = 500, int maxDepth = 8, int maxXmlBlocks = 20)
+        => Call("instance_lookup", new { projectName, plcPath, blockPath, blockName, scopePath, maxItems = Limit(maxItems), maxDepth, maxXmlBlocks, artifactDirectory = ExportDirectory }, cancellationToken);
+
     [McpServerTool(Name = "symbol_trace", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Trace an exact offline native symbol/name/address/path to references, readers/writers and configured I/O ranges. Reports unresolved aliases and incomplete propagation.")]
     public Task<CallToolResult> SymbolTrace(string symbol, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, int maxItems = 500,
@@ -167,6 +173,11 @@ public sealed partial class TiaTools
         if (kind == "graph_import")
             try { request = new GraphWorkflowStore(options.ArtifactsDirectory, options.LibraryLimits).ImportPayload(payload); }
             catch (BridgeException error) { return Failure(error); }
+        // The worker cannot read Host review records, so the reviewed DB identity and snapshot hash are bound here.
+        if (kind == "db_snapshot_load_actual")
+            try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
+            catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
+            { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 

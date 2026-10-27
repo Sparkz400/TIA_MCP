@@ -226,6 +226,19 @@ namespace TiaMcp.Openness.V21
                         observation["fingerprint"] = EngineeringFingerprint(change, project); observation["previewHash"] = change.PreviewHash; observation["idempotentReadback"] = returnedApply;
                         string expected = operation == "change_apply" ? change.BaseFingerprint : change.AfterFingerprint;
                         if (!returnedApply && observation.Value<string>("fingerprint") != expected) throw new BridgeException("StaleRevision", "Project changed since its retained preparation or outcome.");
+                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("db_snapshot_", StringComparison.Ordinal))
+                        {
+                            // Online DB snapshot kinds also reserve the owned simulator and plan the observer project before dispatch.
+                            var marker = OwnedSimulationMarker(change.Payload);
+                            add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorOnlineValues");
+                            observation["markerSha256"] = SharedMutationHash(marker);
+                            string observer = SimulationDiscoveryObserverDirectory(args);
+                            SimulationDiscoveryObserver.VerifyDestination(observer);
+                            absent("project", "discoveryObserverProject", observer);
+                        }
+                        // VCI kinds also create, write or remove files below the workspace root.
+                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("vci_", StringComparison.Ordinal))
+                            add("workspace", change.Preview["vci"].Value<string>("rootPath"), "vciWorkspaceFiles");
                         if (operation == "change_restore")
                         {
                             if (ChangeFileHash(change.ArchivePath) != change.ArchiveHash) throw new BridgeException("CheckpointInvalid", "Recovery archive changed.");
