@@ -321,7 +321,7 @@ try {
             $result.addInSelectionMcp = 'passed; supplied selections, no native companion'
             python -B scripts/test_addin_receiver_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'addin-receiver-host')
             if ($LASTEXITCODE -ne 0) { throw 'Production Add-In receiver enrollment gate failed.' }
-            $result.addInReceiverHost = 'passed; production enrollment unavailable, no worker launched'
+            $result.addInReceiverHost = 'passed; default Host refuses enrollment, explicit enrollment keeps challenge checks, no worker launched'
             python -B scripts/test_encoder_checkpoint.py --fixture (Join-Path $output 'encoder-checkpoint/fixture.json')
             if ($LASTEXITCODE -ne 0) { throw 'C# encoder checkpoint receipt failed independent Python verification.' }
             $result.encoderCheckpointReceipt = 'passed'

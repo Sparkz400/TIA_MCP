@@ -30,7 +30,7 @@ internal static class AddInHandoffTests
         internal AddInHandoff Store;
         internal int Calls;
         internal Func<int, CancellationToken, Task>? OnVerify;
-        internal Fixture()
+        internal Fixture(string? projectHost = null)
         {
             string? directory = AppContext.BaseDirectory; string path = "";
             while (directory is not null)
@@ -40,6 +40,7 @@ internal static class AddInHandoffTests
             }
             if (directory is null) throw new FileNotFoundException("Missing original model fixture.");
             var model = JsonNode.Parse(File.ReadAllText(path))!.AsObject(); model["sessionGeneration"] = Guid.NewGuid().ToString("N");
+            if (projectHost is not null) model["project"]!["host"] = projectHost;
             ReviewId = (string)new ProjectReviewStore(Root).Save(model, [], new())["reviewId"]!;
             var node = model["nodes"]!.AsArray().OfType<JsonObject>().First(n => (string?)n["origin"] == "native" && n["objectPath"] is not null);
             Request = new() { ["schemaVersion"] = "addin-selection.v1", ["reviewId"] = ReviewId, ["selectionId"] = Id(),

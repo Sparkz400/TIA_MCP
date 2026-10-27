@@ -42,10 +42,40 @@ The [owner-discovery correction](../verification/addin-owner-discovery-20261018.
 
 The [portable lifecycle component](../verification/addin-handoff-lifecycle-20261018.md) now retains request identity, issues a one-use thirty-second challenge and publishes a hash-linked receipt before acknowledgment. It reuses the detached selection store, binds supplied authority context and refuses replay after cancellation, owner change, publication failure or restart. Completed receipt lookup is read-only and rechecks the original saved evidence.
 
-The lifecycle itself is internal source with synthetic-authority tests. Production enrollment remains unavailable; an OS process observation or declared package hash cannot enable producer authentication. The existing upload/review/page workflow is unchanged. The receiver integration is described below.
+The lifecycle itself is internal source with synthetic-authority tests. Production enrollment is the explicit opt-in [described below](#native-companion-build-publish-and-enroll); an OS process observation or declared package hash still does not authenticate the producer. The existing upload/review/page workflow is unchanged. The receiver integration is described below.
 
 ## Opt-in Host receiver
 
 The [bounded receiver](../verification/addin-receiver-20261018.md) now runs inside the existing Host when launched with `--addin-handoff`. It is off by default and can be combined with `--no-native-workers`. It publishes `addin-handoffs/receiver.json` under the selected artifacts directory. Discovery may be stale after a crash and is not authentication; clients must verify the connected server process. The [wire contract](../../contracts/addin-handoff-wire.v1.schema.json) permits only status, retained receipt lookup and the fixed selection handoff exchange.
 
-Production has no trusted enrollment provider: begin, complete and cancel return `AddInEnrollmentUnavailable`, and all returned evidence remains unqualified. No new MCP tool or native worker is launched by the receiver. The existing supplied upload/review/page workflow remains usable. Positive transport/receipt tests use a separate test executable with explicitly synthetic authority, never a production option.
+Without `--addin-enrollment`, begin, complete and cancel return `AddInEnrollmentUnavailable`, and all returned evidence remains unqualified. No new MCP tool or native worker is launched by the receiver. The existing supplied upload/review/page workflow remains usable. Positive transport/receipt tests use a separate test executable with explicitly synthetic authority, never a production option.
+
+## Native companion: build, publish and enroll
+
+Added 27 October 2026. `src/TiaMcp.AddIn.V21` is a .NET Framework 4.8 Add-In for TIA Portal V21. Its project-tree context menu entry **TIA MCP › Send selection to TIA MCP** maps each selected object to the worker's project-model object path, copies the exact references from the newest saved review of the same project copy, and hands an `addin-selection.v1` document to the receiver through `begin` and `complete`. It only reads: no file writes, no network, no credentials.
+
+Build and package on an engineering workstation (PowerShell 7):
+
+```powershell
+./scripts/Publish-AddIn.ps1 -TiaApiDirectory 'C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48'
+```
+
+The script builds the project, validates `AddIn.Publisher.xml` against the installed `Siemens.Engineering.AddIn.Publisher.xsd` and runs the Siemens Publisher with its engineering-member check enabled. It writes `TiaMcp.AddIn.V21.addin`, `publisher.log` and `addin-enrollment.json` into a new `artifacts/addin-<timestamp>/` folder. It never installs the package and never starts TIA. A plain build needs `-p:TiaApiDirectory=...` when TIA is not in the default location; hosted CI does not build this project.
+
+To use it:
+
+1. Install the `.addin` in TIA Portal yourself and grant its declared permissions: `TIA.ReadOnly`, environment and file read, and unmanaged code for the pipe-server check.
+2. Set the user environment variable `TIAMCP_ARTIFACTS` to the Host's absolute `--artifacts` directory, then start TIA.
+3. Start the Host with `--addin-handoff --addin-enrollment <addin-enrollment.json>`. The enrollment option is refused without `--addin-handoff`, and the file must contain exactly `schemaVersion`, `assemblySha256` and `configurationSha256`.
+4. Through MCP, attach the worker to that TIA instance and save a review of the project (`project_snapshot_import`).
+5. In TIA, select 1 to 64 objects and choose *Send selection to TIA MCP*. The notification names the retained record; open it with `addin_selection_page`.
+
+With enrollment, the Host asks the already attached worker for `addin_owner_context`; it never starts or attaches one. It then admits a request only when all of these hold:
+
+- The pipe peer is `Siemens.Engineering.AddIn.Loader.x64.exe` under that TIA's `Bin\PublicAPI\AddIn\Loader`. It must be a direct child of the owned TIA process, in the same Windows session, and started after it.
+- The binding carries the live worker session generation and this Host's machine name, so a review captured in an earlier attachment or on another machine is refused.
+- The declared `assemblySha256` and `configurationSha256` equal the enrolled values. The first is the SHA-256 of the deterministic build's module version ID, because TIA may load Add-Ins from bytes. The second is the SHA-256 of the embedded Publisher configuration.
+
+The 30-second challenge stays one-use and is rechecked against the same owner tuple at `begin` and twice during `complete`.
+
+Limits: the companion is compiled and packaged only. No install, menu, sandbox permission, loader lineage or pipe exchange has run inside TIA Portal. Enrollment is an OS-lineage and declared-hash binding, not attestation of the loaded package, so `producerAuthenticated` and `liveSelectionVerified` stay false. The selection binds saved references, not live content. Only project-tree projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags are mapped. Other objects and the devices-and-networks, library and workflow-hook surfaces are refused. Package signing is not configured.

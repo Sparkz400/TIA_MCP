@@ -1,4 +1,4 @@
-"""Exercise the production Host's opt-in pipe and unavailable enrollment gate; no test authority is injected."""
+"""Exercise the production Host's opt-in pipe, its default enrollment refusal and explicit enrollment; no test authority is injected."""
 import argparse
 import ctypes
 from ctypes import wintypes
@@ -63,12 +63,12 @@ def main():
     output = args.output.resolve(); assert not output.exists(); output.mkdir(parents=True)
     artifacts = output / 'host-artifacts'
     discovery_path = artifacts / 'addin-handoffs/receiver.json'
-    report = dict(completed=False, nativeExecuted=False, productionEnrollmentAvailable=False, checks=[], shutdowns=[])
+    report = dict(completed=False, nativeExecuted=False, defaultEnrollmentAvailable=False, explicitEnrollmentChecked=True, checks=[], shutdowns=[])
     def check(value, label):
         assert value, label
         report['checks'].append(label)
-    def start(enabled=True):
-        return Client(args.host.resolve(), 30, ['--no-native-workers', '--artifacts', str(artifacts), *(['--addin-handoff'] if enabled else [])])
+    def start(enabled=True, extra=()):
+        return Client(args.host.resolve(), 30, ['--no-native-workers', '--artifacts', str(artifacts), *(['--addin-handoff'] if enabled else []), *extra])
     def initialize(client):
         client.request('initialize', {'protocolVersion': '2025-11-25', 'capabilities': {}, 'clientInfo': {'name': 'addin-receiver-test', 'version': '1'}})
         client.notify('notifications/initialized')
@@ -125,9 +125,30 @@ def main():
         finally:
             close(client)
         check(json.loads(discovery_path.read_bytes())['state'] == 'stopped', 'Graceful Host shutdown marks discovery stopped')
+    # Explicit enrollment opens the gate but keeps saved-review validation and the one-use challenge; no TIA or worker is needed.
+    enrollment = output / 'addin-enrollment.json'
+    enrollment.write_text(json.dumps(dict(schemaVersion='addin-enrollment.v1', assemblySha256='b' * 64, configurationSha256='c' * 64)) + '\n', encoding='utf-8')
+    rejected = Client(args.host.resolve(), 30, ['--no-native-workers', '--artifacts', str(artifacts), '--addin-enrollment', str(enrollment)])
+    try:
+        rejected.process.wait(timeout=15)
+    finally:
+        close(rejected, 1)
+    client = start(extra=['--addin-enrollment', str(enrollment)])
+    try:
+        initialize(client); discovery = discover(client); validate(discovery, 'discovery')
+        (output / 'discovery-enrolled.json').write_text(json.dumps(discovery, indent=2) + '\n', encoding='utf-8')
+        check(discovery['authorityConfigured'] and not discovery['producerAuthenticated'] and not discovery['nativeQualified'], 'Explicit enrollment configures authority without claiming authentication')
+        response = exchange(discovery, client.process.pid, dict(protocolVersion=1, action='begin', requestId='a' * 32, reviewId='b' * 64, selectionBase64='e30='))
+        check(not response['success'] and response['error'] != 'AddInEnrollmentUnavailable', 'Enrolled begin still validates the saved review first')
+        for action in ['complete', 'cancel']:
+            response = exchange(discovery, client.process.pid, dict(protocolVersion=1, action=action, requestId='a' * 32, challenge='c' * 64))
+            check(not response['success'] and response['error'] == 'HandoffChallengeUnavailable', action + ' still requires an issued one-use challenge')
+        check(not any(p.is_dir() for p in discovery_path.parent.iterdir()), 'Enrolled refusals reserve no request')
+    finally:
+        close(client)
     report['completed'] = True
     (output / 'verification.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
-    print(f'PASS production Add-In receiver: {len(report["checks"])} checks; actual pipes and Host lifetimes, no enrollment or native execution.')
+    print(f'PASS production Add-In receiver: {len(report["checks"])} checks; actual pipes and Host lifetimes, default and explicit enrollment, no native execution.')
 
 
 if __name__ == '__main__':
