@@ -271,13 +271,51 @@ namespace TiaMcp.Openness.V21
                     ?? throw new BridgeException("DependencyUnresolved", "The connection identity is not an exact native Unified HMI connection.");
                 var ownership = new JObject { ["connection"] = connection.Name };
                 var plc = HmiProveIntegratedOwner(project, HmiResolveNativeTarget(project, (JObject)payload["target"]), connection.Name, ownership);
-                var plcTag = HmiRootPlcTag(project, plc, (JObject)payload["plcTag"]);
-                if (!HmiScalarTypesAgree(payload.Value<string>("dataType"), plcTag.DataTypeName))
+                var identity = (JObject)payload["plcTag"];
+                // A global DB member uses the natively observed dotted spelling (DB.Member) and its exported declaration type.
+                var declaration = identity.Value<string>("kind") == "block" ? HmiDbMemberByIdentity(project, plc, identity, change.Directory) : null;
+                var rootTag = declaration == null ? HmiRootPlcTag(project, plc, identity) : null;
+                string spelling = declaration?.Value<string>("plcTag") ?? rootTag.Name, plcDataType = declaration?.Value<string>("dataType") ?? rootTag.DataTypeName;
+                if (!HmiScalarTypesAgree(payload.Value<string>("dataType"), plcDataType))
                     throw new BridgeException("TargetIncompatible", "The requested HMI data type does not exactly match the PLC declaration type; implicit conversions are not inferred.",
-                        new JObject { ["requested"] = payload["dataType"].DeepClone(), ["plcDataType"] = plcTag.DataTypeName });
+                        new JObject { ["requested"] = payload["dataType"].DeepClone(), ["plcDataType"] = plcDataType });
                 result["name"] = payload["name"].DeepClone(); result["dataType"] = payload["dataType"].DeepClone(); result["scope"] = "external";
-                result["connection"] = connection.Name; result["plcTag"] = plcTag.Name; result["plcName"] = plc.Software.Name; result["plcPath"] = plc.Path;
-                result["plcDataType"] = plcTag.DataTypeName; result["accessMode"] = "SymbolicAccess"; result["connectionOwnership"] = ownership;
+                result["connection"] = connection.Name; result["plcTag"] = spelling; result["plcName"] = plc.Software.Name; result["plcPath"] = plc.Path;
+                result["plcDataType"] = plcDataType; result["plcDeclaration"] = declaration; result["accessMode"] = "SymbolicAccess"; result["connectionOwnership"] = ownership;
+                return result;
+            }
+            if (operation == "connection_create")
+            {
+                var hmi = native as Siemens.Engineering.HmiUnified.HmiSoftware ?? throw new BridgeException("HmiTargetMismatch", "connection_create requires the exact native Unified HMI software identity (kind hmiDevice).");
+                if (hmi.Connections.Find(payload.Value<string>("name")) != null) throw new BridgeException("HmiNameConflict", "The requested connection already exists in this HMI.");
+                // Partner/Station/Node are read-only in V21; the partner comes only from the native endpoint pair of this name.
+                var ownership = new JObject();
+                var plc = HmiProveIntegratedOwner(project, HmiResolveNativeTarget(project, (JObject)payload["target"]), payload.Value<string>("name"), ownership);
+                result["name"] = payload["name"].DeepClone(); result["createdPath"] = HmiCreatedPath(payload);
+                result["plcName"] = plc.Software.Name; result["plcPath"] = plc.Path; result["connectionOwnership"] = ownership;
+                return result;
+            }
+            if (operation == "object_create")
+            {
+                var hmi = native as Siemens.Engineering.HmiUnified.HmiSoftware ?? throw new BridgeException("HmiTargetMismatch", "object_create requires the exact native Unified HMI software identity (kind hmiDevice).");
+                string composition = payload.Value<string>("composition");
+                if (UnifiedCompositionObject(hmi, composition, payload.Value<string>("name"), false) != null) throw new BridgeException("HmiNameConflict", "The requested object already exists in " + composition + ".");
+                var type = composition == "DiscreteAlarms" ? typeof(Siemens.Engineering.HmiUnified.HmiAlarm.HmiDiscreteAlarm) : composition == "AnalogAlarms" ? typeof(Siemens.Engineering.HmiUnified.HmiAlarm.HmiAnalogAlarm)
+                    : composition == "DataLogs" ? typeof(Siemens.Engineering.HmiUnified.HmiLogging.HmiDataLog) : typeof(Siemens.Engineering.HmiUnified.HmiLogging.HmiAlarmLog);
+                HmiTypedValues(type, null, payload["properties"] as JObject);
+                HmiRequireReferences(hmi, payload["properties"] as JObject);
+                result["composition"] = composition; result["name"] = payload["name"].DeepClone(); result["createdPath"] = HmiCreatedPath(payload);
+                result["properties"] = payload["properties"]?.DeepClone();
+                return result;
+            }
+            if (operation == "object_properties_set")
+            {
+                string family = UnifiedObjectFamily(native) ?? throw new BridgeException("HmiTargetMismatch", "object_properties_set requires an exact native discrete/analog alarm, data/alarm log or the runtime settings.");
+                var properties = (JObject)payload["properties"];
+                var outside = properties.Properties().FirstOrDefault(p => !HmiEngineeringRules.FamilyProperties[family].Contains(p.Name, StringComparer.Ordinal));
+                if (outside != null) throw new BridgeException("InvalidRequest", "Property is outside the " + family + " allowlist: " + outside.Name);
+                result["family"] = family; result["before"] = HmiTypedValues(native.GetType(), native, properties); result["after"] = properties.DeepClone();
+                HmiRequireReferences((Siemens.Engineering.HmiUnified.HmiSoftware)ResolveHmiTarget(project, (JObject)payload["target"]).Software, properties);
                 return result;
             }
             var item = native as Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase ?? throw new BridgeException("HmiTargetMismatch", "The operation requires an exact native Unified screen-item identity.");
@@ -306,6 +344,7 @@ namespace TiaMcp.Openness.V21
                 }
                 else
                 {
+                    var plcBacked = new JObject();
                     foreach (JObject binding in (JArray)payload["bindings"])
                     {
                         var property = container.Interface.Find(binding.Value<string>("property")) ?? throw new BridgeException("DependencyUnresolved", "The exact native faceplate interface property does not exist.");
@@ -315,10 +354,10 @@ namespace TiaMcp.Openness.V21
                             ?? throw new BridgeException("DependencyUnresolved", "Binding target is not an exact native HMI tag.");
                         HmiRecipeRules.RequireTypeCompatibility(binding.Value<string>("dataType"), tag.DataType);
                         if (!string.IsNullOrEmpty(tag.Connection) || !string.IsNullOrEmpty(tag.PlcTag))
-                            throw new BridgeException("DependencyUnresolved", "This tag's connection ownership is not completely established. A nonempty Connection may be a localized internal pseudo-connection, a broken reference or an external PLC connection; names and caller assertions cannot decide this. Resolve native ownership and any exact PLC declaration/type evidence before binding.",
-                                new JObject { ["connection"] = tag.Connection, ["plcTag"] = tag.PlcTag, ["resolution"] = "unresolved", ["localeIndependentInternalProofRequired"] = true });
+                            plcBacked[binding.Value<string>("property")] = HmiProvePlcBackedTag(project, (JObject)payload["target"], tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName, change.Directory);
                     }
                     result["bindings"] = payload["bindings"].DeepClone();
+                    if (plcBacked.Count > 0) result["plcBackedTags"] = plcBacked;
                     result["interfaceTypeCoverage"] = "Native interface type compatibility still requires independent exact-profile qualification; requested dataType only verifies the resolved HMI tag.";
                 }
             }
@@ -368,14 +407,122 @@ namespace TiaMcp.Openness.V21
             change.Readbacks.Add(new JObject { ["role"] = "hmi-native-readback", ["artifact"] = ChangeArtifact(after) });
         }
 
-        // Classic cycles have no inspection kind; hmiCycle addresses one by its preservation-capture path.
+        // Classic cycles, Unified logs and runtime settings have no inspection kind; hmiCycle and
+        // hmiModelNode address them by their preservation-capture (hmi_inspect section=model) path.
         private HmiNativeEntry HmiEngineeringObject(Project project, JObject identity)
         {
-            if (identity.Value<string>("kind") != "hmiCycle") return HmiResolveNativeObject(project, identity);
+            string kind = identity.Value<string>("kind");
+            if (kind != "hmiCycle" && kind != "hmiModelNode") return HmiResolveNativeObject(project, identity);
             var target = HmiResolveNativeTarget(project, identity);
-            if (target.Family != "classic") throw new BridgeException("UnsupportedObjectKind", "hmiCycle identifies a Classic HMI cycle.");
+            if (target.Family != (kind == "hmiCycle" ? "classic" : "unified"))
+                throw new BridgeException("UnsupportedObjectKind", kind == "hmiCycle" ? "hmiCycle identifies a Classic HMI cycle." : "hmiModelNode writes address Unified data/alarm logs and runtime settings.");
             RequireHmiModule(target.Family);
-            return new HmiNativeEntry { Native = ClassicCycle(target.Software, target.Path, identity.Value<string>("objectPath")) };
+            string path = identity.Value<string>("objectPath");
+            return new HmiNativeEntry { Native = kind == "hmiCycle" ? ClassicCycle(target.Software, target.Path, path) : UnifiedModelObject(target.Software, target.Path, path) };
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IEngineeringObject UnifiedModelObject(Siemens.Engineering.HW.Software software, string hmiPath, string path)
+        {
+            var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)software;
+            if (path == hmiPath + "/runtimeSettings") return hmi.RuntimeSettings;
+            var matches = hmi.DataLogs.Where(l => hmiPath + "/dataLogs/" + Segment(l.Name) == path).Cast<IEngineeringObject>()
+                .Concat(hmi.AlarmLogs.Where(l => hmiPath + "/alarmLogs/" + Segment(l.Name) == path)).Take(2).ToArray();
+            if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ObjectNotFound" : "AmbiguousTarget", "An exact, unique Unified data/alarm log or runtime settings node matching objectPath was not found.");
+            return matches[0];
+        }
+
+        // The created object's typed-readback (hmi_inspect section=model) path.
+        private static string HmiCreatedPath(JObject payload)
+            => payload["target"].Value<string>("hmiPath") + "/" + HmiModelWalk.CompositionSegment(payload.Value<string>("operation") == "connection_create" ? "Connections" : payload.Value<string>("composition"))
+                + "/" + Segment(payload.Value<string>("name"));
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IEngineeringObject UnifiedCompositionObject(Siemens.Engineering.HmiUnified.HmiSoftware hmi, string composition, string name, bool create)
+        {
+            switch (composition)
+            {
+                case "DiscreteAlarms": return create ? hmi.DiscreteAlarms.Create(name) : hmi.DiscreteAlarms.Find(name);
+                case "AnalogAlarms": return create ? hmi.AnalogAlarms.Create(name) : hmi.AnalogAlarms.Find(name);
+                case "DataLogs": return create ? hmi.DataLogs.Create(name) : hmi.DataLogs.Find(name);
+                case "AlarmLogs": return create ? hmi.AlarmLogs.Create(name) : hmi.AlarmLogs.Find(name);
+                default: throw new BridgeException("InvalidRequest", "The composition has no documented Create(name).");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static string UnifiedObjectFamily(IEngineeringObject native)
+        {
+            switch (native)
+            {
+                case Siemens.Engineering.HmiUnified.HmiAlarm.HmiDiscreteAlarm _: return "DiscreteAlarms";
+                case Siemens.Engineering.HmiUnified.HmiAlarm.HmiAnalogAlarm _: return "AnalogAlarms";
+                case Siemens.Engineering.HmiUnified.HmiLogging.HmiDataLog _: return "DataLogs";
+                case Siemens.Engineering.HmiUnified.HmiLogging.HmiAlarmLog _: return "AlarmLogs";
+                case Siemens.Engineering.HmiUnified.RuntimeSettings.HmiRuntimeSetting _: return "RuntimeSettings";
+                default: return null;
+            }
+        }
+
+        // Name-keyed references must resolve to an existing object of this HMI before any write.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void HmiRequireReferences(Siemens.Engineering.HmiUnified.HmiSoftware hmi, JObject properties)
+        {
+            foreach (var p in properties?.Properties() ?? Enumerable.Empty<JProperty>())
+            {
+                string value = p.Value.Value<string>();
+                if (p.Name == "RaisedStateTag" ? hmi.Tags.Find(value) == null : p.Name == "AlarmClass" ? hmi.AlarmClasses.Find(value) == null : p.Name == "StartScreen" && hmi.Screens.Find(value) == null)
+                    throw new BridgeException("DependencyUnresolved", p.Name + " must name an existing object of this HMI; screens inside screen groups are not resolved.", new JObject { ["property"] = p.Name, ["value"] = value });
+            }
+        }
+
+        // Documented typed setter for Property or Part.Property, resolved on the declared types.
+        private static System.Reflection.PropertyInfo HmiTypedSetter(Type type, string name)
+        {
+            System.Reflection.PropertyInfo property = null;
+            foreach (string part in name.Split('.'))
+            {
+                property = type.GetProperty(part, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                    ?? throw new BridgeException("HmiAttributeUnavailable", "No public typed property " + name + " on " + type.FullName);
+                type = property.PropertyType;
+            }
+            if (!property.CanWrite) throw new BridgeException("HmiAttributeUnavailable", "The typed property is read-only: " + name);
+            return property;
+        }
+
+        private static object HmiTypedOwner(object native, string name)
+        {
+            string[] parts = name.Split('.');
+            for (int i = 0; i < parts.Length - 1; i++)
+                native = native.GetType().GetProperty(parts[i]).GetValue(native, null) ?? throw new BridgeException("HmiAttributeUnavailable", "The native part is unavailable: " + parts[i]);
+            return native;
+        }
+
+        // Validates every requested value against its typed setter; returns the observed values when native is given.
+        private static JObject HmiTypedValues(Type type, object native, JObject properties)
+        {
+            var observed = new JObject();
+            foreach (var p in properties?.Properties() ?? Enumerable.Empty<JProperty>())
+            {
+                var setter = HmiTypedSetter(type, p.Name);
+                ConvertChangeValue(p.Value, setter.PropertyType);
+                if (native != null) observed[p.Name] = ChangeScalar(setter.GetValue(HmiTypedOwner(native, p.Name), null));
+            }
+            return observed;
+        }
+
+        private static JObject HmiSetTypedValues(object native, JObject properties)
+        {
+            var readback = new JObject();
+            foreach (var p in properties?.Properties() ?? Enumerable.Empty<JProperty>())
+            {
+                var setter = HmiTypedSetter(native.GetType(), p.Name);
+                object owner = HmiTypedOwner(native, p.Name);
+                setter.SetValue(owner, ConvertChangeValue(p.Value, setter.PropertyType), null);
+                readback[p.Name] = ChangeScalar(setter.GetValue(owner, null));
+                if (!JToken.DeepEquals(readback[p.Name], p.Value)) throw new BridgeException("PreservationMismatch", "Unified typed readback differs: " + p.Name, readback);
+            }
+            return readback;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -513,6 +660,22 @@ namespace TiaMcp.Openness.V21
                 change.HmiEvidence["createdTagReadback"] = new JObject { ["name"] = tag.Name, ["dataType"] = tag.DataType,
                     ["nativeDefaultConnection"] = defaultConnection, ["connection"] = tag.Connection, ["plcTag"] = tag.PlcTag, ["address"] = tag.Address };
             }
+            else if (operation == "connection_create")
+            {
+                var connection = ((Siemens.Engineering.HmiUnified.HmiSoftware)native).Connections.Create(payload.Value<string>("name"));
+                var readback = new JObject { ["name"] = connection.Name, ["partner"] = connection.Partner, ["station"] = connection.Station, ["node"] = connection.Node,
+                    ["communicationDriver"] = connection.CommunicationDriver, ["runtimeVerified"] = false };
+                change.HmiEvidence["createdConnectionReadback"] = readback;
+                if (connection.Name != effect.Value<string>("name") || connection.Partner != effect.Value<string>("plcName") || string.IsNullOrEmpty(connection.CommunicationDriver))
+                    throw new BridgeException("PreservationMismatch", "The created connection does not read back the proven partner PLC and a communication driver.", readback);
+            }
+            else if (operation == "object_create")
+            {
+                var created = UnifiedCompositionObject((Siemens.Engineering.HmiUnified.HmiSoftware)native, payload.Value<string>("composition"), payload.Value<string>("name"), true);
+                if (HmiSafeAttribute(created, "Name") != payload.Value<string>("name")) throw new BridgeException("PreservationMismatch", "The created object's native name differs from the request.");
+                change.HmiEvidence["createdObjectReadback"] = HmiSetTypedValues(created, payload["properties"] as JObject);
+            }
+            else if (operation == "object_properties_set") change.HmiEvidence["objectReadback"] = HmiSetTypedValues(native, (JObject)payload["properties"]);
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
             {
                 foreach (var property in ((JObject)payload["properties"]).Properties())
@@ -571,6 +734,8 @@ namespace TiaMcp.Openness.V21
                 // Tag creation changes the table's export files and adds the created tag's typed nodes, both keyed below its objectPath.
                 if (operation == "tag_create" || operation == "external_tag_create")
                     HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/", changed + "/tags/" + Segment(change.Payload.Value<string>("name")));
+                else if (operation == "connection_create" || operation == "object_create")
+                    HmiPreservationRules.RequireOnlyCreatedSubtree(beforeHashes, afterHashes, HmiCreatedPath(change.Payload));
                 else
                 {
                     // Bindings write the container's typed faceplate interface entries.
