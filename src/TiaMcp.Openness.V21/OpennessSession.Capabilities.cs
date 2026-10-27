@@ -14,6 +14,7 @@ using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.TechnologicalObjects.Motion;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Units;
 using TiaMcp.Model;
@@ -207,6 +208,10 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "technology_read", directApi, "implemented", "Offline configuration parameters only; no runtime axis state or motion commands.");
                 AddTargetFeature(features, "change.to_parameters", directApi, "partial", "Each selected parameter requires native write access and a supported scalar value. Range/unit constraints not exposed in metadata remain unknown.");
                 AddTargetFeature(features, "change.to_delete", directApi, "partial", "Deletion requires a recoverable checkpoint and native dependency/compile checks.");
+                foreach (var feature in new[] { "to_connect", "to_disconnect" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "One role slot per change (actor, sensor, torque, encoder, measuringInput, outputCam); the role's connection service and the target/overload pair are checked at prepare. Requires compile=true; not natively qualified.");
+                AddTargetFeature(features, "change.to_child_create", ProbeCapabilityService<OutputCamMeasuringInputContainer>(technology, "technology", probes), "partial",
+                    "Creates one OutputCams or MeasuringInputs child under this owner; Siemens validates the type/version pair during creation. Not natively qualified.");
                 metadata["technologyParameters"] = CapabilityTechnologyParameters(technology, budget, warnings);
                 metadata["technologyType"] = technology.OfSystemLibElement;
                 metadata["technologyVersion"] = technology.OfSystemLibVersion.ToString();

@@ -1050,6 +1050,25 @@
       ]
     },
     {
+      "featureId": "change.to_connect",
+      "obligations": [
+        "D13",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "change.to_disconnect",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.to_child_create",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
       "featureId": "change.safety_import_xml",
       "obligations": [
         "D14"

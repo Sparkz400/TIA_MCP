@@ -5665,6 +5665,161 @@
       ]
     },
     {
+      "featureId": "change.to_connect",
+      "domain": "technology",
+      "title": "Connect one technology connection slot to exact hardware or a tag",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "to_connect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.SW.TechnologicalObjects.Motion: AxisHardwareConnectionProvider.ActorInterface/SensorInterface/TorqueInterface, EncoderHardwareConnectionProvider.SensorInterface, AxisEncoderHardwareConnectionInterface.Connect(Channel|DeviceItem|PlcTag), TorqueHardwareConnectionInterface.Connect(DeviceItem), MeasuringInputHardwareConnectionProvider.Connect(Channel|DeviceItem,Int32), OutputCamHardwareConnectionProvider.Connect(Channel|PlcTag)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
+          "One role slot per change: actor, sensor (with sensorIndex), torque, encoder, measuringInput or outputCam, named as in technology_read hardwareConnections rows. A null service or slot refuses the preview.",
+          "Targets: hardwarePath (module, submodule or PROFIdrive telegram DeviceItem), hardwarePath with channelType/channelIoType/channelNumber (one native channel), hardwarePath with channelIndex (measuring input only) or tagName (one PLC tag). Unsupported role/target pairs refuse at prepare; native Siemens validation decides compatibility. ConnectOption.AllowAllModules, separate input/output modules, bit addresses and DB-member overloads are not exposed.",
+          "Apply verifies IsConnected and that the slot's Channel/InputModule/OutputModule/InputOutputModule/OutputTag (and ChannelIndex) reports the requested object; a mismatch, including native normalization to another item, requires checkpoint recovery. The change fingerprint adds the selected TO's resolved connection observation; previews and evidence reuse the technology_read connection observation.",
+          "compile=true is mandatory; interrupted changes stay held for admission reconciliation like other to_ kinds."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Existing technology object exposing the selected connection service"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.to_disconnect",
+      "domain": "technology",
+      "title": "Disconnect one technology connection slot",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "to_disconnect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.SW.TechnologicalObjects.Motion: AxisEncoderHardwareConnectionInterface.Disconnect, TorqueHardwareConnectionInterface.Disconnect, MeasuringInputHardwareConnectionProvider.Disconnect, OutputCamHardwareConnectionProvider.Disconnect and their IsConnected readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
+          "Uses the same role/sensorIndex slot selection as to_connect; a slot that is not connected refuses the preview.",
+          "Apply verifies IsConnected=false; a remaining connection requires checkpoint recovery. A TO that is invalid without a connection fails the mandatory compilation and requires recovery.",
+          "compile=true is mandatory; interrupted changes stay held for admission reconciliation like other to_ kinds."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Existing connected technology object slot"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.to_child_create",
+      "domain": "technology",
+      "title": "Create an output cam, cam track or measuring input under an owner technology object",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "to_child_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 OutputCamMeasuringInputContainer.OutputCams/MeasuringInputs (TechnologicalInstanceDBComposition.Create(String,String,Version))."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Requires an exact ownerPath, composition OutputCams or MeasuringInputs, a PLC-wide unused name, typeIdentifier and version. Name collision and owner service are checked at prepare and again before creation; Siemens validates the type/version pair.",
+          "Apply verifies the child at <ownerPath>/children/<composition>/<name>; the technology identity fingerprint covers owner children. Initial parameters, hardware connections and cam content are separate changes.",
+          "compile is optional as for to_create; saving still requires compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Owner technology object exposing OutputCamMeasuringInputContainer"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.safety_import_xml",
       "domain": "safety",
       "title": "Import eligible user F-block XML with native protection",
