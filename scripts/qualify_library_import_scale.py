@@ -233,8 +233,9 @@ def body(h):
     require(source["complete"] and sorted(v["typeName"] for v in source["versions"]) == sorted(n for n, _ in names),
             "Staged library metadata differs from the published components")
     selection = h.selected(source["libraryId"], sorted(source["versions"], key=lambda v: v["typeName"]), target={"plcPath": consumer})
-    h.refuse("refuse a 101-component selection", "library_instantiate", {**selection, "selection": selection["selection"] + selection["selection"][:1]},
-             "PackageLimitExceeded")
+    # The worker counts selections before resolving or de-duplicating them, so cycling fills 101 at any --components.
+    over = [selection["selection"][i % len(selection["selection"])] for i in range(101)]
+    h.refuse("refuse a 101-component selection", "library_instantiate", {**selection, "selection": over}, "PackageLimitExceeded")
     before = h.inventory()
     applied = timed_change(h, "library_instantiate", selection, "combined import of %d components" % len(names), compact=False)
     rows = applied["journal"]["result"]["objects"]
@@ -260,7 +261,8 @@ def body(h):
     for version in versions[:args.separate]:
         timed_change(h, "library_instantiate", h.selected(reopened, [version], target={"plcPath": separate}), "separate import " + version["typeName"])
     h.stage("close separate import session", lambda: h.tool("tia_detach"))
-    h.stage("release the staged package", lambda: h.tool("library_package_release", {"packageId": staged["packageId"]}))
+    # Applied changes' recovery journals keep the package as their source of record.
+    h.refuse("keep the applied package retained", "library_package_release", {"packageId": staged["packageId"]}, "PackageInUse")
 
 
 if __name__ == "__main__":
