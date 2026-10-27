@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.33",
+  "catalogVersion": "0.4.34",
   "targetTiaVersions": [
     21
   ],
@@ -2529,6 +2529,24 @@
         "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
         "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced. The inherited inconsistency is an uncompiled PLC data type; other inconsistent object kinds are not exercised.",
         "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); the CPU-family mismatch surfaces as CompileFailed after checkpoint, not as a refusal at preparation. Firmware-version mismatches are not exercised. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library.native-traversal.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9da66939f90d5f0976d0fdef4cc44f7d8c4f529b",
+        "passedScope": "Owned TIA Portal V21 Portal reopening the saved scale project of run scl864f5c0f (two CPU 1511-1 PN V4.1 PLCs, project library with 1,000 FB + 4,000 UDT types InWork, 10,004 metadata entries). library_list took 54.0 s. library_query elements paged the complete library in 50 pages of 200 items (10,000 items) under one revision token in 2,805.8 s (about 56 s per page, one library walk each); completeness reports truncated=true and scopeComplete=false at the 10,000-entry item budget, as designed. The growth runs that built the library are listed with report and worker hashes in docs/verification/library-native-scale-20261027.md."
+      },
+      "artifacts": [
+        "evidence/local.library.native-traversal.20261027.json"
+      ],
+      "limitations": [
+        "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
+        "Flat FB and UDT types only, InWork; no dependency chain, released versions or global library at this scale. The last 2 of 10,002 rows lie beyond the item budget and are reported as truncation, not returned.",
+        "Growth runs that built the library (prepare/apply, checkpoint and memory per 100-type change up to 5,000 types) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
       ]
     }
   ],
@@ -7154,7 +7172,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library.native-traversal.20261027"
         ]
       },
       "availability": {
@@ -7201,7 +7220,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library.native-traversal.20261027"
         ]
       },
       "availability": {
