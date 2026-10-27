@@ -1,6 +1,9 @@
 """Tests for independent native expectation checks; these are not PLC runtime evidence."""
+import hashlib
 import pathlib
 import json
+import re
+import struct
 import tempfile
 import unittest
 from xml.etree import ElementTree as ET
@@ -111,6 +114,52 @@ class IndependentTopologyTests(unittest.TestCase):
             suite = {"fixtureId": case["fixtureId"], "instances": case["runtimeInstances"], "cases": independent_behavior(case["family"])}
             validate_suite(suite, program)
             self.assertTrue(suite["cases"][0]["steps"][-1]["assertions"])
+
+    def test_wave9_cases_preflight_against_their_authored_sources(self):
+        packet = json.loads((ROOT / "fixtures/typed-graphical/wave9-capture-packet.v1.json").read_bytes())
+        self.assertEqual("authored-not-executed", packet["status"])
+        sources = {}
+        for row in packet["sources"]:
+            path = ROOT / row["path"]
+            self.assertEqual(row["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+            sources[row["names"][0]] = path.read_text(encoding="utf-8")
+        cases = json.loads((ROOT / "fixtures/typed-graphical/wave9-cases.v1.json").read_bytes())["cases"]
+        self.assertEqual(66, len(cases))
+        for case in cases:
+            with self.subTest(case=case["fixtureId"]):
+                self.assertEqual("fixtures/typed-graphical/native/" + case["blockName"] + ".xml", case["referenceXml"])
+                sections = {"Input": [], "Output": [], "InOut": [], "Static": [], "Temp": [], "Constant": []}
+                for keyword, body in re.findall(r"^(VAR_INPUT|VAR_OUTPUT|VAR)\n(.*?)^END_VAR", sources[case["blockName"]], re.M | re.S):
+                    sections[{"VAR_INPUT": "Input", "VAR_OUTPUT": "Output", "VAR": "Static"}[keyword]] += [
+                        {"name": name, "dataType": data_type, "members": []} for name, data_type in re.findall(r"^  (\w+) : (\w+);$", body, re.M)]
+                declared = {member["name"] for members in sections.values() for member in members}
+                for operand in case["payload"]["model"]["operands"]:
+                    if operand["scope"] == "local":
+                        self.assertIn(operand["components"][0], declared)
+                interface = {"block": {"name": case["blockName"], "kind": "FB"}, "objectKinds": ["SW.Blocks.FB"],
+                             "sections": [{"name": name, "members": members} for name, members in sections.items()]}
+                program = generate_program(inspect_interface(interface, {}), ["dut"], prefix="Wave9Harness")
+                suite = {"fixtureId": case["fixtureId"], "instances": ["dut"], "cases": independent_behavior(case["family"])}
+                validate_suite(suite, program)
+                self.assertEqual(1, len(suite["cases"]))  # live qualification admits one authored case
+
+    def test_wave9_arithmetic_and_real_expectations_are_exact_in_their_plc_types(self):
+        limits = {"int": 2 ** 15, "dint": 2 ** 31}
+        operations = {"add": lambda x, y: x + y, "sub": lambda x, y: x - y, "mul": lambda x, y: x * y, "div": lambda x, y: x / y}
+        for numeric in ("int", "dint", "real"):
+            families = ["move-" + numeric] + [op + "-" + numeric for op in operations] + ([c + "-" + numeric for c in ("eq", "lt")] if numeric != "int" else [])
+            for family in families:
+                for step in independent_behavior(family)[0]["steps"]:
+                    values = [*step["set"].values(), *(a["expected"] for a in step["assertions"] if not isinstance(a["expected"], bool))]
+                    for value in values:
+                        if numeric == "real":
+                            self.assertEqual(value, struct.unpack("<f", struct.pack("<f", value))[0], family)
+                        else:
+                            self.assertTrue(isinstance(value, int) and -limits[numeric] <= value < limits[numeric], family)
+                    operation = family.partition("-")[0]
+                    if operation in operations:
+                        left, right = step["set"]["dut.Left"], step["set"]["dut.Right"]
+                        self.assertEqual(operations[operation](left, right), step["assertions"][0]["expected"], family)
 
     def test_all_authored_case_constants_use_typed_request_grammar(self):
         count = 0

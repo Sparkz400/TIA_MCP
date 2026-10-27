@@ -1,0 +1,18 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_R_TRIG_FBD"
+VAR_INPUT
+  Signal : Bool;
+END_VAR
+VAR_OUTPUT
+  Pulse : Bool;
+END_VAR
+VAR
+  Storage : R_TRIG;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+  #Storage.R_TRIG( clk := #Signal, q => #Pulse )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

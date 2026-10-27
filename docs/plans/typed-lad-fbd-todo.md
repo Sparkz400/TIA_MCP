@@ -16,6 +16,10 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   contracts to `extract_typed_graphical_profiles.py`, then qualify the cells. Until then every request
   returns `GraphicalProfileUnavailable`. Created TONR/R_TRIG/F_TRIG storage also needs captured global
   IEC storage documents and IEC dependent-instance effect members.
+  - Prepared, not executed: 69 handwritten standard-route sources (LAD/FBD, local and global IEC
+    storage), extractor pin contracts checked against the wired native pins, 66 cases and runtime
+    expectations. The [wave 9 runbook](../verification/typed-wave9-families-runbook.md) lists the
+    native steps from capture to qualification. IEC effect members for created storage remain open.
 - [ ] A second CPU: profiles, creation/instance templates and dependent-effect manifests are keyed by
   the exact CPU TypeIdentifier, and every capture is CPU 1511-1 PN `OrderNumber:6ES7 511-1AL03-0AB0/V4.1`.
   No typed capture exists for any other CPU. Missing: a capture on that CPU

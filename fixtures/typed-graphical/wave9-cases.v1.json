@@ -1,0 +1,6301 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "fixtureId": "typed-eq-dint-lad",
+      "family": "eq-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_EqDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_EqDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ne-dint-lad",
+      "family": "ne-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_NeDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_NeDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-lt-dint-lad",
+      "family": "lt-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LtDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LtDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-le-dint-lad",
+      "family": "le-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LeDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LeDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-gt-dint-lad",
+      "family": "gt-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GtDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GtDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ge-dint-lad",
+      "family": "ge-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GeDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GeDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-eq-real-lad",
+      "family": "eq-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_EqReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_EqReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ne-real-lad",
+      "family": "ne-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_NeReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_NeReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-lt-real-lad",
+      "family": "lt-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LtReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LtReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-le-real-lad",
+      "family": "le-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LeReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LeReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-gt-real-lad",
+      "family": "gt-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GtReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GtReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ge-real-lad",
+      "family": "ge-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GeReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GeReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "coil",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "compare",
+                "port": "pre"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-int-lad",
+      "family": "move-int",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-int-lad",
+      "family": "add-int",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-int-lad",
+      "family": "sub-int",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-int-lad",
+      "family": "mul-int",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-int-lad",
+      "family": "div-int",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-dint-lad",
+      "family": "move-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-dint-lad",
+      "family": "add-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-dint-lad",
+      "family": "sub-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-dint-lad",
+      "family": "mul-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-dint-lad",
+      "family": "div-dint",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivDInt_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivDInt_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-real-lad",
+      "family": "move-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-real-lad",
+      "family": "add-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-real-lad",
+      "family": "sub-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-real-lad",
+      "family": "mul-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-real-lad",
+      "family": "div-real",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivReal_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivReal_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-tonr-lad",
+      "family": "tonr",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TONR_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TONR_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TONR",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-rtrig-lad",
+      "family": "rtrig",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_R_TRIG_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_R_TRIG_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "R_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-ftrig-lad",
+      "family": "ftrig",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_F_TRIG_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_F_TRIG_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "F_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-eq-dint-fbd",
+      "family": "eq-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_EqDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_EqDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ne-dint-fbd",
+      "family": "ne-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_NeDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_NeDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-lt-dint-fbd",
+      "family": "lt-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LtDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LtDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-le-dint-fbd",
+      "family": "le-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LeDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LeDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-gt-dint-fbd",
+      "family": "gt-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GtDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GtDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ge-dint-fbd",
+      "family": "ge-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GeDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GeDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "DInt"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-eq-real-fbd",
+      "family": "eq-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_EqReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_EqReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "eq",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ne-real-fbd",
+      "family": "ne-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_NeReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_NeReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ne",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-lt-real-fbd",
+      "family": "lt-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LtReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LtReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "lt",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-le-real-fbd",
+      "family": "le-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_LeReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_LeReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "le",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-gt-real-fbd",
+      "family": "gt-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GtReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GtReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "gt",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-ge-real-fbd",
+      "family": "ge-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_GeReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_GeReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "compare",
+              "kind": "compare",
+              "comparison": "ge",
+              "dataType": "Real"
+            },
+            {
+              "key": "result",
+              "kind": "assign",
+              "operand": "Result"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "compare",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "compare",
+                "port": "out"
+              },
+              "to": {
+                "node": "result",
+                "port": "in"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-int-fbd",
+      "family": "move-int",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-int-fbd",
+      "family": "add-int",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-int-fbd",
+      "family": "sub-int",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-int-fbd",
+      "family": "mul-int",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-int-fbd",
+      "family": "div-int",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "Int"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-dint-fbd",
+      "family": "move-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-dint-fbd",
+      "family": "add-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-dint-fbd",
+      "family": "sub-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-dint-fbd",
+      "family": "mul-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-dint-fbd",
+      "family": "div-dint",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivDInt_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivDInt_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "DInt"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-move-real-fbd",
+      "family": "move-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MoveReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MoveReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Source",
+              "scope": "local",
+              "components": [
+                "Source"
+              ]
+            },
+            {
+              "key": "Target",
+              "scope": "local",
+              "components": [
+                "Target"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "move",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Source",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out1"
+              },
+              "to": {
+                "node": "$Target",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-add-real-fbd",
+      "family": "add-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_AddReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_AddReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "ADD",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-sub-real-fbd",
+      "family": "sub-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_SubReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_SubReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "SUB",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-mul-real-fbd",
+      "family": "mul-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_MulReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_MulReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "MUL",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-div-real-fbd",
+      "family": "div-real",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_DivReal_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_DivReal_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Left",
+              "scope": "local",
+              "components": [
+                "Left"
+              ]
+            },
+            {
+              "key": "Right",
+              "scope": "local",
+              "components": [
+                "Right"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "math",
+              "instruction": "DIV",
+              "dataType": "Real"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Left",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in1"
+              }
+            },
+            {
+              "from": {
+                "node": "$Right",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "in2"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "out"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      }
+    },
+    {
+      "fixtureId": "typed-tonr-fbd",
+      "family": "tonr",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TONR_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TONR_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TONR",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-rtrig-fbd",
+      "family": "rtrig",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_R_TRIG_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_R_TRIG_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "R_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-ftrig-fbd",
+      "family": "ftrig",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_F_TRIG_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_F_TRIG_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "F_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingMulti",
+            "components": [
+              "Storage"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixtureId": "typed-existingglobal-tonr-lad",
+      "family": "tonr",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TONR_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TONR_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "enable",
+              "kind": "contact",
+              "operand": "Enable"
+            },
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TONR",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "coil",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "enable",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "enable",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalTonr"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTonr.xml",
+          "names": [
+            "Tgp_GlobalTonr"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-existingglobal-rtrig-lad",
+      "family": "rtrig",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_R_TRIG_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_R_TRIG_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "R_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalRTrig"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalRTrig.xml",
+          "names": [
+            "Tgp_GlobalRTrig"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-existingglobal-ftrig-lad",
+      "family": "ftrig",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_F_TRIG_Global_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_F_TRIG_Global_LAD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "F_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalFTrig"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalFTrig.xml",
+          "names": [
+            "Tgp_GlobalFTrig"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-existingglobal-tonr-fbd",
+      "family": "tonr",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_TONR_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_TONR_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Enable",
+              "scope": "local",
+              "components": [
+                "Enable"
+              ]
+            },
+            {
+              "key": "Reset",
+              "scope": "local",
+              "components": [
+                "Reset"
+              ]
+            },
+            {
+              "key": "Preset",
+              "scope": "local",
+              "components": [
+                "Preset"
+              ]
+            },
+            {
+              "key": "Done",
+              "scope": "local",
+              "components": [
+                "Done"
+              ]
+            },
+            {
+              "key": "Elapsed",
+              "scope": "local",
+              "components": [
+                "Elapsed"
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "timer",
+              "instruction": "TONR",
+              "dataType": "Time",
+              "instance": "storage"
+            },
+            {
+              "key": "done",
+              "kind": "assign",
+              "operand": "Done"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$Enable",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "IN"
+              }
+            },
+            {
+              "from": {
+                "node": "$Reset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "R"
+              }
+            },
+            {
+              "from": {
+                "node": "$Preset",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "PT"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "done",
+                "port": "in"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "ET"
+              },
+              "to": {
+                "node": "$Elapsed",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalTonr"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalTonr.xml",
+          "names": [
+            "Tgp_GlobalTonr"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-existingglobal-rtrig-fbd",
+      "family": "rtrig",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_R_TRIG_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_R_TRIG_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "R_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalRTrig"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalRTrig.xml",
+          "names": [
+            "Tgp_GlobalRTrig"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-existingglobal-ftrig-fbd",
+      "family": "ftrig",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "Tgp_F_TRIG_Global_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/Tgp_F_TRIG_Global_FBD.xml",
+      "interfaceDependencies": [],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "operands": [
+            {
+              "key": "Signal",
+              "scope": "local",
+              "components": [
+                "Signal"
+              ]
+            },
+            {
+              "key": "Pulse",
+              "scope": "local",
+              "components": [
+                "Pulse"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "nodes": [
+            {
+              "key": "instruction",
+              "kind": "edge",
+              "instruction": "F_TRIG",
+              "instance": "storage"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Signal",
+                "port": "value"
+              },
+              "to": {
+                "node": "instruction",
+                "port": "CLK"
+              }
+            },
+            {
+              "from": {
+                "node": "instruction",
+                "port": "Q"
+              },
+              "to": {
+                "node": "$Pulse",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": [
+          {
+            "key": "storage",
+            "kind": "existingGlobal",
+            "blockPath": "$block:Tgp_GlobalFTrig"
+          }
+        ]
+      },
+      "engineeringOnly": true,
+      "dependencyXmls": [
+        {
+          "path": "fixtures/typed-graphical/native/Tgp_GlobalFTrig.xml",
+          "names": [
+            "Tgp_GlobalFTrig"
+          ]
+        }
+      ]
+    }
+  ]
+}
