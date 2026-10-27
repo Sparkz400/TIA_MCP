@@ -1,0 +1,59 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.engineering.interruption-matrix.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T16:05:20+00:00",
+  "source": {
+    "commit": "e44f77e9aeca371d806b81327ec9be6fea7be838",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "change_apply interrupted at each durable journal boundary (checkpointing; applying before mutation_applied; mutation_applied before changed_project_saved; changed_project_saved before applied) by terminating the worker and its owned TIA, and by Host transport loss while applying, for one representative per reconciliation route: source_upsert (project fingerprint), hardware_plug (project + configured hardware), to_create (target-dependent). Each case reconciles once in a fresh owned TIA, asserts the exact disposition, exactly one apply admission (no replay), checkpoint recovery by project_retrieve when released or ResourceBusy while held, and an independent fresh read of the original project for the effect.",
+  "limitations": [
+    "Interruption is process termination of the worker with its owned TIA, or of the Host; power loss, disk faults and remote transport are not exercised.",
+    "One representative kind per reconciliation route: the run qualifies each route's reconciliation, not every kind's native mutation.",
+    "The save-time rule trusts the checkpoint archive's file write time; the archive hash is verified, its timestamp is not.",
+    "Library transactions are covered by the separate library interruption records, not by this run."
+  ],
+  "binaries": [
+    {
+      "name": "ki-h",
+      "files": 31,
+      "sha256": "e33317fe9d0388d5a595f37d46e674e805b280199dfe11d73e7f7a060bc7b877"
+    },
+    {
+      "name": "ki-w",
+      "files": 6,
+      "sha256": "44b2051817a8644813cf9829119e6910bc63800a10d3b383da6d7cc3c99c8cff"
+    }
+  ],
+  "runs": [
+    {
+      "report": "kb1.json",
+      "sha256": "2e04adffd2159c204903583a20fcdc3b4de9e6dbc962e8c60ba8a4a10807e708",
+      "bytes": 988192,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "engineering_read",
+        "hardware_catalog_search",
+        "project_inventory",
+        "project_open",
+        "project_retrieve",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_retrieve"
+      ]
+    }
+  ]
+}

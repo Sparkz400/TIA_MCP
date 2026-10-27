@@ -4,6 +4,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs" Link="HardwareEngineeringRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs" Link="RemoteIoCompanionContract.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/AdmissionReconcileRules.cs" Link="AdmissionReconcileRules.cs" />
     <Compile Include="../../tests/TiaMcp.PlcLibraryIntegration.Tests/BridgeException.cs" Link="BridgeException.cs" />
     <None Update="Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

@@ -36,7 +36,7 @@ plus the project library revision. Hardware kinds add their configured hardware.
 
 | Operation | Resource | Proof |
 | --- | --- | --- |
-| `change_apply` | project | `unchanged`: equals a fresh retrieve of the hash-verified checkpoint archive. `verifiedApplied`: journal `applied` and the fresh fingerprint equals the journal's `afterFingerprint`. HMI, attribute and technology kinds cannot be proven and stay held. |
+| `change_apply` | project | `unchanged`: equals a fresh retrieve of the hash-verified checkpoint archive and was last saved before that archive was written (since 27 October; this also releases unsaved HMI, attribute and technology kinds). `verifiedApplied`: journal `applied` and the fresh fingerprint equals the journal's `afterFingerprint`; HMI, attribute and technology kinds cannot recompute it and stay held. [Coverage](interruption-coverage-20261027.md). |
 | `change_apply`/`change_restore` | change journal | readable, bound to its directory, every recorded archive matches its hash, no unrecorded archive |
 | | prepared input | not written since the dispatch intent |
 | `change_restore` | original project | fresh fingerprint still equals the journal's `afterFingerprint` |

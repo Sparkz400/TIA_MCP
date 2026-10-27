@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.36",
+  "catalogVersion": "0.4.37",
   "targetTiaVersions": [
     21
   ],
@@ -2566,6 +2566,24 @@
         "Unified Comfort only; Classic HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags, nested UDTs and scripts, alarms or faceplate ports as consumers are not exercised.",
         "Creation of member-bound HMI tags and screen items stays a blocker in the install plan; the overall qualify_hmi run accepts no profile because the existing HMI gates are outside this probe."
       ]
+    },
+    {
+      "id": "local.engineering.interruption-matrix.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e44f77e9aeca371d806b81327ec9be6fea7be838",
+        "passedScope": "change_apply kind x point interruption matrix, 15 of 15 cases: source_upsert (project fingerprint), hardware_plug (project + configured hardware) and to_create (target-dependent), each interrupted by terminating the worker and its owned TIA at checkpointing -> held (no hash-recorded checkpoint, original without the change); applying before mutation_applied and mutation_applied before changed_project_saved -> released, project unchanged (last saved before the checkpoint archive), checkpoint retrieved into a new directory without the change, original without the change; changed_project_saved before applied -> held, checkpoint retrieval refused ResourceBusy, original with the change; and by Host transport loss while applying -> released verifiedApplied for source_upsert and hardware_plug, held for to_create (outcome fingerprint needs prepared targets), original with the change. Every case: exactly one change_apply admission (no replay), held admissions stay unresolved, effect confirmed by an independent fresh read of the original project."
+      },
+      "artifacts": [
+        "evidence/local.engineering.interruption-matrix.20261027.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker with its owned TIA, or of the Host, once per case; power loss, disk faults and remote transport are not exercised.",
+        "One representative kind per reconciliation route qualifies the route's reconciliation, not every kind's native mutation; library transactions are covered by the library interruption records.",
+        "The save-time rule trusts the checkpoint archive's file write time; the archive hash is verified, its timestamp is not."
+      ]
     }
   ],
   "features": [
@@ -4030,7 +4048,7 @@
         "limitations": [
           "Supports dispatchIntent and outcomeUnknown admissions of simulation_download, change_apply, change_restore (engineering and library), scratch_create, project_retrieve and library_open; provisioning delegates to simulation_provision_reconcile.",
           "Releases only when the admitted TIA process has exited and every admitted resource is proven unchanged or verifiedApplied by fresh fingerprints, library revisions, hashes or not-written-since-admission checks; otherwise the reservation stays held with reasons.",
-          "Engineering kinds whose fingerprint needs prepared in-memory targets (HMI, attribute, technology) can only be proven unchanged against their checkpoint; library apply outputs and partial destinations stay held.",
+          "An interrupted apply is proven unchanged only when its project was last saved before the checkpoint archive was written; kinds whose outcome fingerprint needs prepared in-memory targets (HMI, attribute, tag/constant set, connection set, technology) stay held after a save or transport loss; library apply outputs and partial destinations stay held.",
           "Never replays, saves, powers or downloads.",
           "Natively qualified by process termination of the worker and its owned TIA, or of the Host, once per scenario; power loss, disk faults and remote-worker transport are not exercised."
         ]
@@ -4039,7 +4057,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.engineering.interruption.rerun.20261024",
-          "local.engineering.boundaries.20261024"
+          "local.engineering.boundaries.20261024",
+          "local.engineering.interruption-matrix.20261027"
         ]
       },
       "availability": {
@@ -4694,7 +4713,8 @@
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03",
-          "local.units.v03"
+          "local.units.v03",
+          "local.engineering.interruption-matrix.20261027"
         ]
       },
       "availability": {
@@ -5255,7 +5275,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.remote-io.full-route.20261024",
-          "local.remote-io.lifecycle.20261024"
+          "local.remote-io.lifecycle.20261024",
+          "local.engineering.interruption-matrix.20261027"
         ]
       },
       "availability": {
@@ -5466,7 +5487,8 @@
         "status": "unverified",
         "evidenceIds": [
           "local.hardware.v02",
-          "local.layers.axis.20261008"
+          "local.layers.axis.20261008",
+          "local.engineering.interruption-matrix.20261027"
         ]
       },
       "availability": {

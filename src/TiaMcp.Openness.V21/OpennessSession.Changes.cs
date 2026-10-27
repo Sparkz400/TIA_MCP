@@ -157,6 +157,8 @@ namespace TiaMcp.Openness.V21
                     {
                         ApplyEngineeringMutation(change, project);
                         change.Stages.Add("mutation_applied");
+                        // Durable stage boundaries tell reconciliation how far an interrupted apply got.
+                        WriteChangeJournal(change);
                     }
                     else change.Stages.Add("compile_only_requested");
                     CaptureTechnologyEvidence(change);
@@ -185,7 +187,7 @@ namespace TiaMcp.Openness.V21
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
-                    if (save) { project.Save(); change.Stages.Add("changed_project_saved"); }
+                    if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = EngineeringFingerprint(change, project);
                     change.State = "applied";
