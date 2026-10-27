@@ -1,9 +1,10 @@
 # Explorer relationship providers and collection scope — 2026-10-26
 
-The configured-network provider and the new collections passed one native V21
-fixture (see [Native result](#native-result)). The technology-connection and
-software-unit-relation providers have offline evidence only. Nothing here is
-desktop-host or release qualification.
+All three providers and the new collections have passed native V21 fixtures.
+Configured-network and collections passed on 26 October ([Native result](#native-result)).
+Technology-connection and software-unit-relation passed on 27 October
+([Technology and unit providers](#technology-and-unit-providers--27-october-2026)).
+Nothing here is desktop-host or release qualification.
 
 ## Implemented
 
@@ -81,8 +82,46 @@ Evidence: [`evidence/local.explorer.native-providers.20261026.json`](../../evide
 - Native capture took 337 and 499 ms; relationship queries took 325–476 ms. One
   machine and one small fixture; this is not a latency guarantee.
 
-The fixture had no technology objects and no unit relations, so those providers
-still need a `--project` audit of a fixture that contains them.
+That fixture had no technology objects and no unit relations; see the next section.
+
+## Technology and unit providers — 27 October 2026
+
+Evidence: [`evidence/local.explorer.native-providers.20261027.json`](../../evidence/local.explorer.native-providers.20261027.json)
+(source `97ba318`, clean tree; release `tia-mcp-v21_20261027_064910_1e3d1e2a`, built
+from `09b0e30` with identical host and worker sources).
+
+The fixture mode now also authors both providers' objects. Neither unit relations nor
+TO hardware connections have a prepared change kind, so after the network fixture:
+
+- a prepared `hardware_plug` adds a TM PosInput 2 V2.0 module
+  (`ExplorerEncoderHardware`, the module of `fixtures/encoder-hardware`) to the CPU rack;
+- the registered fixture tool `scripts/native/UnitSeeder` (`explorer-relations` mode)
+  creates the software units `ExplorerUnitA` and `ExplorerUnitB` with the `SoftwareUnit`
+  relation A → B. It sets the module channel to `MotionControl`, creates a
+  `TO_ExternalEncoder` V10.0 (`ExplorerEncoder`), connects its sensor interface to the
+  channel and compiles the PLC (0 errors, 1 warning about the technology alarm text list).
+
+Result (fixture run 67 steps, read-only rerun 36 steps with zero prepared changes; all
+passed, host exit 0 both times):
+
+- `technologyConnection` edges from `ExplorerEncoder` resolve only to the TM PosInput
+  module and match the hardware paths in `technology_read`. Four native fields
+  (channel parent, input/output module, …) yield edges to the same module.
+- The `unitRelation` edge from `ExplorerUnitA` resolves to unit B; unit B has none. Both
+  match the `software_inspect` relations.
+- Both graphs report `complete` `providerCoverage` and declare the provider in
+  `providerScope`. The configured-network edges again match their 4 oracle associations.
+- Native capture took 398 and 1,730 ms (147 nodes); relationship queries took 470–2,097 ms.
+  One machine; this is not a latency guarantee.
+
+Five failed attempts preceded the passing sixth run; their reports stay under the run's
+`artifacts/`. Attempt 1 hit the Openness firewall because the new release worker was not
+yet registered. The other four exposed qualifier and seeder defects, all fixed in this branch:
+
+- `hardware_plug` requires `compile=true`;
+- the module and its submodule share a name;
+- coverage is reported as `providerCoverage`;
+- `software_inspect` lists units under `softwareScopes`, so the unit check had never run.
 
 ## Native qualification step
 
@@ -99,13 +138,25 @@ python scripts/qualify_project_explorer_relationships.py --release-file artifact
 The first run creates a fresh owned scratch (CPU 1511-1PN plus the contracted
 IM 155-6AU02 V6.4 head), adds one subnet and IO system through prepared
 `hardware_add`, `network_configure` and `network_io_assign`, and requires all
-three network edge kinds. Its oracle derives explorer paths from native names
+three network edge kinds. It then plugs the TM PosInput module and runs the seeder
+as described above. Its oracle derives explorer paths from native names
 in independent `hardware_inspect` reads, then checks outgoing hardware and
 incoming subnet/IO-system graphs, the new collection nodes and the portable
 export. The second run reopens that saved fixture read-only.
 
-Technology and unit providers need fixtures that contain those objects. Audit an
-existing saved project read-only and require positive evidence explicitly:
+Build the seeder first and register it in the Openness AllowList (no elevation after
+the one-time `Register-DevOpennessWorker.ps1 -Grant -AllNativeTools`). Register a new
+release worker path the same way, otherwise `tia_start` waits on TIA's firewall prompt:
+
+```powershell
+dotnet build scripts/native/UnitSeeder -p:TiaApiDirectory="<Portal V21>\PublicAPI\V21\net48"
+pwsh scripts/Register-DevOpennessWorker.ps1 -WorkerPath scripts/native/UnitSeeder/bin/Debug/net48/UnitSeeder.exe
+```
+
+The seeder resolves fixture paths under its own checkout's `artifacts/`, so run the
+qualifier from that checkout with the report under `artifacts/`. Fixture and
+`--verify-report` runs always require positive technology and unit evidence. To audit
+another saved project read-only, require it explicitly:
 
 ```powershell
 python scripts/qualify_project_explorer_relationships.py --release-file artifacts/explorer-relationships-release.txt --project <saved.ap21> --require technologyConnections softwareUnitRelations --report artifacts/project-explorer-native-relationships-units.json
@@ -113,9 +164,10 @@ python scripts/qualify_project_explorer_relationships.py --release-file artifact
 
 ## Still unqualified
 
-- Technology-connection and software-unit-relation providers on a native project with such objects.
+- Other technology connections (axis, measuring input, output cam; tag, block and address
+  targets) and unit relations to `NonUnitDB`/`TODB`, or unresolved and ambiguous names.
+  These have offline oracle tests only.
 - Broader network topologies: several subnets, shared devices, redundancy and couplers.
 - Populated watch tables and external sources against an independent oracle.
-- The evidence is not yet cited from the feature catalog.
 - Fresh desktop/native transport acceptance ([checklist](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual-open)).
 - Alarm text lists and libraries remain outside the tree; physical topology stays unsupported.

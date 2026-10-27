@@ -1,0 +1,24 @@
+DATA_BLOCK "TiaMcpUnitConsumer_Gate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+"TiaMcpLibraryGate"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpUnitConsumer_State"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+VAR
+    State : "TiaMcpLibraryState";
+END_VAR
+BEGIN
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK "TiaMcpUnitConsumer_Cycle"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+    "TiaMcpUnitConsumer_Gate"(Enable := TRUE, Active => "TiaMcpUnitConsumer_State".State.Active);
+END_ORGANIZATION_BLOCK

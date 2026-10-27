@@ -1,0 +1,65 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hostonly.translation.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T08:49:36+00:00",
+  "source": {
+    "commit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/test_translation_host_mcp.py on the Release Host: offline capture/inspect/prepare/review pages/digest-bound approval/candidate/reconcile/reopen/list/artifact reads, blocked batches, the instance-inheritance alarm-text policy and normal Host exits; native import is not allowed.",
+  "limitations": [
+    "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+    "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+    "Synthetic workbook profiles; no Siemens export/import, language activation, category leakage resolution or translation_native_* route."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "51ca5ae12795045de3464705e6f20a2bd525904747c258a9b6b6f60ce21f9f89"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "4b5068f2ad01ed66e9face3b806284f7aca55f39a0b73c63fcd829d3d4e2d9a7",
+      "bytes": 9885,
+      "completed": true,
+      "steps": [
+        "All 10 production translation tools registered with offline schemas",
+        "Committed uploads, capture, cursor, unapproved review, explicit approval and preserving candidate through actual MCP",
+        "Real Host restart, exact artifact retrieval and fresh unapproved reconciliation",
+        "Noncanonical row and opaque extension preservation; malformed capture and annotated-cell approval refusal",
+        "External edited workbook cannot add unreviewed attributes or annotations to a newly created cell",
+        "Explicit alarm inheritance profile: three languages, mixed-state refusal, approval guard, exact peer-preserving repair, schema checks and fresh Host restart"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "translation_approve",
+        "translation_artifact_read",
+        "translation_candidate",
+        "translation_capture",
+        "translation_inspect",
+        "translation_list",
+        "translation_prepare",
+        "translation_reconcile",
+        "translation_reopen",
+        "translation_review_page"
+      ],
+      "toolsRejected": [
+        "translation_approve",
+        "translation_candidate",
+        "translation_capture",
+        "translation_reconcile"
+      ]
+    }
+  ]
+}

@@ -281,6 +281,7 @@ internal static partial class Program
             ("Protected native generated blocks do not request unavailable checksums", EngineeringFingerprintTests.ProtectedNativeGeneratedBlocksDoNotRequestChecksums),
             ("User checksum failures cannot become generated exclusions", EngineeringFingerprintTests.UserFingerprintFailuresCannotBecomeGeneratedExclusions),
             ("Native fingerprint values and missing providers remain distinct", EngineeringFingerprintTests.NativeFingerprintValuesAndMissingProvidersStayDistinct),
+            ("Protected in-work test instances use native fingerprints only", EngineeringFingerprintTests.ProtectedInWorkTestInstancesUseNativeFingerprintsOnly),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),
             ("Native calls preserve instances and expose unresolved arguments", EngineeringSourcesTests.NativeCallsPreserveInstancesAndExposeUnresolvedArguments),

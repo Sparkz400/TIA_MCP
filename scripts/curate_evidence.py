@@ -31,12 +31,18 @@ def tree(path):
 
 def run(path):
     report = json.loads(path.read_text(encoding="utf-8"))
-    # Qualifiers that log each MCP call as a step (tool + isError) have no separate toolCalls list.
-    calls = report.get("toolCalls") or [{"name": st["tool"], "isError": st["isError"]}
-                                        for st in report.get("steps", []) if "tool" in st and "isError" in st]
+    # Qualifiers that log each MCP call as a step (tool + isError) have no separate toolCalls list;
+    # Host-only workflow runners keep each Host lifetime's calls in its close receipt instead.
+    calls = (report.get("toolCalls")
+             or [c for receipt in report.get("hostExits", []) + report.get("cleanups", [])
+                 for c in receipt.get("toolCalls", [])]
+             or [{"name": st["tool"], "isError": st["isError"]}
+                 for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st])
+    steps = [step if isinstance(step, str) else step.get("name") or step.get("tool")
+             for step in report.get("steps", [])] or list(report.get("checks", []))
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
-            "completed": report.get("completed") is True,
-            "steps": [step.get("name") or step.get("tool") for step in report.get("steps", [])],
+            "completed": report.get("completed") is True or report.get("status") == "passed",
+            "steps": steps,
             "toolsPassed": sorted({c["name"] for c in calls if not c["isError"]}),
             "toolsRejected": sorted({c["name"] for c in calls if c["isError"]})}
 

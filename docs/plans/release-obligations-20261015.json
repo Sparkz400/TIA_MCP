@@ -433,7 +433,14 @@
       "prompt": "docs/plans/expansion-prompts/01-vci-and-git.md",
       "planStatus": "missing_standalone_plan",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "All 12 Host-only VCI tools are verified by local.hostonly.vci.20261027 (actual Host, real Git, no worker). Native VCI workspace/mapping/export/import, project reconstruction and remote Git have no catalog rows yet and stay open.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "D02",
@@ -522,7 +529,14 @@
       "prompt": "docs/plans/expansion-prompts/03-project-translations.md",
       "planStatus": "missing_standalone_plan",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "The 10 offline translation_* tools are verified by local.hostonly.translation.20261027. translation_native_* and qualification_translation_* stay open: they need the existing native runner (scripts/qualify_translation_import.py) after the category-leakage blocker is resolved.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "D04",
@@ -570,7 +584,14 @@
       "prompt": "docs/plans/expansion-prompts/04-opc-ua-engineering.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "The 8 offline opcua_* NodeSet tools are verified by local.hostonly.opcua.20261027. Native UA engineering (UA-03/UA-Q00 mappings, category mutations, security) has no catalog rows yet and stays open.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "D05",
@@ -614,7 +635,14 @@
       "prompt": "docs/plans/expansion-prompts/05-automationml-cax.md",
       "planStatus": "missing_standalone_plan",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "The 6 automationml_* document tools are verified by local.hostonly.automationml.20261027. Native AML import/export, device identities and impact scope stay open.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "D06",
@@ -1177,7 +1205,14 @@
       "prompt": "docs/plans/expansion-prompts/17-bug-driven-trace-diagnostics.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "The offline diagnostic, trace, experiment and UA-diagnostic tools (20 features) are verified by local.hostonly.diagnostics/-diagnostic-experiments/-diagnostic-ua.20261027. diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export stay open (genuine runtime capture), as do native trace acquisition and the AX route (B06).",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "X01",
@@ -1433,7 +1468,14 @@
         "D10/D13 for DCC/interpreter; GRAPH/CFC pure models can proceed independently."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "The 6 graph_* GRAPH v6 document tools are verified by local.hostonly.graph.20261027. CFC/DCC/interpreter adapters and native GRAPH import/compile/runtime stay open.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "X07",
@@ -1844,7 +1886,14 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "executionNotes": [
+        {
+          "date": "2026-10-27",
+          "note": "runtime_ua_* (68 open cells) carry AC-recovery, so Host/loopback evidence cannot close them (claim_errors guard). Next: a PLCSIM Advanced or physical UA server run; the loopback suites (scripts/qualify_opcua_runtime.py) are ready.",
+          "evidence": "docs/verification/host-only-qualification-20261027.md"
+        }
+      ]
     },
     {
       "id": "C04",
