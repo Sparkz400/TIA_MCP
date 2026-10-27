@@ -283,7 +283,7 @@ internal static partial class RuntimeCaptureSoakChecks
                     {
                         lock (blocked)
                         {
-                            blocked.Add(signals.Single(s => s.SelectionId == selectionId).Selection.Context.ConnectionId);
+                            blocked.Add(signals.Single(s => s.SelectionId == selectionId).Selection!.Context.ConnectionId);
                             if (blocked.Count == this.workers) AllBlocked.TrySetResult();
                         }
                         await Task.Delay(Timeout.Infinite, token);
@@ -318,8 +318,8 @@ internal static partial class RuntimeCaptureSoakChecks
         }
         internal CaptureCase Case(int worker, int duration, int maximumSamples)
         {
-            var selected = Sessions.Signals.GroupBy(s => s.Selection.Context.ConnectionId).ElementAt(worker).ToArray();
-            return new(Guid.NewGuid().ToString("N"), new(selected[0].Selection.Context.ConnectionId,
+            var selected = Sessions.Signals.GroupBy(s => s.Selection!.Context.ConnectionId).ElementAt(worker).ToArray();
+            return new(Guid.NewGuid().ToString("N"), new(selected[0].Selection!.Context.ConnectionId,
                 selected.Select(s => s.SelectionId).ToArray(), 100, duration, maximumSamples, 16L << 20));
         }
         internal async Task<JsonElement> Status(string id) => Element(await Captures.Status(id, CancellationToken.None));

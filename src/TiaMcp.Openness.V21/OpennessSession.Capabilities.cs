@@ -11,7 +11,10 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Safety;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Alarm;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Supervision;
+using Siemens.Engineering.SW.OpcUa;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.TechnologicalObjects.Motion;
@@ -62,6 +65,9 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
                 AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
                     blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
+                AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
+                AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
+                AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
             }
 
             if (selected.Plc != null)
@@ -90,8 +96,26 @@ namespace TiaMcp.Openness.V21
                     foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
                             blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
+                    foreach (string feature in new[] { "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" })
+                        AddTargetFeature(features, "change." + feature, unit, "partial", "Standard software units only: create with an optional namespace preset, add/remove SoftwareUnit relations between exact units (cycles refused), set Access of one unit block/type (not OBs), delete an empty unreferenced unit. Mandatory compile and recovery checkpoint; not natively qualified.",
+                            applicable: feature == "software_unit_create" ? kind == "plc" : kind != "plc",
+                            blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
                     AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog; Siemens validates the requested pair during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
                         blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
+                    const string alarmBlocker = "Safety units are excluded from PLC alarm and ProDiag imports.";
+                    AddTargetFeature(features, "change.plc_alarm_text_list_import", ProbeCapabilityService<PlcAlarmTextListProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX with explicit None/Override and expected list names; native result/log, fresh-export readback and list-name verification. The workbook layout is not interpreted.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_alarm_instance_text_import", ProbeCapabilityService<PlcAlarmTextProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX updating existing alarm instance texts; native result/log and fresh-export readback only.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    if (kind == "plc")
+                    {
+                        var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
+                        if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
+                        foreach (string feature in OpcUaPayloadFields.Keys)
+                            AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                    }
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
                     AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
                 }
@@ -122,6 +146,12 @@ namespace TiaMcp.Openness.V21
                         + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
                         blocked: protectedBlock || safetyBlock || safetyScope || generated,
                         blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-blocks and safety-unit objects require the dedicated safety workflow.");
+                var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
+                var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
+                foreach (string feature in BlockProtectionKinds)
+                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
+                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
+                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
                 AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
                     applicable: language == "SCL" || language == "STL" || block is DataBlock,
                     blocked: protectedBlock || safetyBlock || safetyScope || generated,

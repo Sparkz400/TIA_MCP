@@ -251,7 +251,14 @@
               "$ref": "runtime-capture.v1.schema.json#/$defs/plan/properties/signals"
             },
             "context": {
-              "$ref": "physical-runtime.v1.schema.json#/$defs/context"
+              "anyOf": [
+                {
+                  "$ref": "physical-runtime.v1.schema.json#/$defs/context"
+                },
+                {
+                  "$ref": "runtime-capture.v1.schema.json#/$defs/simulatorSource"
+                }
+              ]
             },
             "uncommittedDataUnknown": {
               "type": "boolean"

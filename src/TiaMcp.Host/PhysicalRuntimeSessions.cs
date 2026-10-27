@@ -162,6 +162,20 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         finally { gate.Release(); }
     }
 
+    public async Task<WebRuntimeDiagnosticResult> Diagnostics(string attemptId, string kind, string? language, int? count, CancellationToken cancellationToken)
+    {
+        _ = WebRuntimeProtocol.Diagnostic(new('0',32), kind, language, count); // Refuse a bad selection before session or credential use.
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            Live entry = Active(attemptId);
+            WebRuntimeDiagnosticResult? result = null;
+            Use(entry, () => result = entry.Client.DiagnosticAsync(kind, language, count, cancellationToken).GetAwaiter().GetResult(), cancellationToken);
+            return result!;
+        }
+        finally { gate.Release(); }
+    }
+
     public async Task<RuntimeSessionStatus> Status(string attemptId, CancellationToken cancellationToken)
     {
         await gate.WaitAsync(cancellationToken);

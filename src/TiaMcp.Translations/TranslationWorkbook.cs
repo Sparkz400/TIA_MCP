@@ -266,6 +266,8 @@ public sealed class TranslationWorkbook
         return (column, row);
     }
 
+    internal static string ColumnName(int column) => column <= 26 ? ((char)('A' + column - 1)).ToString() : ColumnName((column - 1) / 26) + (char)('A' + (column - 1) % 26);
+
     private static void CheckCulture(string culture)
     {
         try { Require(!string.IsNullOrWhiteSpace(culture) && CultureInfo.GetCultureInfo(culture).Name == culture,

@@ -1,5 +1,7 @@
 # TS-03 production Host integration
 
+**TS-05 application tests:** [Application-test inventory, strict import and owned-simulator run reviews](#ts-05-application-tests) reuse this job lifecycle. Their native execution stays behind the same disabled profile gate.
+
 **Offline supplied-result review:** Two separate [result intake/review tools](testsuite-result-review.md) now retain supplied packets, page exact findings and export JUnit without invoking this native execution queue. The ten style tools below retain their original gating.
 
 **16 October owning-worker continuation:** [Gated worker integration and scope-editor evidence](../verification/testsuite-worker-integration-20261016.md) now connect the existing Host adapter to the owning-worker protocol and optional library. The earlier “not loaded or registered” statement below describes the initial TS-03 handoff and is superseded. An owned GUI scratch supplied independent selected-scope screenshots and exact normal cleanup receipts; the historical observation is not a repeatable worker-bound scope provider. Native effective-scope, current execution-license and complete lifecycle providers remain unqualified; execution is still disabled and TS-Q01 execution has not run.
@@ -61,6 +63,24 @@ Smallest proposed **TS-Q01** packet, to be scheduled solely by the native queue 
 5. In a separately admitted failure window, interrupt after dispatch intent/return, reopen the Host, prove replay refusal and retained project contention, then perform explicit archive restoration to a new reserved location. Independently reconcile original and recovered copies and verify actual cleanup. Only those exact demonstrated profiles may be proposed for enablement.
 
 Application/system execution, scope authoring/import, native list/group profiles and CI provisioning remain outside this increment.
+
+## TS-05 application tests
+
+Compiled against the V21 PublicAPI only; nothing below has run natively. Ledger D06; qualification is TS-Q02.
+
+| Entry | What it does |
+| --- | --- |
+| `testsuite_application_inventory` (read-only) | Lists the project's `ApplicationTestGroup`: test cases with `TestCase.GetScope()`, test sets and counts, bounded by `maxItems` with `truncated`. `export=true` saves each listed case with `TestCase.SaveToFile` as `.tat` and returns path and SHA-256. Sets are listed by name only: V21 Openness has no `ApplicationTestSet` export. |
+| `change_prepare` kind `testsuite_application_import` | Strict import of a supplied `.tat` (`TestCaseComposition.LoadFromFile`) or `.ttst` (`ApplicationTestSystemGroup.LoadFromFile`) with `ImportOptions.None` and load options `None`. Existing names refuse at prepare and apply. The file is copied byte-exact into the change directory. The native return value and `Find` readback must equal the reviewed names. Usual checkpoint, apply and restore; see the [kind table](../guides/engineering-workflows.md). |
+| `testsuite_application_plan_prepare` | Same request as `testsuite_style_plan_prepare`, plus `executionMode` (`systemManaged` or `externallyManaged`), `simulatorTicket` (the `downloadTicket` of an owned `sim_create` instance) and `wholeGroup`. Definitions use the `application` (`.tat`) and `applicationSet` (`.ttst`) families. The review then runs through the unchanged `testsuite_style_job_*` tools. |
+
+Each reviewed run is one native `TestCaseExecutor.Run` call, chosen by [TestSuiteApplicationRun.Route](../../src/TiaMcp.Core/TestSuite/TestSuiteApplicationRun.cs): one case, a case list, one set, a set list, or the whole `ApplicationTestSystemGroup` (`wholeGroup`, every reviewed case and nothing excluded). One call never mixes cases and sets. The operation is `testSuite.application.run`. Its required probes add `testsuite.applicationService` and `simulator.ownedInstance`.
+
+In the owning worker, observation and dispatch both decode the ticket with the `simulation_download` ownership rules: DPAPI ticket, on-disk marker, registered instance ID, name and storage, Softbus and runtime V8. The instance does not need to be OFF, because Test Suite drives the CPU state. The ticket expires 15 minutes after `sim_create`. Before the single Run, every reviewed case must re-export to its original bytes; sets resolve by exact name only. A whole-group run refuses if the group holds unreviewed cases. `SetScope(PlcSoftware, instanceName, ExecutionMode)` is then written to every reviewed case. That persists in the project, so it runs after the checkpoint and is never replayed. The `GetScope` readback goes into the execution-return receipt. `scopeVerified` stays false.
+
+The native `TestResults` tree is retained losslessly in the existing raw format (`NativeTestResult`). One call returns one tree for all its units. `TestSuiteApplicationRun.Captures` gives the whole tree to every required, non-excluded definition. Only a run whose closure is exactly one definition owns it. Lists, set members and groups stay `inconclusive` per unit until a per-case tree profile is qualified. `TestSuiteResultNormalizer` and the JUnit export are unchanged.
+
+Open gaps: production `RequireQualification` refuses on both Host and worker. System-managed mode still receives the owned instance's name, although Test Suite creates its own instance there. Checkpoint capture refuses projects that contain test sets, because sets have no export route. Preservation does not yet account for the intended `SetScope` change.
 
 ## Verification and integration handoff
 

@@ -32,10 +32,33 @@ public sealed partial class TiaTools
     public Task<CallToolResult> SimulationDiscoveryBaseline(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null)
         => Call("simulation_discovery_baseline", new { projectName, plcPath }, cancellationToken);
 
+    [McpServerTool(Name = "plc_online_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Compare the selected PLC's offline software with its ticket-bound owned PLCSIM Advanced instance (downloadTicket from sim_create) in a worker-owned TIA instance. The instance must already be powered in STOP or RUN and be the only registered local Softbus simulator; a fresh observer Portal must see exactly one addressable PLCSIM endpoint, at the instance's own address. Applies the PLC's sole PN/IE / PLCSIM (1) target interface, goes online, runs PlcSoftware.CompareToOnline and returns a bounded left/right/state/detail/children tree, plus FingerprintDataProvider items and hash where exposed (optional expectedFingerprintSha256 compares them). TLS trust, logins and passwords are rejected (fail closed). Always goes offline; never powers, writes, downloads or saves, and never targets a physical PLC.")]
+    public Task<CallToolResult> PlcOnlineCompare(string downloadTicket, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null,
+        int maxItems = 500, string? expectedFingerprintSha256 = null)
+        => Call("plc_online_compare", new { downloadTicket, projectName, plcPath, maxItems = Limit(maxItems), expectedFingerprintSha256,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "online") }, cancellationToken);
+
+    [McpServerTool(Name = "plc_station_upload", Destructive = false, OpenWorld = false)]
+    [Description("Upload the station from a ticket-bound owned PLCSIM Advanced instance into a new worker-owned project, in an empty TIA instance started with tia_start, through StationUploadProvider.StationUpload on PN/IE / PLCSIM (1) at the instance's single verified endpoint (same owned-instance guards as plc_online_compare). Missing products are not uploaded; TLS trust, logins, passwords and other acknowledgements are rejected. Keeps every upload message, saves the new project even when partial, and returns its path. Never opens or changes an existing project and never powers or writes the instance.")]
+    public Task<CallToolResult> PlcStationUpload(string downloadTicket, CancellationToken cancellationToken)
+        => Call("plc_station_upload", new { downloadTicket, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads") }, cancellationToken);
+
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
-    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
-    public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken)
-        => Call("project_open", new { path }, cancellationToken);
+    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: reads work, every mutation is refused with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
+    public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
+        => Call("project_open", new { path, readOnly }, cancellationToken);
+
+    [McpServerTool(Name = "project_copy", Destructive = false, OpenWorld = false)]
+    [Description("Copy the saved state of an open project into a new unique directory under the host's copies artifacts, in a worker-owned instance started with tia_start: archive, retrieve as a secondary project, verify name and location, close the copy. The source stays open and is never saved or changed; unsaved source edits are refused. Returns the copy's path and identity plus the archive hash; open it with project_open in a fresh instance.")]
+    public Task<CallToolResult> ProjectCopy(CancellationToken cancellationToken, string? projectName = null)
+        => Call("project_copy", new { projectName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "copies") }, cancellationToken);
+
+    [McpServerTool(Name = "plc_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Offline compare of one PLC's software with exactly one target: another PLC in the same project (targetPlcPath) or a library (libraryId from library_list/library_open). Returns the bounded native compare tree (left/right names, state, detail, children) with explicit truncation. No online compare; states are not runtime equivalence.")]
+    public Task<CallToolResult> PlcCompare(CancellationToken cancellationToken, string? plcPath = null, string? targetPlcPath = null, string? libraryId = null,
+        string? projectName = null, int maxItems = 500)
+        => Call("plc_compare", new { projectName, plcPath, targetPlcPath, libraryId, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "project_retrieve", Destructive = false, OpenWorld = false)]
     [Description("Retrieve an exact .zap21 archive with a required SHA-256 into a new unique directory in an empty worker-owned TIA instance. Supports explicit checkpoint recovery after a restart. Never overwrites an existing project.")]
@@ -48,9 +71,19 @@ public sealed partial class TiaTools
         => Call("software_inspect", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "type_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect.")]
-    public Task<CallToolResult> TypeRead(CancellationToken cancellationToken, string? typeName = null, string? typePath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? scopePath = null)
-        => Call("type_read", new { typeName, typePath, projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its .udt external source file; both return SHA-256 hashed artifacts instead of parsed members.")]
+    public Task<CallToolResult> TypeRead(CancellationToken cancellationToken, string? typeName = null, string? typePath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? scopePath = null, string? format = null)
+        => Call("type_read", new { typeName, typePath, projectName, plcPath, scopePath, format, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "plc_document_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("List native PLC documents (PlcDocument below PLC data type groups) of a PLC or exact software scope, bounded by maxItems with explicit truncation. exportPaths exports those exact document paths as SIMATIC SD files with SHA-256 into the artifact directory. No project changes.")]
+    public Task<CallToolResult> PlcDocumentInventory(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null, int maxItems = 500, string[]? exportPaths = null)
+        => Call("plc_document_inventory", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems), exportPaths, artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "plc_loadable_generate", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Generate a native loadable file for exact non-unit blockPaths or exact software unitPaths with an explicit target (plc or plcSim) into the artifact directory with SHA-256. Refuses inconsistent objects instead of compiling. Never downloads, connects to a PLC/PLCSIM or changes runtime state.")]
+    public Task<CallToolResult> PlcLoadableGenerate(string target, CancellationToken cancellationToken, string[]? blockPaths = null, string[]? unitPaths = null, string? projectName = null, string? plcPath = null)
+        => Call("plc_loadable_generate", new { target, blockPaths, unitPaths, projectName, plcPath, artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "tag_table_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Export a selected tag table as unchanged native XML including constants and multilingual comments. Select tagTableName or tagTablePath from software_inspect.")]

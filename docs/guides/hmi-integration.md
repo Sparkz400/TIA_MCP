@@ -8,7 +8,7 @@ See [qualification and remaining gates](../verification/hmi-qualification.md), [
 
 Start with `hmi_capabilities` and an empty request for optional installation evidence. Use `hmi_inspect` with `request.section = "devices"` on an attached project. Every accessible HMI software target returns its actual device/software path, family, observed catalog identifier/runtime version, and project-copy/session-bound identity. Unknown or inaccessible software remains visible with diagnostic evidence.
 
-Pass that returned identity as `request.target` with one of `connections`, `tags`, `screens`, `alarms`, `scripts`, or `resources`. Use `items` plus the exact `screenPath` returned by screen inspection for screen children. Native names may repeat in valid separate scopes; preserve the returned paths. HMI identities never contain a fabricated PLC owner.
+Pass that returned identity as `request.target` with one of `connections`, `tags`, `screens`, `alarms`, `scripts`, or `resources`; Unified targets also accept the opt-in `model` section described below. Use `items` plus the exact `screenPath` returned by screen inspection for screen children. Native names may repeat in valid separate scopes; preserve the returned paths. HMI identities never contain a fabricated PLC owner.
 
 Example request shape (values must come from the current worker):
 
@@ -17,6 +17,12 @@ Example request shape (values must come from the current worker):
 ```
 
 Inspection returns per-section `complete`, `truncated`, `unsupported`, `unavailable` or `failed` coverage, measured native visits, diagnostics, and `nextOffset` where another bounded page exists. Pass the returned `metadataRevision` as `expectedMetadataRevision` when continuing a live traversal. This is a metadata consistency check, not a content fingerprint. Cached explorer pages instead use the shared authenticated snapshot cursors.
+
+For a Unified target, the opt-in `model` section walks the whole public V21 `HmiSoftware` object model: screens and nested screen items, dynamizations, event and property-event handlers, faceplate interface entries, tag tables/groups, tags and members, thresholds, logging tags, system tags, connections, alarm classes, discrete/analog alarms, audit classes, OPC UA alarm types, alarm/data logs, audit trails, script modules, text/graphic/system text lists, plant object tags and runtime settings. It reads typed public properties plus `GetAttributeInfos`/`GetAttribute` and `GetCompositionInfos`/`GetComposition`. Each composition member is one `hmiModelNode` row at its `hmi_inspect` path (for example `.../screens/Main/items/Button_1/dynamizations/Visible`). Typed attributes are returned with object parts and multilingual texts inline, and with a `contentSha256` identical to that node's preservation-manifest entry. Script code appears only as SHA-256 and length; attribute names matching the worker's sensitive pattern (password, credential, private key, secret, token) are returned as `<excluded>`. `modelRoots` (for example `["Screens","AlarmClasses"]`) restricts the walk, and `objectPath` selects a subtree. `maxVisited`, the 8 MiB retained-row bound and normal paging bound the result; truncation and failed getters are reported in `coverage` and `diagnostics`. The walk only observes what the public API exposes. It is not a native export, is not natively qualified, and Classic targets report the section as unsupported.
+
+```json
+{"request":{"schemaVersion":1,"section":"model","target":{"hmiPath":"<returned exact path>","family":"unified"},"modelRoots":["Screens"],"maxVisited":5000,"limit":200}}
+```
 
 Source export is opt-in with `includeSource:true` and an exact `objectPath`. The host injects its configured artifact directory. Publicly supported native exports retain their original bytes and SHA-256; unavailable export routes report their limitation. Selected Classic screen-item inspection retains native XML, including unknown payloads. Export-local IDs have only the documented artifact lifetime. Script text is inspected as data; project scripts are never executed to extract relationships or produce previews.
 
@@ -32,7 +38,7 @@ The tree, details and relationships use the same exact references as agent queri
 
 ## Engineering and library integration
 
-The allowlist is exposed through `change_prepare` kind `hmi_engineering`, using the existing apply/status/restore workflow. Classic standalone-screen `BackColor` and Unified internal tag creation, selected item properties, existing faceplate placement and explicit interface binding have family-specific guarded bodies. The server rejects a request before project mutation if complete preservation, exact dependencies or the operation's native qualification are missing. There is no client flag to bypass a blocked gate.
+The allowlist is exposed through `change_prepare` kind `hmi_engineering`, using the existing apply/status/restore workflow. Classic standalone-screen `BackColor`, Classic whole-object XML import (`classic_xml_import`) and Unified internal tag creation, selected item properties, existing faceplate placement and explicit interface binding have family-specific guarded bodies. The server rejects a request before project mutation if complete preservation, exact dependencies or the operation's native qualification are missing. There is no client flag to bypass a blocked gate.
 
 `contracts/hmi-engineering.v1.schema.json` defines operation payloads. Scalar types, rectangles, names and explicit binding ownership are validated before dispatch; a metadata revision cannot replace the required native content fingerprint. Raw exports, the narrow qualified export-time normalization, baseline/after manifests, native compiler diagnostics and recovery evidence remain in the existing change journal. Unknown write outcomes are not replayed.
 

@@ -67,7 +67,8 @@ public sealed partial class WatchTableDispatcher
                         // A live worker's structured change failure is a returned outcome: its journal (recovery_required etc.)
                         // drives change_restore. Transport loss, timeouts and unstructured errors stay unknown; simulation
                         // download and provisioning failures stay unknown on purpose (their storage needs reconciliation).
-                        bool returned = error is BridgeOperationException && operation is ("change_apply" or "change_restore");
+                        // A structured station-upload failure only read the instance and reports its retained destination.
+                        bool returned = error is BridgeOperationException && operation is ("change_apply" or "change_restore" or "plc_station_upload");
                         // Bind a later independent report check without persisting raw diagnostic text or credentials.
                         string? nativeDetailsHash = nativeDetails is null ? null : CanonicalJson.Sha256(new JsonObject {
                             ["details"] = JsonNode.Parse(nativeDetails.Value.GetRawText()) });

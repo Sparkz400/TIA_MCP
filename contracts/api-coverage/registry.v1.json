@@ -675,7 +675,25 @@
       ]
     },
     {
+      "featureId": "project_open.read_only",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "project_retrieve",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_copy",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "plc_compare",
       "obligations": [
         "X01"
       ]
@@ -844,6 +862,19 @@
       ]
     },
     {
+      "featureId": "plc_online_compare",
+      "obligations": [
+        "D09",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "plc_station_upload",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
       "featureId": "simulation_provision_reconcile",
       "obligations": [
         "L03"
@@ -997,6 +1028,24 @@
       "featureId": "change.block_delete",
       "obligations": [
         "L01",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_protect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_unprotect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_write_protection_set",
+      "obligations": [
         "X11"
       ]
     },
@@ -1306,6 +1355,31 @@
       "featureId": "change.group_delete",
       "obligations": [
         "X11"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_create",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_relation_set",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_publication_set",
+      "obligations": [
+        "D07",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_delete",
+      "obligations": [
+        "D07"
       ]
     },
     {
@@ -2264,6 +2338,12 @@
       ]
     },
     {
+      "featureId": "project_text_export",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
       "featureId": "vci_prepare",
       "obligations": [
         "D01"
@@ -2460,6 +2540,24 @@
       "obligations": [
         "D06",
         "C04"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_inventory",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_application_import",
+      "obligations": [
+        "D06"
       ]
     },
     {
@@ -2717,6 +2815,12 @@
       ]
     },
     {
+      "featureId": "runtime_web_diagnostics",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "obligations": [
         "D16"
@@ -2731,7 +2835,9 @@
     {
       "featureId": "runtime_capture_start",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {
@@ -2743,7 +2849,9 @@
     {
       "featureId": "runtime_capture_stop",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {
@@ -2844,6 +2952,18 @@
         "C02",
         "F02",
         "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_capture",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "obligations": [
+        "C02"
       ]
     },
     {
@@ -3163,6 +3283,90 @@
       "featureId": "drive_observe",
       "obligations": [
         "D10"
+      ]
+    },
+    {
+      "featureId": "plc.document_formats",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_document_inventory",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_loadable_generate",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_text_list_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "obligations": [
+        "D04"
       ]
     }
   ],

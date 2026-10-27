@@ -16,6 +16,8 @@ public sealed partial class TiaTools
     private sealed record StyleDefinitionInput(TestSuiteDefinitionManifest Manifest, EngineeringArtifactReference OriginalArtifact);
     private sealed record StylePlanRequest(NativeTargetObservation Target, string ExecutionProfile,
         StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
+    private sealed record ApplicationPlanRequest(NativeTargetObservation Target, string ExecutionProfile, string ExecutionMode,
+        string SimulatorTicket, bool WholeGroup, StyleDefinitionInput[] Definitions, TestSuiteStyleSelection[] Runs);
     private TestSuiteStyleJobs StyleJobs() => new(options.ArtifactsDirectory);
     private static CallToolResult StyleResult(Func<object> action)
     {
@@ -33,11 +35,36 @@ public sealed partial class TiaTools
     public CallToolResult TestSuiteStylePlanPrepare(JsonElement request) => StyleResult(() =>
     {
         var input = TestSuiteStyleJobs.Parse<StylePlanRequest>(Encoding.UTF8.GetBytes(request.GetRawText()));
-        if (input.Definitions is null || input.Definitions.Length is < 1 or > 1000 || input.Definitions.Any(d => d?.Manifest is null || d.OriginalArtifact is null) ||
-            input.Definitions.Sum(d => (long)d.Manifest.OriginalBytes) > TestSuiteDefinitionBundle.MaxOriginalBytes)
+        var definitions = StyleCaptures(input.Definitions);
+        var jobs = StyleJobs();
+        var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile);
+        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+    });
+
+    [McpServerTool(Name = "testsuite_application_plan_prepare", Destructive = false, OpenWorld = false)]
+    [Description("Retain a complete bounded application-test review (TS-05). request is the style plan request plus executionMode: systemManaged or externallyManaged, simulatorTicket: the downloadTicket of an owned sim_create instance, wholeGroup: true to run the project's whole application group. Each run dispatches one native TestCaseExecutor.Run: one case, a case list, one set, a set list or the whole group; cases and sets never mix. Use the testsuite_style_job_* tools with the returned review; they carry application reviews unchanged. The worker verifies the ticket-owned PLCSIM instance before SetScope and Run. Native execution stays disabled until qualified.")]
+    public CallToolResult TestSuiteApplicationPlanPrepare(JsonElement request) => StyleResult(() =>
+    {
+        var input = TestSuiteStyleJobs.Parse<ApplicationPlanRequest>(Encoding.UTF8.GetBytes(request.GetRawText()));
+        var definitions = StyleCaptures(input.Definitions);
+        var jobs = StyleJobs();
+        var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile,
+            new TestSuiteApplicationBinding(input.ExecutionMode, input.SimulatorTicket, input.WholeGroup));
+        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
+    });
+
+    [McpServerTool(Name = "testsuite_application_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("List the project's Test Suite application group: test cases with their GetScope target, test sets and counts, bounded by maxItems with explicit truncation. export=true also saves each listed case as .tat (TestCase.SaveToFile) under the Host export directory with SHA-256; sets have no Openness export route. No import, SetScope or execution.")]
+    public Task<CallToolResult> TestSuiteApplicationInventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200, bool export = false)
+        => Call("testsuite_application_inventory", new { projectName, maxItems = Limit(maxItems), export, artifactDirectory = ExportDirectory }, cancellationToken);
+
+    private TestSuiteDefinitionCapture[] StyleCaptures(StyleDefinitionInput[] inputs)
+    {
+        if (inputs is null || inputs.Length is < 1 or > 1000 || inputs.Any(d => d?.Manifest is null || d.OriginalArtifact is null) ||
+            inputs.Sum(d => (long)d.Manifest.OriginalBytes) > TestSuiteDefinitionBundle.MaxOriginalBytes)
             throw new BridgeException("TestSuiteJobLimit", "Supply bounded exact definition manifests and original artifacts.");
         var jobs = StyleJobs();
-        var definitions = input.Definitions.Select(d =>
+        return inputs.Select(d =>
         {
             var m = d.Manifest;
             var capture = new TestSuiteDefinitionCapture(m.Id, m.Family, m.Name, m.Extension, m.Reference,
@@ -46,9 +73,7 @@ public sealed partial class TiaTools
                 throw new BridgeException("InvalidDefinitionBundle", "Original bytes must match the complete reviewed manifest.");
             return capture;
         }).ToArray();
-        var review = jobs.Review(definitions, input.Runs, input.Target, input.ExecutionProfile);
-        return new { review, completePlan = jobs.ReadReview(review), qualifiedProfiles = TestSuiteProductionAdapter.QualifiedProfiles, nativeExecutionAuthorized = false };
-    });
+    }
 
     [McpServerTool(Name = "testsuite_style_plan_review", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen and validate the complete style review, every requested scope, frozen definition bundle and durable effect/checkpoint plan. No pagination or omitted run membership; no native calls.")]

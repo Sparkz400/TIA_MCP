@@ -8,7 +8,9 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.SW;
 using Siemens.Engineering.TestSuite;
+using Siemens.Engineering.TestSuite.ApplicationTest;
 using Siemens.Engineering.TestSuite.StyleGuide;
 
 namespace TiaMcp.TestSuite.V21
@@ -74,6 +76,79 @@ namespace TiaMcp.TestSuite.V21
                 ["dispatched"] = true,
                 // Public Run/SetScope returns do not prove independently observed effective scope.
                 ["scopeVerified"] = independentlyObservedScope, ["failureKind"] = null
+            };
+            return StyleRawCapture.Retain(rawResultPath, result, messages => Messages(native.Messages, messages, 1, ref count, ref textBytes));
+        }
+
+        /// <summary>
+        /// One application Run (case, case list, set, set list or whole group) on an owned PLCSIM instance the
+        /// worker verified by ticket. Every reviewed case must re-export to its original bytes; sets have no
+        /// export route and resolve by exact name only. SetScope persists the target on each reviewed case, so
+        /// the owning worker checkpoints before this call. No import, retry or cancellation route.
+        /// </summary>
+        public byte[] RunApplicationOnce(PlcSoftware software, string instanceName, string executionMode, string route,
+            JArray definitions, string[] dispatchIds, string verificationDirectory, string executionReturnPath, string rawResultPath)
+        {
+            RequireQualification();
+            if (invoked) throw new InvalidOperationException("RecoveryRequired: native dispatch cannot be replayed.");
+            if (software == null || string.IsNullOrWhiteSpace(instanceName) || dispatchIds == null || dispatchIds.Length < 1)
+                throw new ArgumentException("Exact PLC software, owned instance name and dispatch units required.");
+            var mode = executionMode == "systemManaged" ? ExecutionMode.SystemManagedPLCSIMInstance
+                : executionMode == "externallyManaged" ? ExecutionMode.ExternallyManagedPLCSIMInstance
+                : throw new ArgumentException("Exact application execution mode required.");
+            var group = ApplicationTestDefinitions.Group(project);
+            var casesById = new Dictionary<string, TestCase>(StringComparer.Ordinal);
+            var setsById = new Dictionary<string, ApplicationTestSet>(StringComparer.Ordinal);
+            Directory.CreateDirectory(verificationDirectory);
+            foreach (var definition in definitions)
+            {
+                string id = definition.Value<string>("id"), name = definition.Value<string>("name");
+                if (definition.Value<string>("family") == "applicationSet")
+                {
+                    setsById.Add(id, group.ApplicationTestSets.Find(name) ?? throw new InvalidOperationException("StaleContent: exact test set is absent."));
+                    continue;
+                }
+                var test = group.TestCases.Find(name) ?? throw new InvalidOperationException("StaleContent: exact test case is absent.");
+                var export = ApplicationTestDefinitions.Export(test, Path.Combine(verificationDirectory, "case-" + (casesById.Count + 1) + ".tat"));
+                if (export.Value<string>("sha256") != definition.Value<string>("originalSha256")) throw new InvalidOperationException("StaleContent: exact test case definition changed.");
+                casesById.Add(id, test);
+            }
+            var cases = dispatchIds.Where(casesById.ContainsKey).Select(id => casesById[id]).ToList();
+            var sets = dispatchIds.Where(setsById.ContainsKey).Select(id => setsById[id]).ToList();
+            if (cases.Count + sets.Count != dispatchIds.Length || cases.Count != 0 && sets.Count != 0)
+                throw new InvalidOperationException("StaleContent: dispatch units must resolve to reviewed cases or sets, never both.");
+            if (route == "group" && group.TestCases.Count != cases.Count) throw new InvalidOperationException("StaleContent: the project group holds unreviewed test cases.");
+            var executor = group.GetService<TestCaseExecutor>() ?? throw new InvalidOperationException("TargetPrerequisiteMissing: application executor is absent.");
+            invoked = true; // Before SetScope: a partially written scope is never replayed either.
+            var scopes = new JArray();
+            foreach (var test in casesById.Values)
+            {
+                test.SetScope(software, instanceName, mode);
+                var row = new JObject { ["name"] = test.Name }; scopes.Add(row);
+                try { row["scope"] = test.GetScope(); } catch (Exception e) { row["scopeFailure"] = e.GetType().Name + ": " + e.Message; }
+            }
+            TestResults native;
+            switch (route)
+            {
+                case "testCase": native = executor.Run(cases.Single()); break;
+                case "testCaseList": native = executor.Run(cases); break;
+                case "testSet": native = executor.Run(sets.Single()); break;
+                case "testSetList": native = executor.Run(sets); break;
+                case "group": native = executor.Run(group); break;
+                default: throw new InvalidOperationException("Unknown application Run route.");
+            }
+            FlushNew(executionReturnPath, Encoding.UTF8.GetBytes(new JObject {
+                ["callReturned"] = true, ["atUtc"] = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
+                ["route"] = route, ["executionMode"] = executionMode, ["instanceName"] = instanceName,
+                ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes, ["setContentVerified"] = false,
+                ["rawResultPath"] = rawResultPath, ["automaticReplay"] = false }.ToString(Formatting.None)));
+            int count = 0; long textBytes = 0;
+            var result = new JObject {
+                ["definitionId"] = dispatchIds[0], ["definitionReference"] = definitions.First(d => d.Value<string>("id") == dispatchIds[0])["reference"].DeepClone(),
+                ["state"] = native.State.ToString(), ["errorCount"] = native.ErrorCount, ["warningCount"] = native.WarningCount,
+                ["dispatched"] = true,
+                // GetScope names only the target controller; executed objects are not independently observed.
+                ["scopeVerified"] = false, ["failureKind"] = null
             };
             return StyleRawCapture.Retain(rawResultPath, result, messages => Messages(native.Messages, messages, 1, ref count, ref textBytes));
         }

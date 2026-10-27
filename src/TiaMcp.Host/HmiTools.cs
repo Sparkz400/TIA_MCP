@@ -8,7 +8,7 @@ namespace TiaMcp.Host;
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "hmi_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect bounded native HMI sections: devices, connections, tags, screens, items, alarms, scripts or resources. Select exact hmiPath/family and objectPath returned by discovery; repeated names are not identities. Classic screens include regular, template, popup, slide-in, global and overview roles with per-scope coverage; additional roles expose metadata without qualified item parsing. Per-section coverage distinguishes unavailable and unsupported data. Script inspection never executes project code. Request schema: contracts/hmi-inspection.v1.schema.json.")]
+    [Description("Inspect bounded native HMI sections: devices, connections, tags, screens, items, alarms, scripts or resources, or opt-in section=model for Unified typed whole-HMI attribute readback (optional modelRoots; script code hashed, secrets excluded). Select exact hmiPath/family and objectPath returned by discovery; repeated names are not identities. Classic screens include regular, template, popup, slide-in, global and overview roles with per-scope coverage; additional roles expose metadata without qualified item parsing. Per-section coverage distinguishes unavailable and unsupported data. Script inspection never executes project code. Request schema: contracts/hmi-inspection.v1.schema.json.")]
     public Task<CallToolResult> HmiInspect(JsonElement request, CancellationToken cancellationToken)
         => Call("hmi_inspect", HmiArguments(request), cancellationToken);
 

@@ -29,6 +29,11 @@ public sealed class PhysicalRuntimeTools(PhysicalRuntimeSessions sessions)
     public Task<CallToolResult> Read(string attemptId,string selectionId,CancellationToken cancellationToken,string representation="simple") =>
         Run(async () => await sessions.ReadValue(attemptId,selectionId,representation,cancellationToken));
 
+    [McpServerTool(Name="runtime_web_diagnostics",ReadOnly=true,Destructive=false,OpenWorld=true)]
+    [Description("Read one CPU diagnostic kind in an owned session after rechecking protected credential and advertised session identity. kind: languages (Project.ReadLanguages), alarms (Alarms.Browse), diagnosticBuffer (DiagnosticBuffer.Browse), operatingMode (Plc.ReadOperatingMode), modeSelector (Plc.ReadModeSelectorState), systemTime (Plc.ReadSystemTime), timeSettings (Plc.ReadTimeSettings) or projectInformation (Project.ReadInformation). alarms and diagnosticBuffer require language (a tag from languages, e.g. en-US) and count 1..500; other kinds take neither. A method the session did not advertise returns unsupported without a request; provider denial stays explicit. Returns bounded raw JSON, entry count, truncation against count_current (null when unknown) and host request/receive times. No acknowledgment, filters, clock setting, mode change, lossless-history or program-identity claim.")]
+    public Task<CallToolResult> Diagnostics(string attemptId,string kind,CancellationToken cancellationToken,string? language=null,int? count=null) =>
+        Run(async () => await sessions.Diagnostics(attemptId,kind,language,count,cancellationToken));
+
     [McpServerTool(Name="runtime_web_status",ReadOnly=true,Destructive=false,OpenWorld=false)]
     [Description("Read retained local session state and observed profile without contacting the PLC. V1 records remain readable without inventing a profile. After Host restart the remote session outcome remains unknown; tokens are not persisted and no login is replayed. Unknown outcomes block another login to the same endpoint in this artifact root.")]
     public Task<CallToolResult> Status(string attemptId,CancellationToken cancellationToken) =>

@@ -122,34 +122,44 @@ public static class TranslationCategoryScope
             for (int i = 0; i < headers.Length; i++)
                 Require(Plain(workbook, part.Key, ((char)('A' + i)) + "1") == headers[i],
                     "UnsupportedTranslationScopeLayout", "Bilingual native header differs from the observed layout.");
-            string targetCulture = Plain(workbook, part.Key, "F1");
-            try { Require(System.Globalization.CultureInfo.GetCultureInfo(targetCulture).Name == targetCulture && targetCulture.Length > 0,
-                "UnsupportedTranslationScopeLayout", "Target header must name an exact canonical culture."); }
-            catch (System.Globalization.CultureNotFoundException) { throw new TiaMcp.Core.BridgeException("UnsupportedTranslationScopeLayout", "Unknown target culture header."); }
-            Require(targetCulture != workbook.Mapping.SourceCulture && rows[0].Elements(sheet + "c").Count() == 22,
-                "UnsupportedTranslationScopeLayout", "Exactly one distinct target and the observed reference headers are required.");
+            // Target columns follow the source until ref="0"; the five-argument overload may declare several.
+            var targets = new List<string>();
+            for (string culture; (culture = Plain(workbook, part.Key, TranslationWorkbook.ColumnName(6 + targets.Count) + "1")) != "ref=\"0\"";)
+            {
+                try { Require(System.Globalization.CultureInfo.GetCultureInfo(culture).Name == culture && culture.Length > 0,
+                    "UnsupportedTranslationScopeLayout", "Target header must name an exact canonical culture."); }
+                catch (System.Globalization.CultureNotFoundException) { throw new TiaMcp.Core.BridgeException("UnsupportedTranslationScopeLayout", "Unknown target culture header."); }
+                Require(culture != workbook.Mapping.SourceCulture && !targets.Contains(culture) && targets.Count < 64,
+                    "UnsupportedTranslationScopeLayout", "Distinct target cultures other than the source are required.");
+                targets.Add(culture);
+            }
+            // One target keeps the observed bilingual values, so existing content hashes are unchanged.
+            string targetCulture = string.Join(",", targets);
+            Require(targets.Count > 0 && rows[0].Elements(sheet + "c").Count() == 21 + targets.Count,
+                "UnsupportedTranslationScopeLayout", "Target culture and the observed reference headers are required.");
             Require(workbookTargetCulture is null || workbookTargetCulture == targetCulture,
                 "UnsupportedTranslationScopeLayout", "Every worksheet must declare the same target culture, including empty sheets.");
             workbookTargetCulture = targetCulture;
             for (int i = 0; i < 16; i++)
-                Require(Plain(workbook, part.Key, ((char)('G' + i)) + "1") == $"ref=\"{i}\"",
+                Require(Plain(workbook, part.Key, TranslationWorkbook.ColumnName(6 + targets.Count + i) + "1") == $"ref=\"{i}\"",
                     "UnsupportedTranslationScopeLayout", "Reference headers differ from the observed layout.");
             foreach (var row in rows.Skip(1))
             {
                 string number = (string)row.Attribute("r")!;
+                var targetCells = targets.Select((_, i) => new CellLocation(part.Key, TranslationWorkbook.ColumnName(6 + i) + number)).ToArray();
                 Require(row.Elements(sheet + "c").Select(c => (string?)c.Attribute("r")).Order(StringComparer.Ordinal)
-                    .SequenceEqual("ABCDEF".Select(c => c + number).Order(StringComparer.Ordinal)),
-                    "UnsupportedTranslationScopeLayout", "Every data row must contain exactly the observed A:F cells.");
+                    .SequenceEqual(Enumerable.Range(1, 5 + targets.Count).Select(c => TranslationWorkbook.ColumnName(c) + number).Order(StringComparer.Ordinal)),
+                    "UnsupportedTranslationScopeLayout", "Every data row must contain exactly the observed metadata, source and target cells.");
                 string key = Plain(workbook, part.Key, "C" + number), category = Plain(workbook, part.Key, "A" + number);
                 Require(mapped.TryGetValue(key, out var map) && map.Category == category && labels.Contains(category) &&
                     map.KeyCell == new CellLocation(part.Key, "C" + number) && map.SourceCell == new CellLocation(part.Key, "E" + number) &&
-                    map.Targets.Length == 1 && map.Targets[0].Culture == targetCulture && map.Targets[0].Location == new CellLocation(part.Key, "F" + number),
+                    map.Targets.Select(t => t.Culture).SequenceEqual(targets) && map.Targets.Select(t => t.Location).SequenceEqual(targetCells),
                     "TranslationScopeMapMismatch", "Every actual row and category must match the complete explicit map; omitted or relabelled rows are refused.");
                 var source = workbook.ReadText(new(part.Key, "E" + number));
-                var target = workbook.ReadText(new(part.Key, "F" + number));
-                Require(!source.RichText && !target.RichText, "UnsupportedTranslationScopeLayout", "Rich text requires a separate scope profile.");
+                var values = targetCells.Select(workbook.ReadText).ToArray();
+                Require(!source.RichText && values.All(v => !v.RichText), "UnsupportedTranslationScopeLayout", "Rich text requires a separate scope profile.");
                 Require(observed.TryAdd(key, new(names[sheetIndex], category, Plain(workbook, part.Key, "B" + number), Plain(workbook, part.Key, "D" + number),
-                    workbook.Mapping.SourceCulture, source.Sha256, targetCulture, target.Sha256)),
+                    workbook.Mapping.SourceCulture, source.Sha256, targetCulture, string.Join(",", values.Select(v => v.Sha256)))),
                     "TranslationScopeMapMismatch", "Duplicate native key in observed workbook.");
             }
         }

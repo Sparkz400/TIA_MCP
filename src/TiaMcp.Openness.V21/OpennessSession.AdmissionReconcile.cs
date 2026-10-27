@@ -13,7 +13,7 @@ namespace TiaMcp.Openness.V21
         // Kinds whose change fingerprint needs prepared in-memory targets; a fresh session cannot recompute them.
         private static readonly HashSet<string> AdmissionReconcileTargetKinds = new HashSet<string>(new[] {
             "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set",
-            "block_attributes_set", "project_attributes_set", "connection_set" }, StringComparer.Ordinal);
+            "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set" }, StringComparer.Ordinal);
 
         // Read-only evidence for releasing an unresolved shared mutation admission. Runs in a fresh empty owned
         // Portal; it only opens projects, retrieves archives into new reconcile directories and closes them.
@@ -54,6 +54,7 @@ namespace TiaMcp.Openness.V21
                     case "simulation_download": AdmissionReconcileDownload(check); break;
                     case "scratch_create": AdmissionReconcileScratch(check); break;
                     case "project_retrieve": AdmissionReconcileRetrieve(check, observationSha256); break;
+                    case "project_copy": AdmissionReconcileCopy(check); break;
                     case "library_open": AdmissionReconcileLibraryOpen(check, observationSha256); break;
                 }
             }
@@ -93,9 +94,10 @@ namespace TiaMcp.Openness.V21
             foreach (var row in new[] { check.Row("checkpointMutationCompileSave"), check.Row("preserveAndRecover") }.Where(r => r != null))
                 if (!SameSimulationPath(row.Value<string>("path"), projectPath)) { check.HoldAll("The change journal names a different project than the admission."); return; }
             string kind = journal.Value<string>("kind") ?? "";
-            // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware.
+            // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware,
+            // PLC alarm kinds the content hash of a fresh native export of their artifact type, OPC UA kinds their server interface groups.
             bool covered = !AdmissionReconcileTargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
-            if (HardwareEngineeringRules.Applies(kind)) check.FingerprintKind = kind;
+            if (HardwareEngineeringRules.Applies(kind) || IsPlcAlarmKind(kind) || kind.StartsWith("opcua_", StringComparison.Ordinal)) check.FingerprintKind = kind;
             Func<Project, string> outcome = project => {
                 if (AdmissionReconcileTargetKinds.Contains(kind) || kind.StartsWith("to_", StringComparison.Ordinal) || journal.Value<string>("afterFingerprint") == null) return null;
                 var replay = new EngineeringChange { Kind = kind, Payload = journal["preview"]?["payload"] as JObject ?? new JObject() };
@@ -188,6 +190,23 @@ namespace TiaMcp.Openness.V21
             else check.Hold(archiveRow, "The archive is missing or no longer has its admitted hash.");
             check.Destination(destination, () => unchanged ? check.ArchiveFingerprint(destination, archive) : null,
                 "The destination is the retrieved archive (fresh fingerprints are equal).");
+        }
+
+        private void AdmissionReconcileCopy(AdmissionReconcileCheck check)
+        {
+            var source = check.Row("archiveSavedSourceUnchanged");
+            var created = check.Rows("createNewDestination");
+            JObject archive = created.SingleOrDefault(r => r.Value<string>("kind") == "workspace"), destination = created.SingleOrDefault(r => r.Value<string>("kind") == "project");
+            if (source == null || archive == null || destination == null) return;
+            check.NotSavedSince(source, "project_copy never saves its source; the fresh source was not saved since admission.");
+            string reference = source["disposition"].Type == JTokenType.String ? source["evidence"]["project"]?.Value<string>("fingerprint") : null;
+            string path = archive.Value<string>("path"), staging = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+            if (!File.Exists(path) && !Directory.Exists(path) && !Directory.Exists(staging))
+                check.Prove(archive, "unchanged", "Neither the copy archive nor its staging directory was created.");
+            else if (reference != null && File.Exists(path) && check.ArchiveFingerprint(archive, path) == reference)
+                check.Prove(archive, "verifiedApplied", "The copy archive retrieves to the unchanged source (fresh fingerprints are equal).");
+            else if (!((JArray)archive["reasons"]).Any()) check.Hold(archive, "The copy archive is partial or differs from the unchanged source.");
+            check.Destination(destination, () => reference, "The destination is a copy of the unchanged source (fresh fingerprints are equal).");
         }
 
         private void AdmissionReconcileLibraryOpen(AdmissionReconcileCheck check, string observationSha256)
