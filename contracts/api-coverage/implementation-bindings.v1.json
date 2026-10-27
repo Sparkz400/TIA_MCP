@@ -2637,8 +2637,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/Program.cs",
-      "sha256": "1f2948e6fb5589be290659d7e18ba041c66ccde40261731244446aeb8adcfed2",
-      "bytes": 13609
+      "sha256": "4c5be190f722b708ab50764d542c08f3537073dfdc8e3e984a253556b52b981b",
+      "bytes": 13936
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectIndexStore.cs",
