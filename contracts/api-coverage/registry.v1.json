@@ -2069,6 +2069,42 @@
       ]
     },
     {
+      "featureId": "change.opcua_server_interface_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
       "featureId": "qualification_watch_authoring_source_negative",
       "obligations": [
         "D02"

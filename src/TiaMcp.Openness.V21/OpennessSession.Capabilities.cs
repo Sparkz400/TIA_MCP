@@ -11,6 +11,7 @@ using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Safety;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.OpcUa;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.Types;
@@ -83,6 +84,13 @@ namespace TiaMcp.Openness.V21
                             blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
                     AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog; Siemens validates the requested pair during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
                         blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
+                    if (kind == "plc")
+                    {
+                        var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
+                        if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
+                        foreach (string feature in OpcUaPayloadFields.Keys)
+                            AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                    }
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
                     AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
                 }
