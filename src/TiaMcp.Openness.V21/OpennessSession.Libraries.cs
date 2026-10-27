@@ -189,7 +189,8 @@ namespace TiaMcp.Openness.V21
             if ((args.Value<string>("action") ?? "").StartsWith("hmi_", StringComparison.Ordinal)) return LibraryHmiQuery(args);
             var library = ResolveLibrary(ChangeText(args, "libraryId", 64));
             string query = args.Value<string>("query") ?? "elements";
-            var revision = LibraryRevision(library);
+            int walked = 0; JArray snapshot = null;
+            var revision = query == "elements" ? LibraryRevision(library, out snapshot, out walked) : LibraryRevision(library);
             if (args["revision"] != null && args.Value<string>("revision") != revision) throw new BridgeException("PreviewStale", "Library metadata changed. Restart paging with the new revision.");
             int max = args.Value<int?>("maxItems") ?? 100, offset = args.Value<int?>("offset") ?? 0;
             if (max < 1 || max > 200 || offset < 0 || offset > 10000) throw new BridgeException("InvalidRequest", "maxItems must be 1..200 and offset 0..10000.");
@@ -197,9 +198,9 @@ namespace TiaMcp.Openness.V21
             JArray rows; bool complete = true;
             if (query == "elements")
             {
-                var budget = new ScanBudget(10000);
-                rows = LibraryMetadata(library, budget);
-                complete = !budget.Truncated;
+                // Rows come from the revision walk; above the 10,000-entry item budget they are its sorted first 10,000 (scale run: a second walk tripled page cost).
+                complete = walked <= 10000;
+                rows = complete ? snapshot : new JArray(snapshot.Take(10000));
             }
             else if (query == "versions")
             {
@@ -245,7 +246,8 @@ namespace TiaMcp.Openness.V21
             result["items"] = new JArray(rows.Skip(offset).Take(max)); result["totalCaptured"] = rows.Count;
             result["nextOffset"] = offset + max < rows.Count ? (JToken)(offset + max) : JValue.CreateNull();
             result["completeness"] = new JObject { ["scopeComplete"] = complete, ["truncated"] = !complete, ["scope"] = query == "uses" ? "Native library links in the selected project; other projects and textual references excluded." : "Native library metadata; protected or indirect runtime dependencies are not inferred." };
-            if (LibraryRevision(library) != revision) throw new BridgeException("PreviewStale", "Library changed during query. Retry inspection.");
+            // Rows taken from the revision snapshot are consistent with it by construction; other queries walk separately.
+            if (snapshot == null && LibraryRevision(library) != revision) throw new BridgeException("PreviewStale", "Library changed during query. Retry inspection.");
             return result;
         }
 
@@ -379,10 +381,13 @@ namespace TiaMcp.Openness.V21
             foreach (var child in folder.Folders) { CaptureLibraryFolders(child, path + "/" + Segment(child.Name), rows, budget, depth + 1); if (budget.Truncated) break; }
         }
 
-        private static string LibraryRevision(ManagedLibrary library)
+        private static string LibraryRevision(ManagedLibrary library) => LibraryRevision(library, out _, out _);
+
+        private static string LibraryRevision(ManagedLibrary library, out JArray metadata, out int walked)
         {
-            var budget = new ScanBudget(10000); var metadata = LibraryMetadata(library, budget);
-            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Library exceeds the 10000-entry revision budget. Split or filter the source library before preparing a mutation.");
+            // Folders, types and versions each take entries, so a 10,000-type library needs more than 10,000 (scale plan).
+            var budget = new ScanBudget(50000); metadata = LibraryMetadata(library, budget); walked = budget.Used;
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Library exceeds the 50000-entry revision budget. Split or filter the source library before preparing a mutation.");
             return ChangeHash(metadata.ToString(Formatting.None));
         }
 
