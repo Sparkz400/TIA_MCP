@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.30",
+  "catalogVersion": "0.4.31",
   "targetTiaVersions": [
     21
   ],
@@ -2009,6 +2009,39 @@
       "limitations": [
         "Engineering-only; runtime behavior inside the parent chain is not claimed.",
         "Standard route only; software-unit and namespace parents remain refused until their transitive effect is captured."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-capture.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "3944707b13a466a9cc5ca8119d219274bbb6b882",
+        "passedScope": "Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace)."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-capture.20261027.json"
+      ],
+      "limitations": [
+        "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-effects.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fb5fb64ea77a4ded82aef3e7cdd6f074343f0241",
+        "passedScope": "Software-unit and namespace route numeric FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep in its own namespace (<prefix>Host.Inner, <prefix>HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (28 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured route transitive effect (local.typed.route-transitive-capture.20261027); native readback matched every prediction exactly and each cell passed the four engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-effects.20261027.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+        "Parent chains share the caller's namespace; parents in another namespace or unit and custom declaration shapes stay refused."
       ]
     },
     {
@@ -9434,7 +9467,7 @@
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. On the standard route, parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect (local.typed.transitive-capture.20261026) and are engineering-qualified for created multi-instance storage (local.typed.transitive-effects.20261026); software-unit and namespace parents and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9471,7 +9504,9 @@
           "local.typed.standard-created-storage-runtime.20261026",
           "local.typed.insertion-storage.20261026",
           "local.typed.transitive-capture.20261026",
-          "local.typed.transitive-effects.20261026"
+          "local.typed.transitive-effects.20261026",
+          "local.typed.route-transitive-capture.20261027",
+          "local.typed.route-transitive-effects.20261027"
         ]
       },
       "availability": {
