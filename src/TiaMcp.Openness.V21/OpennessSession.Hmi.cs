@@ -70,7 +70,7 @@ namespace TiaMcp.Openness.V21
             if (args["screenPath"] == null && requestedIdentity?["screenPath"] != null) args["screenPath"] = requestedIdentity["screenPath"].DeepClone();
             var project = SelectProject(args);
             string section = args.Value<string>("section") ?? "devices";
-            if (!new[] { "devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources" }.Contains(section))
+            if (!new[] { "devices", "connections", "tags", "screens", "items", "alarms", "scripts", "resources", "model" }.Contains(section))
                 throw new BridgeException("InvalidRequest", "Unknown HMI inspection section.");
             int limit = HmiBound(args, "limit", 100, 1, 200), offset = HmiBound(args, "offset", 0, 0, 50000);
             int maxBytes = HmiBound(args, "maxBytes", 262144, 4096, 1048576);
@@ -103,7 +103,8 @@ namespace TiaMcp.Openness.V21
             var ordered = capture.Entries.OrderBy(e => e.Identity.Value<string>("objectPath"), StringComparer.Ordinal).ToList();
             string exact = args.Value<string>("objectPath") ?? (args["target"] as JObject ?? args["identity"] as JObject)?.Value<string>("objectPath");
             if (target != null && exact == target.Path) exact = null;
-            if (exact != null && section != "items" && section != "devices") ordered = ordered.Where(e => e.Identity.Value<string>("objectPath") == exact).ToList();
+            if (exact != null && section == "model") ordered = ordered.Where(e => e.Identity.Value<string>("objectPath") == exact || e.Identity.Value<string>("objectPath").StartsWith(exact + "/", StringComparison.Ordinal)).ToList();
+            else if (exact != null && section != "items" && section != "devices") ordered = ordered.Where(e => e.Identity.Value<string>("objectPath") == exact).ToList();
             string revision = ChangeHash(new JArray(ordered.Select(e => e.Row)).ToString(Formatting.None));
             if (args.Value<string>("expectedMetadataRevision") is string expected && revision != expected)
                 throw new BridgeException("HmiMetadataChanged", "Observed metadata changed between pages; capture again from offset zero.");
@@ -134,6 +135,7 @@ namespace TiaMcp.Openness.V21
             if (section == "screens" || section == "items") result["coverage"]["behaviorScope"] = target?.Family == "unified"
                 ? "Exposed screen/item dynamizations, event handlers, property event handlers, script text/hash and trigger scalar properties. Script semantics and static navigation targets remain unresolved."
                 : "Classic native scalar metadata and selected screen exports. Unknown event/script/navigation XML remains in the retained artifact without invented bindings.";
+            if (section == "model") result["coverage"]["modelScope"] = "Unified typed readback of the public V21 object model: one row per composition member with typed attributes; parts and translations inline, script code as SHA-256 only, sensitive attribute names excluded. Payloads without a public getter are not observed; this is not a native export or runtime proof.";
             result["diagnostics"] = capture.Diagnostics; result["artifacts"] = capture.Artifacts;
             result["scriptsExecuted"] = false; result["runtimeVerified"] = false;
             return result;
@@ -421,6 +423,7 @@ namespace TiaMcp.Openness.V21
                 HmiComposition(project, target, hmi, "TextLists", target.Path + "/textLists", "hmiResource", capture);
                 HmiComposition(project, target, hmi, "GraphicLists", target.Path + "/graphicLists", "hmiResource", capture);
             }
+            else if (section == "model") { capture.Status = "unsupported"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiSectionUnsupported", ["reason"] = "The typed model walker covers the Unified object model; Classic content is retained through its native exports." }); }
             else { capture.Status = "unsupported"; capture.Diagnostics.Add(new JObject { ["code"] = "HmiSectionUnsupported", ["reason"] = "Installed Classic HmiTarget exposes no public alarm composition. No private project database is inspected." }); }
         }
 
@@ -559,6 +562,7 @@ namespace TiaMcp.Openness.V21
                     foreach (var alarm in capture.Entries.Where(e => e.Identity.Value<string>("kind") == "hmiAlarm")) HmiUnifiedAlarmParameters(alarm, capture);
                     break;
                 case "scripts": HmiComposition(project, target, hmi, "Scripts", target.Path + "/scripts", "hmiScript", capture); break;
+                case "model": HmiUnifiedModel(project, target, args, capture); break;
                 case "resources":
                     HmiComposition(project, target, hmi, "HmiTextLists", target.Path + "/textLists", "hmiResource", capture);
                     HmiComposition(project, target, hmi, "HmiGraphicLists", target.Path + "/graphicLists", "hmiResource", capture);
