@@ -20,7 +20,7 @@ namespace TiaMcp.Openness.V21
         // before execution, including failed/partially committed mutations.
         private void ObserveIndexOperation(string operation)
         {
-            if (new[] { "attach", "start", "detach", "project_open", "project_retrieve", "scratch_create", "change_restore" }.Contains(operation)) InvalidateHmiSession();
+            if (new[] { "attach", "start", "detach", "project_open", "project_retrieve", "scratch_create", "plc_station_upload", "change_restore" }.Contains(operation)) InvalidateHmiSession();
             switch (operation)
             {
                 case "hmi_inspect": case "hmi_references": case "hmi_capabilities": return;
@@ -30,7 +30,8 @@ namespace TiaMcp.Openness.V21
                 case "hardware_inspect": case "technology_read": case "safety_inspect": case "call_graph":
                 case "symbol_trace": case "change_impact": case "engineering_read": case "fixture_sources":
                 case "change_status": case "object_resolve": case "target_capabilities":
-                case "library_list": case "library_query": case "library_compare": case "library_export": case "library_capabilities": return;
+                case "library_list": case "library_query": case "library_compare": case "library_export": case "library_capabilities":
+                case "plc_online_compare": return;
                 default: _projectIndexes.Invalidate(operation); _indexRequests.Clear(); InvalidateProjectModels(operation); return;
             }
         }

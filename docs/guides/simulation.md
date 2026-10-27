@@ -41,6 +41,8 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `simulation_download` | Engineering operation: `downloadTicket`, optional `projectName`, exact `plcPath`, `credentialMetadataPath` and `credentialLineageJournalPaths` array. The singular `credentialLineageJournalPath` remains available for one hop; do not supply both forms. Compiles the selected in-memory PLC and generates a fresh virtual memory card. |
 | `simulation_provision_scratch_credential` | Opt-in engineering operation: the exact `downloadTicket`, required generated `credentialMetadataPath`, optional `projectName`, `plcPath` and `credentialLineageJournalPaths`. Validates the original card and owned scratch/Softbus target, starts the same CPU empty, then attempts `OnlineProvider.SetPlcMasterSecret` with the generated DPAPI credential. Optional `trustOwnedEmptyCpuCertificate` defaults false. One attempt per owned instance; success requires OFF with protection enabled and the original card restored unchanged. Does not establish RUN or live values. |
 | `sim_state` | `instanceId`, `action` (`powerOn`, `powerOff`, `run`, `stop`), optional bounded `timeoutMs`. No automatic RUN following download. |
+| `plc_online_compare` | Engineering operation: `downloadTicket`, optional `projectName`, `plcPath`, `maxItems` and `expectedFingerprintSha256`. Goes online to the already powered owned instance and returns a bounded `PlcSoftware.CompareToOnline` tree plus fingerprint items. See [Online compare and station upload](#online-compare-and-station-upload). |
+| `plc_station_upload` | Engineering operation: `downloadTicket`. Uploads the owned instance's station into a new worker-owned project and returns its path. Shared mutation admission. See [Online compare and station upload](#online-compare-and-station-upload). |
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
 | `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation time and quality/error. |
 | `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Validates all values before writing and reports completed writes if a later write fails. |
@@ -70,6 +72,37 @@ TIA can request a `PlcMasterSecretPassword` callback when generating the first v
 New scratch CPUs on recent firmware also require a runtime user with the CPU's Full access function right. The scratch-only setup creates a unique password-authenticated `TiaMcpTest_*` user and a unique role assigned to that newly created device. It generates the password locally and stores it only in a CurrentUser DPAPI file with separate nonsecret metadata. It does not enable anonymous full access, disable existing protection, edit an existing user or connect to a PLC. This helper is restricted to the current worker-owned scratch project. It checks the exposed native rights and declines unknown/ambiguous matches. The implementation follows Siemens' [project-user API](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-data-of-the-user-management/functions-for-accessing-user-roles-and-function-rights/project-users) and [device-function-right API](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-data-of-the-user-management/functions-for-accessing-user-roles-and-function-rights/device-function-rights).
 
 `simulation-download.json` contains compile/download diagnostics, target identity, relative card-file hashes and a `programRevision` derived from that generated card manifest. This is evidence of what was generated, not proof of the program currently executing. It is not a source-control revision or a safety signature. Simulator test reports include this evidence when available and explicitly mark runtime readback verification as false. Later external card/program changes are not detected by the retained manifest.
+
+## Online compare and station upload
+
+`plc_online_compare` and `plc_station_upload` reuse the credential-provisioning route to an owned
+instance and never power, address, credential, write or download it. Both require a worker-owned
+TIA instance, a current `downloadTicket` (15 minutes from `sim_create`), the exact owned instance as
+the only registered local Softbus simulator, and that instance already powered in STOP or RUN
+through `sim_state`. A fresh observer Portal (as in provisioning) must see exactly one addressable
+PN/IE / PLCSIM (1) endpoint, at the instance's own controller address; zero-address entries such as
+the Runtime Manager placeholder are recorded only. TLS verification is answered `NonTrusted` and
+login or password challenges are never answered, so a target that needs either fails closed. Every
+connection is taken offline in a `finally` block, the observer Portal is stopped and the instance's
+power state is reported before and after.
+
+- `plc_online_compare` keeps the selected PLC's project open, requires it offline, applies its sole
+  PLCSIM target interface, goes online and runs `PlcSoftware.CompareToOnline`. The result tree has
+  `left`, `right`, `state` (`CompareResultState`), `detail` and `children`, bounded by `maxItems` and
+  depth 64 with explicit truncation. Before connecting it reads `FingerprintDataProvider` data through
+  the same route and returns its items and SHA-256; `expectedFingerprintSha256` reports whether an
+  earlier hash still matches. An unavailable provider is reported and does not stop the compare.
+  `projectModifiedBefore/After` shows whether applying the route marked the in-memory project
+  modified; the tool never saves.
+- `plc_station_upload` needs an empty worker-owned Portal, creates `TiaMcpUpload` in a new directory
+  under the artifact root and calls `StationUploadProvider.StationUpload` at the verified address.
+  Missing products are answered `NoAction` and make the result partial; any other upload request,
+  passwords included, fails the upload. Every message is kept in the response and in
+  `station-upload.json`; the new project is saved, also when partial, and stays open. It is a shared
+  mutation: a structured failure is a returned outcome, while a lost worker leaves the admission
+  unknown, with no reconciliation adapter yet.
+
+Neither tool is natively qualified; both are compiled against the V21 public API only.
 
 ## Authentication prompts
 

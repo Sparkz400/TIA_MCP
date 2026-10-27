@@ -31,6 +31,18 @@ public sealed partial class TiaTools
     public Task<CallToolResult> SimulationDiscoveryBaseline(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null)
         => Call("simulation_discovery_baseline", new { projectName, plcPath }, cancellationToken);
 
+    [McpServerTool(Name = "plc_online_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Compare the selected PLC's offline software with its ticket-bound owned PLCSIM Advanced instance (downloadTicket from sim_create) in a worker-owned TIA instance. The instance must already be powered in STOP or RUN and be the only registered local Softbus simulator; a fresh observer Portal must see exactly one addressable PLCSIM endpoint, at the instance's own address. Applies the PLC's sole PN/IE / PLCSIM (1) target interface, goes online, runs PlcSoftware.CompareToOnline and returns a bounded left/right/state/detail/children tree, plus FingerprintDataProvider items and hash where exposed (optional expectedFingerprintSha256 compares them). TLS trust, logins and passwords are rejected (fail closed). Always goes offline; never powers, writes, downloads or saves, and never targets a physical PLC.")]
+    public Task<CallToolResult> PlcOnlineCompare(string downloadTicket, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null,
+        int maxItems = 500, string? expectedFingerprintSha256 = null)
+        => Call("plc_online_compare", new { downloadTicket, projectName, plcPath, maxItems = Limit(maxItems), expectedFingerprintSha256,
+            artifactDirectory = Path.Combine(options.ArtifactsDirectory, "online") }, cancellationToken);
+
+    [McpServerTool(Name = "plc_station_upload", Destructive = false, OpenWorld = false)]
+    [Description("Upload the station from a ticket-bound owned PLCSIM Advanced instance into a new worker-owned project, in an empty TIA instance started with tia_start, through StationUploadProvider.StationUpload on PN/IE / PLCSIM (1) at the instance's single verified endpoint (same owned-instance guards as plc_online_compare). Missing products are not uploaded; TLS trust, logins, passwords and other acknowledgements are rejected. Keeps every upload message, saves the new project even when partial, and returns its path. Never opens or changes an existing project and never powers or writes the instance.")]
+    public Task<CallToolResult> PlcStationUpload(string downloadTicket, CancellationToken cancellationToken)
+        => Call("plc_station_upload", new { downloadTicket, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads") }, cancellationToken);
+
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
     [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken)

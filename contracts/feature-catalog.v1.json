@@ -3891,6 +3891,101 @@
       ]
     },
     {
+      "featureId": "plc_online_compare",
+      "domain": "simulation",
+      "title": "Compare offline PLC software with its owned PLCSIM instance online",
+      "mcpTools": [
+        "plc_online_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcSoftware.CompareToOnline() (CompareResult.RootElement; CompareResultElement LeftName, RightName, ComparisonResult, DetailedInformation, Elements), OnlineProvider.Configuration/State/GoOnline()/GoOffline(), ConnectionConfiguration.ApplyConfiguration(ConfigurationTargetInterface) and OnlineLegitimation, and TiaPortal.GetService<FingerprintDataProvider>().GetFingerprintData(ConfigurationAddress, OnlineConfigurationDelegate)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Only a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN; never powers, addresses, writes or downloads it and never targets a physical PLC.",
+          "Endpoint identity uses the credential-provisioning observer Portal: exactly one addressable PLCSIM endpoint, equal to the instance's own controller address. Zero-address entries such as the Runtime Manager placeholder are recorded, not excluded by a baseline.",
+          "TLS verification is answered NonTrusted and every login/password challenge is left unanswered (fail closed); a target that requires either cannot be compared.",
+          "Applies the PLC's sole PLCSIM target interface like provisioning; whether TIA marks the in-memory project modified is reported (projectModifiedBefore/After), never saved.",
+          "Bounded tree (maxItems, depth 64) with explicit truncation. The FingerprintDataProvider owner (TiaPortal) and fingerprint coverage are unqualified; an unavailable or failing provider is reported and does not stop the compare."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM online route must pass runtime checks."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus",
+        "Selected PLC offline with a PN/IE / PLCSIM (1) connection exposing one target interface"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_station_upload",
+      "domain": "simulation",
+      "title": "Upload an owned PLCSIM station into a new worker-owned project",
+      "mcpTools": [
+        "plc_station_upload"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Project.GetService<StationUploadProvider>(), its Configuration PN/IE / PLCSIM (1) Addresses.Create, StationUploadProvider.StationUpload(ConfigurationAddress, UploadConfigurationDelegate), UploadResult State/ErrorCount/WarningCount/Messages/UploadedStation and UploadMissingProducts."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Requires an empty worker-owned Portal; creates a new project under the artifact root and never opens or changes an existing project. Goes through shared mutation admission; a structured failure is a returned outcome, while a lost worker leaves the admission unknown with no reconciliation adapter.",
+          "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
+          "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
+          "Uploaded hardware/software completeness, compile and reopen of the new project are not verified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "The exact owned instance, its powered state and the PLCSIM upload route must pass runtime checks."
+        ]
+      },
+      "prerequisites": [
+        "Worker-owned TIA instance started with tia_start",
+        "Current owned-instance ticket from sim_create; the instance already powered in STOP or RUN by sim_state",
+        "PLCSIM Advanced V8 as the only registered local instance, isolated through Softbus"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "simulation_provision_reconcile",
       "domain": "simulation",
       "title": "Release a failed provisioning admission on fresh native evidence",
