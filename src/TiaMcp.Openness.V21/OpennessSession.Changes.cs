@@ -316,6 +316,9 @@ namespace TiaMcp.Openness.V21
                 case "testsuite_application_import":
                     PrepareTestSuiteApplicationImport(change, project, preview);
                     break;
+                case "testsuite_system_import":
+                    PrepareTestSuiteSystemImport(change, project, preview);
+                    break;
                 case "project_simulation_enable":
                 {
                     bool enabled = ExplicitChangeBool(payload, "enabled");
@@ -728,6 +731,9 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "testsuite_application_import":
                     ApplyTestSuiteApplicationImport(change, project);
+                    break;
+                case "testsuite_system_import":
+                    ApplyTestSuiteSystemImport(change, project);
                     break;
                 case "project_simulation_enable":
                 {

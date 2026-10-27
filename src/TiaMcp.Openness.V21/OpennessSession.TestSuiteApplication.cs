@@ -80,7 +80,8 @@ namespace TiaMcp.Openness.V21
             try
             {
                 return new JObject { ["instanceId"] = marker["instanceId"], ["instanceName"] = marker["instanceName"],
-                    ["storagePath"] = marker["storagePath"], ["operatingState"] = instance.OperatingState.ToString() };
+                    ["storagePath"] = marker["storagePath"], ["operatingState"] = instance.OperatingState.ToString(),
+                    ["controllerAddresses"] = new JArray(instance.ControllerIP ?? new string[0]) };
             }
             finally { RetainSimulationInterface(instance); }
         }

@@ -17101,6 +17101,150 @@
       ]
     },
     {
+      "featureId": "testsuite_system_inventory",
+      "domain": "test_suite",
+      "title": "List and export Test Suite system test cases",
+      "mcpTools": [
+        "testsuite_system_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 TestSuiteService.SystemTestGroup, SystemTestSystemGroup.SystemTestCases, SystemTestCase.Name/OPCUAServerAddress/OPCUAServerInterfaceType/OPCUAServerInterfaceFolderPath and SystemTestCase.SaveToFile(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Bounded by maxItems with explicit truncation; per-case scope/export failures such as LicenseNotFoundException are reported per row.",
+          "Exported .tst bytes are retained with SHA-256 but not parsed; an interface folder referenced by the case is not exported."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product in the attached TIA instance; service or adapter absence is reported, never replaced by an empty inventory."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "An open project"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "testsuite_system_plan_prepare",
+      "domain": "test_suite",
+      "title": "Retain a bounded system-test run review against an owned PLCSIM endpoint",
+      "mcpTools": [
+        "testsuite_system_plan_prepare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Local durable Host workflow; the optional V21 boundary compiles SystemTestCase.SetScope(String, ServerInterfaces.StandardSIMATIC), SystemTestSystemGroup.GetService<SystemTestCaseExecutor>() and SystemTestCaseExecutor.Run(SystemTestCase / IEnumerable<SystemTestCase> / SystemTestSystemGroup), returning TestResults with State and Messages."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
+          "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses before SetScope and Run. Physical or unowned endpoints are refused.",
+          "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
+          "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Offline retained workflow is available. Native actions require an accepted system-test profile, an owned PLCSIM instance in RUN with its OPC UA server enabled and independent current observations."
+        ]
+      },
+      "prerequisites": [
+        "One shared artifact root across cooperating Hosts",
+        "An owned PLCSIM Advanced V8 instance from sim_create, its downloadTicket and its opc.tcp controller address",
+        "Native actions require a qualified adapter, product/license, simulator, endpoint and scope evidence"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preview",
+        "AC-evidence",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-native",
+        "AC-runtime",
+        "AC-simulator-lifecycle"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_system_import",
+      "domain": "test_suite",
+      "title": "Strictly import Test Suite system test cases from a file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "testsuite_system_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 SystemTestCaseComposition.LoadFromFile(FileInfo, ImportOptions.None, TCLoadOptions.None) for .tst, with SystemTestCaseComposition.Find readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Strict only: collisions and invalid objects refuse; no Override or IgnoreInvalidObject route. The .tst grammar is not parsed; reviewed names are verified against the native return value and Find readback.",
+          "sourcePath is copied byte-exact into the change directory. No OPC UA scope is set and nothing executes. An interface folder referenced by the case is not imported.",
+          "Saving requires compile=true with a plcPath, as for every prepared change; compilation does not cover Test Suite objects. The project fingerprint does not cover Test Suite objects, so an interrupted apply is never reconciled as applied from it."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product and its definition license in the attached TIA instance; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "A verified recovery checkpoint",
+        "An existing absolute .tst file and the exact expected names"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "software_unit_review",
       "domain": "software_units",
       "title": "Review supplied software-unit prerequisites and proposed edits",
