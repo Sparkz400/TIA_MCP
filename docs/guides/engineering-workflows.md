@@ -107,6 +107,11 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `to_parameters` | `technologyPath` or unique `name`, `parameters: {...}` | Up to 500 scalar TO parameters with known read/write access and explicit native types; see the scalar-write boundary below. |
 | `to_delete` | `technologyPath` or unique `name` | Deletes an existing technology object after an XML backup and project checkpoint. |
 | `safety_import_xml` | `xml`, `expectedBlockNames: [...]`, `safetyAcknowledged: true` | Dedicated import for consistent, exportable user F-blocks on a safety-enabled PLC with the required existing login state. |
+| `plc_alarm_text_list_import` | `artifactPath` (.xlsx), `expectedSha256`, `importOption: "None"` or `"Override"`, `expectedTextListNames: [...]`, optional `scopePath` | Native PLC alarm user text-list import into one PLC or software unit. See [PLC alarm and ProDiag imports](#plc-alarm-and-prodiag-imports). |
+| `plc_alarm_instance_text_import` | `artifactPath` (.xlsx), `expectedSha256`, optional `scopePath` | Updates texts of existing alarm instances in one PLC or software unit, all workbook languages. |
+| `plc_supervision_import` | `artifactPath` (.xlsx), `expectedSha256`, `importOption: "None"` or `"Override"`, optional `scopePath` | Global ProDiag supervision workbook of one PLC or software unit. |
+| `plc_alarm_class_import` | `artifactPath` (.dat), `expectedSha256` | Project-wide alarm class import; compiles every device. |
+| `plc_supervision_settings_import` | `artifactPath` (.dat), `expectedSha256` | Project-wide ProDiag supervision settings import; compiles every device. |
 
 Source declarations are parsed outside comments, literals and quoted symbols, including multiple declarations on one line. Their names must match the explicit expected set. Block and type source changes are separate. Number-addressed declarations such as `FUNCTION FC 10` are rejected; use explicit symbolic names. Name collisions are compared without case. Import XML cannot use DTDs, import unlisted top-level object kinds, repeat object IDs, change an existing block's language, or collide with an unpreviewed block number.
 
@@ -123,6 +128,18 @@ The worker validates the import envelope and intended scope. It does not claim t
 This scan is conservative and does not prove the absence of runtime pointers, external consumers or all indirect references. It does not rewrite references or cascade-delete dependents. `hardware_delete` and `to_delete` retain their separate documented behavior; they are not covered by this symbol dependency policy.
 
 Group creation targets an existing parent; rename/delete target an existing user group. Deletion rejects contained objects and subgroups. Group moves, object moves, namespace relocation, recursive deletion, generated groups and generic safety-unit mutations remain unsupported. Native create/rename/delete outcomes are read back; the whole-project checkpoint remains the recovery mechanism.
+
+### PLC alarm and ProDiag imports
+
+These kinds import a file you supply; they do not generate or interpret workbook or DAT content. Prepare copies the file into the change directory and refuses it unless its SHA-256 equals `expectedSha256`; apply imports that copy. Prepare also exports the current state through the same native provider as a preimage. A missing provider (for example ProDiag without its product or license), `LicenseNotFoundException` or `MissingProductsException` refuses at prepare with the native message.
+
+`importOption` is the native `ImportOptions` value. `None` refuses existing text lists at prepare; `Override` replaces each supplied list's complete entry set and leaves unmentioned lists. Never use a partial translation workbook as a replacement list. Instance-text import only updates existing alarms and does not activate languages.
+
+Apply retains the native result state, counts/messages and a copy of the log, then a fresh native export as readback. Text-list import also verifies every `expectedTextListNames` entry by name. `Error`, `Failure` and `ErrorRollback` fail apply with `recovery_required`; `Warning` is accepted and retained but can describe a partial import, so review the log and readback. All five kinds require `compile=true`. The selected PLC is compiled for owner kinds and every device for the two project-wide kinds.
+
+For these kinds the change fingerprint also hashes a fresh native export of the affected artifact type for every PLC/software-unit owner, or the project. XLSX document properties are excluded and DAT files are hashed as bytes. Interruption reconciliation can therefore compare outcomes. Whether the exports are deterministic is not natively qualified: if one is not, apply fails with `StaleRevision` before any write.
+
+The per-FB ProDiag provider, `ImportSupervisionSettingsFromXlsx`, safety units and the text-list library lifecycle are not covered. All five kinds are compiled against the V21 Public API only and are not natively qualified. See [PLC alarms and ProDiag plan](../plans/expansion-plans/plc-alarms-prodiag.md).
 
 ## Data inspection and nested references
 

@@ -1228,6 +1228,36 @@
       ]
     },
     {
+      "featureId": "change.plc_alarm_text_list_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
       "featureId": "change.hardware_address_set",
       "obligations": [
         "X10"
