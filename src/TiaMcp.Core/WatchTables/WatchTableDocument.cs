@@ -81,17 +81,19 @@ namespace TiaMcp.Core.WatchTables
         public string RowKind(int ordinal) { return Row(ordinal).Name.LocalName.Substring(Prefix.Length); }
         public void Rename(string name)
         {
-            Writable(); if (string.IsNullOrWhiteSpace(name) || name.Length > 128 || name.Any(char.IsControl)) throw new InvalidDataException("Invalid table name.");
+            Writable(); if (IsForce) throw new InvalidDataException("V21 PlcForceTable.Name has no setter; the existing force table keeps its name.");
+            if (string.IsNullOrWhiteSpace(name) || name.Length > 128 || name.Any(char.IsControl)) throw new InvalidDataException("Invalid table name.");
             VerifyText(name); if (Name == name) return; table.Element("AttributeList").Element("Name").Value = name; edited = true;
         }
 
         public void SetField(int ordinal, string field, string value)
         {
             Writable();
-            if (!new[] { "Name", "Address", "DisplayFormat", "ModifyValue" }.Contains(field) || value == null || value.Length > 8192)
+            if (field == "ForceIntention") throw new InvalidDataException("ForceIntention is never set: this editor does not select rows for forcing or activate forcing.");
+            if (!new[] { "Name", "Address", "DisplayFormat", IsForce ? "ForceValue" : "ModifyValue" }.Contains(field) || value == null || value.Length > 8192)
                 throw new InvalidDataException("Only bounded offline selectors, display format and literal values may be edited.");
             var row = Row(ordinal);
-            if (row.Name != Prefix + "PlcWatchTableEntry") throw new InvalidDataException("A watch entry is required.");
+            if (row.Name != Prefix + (IsForce ? "PlcForceTableEntry" : "PlcWatchTableEntry")) throw new InvalidDataException("A watch or force signal entry is required.");
             var attrs = row.Element("AttributeList");
             var fields = attrs == null ? new XElement[0] : attrs.Elements(field).ToArray();
             if (fields.Length != 1 || !Plain(fields[0])) throw new InvalidDataException("Field must already exist as plain text in this captured native profile.");
@@ -343,7 +345,13 @@ namespace TiaMcp.Core.WatchTables
         public static string Hash(byte[] bytes) { using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant(); }
         private XElement[] Rows() { return table.Elements("ObjectList").Elements().ToArray(); }
         private XElement Row(int ordinal) { var rows = Rows(); if (ordinal < 0 || ordinal >= rows.Length) throw new InvalidDataException("Row ordinal out of bounds."); return rows[ordinal]; }
-        private void Writable() { if (IsForce) throw new InvalidDataException("Force documents are capture-only in this profile."); }
+        // A selected force row (any serialized ForceIntention other than false) refuses every edit; forcing is never authored here.
+        public void RequireNoForceSelection()
+        {
+            if (table.Descendants("ForceIntention").Any(e => !Plain(e) || (e.Value != "false" && e.Value != "False")))
+                throw new InvalidDataException("A force row is selected for forcing (ForceIntention); force documents are edited only while every row is unselected.");
+        }
+        private void Writable() { RequireNoForceSelection(); }
         private static XmlReader Reader(Stream stream) { return XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 }); }
         private static bool Plain(XElement element) { return element != null && element.Nodes().All(n => n is XText); }
         private static void VerifyText(string value) { try { XmlConvert.VerifyXmlChars(value); } catch (XmlException error) { throw new InvalidDataException("Invalid XML text.", error); } }

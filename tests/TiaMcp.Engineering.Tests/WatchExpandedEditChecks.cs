@@ -47,6 +47,52 @@ internal static class WatchExpandedEditChecks
             if ((string)final["operation"]!["state"]! != "reconciled" || native.ApplyCount != 1 || native.RestoreCount != 1) throw new Exception("Expanded edit did not reconcile exactly once.");
             passed++;
         }
+        // Force documents reuse the same reviewed prepare/apply/verify/recover route; only targetKind differs.
+        var force = new WatchTableDocument(Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(genuine).Replace("PlcWatchTable", "PlcForceTable")
+            .Replace("<ModifyTrigger>Permanent</ModifyTrigger>", "<Address>%I0.0:P</Address>").Replace("ModifyValue", "ForceValue").Replace("MilestoneWatch", "Force table")));
+        force.Duplicate(0, 1); force.Duplicate(0, 2); force.SetField(1, "ForceValue", "TRUE"); force.SetComment(2, "de-DE", "Separate row");
+        foreach (var edit in new JsonObject[] {
+            new() { ["editKind"] = "field", ["ordinal"] = 0, ["field"] = "ForceValue", ["value"] = "TRUE" },
+            new() { ["editKind"] = "field", ["ordinal"] = 1, ["field"] = "Address", ["value"] = "%Q0.0:P" },
+            new() { ["editKind"] = "field", ["ordinal"] = 2, ["field"] = "DisplayFormat", ["value"] = "Hex" },
+            new() { ["editKind"] = "comment", ["ordinal"] = 0, ["culture"] = "en-GB", ["text"] = "Valve {0}" },
+            new() { ["editKind"] = "clone", ["ordinal"] = 0, ["insertAt"] = 3 },
+            new() { ["editKind"] = "delete", ["ordinal"] = 1 },
+            new() { ["editKind"] = "reorder", ["order"] = new JsonArray(2, 0, 1) } })
+        {
+            string root = Path.Combine(Path.GetTempPath(), "force-expanded-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+            var native = new ProductionRecoveryChecks.FakeWatch(root, force.ToBytes());
+            edit["tableName"] = "Force table"; edit["targetKind"] = "forceTable"; edit["idempotencyKey"] = "force-review";
+            try { await new WatchTableDispatcher(native, root).CallAsync("watch_prepare", edit); throw new Exception("Unqualified force profile was accepted."); }
+            catch (BridgeException e) when (e.Code == "UnsupportedProfile") { passed++; }
+            var dispatcher = new WatchTableDispatcher(native, root, allowUnqualifiedDocumentEdits: true);
+            var plan = JsonNode.Parse((await dispatcher.CallAsync("watch_prepare", edit)).GetRawText())!;
+            if ((string?)plan["review"]?["selector"]?["targetKind"] != "forceTable") throw new Exception("Force target is absent from the immutable review selector.");
+            string id = (string)plan["operation"]!["id"]!;
+            await dispatcher.CallAsync("watch_apply", new { operationId = id, reviewedPlanSha256 = (string)plan["operation"]!["planSha256"]! });
+            native.NewInstance(); await dispatcher.CallAsync("watch_verify_reopen", new { operationId = id });
+            await dispatcher.CallAsync("watch_recover", new { operationId = id });
+            native.NewInstance(); await dispatcher.CallAsync("watch_reconcile_recovery", new { operationId = id, role = "restored" });
+            native.SelectOriginal(); var final = JsonNode.Parse((await dispatcher.CallAsync("watch_reconcile_recovery", new { operationId = id, role = "original" })).GetRawText())!;
+            if ((string)final["operation"]!["state"]! != "reconciled" || native.ApplyCount != 1 || native.RestoreCount != 1) throw new Exception("Force edit did not reconcile exactly once.");
+            passed++;
+        }
+        foreach (var (code, bytes, edit, selected) in new (string, byte[], JsonObject, bool)[] {
+            ("ForceSelectionRefused", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceValue", ["value"] = "TRUE" }, true),
+            ("InvalidDataException", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceIntention", ["value"] = "true" }, false),
+            ("InvalidDataException", force.ToBytes(), new() { ["modifyValue"] = "TRUE" }, false),
+            ("InvalidRequest", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceValue", ["value"] = "TRUE", ["targetKind"] = "watchTableGroup" }, false),
+            ("IdentityMismatch", genuine, new() { ["editKind"] = "field", ["field"] = "ModifyValue", ["value"] = "TRUE" }, false) })
+        {
+            string root = Path.Combine(Path.GetTempPath(), "force-refusal-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+            var native = new ProductionRecoveryChecks.FakeWatch(root, bytes);
+            if (selected) native.TransformSnapshot = snapshot => { snapshot["target"]!["rows"]![0]!["forceIntention"] = true; return snapshot; };
+            edit["tableName"] = "Force table"; edit["ordinal"] = 0; edit["idempotencyKey"] = "force-refusal"; edit["targetKind"] ??= "forceTable";
+            try { await new WatchTableDispatcher(native, root, allowUnqualifiedDocumentEdits: true).CallAsync("watch_prepare", edit); throw new Exception("Unsafe force edit was accepted: " + code); }
+            catch (Exception e) when (e is BridgeException b ? b.Code == code : e.GetType().Name == code) { passed++; }
+            if (native.ApplyCount != 0 || native.CheckpointCount != 0 || Directory.GetFiles(root, "reviewed.xml", SearchOption.AllDirectories).Length != 0)
+                throw new Exception("Refused force edit published a review or reached native effects.");
+        }
         foreach (var (field, value, edit) in new[] {
             ("DisplayFormat", "Bool", new JsonObject { ["modifyValue"] = "TRUE" }),
             ("Culture", "de-DE", new JsonObject { ["editKind"] = "comment", ["culture"] = "de-DE", ["text"] = "changed" }) })
