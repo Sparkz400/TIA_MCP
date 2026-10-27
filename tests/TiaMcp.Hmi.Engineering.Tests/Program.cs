@@ -111,6 +111,16 @@ Check("Tag-table preservation delta admits only the changed table's export files
     Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, emptied, prefix));
     Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, "/hmi/tagTables/Default"));
 });
+Check("Tag creation admits only the created tag's own typed-readback subtree", () => {
+    const string prefix = "/hmi/tagTables/Default/export/", created = "/hmi/tagTables/Default/tags/Linked";
+    var before = new Dictionary<string, string> { [prefix + "Tags.xml"] = "1", ["/hmi/tagTables/Default"] = "2", ["/hmi/tagTables/Default/tags/Old"] = "3" };
+    var after = new Dictionary<string, string>(before) { [prefix + "Tags.xml"] = "4", [created] = "5", [created + "/thresholds/High"] = "6" };
+    HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix, created);
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, new Dictionary<string, string>(after) { ["/hmi/tagTables/Default"] = "7" }, prefix, created));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, new Dictionary<string, string>(after) { [created + "Suffix"] = "8" }, prefix, created));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix, "/hmi/tagTables/Default/tags/Old"));
+});
 Check("Classic scalar patch selects export-local owner, preserving duplicate member names", () => {
     var before = HmiPreservationRules.ReadXml(xml);
     var expected = HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "0", "BackColor", "204, 204, 204", "128, 128, 128");

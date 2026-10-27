@@ -138,13 +138,16 @@ namespace TiaMcp.Model
 
         // A tag-table export directory has no qualified per-file layout: every file under the
         // created tag's table export may change or appear; any other artifact must stay identical.
-        internal static void RequireUnrelatedPreservedOutside(IDictionary<string, string> before, IDictionary<string, string> after, string exportPrefix)
+        // The created object's own typed-readback subtree may appear, but never pre-exist.
+        internal static void RequireUnrelatedPreservedOutside(IDictionary<string, string> before, IDictionary<string, string> after, string exportPrefix, string createdObjectPath = "")
         {
             if (string.IsNullOrEmpty(exportPrefix) || !exportPrefix.EndsWith("/export/", StringComparison.Ordinal))
                 throw new ArgumentException("The prepared preservation delta is contradictory.");
             Func<string, bool> inside = path => path.StartsWith(exportPrefix, StringComparison.Ordinal);
+            Func<string, bool> created = path => !string.IsNullOrEmpty(createdObjectPath) && (path == createdObjectPath || path.StartsWith(createdObjectPath + "/", StringComparison.Ordinal));
             if (!after.Keys.Any(inside)) throw new ArgumentException("PreservationMismatch: the changed tag table no longer exports any native artifact.");
-            RequireUnrelatedPreserved(before, after, before.Keys.Where(inside), after.Keys.Where(k => inside(k) && !before.ContainsKey(k)));
+            if (before.Keys.Any(created)) throw new ArgumentException("The prepared preservation delta is contradictory.");
+            RequireUnrelatedPreserved(before, after, before.Keys.Where(inside), after.Keys.Where(k => (inside(k) || created(k)) && !before.ContainsKey(k)));
         }
     }
 }

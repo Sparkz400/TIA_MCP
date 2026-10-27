@@ -64,6 +64,7 @@ namespace TiaMcp.Openness.V21
             var artifacts = new JObject();
             var missing = new JArray();
             var capturedTargets = new JArray();
+            var typed = new JObject();
             JObject nativeFailure = null;
             try
             {
@@ -75,8 +76,10 @@ namespace TiaMcp.Openness.V21
                     string targetDirectory = Path.Combine(directory, "target-" + capturedTargets.Count);
                     Directory.CreateDirectory(targetDirectory);
                     if (current.Family == "classic") CaptureClassicEngineeringScope(current, targetDirectory, artifacts, missing);
-                    else CaptureUnifiedEngineeringScope(current, targetDirectory, artifacts, missing);
+                    else CaptureUnifiedEngineeringScope(current, targetDirectory, artifacts, missing, typed);
                 }
+                // Typed node hashes join after all exports so they never count against the 200-file export bound.
+                foreach (var node in typed.Properties()) artifacts.Add(node.Name, node.Value);
             }
             catch (Exception ex)
             {
@@ -86,7 +89,7 @@ namespace TiaMcp.Openness.V21
             }
             var manifest = new JObject { ["schemaVersion"] = 1, ["policyVersion"] = HmiPreservationRules.PolicyVersion,
                 ["family"] = target.Family, ["hmiPath"] = target.Path, ["projectPath"] = project.Path.FullName,
-                ["targets"] = capturedTargets, ["scope"] = "all discovered project HMI targets; complete public export surface per family, subject to explicit missing coverage",
+                ["targets"] = capturedTargets, ["scope"] = "all discovered project HMI targets; complete public export surface per family plus Unified typed object-model readback per node (target-N/typed-model.json), subject to explicit missing coverage",
                 ["complete"] = missing.Count == 0, ["artifacts"] = artifacts, ["missingCoverage"] = missing,
                 ["contentHash"] = null, ["nativeFailure"] = nativeFailure, ["status"] = nativeFailure != null ? "failed" : missing.Count == 0 ? "complete" : "incomplete",
                 ["capturedAtUtc"] = DateTime.UtcNow.ToString("O") };
@@ -155,7 +158,7 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void CaptureUnifiedEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing)
+        private static void CaptureUnifiedEngineeringScope(HmiTargetSelection target, string directory, JObject artifacts, JArray missing, JObject typed)
         {
             var hmi = (Siemens.Engineering.HmiUnified.HmiSoftware)target.Software;
             int count = 0;
@@ -169,7 +172,21 @@ namespace TiaMcp.Openness.V21
                     AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + path.Substring(exported.Length + 1).Replace('\\', '/'), path, artifacts);
             }
             missing.Add("Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.");
-            missing.Add("The V21 Unified screen API has no documented native Screen.Export; complete preservation readback for screen children, events, dynamics, translations, resources and unknown payloads is unavailable.");
+            // No Screen.Export exists in V21: compare typed readback of every exposed node instead, keyed by its hmi_inspect path.
+            var walk = new HmiModelWalk(new ScanBudget(Math.Max(0, 45000 - typed.Count)));
+            walk.Capture(hmi, target.Path, HmiModelRoots);
+            if (walk.Budget.Truncated) throw new BridgeException("TraversalLimit", "Unified typed preservation readback exceeds 45000 model nodes or 32 composition levels; no truncated scope authorizes mutation.");
+            string model = Path.Combine(directory, "typed-model.json");
+            File.WriteAllText(model, new JArray(walk.Nodes.Select(n => n.Row)).ToString(Formatting.None));
+            if (new FileInfo(model).Length > 64L * 1024 * 1024) throw new BridgeException("TraversalLimit", "Unified typed preservation readback exceeds 64 MiB; no truncated scope authorizes mutation.");
+            foreach (var node in walk.Nodes)
+            {
+                string path = node.Row.Value<string>("path");
+                if (typed[path] != null || artifacts[path] != null) throw new BridgeException("AmbiguousTarget", "Duplicate exact HMI typed-readback identity: " + path);
+                typed[path] = new JObject { ["sha256"] = HmiPreservationRules.Hash(node.Row.ToString(Formatting.None)), ["source"] = "typedReadback" };
+            }
+            if (walk.ErrorCount > 0) missing.Add(walk.ErrorCount + " Unified typed attribute read(s) failed; their readError markers are compared, their values are not. See typed-model.json.");
+            missing.Add("Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.");
         }
 
         private static void CaptureHmiArtifact(string directory, string identity, JObject artifacts, Action<FileInfo> exporter)
@@ -439,9 +456,16 @@ namespace TiaMcp.Openness.V21
             string operation = change.Payload.Value<string>("operation");
             try
             {
-                // Tag creation changes the table's export files, keyed below its objectPath.
-                if (operation == "tag_create" || operation == "external_tag_create") HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/");
-                else HmiPreservationRules.RequireUnrelatedPreserved(beforeHashes, afterHashes, new[] { changed }, Array.Empty<string>());
+                // Tag creation changes the table's export files and adds the created tag's typed nodes, both keyed below its objectPath.
+                if (operation == "tag_create" || operation == "external_tag_create")
+                    HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/", changed + "/tags/" + Segment(change.Payload.Value<string>("name")));
+                else
+                {
+                    // Bindings write the container's typed faceplate interface entries.
+                    var paths = new List<string> { changed };
+                    if (change.Payload["bindings"] is JArray bindings) paths.AddRange(bindings.Select(b => changed + "/interface/" + Segment(b.Value<string>("property"))).Where(beforeHashes.ContainsKey));
+                    HmiPreservationRules.RequireUnrelatedPreserved(beforeHashes, afterHashes, paths, Array.Empty<string>());
+                }
             }
             catch (ArgumentException error) { throw new BridgeException("PreservationMismatch", error.Message, after); }
             change.HmiEvidence["after"] = after;

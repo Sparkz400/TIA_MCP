@@ -24,7 +24,13 @@ Classic capture exports every exposed screen, template, popup, slide-in, global 
 
 Raw SHA-256 is retained for every export. The sole current Classic content normalization changes `/Document/DocumentInfo/Created`, with its observed scalar timestamp shape, to a fixed export-time marker. Unchanged V21 Update 2 native exports before repeated read and fresh reopen established that this field is export metadata. No GUIDs, IDs, unknown nodes, events, bindings, translations, library version references, resource content, whitespace or product metadata are removed. Nested `Created` fields remain content. Pure negative tests enforce these boundaries. An unexpected native normalization fails preservation.
 
-Unified tag tables use documented native composition export. After `tag_create` or `external_tag_create`, only files under the target table's export may change or appear; every other artifact must be identical. Installed V21 metadata exposes no `HmiScreen.Export`; item/property readback is insufficient to certify all events, dynamics, translations, resources and unknown screen payloads. Those screen mutations therefore remain unavailable until a complete preserving readback mechanism and exact-profile native fixtures establish the required coverage.
+Unified tag tables use documented native composition export. Installed V21 metadata exposes no `HmiScreen.Export`. The Unified manifest therefore also records a SHA-256 for every node of the typed object-model walk that `hmi_inspect` `section=model` uses. The keys are the node's inspection path, and each target's `typed-model.json` is retained. The walk covers screens, items, dynamizations, events with hashed script code, parts, translations, tags, alarms, logs, audit trails, runtime settings, groups, lists and script modules. It is bounded to 45000 nodes and 64 MiB; a truncated walk fails the capture. The existing preservation rules decide what may differ:
+
+- `tag_create` and `external_tag_create`: only the target table's export files and the created tag's own node subtree.
+- Item property and placement operations: only the target item's node.
+- Binding operations: the target item and its bound `interface` entries.
+
+Every other node and export must be identical. Typed readback cannot observe payloads without a public getter, and failed getters are listed as missing coverage. The manifest therefore stays incomplete and these mutations remain unavailable until exact-profile native fixtures qualify the coverage. This readback is compiled against the V21 PublicAPI only and is not natively qualified.
 
 The Classic HmiTarget surface has no public alarm composition. Full resource and dependency coverage and operation-specific stable exports must still be established before claiming a complete affected preservation scope. An archive is a recovery artifact, not proof that all unrelated native content was compared.
 
