@@ -1,0 +1,12 @@
+FUNCTION_BLOCK "TiaMcpProtectedPlain"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Enable : Bool;
+END_VAR
+VAR_OUTPUT
+    Active : Bool;
+END_VAR
+BEGIN
+    #Active := NOT #Enable;
+END_FUNCTION_BLOCK

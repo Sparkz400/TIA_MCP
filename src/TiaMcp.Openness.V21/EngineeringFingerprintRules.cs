@@ -26,6 +26,16 @@ namespace TiaMcp.Openness.V21
             return new Content<T> { Mode = payload == null ? "metadataNoNativeProvider" : "nativeFingerprints", Payload = payload };
         }
 
+        // Openness cannot export a know-how protected block, so a protected in-work test instance is pinned by
+        // its native fingerprints instead (the project fingerprint already covers protected user blocks this way).
+        internal static Content<string> ReadInWorkBlockContent(bool knowHowProtected, Func<string> exportHash, Func<string> nativeFingerprints)
+        {
+            if (!knowHowProtected) return new Content<string> { Mode = "nativeExport", Payload = exportHash() };
+            string fingerprints = nativeFingerprints();
+            if (fingerprints == null) throw new BridgeException("LibraryContentFingerprintUnavailable", "A know-how protected in-work test instance exposes no native fingerprint provider, and Openness cannot export protected content.");
+            return new Content<string> { Mode = "protectedNativeFingerprints", Payload = fingerprints };
+        }
+
         internal sealed class Content<T> where T : class
         {
             internal string Mode;
