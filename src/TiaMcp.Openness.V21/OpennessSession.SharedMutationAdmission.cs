@@ -236,6 +236,9 @@ namespace TiaMcp.Openness.V21
                             SimulationDiscoveryObserver.VerifyDestination(observer);
                             absent("project", "discoveryObserverProject", observer);
                         }
+                        // VCI kinds also create, write or remove files below the workspace root.
+                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("vci_", StringComparison.Ordinal))
+                            add("workspace", change.Preview["vci"].Value<string>("rootPath"), "vciWorkspaceFiles");
                         if (operation == "change_restore")
                         {
                             if (ChangeFileHash(change.ArchivePath) != change.ArchiveHash) throw new BridgeException("CheckpointInvalid", "Recovery archive changed.");
