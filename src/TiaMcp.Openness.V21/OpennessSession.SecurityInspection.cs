@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
@@ -254,33 +256,75 @@ namespace TiaMcp.Openness.V21
                 ["validUntil"] = SecurityValue(() => certificate.ValidUntil), ["hasPrivateKey"] = SecurityValue(() => certificate.HasPrivateKey), ["privateKeyReturned"] = false };
             try
             {
-                Directory.CreateDirectory(directory);
-                var file = new FileInfo(Path.Combine(directory, Guid.NewGuid().ToString("N") + ".cer"));
-                try
-                {
-                    certificate.Export(file);
-                    file.Refresh();
-                    // public_certificate_review accepts at most 64 KiB DER; anything but one public certificate is discarded unread.
-                    if (!file.Exists || file.Length > 64 * 1024) throw new InvalidDataException();
-                    byte[] bytes = File.ReadAllBytes(file.FullName);
-                    if (X509Certificate2.GetCertContentType(bytes) != X509ContentType.Cert) throw new InvalidDataException();
-                    using (var parsed = new X509Certificate2(bytes))
-                    using (var sha = SHA256.Create())
-                    {
-                        if (parsed.HasPrivateKey) throw new InvalidDataException();
-                        byte[] der = parsed.RawData;
-                        row["subject"] = parsed.Subject; row["issuer"] = parsed.Issuer; row["serialNumber"] = parsed.SerialNumber; row["thumbprintSha1"] = parsed.Thumbprint;
-                        row["sha256"] = BitConverter.ToString(sha.ComputeHash(der)).Replace("-", "").ToLowerInvariant();
-                        row["notBeforeUtc"] = parsed.NotBefore.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
-                        row["notAfterUtc"] = parsed.NotAfter.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
-                        observation["format"] = "der"; observation["contentBase64"] = Convert.ToBase64String(der);
-                    }
-                }
-                finally { file.Refresh(); if (file.Exists) file.Delete(); }
+                byte[] der = ExportPublicDer(certificate, directory);
+                row.Merge(PublicIdentity(der));
+                observation["format"] = "der"; observation["contentBase64"] = Convert.ToBase64String(der);
             }
             catch (Exception) { observation["unavailableReason"] = "Native export was unavailable or did not yield exactly one public certificate."; }
             row["observation"] = observation;
             return row;
+        }
+
+        // Native export is accepted only as exactly one certificate without a private key; the file is deleted in every case.
+        private static byte[] ExportPublicDer(Certificate certificate, string directory)
+        {
+            Directory.CreateDirectory(directory);
+            var file = new FileInfo(Path.Combine(directory, Guid.NewGuid().ToString("N") + ".cer"));
+            try
+            {
+                certificate.Export(file);
+                file.Refresh();
+                // public_certificate_review accepts at most 64 KiB DER; anything but one public certificate is discarded unread.
+                if (!file.Exists || file.Length > 64 * 1024) throw new InvalidDataException();
+                byte[] bytes = File.ReadAllBytes(file.FullName);
+                if (X509Certificate2.GetCertContentType(bytes) != X509ContentType.Cert) throw new InvalidDataException();
+                using (var parsed = new X509Certificate2(bytes)) { if (parsed.HasPrivateKey) throw new InvalidDataException(); return parsed.RawData; }
+            }
+            finally { file.Refresh(); if (file.Exists) file.Delete(); }
+        }
+
+        private static JObject PublicIdentity(byte[] der)
+        {
+            using (var parsed = new X509Certificate2(der))
+            using (var sha = SHA256.Create())
+                return new JObject { ["subject"] = parsed.Subject, ["issuer"] = parsed.Issuer, ["serialNumber"] = parsed.SerialNumber, ["thumbprintSha1"] = parsed.Thumbprint,
+                    ["sha256"] = BitConverter.ToString(sha.ComputeHash(der)).Replace("-", "").ToLowerInvariant(),
+                    ["notBeforeUtc"] = parsed.NotBefore.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
+                    ["notAfterUtc"] = parsed.NotAfter.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
+                    ["subjectAlternativeNames"] = SubjectAlternativeNames(parsed) };
+        }
+
+        // rfc822Name, dNSName, URI and iPAddress entries of the SAN extension (net48 has no SAN decoder); other forms are opaque, malformed content is null.
+        private static JArray SubjectAlternativeNames(X509Certificate2 certificate)
+        {
+            var names = new JArray();
+            var extension = certificate.Extensions["2.5.29.17"];
+            if (extension == null) return names;
+            try
+            {
+                byte[] data = extension.RawData; int offset = 1;
+                if (data[0] != 0x30 || DerLength(data, ref offset) != data.Length - offset) return null;
+                while (offset < data.Length)
+                {
+                    byte tag = data[offset++]; int length = DerLength(data, ref offset);
+                    if (length > data.Length - offset) return null;
+                    byte[] value = new byte[length]; Array.Copy(data, offset, value, 0, length); offset += length;
+                    string type = tag == 0x81 ? "Email" : tag == 0x82 ? "Dns" : tag == 0x86 ? "Uri" : tag == 0x87 ? "IP" : null;
+                    names.Add(new JObject { ["type"] = type ?? "opaque", ["value"] = type == "IP" ? new IPAddress(value).ToString() : type == null ? null : Encoding.ASCII.GetString(value) });
+                }
+                return names;
+            }
+            catch (Exception) { return null; }
+        }
+
+        private static int DerLength(byte[] data, ref int offset)
+        {
+            int length = data[offset++];
+            if (length < 0x80) return length;
+            int count = length & 0x7f;
+            if (count < 1 || count > 3) throw new InvalidDataException();
+            for (length = 0; count > 0; count--) length = length << 8 | data[offset++];
+            return length;
         }
 
         private static JObject AccessEntity(string id, string kind, bool? enabled, IEnumerable<(string Id, string Scope)> rights, bool rightsComplete, IEnumerable<string> inherits, bool assignmentsComplete)

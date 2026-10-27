@@ -2767,6 +2767,34 @@
       ]
     },
     {
+      "featureId": "change.certificate_create",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_import",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_assign",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_delete",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
       "featureId": "web_inspect",
       "obligations": [
         "D12"

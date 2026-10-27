@@ -18409,6 +18409,209 @@
       ]
     },
     {
+      "featureId": "change.certificate_create",
+      "domain": "public-certificates",
+      "title": "Create a device certificate in a CPU local certificate store from a usage template",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Security.LocalCertificateManager (DeviceItem service): LocalCertificateStore, EnableGlobalCertificatesStore; LocalCertificateStore.GetCertificateTemplate(CertificateUsage) and Certificates.Create(CertificateTemplate).",
+          "V21 CertificateTemplate SubjectCommonName/ValidFrom/ValidUntil setters, SubjectAlternativeNames.Create(SubjectAlternativeNameType, string) and SubjectAlternativeName.Delete(); Certificate Id/SubjectCommonName/HasPrivateKey/Export(FileInfo) for readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: hardwarePath (CPU), usage (Tls, OpcUaClient, OpcUaClientServer, OpcUaServer or WebServer), subjectCommonName (max 64), subjectAlternativeNames [{type: Dns|Email|Uri|IP, value}] that replace the template defaults, validFromUtc and validUntilUtc. The signature algorithm stays the template default.",
+          "V21 exposes no issuer or CA selection: TIA decides between self-signed and CA-signed; the readback reports the actual issuer. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Readback requires a public export of the new certificate with exactly the requested subject, UTC validity and alternative names. How TIA interprets template times and whether it adds names is unverified; a mismatch fails after the write and needs checkpoint recovery.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_import",
+      "domain": "public-certificates",
+      "title": "Import one public certificate into a CPU local certificate store",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 LocalCertificateStore.Certificates.Import(FileInfo); the Import(FileInfo, SecureString) password overload is never called. Certificate Id/HasPrivateKey/Export(FileInfo) for readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: hardwarePath, uploadRef (committed artifact upload) and format der or pem. The Host turns the upload into exact public DER (PublicCertificateReview.PublicDer): exactly one certificate; PKCS#12/PFX, PKCS#7, private or encrypted keys, surplus data and any other payload field, including a password, refuse. Generic uploads retain their bytes before this check.",
+          "The worker re-checks the DER, imports a hash-pinned change artifact and verifies exactly one new certificate without a private key whose exported public DER has the reviewed SHA-256.",
+          "Importing does not establish trust, usage or assignment. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_assign",
+      "domain": "public-certificates",
+      "title": "Assign or unassign a local certificate through a native certificate attribute",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_assign",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/GetAttribute/SetAttribute on the target DeviceItem with a Siemens.Engineering.Security.Certificate from LocalCertificateStore.Certificates. The assignment attribute is dynamic and not named in the V21 PublicAPI metadata; it is discovered at runtime (name ending in Certificate, native ReadWrite, value null or Certificate)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: hardwarePath (store owner CPU), targetPath (that CPU or one of its subitems), attributeName, certificateId (null unassigns) and expectedCertificateId (the current Id or null). Drift from the expected current assignment refuses at prepare and apply; readback compares the attribute's certificate Id.",
+          "Web server and OPC UA server assignments are separate attributes. Their exact V21 names, whether null unassigns, and per-service usage, key and SAN suitability are unverified. HW.CertificateSupportedService (runtime certificate management) is not used as an assignment route. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_delete",
+      "domain": "public-certificates",
+      "title": "Delete an unreferenced certificate from a CPU local certificate store",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Certificate.Delete() on LocalCertificateStore.Certificates. References are read through DeviceItem GetAttributeInfos/GetAttribute, HW.Features.CertificateManagementConfiguration.CertificateSupportedServices (Id) and PlcAccessControlConfigurationProvider.UmcTrustedCertificateIds."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: hardwarePath and certificateId. Refused when a certificate-named attribute on the owning device holds the certificate, a runtime-managed supported service or UMC trusted id names its Id, or any such reference cannot be read (fail closed).",
+          "Program, connection-DB and online references to the certificate Id are not scanned, and the device compile does not prove their absence. A deleted key pair is recoverable only through the project checkpoint. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "web_inspect",
       "domain": "web-applications",
       "title": "Read native CPU web server and web application configuration",

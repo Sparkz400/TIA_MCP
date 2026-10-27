@@ -78,6 +78,7 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_engineering") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
+                if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
@@ -731,6 +732,12 @@ namespace TiaMcp.Openness.V21
                         ["operation"] = payload["operation"].DeepClone(), ["telegramType"] = payload["telegramType"].DeepClone(), ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("The telegram change moves PLC-side I/O addresses. Apply reads back every telegram row of the drive object and reports the address shift; a collateral telegram change or an address overlap fails after the write and requires checkpoint recovery. Technology-object connections, PLC tags and program references to the telegram are not rebound; the mandatory device compile validates the configuration. Offline project only: no download.");
                     break;
+                case "certificate_create":
+                case "certificate_import":
+                case "certificate_assign":
+                case "certificate_delete":
+                    PrepareCertificateChange(change, project, preview);
+                    break;
                 default: throw new BridgeException("UnsupportedChange", "Unknown or unsupported change kind: " + change.Kind);
             }
             PrepareHardwarePreservation(change, project, preview);
@@ -1014,6 +1021,12 @@ namespace TiaMcp.Openness.V21
                 case "vci_synchronize":
                     ApplyVciChange(change, project);
                     break;
+                case "certificate_create":
+                case "certificate_import":
+                case "certificate_assign":
+                case "certificate_delete":
+                    ApplyCertificateChange(change, project);
+                    break;
             }
         }
 
@@ -1047,7 +1060,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || PlcAlarmProjectKinds.Contains(change.Kind))
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal))
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1214,6 +1227,7 @@ namespace TiaMcp.Openness.V21
             if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
+            if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();
