@@ -347,8 +347,8 @@
     },
     {
       "path": "contracts/library-component-preview.v1.schema.json",
-      "sha256": "dfc82b8e29f38b173fa93537b62c3947b0ece1d00b205e9fcbbcea52d7ad1873",
-      "bytes": 29945
+      "sha256": "d3130f51b51629e75bb010f1b0d9f0f1bacd202551d6a42726818a38927dcb7a",
+      "bytes": 31054
     },
     {
       "path": "contracts/library-export-manifest.v1.schema.json",
