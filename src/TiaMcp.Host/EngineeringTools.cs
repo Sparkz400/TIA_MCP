@@ -130,5 +130,10 @@ public sealed partial class TiaTools
     [Description("Inspect exposed offline safety administration, runtime groups and signatures. Optional block selector requests a per-block signature. Does not unlock, accept or change a safety program.")]
     public Task<CallToolResult> SafetyInspect(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? blockName = null, string? blockPath = null, int maxItems = 500, string? scopePath = null)
         => Call("safety_inspect", new { projectName, plcPath, blockName, blockPath, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "vci_workspace_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state and supported file formats. Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, export or synchronization.")]
+    public Task<CallToolResult> VciWorkspaceInspect(CancellationToken cancellationToken, string? projectName = null, int maxItems = 500)
+        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
     private static JsonElement ObjectArguments(JsonElement value) => value.ValueKind == JsonValueKind.Object ? value : throw new McpException("An object is required.");
 }

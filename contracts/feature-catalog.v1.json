@@ -14226,6 +14226,49 @@
       ]
     },
     {
+      "featureId": "vci_workspace_inspect",
+      "domain": "version_control",
+      "title": "Inspect native VCI workspaces and mappings",
+      "mcpTools": [
+        "vci_workspace_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.VersionControl: Project.GetService<VersionControlInterface>().WorkspaceGroup, WorkspaceSystemGroup/WorkspaceUserGroup.Name, WorkspaceGroup.Workspaces/Groups, Workspace.Name/RootPath/WorkspaceLanguage/GlobalLibraryPath/DeleteUnusedTypeVersionFromLibrary/MappedObjects/GetSupportedFileFormats(IEngineeringObject), MappedObject.EngineeringObject/DirectoryPath/FileNameWithoutExtension/FileFormat/GetStatus()/GetChildStatus()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Read-only bounded traversal (maxItems shared by groups, workspaces, mapped objects and supported formats; group depth 32) with explicit truncation and per-workspace/per-mapping warnings.",
+          "Mapped-object identity is the native ancestor type/Name/Number chain, not a stable GUID. CompareState, IndividualObjectCompareDetails and child MappingState are native observations, not preservation, import or synchronization qualification.",
+          "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation, mapping edits and synchronization are not implemented.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an attached V21 instance with an open project exposing the VCI service."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project; VCI workspaces configured in TIA Portal"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "project_snapshot_import",
       "domain": "inspection",
       "title": "Import a supplied saved project review",
