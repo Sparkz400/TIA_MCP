@@ -223,7 +223,10 @@ controller was modified.
   at depth 1 and 2, in parent FBs and their DBs, gains the member in the direct DB shape without its top-level
   attributes) and the worker follows it; all 14 created multi-instance cells with a two-level parent chain pass the
   four engineering gates (`local.typed.transitive-effects.20261026`). Software-unit/namespace transitive parents
-  and custom-start/structured shapes still have no captured effect and stay rejected.
+  in the caller's namespace are captured the same way (`local.typed.route-transitive-capture.20261027`: the
+  rule holds with namespace-qualified type names) and all 28 route cells pass the four engineering gates
+  (`local.typed.route-transitive-effects.20261027`). Parents in another namespace or unit and
+  custom-start/structured shapes still have no captured effect and stay rejected.
 
 ### 3. Complete runtime assertions separately
 
