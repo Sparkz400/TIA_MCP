@@ -48,12 +48,31 @@ namespace TiaMcp.Openness.V21
                 (_translationQualification ? !WatchOwnsScratch(project) : TranslationInstalledEntry(args.Value<string>("projectPath")) == null) ||
                 project.Path.FullName != args.Value<string>("projectPath") || (saved && project.IsModified))
                 throw new BridgeException("ProjectIsolationRequired", "Exact saved worker-owned translation fixture required.");
-            EnsureProjectOffline(project);
+            EnsureProjectOffline(project); if (!_translationQualification) TranslationProductionScope(args, null);
             var budget = new ScanBudget(10000);
-            var software = DeviceItems(project, budget).Select(x => x.Item.GetService<SoftwareContainer>()?.Software).Where(x => x != null).ToArray();
-            if (budget.Truncated || software.Length != 1 || !(software[0] is PlcSoftware))
-                throw new BridgeException("TranslationScopeUnqualified", "Only the complete one-PLC fixture is admitted.");
+            var owners = DeviceItems(project, budget).Select(x => new { x.Path, Software = x.Item.GetService<SoftwareContainer>()?.Software }).Where(x => x.Software != null)
+                .Select(x => x.Software is PlcSoftware ? x.Path + "/plc/" + Segment(x.Software.Name) : null).OrderBy(x => x, StringComparer.Ordinal).ToArray();
+            // Whole-project import reaches every owner, so all must be named; only PLC compile and peers are covered.
+            if (budget.Truncated || !owners.SequenceEqual(TranslationOwners(args).OrderBy(x => x, StringComparer.Ordinal)))
+                throw new BridgeException("TranslationScopeUnqualified", "Every software owner must be an explicitly named PLC (plcPaths); HMI and other owners are not admitted.");
             return project;
+        }
+        private static string[] TranslationOwners(JObject args)
+        {
+            string plc = args.Value<string>("plcPath");
+            var owners = (args["plcPaths"] as JArray)?.Select(x => x.Type == JTokenType.String ? x.Value<string>() : null).ToArray() ?? new[] { plc };
+            if (owners.Length == 0 || owners.Length > 32 || owners.Any(string.IsNullOrWhiteSpace) || owners.Distinct(StringComparer.Ordinal).Count() != owners.Length || plc != null && !owners.Contains(plc))
+                throw new BridgeException("TranslationScopeUnqualified", "One to 32 distinct exact PLC owner paths, including plcPath, are required.");
+            return owners;
+        }
+        private static string[] TranslationCultures(JObject args) =>
+            new[] { args.Value<string>("sourceCulture") ?? "de-DE", args.Value<string>("targetCulture") ?? "en-GB" };
+        // The installed admission contract is whole-project de-DE/en-GB, one PLC, target-only; generalized selectors stay qualification-only.
+        private static void TranslationProductionScope(JObject selector, JObject context)
+        {
+            if (TranslationOwners(selector).Length != 1 || !TranslationCultures(selector).SequenceEqual(new[] { "de-DE", "en-GB" }) ||
+                context?.Value<bool?>("updateSourceLanguage") == true)
+                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB and target-only import.");
         }
         private JObject TranslationFixture(JObject args)
         {
@@ -114,31 +133,37 @@ namespace TiaMcp.Openness.V21
         {
             EnsureProjectOffline(project);
             string directory = TranslationDirectory(args, "observe");
-            var settings = project.LanguageSettings;
+            var settings = project.LanguageSettings; var pair = TranslationCultures(args);
             var cultures = settings.ActiveLanguages.Select(x => x.Culture.Name).OrderBy(x => x, StringComparer.Ordinal).ToArray();
-            if (!cultures.SequenceEqual(new[] { "de-DE", "en-GB" }) || settings.ReferenceLanguage.Culture.Name != "de-DE")
-                throw new BridgeException("TranslationScopeUnqualified", "Exactly de-DE/en-GB active languages required.");
+            // A bilingual export cannot observe a third language, so exactly the pair must be active.
+            if (pair[0] == pair[1] || !cultures.SequenceEqual(pair.OrderBy(x => x, StringComparer.Ordinal)) || settings.ReferenceLanguage.Culture.Name != pair[0])
+                throw new BridgeException("TranslationScopeUnqualified", "Exactly the source/target pair must be active, with the source as reference language.");
             string workbook = Path.Combine(directory, "all.xlsx");
-            // This initial profile is explicitly whole-project. Restricted overloads are never substituted.
-            project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo("de-DE"), CultureInfo.GetCultureInfo("en-GB"));
-            var selector = (JObject)args.DeepClone(); selector["projectPath"] = project.Path.FullName;
-            selector["artifactDirectory"] = directory; selector["tableName"] = "__translation_absent_control__";
-            selector["group"] = "root"; selector["allowAbsent"] = true;
-            var snapshot = WatchSnapshot(selector);
-            string snapshotPath = snapshot["receipt"].Value<string>("path");
-            var peers = new JArray();
-            foreach (string path in Directory.GetFiles(Path.GetDirectoryName(snapshotPath), "*.xml").OrderBy(x => Path.GetFileName(x), StringComparer.Ordinal))
-                peers.Add(new JObject { ["identity"] = Path.GetFileName(path), ["profile"] = "tia21-simaticml-translation-v1", ["artifact"] = FileArtifact(new FileInfo(path)) });
-            var manifest = (JObject)snapshot["peers"].DeepClone();
-            foreach (var property in manifest.Properties().Where(x => x.Name.StartsWith("block:") || x.Name.StartsWith("type:") || x.Name.StartsWith("tags:")).ToArray()) property.Remove();
-            string manifestPath = Path.Combine(directory, "native-inventory.json"); TranslationWrite(manifestPath, manifest);
-            peers.Add(new JObject { ["identity"] = "native-inventory", ["profile"] = "exact", ["artifact"] = FileArtifact(new FileInfo(manifestPath)) });
+            // This profile is explicitly whole-project. Restricted overloads are never substituted.
+            project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo(pair[0]), CultureInfo.GetCultureInfo(pair[1]));
+            var owners = TranslationOwners(args);
+            var peers = new JArray(); var receipts = new JArray(); JToken hardware = null;
+            for (int index = 0; index < owners.Length; index++)
+            {
+                var selector = (JObject)args.DeepClone(); selector["projectPath"] = project.Path.FullName; selector["plcPath"] = owners[index];
+                selector["artifactDirectory"] = directory; selector["tableName"] = "__translation_absent_control__";
+                selector["group"] = "root"; selector["allowAbsent"] = true;
+                var snapshot = WatchSnapshot(selector);
+                string snapshotPath = snapshot["receipt"].Value<string>("path"), prefix = owners.Length == 1 ? "" : owners[index] + "|";
+                foreach (string path in Directory.GetFiles(Path.GetDirectoryName(snapshotPath), "*.xml").OrderBy(x => Path.GetFileName(x), StringComparer.Ordinal))
+                    peers.Add(new JObject { ["identity"] = prefix + Path.GetFileName(path), ["profile"] = "tia21-simaticml-translation-v1", ["artifact"] = FileArtifact(new FileInfo(path)) });
+                var manifest = (JObject)snapshot["peers"].DeepClone();
+                foreach (var property in manifest.Properties().Where(x => x.Name.StartsWith("block:") || x.Name.StartsWith("type:") || x.Name.StartsWith("tags:")).ToArray()) property.Remove();
+                string manifestPath = Path.Combine(directory, owners.Length == 1 ? "native-inventory.json" : "native-inventory-" + index + ".json"); TranslationWrite(manifestPath, manifest);
+                peers.Add(new JObject { ["identity"] = prefix + "native-inventory", ["profile"] = "exact", ["artifact"] = FileArtifact(new FileInfo(manifestPath)) });
+                hardware = hardware ?? snapshot["observation"]["hardwareIdentity"].DeepClone(); receipts.Add(snapshot["receipt"].DeepClone());
+            }
             var result = new JObject { ["workbook"] = FileArtifact(new FileInfo(workbook)), ["peers"] = peers,
-                ["projectPath"] = project.Path.FullName, ["projectName"] = project.Name, ["plcPath"] = args["plcPath"],
+                ["projectPath"] = project.Path.FullName, ["projectName"] = project.Name, ["plcPath"] = args["plcPath"], ["plcPaths"] = new JArray(owners),
                 ["sessionEpoch"] = _translationEpoch, ["workerSha256"] = ChangeFileHash(typeof(OpennessSession).Assembly.Location),
-                ["hardwareIdentity"] = snapshot["observation"]["hardwareIdentity"].DeepClone(), ["offline"] = true,
+                ["hardwareIdentity"] = hardware, ["offline"] = true,
                 ["activeCultures"] = new JArray(cultures), ["categoryIds"] = new JArray(project.TextCategories.Select(x => x.Identifier).OrderBy(x => x, StringComparer.Ordinal)),
-                ["processId"] = _processId, ["modified"] = project.IsModified, ["nativeSnapshot"] = snapshot["receipt"].DeepClone() };
+                ["processId"] = _processId, ["modified"] = project.IsModified, ["nativeSnapshot"] = receipts.Count == 1 ? receipts[0] : receipts };
             TranslationWrite(Path.Combine(directory, "observation.json"), result); return result;
         }
         private JObject TranslationBegin(JObject args)
@@ -154,6 +179,7 @@ namespace TiaMcp.Openness.V21
                 if (entry.Value<string>("plcPath") != selector.Value<string>("plcPath") ||
                     op["plan"]["target"].Value<string>("adapterSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location))
                     throw new BridgeException("TranslationAdmissionMismatch", "Installed native selector or owning worker changed.");
+                TranslationProductionScope(selector, context);
             }
             if (op.Value<string>("state") == "acquired")
             {
@@ -232,11 +258,13 @@ namespace TiaMcp.Openness.V21
                     string candidate = payload.Value<string>("path");
                     if (ChangeFileHash(candidate) != _translationContext.Value<string>("candidateSha256")) throw new BridgeException("ArtifactChanged", "Candidate bytes differ.");
                     _translationImportAttempted = true;
+                    // Source-text mode comes only from the approved review bound into the operation context.
+                    bool updateSource = _translationContext.Value<bool?>("updateSourceLanguage") == true;
                     using (var held = new FileStream(candidate, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        var returned = _translationProject.ImportProjectTexts(new FileInfo(candidate), false);
+                        var returned = _translationProject.ImportProjectTexts(new FileInfo(candidate), updateSource);
                         var raw = new JObject { ["state"] = returned.State.ToString(), ["path"] = returned.Path.FullName,
-                            ["candidateSha256"] = ChangeFileHash(candidate), ["updateSourceLanguage"] = false, ["operationId"] = op["id"], ["planSha256"] = op["planSha256"] };
+                            ["candidateSha256"] = ChangeFileHash(candidate), ["updateSourceLanguage"] = updateSource, ["operationId"] = op["id"], ["planSha256"] = op["planSha256"] };
                         TranslationWrite(Path.Combine(directory, "native-return.json"), raw);
                         if (!File.Exists(returned.Path.FullName)) throw new BridgeException("TranslationLogMissing", "Native return retained; complete native log is absent.");
                         File.Copy(returned.Path.FullName, Path.Combine(directory, "complete-log"));
@@ -245,8 +273,10 @@ namespace TiaMcp.Openness.V21
                     }
                     break;
                 case "compile":
-                    var compiled = ChangeCompilation(SelectPlc(selector).Software.GetService<ICompilable>().Compile(), selector.Value<string>("plcPath"));
-                    value = new JObject { ["passed"] = CompilationEvidenceRules.IsSuccessfulTarget(compiled), ["compilation"] = compiled };
+                    var compilations = new JArray(TranslationOwners(selector).Select(path => {
+                        var owner = (JObject)selector.DeepClone(); owner["plcPath"] = path;
+                        return ChangeCompilation(SelectPlc(owner).Software.GetService<ICompilable>().Compile(), path); }));
+                    value = new JObject { ["passed"] = compilations.All(c => CompilationEvidenceRules.IsSuccessfulTarget((JObject)c)), ["compilations"] = compilations };
                     break;
                 case "save": _translationProject.Save(); value = new JObject { ["saved"] = true, ["modified"] = _translationProject.IsModified }; break;
                 case "reopen":

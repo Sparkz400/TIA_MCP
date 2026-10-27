@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.39",
+  "catalogVersion": "0.4.40",
   "targetTiaVersions": [
     21
   ],
@@ -10298,7 +10298,9 @@
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October PLC library-instance observation retains exact per-object FB/FC/PLC-type service identity with distinct no-service, unsupported and unavailable states. Linked GUID pairs are detached one-read observations; complete library/dependency coverage, export correspondence and runtime instance identity are not inferred. Synthetic-shape and Framework helper checks do not compile or qualify Siemens callers; the new native capture route still needs SDK and native acceptance. Historical evidence is unchanged.",
-          "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged."
+          "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged.",
+          "Unscoped captures add project-library nodes (type folders, types, versions, master-copy folders, master copies) from the library tools' metadata walk, bounded by 10000 entries and the remaining capture budget; truncation and unavailable elements are reported in `libraries` coverage. PLC-scoped captures omit the library. Global libraries, version dependencies and master-copy usage are not modeled. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "FB/FC/PLC-type library-instance GUID pairs become `libraryVersion` edges only on an exact type/version GUID match with a captured project-library version; missing or partially captured libraries leave them unresolved. Configured port interconnections (`connectedPort`, NetworkPort.ConnectedPorts) are read only for a selected port device item and are not verified cables or link state. Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
       "qualification": {
@@ -10350,7 +10352,8 @@
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October PLC library-instance observation retains exact per-object FB/FC/PLC-type service identity with distinct no-service, unsupported and unavailable states. Linked GUID pairs are detached one-read observations; complete library/dependency coverage, export correspondence and runtime instance identity are not inferred. Synthetic-shape and Framework helper checks do not compile or qualify Siemens callers; the new native capture route still needs SDK and native acceptance. Historical evidence is unchanged.",
-          "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged."
+          "Saved PLC library-instance observations now retain direct dependency version GUID lists from the same captured version. Observed empty lists remain distinct from unavailable observations. Each list is bounded to 1000 entries; a separate shared 20000 collection/iterator-read budget spans the capture and is exposed in limits, usage and partial provider coverage. Budget exhaustion publishes no partial list and does not discard the known owner GUID pair. Duplicate and self references remain original observations, not complete dependency closure or export/object association. Portable and actual Framework helper checks use synthetic Siemens shapes; native callers still require SDK compilation and qualification. Historical evidence is unchanged.",
+          "Unscoped captures add project-library nodes (type folders, types, versions, master-copy folders, master copies) from the library tools' metadata walk, bounded by 10000 entries and the remaining capture budget; truncation and unavailable elements are reported in `libraries` coverage. PLC-scoped captures omit the library. Global libraries, version dependencies and master-copy usage are not modeled. Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
       "qualification": {
@@ -10547,7 +10550,8 @@
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October HMI faceplate relationship-key repair retains observed type/version GUID text so distinct library observations do not deduplicate. GUID-bearing newly captured faceplate edges use stronger IDs; existing snapshots and non-library/no-GUID keys remain unchanged. Linked pure-helper checks use synthetic observations. Native collection, SDK compilation, export association and complete library/consumer identity remain unverified.",
-          "Retained relationship traversal reports explicit scope and depth/node/edge budgets with visible truncation. Independent saved-model fixtures qualify only their declared scope; native collection completeness and desktop host acceptance remain separate."
+          "Retained relationship traversal reports explicit scope and depth/node/edge budgets with visible truncation. Independent saved-model fixtures qualify only their declared scope; native collection completeness and desktop host acceptance remain separate.",
+          "FB/FC/PLC-type library-instance GUID pairs become `libraryVersion` edges only on an exact type/version GUID match with a captured project-library version; missing or partially captured libraries leave them unresolved. Configured port interconnections (`connectedPort`, NetworkPort.ConnectedPorts) are read only for a selected port device item and are not verified cables or link state. Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
       "qualification": {
@@ -14359,7 +14363,7 @@
     {
       "featureId": "qualification_translation_prepare",
       "domain": "qualification",
-      "title": "Qualification-session only: bind fresh capture to an explicit no-op or single target edit and exact durable review.",
+      "title": "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
       "mcpTools": [
         "qualification_translation_prepare"
       ],
@@ -14373,7 +14377,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Qualification-session only: bind fresh capture to an explicit no-op or single target edit and exact durable review.",
+          "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
         ]
       },
@@ -15192,7 +15196,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15238,7 +15243,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15284,7 +15290,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15330,7 +15337,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15376,7 +15384,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15422,7 +15431,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15447,6 +15457,51 @@
         "AC-preserve",
         "AC-native",
         "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_text_export",
+      "domain": "translations",
+      "title": "Read-only native project-text export with filtered-export leak check",
+      "mcpTools": [
+        "project_text_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase.ExportProjectTexts(FileInfo,CultureInfo,CultureInfo) for whole-project bilingual workbooks and ExportProjectTexts(FileInfo,Language,IEnumerable<Language>,IEnumerable<TextCategory>,IEnumerable<IEngineeringObject>) for explicit owners, several targets and categories; LanguageSettings.ActiveLanguages, ProjectBase.TextCategories and TextCategoryComposition.Find."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Whole-project mode uses the three-argument overload, one bilingual workbook per target culture. The five-argument overload refuses null or empty owner lists natively, so category filtering requires explicit owners.",
+          "Filtered exports are evidence only: earlier native probes showed category filtering leaking rows. The full all-category export of the same owners and targets always runs, and the Host reports leaked, dropped and changed rows by native key; see docs/reference/translation-native-import.md.",
+          "The multi-target workbook layout is unobserved. The Host reader expects one column per target between the source and ref=\"0\" headers and fails closed on any other layout; category rows are matched by the observed \"<Identifier>\" label form, and any other label makes the comparison unavailable.",
+          "Owner-mode exports omitted project-level texts such as alarm classes in earlier PLC probes; HMI owner coverage is unobserved. Never imports, saves or activates languages."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an open V21 project in the worker-owned TIA instance with the source and every target culture active."
+        ]
+      },
+      "prerequisites": [
+        "Open project in a worker-owned TIA instance",
+        "Active source and target cultures",
+        "Exact owner paths from project_inventory for owner or filtered mode"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
         "AC-evidence"
       ]
     },
@@ -19190,6 +19245,95 @@
       ]
     },
     {
+      "featureId": "composite_engineering_capture",
+      "domain": "hardware",
+      "title": "Produce a composite phase from native captures of one saved project",
+      "mcpTools": [
+        "composite_engineering_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Calls the existing read-only worker operations cax_export, connection_inspect, drive_observe and technology_read; no new Siemens API. Operations absent from the running worker are reported unavailable."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Each native capture is retained through its existing workflow (AutomationML document, connection-review-request.v1, drive-profile-review-request.v2, technology-profile-review-request.v1) as one observed state with identical before/after; the result is one composite phase plus per-capture native/unavailable/failed status and per-record refusals.",
+          "Technology objects come from the saved review; technology_read connection slots become hardware relationships whose target is the single resolved hardware or channel-owner reference, otherwise disconnected or unknown with a reason. CPU order number, firmware and encoder routes (technology v4) are not captured.",
+          "At most 32 component records per phase with explicit truncation; drive_observe is bounded by maxItems 2000 and reports parametersComplete false when paged. Captures are sequential, not an atomic project revision, and a response for a different project path refuses the whole capture.",
+          "Host logic tested offline against fake worker responses only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Needs an attached V21 project matching an exact saved reviewId in this artifact store; AML, connection and drive captures need workers that provide cax_export, connection_inspect and drive_observe (drives also need Startdrive)."
+        ]
+      },
+      "prerequisites": [
+        "Exact saved project review of the open project in the Host artifact store",
+        "Authorized TIA V21 Openness user; Startdrive for drive captures",
+        "Bounded writable artifact and upload storage"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-native"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "domain": "hardware",
+      "title": "Plan technology-object rebinds after a declared hardware replacement",
+      "mcpTools": [
+        "composite_engineering_rebind_plan"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Offline Host planning over a revalidated composite record; no native product or execution API is invoked."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
+          "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
+          "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
+          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact retained composite handle whose AML, saved review and component dependencies still revalidate."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host and bounded artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preview",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "runtime_handoff_observation",
       "domain": "security-access",
       "title": "Retain original public runtime handoff observations",
@@ -20887,6 +21031,584 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_text_list_import",
+      "domain": "engineering",
+      "title": "Import PLC alarm user text lists from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_text_list_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Alarm.PlcAlarmTextListProvider>() on PlcSoftware or PlcUnitBase; ImportFromXlsx(FileInfo, ImportOptions.None|Override) returning TextListXlsxResult (State, LogFilePath); ExportToXlsx(FileInfo) for preimage, readback and fingerprint (TextListNotFoundException = no lists); PlcAlarmTextlistGroup.PlcAlarmUserTextlists (Name, ID, ListRange) for name readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The supplied workbook is imported as hash-bound opaque bytes; its layout and list entries are not interpreted. expectedTextListNames must name every imported list: None refuses existing names at prepare, Override replaces each supplied list's complete entry set. Readback verifies list names; entries, ranges, comments and languages are covered only by the retained fresh export and its content hash.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Safety units, system text lists and the text-list library lifecycle (CreateFrom, delete, rename, master copies) are not covered.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256 and expectedTextListNames"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "domain": "engineering",
+      "title": "Import PLC alarm instance texts from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_instance_text_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Alarm.PlcAlarmTextProvider>() on PlcSoftware or PlcUnitBase; ImportInstanceTextsFromXlsx(FileInfo, languages: null) returning PlcAlarmTextXlsxResult (State, LogFilePath); ExportInstanceTextsToXlsx(FileInfo, null, PlcAlarmTextXlsxExportOption.All) for preimage, readback and fingerprint."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Updates texts of existing alarm instances in all workbook languages; instance creation and language activation are not part of this route. Workbook keys and inherited-text markers are not interpreted.",
+          "Readback is the native result/log and a fresh All-option export; individual alarm texts are not verified.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "domain": "engineering",
+      "title": "Import project alarm classes from a supplied DAT",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_alarm_class_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: Project.GetService<Siemens.Engineering.SW.Alarm.AlarmClassDataProvider>(); Import(FileInfo) and Export(FileInfo) returning AlarmClassExportImportResult (State, ErrorCount, WarningCount, Messages[State, Message])."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Project-wide opaque DAT: schema, class limits and active-language overlap are left to the native import. Every PLC/HMI consumer of the classes is affected; apply compiles every device in the project.",
+          "Readback is the native result, counts, first 500 messages and a fresh DAT export.",
+          "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "Supplied absolute .dat artifactPath with expectedSha256; no plcPath/scopePath owner"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "domain": "engineering",
+      "title": "Import project ProDiag supervision settings from a supplied DAT",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_supervision_settings_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: Project.GetService<Siemens.Engineering.SW.Supervision.SupervisionSettingsProvider>(); Import(FileInfo) and Export(FileInfo) returning SupervisionSettingsExportImportResult (State Success|ErrorRollback, ErrorCount, WarningCount, Messages[Message])."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Project-wide opaque ProDiag settings DAT. A missing provider, LicenseNotFoundException or MissingProductsException refuses at prepare with the native message. ErrorRollback fails apply; the rollback itself is not trusted and the checkpoint remains the recovery route.",
+          "Readback is the native result, counts, first 500 messages and a fresh DAT export; apply compiles every device in the project.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "ProDiag product/license where the native provider requires it",
+        "Supplied absolute .dat artifactPath with expectedSha256; no plcPath/scopePath owner"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "domain": "engineering",
+      "title": "Import ProDiag supervisions from a supplied XLSX",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "plc_supervision_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: GetService<Siemens.Engineering.SW.Supervision.SupervisionProvider>() on PlcSoftware or PlcUnitBase; ImportSupervisionsFromXlsx(FileInfo, ImportOptions.None|Override) returning SupervisionXlsxResult (State Success|Failure, LogFilePath); ExportSupervisionsToXlsx(FileInfo) for preimage, readback and fingerprint."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Global supervision workbook of one PLC or software unit; the per-ProDiag-FB provider and ImportSupervisionSettingsFromXlsx are not called. Workbook schema, supervision IDs and generated ProDiag objects are not interpreted. A missing provider or license/product error refuses at prepare with the native message.",
+          "Failure fails apply; readback is the native result/log and a fresh supervision export.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe the native provider and license independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project; compile=true and a verified recovery checkpoint",
+        "ProDiag product/license where the native provider requires it",
+        "Exact PLC or software-unit scope; safety units are excluded",
+        "Supplied absolute .xlsx artifactPath with expectedSha256"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_import",
+      "domain": "opc_ua",
+      "title": "Import one user-defined OPC UA server interface from a supplied file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.OpcUaProvider.CommunicationGroup.ServerInterfaceGroup.ServerInterfaces: ServerInterfaceComposition.Create(String), ServerInterface.Import(FileInfo), ServerInterface.Export(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName, mode create|replace, absolute non-linked path (<= 16 MiB) and expectedSha256; the file is copied into the change directory and hash-bound. No Host OPC UA store resolver for change payloads.",
+          "Replace exports the existing interface as a backup first. Readback exports the native interface and reports whether it equals the input bytes.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "domain": "opc_ua",
+      "title": "Delete one user-defined OPC UA server interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterfaceGroup.ServerInterfaces, ServerInterface.Export(FileInfo), ServerInterface.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName only. Exports a backup, deletes and verifies absence.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused. External OPC UA clients are not discovered.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "domain": "opc_ua",
+      "title": "Enable or disable one user-defined OPC UA server interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_enable",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterface.Enabled (get/set)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName and explicit enabled boolean; read back after the write.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused; reference namespace Enabled is not exposed by this kind.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "domain": "opc_ua",
+      "title": "Import one OPC UA reference namespace from a supplied file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_reference_namespace_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterfaceGroup.ReferenceNamespaces: ReferenceNamespaceComposition.Create(String,FileInfo), ReferenceNamespace.Import(FileInfo), ReferenceNamespace.Export(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload namespaceName, mode create|replace, absolute non-linked path (<= 16 MiB) and expectedSha256; hash-bound copy in the change directory.",
+          "Readback reports Name, Enabled, GenerateNodes, GeneratedInterfaceName, UseStringNodeIds and a native export. Generation settings are not written by this kind.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "domain": "opc_ua",
+      "title": "Delete one OPC UA reference namespace",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_reference_namespace_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ReferenceNamespace.Export(FileInfo), ReferenceNamespace.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload namespaceName only. Exports a backup, deletes and verifies absence; the preview names any generated interface that may disappear with it.",
+          "Role permissions and external clients that use the namespace are not scanned.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "domain": "opc_ua",
+      "title": "Create or remove one OPC UA role mapping with explicit namespace permissions",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_role_mapping_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.AccessControl: ServerInterfaceGroup.AccessControl.RoleMappings, RoleMappingComposition.Create(String,String), RoleMapping.SetProjectRole(String), RoleMapping.NamespacePermissions, NamespacePermission.SetPermission(String,Boolean), RoleMapping.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "action=create needs roleName, definedInNamespace, optional projectRole and 1-64 namespacePermissions entries with namespaceUri and explicit Browse/Read/Write/Call/ReceiveEvents/ReadRolePermissions booleans; action=remove takes roleName only.",
+          "Any other payload field is refused; passwords, certificates, users and certificate trust are never accepted. AddStandardOpcUaRole, role rename and editing an existing mapping are not exposed.",
+          "SetPermission permission-name strings are assumed to equal the NamespacePermission property names; a namespace missing from the new role fails apply after the checkpoint.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     }

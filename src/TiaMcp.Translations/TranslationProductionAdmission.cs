@@ -59,6 +59,7 @@ internal static class TranslationProductionAdmission
             "TranslationAdmissionMismatch", "Admission context differs from the retained candidate and scope.");
         var candidate = new TranslationWorkflowStore(context.ArtifactRoot).NativeCandidate(binding.CandidateRef, binding.CandidateReceiptSha256);
         var scope = binding.Baseline.Scope;
+        Require(!candidate.UpdateSourceLanguage, "TranslationAdmissionScopeUnqualified", "Source-text mode has no production admission.");
         Require(scope.SourceCulture == "de-DE" && scope.TargetCulture == "en-GB" &&
             scope.ActiveCultures.SequenceEqual(new[] { "de-DE", "en-GB" }) &&
             scope.ObjectSelections.SequenceEqual(new[] { "whole-project:legacy-bilingual" }),

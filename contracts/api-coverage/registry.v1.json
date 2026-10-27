@@ -2338,6 +2338,12 @@
       ]
     },
     {
+      "featureId": "project_text_export",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
       "featureId": "vci_prepare",
       "obligations": [
         "D01"
@@ -2949,6 +2955,18 @@
       ]
     },
     {
+      "featureId": "composite_engineering_capture",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
       "featureId": "runtime_handoff_observation",
       "obligations": [
         "C03",
@@ -3283,6 +3301,72 @@
       "featureId": "plc_loadable_generate",
       "obligations": [
         "X11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_text_list_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "obligations": [
+        "D04"
       ]
     }
   ],

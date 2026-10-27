@@ -160,9 +160,20 @@ Test("tampered retained original peer bytes refuse before native lease", async (
 Test("no approval cannot become a native candidate", async () => {
     var f = New(); await Reject("InvalidTranslationReference", () => { f.Runner.Prepare("upload:any", f.CandidateReceipt, f.Observation(), "bad"); return Task.CompletedTask; });
 });
-foreach (string shape in new[] { "source", "clear", "empty-target" }) Test("initial native packet refuses " + shape + " writes", async () => {
+foreach (string shape in new[] { "clear", "empty-target" }) Test("initial native packet refuses " + shape + " writes", async () => {
     var f = new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), true, shape);
     await Reject("TranslationImportShapeUnqualified", () => { f.Prepare(); return Task.CompletedTask; }); True(f.Adapter.Opens == 0);
+});
+Test("approved source-text mode imports with updateSourceLanguage and has no production admission", async () => {
+    var f = new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), true, "source", exactAdmission: true); var op = f.Prepare();
+    var candidate = new TranslationWorkflowStore(f.Root).NativeCandidate(f.CandidateRef, f.CandidateReceipt);
+    await Reject("TranslationAdmissionScopeUnqualified", () => { TranslationProductionAdmission.Describe(new(f.Root, op, f.CandidateRef, f.CandidateReceipt,
+        candidate.Candidate.WorkbookSha256, f.Scope), new(new('1', 64), new('2', 64), f.Target.AdapterSha256, new('3', 64))); return Task.CompletedTask; });
+    var done = await f.Apply(op);
+    True(candidate.UpdateSourceLanguage && f.Adapter.Context.UpdateSourceLanguage && done.State == "succeeded" && Fixture.Cell(f.Adapter.Current, "E2") == "Kühlung Ω bereit");
+});
+Test("target-only candidates keep updateSourceLanguage false", async () => {
+    var f = New(); await f.Apply(f.Prepare()); True(!f.Adapter.Context.UpdateSourceLanguage);
 });
 Test("complete initial fresh export detects unchanged mapped-peer drift", async () => {
     var f = New(); var observed = f.Observation(Fixture.Change(f.Original, "F3", "changed peer"));
@@ -290,6 +301,7 @@ Test("actual managed process loss at flushed dispatch intent survives restart", 
 if (admissionOnly) tests.Clear();
 TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true));
 TranslationRegistryChecks.Register(Test, output);
+ProjectTextExportChecks.Register(Test, output);
 var results = new JsonArray(); int failed = 0;
 foreach (var test in tests)
 {
@@ -401,6 +413,7 @@ internal sealed class FakeAdapter(Fixture fixture) : ITranslationImportAdapter, 
     internal string? Fault;
     internal Func<int, TranslationImportObservation, TranslationImportObservation>? Alter;
     private TranslationImportContext context = null!;
+    internal TranslationImportContext Context => context;
     public void RequireQualification(TranslationImportContext c, string action) { }
     public Task<ITranslationImportSession> OpenExclusive(TranslationImportContext c, CancellationToken token) { Opens++; context = c; return Task.FromResult<ITranslationImportSession>(this); }
     public Task<TranslationImportObservation> Observe(CancellationToken token)

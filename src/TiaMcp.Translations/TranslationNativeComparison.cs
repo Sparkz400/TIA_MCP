@@ -23,15 +23,17 @@ internal static class TranslationNativeComparison
         created[0].Value = "";
         // The first profile admits Main OB1's block comment only. Match its full
         // captured view path and exact XML composition; equal text elsewhere is
-        // never authority to normalize a different native object or field.
-        foreach (var row in candidate.Baseline.Profile.Rows)
-        foreach (var target in row.Targets)
+        // never authority to normalize a different native object or field. Only the
+        // approved cell's own culture leaf (target, or source in source-text mode) is normalized.
+        var map = candidate.Baseline.Profile;
+        foreach (var row in map.Rows)
+        foreach (var target in row.Targets.Prepend(new TranslationCell(map.SourceCulture, row.SourceCell)))
         {
             var before = candidate.Baseline.ReadText(target.Location); var after = candidate.Candidate.ReadText(target.Location);
             if (before == after) continue;
             string view = candidate.Baseline.ReadText(new(row.SourceCell.Part, "B" + row.SourceCell.Cell[1..])).Text ?? "";
             string[] path = view.Split('\\');
-            Require(row.Category == "<BlockCommentCategoryData>" && target.Culture == "en-GB" && path.Length == 5 &&
+            Require(row.Category == "<BlockCommentCategoryData>" && path.Length == 5 &&
                 path[0] == Path.GetFileNameWithoutExtension(candidate.Baseline.Project.Object.ProjectPath) &&
                 path[2] == "Programmbausteine" && path[3] == "Main" && path[4] == "Bausteinkommentar",
                 "TranslationPeerProfileUnqualified", "Only the captured Main OB1 block-comment target is admitted by this native peer profile.");

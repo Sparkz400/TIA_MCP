@@ -24,13 +24,31 @@ namespace TiaMcp.Openness.V21
                 try
                 {
                     var network = entry.Item.GetService<NetworkInterface>();
-                    if (network != null) items.Add(new JObject { ["path"] = entry.Path, ["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings) });
+                    // Port partners serve a selected port item; project-wide subnet/IO-system scans skip them.
+                    var port = hardwarePath == null ? null : entry.Item.GetService<NetworkPort>();
+                    if (network == null && port == null) continue;
+                    var row = new JObject { ["path"] = entry.Path };
+                    if (network != null) row["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings);
+                    if (port != null) row["port"] = InspectPortPartners(port, hardware, budget, warnings, entry.Path);
+                    items.Add(row);
                 }
                 catch (Exception error) { warnings.Add(InspectionWarning(entry.Path, error)); }
             }
             return new JObject { ["items"] = items, ["warnings"] = warnings,
                 ["completeness"] = InspectionCoverage(budget, warnings, "Configured network interfaces, subnet memberships, IO-system associations and port interconnections of bounded project hardware.",
                     "Configured port interconnections only; no cables or physical topology") };
+        }
+
+        private static JObject InspectPortPartners(NetworkPort port, HardwareEntry[] hardware, ScanBudget budget, JArray warnings, string path)
+        {
+            var partners = new JArray();
+            foreach (var partner in port.ConnectedPorts)
+            {
+                if (!budget.Take()) break;
+                try { partners.Add(NetworkOwnerReference(partner, hardware)); }
+                catch (Exception error) { partners.Add(new JObject { ["resolution"] = "unavailable", ["reason"] = error.Message }); warnings.Add(InspectionWarning(path, error)); }
+            }
+            return new JObject { ["connectedPorts"] = partners, ["origin"] = "nativeConfiguredOffline", ["physicalLinkVerified"] = false };
         }
 
         private JObject InspectConfiguredNetwork(Project project, HardwareEntry owner, NetworkInterface network,
