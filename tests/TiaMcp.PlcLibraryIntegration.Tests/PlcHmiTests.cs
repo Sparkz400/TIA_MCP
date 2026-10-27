@@ -107,6 +107,9 @@ internal static class PlcHmiTests
             Equal(2, nested.Count); Equal(false, nested.Any(m => m.Value<bool>("scalar")));
             Equal("speed", PlcHmiIntegrationPlanner.SplitAtType(members, ["status", "speed"], "MotorStatus")[1][0]);
             Equal(null, PlcHmiIntegrationPlanner.SplitAtType(members, ["Enable"], "MotorStatus"));
+            // Native V21 FB exports inline the UDT members under the member's own Sections element.
+            var inline = PlcHmiIntegrationPlanner.Members(XDocument.Parse("""<Document><Sections><Section Name="Static"><Member Name="status" Datatype="&quot;MotorStatus&quot;"><Sections><Section Name="None"><Member Name="speed" Datatype="Real"/></Section></Sections></Member></Section></Sections></Document>"""));
+            Equal(true, inline.Any(m => m["path"].ToString(Newtonsoft.Json.Formatting.None) == "[\"status\",\"speed\"]" && m.Value<bool>("scalar")));
         });
         test("non-breaking UDT update previews every binding and proposes a fresh update step", () => {
             var plan = PlcHmiIntegrationPlanner.BuildUpdate(UpdatePayload(), UpdateObserved());

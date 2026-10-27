@@ -80,8 +80,9 @@ namespace TiaMcp.Openness.V21
             return plc;
         }
 
-        // Flattens exported Openness interface members. Quoted UDT types expand one level from the
-        // supplied exports; nested UDTs inside those stay opaque. Arrays are never expanded.
+        // Flattens exported Openness interface members. A quoted UDT member expands from the members
+        // the export inlines, else one level from the supplied exports, where nested UDTs stay opaque.
+        // Arrays are never expanded.
         internal static JArray Members(XDocument export, IDictionary<string, XDocument> types = null)
         {
             var rows = new JArray();
@@ -100,7 +101,10 @@ namespace TiaMcp.Openness.V21
                 var path = prefix.Concat(new[] { name }).ToArray();
                 bool scalar = Scalars.Contains(type);
                 rows.Add(new JObject { ["path"] = new JArray(path), ["dataType"] = type, ["scalar"] = scalar });
+                var inline = member.Elements().Where(e => e.Name.LocalName == "Sections").SelectMany(e => e.Elements().Where(x => x.Name.LocalName == "Section")).ToList();
                 if (member.Elements().Any(e => e.Name.LocalName == "Member")) Add(rows, member, path, types, depth + 1);
+                // Native FB/DB exports inline the UDT members they were compiled against.
+                else if (inline.Count > 0) foreach (var section in inline) Add(rows, section, path, null, depth + 1);
                 else if (type.Length > 2 && type[0] == '"' && type[type.Length - 1] == '"' && types != null && types.TryGetValue(type.Substring(1, type.Length - 2), out var udt))
                     foreach (var section in udt.Descendants().Where(e => e.Name.LocalName == "Section")) Add(rows, section, path, null, depth + 1);
             }

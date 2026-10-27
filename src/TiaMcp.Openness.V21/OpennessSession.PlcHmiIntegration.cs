@@ -76,7 +76,7 @@ namespace TiaMcp.Openness.V21
             {
                 var xml = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)version["artifact"], version.Value<string>("contentSha256")));
                 if (string.Equals(version.Value<string>("versionGuid"), rootVersion, StringComparison.OrdinalIgnoreCase)) fb = xml;
-                else if (xml.Root?.Elements().Any(e => e.Name.LocalName == "SW.Types.PlcStruct") == true) udts[version.Value<string>("typeName")] = xml;
+                else if (xml.Root?.Descendants().Any(e => e.Name.LocalName == "SW.Types.PlcStruct") == true) udts[version.Value<string>("typeName")] = xml;
             }
             observed["instanceMembers"] = PlcHmiIntegrationPlanner.Members(fb ?? throw new BridgeException("DependencyUnresolved", "The pinned root FB export is missing."), udts);
             var screens = new JArray();
