@@ -14,6 +14,7 @@ using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Alarm;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Supervision;
+using Siemens.Engineering.SW.OpcUa;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
 using Siemens.Engineering.SW.TechnologicalObjects.Motion;
@@ -108,6 +109,13 @@ namespace TiaMcp.Openness.V21
                         blocked: safetyScope, blocker: alarmBlocker);
                     AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
                         blocked: safetyScope, blocker: alarmBlocker);
+                    if (kind == "plc")
+                    {
+                        var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
+                        if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
+                        foreach (string feature in OpcUaPayloadFields.Keys)
+                            AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                    }
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
                     AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
                 }

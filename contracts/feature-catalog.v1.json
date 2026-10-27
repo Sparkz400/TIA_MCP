@@ -21108,6 +21108,326 @@
         "AC-recovery",
         "AC-evidence"
       ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_import",
+      "domain": "opc_ua",
+      "title": "Import one user-defined OPC UA server interface from a supplied file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.OpcUaProvider.CommunicationGroup.ServerInterfaceGroup.ServerInterfaces: ServerInterfaceComposition.Create(String), ServerInterface.Import(FileInfo), ServerInterface.Export(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName, mode create|replace, absolute non-linked path (<= 16 MiB) and expectedSha256; the file is copied into the change directory and hash-bound. No Host OPC UA store resolver for change payloads.",
+          "Replace exports the existing interface as a backup first. Readback exports the native interface and reports whether it equals the input bytes.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "domain": "opc_ua",
+      "title": "Delete one user-defined OPC UA server interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterfaceGroup.ServerInterfaces, ServerInterface.Export(FileInfo), ServerInterface.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName only. Exports a backup, deletes and verifies absence.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused. External OPC UA clients are not discovered.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "domain": "opc_ua",
+      "title": "Enable or disable one user-defined OPC UA server interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_interface_enable",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterface.Enabled (get/set)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload interfaceName and explicit enabled boolean; read back after the write.",
+          "SIMATIC interfaces and interfaces generated from reference namespaces are refused; reference namespace Enabled is not exposed by this kind.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "domain": "opc_ua",
+      "title": "Import one OPC UA reference namespace from a supplied file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_reference_namespace_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ServerInterfaceGroup.ReferenceNamespaces: ReferenceNamespaceComposition.Create(String,FileInfo), ReferenceNamespace.Import(FileInfo), ReferenceNamespace.Export(FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload namespaceName, mode create|replace, absolute non-linked path (<= 16 MiB) and expectedSha256; hash-bound copy in the change directory.",
+          "Readback reports Name, Enabled, GenerateNodes, GeneratedInterfaceName, UseStringNodeIds and a native export. Generation settings are not written by this kind.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "domain": "opc_ua",
+      "title": "Delete one OPC UA reference namespace",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_reference_namespace_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.ReferenceNamespace.Export(FileInfo), ReferenceNamespace.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload namespaceName only. Exports a backup, deletes and verifies absence; the preview names any generated interface that may disappear with it.",
+          "Role permissions and external clients that use the namespace are not scanned.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "domain": "opc_ua",
+      "title": "Create or remove one OPC UA role mapping with explicit namespace permissions",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_role_mapping_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: SW.OpcUa.AccessControl: ServerInterfaceGroup.AccessControl.RoleMappings, RoleMappingComposition.Create(String,String), RoleMapping.SetProjectRole(String), RoleMapping.NamespacePermissions, NamespacePermission.SetPermission(String,Boolean), RoleMapping.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "action=create needs roleName, definedInNamespace, optional projectRole and 1-64 namespacePermissions entries with namespaceUri and explicit Browse/Read/Write/Call/ReceiveEvents/ReadRolePermissions booleans; action=remove takes roleName only.",
+          "Any other payload field is refused; passwords, certificates, users and certificate trust are never accepted. AddStandardOpcUaRole, role rename and editing an existing mapping are not exposed.",
+          "SetPermission permission-name strings are assumed to equal the NamespacePermission property names; a namespace missing from the new role fails apply after the checkpoint.",
+          "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
+          "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
+          "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU exposing the OPC UA server interface group",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
     }
   ]
 }

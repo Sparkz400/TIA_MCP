@@ -95,9 +95,9 @@ namespace TiaMcp.Openness.V21
                 if (!SameSimulationPath(row.Value<string>("path"), projectPath)) { check.HoldAll("The change journal names a different project than the admission."); return; }
             string kind = journal.Value<string>("kind") ?? "";
             // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware,
-            // PLC alarm kinds the content hash of a fresh native export of their artifact type.
+            // PLC alarm kinds the content hash of a fresh native export of their artifact type, OPC UA kinds their server interface groups.
             bool covered = !AdmissionReconcileTargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
-            if (HardwareEngineeringRules.Applies(kind) || IsPlcAlarmKind(kind)) check.FingerprintKind = kind;
+            if (HardwareEngineeringRules.Applies(kind) || IsPlcAlarmKind(kind) || kind.StartsWith("opcua_", StringComparison.Ordinal)) check.FingerprintKind = kind;
             Func<Project, string> outcome = project => {
                 if (AdmissionReconcileTargetKinds.Contains(kind) || kind.StartsWith("to_", StringComparison.Ordinal) || journal.Value<string>("afterFingerprint") == null) return null;
                 var replay = new EngineeringChange { Kind = kind, Payload = journal["preview"]?["payload"] as JObject ?? new JObject() };
