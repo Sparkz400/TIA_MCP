@@ -258,7 +258,7 @@ def run(args):
         device = inventory["plcs"][0]["hardwarePath"].split("/items/")[0] + "/items/"
         rail = [row for row in inventory["hardware"] if row["path"].startswith(device) and row["positionNumber"] == 0 and row["path"].count("/items/") == 1]
         require(len(rail) == 1, "PLC rack identity is ambiguous")
-        apply("hardware_plug", {"hardwarePath": rail[0]["path"], "typeIdentifier": ENCODER_MODULE, "name": ENCODER_MODULE_NAME, "positionNumber": 2}, compile_save=False)
+        apply("hardware_plug", {"hardwarePath": rail[0]["path"], "typeIdentifier": ENCODER_MODULE, "name": ENCODER_MODULE_NAME, "positionNumber": 2})
         authorization = run_root / "seeder-authorization.json"
         authorization.write_text(json.dumps({"ownsPortalProcess": True, "creationTool": "tia_create_scratch", "processId": report["processId"],
                                              "projectPath": report["projectPath"], "moduleName": ENCODER_MODULE_NAME}, indent=2), encoding="utf-8")
