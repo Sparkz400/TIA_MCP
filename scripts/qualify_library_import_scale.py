@@ -127,6 +127,19 @@ def timed_change(h, kind, payload, label, compact=True):
     return applied
 
 
+def recycle(h, label):
+    """Save, detach and reopen the owned project in a fresh Portal.
+
+    Workers before 65fd13b accumulated finalizable Openness proxies; TIA refused change 124 of one authoring session
+    (EngineeringOutOfMemoryException, 500,000 instances). Off by default; kept to bound older workers."""
+    path = h.tool("tia_session_status")["projects"][0]["path"]
+    h.stage("close session " + label, lambda: h.tool("tia_detach"))
+    h.owned_portal(label)
+    h.stage("reopen " + label, lambda: h.reopen_project(path))
+    h.report.setdefault("recycles", []).append({"label": label, "afterChanges": len(h.report["changes"]), "memory": memory()})
+    h.persist()
+
+
 def upload(h, package):
     data = Path(package["path"]).read_bytes()
     started = time.perf_counter()
@@ -152,17 +165,24 @@ def body(h):
     documents = h.directory / "documents"
     documents.mkdir()
     released = []
-    for name, composition in names:
+
+    def versions(type_guid):
+        return h.query(library, query="versions", typeGuid=type_guid)["items"]
+    for index, (name, composition) in enumerate(names):
+        if index and args.recycle and index % args.recycle == 0:
+            recycle(h, "authoring after %d components" % index)
+            library = h.project_library()
         text, suffix = document(name, composition)
         (documents / (name + suffix)).write_text(text, encoding="utf-8")
-        timed_change(h, "library_create_type", {"schemaVersion": 1, "destinationLibraryId": library, "documentDirectory": str(documents),
-                     "documentName": name, "targetEnvironment": "selectedPlc", "destinationComposition": composition, "target": {"plcPath": plc}},
-                     "create " + name)
-        version = [x for x in h.versions(library, name) if x["state"] == "InWork"]
+        created = timed_change(h, "library_create_type", {"schemaVersion": 1, "destinationLibraryId": library, "documentDirectory": str(documents),
+                               "documentName": name, "targetEnvironment": "selectedPlc", "destinationComposition": composition, "target": {"plcPath": plc}},
+                               "create " + name)
+        type_guid = created["journal"]["result"]["objects"][0]["typeGuid"]
+        version = [x for x in versions(type_guid) if x["state"] == "InWork"]
         require(len(version) == 1, "Expected one InWork version of " + name)
         timed_change(h, "library_release_version", h.selected(library, version, versionNumber="1.0.0", author="TIA MCP qualification",
                      comment="Scale fixture"), "release " + name)
-        committed = [x for x in h.versions(library, name) if x["state"] == "Committed"]
+        committed = [x for x in versions(type_guid) if x["state"] == "Committed"]
         require(len(committed) == 1 and committed[0]["version"] == "1.0.0", "Release of " + name + " differs")
         released.append(committed[0])
     global_library = h.apply("library_create", {"schemaVersion": 1, "name": "OpenScaleLibrary"})["journal"]["result"]["library"]["libraryId"]
@@ -258,7 +278,10 @@ def body(h):
     separate = h.owned_scratch("separate imports")
     reopened = h.tool("library_open", {"request": opened(LIBRARY)})["libraryId"]
     versions = sorted((x for x in all_items(h, reopened)["items"] if x.get("kind") == "version"), key=lambda v: v["typeName"])
-    for version in versions[:args.separate]:
+    for index, version in enumerate(versions[:args.separate]):
+        if index and args.recycle and index % args.recycle == 0:
+            recycle(h, "separate imports after %d changes" % index)
+            reopened = h.tool("library_open", {"request": opened(LIBRARY)})["libraryId"]
         timed_change(h, "library_instantiate", h.selected(reopened, [version], target={"plcPath": separate}), "separate import " + version["typeName"])
     h.stage("close separate import session", lambda: h.tool("tia_detach"))
     # Applied changes' recovery journals keep the package as their source of record.
@@ -275,10 +298,13 @@ if __name__ == "__main__":
     parser.add_argument("--components", type=int, default=100)
     parser.add_argument("--separate", type=int, default=100, help="Components applied again as separate single-component changes.")
     parser.add_argument("--package-bytes", type=int, default=DMC_V17_BYTES)
+    parser.add_argument("--recycle", type=int, default=0, help="Reopen the project in a fresh Portal after this many components or separate changes (0: never).")
     arguments = parser.parse_args()
     arguments.runner = __file__
     Harness(arguments, "is_", "Native %d-component planned import and vendor-sized package intake" % arguments.components, [
         "Owned scratch only; observed timings on this host, not cross-machine budgets.",
         "The package reproduces the byte volume and shape of the retained DMC V17 distribution; its only valid native payload is the owned archive. Vendor bytes are not on this PC.",
         "library_instantiate copies exact released types; PLC library_integrate (call/instance/signal) combined apply stays disabled and is not exercised.",
-        "Toolbox executables are generated random bytes and never executed."], []).run(body)
+        "Toolbox executables are generated random bytes and never executed.",
+        ("Authoring and the separate imports reopen the project in a fresh Portal every %d components or changes." % arguments.recycle) if arguments.recycle
+        else "Each phase runs in one Portal session; this needs the worker's per-request proxy release (65fd13b)."], []).run(body)
