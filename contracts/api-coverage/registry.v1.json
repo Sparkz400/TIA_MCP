@@ -2219,6 +2219,18 @@
       ]
     },
     {
+      "featureId": "graph_export",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "change.graph_import",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
       "featureId": "vci_branches",
       "obligations": [
         "D01"

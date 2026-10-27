@@ -73,7 +73,7 @@ namespace TiaMcp.Openness.V21
                 {
                     AddTargetFeature(features, "software_inspect", directApi, "partial", "Bounded exposed software scopes, tags and data types; native protected content remains inaccessible.");
                     AddTargetFeature(features, "technology_read", directApi, "partial", "Enumerates PLC technology groups and the OutputCams/MeasuringInputs child compositions; it does not infer unit-local TO support or other service coverage.");
-                    foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "plc_type_import_xml", "tag_table_import_xml" })
+                    foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "graph_import", "plc_type_import_xml", "tag_table_import_xml" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Standard and software-unit scopes use explicit native group routing; payload language/type, collision, protection and compile checks occur during prepare/apply. Unit routes require separate qualification.",
                             blocked: safetyScope, blocker: "Safety-unit mutations require the dedicated safety import workflow.");
                     AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Versioned separate LAD/FBD models, explicit declaration/storage effects and immutable native artifacts use the existing checkpoint workflow. Exact CPU, instruction, data type, language and route profiles are required. Native-format evidence and runtime qualification are separate; inspect the shipped typed profile catalog.",

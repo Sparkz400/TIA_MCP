@@ -70,4 +70,19 @@ string incomplete = Path.Combine(root, "graph-workflow", new string('a',32)); Di
 Check(Json(store.List()).GetProperty("rows").EnumerateArray().Any(r=>Text(r,"state")=="incomplete"), "unfinished publication remains discoverable");
 File.AppendAllText(Path.Combine(root,"graph-workflow",Text(after,"recordRef").Split(':')[1],"report.json"), " ");
 Check(Json(store.List()).GetProperty("rows").EnumerateArray().Any(r=>Text(r,"state")=="integrity-failed"), "changed report is discoverable as damaged");
+string exports = Path.Combine(root, "exports"); Directory.CreateDirectory(exports);
+string Fixture(string name) { string path = Path.Combine(exports, name); File.Copy(Path.Combine(AppContext.BaseDirectory, "fixtures", name), path); return path; }
+string populated = Fixture("native-populated.xml"), emptyCondition = Fixture("native-empty-condition.xml");
+var exported = Json(store.Retain(populated, Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(populated)))));
+Check(Download(Text(exported, "recordRef"), "original.xml").SequenceEqual(File.ReadAllBytes(populated)), "native export is retained as an exact document record");
+Reject("GraphInputChanged", () => store.Retain(populated, new string('0', 64)));
+Reject("ArtifactPathDenied", () => store.Retain(Path.Combine(AppContext.BaseDirectory, "fixtures", "native-populated.xml"), new string('0', 64)));
+JsonElement Payload(object value) => JsonSerializer.SerializeToElement(value);
+var byRef = store.ImportPayload(Payload(new { graphRef = Text(exported, "recordRef"), expectedBlockNames = new[] { "GraphQualification" } }));
+Check(byRef["xml"]!.GetValue<string>().StartsWith("<?xml") && byRef["expectedBlockNames"]![0]!.GetValue<string>() == "GraphQualification" &&
+    byRef["sourceSha256"]!.GetValue<string>() == Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(populated))), "retained native GRAPH document becomes an import payload without BOM");
+Check(store.ImportPayload(Payload(new { path = "exports/native-populated.xml" }))["xml"]!.GetValue<string>() == byRef["xml"]!.GetValue<string>(), "artifact-relative path yields the same import payload");
+Reject("GraphImportRefused", () => store.ImportPayload(Payload(new { path = emptyCondition })));
+Reject("GraphImportRefused", () => store.ImportPayload(Payload(new { graphRef = Text(large, "recordRef") })));
+Reject("InvalidRequest", () => store.ImportPayload(Payload(new { graphRef = Text(exported, "recordRef"), path = populated })));
 Console.WriteLine($"{checks} GRAPH workflow checks passed; no native execution.");

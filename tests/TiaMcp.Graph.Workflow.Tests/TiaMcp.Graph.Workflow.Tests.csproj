@@ -4,5 +4,7 @@
     <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
     <None Include="../TiaMcp.Graph.Tests/fixtures/sequence-v1.xml" Link="fixtures/sequence-v1.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../TiaMcp.Graph.Tests/fixtures/sequence-v2.xml" Link="fixtures/sequence-v2.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../TiaMcp.Graph.Tests/fixtures/native-v21/populated/baseline.xml" Link="fixtures/native-populated.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../TiaMcp.Graph.Tests/fixtures/native-v21/empty-condition/baseline.xml" Link="fixtures/native-empty-condition.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
