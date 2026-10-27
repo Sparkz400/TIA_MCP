@@ -125,7 +125,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
@@ -426,6 +426,14 @@ namespace TiaMcp.Openness.V21
                 case "constant_delete":
                     PrepareTagEdit(change, preview);
                     break;
+                case "tag_create":
+                case "constant_create":
+                    PrepareTagCreate(change, preview);
+                    break;
+                case "block_number_set":
+                case "block_attributes_set":
+                    PrepareBlockEdit(change, preview);
+                    break;
                 case "group_create":
                 case "group_rename":
                 case "group_delete":
@@ -689,6 +697,17 @@ namespace TiaMcp.Openness.V21
                 case "constant_set":
                 case "constant_delete":
                     ApplyTagEdit(change);
+                    break;
+                case "tag_create":
+                case "constant_create":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    TagCreate(change, plc, MutationTable(change, plc), true);
+                    break;
+                }
+                case "block_number_set":
+                case "block_attributes_set":
+                    ApplyBlockEdit(change);
                     break;
                 case "group_create":
                 case "group_rename":

@@ -103,15 +103,7 @@ namespace TiaMcp.Openness.V21
                 var attrs = ChangeObject(change.Payload, "attributes");
                 if (attrs.Count == 0) throw new BridgeException("InvalidRequest", "attributes must contain at least one editable field.");
                 var allow = new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal);
-                if (attrs["Name"] != null)
-                {
-                    string name = ChangeText(attrs, "Name", 128);
-                    var tables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags);
-                    if (tables.Any(item => item.Tags.Any(tag => !ReferenceEquals(tag, member) && string.Equals(tag.Name, name, StringComparison.OrdinalIgnoreCase)) ||
-                        item.UserConstants.Any(constant => !ReferenceEquals(constant, member) && string.Equals(constant.Name, name, StringComparison.OrdinalIgnoreCase)) ||
-                        item.SystemConstants.Any(constant => string.Equals(constant.Name, name, StringComparison.OrdinalIgnoreCase))))
-                        throw new BridgeException("ObjectExists", "A tag or constant already uses the requested name in the software scope.");
-                }
+                if (attrs["Name"] != null) RejectTagNameCollision(change, plc, ChangeText(attrs, "Name", 128), member);
                 change.AttributeTarget = member;
                 ((JArray)preview["effects"]).Add(new JObject { ["memberName"] = change.Payload["memberName"], ["attributes"] = PrepareAttributes(member, attrs, allow) });
             }
@@ -131,6 +123,96 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("MutationVerificationFailed", "Deleted member still exists.");
             }
             else ApplyAttributes(member, ChangeObject(change.Payload, "attributes"), new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal));
+        }
+
+        private static void RejectTagNameCollision(EngineeringChange change, PlcSelection plc, string name, IEngineeringObject except)
+        {
+            if (AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).Any(item => item.Tags.Any(tag => !ReferenceEquals(tag, except) && string.Equals(tag.Name, name, StringComparison.OrdinalIgnoreCase)) ||
+                item.UserConstants.Any(constant => !ReferenceEquals(constant, except) && string.Equals(constant.Name, name, StringComparison.OrdinalIgnoreCase)) ||
+                item.SystemConstants.Any(constant => string.Equals(constant.Name, name, StringComparison.OrdinalIgnoreCase))))
+                throw new BridgeException("ObjectExists", "A tag or constant already uses the requested name in the software scope.");
+        }
+
+        private void PrepareTagCreate(EngineeringChange change, JObject preview)
+        {
+            var plc = SelectPlc(change.Selector);
+            change.ObjectNames = new[] { MutationObjectName(change, plc, "tagTable") };
+            PrepareMutationScope(change, plc, "tagTable", change.ObjectNames);
+            var table = MutationTable(change, plc);
+            TagCreate(change, plc, table, false);
+            string path = Path.Combine(change.Directory, "before-tags.xml");
+            table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+            change.Backups.Add(new JObject { ["tableName"] = table.Name, ["artifact"] = ChangeArtifact(path) });
+            string detail = change.Kind == "constant_create" ? "value" : "logicalAddress";
+            ((JArray)preview["effects"]).Add(new JObject { ["action"] = change.Kind, ["tableName"] = table.Name, ["name"] = change.Payload["name"], ["dataTypeName"] = change.Payload["dataTypeName"], [detail] = change.Payload[detail] });
+        }
+
+        // Prepare and apply share this so apply repeats the scope-wide collision check immediately before creation.
+        private void TagCreate(EngineeringChange change, PlcSelection plc, PlcTagTable table, bool apply)
+        {
+            bool constant = change.Kind == "constant_create";
+            string name = ChangeText(change.Payload, "name", 128), type = ChangeText(change.Payload, "dataTypeName", 256), detail = ChangeText(change.Payload, constant ? "value" : "logicalAddress", 1024);
+            RejectTagNameCollision(change, plc, name, null);
+            if (!apply) return;
+            if (constant)
+            {
+                table.UserConstants.Create(name, type, detail);
+                var created = table.UserConstants.Find(name) ?? throw new BridgeException("MutationVerificationFailed", "Created user constant is missing from its table.");
+                if (created.DataTypeName != type || created.Value != detail) throw new BridgeException("MutationVerificationFailed", "Created user constant read-back differs from the request.");
+            }
+            else
+            {
+                table.Tags.Create(name, type, detail);
+                var created = table.Tags.Find(name) ?? throw new BridgeException("MutationVerificationFailed", "Created tag is missing from its table.");
+                if (created.IsSafety) throw new BridgeException("SafetyBoundary", "The created tag is a safety tag; generic tag creation excludes safety tags. Recover from the checkpoint.");
+                if (created.DataTypeName != type || created.LogicalAddress != detail) throw new BridgeException("MutationVerificationFailed", "Created tag read-back differs from the request.");
+            }
+        }
+
+        private static readonly HashSet<string> BlockHeaderAttributes = new HashSet<string>(new[] { "HeaderAuthor", "HeaderFamily", "HeaderName", "HeaderVersion" }, StringComparer.Ordinal);
+        // OB names from the V21 Openness manual (OB export attributes, PriorityNumber write access); native attribute infos still decide writability.
+        private static readonly HashSet<string> ObWriteAttributes = new HashSet<string>(BlockHeaderAttributes.Concat(new[] { "PriorityNumber", "CyclicTime", "PhaseOffset", "ProcessImagePartNumber" }), StringComparer.Ordinal);
+        private static readonly HashSet<string> BlockNumberAttributes = new HashSet<string>(new[] { "AutoNumber", "Number" }, StringComparer.Ordinal);
+
+        private void PrepareBlockEdit(EngineeringChange change, JObject preview)
+        {
+            var plc = SelectPlc(change.Selector);
+            var effects = (JArray)preview["effects"];
+            change.BlockNames = new[] { MutationBlockName(change.Payload, plc) };
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            PrepareBlockTargets(change, plc, false, true, effects);
+            var block = FindBlockByName(plc, change.BlockNames[0], true, change);
+            change.AttributeTarget = block.Item;
+            effects.Add(new JObject { ["attributes"] = PrepareAttributes(block.Item, BlockEditAttributes(change, plc, block, out var allow), allow) });
+        }
+
+        private void ApplyBlockEdit(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            VerifyBlockTargets(change, plc, false);
+            var block = FindBlockByName(plc, change.BlockNames[0], true, change);
+            ApplyAttributes(block.Item, BlockEditAttributes(change, plc, block, out var allow), allow);
+        }
+
+        private static JObject BlockEditAttributes(EngineeringChange change, PlcSelection plc, BlockEntry block, out HashSet<string> allow)
+        {
+            if (change.Kind == "block_attributes_set")
+            {
+                var attrs = ChangeObject(change.Payload, "attributes");
+                if (attrs.Count == 0) throw new BridgeException("InvalidRequest", "attributes must contain at least one editable field.");
+                allow = block.Item is OB ? ObWriteAttributes : BlockHeaderAttributes;
+                return attrs;
+            }
+            long number = change.Payload["number"]?.Type == JTokenType.Integer ? change.Payload.Value<long>("number") : 0;
+            if (number < 1 || number > 65535) throw new BridgeException("InvalidRequest", "number must be an integer from 1 to 65535.");
+            string kind = BlockNumberKind(block.Item);
+            var budget = new ScanBudget(50000);
+            if (AllBlocks(plc, budget).Any(item => item.Path != block.Path && item.Item.Number == number && BlockNumberKind(item.Item) == kind))
+                throw new BridgeException("BlockNumberCollision", "Another " + kind + " block already uses number " + number + ".");
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block-number collision check is incomplete.");
+            allow = BlockNumberAttributes;
+            // Ordered: the explicit Number applies only once auto-numbering is off.
+            return new JObject { ["AutoNumber"] = false, ["Number"] = number };
         }
 
         private JObject CheckDeleteDependencies(EngineeringChange change, PlcSelection plc, IEngineeringObject target, string name)

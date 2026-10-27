@@ -4858,6 +4858,106 @@
       ]
     },
     {
+      "featureId": "change.block_number_set",
+      "domain": "language",
+      "title": "Set an explicit number on one standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_number_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/SetAttribute/GetAttribute for PlcBlock AutoNumber and Number (documented PlcBlock properties), PlcBlock.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One standard, unprotected, non-generated block; sets AutoNumber=false then Number and reads both back. Native attribute infos must report both as readable and writable; AutoNumber is read-only for protected blocks and several OBs.",
+          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.block_attributes_set",
+      "domain": "language",
+      "title": "Set reviewed header or OB attributes on one standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_attributes_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/SetAttribute/GetAttribute on PlcBlock; HeaderAuthor/HeaderFamily/HeaderName/HeaderVersion are documented PlcBlock properties, OB names come from the V21 Openness manual block-attribute table."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "domain": "language",
       "title": "Delete one exact standard block",
@@ -6760,6 +6860,107 @@
         "status": "conditional",
         "reasons": [
           "Recorded fixtures do not establish availability or authorization for the current target; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_create",
+      "domain": "data",
+      "title": "Create one PLC tag in an existing tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "tag_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcTagTable.Tags (PlcTagComposition.Create(string,string,string), PlcTagComposition.Find(string)), PlcTag.DataTypeName/LogicalAddress/IsSafety readback, PlcTagTable.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
+          "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.constant_create",
+      "domain": "data",
+      "title": "Create one user constant in an existing tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "constant_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcTagTable.UserConstants (PlcUserConstantComposition.Create(string,string,string), PlcUserConstantComposition.Find(string)), PlcUserConstant.DataTypeName/Value readback, PlcTagTable.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exact existing table selector plus explicit name, dataTypeName and value; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
+          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [

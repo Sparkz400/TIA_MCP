@@ -108,7 +108,7 @@ namespace TiaMcp.Openness.V21
                         feature == "block_interface" ? "Native XML is retained with normalized explicit array-element starts and nested declarations. Implicit array values are not expanded; unknown native elements remain explicit. Generated system blocks can reject export."
                             : "Native export eligibility is determined by Siemens; generated system blocks can reject export.",
                         blocked: protectedBlock || !consistent, blocker: protectedBlock ? "The selected block is know-how protected." : "The selected block is inconsistent; native export eligibility is not established.");
-                foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml" })
+                foreach (string feature in new[] { "block_rename", "block_delete", "block_import_xml", "block_number_set", "block_attributes_set" })
                     AddTargetFeature(features, "change." + feature, directApi, "partial", "Prepare/apply enforce explicit scope, protection and recovery checkpoints. Generated/system objects may be rejected by the native API."
                         + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
                         blocked: protectedBlock || safetyBlock || safetyScope || generated,
@@ -154,6 +154,9 @@ namespace TiaMcp.Openness.V21
                     blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
                 foreach (string feature in new[] { "tag_set", "constant_set", "tag_delete", "constant_delete" })
                     AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact existing table member with an explicit attribute allowlist. Deletion requires rejectReferenced dependency policy; incomplete dependency evidence is rejected. Native compilation and recovery checkpoints are required; recorded fixture evidence does not qualify the current target.",
+                        blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
+                foreach (string feature in new[] { "tag_create", "constant_create" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "Creates one member in this table after a scope-wide tag/constant name collision check; created safety tags are rejected. Native compilation and recovery checkpoints are required.",
                         blocked: safetyScope || generated, blocker: "Safety-unit/generated tag tables are excluded from this mutation workflow.");
             }
             else if (selected.Target is DeviceItem hardware)
