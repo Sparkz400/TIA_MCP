@@ -40,7 +40,7 @@ class CurateEvidenceTests(unittest.TestCase):
     def test_run_accepts_passed_status_and_string_steps(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "result.json")
-            path.write_text(json.dumps({"status": "passed", "steps": ["tool refusal kept"], "hostExits": [
+            path.write_text(json.dumps({"status": "passed", "steps": ["tool refusal kept"], "cleanups": [
                 {"toolCalls": [{"name": "trace_analyze", "isError": False}]}]}), encoding="utf-8")
             summary = run(path)
             path.write_text(json.dumps({"status": "failed", "steps": []}), encoding="utf-8")
