@@ -65,6 +65,7 @@ namespace TiaMcp.Openness.V21
             if (!LibraryChangeKinds.Contains(kind)) throw new BridgeException("UnsupportedChangeKind", "Unknown library change kind: " + kind);
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             if (payload.Value<int?>("schemaVersion") != 1) throw new BridgeException("InvalidRequest", "Library payload schemaVersion=1 is required.");
+            if (kind == "library_integrate" && PlcHmiIntegrationPlanner.IsRecipe(payload)) ValidatePlcHmiRecipe(payload);
             var change = new LibraryChange { Id = "lib-" + Guid.NewGuid().ToString("N"), Kind = kind, Payload = (JObject)payload.DeepClone(), Selector = (JObject)args.DeepClone(), State = "preparing" };
             if (componentContentPins != null)
             {
@@ -228,7 +229,7 @@ namespace TiaMcp.Openness.V21
                         change.Preview["targetPreview"] = PrepareLibraryHmiAction(change.Project, payload, change.Versions.FirstOrDefault(), change.Masters.FirstOrDefault());
                         break;
                     }
-                    if (change.Kind == "library_integrate") { PreparePlcLibraryIntegrationPlan(change); break; }
+                    if (change.Kind == "library_integrate") { if (PlcHmiIntegrationPlanner.IsRecipe(payload)) PreparePlcHmiIntegrationPlan(change); else PreparePlcLibraryIntegrationPlan(change); break; }
                     PreparePlcLibraryInstantiation(change);
                     break;
                 case "library_update_project":
