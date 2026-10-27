@@ -68,6 +68,9 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
                 AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
                 AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
+                var vci = ProbeCapabilityService<Siemens.Engineering.VersionControl.VersionControlInterface>(project, "project", probes);
+                foreach (string feature in VciChangeKinds)
+                    AddTargetFeature(features, "change." + feature, vci, "partial", "Exact workspace/group paths from vci_workspace_inspect and exact objectPath targets. Roots overlapping the project or artifact store, links and non-empty new roots are refused; a bounded root file inventory is pinned at prepare, rechecked before the checkpoint and verified after apply. Not natively qualified.");
             }
 
             if (selected.Plc != null)

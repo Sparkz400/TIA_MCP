@@ -2491,6 +2491,36 @@
       ]
     },
     {
+      "featureId": "change.vci_workspace_create",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_delete",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_add",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_remove",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_synchronize",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
       "featureId": "project_snapshot_import",
       "obligations": [
         "L04",

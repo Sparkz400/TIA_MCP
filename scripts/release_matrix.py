@@ -36,6 +36,7 @@ PREFIX_OWNERS = {
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],
+    "change.vci_workspace_create": ["D01"], "change.vci_workspace_delete": ["D01"], "change.vci_mapping_add": ["D01"], "change.vci_mapping_remove": ["D01"], "change.vci_synchronize": ["D01"],
 }
 
 

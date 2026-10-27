@@ -77,6 +77,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_engineering") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
+                if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
@@ -130,6 +131,8 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "Actual-value loads change no project content; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
+            if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
+                throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
                 "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
@@ -144,6 +147,7 @@ namespace TiaMcp.Openness.V21
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
+                if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
                 // An unopenable credential must refuse before the checkpoint save, not after it.
                 if (BlockProtectionKinds.Contains(change.Kind)) OpenBlockProtectionCredential(change.Payload, "credential").Dispose();
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
@@ -706,6 +710,13 @@ namespace TiaMcp.Openness.V21
                 case "db_snapshot_load_actual":
                     PrepareDbSnapshotChange(change, preview);
                     break;
+                case "vci_workspace_create":
+                case "vci_workspace_delete":
+                case "vci_mapping_add":
+                case "vci_mapping_remove":
+                case "vci_synchronize":
+                    PrepareVciChange(change, project, preview);
+                    break;
                 case "drive_parameter_set":
                     preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
                     effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(), ["action"] = change.Kind });
@@ -981,6 +992,13 @@ namespace TiaMcp.Openness.V21
                 case "db_snapshot_load_actual":
                     ApplyDbSnapshotChange(change);
                     break;
+                case "vci_workspace_create":
+                case "vci_workspace_delete":
+                case "vci_mapping_add":
+                case "vci_mapping_remove":
+                case "vci_synchronize":
+                    ApplyVciChange(change, project);
+                    break;
             }
         }
 
@@ -1180,6 +1198,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
             if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
+            if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();

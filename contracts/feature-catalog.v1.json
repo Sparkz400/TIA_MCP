@@ -16540,7 +16540,7 @@
         "limitations": [
           "Read-only bounded traversal (maxItems shared by groups, workspaces, mapped objects and supported formats; group depth 32) with explicit truncation and per-workspace/per-mapping warnings.",
           "Mapped-object identity is the native ancestor type/Name/Number chain, not a stable GUID. CompareState, IndividualObjectCompareDetails and child MappingState are native observations, not preservation, import or synchronization qualification.",
-          "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation, mapping edits and synchronization are not implemented.",
+          "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation/deletion, mapping add/remove and directed synchronization are separate prepared change kinds (change.vci_*), not part of this read-only tool.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
@@ -16561,6 +16561,272 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_create",
+      "domain": "version_control",
+      "title": "Create a native VCI workspace with an explicit root and language",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_workspace_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: WorkspaceComposition.Create(string, DirectoryInfo, CultureInfo) on the exact WorkspaceSystemGroup/WorkspaceUserGroup from VersionControlInterface.WorkspaceGroup; WorkspaceComposition.Find(string) and Workspace.Name/RootPath/WorkspaceLanguage readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: groupPath, name (unused in that group), rootPath (absolute, absent or an empty directory, not overlapping another workspace root), language (exact active project culture). The root directory is created if absent.",
+          "Workspace.WorkspaceLanguage has no public setter, so the language is fixed at creation. Rename, root relocation, library policy (GlobalLibraryPath, DeleteUnusedTypeVersionFromLibrary) and user group create/delete are not implemented.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_delete",
+      "domain": "version_control",
+      "title": "Delete one native VCI workspace and its mappings",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_workspace_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: Workspace.Delete() on the exact workspace; WorkspaceComposition enumeration readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath. The preview lists every mapping (with GetStatus/GetChildStatus) removed with the workspace; the mapped engineering objects stay.",
+          "Whether TIA deletes files below the root is not established: every root file is backed up first and the observed file effect is reported, not required.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_add",
+      "domain": "version_control",
+      "title": "Map one exact object into a VCI workspace by export or by connecting existing files",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_mapping_add",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: Workspace.GetSupportedFileFormats(IEngineeringObject), Workspace.ExportObject(IEngineeringObject, DirectoryInfo, string, string) or Workspace.ConnectObject(IEngineeringObject, DirectoryInfo, string, string); MappedObjectComposition.Find(IEngineeringObject) and MappedObject.DirectoryPath/FileNameWithoutExtension/FileFormat/GetStatus/GetChildStatus readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, objectPath, mode (export or connect), directory (relative to the root, empty for the root), fileName (without extension), format (exact native token from GetSupportedFileFormats).",
+          "An object already mapped in any workspace and a package already owned by another mapping are refused. export refuses existing package files and must read back Equal; connect requires existing package files and only reports the native status.",
+          "The directory is passed as the absolute path below the root: the 15 October V21 probe rejected a relative DirectoryInfo for this parameter. Package completeness (for example SIMATIC SD .s7res companions) is not checked.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_remove",
+      "domain": "version_control",
+      "title": "Remove one object's VCI mapping",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_mapping_remove",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: MappedObjectComposition.Find(IEngineeringObject) and MappedObject.Delete(); Find readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, objectPath. Removes only the mapping; the engineering object stays. Package files are backed up first; any native file effect within the package is reported.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_synchronize",
+      "domain": "version_control",
+      "title": "Synchronize mapped VCI objects in one explicit direction",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_synchronize",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: MappedObject.GetStatus()/GetChildStatus() before and after, MappedObject.Synchronize(SynchronizationMode.ProjectToWorkspace or SynchronizationMode.WorkspaceToProject)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: workspacePath, direction (ProjectToWorkspace or WorkspaceToProject), and either objectPath or allMappedObjects=true (1..200 mappings, ProjectToWorkspace only). Mappings with both ProjectObjectChanged and WorkspaceFileChanged are refused as VciConflict; WorkspaceToProject refuses WorkspaceFileMissing.",
+          "Each synchronized mapping must read back CompareState Equal. A whole-workspace sync is a journaled sequence of per-mapping calls, not a transaction.",
+          "ProjectToWorkspace overwrites the previewed package files (backed up first); every other workspace file must stay byte-identical. WorkspaceToProject keeps the workspace files byte-identical, applies the guards of direct mutations (safety-unit, F-block, know-how protected objects refused) and requires compile=true.",
+          "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
