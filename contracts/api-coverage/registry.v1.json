@@ -2117,6 +2117,12 @@
       ]
     },
     {
+      "featureId": "project_text_export",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
       "featureId": "vci_prepare",
       "obligations": [
         "D01"

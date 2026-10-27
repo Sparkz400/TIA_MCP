@@ -66,6 +66,7 @@ namespace TiaMcp.Openness.V21
                 case "translation_begin": return TranslationBegin(arguments);
                 case "translation_stage": return TranslationStage(arguments);
                 case "translation_end": return TranslationEnd(arguments);
+                case "project_text_export": return ProjectTextExport(arguments);
                 case "testsuite_style_begin": return TestSuiteBegin(arguments);
                 case "testsuite_scope_probe": return TestSuiteScopeProbe(arguments);
 #if TESTSUITE_QUALIFICATION
