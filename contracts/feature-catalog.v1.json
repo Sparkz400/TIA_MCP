@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.31",
+  "catalogVersion": "0.4.33",
   "targetTiaVersions": [
     21
   ],
@@ -2491,6 +2491,44 @@
       "limitations": [
         "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
         "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
+      ]
+    },
+    {
+      "id": "local.library_import_scale.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "316ef5bb3c43301f0baf6785d2106b4d816b5676",
+        "passedScope": "scripts/qualify_library_import_scale.py at 316ef5b on worktree Release builds of 316ef5b (worker includes the per-request Openness proxy release 8f913f6, cherry-picked from 65fd13b). One owned TIA V21 scratch session authors and releases 100 flat library types (50 SCL FBs, 50 PLC data types) in 200 single changes, publishes them in one change to a new global library and archives it (805,217 bytes). That archive is wrapped in a generated 149,702,909-byte, 29-entry package with the shape of the retained DMC Open Library V17 review (nested 27-entry toolbox ZIP with 25 executables, documentation, a corrupt decoy .zal21); it is uploaded in 2,285 x 64 KiB chunks (42.1 s), staged (3.2 s; 155,736,855 expanded bytes, 57 files, 2 candidates) and a 1,082,356,395-byte package is refused at the 1 GiB input limit (PackageLimitExceeded, 1.4 s). In a fresh owned scratch project the decoy is refused, the real library opens with complete metadata (202 items), a 101-component selection is refused (PackageLimitExceeded), and all 100 components are prepared (8.5 s, 148,091-byte preview) and applied as one library_instantiate change (22.5 s, 359,341-byte checkpoint): 100 linkVerified rows, exactly 50 blocks and 50 types added, existing content preserved, compile 0 errors. A third session applies the same 100 components as separate single-component changes (829 s total; checkpoint 359 KB to 1.05 MB). The applied package stays retained (PackageInUse). 626/626 steps."
+      },
+      "artifacts": [
+        "evidence/local.library_import_scale.20261027.json"
+      ],
+      "limitations": [
+        "Owned scratch only; observed timings on PCNico, not cross-machine budgets.",
+        "Real vendor bytes remain open: the vendor ZIPs are no longer on this PC; the package reproduces DMC V17's byte volume and shape around an owned archive.",
+        "Flat types without dependencies; PLC library_integrate (call/instance/signal) combined apply stays disabled and is not exercised.",
+        "Requires the worker's per-request proxy release; without it one session hit TIA's 500,000-instance cap at change 124."
+      ]
+    },
+    {
+      "id": "local.library_compatibility.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4b69ad2c379e42b797ba533900124b7478916f7c",
+        "passedScope": "scripts/qualify_library_compatibility.py at 4b69ad2 on build c6486c8 (frozen D:/lco/b2, package tia-mcp-v21_20261027_130141_7a563422), owned TIA V21 scratch projects: a Bool-only FB type and an FB type using LInt/LWord/LTime are authored and released 1.0.0 on a CPU 1511-1 PN and archived in a global library. In a consumer scratch with an added CPU 1214C DC/DC/DC: (1) library_upgrade of TIA's own shipped native V13 library (Predefined-Styles.al13) is refused before any native call (LibraryVersionUnsupported) and the copied source tree stays byte-identical. (2) A compiled, unsaved source change is pending; the library_instantiate preview reports unsavedTargetEdits {present: true, disposition: savedIntoCheckpointBaseline}, the apply saves it into the checkpoint baseline, and a fresh reopen contains both the edit and the instance. (3) A type whose source generation fails is discarded by TIA (EngineeringError, not in memory); a valid PLC data type generated with compile=false is inconsistent (isConsistent false) and library_instantiate is refused before any checkpoint or write (InheritedDiagnostics) with the native inventory unchanged; the reopen proves both types were discarded. (4) Into the S7-1200 the Bool-only type instantiates and compiles with 0 errors; the 64-bit type is checkpointed and instantiated but fails compilation (CompileFailed, 8 errors: LInt/LWord/LTime unknown on the CPU), completes no save, and a fresh reopen equals the saved inventory before the attempt. 41/41 steps."
+      },
+      "artifacts": [
+        "evidence/local.library_compatibility.20261027.json"
+      ],
+      "limitations": [
+        "No V20 library input exists on this PC, so V20 upgrades stay open until one is obtained. V14 SP1-V18 upgrades are covered by local.library_upgrades.20261024 and the five DMC V19 archives by local.library_vendor.20261024/20261025.",
+        "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
+        "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced. The inherited inconsistency is an uncompiled PLC data type; other inconsistent object kinds are not exercised.",
+        "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); the CPU-family mismatch surfaces as CompileFailed after checkpoint, not as a refusal at preparation. Firmware-version mismatches are not exercised. No runtime execution."
       ]
     }
   ],
@@ -7068,7 +7106,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7334,7 +7373,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7376,7 +7416,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7459,7 +7500,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7585,7 +7627,8 @@
         "evidenceIds": [
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
-          "local.library_upgrades.20261024"
+          "local.library_upgrades.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7628,7 +7671,8 @@
         "evidenceIds": [
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
-          "local.library_upgrades.20261024"
+          "local.library_upgrades.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7669,7 +7713,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7710,7 +7755,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7813,7 +7859,8 @@
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available."
         ]
       },
       "qualification": {
@@ -7821,7 +7868,8 @@
         "evidenceIds": [
           "local.library_upgrades.20261024",
           "local.library_vendor.20261025",
-          "local.library_formats.20261025"
+          "local.library_formats.20261025",
+          "local.library_compatibility.20261027"
         ]
       },
       "availability": {
@@ -7928,7 +7976,8 @@
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
+          "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source.",
+          "Target state (local.library_compatibility.20261027): unsaved target edits are reported in the preview (unsavedTargetEdits) and saved into the checkpoint baseline; an inherited inconsistent PLC data type is refused before any checkpoint (InheritedDiagnostics). A type using data types the target CPU family lacks (LInt/LWord/LTime on an S7-1200) fails compilation after checkpoint without saving (CompileFailed); it is not refused at preparation. Firmware-version mismatches are not exercised."
         ]
       },
       "qualification": {
@@ -7945,7 +7994,9 @@
           "local.library_units.20261025",
           "local.library_dependencies.20261025",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027",
+          "local.library_compatibility.20261027"
         ]
       },
       "availability": {
@@ -8121,7 +8172,8 @@
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -8299,7 +8351,8 @@
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -8640,7 +8693,8 @@
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {

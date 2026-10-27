@@ -110,7 +110,13 @@ namespace TiaMcp.Openness.V21
             if (change.ComponentContentPins != null) preview["componentContentPins"] = change.ComponentContentPins.DeepClone();
             foreach (var library in new[] { change.Source, change.Destination }.Where(x => x != null).Distinct())
                 ((JArray)preview["resources"]).Add(new JObject { ["libraryId"] = library.Id, ["revision"] = LibraryRevision(library), ["path"] = library.Project?.Path?.FullName ?? library.Global.Path?.FullName, ["sourcePath"] = library.SourcePath, ["sourceHash"] = library.SourceHash });
-            if (change.Project != null) preview["projectPath"] = change.Project.Path?.FullName;
+            if (change.Project != null)
+            {
+                preview["projectPath"] = change.Project.Path?.FullName;
+                // checkpointSave persists in-memory edits before archiving, so they join the recovery baseline and the result.
+                preview["unsavedTargetEdits"] = new JObject { ["present"] = change.Project.IsModified,
+                    ["disposition"] = change.Project.IsModified ? "savedIntoCheckpointBaseline" : "none" };
+            }
             var dependencyRoots = change.Versions.ToList();
             if (kind == "library_copy_elements" || kind == "library_publish")
             {

@@ -57,6 +57,17 @@ internal static class EngineeringFingerprintTests
         Check.Equal("LibraryContentFingerprintUnavailable", missing.Code);
     }
 
+    internal static async Task LibraryChangesRefuseInheritedInconsistentTypes()
+    {
+        string path = Plc + "/types/Broken";
+        var refused = await Check.ThrowsAsync<FingerprintException>(() => Task.FromResult(
+            EngineeringFingerprintRules.RequireConsistentType("library", () => false, path, "entry")));
+        Check.Equal("InheritedDiagnostics", refused.Code);
+        Check.Equal("entry", EngineeringFingerprintRules.RequireConsistentType("library", () => true, path, "entry"));
+        // Other change kinds keep their type policy and never read native consistency.
+        Check.Equal("entry", EngineeringFingerprintRules.RequireConsistentType<string>("source_upsert", () => throw new InvalidOperationException("not read"), path, "entry"));
+    }
+
     internal static Task NativeFingerprintValuesAndMissingProvidersStayDistinct()
     {
         var observed = EngineeringFingerprintRules.ReadBlockContent(false, false, true, false, Plc + "/blocks/User", () => "native:1");
