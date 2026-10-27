@@ -6696,7 +6696,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Backlog for the remaining Startdrive adapters (drive creation, telegram edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation and scalar parameter writes are tracked as drive_observe and change.drive_parameter_set."
         ]
       },
       "qualification": {
