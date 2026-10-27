@@ -29,6 +29,7 @@
     <Compile Include="../TiaMcp.Core/SimulationDiscoveryWait.cs" Link="SimulationDiscoveryWait.cs" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Drawing" />
     <Compile Include="..\TiaMcp.Simulator.V8\SimulationTicket.cs" Link="SimulationTicket.cs" />
     <Reference Include="Siemens.Simatic.Simulation.Runtime.Api.x64">
       <HintPath>$(SimulatorApiDirectory)\Siemens.Simatic.Simulation.Runtime.Api.x64.dll</HintPath>

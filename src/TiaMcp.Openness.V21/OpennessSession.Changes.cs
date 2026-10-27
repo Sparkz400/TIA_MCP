@@ -201,7 +201,7 @@ namespace TiaMcp.Openness.V21
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
                     if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
@@ -603,6 +603,15 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_memory_bytes":
                     PrepareCpuMemoryBytes(change, project, preview);
                     break;
+                case "safety_fparameter_set":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    preview["parameterChanges"] = FParameterSet(change, project, false);
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
+                    break;
+                }
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
@@ -930,6 +939,9 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_memory_bytes":
                     ApplyCpuMemoryBytes(change, project);
                     break;
+                case "safety_fparameter_set":
+                    change.Readbacks.Add(new JObject { ["role"] = "f-parameter-readback", ["parameters"] = FParameterSet(change, project, true) });
+                    break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
                     break;
@@ -1047,7 +1059,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || PlcAlarmProjectKinds.Contains(change.Kind))
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind))
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
