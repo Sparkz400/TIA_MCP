@@ -21,9 +21,9 @@ PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simul
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
     "access_review": ["X03"], "addin_": ["X04"], "automationml_": ["D05"],
-    "change.hardware_cpu_memory_bytes": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_review": ["D08"],
+    "change.hardware_cpu_memory_bytes": ["X10"], "change.hardware_port_": ["X10"], "change.hardware_replace": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_review": ["D08"],
     "db_snapshot": ["D09"], "device_": ["X10"], "diagnostic_": ["D17"], "drive_profile": ["D10"],
-    "engineering_": ["F03"], "graph_": ["X06"], "hmi_": ["X07", "X08"], "multiuser_": ["X05"],
+    "engineering_": ["F03"], "graph_": ["X06"], "hardware_gsd_export": ["X10"], "hmi_": ["X07", "X08"], "multiuser_": ["X05"],
     "opcua_": ["D04"], "project_snapshot": ["L04"], "public_certificate": ["X03"],
     "qualification_component": ["L02"], "qualification_testsuite": ["D06"],
     "qualification_translation": ["D03"], "qualification_watch": ["D02"],

@@ -29,8 +29,8 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) { warnings.Add(InspectionWarning(entry.Path, error)); }
             }
             return new JObject { ["items"] = items, ["warnings"] = warnings,
-                ["completeness"] = InspectionCoverage(budget, warnings, "Configured network interfaces, subnet memberships and IO-system associations of bounded project hardware.",
-                    "No cables, ports or physical topology") };
+                ["completeness"] = InspectionCoverage(budget, warnings, "Configured network interfaces, subnet memberships, IO-system associations and port interconnections of bounded project hardware.",
+                    "Configured port interconnections only; no cables or physical topology") };
         }
 
         private JObject InspectConfiguredNetwork(Project project, HardwareEntry owner, NetworkInterface network,
@@ -98,6 +98,28 @@ namespace TiaMcp.Openness.V21
                 }
             }
             catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/connectors", error)); }
+            var ports = new JArray(); result["ports"] = ports;
+            try
+            {
+                int portIndex = 0;
+                foreach (var port in network.Ports)
+                {
+                    if (!budget.Take()) break;
+                    var row = new JObject { ["portIndex"] = portIndex++ }; ports.Add(row);
+                    try
+                    {
+                        row["port"] = NetworkOwnerReference(port, hardware);
+                        var partners = new JArray(); row["connectedPorts"] = partners;
+                        foreach (var partner in port.ConnectedPorts)
+                        {
+                            if (!budget.Take()) break;
+                            partners.Add(NetworkOwnerReference(partner, hardware));
+                        }
+                    }
+                    catch (Exception error) { row["unavailable"] = error.Message; warnings.Add(InspectionWarning(owner.Path, error)); }
+                }
+            }
+            catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/ports", error)); }
             bool unresolved = result.Descendants().OfType<JProperty>().Any(property => property.Name == "resolution" && (string)property.Value != "resolved");
             result["scopeComplete"] = !budget.Truncated && warnings.Count == failuresBefore && !unresolved;
             result["associationBasis"] = "Native controller/connector associations and engineering-object equality; names and address overlap never establish ownership.";
@@ -140,6 +162,7 @@ namespace TiaMcp.Openness.V21
                 else if (item is IoController controller) item = controller.Parent;
                 else if (item is IoConnector connector) item = connector.Parent;
                 else if (item is NetworkInterface network) item = network.OwnedBy;
+                else if (item is NetworkPort port) item = port.OwnedBy;
                 else break;
             }
             return new JObject { ["resolution"] = "unresolved", ["ownerHardwarePath"] = null,

@@ -729,6 +729,12 @@
       ]
     },
     {
+      "featureId": "hardware_gsd_export",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
       "featureId": "technology_read",
       "obligations": [
         "D13"
@@ -1631,6 +1637,24 @@
     },
     {
       "featureId": "change.hardware_cpu_memory_bytes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_connect",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_disconnect",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_replace",
       "obligations": [
         "X10"
       ]

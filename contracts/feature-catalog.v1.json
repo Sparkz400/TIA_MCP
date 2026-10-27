@@ -3152,7 +3152,8 @@
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Configured I/O controller/connector/subnet inspection added on 2026-10-09; bounded owner resolution uses native object equality. New association coverage requires its own native evidence; distributed-I/O creation and physical topology remain outside this read route.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Port interconnections (NetworkInterface.Ports, NetworkPort.ConnectedPorts) and GSD identities (GsdDeviceItem/GsdDevice GsdId, GsdName, GsdType) are reported as configured offline data. Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
       "qualification": {
@@ -3161,6 +3162,49 @@
           "local.hardware.v02",
           "local.layers.encoder-connected.20261008"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "hardware_gsd_export",
+      "domain": "hardware",
+      "title": "Export an I-device GSD file",
+      "mcpTools": [
+        "hardware_gsd_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: GsdExportProvider.Export(FileInfo, String, String), reached through DeviceItem.GetService<GsdExportProvider>()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exact hardwarePath whose item exposes GsdExportProvider (hardware_inspect reports gsdExportAvailable); other items are refused as UnsupportedCapability.",
+          "Siemens writes into a fresh artifact directory; up to 32 produced files are returned with SHA-256 and further files are reported as truncated. The GSD content is not validated by the bridge.",
+          "Which item exposes the service and whether Siemens requires a compiled I-device configuration are not observed yet.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",
@@ -9884,6 +9928,156 @@
         "evidenceIds": [
           "local.cpu_memory_bytes.20261026"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_connect",
+      "domain": "hardware",
+      "title": "Connect two exact network ports",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_port_connect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkPort.ConnectToPort(NetworkPort), NetworkPort.DisconnectFromPort(NetworkPort) and NetworkPort.ConnectedPorts (documented as internal use only), reached through DeviceItem.GetService<NetworkPort>()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Both ports must be free; an existing partner is removed first with hardware_port_disconnect. Forward and reverse ConnectedPorts readback must show exactly the new link.",
+          "hardwarePath and partnerHardwarePath each select one exact port device item exposing the native NetworkPort service; hardware_inspect lists them under network.ports.",
+          "Configured-hardware preservation adds every port's ConnectedPorts owner paths to the manifest; only the two selected link entries may change. Compilation and the whole-project checkpoint are required.",
+          "Configured offline topology only: no cable data, port options, alternative partners (tool changers), physical wiring or live topology.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_disconnect",
+      "domain": "hardware",
+      "title": "Disconnect two exact network ports",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_port_disconnect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkPort.ConnectToPort(NetworkPort), NetworkPort.DisconnectFromPort(NetworkPort) and NetworkPort.ConnectedPorts (documented as internal use only), reached through DeviceItem.GetService<NetworkPort>()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The two ports must be connected to each other. Forward and reverse ConnectedPorts readback must no longer contain the link.",
+          "hardwarePath and partnerHardwarePath each select one exact port device item exposing the native NetworkPort service; hardware_inspect lists them under network.ports.",
+          "Configured-hardware preservation adds every port's ConnectedPorts owner paths to the manifest; only the two selected link entries may change. Compilation and the whole-project checkpoint are required.",
+          "Configured offline topology only: no cable data, port options, alternative partners (tool changers), physical wiring or live topology.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_replace",
+      "domain": "hardware",
+      "title": "Replace a pluggable module's type with an exact catalog type",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_replace",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: DeviceItem.ChangeType(String); the target identifier is checked against the installed HardwareCatalog."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
+          "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
+          "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
+          "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",

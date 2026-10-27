@@ -540,6 +540,13 @@ namespace TiaMcp.Openness.V21
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    PreparePortLink(change, project, preview);
+                    break;
+                case "hardware_replace":
+                    PrepareHardwareReplace(change, project, preview);
+                    break;
                 case "hardware_plug":
                 {
                     var item = ChangeHardware(project, payload);
@@ -772,6 +779,13 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
+                    break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    ApplyPortLink(change, project);
+                    break;
+                case "hardware_replace":
+                    ApplyHardwareReplace(change, project);
                     break;
                 case "hardware_delete":
                 {
@@ -1007,7 +1021,7 @@ namespace TiaMcp.Openness.V21
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();
