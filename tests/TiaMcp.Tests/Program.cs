@@ -294,6 +294,7 @@ internal static partial class Program
             ("Native fingerprint values and missing providers remain distinct", EngineeringFingerprintTests.NativeFingerprintValuesAndMissingProvidersStayDistinct),
             ("Protected in-work test instances use native fingerprints only", EngineeringFingerprintTests.ProtectedInWorkTestInstancesUseNativeFingerprintsOnly),
             ("Library changes refuse inherited inconsistent PLC data types", EngineeringFingerprintTests.LibraryChangesRefuseInheritedInconsistentTypes),
+            ("UMAC role changes plan exact effects and preserve administrators", UmacRoleRulesTests.PlansExactEffectsAndPreservesAdministrators),
             ("Graphical fragments use the native default namespace", EngineeringSourcesTests.GraphicalFragmentsUseNativeDefaultNamespace),
             ("Native network insertion preserves existing units and checks IDs", EngineeringSourcesTests.NativeNetworkInsertionPreservesExistingUnitsAndChecksIds),
             ("Native calls preserve instances and expose unresolved arguments", EngineeringSourcesTests.NativeCallsPreserveInstancesAndExposeUnresolvedArguments),

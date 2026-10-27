@@ -3536,6 +3536,25 @@
       "obligations": [
         "D04"
       ]
+    },
+    {
+      "featureId": "change.webserver_page_set",
+      "obligations": [
+        "D12"
+      ]
+    },
+    {
+      "featureId": "change.webserver_user_pages_generate",
+      "obligations": [
+        "D12"
+      ]
+    },
+    {
+      "featureId": "change.umac_role_set",
+      "obligations": [
+        "X03",
+        "D12"
+      ]
     }
   ],
   "manualResiduals": [
