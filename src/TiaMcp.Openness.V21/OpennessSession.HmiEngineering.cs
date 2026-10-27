@@ -25,7 +25,7 @@ namespace TiaMcp.Openness.V21
             var identity = (JObject)change.Payload["target"];
             HmiValidateIdentity(project, identity);
             var discovered = HmiResolveNativeTarget(project, identity);
-            var entry = HmiResolveNativeObject(project, identity);
+            var entry = HmiEngineeringObject(project, identity);
             var target = ResolveHmiTarget(project, identity);
             string operation = change.Payload.Value<string>("operation");
             var gate = HmiEngineeringRules.Gate(target.Family, discovered.Profile, operation);
@@ -40,7 +40,7 @@ namespace TiaMcp.Openness.V21
             change.HmiEvidence["baseline"] = change.HmiBeforeManifest.DeepClone();
             var native = entry.Native as IEngineeringObject;
             if (native == null) throw new BridgeException("HmiMutationTargetUnsupported", "This HMI object is parsed export content without a qualified native mutation adapter.", change.HmiEvidence);
-            var effect = target.Family == "classic" ? PrepareClassicEngineeringBody(change, native) : PrepareUnifiedEngineeringBody(change, project, native);
+            var effect = target.Family == "classic" ? PrepareClassicEngineeringBody(change, target.Software, native) : PrepareUnifiedEngineeringBody(change, project, native);
             change.HmiEvidence["proposedEffect"] = effect;
             RequireHmiEngineeringGate(gate, change.HmiEvidence);
             RequireHmiCompleteScope(change.HmiBeforeManifest);
@@ -113,7 +113,10 @@ namespace TiaMcp.Openness.V21
                 CaptureHmiArtifact(directory, target.Path + "/connections/" + Segment(connection.Name), artifacts, f => connection.Export(f, ExportOptions.WithDefaults));
             CaptureClassicEngineeringFolder(hmi.ScreenTemplateFolder, "ScreenTemplates", target.Path + "/screenTemplates", directory, artifacts, 0);
             CaptureClassicEngineeringFolder(hmi.ScreenPopupFolder, "ScreenPopups", target.Path + "/screenPopups", directory, artifacts, 0);
-            CaptureClassicEngineeringFolder(hmi.ScreenSlideinFolder, "ScreenSlideins", target.Path + "/screenSlideins", directory, artifacts, 0);
+            // Slide-ins have no Name or Folders; their SlideinType is the inventory path segment.
+            if (hmi.ScreenSlideinFolder != null)
+                foreach (var slidein in hmi.ScreenSlideinFolder.ScreenSlideins)
+                    CaptureHmiArtifact(directory, target.Path + "/screenSlideins/" + Segment(slidein.SlideinType.ToString()), artifacts, f => slidein.Export(f, ExportOptions.WithDefaults));
             CaptureClassicEngineeringFolder(hmi.VBScriptFolder, "VBScripts", target.Path + "/scripts", directory, artifacts, 0);
             foreach (var cycle in hmi.Cycles)
                 CaptureHmiArtifact(directory, target.Path + "/cycles/" + Segment(cycle.Name), artifacts, f => cycle.Export(f, ExportOptions.WithDefaults));
@@ -141,7 +144,6 @@ namespace TiaMcp.Openness.V21
                 {
                     if (native is Siemens.Engineering.Hmi.Screen.ScreenTemplate template) template.Export(file, ExportOptions.WithDefaults);
                     else if (native is Siemens.Engineering.Hmi.Screen.ScreenPopup popup) popup.Export(file, ExportOptions.WithDefaults);
-                    else if (native is Siemens.Engineering.Hmi.Screen.ScreenSlidein slidein) slidein.Export(file, ExportOptions.WithDefaults);
                     else if (native is Siemens.Engineering.Hmi.RuntimeScripting.VBScript script) script.Export(file, ExportOptions.WithDefaults);
                     else throw new BridgeException("HmiExportUnsupported", "The exact Classic folder member lacks an allowlisted public export route: " + native.GetType().FullName);
                 });
@@ -207,10 +209,11 @@ namespace TiaMcp.Openness.V21
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private JObject PrepareClassicEngineeringBody(EngineeringChange change, IEngineeringObject native)
+        private JObject PrepareClassicEngineeringBody(EngineeringChange change, Siemens.Engineering.HW.Software software, IEngineeringObject native)
         {
+            if (change.Payload.Value<string>("operation") == "classic_xml_import") return PrepareClassicXmlImport(change, software, native);
             if (change.Payload.Value<string>("operation") != "scalar_property_set" || !(native is Siemens.Engineering.Hmi.Screen.Screen screen))
-                throw new BridgeException("HmiOperationUnsupported", "Classic only has an export-preserving screen BackColor scalar candidate; typed item/tag creation/placement/binding adapters are unavailable.", change.HmiEvidence);
+                throw new BridgeException("HmiOperationUnsupported", "Classic only has the export-preserving screen BackColor scalar candidate and whole-object classic_xml_import; typed item/tag creation/placement/binding adapters are unavailable.", change.HmiEvidence);
             HmiLibraryLink.RequireNoLink(screen);
             string before = Path.Combine(change.Directory, "hmi-classic-before.xml");
             screen.Export(new FileInfo(before), ExportOptions.WithDefaults);
@@ -312,15 +315,16 @@ namespace TiaMcp.Openness.V21
             var target = HmiResolveNativeTarget(project, (JObject)change.Payload["target"]);
             RequireHmiEngineeringGate(HmiEngineeringRules.Gate(target.Family, target.Profile, change.Payload.Value<string>("operation")), change.HmiEvidence);
             RequireHmiCompleteScope(change.HmiBeforeManifest);
-            var entry = HmiResolveNativeObject(project, (JObject)change.Payload["target"]);
-            if (target.Family == "classic") ApplyClassicEngineeringBody(change, (IEngineeringObject)entry.Native);
+            var entry = HmiEngineeringObject(project, (JObject)change.Payload["target"]);
+            if (target.Family == "classic") ApplyClassicEngineeringBody(change, target.Software, (IEngineeringObject)entry.Native);
             else ApplyUnifiedEngineeringBody(change, project, (IEngineeringObject)entry.Native);
             change.Stages.Add("hmi_precise_readback_verified");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void ApplyClassicEngineeringBody(EngineeringChange change, IEngineeringObject native)
+        private static void ApplyClassicEngineeringBody(EngineeringChange change, Siemens.Engineering.HW.Software software, IEngineeringObject native)
         {
+            if (change.Payload.Value<string>("operation") == "classic_xml_import") { ApplyClassicXmlImport(change, software, native); return; }
             var screen = native as Siemens.Engineering.Hmi.Screen.Screen ?? throw new BridgeException("HmiTargetMismatch", "Classic screen identity changed.");
             string requested = ((JObject)change.Payload["properties"]).Value<string>("BackColor");
             HmiPreservationRules.ClassicColor(requested);
@@ -345,6 +349,114 @@ namespace TiaMcp.Openness.V21
             screen.Export(new FileInfo(after), ExportOptions.WithDefaults);
             HmiPreservationRules.RequireClassicDocumentPreservation(HmiPreservationRules.ReadXml(File.ReadAllText(change.InputPath)), HmiPreservationRules.ReadXml(File.ReadAllText(after)));
             change.Readbacks.Add(new JObject { ["role"] = "hmi-native-readback", ["artifact"] = ChangeArtifact(after) });
+        }
+
+        // Classic cycles have no inspection kind; hmiCycle addresses one by its preservation-capture path.
+        private HmiNativeEntry HmiEngineeringObject(Project project, JObject identity)
+        {
+            if (identity.Value<string>("kind") != "hmiCycle") return HmiResolveNativeObject(project, identity);
+            var target = HmiResolveNativeTarget(project, identity);
+            if (target.Family != "classic") throw new BridgeException("UnsupportedObjectKind", "hmiCycle identifies a Classic HMI cycle.");
+            RequireHmiModule(target.Family);
+            return new HmiNativeEntry { Native = ClassicCycle(target.Software, target.Path, identity.Value<string>("objectPath")) };
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IEngineeringObject ClassicCycle(Siemens.Engineering.HW.Software software, string hmiPath, string path)
+        {
+            var matches = ((Siemens.Engineering.Hmi.HmiTarget)software).Cycles.Where(c => hmiPath + "/cycles/" + Segment(c.Name) == path).Take(2).ToArray();
+            if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ObjectNotFound" : "AmbiguousTarget", "An exact, unique Classic cycle matching objectPath was not found.");
+            return matches[0];
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static Action<FileInfo> ClassicObjectExport(IEngineeringObject native)
+        {
+            switch (native)
+            {
+                case Siemens.Engineering.Hmi.Tag.TagTable x: return f => x.Export(f, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.RuntimeScripting.VBScript x: return f => x.Export(f, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.TextGraphicList.TextList x: return f => x.Export(f, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.TextGraphicList.GraphicList x: return f => x.Export(f, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Cycle.Cycle x: return f => x.Export(f, ExportOptions.WithDefaults);
+                case Siemens.Engineering.Hmi.Communication.Connection x: return f => x.Export(f, ExportOptions.WithDefaults);
+                default: return HmiClassicScreenExport(native) ?? throw new BridgeException("HmiExportUnsupported", "The exact Classic object has no allowlisted public export: " + native.GetType().FullName);
+            }
+        }
+
+        // The exact object's owning composition: Import(Override), then re-find the same identity.
+        // Owners outside this allowlist fail closed during preparation, before any write.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static Func<FileInfo, IEngineeringObject> ClassicXmlImportRoute(Siemens.Engineering.HW.Software software, IEngineeringObject native)
+        {
+            var hmi = (Siemens.Engineering.Hmi.HmiTarget)software;
+            var parent = native.Parent;
+            switch (native)
+            {
+                case Siemens.Engineering.Hmi.Screen.Screen x when parent is Siemens.Engineering.Hmi.Screen.ScreenFolder p:
+                { string name = x.Name; return f => { p.Screens.Import(f, ImportOptions.Override); return p.Screens.Find(name); }; }
+                case Siemens.Engineering.Hmi.Screen.ScreenTemplate x when parent is Siemens.Engineering.Hmi.Screen.ScreenTemplateFolder p:
+                { string name = x.Name; return f => { p.ScreenTemplates.Import(f, ImportOptions.Override); return p.ScreenTemplates.Find(name); }; }
+                case Siemens.Engineering.Hmi.Screen.ScreenPopup x when parent is Siemens.Engineering.Hmi.Screen.ScreenPopupFolder p:
+                { string name = x.Name; return f => { p.ScreenPopups.Import(f, ImportOptions.Override); return p.ScreenPopups.Find(name); }; }
+                case Siemens.Engineering.Hmi.Screen.ScreenSlidein x when parent is Siemens.Engineering.Hmi.Screen.ScreenSlideinSystemFolder p:
+                { var type = x.SlideinType; return f => { p.ScreenSlideins.Import(f, ImportOptions.Override); return p.ScreenSlideins.Find(type); }; }
+                case Siemens.Engineering.Hmi.Screen.ScreenGlobalElements _:
+                    return f => { hmi.ImportScreenGlobalElements(f, ImportOptions.Override); return hmi.ScreenGlobalElements; };
+                case Siemens.Engineering.Hmi.Screen.ScreenOverview _:
+                    return f => { hmi.ImportScreenOverview(f, ImportOptions.Override); return hmi.ScreenOverview; };
+                case Siemens.Engineering.Hmi.Tag.TagTable x when parent is Siemens.Engineering.Hmi.Tag.TagFolder p:
+                { string name = x.Name; return f => { p.TagTables.Import(f, ImportOptions.Override); return p.TagTables.Find(name); }; }
+                case Siemens.Engineering.Hmi.RuntimeScripting.VBScript x when parent is Siemens.Engineering.Hmi.RuntimeScripting.VBScriptFolder p:
+                { string name = x.Name; return f => { p.VBScripts.Import(f, ImportOptions.Override); return p.VBScripts.Find(name); }; }
+                case Siemens.Engineering.Hmi.TextGraphicList.TextList x:
+                { string name = x.Name; return f => { hmi.TextLists.Import(f, ImportOptions.Override); return hmi.TextLists.Find(name); }; }
+                case Siemens.Engineering.Hmi.TextGraphicList.GraphicList x:
+                { string name = x.Name; return f => { hmi.GraphicLists.Import(f, ImportOptions.Override); return hmi.GraphicLists.Find(name); }; }
+                case Siemens.Engineering.Hmi.Cycle.Cycle x:
+                { string name = x.Name; return f => { hmi.Cycles.Import(f, ImportOptions.Override); return hmi.Cycles.Find(name); }; }
+                case Siemens.Engineering.Hmi.Communication.Connection x:
+                { string name = x.Name; return f => { hmi.Connections.Import(f, ImportOptions.Override); return hmi.Connections.Find(name); }; }
+                default: throw new BridgeException("HmiDestinationUnsupported", "The exact Classic object has no allowlisted owning-composition import route: " + native.GetType().FullName);
+            }
+        }
+
+        // Screens and VB scripts can be library type instances; their XML alone cannot preserve the link.
+        private static void RequireClassicImportUnlinked(IEngineeringObject native)
+        {
+            if (native is Siemens.Engineering.Hmi.Screen.Screen || native is Siemens.Engineering.Hmi.RuntimeScripting.VBScript) HmiLibraryLink.RequireNoLink(native);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private JObject PrepareClassicXmlImport(EngineeringChange change, Siemens.Engineering.HW.Software software, IEngineeringObject native)
+        {
+            ClassicXmlImportRoute(software, native);
+            RequireClassicImportUnlinked(native);
+            string before = Path.Combine(change.Directory, "hmi-classic-before.xml");
+            ClassicObjectExport(native)(new FileInfo(before));
+            change.Backups.Add(new JObject { ["role"] = "hmi-classic-before", ["artifact"] = ChangeArtifact(before) });
+            string xml = change.Payload.Value<string>("xml");
+            System.Xml.Linq.XElement current;
+            try { current = HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(File.ReadAllText(before))); HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(xml), current); }
+            catch (ArgumentException error) { throw new BridgeException("XmlScopeMismatch", error.Message, change.HmiEvidence); }
+            change.InputPath = Path.Combine(change.Directory, "hmi-classic-expected.xml");
+            File.WriteAllText(change.InputPath, xml);
+            change.InputHash = ChangeFileHash(change.InputPath);
+            return new JObject { ["operation"] = "classic_xml_import", ["objectPath"] = change.Payload["target"]["objectPath"].DeepClone(),
+                ["nativeType"] = native.GetType().FullName, ["exportRoot"] = current.Name.LocalName, ["beforeSha256"] = ChangeFileHash(before), ["inputSha256"] = change.InputHash,
+                ["declaredDelta"] = "The exact object's native re-export must equal the supplied document apart from DocumentInfo and formatting; every other HMI export must stay identical." };
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void ApplyClassicXmlImport(EngineeringChange change, Siemens.Engineering.HW.Software software, IEngineeringObject native)
+        {
+            RequireClassicImportUnlinked(native);
+            var imported = ClassicXmlImportRoute(software, native)(new FileInfo(change.InputPath))
+                ?? throw new BridgeException("PreservationMismatch", "Native import did not preserve the exact Classic object identity.");
+            string after = Path.Combine(change.Directory, "hmi-classic-after.xml");
+            ClassicObjectExport(imported)(new FileInfo(after));
+            change.Readbacks.Add(new JObject { ["role"] = "hmi-native-readback", ["artifact"] = ChangeArtifact(after) });
+            EngineeringSources.RequireNativePreservation(HmiPreservationRules.ReadXml(File.ReadAllText(change.InputPath)), HmiPreservationRules.ReadXml(File.ReadAllText(after)));
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
