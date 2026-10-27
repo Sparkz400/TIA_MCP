@@ -19675,7 +19675,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified."
+          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
         ]
       },
       "qualification": {
@@ -19719,7 +19720,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified."
+          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
         ]
       },
       "qualification": {
@@ -19743,6 +19745,49 @@
         "AC-evidence",
         "AC-recovery",
         "AC-preserve",
+        "AC-native"
+      ]
+    },
+    {
+      "featureId": "addin_companion",
+      "domain": "addins",
+      "title": "TIA Portal Add-In companion: send an exact project-tree selection to an enrolled Host",
+      "mcpTools": [],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Add-In API: Siemens.Engineering.AddIn.ProjectTreeAddInProvider.GetContextMenuAddIns, Menu.ContextMenuAddIn.BuildContextMenuItems, Menu.ChildItemFactory.AddActionItem<IEngineeringObject>, Menu.MenuSelectionProvider.GetSelection<T>, TiaPortal.GetService<MessageBoxProvider>().ShowNotification; read-only Parent/Name/Namespace/Project.Path of the selected objects. Packaged with the installed Siemens.Engineering.AddIn.Publisher.exe against Siemens.Engineering.AddIn.Publisher.xsd (V21)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified. The Publisher package builds, but no install, menu, selection, sandbox or pipe exchange has run inside TIA Portal.",
+          "Project-tree selections of projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags. Other objects, devices-and-networks, library and workflow-hook surfaces are refused. Object paths mirror the worker's project model; a path absent from the newest saved review of the same project copy is refused, never matched by name.",
+          "Declares TIA.ReadOnly, EnvironmentPermission, FileIOPermission and SecurityPermission.UnmanagedCode (pipe-server process check). Whether TIA's Add-In sandbox allows these calls, and whether its loader is a direct child of the TIA process, is unverified.",
+          "Host enrollment (--addin-handoff --addin-enrollment) pins the published module-version and configuration hashes and requires the peer to be TIA's Add-In loader below the TIA process the attached worker owns, in the live worker session generation. These are OS lineage and declared-hash checks, not attestation of the loaded package; producerAuthenticated and liveSelectionVerified stay false. Package signing is not configured."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "TIA Portal V21 with the user-installed package, TIAMCP_ARTIFACTS set for TIA, a Host started with --addin-handoff --addin-enrollment whose worker is attached to that TIA instance, and a saved review captured in that worker session."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Publisher package and enrollment file from scripts/Publish-AddIn.ps1",
+        "Saved project review captured by the same attached worker session"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
         "AC-native"
       ]
     },

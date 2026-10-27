@@ -3010,6 +3010,13 @@
       ]
     },
     {
+      "featureId": "addin_companion",
+      "obligations": [
+        "X04",
+        "F02"
+      ]
+    },
+    {
       "featureId": "multiuser_observation_review",
       "obligations": [
         "X05",

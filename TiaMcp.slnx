@@ -10,6 +10,7 @@
     <Project Path="src/TiaMcp.Host/TiaMcp.Host.csproj" />
     <Project Path="src/TiaMcp.Openness.V21/TiaMcp.Openness.V21.csproj" />
     <Project Path="src/TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj" />
+    <Project Path="src/TiaMcp.AddIn.V21/TiaMcp.AddIn.V21.csproj" />
     <Project Path="src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj" />
   </Folder>
   <Folder Name="/tests/">
