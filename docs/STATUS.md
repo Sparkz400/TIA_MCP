@@ -1,5 +1,15 @@
 # Current status
 
+**PLCSIM-bound runtime and gated writes, DB snapshots, library maintenance, Unified connections and non-screen objects — 27 October 2026:** All compiled against the V21 PublicAPI and the PLCSIM Advanced V8 API; none run natively. Everything is catalog `partial`/`unverified`.
+- **Runtime against PLCSIM:**
+  - `runtime_plcsim_bind` retains the owned PLCSIM instance's identity: name, storage path, ownership-marker hash, controller IPs, and the online program fingerprint when `plc_online_compare` returns one. Given that binding, `runtime_handoff_review` matches target and program identity against it and states `boundOwnedPlcsim` or `unbound`.
+  - `runtime_web_write`, `runtime_web_operating_mode` and `runtime_ua_write` refuse unless the session endpoint is a controller IP of a live binding. Each needs an acknowledgement flag, exact expected values or mode and at most 16 items, and reads back what it wrote. Alarm acknowledge is not implemented: no verifiable `Alarms.Acknowledge` contract.
+- **DB snapshots:** `db_snapshot_capture` exports one DB's stored snapshot natively into a review. Prepared kinds `db_snapshot_create` (online snapshot from the owned PLCSIM instance into the project) and `db_snapshot_load_actual` (writes the stored snapshot into the owned PLCSIM instance; acknowledged and bound to the review hash). V21 has no actual-value read, so the load is reported, not read back.
+- **Libraries:** prepared kinds `library_cleanup` (project library; refuses anything still used) and `library_harmonize` (one PLC), and read-only `library_update_check`. `library_create_master_copy` accepts a PLC user group as one composite source. V21 has no API to move library types or folders.
+- **Unified HMI:** `hmi_engineering` gains `connection_create`, `object_create` (alarms, data and alarm logs), `object_properties_set` (alarms, logs, runtime settings including the start screen), DB-member external tags and bindings to PLC-backed tags, all behind the closed preservation gate. V21 offers no create or writable property for text/graphic lists or script modules.
+
+[Engineering workflows](guides/engineering-workflows.md), [physical runtime sessions](reference/physical-runtime-sessions.md), [DB snapshot review](reference/db-snapshot-review.md), [HMI engineering](guides/hmi-engineering.md).
+
 **Project texts, explorer libraries and ports, composite capture, OPC UA engineering changes, PLC alarm imports — 27 October 2026:** All compiled against the V21 PublicAPI; none run natively. Everything is catalog `partial`/`unverified`.
 - **Project texts:**
   - `project_text_export` exports per target culture, or one workbook for explicit owners. Filtered category exports are always compared with a full export by native key, and leaked or dropped rows are reported.
