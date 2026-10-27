@@ -106,7 +106,10 @@ def run(args):
                 name = str(len(known) + 1)
                 h.apply("hardware_add", {"typeIdentifier": h.scratch_cpu, "deviceName": "ScratchStation" + name, "itemName": "ScratchPLC" + name,
                         "configureScratchSecurity": True})  # a new S7-1500 needs its confidential-data password before it compiles
-                added = [x["path"] for x in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if x["path"] not in known]
+                # project_inventory spends one budget on hardware items and blocks; UDT batches add no blocks, so FBs stay well below it.
+                inventory = h.tool("project_inventory", {"maxItems": 2000})
+                require(not inventory["completeness"]["truncated"], "Inventory truncated before the added PLC; keep FB types below about 1,900 per PLC")
+                added = [x["path"] for x in inventory["plcs"] if x["path"] not in known]
                 require(len(added) == 1, "Expected exactly one added PLC")
                 plc = added[0]
                 h.report["plcs"].append(plc)
