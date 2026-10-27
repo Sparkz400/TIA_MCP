@@ -66,16 +66,19 @@ internal static partial class Program
         if (args.Length == 3 && args[0] == "visual") return Visual(args[1], args[2]);
         if (args.Length == 2 && args[0] == "repair-ui") return RepairUi(args[1]);
         if (args.Length == 2 && args[0] == "verify-configured") return VerifyConfigured(args[1]);
-        if (args.Length < 2 || args.Length > 5 || args[0] != "qualify") throw new ArgumentException("HmiSeeder.exe qualify <NEW-output-directory> [comma-separated-profile-ids] [positive|negative] [textlists]");
+        if (args.Length < 2 || args.Length > 5 || args[0] != "qualify") throw new ArgumentException("HmiSeeder.exe qualify <NEW-output-directory> [comma-separated-profile-ids] [positive|negative] [textlists|plchmi]");
         string mode = args.Length >= 4 ? args[3] : "negative";
         if (mode != "positive" && mode != "negative") throw new ArgumentException("Fixture mode must be positive or negative.");
         PositiveFixture = mode == "positive";
-        TextListFixture = args.Length == 5;
-        if (TextListFixture && args[4] != "textlists") throw new ArgumentException("The only documented optional resource fixture is textlists.");
+        TextListFixture = args.Length == 5 && args[4] == "textlists";
+        PlcHmiFixture = args.Length == 5 && args[4] == "plchmi";
+        if (args.Length == 5 && !TextListFixture && !PlcHmiFixture) throw new ArgumentException("The optional fixture must be textlists or plchmi.");
         var requested = args.Length >= 3 ? args[2].Split(',') : null;
         var knownProfiles = new[] { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
         if (requested != null && (requested.Length != requested.Distinct().Count() || requested.Any(id => !knownProfiles.Contains(id))))
             throw new ArgumentException("Select distinct known exact HMI profile IDs before starting an owned portal.");
+        if (PlcHmiFixture && (!PositiveFixture || requested == null || requested.Any(id => !id.StartsWith("unified-", StringComparison.Ordinal))))
+            throw new ArgumentException("The plchmi fixture requires positive mode and explicitly selected Unified profiles.");
         if (TextListFixture && (requested == null || requested.Any(id => !id.StartsWith("unified-", StringComparison.Ordinal))))
             throw new ArgumentException("The paired text-list fixture requires explicitly selected Unified profiles.");
         if (TextListFixture) foreach (string name in TextListInputNames)
@@ -89,7 +92,7 @@ internal static partial class Program
             ["scope"] = "Independent newly-created offline HMI fixtures; no existing user project, scripts or deployment",
             ["seederSha256"] = Hash(Assembly.GetExecutingAssembly().Location), ["profiles"] = new JArray(), ["runtimeVerified"] = false,
             ["fixtureMode"] = mode, ["deliberateInvalidReferences"] = !PositiveFixture,
-            ["resourceFixture"] = TextListFixture ? "documented-bilingual-text-list" : "none",
+            ["resourceFixture"] = TextListFixture ? "documented-bilingual-text-list" : "none", ["plcHmiFixture"] = PlcHmiFixture,
             ["assembly"] = typeof(TiaPortal).Assembly.FullName, ["cleanup"] = "pending" };
         Persist();
         RecordProcesses(null, "before-owned-start");
@@ -164,6 +167,12 @@ internal static partial class Program
                     row["softwareTypes"] = new JArray(software.Select(sw => sw.GetType().FullName));
                     row["fixtureAuthoring"] = new JArray(software.Select(sw => Seed(sw, directory)));
                     row["connectionFixture"] = SeedConnections(portal, project, new[] { first, second }, directory);
+                    if (PlcHmiFixture)
+                    {
+                        var link = (JObject)row["connectionFixture"]["links"][0];
+                        row["plcHmiFixture"] = SeedPlcHmiRecipe(project, software.Single(sw => sw.Name == link.Value<string>("hmiSoftware")), link.Value<string>("localConnectionName"), directory);
+                        Persist();
+                    }
                     // Native dynamics are authored only after their external tags exist.
                     row["dynamicsFixture"] = new JArray(software.Where(sw => sw.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.")).Select(sw =>
                         new JObject { ["software"] = sw.Name, ["dynamics"] = SeedDynamics(sw) }));
