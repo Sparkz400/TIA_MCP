@@ -15849,7 +15849,7 @@
     {
       "featureId": "runtime_capture_start",
       "domain": "runtime",
-      "title": "Start bounded Web polling capture",
+      "title": "Start bounded Web or owned PLCSIM polling capture",
       "mcpTools": [
         "runtime_capture_start"
       ],
@@ -15857,7 +15857,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Documented Siemens Web API methods; local status/binding use no network."
+          "Documented Siemens Web API methods; local status/binding use no network.",
+          "source plcsim uses the PLCSIM Advanced V8 IInstance typed Read* methods, OperatingMode with EOperatingMode.SingleStep_C, RegisterOnSyncPointReachedEvent, RunToNextSyncPoint, WaitForOnSyncPointReachedEvent(UInt32) and UnregisterOnSyncPointReachedEvent through the simulator worker."
         ]
       },
       "implementation": {
@@ -15866,7 +15867,10 @@
           "Portable Web polling, immutable committed prefixes and offline Explorer viewing are implemented; see docs/reference/runtime-captures.md.",
           "No native CPU qualification, program-match proof, interpolation, scan synchronization, UA subscriptions or automatic resume.",
           "Optional explicit diagnostic-case mappings retain re-resolved source declarations and observed types; online address equivalence and running-program identity remain unverified.",
-          "Optional retained handoff binding checks original evidence and owned session context before reads; historical export remains available. Identity, effective rights and operation/assertion admission remain unverified."
+          "Optional retained handoff binding checks original evidence and owned session context before reads; historical export remains available. Identity, effective rights and operation/assertion admission remain unverified.",
+          "source plcsim polls only an exact PLCSIM Advanced V8 instance this Host created or adopted (attemptId is its creationId; ID, name and creation receipt are rechecked by the worker for every call); unowned instances are refused. Caller-declared datatypes must fit the typed read and are what diagnostic mappings compare; PLCSIM tag metadata is not read.",
+          "cycleSynchronous switches the running owned instance to SingleStep_C, steps one sync point per sample, reads every signal while the CPU holds there and restores the recorded operating mode on stop, failure or Host shutdown. A lost simulator worker or faulted bridge cannot restore it; an unconfirmed restore is reported as localFailure PlcsimOperatingModeRestoreFailed.",
+          "PLCSIM rows retain per-row sync-point evidence, but capture status, analysis and diagnostic acquisition keep atomicAcrossSignals and scanSynchronized false; Project Explorer Open capture accepts Web captures only. Compiled against the installed PLCSIM Advanced V8 API only; not natively qualified."
         ]
       },
       "qualification": {
@@ -15876,11 +15880,12 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Start requires an owned Web session and exact selections. Reopen, page and export need only retained local capture data."
+          "Start requires an owned Web session and exact selections, or an owned PLCSIM Advanced V8 instance selected in this Host's simulator worker. Reopen, page and export need only retained local capture data."
         ]
       },
       "prerequisites": [
-        "Existing owned session for acquisition; retained capture files for offline review"
+        "Existing owned session for acquisition; retained capture files for offline review",
+        "For source plcsim: instance created by sim_create or adopted by sim_select with its creationId; a running CPU for cycleSynchronous"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -15948,7 +15953,8 @@
         "status": "partial",
         "limitations": [
           "Portable Web polling, immutable committed prefixes and offline Explorer viewing are implemented; see docs/reference/runtime-captures.md.",
-          "No native CPU qualification, program-match proof, interpolation, scan synchronization, UA subscriptions or automatic resume."
+          "No native CPU qualification, program-match proof, interpolation, scan synchronization, UA subscriptions or automatic resume.",
+          "Stopping a cycle-synchronous PLCSIM capture restores the operating mode recorded at start through the simulator worker; an unconfirmed restore stays visible as localFailure PlcsimOperatingModeRestoreFailed."
         ]
       },
       "qualification": {

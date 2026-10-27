@@ -42,12 +42,14 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `simulation_provision_scratch_credential` | Opt-in engineering operation: the exact `downloadTicket`, required generated `credentialMetadataPath`, optional `projectName`, `plcPath` and `credentialLineageJournalPaths`. Validates the original card and owned scratch/Softbus target, starts the same CPU empty, then attempts `OnlineProvider.SetPlcMasterSecret` with the generated DPAPI credential. Optional `trustOwnedEmptyCpuCertificate` defaults false. One attempt per owned instance; success requires OFF with protection enabled and the original card restored unchanged. Does not establish RUN or live values. |
 | `sim_state` | `instanceId`, `action` (`powerOn`, `powerOff`, `run`, `stop`), optional bounded `timeoutMs`. No automatic RUN following download. |
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
-| `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation time and quality/error. |
+| `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation and completion time and quality, with error text and code for a bad read. |
 | `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Validates all values before writing and reports completed writes if a later write fails. |
 | `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. |
 | `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
 Runtime action calls require an instance created or explicitly selected by the current worker. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on requires existing local `Softbus` mode. RUN, writes and scenarios additionally require that the instance reports a Softbus communication interface. This adapter never changes shared adapter bindings/network mode and never uses remote instance discovery or an online physical-PLC download API.
+
+For bounded retained polling of an owned instance, optionally one sample per PLC cycle in single-step mode, use `runtime_capture_start` with `source:"plcsim"`; the Host drives the worker's internal `sim_capture_begin`, `sim_capture_sample` and `sim_capture_end` operations. See [PLCSIM capture source](../reference/runtime-captures.md#plcsim-capture-source).
 
 Releasing a client interface and shutting down the worker do not power off or unregister simulator instances. Use explicit owned cleanup while that worker still holds ownership. After a worker restart, existing instances can be selected but are not silently reclaimed as owned. Retained storage can be inspected or removed separately by the user.
 

@@ -144,7 +144,7 @@ public sealed class RuntimeCaptureAnalysis(string artifactsRoot)
             ["association"]=JsonSerializer.SerializeToNode(association,BridgeProtocol.Json),
             ["capture"]=new JsonObject{["captureId"]=plan.CaptureId,["recordedProgress"]=JsonSerializer.SerializeToNode(snapshot.Progress,BridgeProtocol.Json),
                 ["request"]=JsonSerializer.SerializeToNode(plan.Request,BridgeProtocol.Json),["signals"]=JsonSerializer.SerializeToNode(plan.Signals,BridgeProtocol.Json),
-                ["context"]=JsonSerializer.SerializeToNode(plan.Signals[0].Selection.Context,BridgeProtocol.Json),["uncommittedDataUnknown"]=snapshot.Progress.State=="running"},
+                ["context"]=JsonSerializer.SerializeToNode((object?)plan.Signals[0].Selection?.Context??plan.Request.Simulator,BridgeProtocol.Json),["uncommittedDataUnknown"]=snapshot.Progress.State=="running"},
             ["qualityAssessment"]=new JsonObject{["cyclesObserved"]=cycles,["missingValues"]=missing,["hostReadErrors"]=hostErrors,["providerFailures"]=providerFailures,
                 ["unsupportedValues"]=unsupportedValues,["unavailableReasons"]=unavailableReasons,["skippedPolls"]=snapshot.Progress.SkippedPolls,["droppedReadResults"]=snapshot.Progress.DroppedReadResults,
                 ["uncapturedSignalIds"]=D.Strings(signals.Keys.Except(mapped.Values.Select(x=>x.SignalId),StringComparer.Ordinal))},

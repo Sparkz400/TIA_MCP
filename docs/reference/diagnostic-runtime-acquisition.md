@@ -7,7 +7,7 @@ This is a separate workflow from `trace_read`, `diagnostic_experiment_review` an
 ## Workflow
 
 1. Retain a diagnostic case with `diagnostic_plan`, explicitly selecting the saved review, FB/call/instance and justified signals. Compose its watch/manual-trace experiment with `diagnostic_experiment_plan`.
-2. When separately starting a runtime capture, supply its existing `association:{caseId,mappings:[{selectionId,signalId,reason}]}` with the exact diagnostic case ID and review ID. Selection IDs identify retained runtime symbol selections. The mapping is a declaration of intended association; matching names/types and caller-supplied program labels do not establish online program or address identity.
+2. When separately starting a runtime capture, supply its existing `association:{caseId,mappings:[{selectionId,signalId,reason}]}` with the exact diagnostic case ID and review ID. Selection IDs identify retained runtime symbol selections, or the caller-chosen signal labels of a [PLCSIM capture](runtime-captures.md#plcsim-capture-source), whose rows also retain per-row sync-point evidence. The mapping is a declaration of intended association; matching names/types and caller-supplied program labels do not establish online program or address identity.
 3. Select an immutable `snapshotRef` returned by the capture workflow. The reference binds the plan and complete committed segment prefix. An active prefix remains that same prefix after later append, stop or Host restart.
 4. Call:
 
