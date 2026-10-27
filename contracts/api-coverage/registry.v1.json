@@ -2371,6 +2371,30 @@
       ]
     },
     {
+      "featureId": "connection_inspect",
+      "obligations": [
+        "D08"
+      ]
+    },
+    {
+      "featureId": "change.connection_create",
+      "obligations": [
+        "D08"
+      ]
+    },
+    {
+      "featureId": "change.connection_delete",
+      "obligations": [
+        "D08"
+      ]
+    },
+    {
+      "featureId": "change.connection_set",
+      "obligations": [
+        "D08"
+      ]
+    },
+    {
       "featureId": "db_snapshot_review",
       "obligations": [
         "D09",

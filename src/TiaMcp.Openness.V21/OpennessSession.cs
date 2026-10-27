@@ -123,6 +123,7 @@ namespace TiaMcp.Openness.V21
                 case "tag_table_read": return TagTableRead(arguments);
                 case "block_interface": return BlockInterface(arguments);
                 case "hardware_inspect": return HardwareInspect(arguments);
+                case "connection_inspect": return ConnectionInspect(arguments);
                 case "technology_read": return TechnologyRead(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
                 case "call_graph": return CallGraph(arguments);
