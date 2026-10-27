@@ -2639,6 +2639,18 @@
       ]
     },
     {
+      "featureId": "composite_engineering_capture",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
       "featureId": "runtime_handoff_observation",
       "obligations": [
         "C03",

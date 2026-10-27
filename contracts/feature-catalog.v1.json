@@ -16606,6 +16606,95 @@
       ]
     },
     {
+      "featureId": "composite_engineering_capture",
+      "domain": "hardware",
+      "title": "Produce a composite phase from native captures of one saved project",
+      "mcpTools": [
+        "composite_engineering_capture"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Calls the existing read-only worker operations cax_export, connection_inspect, drive_observe and technology_read; no new Siemens API. Operations absent from the running worker are reported unavailable."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Each native capture is retained through its existing workflow (AutomationML document, connection-review-request.v1, drive-profile-review-request.v2, technology-profile-review-request.v1) as one observed state with identical before/after; the result is one composite phase plus per-capture native/unavailable/failed status and per-record refusals.",
+          "Technology objects come from the saved review; technology_read connection slots become hardware relationships whose target is the single resolved hardware or channel-owner reference, otherwise disconnected or unknown with a reason. CPU order number, firmware and encoder routes (technology v4) are not captured.",
+          "At most 32 component records per phase with explicit truncation; drive_observe is bounded by maxItems 2000 and reports parametersComplete false when paged. Captures are sequential, not an atomic project revision, and a response for a different project path refuses the whole capture.",
+          "Host logic tested offline against fake worker responses only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Needs an attached V21 project matching an exact saved reviewId in this artifact store; AML, connection and drive captures need workers that provide cax_export, connection_inspect and drive_observe (drives also need Startdrive)."
+        ]
+      },
+      "prerequisites": [
+        "Exact saved project review of the open project in the Host artifact store",
+        "Authorized TIA V21 Openness user; Startdrive for drive captures",
+        "Bounded writable artifact and upload storage"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-native"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "domain": "hardware",
+      "title": "Plan technology-object rebinds after a declared hardware replacement",
+      "mcpTools": [
+        "composite_engineering_rebind_plan"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Offline Host planning over a revalidated composite record; no native product or execution API is invoked."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
+          "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
+          "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
+          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Exact retained composite handle whose AML, saved review and component dependencies still revalidate."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host and bounded artifact storage",
+        "Every referenced AML, saved review, connection, drive and technology record remains available and unchanged"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preview",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "runtime_handoff_observation",
       "domain": "security-access",
       "title": "Retain original public runtime handoff observations",
