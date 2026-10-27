@@ -28,7 +28,7 @@ namespace TiaMcp.Openness.V21
         {
             string projectPath = ChangeText(args, "projectPath", 8192), plcPath = ChangeText(args, "plcPath", 8192);
             string blockPath = ChangeText(args, "blockPath", 8192), instancePath = ChangeText(args, "instanceDbPath", 8192);
-            var plc = SelectPlc(args); EnsureProjectOffline(plc.Project);
+            var plc = SelectPlc(args); EnsureProjectOffline(plc.Project, false);
             if (!string.Equals(plc.Project.Path.FullName, projectPath, StringComparison.OrdinalIgnoreCase) || plc.Path != plcPath)
                 throw new BridgeException("IdentityMismatch", "Exact physical project and PLC required for watch generation.");
             if (plc.Project.IsModified) throw new BridgeException("UnsavedProject", "Save the source before generating watch rows.");

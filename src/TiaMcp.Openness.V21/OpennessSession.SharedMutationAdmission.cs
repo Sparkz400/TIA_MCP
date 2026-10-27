@@ -21,7 +21,7 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsSharedMutation(string operation) => operation == "change_apply" || operation == "change_restore" ||
             operation == "simulation_download" || operation == "simulation_provision_scratch_credential" || operation == "library_open" ||
-            operation == "scratch_create" || operation == "project_retrieve" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step";
+            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step";
 
         private JObject SharedMutationBegin(JObject args)
         {
@@ -63,6 +63,7 @@ namespace TiaMcp.Openness.V21
                 case "library_open": return LibraryOpen(arguments);
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
+                case "project_copy": return ProjectCopy(arguments);
                 case "watch_fixture_seed": return WatchFixtureSeed(arguments);
                 case "watch_authoring_source_negative": return WatchAuthoringSourceNegative(arguments);
                 case "component_window_step": return ComponentWindowExecute(arguments);
@@ -250,6 +251,15 @@ namespace TiaMcp.Openness.V21
                 string destination = SharedMutationPlannedDestination("projectRetrieve", () => Path.Combine(SharedMutationArtifactDirectory(args), "r_" + Guid.NewGuid().ToString("N").Substring(0, 12)));
                 if (destination.Length > 80) throw new BridgeException("RecoveryPathTooLong", "Planned retrieval destination exceeds the native path limit.");
                 absent("project", "retrievalDestination", destination);
+            }
+            else if (operation == "project_copy")
+            {
+                if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Project copy requires this worker's owned Portal.");
+                var source = SelectProject(args); string root = SharedMutationArtifactDirectory(args);
+                if (source.IsModified) throw new BridgeException("UnsavedProject", "project_copy never saves its source; save or discard its edits first.");
+                add("project", source.Path.FullName, "archiveSavedSourceUnchanged"); observation["source"] = ProjectInfo(source);
+                absent("workspace", "copyArchive", SharedMutationPlannedDestination("projectCopyArchive", () => Path.Combine(root, EngineeringPaths.NewRecoveryArchiveName(root))));
+                absent("project", "copyDestination", SharedMutationPlannedDestination("projectCopy", () => EngineeringPaths.NewRecoveryDirectory(root, source.Name)));
             }
             else if (operation == "library_open")
             {

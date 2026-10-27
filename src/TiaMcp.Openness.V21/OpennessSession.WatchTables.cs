@@ -26,11 +26,12 @@ namespace TiaMcp.Openness.V21
         private JObject WatchRead(JObject args)
         {
             EnsureAttached();
-            using (_portal.ExclusiveAccess("TIA MCP: watch snapshot")) return WatchSnapshot(args);
+            using (_portal.ExclusiveAccess("TIA MCP: watch snapshot")) return WatchSnapshot(args, false);
         }
-        private JObject WatchSnapshot(JObject args)
+        // Mutation flows keep write: true so a read-only project is refused before any watch dispatch.
+        private JObject WatchSnapshot(JObject args, bool write = true)
         {
-            var selected = SelectPlc(args); EnsureProjectOffline(selected.Project);
+            var selected = SelectPlc(args); EnsureProjectOffline(selected.Project, write);
             if (args.Value<string>("projectPath") != null && !string.Equals(args.Value<string>("projectPath"), selected.Project.Path.FullName, StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("IdentityMismatch", "Exact physical destination project required.");
             string groupPath = args.Value<string>("group") ?? "root", tableName = ChangeText(args, "tableName", 128);

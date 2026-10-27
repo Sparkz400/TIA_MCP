@@ -675,7 +675,25 @@
       ]
     },
     {
+      "featureId": "project_open.read_only",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "project_retrieve",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_copy",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "plc_compare",
       "obligations": [
         "X01"
       ]

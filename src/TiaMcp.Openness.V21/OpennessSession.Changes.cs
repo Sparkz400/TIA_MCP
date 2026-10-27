@@ -1064,8 +1064,11 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["name"] = node.Name, ["type"] = node.NodeType.ToString(), ["subnet"] = node.ConnectedSubnet?.Name, ["attributes"] = attributes };
         }
 
-        private void EnsureProjectOffline(Project project)
+        // Every engineering mutation route calls this; read-only callers pass write: false.
+        private void EnsureProjectOffline(Project project, bool write = true)
         {
+            if (write && !project.IsPrimary)
+                throw new BridgeException("ReadOnlyProject", "The project is open read-only (secondary); mutations are refused. Use project_copy and open the copy for edits.");
             var budget = new ScanBudget(50000);
             foreach (var entry in DeviceItems(project, budget))
             {
