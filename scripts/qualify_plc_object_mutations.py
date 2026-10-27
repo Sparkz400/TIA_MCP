@@ -21,7 +21,7 @@ from qualify_typed_resolution import empty_tag_template, tag_fixture
 KINDS = ("tag_set", "tag_create", "tag_delete", "constant_set", "constant_create", "constant_delete", "tag_table_import_xml",
          "type_source_upsert", "type_rename", "type_delete", "plc_type_import_xml",
          "source_upsert", "block_import_xml", "block_rename", "block_delete", "block_number_set", "block_attributes_set",
-         "group_create", "group_rename", "group_delete", "plc_compile")
+         "group_create", "group_rename", "group_delete", "plc_compile", "instance_db_create")
 _CREDENTIAL = "Apply refuses with CredentialRouteUnavailable before the checkpoint: no route hands a Host credential to the worker."
 _GRAPHICAL = "Needs LAD/FBD fixture blocks and exported network/UId selectors; a plain scratch holds SCL blocks only."
 # X11-owned change kinds a plain scratch cannot qualify; scripts/test_qualify_plc_object_mutations.py keeps
@@ -404,6 +404,12 @@ def edit_blocks(run, gate):
     run.refuse("block_delete", "FB TiaMcp_EnableGate, used by its instance DB and Main", {"blockName": "TiaMcp_EnableGate", **POLICY}, "DependencyExists")
     run.mutate("delete X11Drop", "block_delete", {"blockName": "X11Drop", **POLICY},
                {"effects": [{"action": "block_delete", "existingBlock": run.info("X11Drop")}], "dependencies": NO_REFERENCES}, removed=[run.blk("X11Drop")])
+    # Instance DBs of the scratch's own FB, which no later step renames or deletes.
+    run.refuse("instance_db_create", "an existing block name", {"name": "X11Data", "instanceOfName": "TiaMcp_EnableGate"}, "ObjectExists")
+    run.refuse("instance_db_create", "a missing FB", {"name": "X11GateDB", "instanceOfName": "X11Missing"}, "BlockNotFound")
+    run.mutate("create an instance DB of TiaMcp_EnableGate", "instance_db_create", {"name": "X11GateDB", "instanceOfName": "TiaMcp_EnableGate"},
+               {"effects": [{"action": "create", "blockType": "InstanceDB", "blockName": "X11GateDB", "instanceOfName": "TiaMcp_EnableGate"}]},
+               added=[run.blk("X11GateDB")], rows={run.blk("X11GateDB"): {"kind": "InstanceDB"}})
 
 
 def edit_groups(run):
@@ -497,6 +503,9 @@ def recover_each_kind(run):
     run.group("rename X11TagsMoved", "group_rename", "tags", groups + "X11TagsMoved", "X11TagsAgain",
               added=[groups + "X11TagsAgain"], removed=[groups + "X11TagsMoved"], restore=True)
     run.group("delete X11TypesMoved", "group_delete", "types", run.plc + "/types/groups/X11TypesMoved", removed=[run.plc + "/types/groups/X11TypesMoved"], restore=True)
+    run.mutate("create another instance DB of TiaMcp_EnableGate", "instance_db_create", {"name": "X11GateAgainDB", "instanceOfName": "TiaMcp_EnableGate"},
+               {"effects": [{"action": "create", "blockType": "InstanceDB", "blockName": "X11GateAgainDB", "instanceOfName": "TiaMcp_EnableGate"}]},
+               added=[run.blk("X11GateAgainDB")], rows={run.blk("X11GateAgainDB"): {"kind": "InstanceDB"}}, restore=True)
     run.mutate("compile the PLC again", "plc_compile", {}, {"effects": [{"action": "compile", "plcPath": run.plc}]}, restore=True)
 
     # A partial failure: X11Ref beyond the CPU's bit memory; the outcome is recorded and recovered, never replayed.
