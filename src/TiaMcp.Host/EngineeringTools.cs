@@ -168,5 +168,10 @@ public sealed partial class TiaTools
     [Description("Read offline CPU web server configuration: system web pages flag, default/user web application configurations and web-named CPU attributes. Each CPU observation can be passed to web_application_review; archives are not read. Never generates blocks or deploys. Bounded by maxItems.")]
     public Task<CallToolResult> WebInspect(CancellationToken cancellationToken, string? projectName = null, string? hardwarePath = null, int maxItems = 500)
         => Call("web_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "vci_workspace_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state and supported file formats. Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, export or synchronization.")]
+    public Task<CallToolResult> VciWorkspaceInspect(CancellationToken cancellationToken, string? projectName = null, int maxItems = 500)
+        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
     private static JsonElement ObjectArguments(JsonElement value) => value.ValueKind == JsonValueKind.Object ? value : throw new McpException("An object is required.");
 }

@@ -2347,6 +2347,12 @@
       ]
     },
     {
+      "featureId": "vci_workspace_inspect",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
       "featureId": "project_snapshot_import",
       "obligations": [
         "L04",

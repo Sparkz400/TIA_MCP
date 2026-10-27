@@ -39,6 +39,26 @@ claiming complete enumeration or supplying an opaque `Equal` native-status label
 does not establish a current target, native completeness or engineering equality.
 The caller must review those assertions against its original evidence.
 
+## Native workspace inspection
+
+`vci_workspace_inspect` (optional `projectName`, `maxItems` 1..2000, default 500)
+reads the open project's native VCI tree without changing it: system/user workspace
+groups, each workspace's root path, language and library policy (global library
+path, delete-unused-type-versions flag), and every mapped object with its native
+ancestor identity, directory, file name, format, `CompareState`,
+`IndividualObjectCompareDetails`, child `MappingState` and the formats
+`GetSupportedFileFormats` offers for it. Groups, workspaces, mappings and formats
+share the `maxItems` budget; `completeness.truncated` and per-item `warnings` are
+explicit. Use the result to write reviewed mapping evidence; it is an observation,
+not a manifest, and its states do not establish preservation or import support.
+
+There is no native export tool. V21 `Workspace.ExportObject` creates a mapping
+in the project and writes below the workspace root, and `MappedObject.Synchronize`
+writes the user's workspace; neither is a project-neutral export into a
+Host-owned directory. Workspace creation, mapping edits and synchronization remain
+unimplemented. The tool is compiled against the V21 Public API only and is not
+natively qualified.
+
 ## Conflict and preservation rules
 
 - Package identity includes exact object selectors and relevant library/native
