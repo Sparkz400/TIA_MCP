@@ -102,9 +102,10 @@ internal static class Program
                     provider.UnitGroup.Units.Create("ExplorerUnitB");
                     provider.UnitGroup.Units.Create("ExplorerUnitA").Relations.Create("ExplorerUnitB", UnitRelationType.SoftwareUnit);
                     string moduleName = authorization.Value<string>("moduleName");
-                    var module = Devices(project).SelectMany(device => Items(device.DeviceItems)).Single(item => item.Name == moduleName);
-                    var channel = Items(new[] { module }).SelectMany(item => item.Channels)
-                        .Single(candidate => candidate.Number == 0 && candidate.Type == ChannelType.Technology && candidate.IoType == ChannelIoType.Complex);
+                    // The module and its submodule can share the name; the channel owner is the exact one (as in EncoderSeeder).
+                    Func<Channel, bool> technologyChannel = candidate => candidate.Number == 0 && candidate.Type == ChannelType.Technology && candidate.IoType == ChannelIoType.Complex;
+                    var module = Devices(project).SelectMany(device => Items(device.DeviceItems)).Single(item => item.Name == moduleName && item.Channels.Any(technologyChannel));
+                    var channel = module.Channels.Single(technologyChannel);
                     // V21 exposes OperatingMode as UInt64 beside a public symbolic enum; resolve that exact enum, never a number.
                     object before = channel.GetAttribute("OperatingMode");
                     object mode = Enum.Parse(before.GetType().IsEnum ? before.GetType() : typeof(DeviceItem).Assembly.GetType("Siemens.Engineering.HW.OperatingMode", true), "MotionControl");
