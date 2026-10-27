@@ -188,6 +188,7 @@ namespace TiaMcp.Openness.V21
         private JArray CaptureHardwareEngineering(Project project, string kind = null)
         {
             bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind);
+            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -230,7 +231,7 @@ namespace TiaMcp.Openness.V21
                 var item = entry.Item;
                 var row = new JObject { ["path"] = entry.Path, ["name"] = item.Name, ["typeIdentifier"] = HardwareEngineeringRules.MetadataString(item.TypeIdentifier), ["positionNumber"] = item.PositionNumber,
                     ["containerPath"] = HardwareEngineeringRules.MetadataString(item.Container is DeviceItem container ? Owner(container) : null),
-                    ["attributes"] = Attributes(item, cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : HardwareWriteAttributes),
+                    ["attributes"] = Attributes(item, attributeAllowlist),
                     ["channels"] = new JArray(item.Channels.OrderBy(channel => channel.Type).ThenBy(channel => channel.IoType).ThenBy(channel => channel.Number).Select(channel => new JObject { ["number"] = channel.Number, ["type"] = channel.Type.ToString(), ["ioType"] = channel.IoType.ToString(), ["attributes"] = Attributes(channel, ChannelWriteAttributes) })),
                     ["addresses"] = new JArray(item.Addresses.Select(address => new JObject { ["ioType"] = address.IoType.ToString(), ["startAddress"] = address.StartAddress, ["lengthBits"] = address.Length,
                         ["owners"] = new JArray(address.AddressControllers.Select(owner => Owner(owner)).OrderBy(value => value, StringComparer.Ordinal)) })) };
@@ -256,6 +257,7 @@ namespace TiaMcp.Openness.V21
                 ["covered"] = "All observed hardware identities/slots, reviewed hardware/channel attributes, configured address ranges/owners, node configuration and exact I/O-system assignments; fail closed on capture failure.",
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
+            if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }
 

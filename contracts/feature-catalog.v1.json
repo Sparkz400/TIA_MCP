@@ -3783,7 +3783,7 @@
           "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
           "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
           "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
-          "Validity uses the native TestValidity.CheckValidity query; side effects are not natively verified. Activation-test execution, ResetTestResult, F-parameter writes and safety login are not implemented.",
+          "Validity uses the native TestValidity.CheckValidity query; side effects are not natively verified. Activation-test execution, ResetTestResult and safety login are not implemented; F-parameter writes use change.safety_fparameter_set and printouts with explicit options use safety_printout.",
           "Optional exports require the Windows Microsoft Print to PDF driver for the safety printout; XLSX/PDF/SimaticML files are retained opaquely with SHA-256 and not parsed. Missing services or failed exports are warnings and mark the scope incomplete."
         ]
       },
@@ -3795,6 +3795,51 @@
         "status": "conditional",
         "reasons": [
           "Requires SafetyAdministration on the PLC; the Safety Validation Assistant service is reported as UnsupportedCapability when absent."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "safety_printout",
+      "domain": "safety",
+      "title": "Print the safety printout and activation-test reports to files",
+      "mcpTools": [
+        "safety_printout"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 DeviceItem.GetService<SafetyPrintout>().Print(SafetyPrintoutFilePrinter MicrosoftPrintToPdf or MicrosoftXpsDocumentWriter, FileInfo, documentLayout, SafetyPrintoutOption All or Compact) on the PLC DeviceItem owning SafetyAdministration.",
+          "V21 ActivationTest.GetService<ActivationTestPrintout>().Generate(FileInfo) and ActivationTest.Export(FileInfo, ExportOptions) through the safety_validation_inspect inventory when activationTestReports is set."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Only the two Windows file printers the API offers; the Print to PDF or XPS Document Writer queue must be installed (System.Drawing PrinterSettings.InstalledPrinters), otherwise PrinterUnavailable and nothing is printed. XPS output keeps whatever XPS/OpenXPS format the driver writes.",
+          "documentLayout is passed through as a plain layout name (letters, digits, underscore); TIA decides whether it exists.",
+          "PDF/XPS/XLSX/SimaticML files are written to the Host export directory and retained opaquely with SHA-256; content is not parsed or certified. A printout or report does not validate, accept or approve the safety program.",
+          "Activation tests are project-level; correlation to the PLC is by EvaluationDeviceName only, as in safety_validation_inspect."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SafetyAdministration and the SafetyPrintout service on the PLC and an installed Windows file printer."
         ]
       },
       "prerequisites": [
@@ -6580,6 +6625,60 @@
       ]
     },
     {
+      "featureId": "change.safety_fparameter_set",
+      "domain": "safety",
+      "title": "Set allowlisted F-parameters of F-I/O owned by one safety PLC",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "safety_fparameter_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for Failsafe_FDestinationAddress and Failsafe_FMonitoringtime; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
+          "V21 SafetyAdministration.IsSafetyOfflineProgramPasswordSet/IsLoggedOnToSafetyOfflineProgram/ProgramSignatures on the PLC DeviceItem, DeviceItem.Addresses with Address.AddressControllers for ownership, and Device.GetService<ICompilable>().Compile() for the whole-project device compile. V21 exposes no separate safety-program compile; the device compile covers hardware and software including the F-program.",
+          "The Failsafe_* attribute names come from the V21 Openness F-I/O documentation, not from the installed PublicAPI XML (which lists only Failsafe_* enum types); each name's presence and Read/Write access is probed natively before preview."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
+          "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
+          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
+          "A new F-destination address must differ from the current and planned address of every other F-I/O whose F-source is this PLC's or unreadable, so swaps and chained moves are refused; an unreadable F-destination address refuses as DependencyCoverageIncomplete.",
+          "A password-protected safety program must already be logged in through the authorized TIA workflow; no password is accepted, stored or passed to a login API.",
+          "Apply requires compile=true (whole-project device compile) and checkpointSave; configured-hardware preservation covers the two attributes on every device item plus the existing hardware manifest. Readback reports the written values and the F-I/O Failsafe_*Signature* attributes right after the write; safetyAfter reports PLC program signatures after compile."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.project_simulation_enable",
       "domain": "simulation",
       "title": "Change project simulation compilation settings",
@@ -7204,7 +7303,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Backlog beyond change.safety_fparameter_set (Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only); no other typed F-I/O parameter operation is exposed."
         ]
       },
       "qualification": {

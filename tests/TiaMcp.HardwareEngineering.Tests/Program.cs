@@ -155,6 +155,12 @@ var disable = new JObject { ["hardwarePath"] = controller, ["attributes"] = new 
 void EnabledRows(JArray rows) { MemoryRows(rows); rows[2]["attributes"]["SystemMemoryByte"] = true; rows[2]["attributes"]["SystemMemoryByteAddress"] = 20UL; }
 Check("cpu memory disable drops its byte number", "hardware_cpu_memory_bytes", disable, rows => { rows[2]["attributes"]["SystemMemoryByte"] = false; ((JObject)rows[2]["attributes"]).Remove("SystemMemoryByteAddress"); }, true, EnabledRows);
 Check("cpu memory disable keeping its byte number rejected", "hardware_cpu_memory_bytes", disable, rows => rows[2]["attributes"]["SystemMemoryByte"] = false, false, EnabledRows);
+var fParameters = new JObject { ["safetyAcknowledged"] = true, ["parameters"] = new JArray(new JObject { ["hardwarePath"] = module, ["name"] = "Failsafe_FDestinationAddress", ["expected"] = 100, ["value"] = 120 }) };
+void FRows(JArray rows) { rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 100; rows[1]["attributes"]["Failsafe_FMonitoringtime"] = 150; rows[3]["attributes"]["Failsafe_FDestinationAddress"] = 101; }
+Check("f-destination address on the exact F-I/O", "safety_fparameter_set", fParameters, rows => rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 120, true, FRows);
+Check("f-parameter request not applied rejected", "safety_fparameter_set", fParameters, _ => { }, false, FRows);
+Check("collateral f-monitoring time rejected", "safety_fparameter_set", fParameters, rows => { rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 120; rows[1]["attributes"]["Failsafe_FMonitoringtime"] = 200; }, false, FRows);
+Check("f-parameter on another F-I/O rejected", "safety_fparameter_set", fParameters, rows => { rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 120; rows[3]["attributes"]["Failsafe_FDestinationAddress"] = 120; }, false, FRows);
 var memoryCurrent = new JObject { ["SystemMemoryByte"] = false, ["ClockMemoryByte"] = true, ["ClockMemoryByteAddress"] = 0UL };
 void Memory(string name, JObject requested, string code)
 {

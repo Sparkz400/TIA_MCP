@@ -784,6 +784,12 @@
       ]
     },
     {
+      "featureId": "safety_printout",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
       "featureId": "xref_query",
       "obligations": [
         "L04"
@@ -1133,6 +1139,12 @@
     },
     {
       "featureId": "change.safety_import_xml",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "change.safety_fparameter_set",
       "obligations": [
         "D14"
       ]

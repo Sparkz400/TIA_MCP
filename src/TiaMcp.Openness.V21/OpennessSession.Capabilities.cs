@@ -467,6 +467,9 @@ namespace TiaMcp.Openness.V21
             probe["owner"] = "owningCpu"; probe["serviceType"] = typeof(SafetyAdministration).FullName; probes.Add(probe);
             AddTargetFeature(features, "safety_inspect", api, "partial", "Reads exposed offline configuration/signatures only; it does not validate or accept the safety program.");
             AddTargetFeature(features, "safety_validation_inspect", api, "partial", "Adds Failsafe_* F-parameters and Safety Validation Assistant activation tests (read-only); no test execution, result reset or approval.");
+            AddTargetFeature(features, "safety_printout", api, "partial", "Native safety printout through a Windows file printer only, optionally with activation-test XLSX reports; no validation or approval.");
+            AddTargetFeature(features, "change.safety_fparameter_set", api, "partial", "Acknowledged writes of Failsafe_FDestinationAddress and Failsafe_FMonitoringtime on F-I/O owned by this safety PLC, with expected values, F-destination collision refusal, device compile, preservation and checkpoint.",
+                blocked: blocked, blocker: "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");
             AddTargetFeature(features, "change.safety_import_xml", api, "partial", "Dedicated acknowledged F-LAD/F-FBD/F-DB import only; explicit group/scope, protection, native consistency and signature checks apply.",
                 applicable: importApplicable, blocked: blocked || generated || targetBlocker != null,
                 blocker: generated ? "Generated system-group objects are excluded from direct mutations." : targetBlocker ?? "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");
