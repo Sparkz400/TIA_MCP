@@ -83,7 +83,7 @@ class ProjectModelContracts(unittest.TestCase):
 
     def test_native_provider_edge_kinds_are_explicit(self):
         fixture = read("fixtures/project-explorer/representative.project-model.json")
-        for kind in ["connectedSubnet", "ioSystemController", "ioSystemDevice", "technologyConnection", "unitRelation"]:
+        for kind in ["connectedSubnet", "ioSystemController", "ioSystemDevice", "technologyConnection", "unitRelation", "connectedPort", "libraryVersion"]:
             fixture["edges"][0]["kind"] = kind
             self.validate(fixture)
         fixture["edges"][0]["kind"] = "physicalCable"
