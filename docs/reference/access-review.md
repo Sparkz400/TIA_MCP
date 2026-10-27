@@ -45,6 +45,30 @@ per row; traversal depth is 64. Reports are bounded to 16 MiB, retained storage 
 complete artifact. Exact original input and saved review are revalidated on every
 reopen; forged reports cannot upgrade authorization or qualification.
 
+## Native capture with `access_inspect`
+
+With TIA Portal V21 attached, `access_inspect(projectName?, hardwarePath?, maxItems)`
+reads the offline project and returns observations in this request's shape:
+
+- `projectUmac`: project users (including the anonymous user), UMC users and groups,
+  and custom and system roles. Entity IDs are `user:<name>`, `umcUser:<name>`,
+  `umcGroup:<name>` and `role:<identifier>`; `roleNames` maps role IDs to display
+  names. Role rights are engineering function rights with scope `project` and device
+  function rights scoped by the device path.
+- `devices[]`: per CPU, the configured access level, access-control/UMC settings and
+  confidential-configuration state and, when exposed, a `legacyWeb` observation of
+  the web server users whose permissions become rights scoped by the CPU path.
+
+Copy an observation's `identity` to `request.identity` and its `snapshot` to `before`
+or `after`, then resolve `owner.objectPath` to its `nodeId` in the saved review. Roles
+expose no activation state, so `enabled` is `null` and the review reports
+`activationUnknown`. The UMC server holds group membership, so UMC users report
+`assignmentsComplete: false`. CPU runtime rights appear as device-scoped `projectUmac`
+rights; there is no separate `cpuRuntime`, SIWAREX or OPC UA capture. Snapshots stay
+within this review's limits and mark truncation as incomplete. Passwords, hashes,
+secrets and private keys are never read; attributes with sensitive names are excluded.
+The capture is compiled against the V21 API and not yet natively qualified.
+
 Use **public metadata only**. Passwords, private keys, tokens and arbitrary settings
 are not accepted fields. Unknown-field errors do not echo supplied values, but
 ordinary string identifiers are not a secret detector. Generic upload storage
@@ -53,6 +77,7 @@ review to redact or erase them. The output is not a credential vault, protected
 reference service or deployment approval.
 
 The [full D12/X03 plan](../plans/expansion-plans/web-server-access-configuration.md)
-now includes [public certificate inspection](public-certificate-review.md). Native
-capture/lifecycle, app/configuration review, credential recovery, UMC synchronization,
-operational settings and separate physical web/UA acceptance remain unfinished.
+now includes [public certificate inspection](public-certificate-review.md) and the
+read-only native capture above. Native lifecycle changes, credential recovery, UMC
+synchronization, operational settings and separate physical web/UA acceptance remain
+unfinished.

@@ -2506,6 +2506,25 @@
       ]
     },
     {
+      "featureId": "access_inspect",
+      "obligations": [
+        "X03",
+        "D12"
+      ]
+    },
+    {
+      "featureId": "certificate_inspect",
+      "obligations": [
+        "X03"
+      ]
+    },
+    {
+      "featureId": "web_inspect",
+      "obligations": [
+        "D12"
+      ]
+    },
+    {
       "featureId": "access_review",
       "obligations": [
         "D12",

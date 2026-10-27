@@ -153,5 +153,20 @@ public sealed partial class TiaTools
     [Description("Inspect exposed offline safety administration, runtime groups and signatures. Optional block selector requests a per-block signature. Does not unlock, accept or change a safety program.")]
     public Task<CallToolResult> SafetyInspect(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? blockName = null, string? blockPath = null, int maxItems = 500, string? scopePath = null)
         => Call("safety_inspect", new { projectName, plcPath, blockName, blockPath, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "access_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read offline project UMAC users, UMC users/groups and roles with assigned engineering/device function rights, plus each CPU's access level, access-control/UMC settings, confidential-configuration state and legacy web users with permissions. Never reads passwords, hashes, secrets or private keys. Each observation's identity and snapshot can be passed to access_review. Optional exact hardwarePath narrows CPU rows; bounded by maxItems.")]
+    public Task<CallToolResult> AccessInspect(CancellationToken cancellationToken, string? projectName = null, string? hardwarePath = null, int maxItems = 500)
+        => Call("access_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "certificate_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read offline CPU local certificate stores as public certificates (subject, issuer, validity, SHA-1/SHA-256 fingerprints, public DER), dynamic certificate-management services, certificate/syslog-named CPU attributes and project syslog servers. Private keys are never exported. Each certificate observation can be passed to public_certificate_review. Bounded by maxItems.")]
+    public Task<CallToolResult> CertificateInspect(CancellationToken cancellationToken, string? projectName = null, string? hardwarePath = null, int maxItems = 500)
+        => Call("certificate_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "web_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read offline CPU web server configuration: system web pages flag, default/user web application configurations and web-named CPU attributes. Each CPU observation can be passed to web_application_review; archives are not read. Never generates blocks or deploys. Bounded by maxItems.")]
+    public Task<CallToolResult> WebInspect(CancellationToken cancellationToken, string? projectName = null, string? hardwarePath = null, int maxItems = 500)
+        => Call("web_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems) }, cancellationToken);
     private static JsonElement ObjectArguments(JsonElement value) => value.ValueKind == JsonValueKind.Object ? value : throw new McpException("An object is required.");
 }

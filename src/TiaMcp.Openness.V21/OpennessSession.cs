@@ -128,6 +128,9 @@ namespace TiaMcp.Openness.V21
                 case "technology_read": return TechnologyRead(arguments);
                 case "plc_alarm_inspect": return PlcAlarmInspect(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
+                case "access_inspect": return AccessInspect(arguments);
+                case "certificate_inspect": return CertificateInspect(arguments);
+                case "web_inspect": return WebInspect(arguments);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);
