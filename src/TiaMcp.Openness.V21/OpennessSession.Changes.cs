@@ -302,6 +302,9 @@ namespace TiaMcp.Openness.V21
                 case "graphical_typed_edit":
                     PrepareTypedGraphical(change, preview);
                     break;
+                case "testsuite_application_import":
+                    PrepareTestSuiteApplicationImport(change, project, preview);
+                    break;
                 case "project_simulation_enable":
                 {
                     bool enabled = ExplicitChangeBool(payload, "enabled");
@@ -636,6 +639,9 @@ namespace TiaMcp.Openness.V21
             {
                 case "graphical_typed_edit":
                     ApplyTypedGraphical(change);
+                    break;
+                case "testsuite_application_import":
+                    ApplyTestSuiteApplicationImport(change, project);
                     break;
                 case "project_simulation_enable":
                 {

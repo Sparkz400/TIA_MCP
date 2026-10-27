@@ -73,6 +73,7 @@ namespace TiaMcp.Openness.V21
                 case "testsuite_qualification_fault": return TestSuiteQualificationFault(arguments);
 #endif
                 case "testsuite_style_prerequisites": return TestSuitePrerequisites(arguments);
+                case "testsuite_application_inventory": return TestSuiteApplicationInventory(arguments);
                 case "testsuite_style_observe": return TestSuiteStage("observe", arguments);
                 case "testsuite_style_checkpoint": return TestSuiteStage("checkpoint", arguments);
                 case "testsuite_style_run": return TestSuiteStage("run", arguments);

@@ -53,6 +53,7 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
                 var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
                 AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; no simulator is started.");
+                AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
             }
 
             if (selected.Plc != null)

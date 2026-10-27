@@ -55,7 +55,10 @@ internal static class DurableChecks
         var application = new TestSuiteDefinitionCapture("application", "application", "Application", ".tat",
             definition.Manifest.Reference with { ContentSha256 = null }, Encoding.UTF8.GetBytes("opaque synthetic application"), "authored-v1", [scope], [], true, true, []);
         var applicationRun = TestSuiteRunPlanner.Prepare([application], ["application"], [], "systemManaged");
-        Reject(() => TestSuiteStyleOperation.BuildPlan(applicationRun, target, runArtifact, definitionArtifact, bundle), "TestSuiteStyleNotReady");
+        Reject(() => TestSuiteStyleOperation.BuildPlan(applicationRun, target, runArtifact, definitionArtifact, bundle), "TargetPrerequisiteMissing");
+        var systemRun = TestSuiteRunPlanner.Prepare([new TestSuiteDefinitionCapture("system", "system", "System", ".tst", definition.Manifest.Reference with { ContentSha256 = null },
+            Encoding.UTF8.GetBytes("opaque synthetic system"), "authored-v1", [scope], [], true, true, [])], ["system"], [], "endpoint");
+        Reject(() => TestSuiteStyleOperation.BuildPlan(systemRun, target, runArtifact, definitionArtifact, bundle), "TestSuiteStyleNotReady");
         var store = new EngineeringOperationStore(root);
         var unrelated = Save("unrelated-definition-bundle.json", "{\"authoredSyntheticFixture\":true}");
         var misidentified = TestSuiteStyleOperation.BuildPlan(run, target, runArtifact, unrelated with { Sha256 = bundle.Sha256 }, bundle);

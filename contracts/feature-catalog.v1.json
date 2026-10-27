@@ -11103,7 +11103,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11149,7 +11149,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11195,7 +11195,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11241,7 +11241,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11287,7 +11287,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11333,7 +11333,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11379,7 +11379,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11425,7 +11425,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -11471,7 +11471,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay."
         ]
       },
@@ -14670,6 +14670,149 @@
         "AC-recovery",
         "AC-preserve",
         "AC-native"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_inventory",
+      "domain": "test_suite",
+      "title": "List and export Test Suite application test cases and sets",
+      "mcpTools": [
+        "testsuite_application_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 TestSuiteService.ApplicationTestGroup, ApplicationTestSystemGroup.TestCases/ApplicationTestSets, TestCase.Name/GetScope()/SaveToFile(FileInfo) and ApplicationTestSet.Name. The installed V21 PublicAPI has no ApplicationTestSet export member."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Bounded by maxItems with explicit truncation; per-case GetScope/export failures such as LicenseNotFoundException are reported per row.",
+          "Test sets are listed by name only because V21 Openness has no set export route. Exported .tat bytes are retained with SHA-256 but not parsed."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product in the attached TIA instance; service or adapter absence is reported, never replaced by an empty inventory."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "An open project"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_plan_prepare",
+      "domain": "test_suite",
+      "title": "Retain a bounded application-test run review on an owned PLCSIM instance",
+      "mcpTools": [
+        "testsuite_application_plan_prepare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Local durable Host workflow; the optional V21 boundary compiles TestCase.SetScope(PlcSoftware,String,ExecutionMode) with ExecutionMode.SystemManagedPLCSIMInstance/ExternallyManagedPLCSIMInstance, ApplicationTestSystemGroup.GetService<TestCaseExecutor>() and TestCaseExecutor.Run(TestCase / IEnumerable<TestCase> / ApplicationTestSet / IEnumerable<ApplicationTestSet> / ApplicationTestSystemGroup)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
+          "One native Run returns one TestResults tree. It is retained losslessly for every reviewed unit, but only a single-definition run owns it; lists, sets and groups stay inconclusive per unit until a per-case tree profile is qualified.",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry) and the registered owned instance before SetScope and Run. System-managed mode, where Test Suite creates its own instance, still receives the owned instance name and is unqualified.",
+          "SetScope persists the target on every reviewed case after the checkpoint. Preservation, set content (no export route) and effective scope remain unverified; the existing checkpoint capture refuses projects that contain test sets."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Offline retained workflow is available. Native actions require an accepted TS-Q02 profile, an owned PLCSIM instance and independent current observations."
+        ]
+      },
+      "prerequisites": [
+        "One shared artifact root across cooperating Hosts",
+        "An owned PLCSIM Advanced V8 instance from sim_create and its downloadTicket",
+        "Native actions require a qualified adapter, product/license, simulator and scope evidence"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preview",
+        "AC-evidence",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-native",
+        "AC-runtime",
+        "AC-simulator-lifecycle"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_application_import",
+      "domain": "test_suite",
+      "title": "Strictly import Test Suite application test cases or sets from a file",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "testsuite_application_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 TestCaseComposition.LoadFromFile(FileInfo, ImportOptions.None, TCLoadOptions.None) for .tat and ApplicationTestSystemGroup.LoadFromFile(FileInfo, ImportOptions.None, TSLoadOptions.None) for .ttst, with TestCaseComposition.Find and ApplicationTestSetComposition.Find readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Strict only: collisions and invalid objects refuse; no Override or IgnoreInvalidObject route. The .tat/.ttst grammar is not parsed; reviewed names are verified against the native return value and Find readback.",
+          "sourcePath is copied byte-exact into the change directory. No scope is set and nothing executes. Imported set content has no export route for content readback.",
+          "Saving requires compile=true with a plcPath, as for every prepared change; compilation does not cover Test Suite objects."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the optional Test Suite product and its definition license in the attached TIA instance; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with Test Suite Advanced and an authorized Windows user",
+        "A verified recovery checkpoint",
+        "An existing absolute .tat or .ttst file and the exact expected names"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
       ]
     },
     {

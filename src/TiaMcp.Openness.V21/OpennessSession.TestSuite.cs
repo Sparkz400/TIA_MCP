@@ -168,7 +168,14 @@ namespace TiaMcp.Openness.V21
 #endif
                 string output = NewDirectory("observation");
                 var definitions = (JArray)context["run"]["definitions"];
-                var receipt = StylePrerequisiteProbe.Read(project, definitions.Select(d => d.Value<string>("name")).ToArray(), output);
+                var application = context["application"] as JObject;
+                var receipt = application == null ? StylePrerequisiteProbe.Read(project, definitions.Select(d => d.Value<string>("name")).ToArray(), output)
+                    : ApplicationTestDefinitions.Inventory(project, 1000, output);
+                if (application != null)
+                {
+                    receipt["simulator"] = owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
+                    receipt["completeEffectiveScope"] = false; // GetScope names only the target controller.
+                }
                 receipt["sessionEpoch"] = owner._testSuiteEpoch;
                 receipt["processId"] = owner._processId;
                 receipt["workerSha256"] = ChangeFileHash(typeof(OpennessSession).Assembly.Location);
@@ -192,6 +199,16 @@ namespace TiaMcp.Openness.V21
             public JObject Run()
             {
                 var definitions = (JArray)context["run"]["definitions"];
+                if (context["application"] is JObject application)
+                {
+                    // Reverify the ticket-owned instance immediately before SetScope and the one Run.
+                    var simulator = owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
+                    string output = Path.Combine(directory, "raw-results.json");
+                    api.RunApplicationOnce(owner.SelectPlc(selector).Software, simulator.Value<string>("instanceName"), application.Value<string>("executionMode"),
+                        application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
+                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), output);
+                    return new JObject { ["rawResults"] = Artifact(output) };
+                }
                 if (definitions.Count != 1) throw new BridgeException("TestSuiteProfileUnqualified", "Only a separately reviewed single-rule dispatch is implemented.");
                 var definition = definitions[0];
                 string raw = Path.Combine(directory, "raw-results.json");
