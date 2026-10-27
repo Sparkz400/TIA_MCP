@@ -3,7 +3,9 @@
 `CompositeEngineeringReview.Build(artifactsRoot, requestBytes)` now evaluates
 explicit associations between retained AutomationML, saved model, connection,
 drive and technology records. Five offline MCP tools retain and revalidate
-these combined reviews. Native rebind is not implemented.
+these combined reviews. `composite_engineering_capture` produces a phase from
+native captures and `composite_engineering_rebind_plan` plans, but never
+applies, technology-object rebinds; see [native producer and rebind plan](#native-producer-and-rebind-plan).
 
 The [v1 request](../../contracts/composite-engineering-request.v1.schema.json)
 and [v1 result](../../contracts/composite-engineering-review.v1.schema.json)
@@ -225,8 +227,61 @@ indirect dependencies and charge their bytes. V3 adds the explicit selectors
 and declared-reference checks described above; native profile qualification
 and complete cross-domain effects remain unverified.
 
+## Native producer and rebind plan
+
+`composite_engineering_capture(reviewId)` produces one phase object
+(`reviewId`, `automationMlRef`, `connections`, `drives`, `technology`) from
+read-only native captures of the open project. Every worker response must name
+the saved review's project path, otherwise the whole capture refuses
+(`ProjectMismatch`). Each capture is retained through its existing workflow as
+one observed state with identical before/after:
+
+| Capture | Worker operation | Retained as |
+| --- | --- | --- |
+| `automationMl` | `cax_export` | AutomationML document record (`automationMlRef`) |
+| `connections` | `connection_inspect` | `connection-review-request.v1` with identity matches |
+| `drives` | `drive_observe` | one `drive-profile-review-request.v2` record per drive object |
+| `technology` | `technology_read` per saved technology object | `technology-profile-review-request.v1` |
+
+`captures[]` records each domain as `native`, `unavailable` (the worker returns
+`UnknownOperation` or `UnsupportedCapability`, for example no Startdrive) or
+`failed` (any other completed refusal, with its code), plus per-record
+`retained`/`failed` rows. Lost transport aborts the capture. Without an AML
+capture `automationMlRef` stays `null` and `composable` is false; supply one
+from `automationml_inspect`. At most 32 component records are retained per
+phase so two phases fit the 64-reference request bound; `truncated` marks the
+rest. Call the tool once on the saved "before" project state and once on the
+"after" state, put both phases into a v3 request with explicit mappings and
+correspondences, and submit it to `composite_engineering_review`.
+
+Technology slots from `technology_read` become `hardware` relationships with
+the slot ID after `hardwareConnections/` (for example `axis/actor`,
+`axis/sensors/0`). A connected slot with exactly one resolved hardware or
+channel reference is `declared` to that hardware (a channel targets its owning
+module); a disconnected slot is `disconnected`; anything else is `unknown` with
+a reason. Not-exposed slots are omitted. Relationship metadata keeps `role`,
+`sensorIndex`, `channelIndex` and the original reference. CPU order number,
+firmware and encoder routes (technology v4) are not captured.
+
+`composite_engineering_rebind_plan(recordRef)` revalidates a composite record
+and lists each before-phase `declared` TO hardware relationship that is
+missing, `disconnected`, `unknown`, ambiguous or unresolved in an after-phase
+record of the same TO. The replacement target comes only from declared
+correspondences: a `model` correspondence, or an `amlObject` correspondence
+whose objects have declared `hardware` mappings in both phases. Each entry is
+`planned` with a `to_connect` change (`technologyPath`, `role`, `sensorIndex`
+for sensors, replacement `hardwarePath`, and the before channel selector or
+channel index carried over and flagged `selectorCarriedOver`), or explains why
+not: `noDeclaredReplacement`, `conflictingReplacement`,
+`connectionRoleUnknown` (supplied records without capture metadata) or
+`changeKindUnavailable` when this build's catalog has no `to_connect` change
+kind. TOs without an after-phase record are counted in `notCapturedAfterCount`,
+not planned. At most 200 entries. Nothing is prepared or applied; every change
+still needs `change_prepare`/`change_apply` with its own preview, checkpoint
+and compile. Both tools are tested offline against fake worker responses only.
+
 The remaining full [C02/C03 contract](../plans/expansion-plans/composite-identity-contracts.md)
-still requires C03 security/runtime handoff and full native C02 orchestration.
-Complete native consumer coverage, exchange, rebind,
+still requires C03 security/runtime handoff and native qualification of the
+C02 producer above. Complete native consumer coverage, exchange, applied rebind,
 preservation, compile/reopen/recovery and physical communication/motion
 acceptance remain separate gates.
