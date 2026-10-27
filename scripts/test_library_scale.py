@@ -1,7 +1,7 @@
 """Offline checks of the library scale runner's generated documents; no native evidence."""
 import unittest
 
-from qualify_library_scale import chain_source, flat_source
+from qualify_library_scale import chain_source, flat_source, udt_source
 
 
 class ScaleSourceTests(unittest.TestCase):
@@ -14,6 +14,10 @@ class ScaleSourceTests(unittest.TestCase):
         self.assertIn('"Chain_0006"(Value := #Value)', chain_source("Chain_0007", "Chain_0006"))
         root = chain_source("Chain_0000", None)
         self.assertNotIn('"Chain_', root.split("\n", 1)[1].replace('#"Chain_0000"', ""))
+
+    def test_udt_is_one_plc_data_type(self):
+        source = udt_source("Udt_00042")
+        self.assertTrue(source.startswith('TYPE "Udt_00042"') and source.rstrip().endswith("END_TYPE") and source.count("TYPE") == 2)
 
 
 if __name__ == "__main__":

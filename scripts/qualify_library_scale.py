@@ -1,6 +1,7 @@
 """Native library scale measurement: a 10,000-type project library in an owned scratch, built 100 types per change.
 
-Flat FB types plus a dependency chain (each chain FC calls the previous one). Every change records wall time, the
+Flat FB types, flat PLC data types (they do not count toward the CPU's block limit; the scratch CPU allows 4,000 blocks)
+and a dependency chain (each chain FC calls the previous one). Every change records wall time, the
 checkpoint archive size and TIA/worker memory; every --probe-every changes the library is listed and paged completely,
 with truncation flags. A stop file ends the run between changes. Measurements are observations on this host, not budgets.
 """
@@ -17,6 +18,10 @@ BATCH = 100
 def flat_source(name):
     return (f'FUNCTION_BLOCK "{name}"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\nVAR_INPUT\n    Enable : Bool;\nEND_VAR\n'
             f'VAR_OUTPUT\n    Active : Bool;\nEND_VAR\nBEGIN\n    #Active := #Enable;\nEND_FUNCTION_BLOCK\n')
+
+
+def udt_source(name):
+    return f'TYPE "{name}"\nVERSION : 0.1\nSTRUCT\n    Active : Bool;\n    Count : DInt;\nEND_STRUCT;\nEND_TYPE\n'
 
 
 def chain_source(name, previous):
@@ -76,13 +81,14 @@ def probe(h, library, label, full=False):
 
 
 def run(args):
-    total, chain = args.types, args.chain
-    require(total % BATCH == 0 and chain % BATCH == 0 and chain <= total, "Type and chain counts must be multiples of 100.")
+    total, chain, udts = args.types, args.chain, args.udts
+    require(total % BATCH == 0 and chain % BATCH == 0 and udts % BATCH == 0 and chain + udts <= total, "Type, UDT and chain counts must be multiples of 100.")
     stop = args.stop_file.resolve()
     h = Harness(args, "scl", "library-scale-" + str(total), ["Owned scratch only; observed timings on this host, not cross-machine budgets.",
                 "Types stay InWork; release, global publication and component apply are not measured."], [])
-    h.report.update(types=total, chain=chain, batches=[], probes=[], stopFile=str(stop))
-    names = ["Scale_" + str(i).zfill(5) for i in range(total - chain)] + ["Chain_" + str(i).zfill(4) for i in range(chain)]
+    h.report.update(types=total, chain=chain, udts=udts, batches=[], probes=[], stopFile=str(stop))
+    names = (["Scale_" + str(i).zfill(5) for i in range(total - chain - udts)] + ["Udt_" + str(i).zfill(5) for i in range(udts)]
+             + ["Chain_" + str(i).zfill(4) for i in range(chain)])
 
     def body(h):
         plc = h.owned_scratch("scale")
@@ -95,15 +101,16 @@ def run(args):
             documents = h.directory / "docs" / str(start // BATCH).zfill(3)
             documents.mkdir(parents=True)
             batch = names[start:start + BATCH]
+            udt = batch[0].startswith("Udt_")  # batches are homogeneous: every group is a multiple of 100
             for name in batch:
                 index = int(name.split("_")[1])
-                source = chain_source(name, "Chain_" + str(index - 1).zfill(4) if index else None) if name.startswith("Chain_") else flat_source(name)
-                (documents / (name + ".scl")).write_bytes(source.encode("utf-8"))
+                source = udt_source(name) if udt else chain_source(name, "Chain_" + str(index - 1).zfill(4) if index else None) if name.startswith("Chain_") else flat_source(name)
+                (documents / (name + (".udt" if udt else ".scl"))).write_bytes(source.encode("utf-8"))
             row = {"batch": start // BATCH, "first": batch[0], "last": batch[-1]}
             started = time.perf_counter()
             prepared = h.prepare("library_create_type", {"schemaVersion": 1, "destinationLibraryId": library, "documentDirectory": str(documents),
                                  "documentNames": batch, "targetEnvironment": "selectedPlc",  # native document names omit the extension
-                                 "destinationComposition": "blocks", "target": {"plcPath": plc}})
+                                 "destinationComposition": "types" if udt else "blocks", "target": {"plcPath": plc}})
             row["prepareSeconds"] = round(time.perf_counter() - started, 3)
             started = time.perf_counter()
             applied = h.apply_prepared("library_create_type", prepared)
@@ -120,7 +127,7 @@ def run(args):
             h.persist()
             print("BATCH " + json.dumps({k: v for k, v in row.items() if k != "memory"}), flush=True)
             if (start // BATCH + 1) % args.probe_every == 0:
-                probe(h, library, str(start + BATCH) + " types", args.full_paging)
+                probe(h, library, str(start + BATCH) + " types")
         probe(h, library, "final", args.full_paging)
         last = [x for x in page_all_items(h, library) if x.get("kind") == "version" and x.get("typeName") == names[-1]] if names[-1].startswith("Chain_") else []
         if last:
@@ -155,8 +162,9 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--types", type=int, default=10000)
     parser.add_argument("--chain", type=int, default=1000)
+    parser.add_argument("--udts", type=int, default=0, help="PLC data types among --types; they keep the PLC under its block limit.")
     parser.add_argument("--probe-every", type=int, default=10)
-    parser.add_argument("--full-paging", action="store_true", help="Page the complete library at each probe instead of one page.")
+    parser.add_argument("--full-paging", action="store_true", help="Page the complete library at the final probe; periodic probes read one page.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))
     arguments = parser.parse_args()
     arguments.runner = __file__
