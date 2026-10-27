@@ -23,6 +23,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
                 "watch_generate" => Element(await Generate(args, cancellationToken)),
                 "watch_prepare_authoring" => Element(await PrepareAuthoring(args, cancellationToken)),
                 "watch_prepare" => Element(await Prepare(args, cancellationToken)),
+                "watch_prepare_lifecycle" => Element(await PrepareLifecycle(args, cancellationToken)),
                 "watch_apply" => Element(await Apply(args, cancellationToken)),
                 "watch_verify_reopen" => Element(await Verify(args, cancellationToken)),
                 "watch_recover" => Element(await Recover(args, cancellationToken)),
@@ -122,7 +123,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
             throw new BridgeException("UnsupportedProfile", "This document-edit plan has no accepted native qualification for production apply.");
         if (record.State != "prepared") throw new BridgeException("RecoveryRequired", "A prior attempt cannot be dispatched again; inspect and reconcile it.");
         var review = LoadReview(record); string directory = DirectoryOf(record);
-        if (record.Plan.Operation == "watchAuthoring") WatchMutationProfiles.RequireVerified(review["edit"]!["requiredProfiles"]!.AsArray(), allowUnqualifiedDocumentEdits);
+        if (record.Plan.Operation is "watchAuthoring" or "watchLifecycle") WatchMutationProfiles.RequireVerified(review["edit"]!["requiredProfiles"]!.AsArray(), allowUnqualifiedDocumentEdits);
         record = store.Acquire(record.Id, record.Revision);
         string? lease = null; bool stopAfterRelease = false; Exception? primaryError = null;
         try
@@ -135,10 +136,12 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
             record = store.Checkpoint(record.Id, record.Revision, [archive]);
             record = store.Dispatch(record.Id, record.Revision, () => Observation(checkpoint["snapshot"]!.AsObject()));
             var input = record.Plan.Inputs[1];
-            var after = Node(await native.CallAsync("watch_apply_native", new { leaseToken = lease, inputPath = Resolve(input), inputSha256 = input.Sha256 }, token));
+            object request = record.Plan.Operation == "watchLifecycle" ? new { leaseToken = lease, lifecycle = review["edit"] }
+                : new { leaseToken = lease, inputPath = Resolve(input), inputSha256 = input.Sha256 };
+            var after = Node(await native.CallAsync("watch_apply_native", request, token));
             var evidence = Save(directory, "applied.json", after);
             record = store.RecordDispatchEvidence(record.Id, record.Revision, new("dispatch.readback", evidence));
-            if (record.Plan.Operation == "watchAuthoring")
+            if (record.Plan.Operation is "watchAuthoring" or "watchLifecycle")
             {
                 ValidateSnapshotIdentity(record, after, record.Plan.Target.ProjectFilePath);
                 if (after["saved"]?.GetValue<bool>() != true) throw new BridgeException("VerificationFailed", "Saved authoring readback is required.");
@@ -260,12 +263,20 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     private void ValidateResult(JsonObject review, JsonObject after)
     {
         if (Text(after, "peerSha256") != review["before"]!["peerSha256"]!.GetValue<string>() ||
-            after["target"]!["semanticSha256"]!.GetValue<string>() != Text(review, "expectedSemanticSha256") || !after["target"]!["isConsistent"]!.GetValue<bool>())
+            !Applied(review, after) || !after["target"]!["isConsistent"]!.GetValue<bool>())
             throw new BridgeException("VerificationFailed", "Native readback, consistency or peer manifest differs from the reviewed change.");
         if (after["target"]?["exists"]?.GetValue<bool>() == false) throw new BridgeException("VerificationFailed", "Reviewed native table is absent.");
-        ValidateCapturedContent(after, Text(review, "expectedSemanticSha256"));
+        ValidateCapturedContent(after, after["target"]!["semanticSha256"]!.GetValue<string>());
     }
-    private static bool IsWatchPlan(EngineeringOperationRecord record) => record.Plan.Operation is "watchLiteralEdit" or "watchDocumentEdit" or "watchAuthoring";
+    // Reviewed outcome: the exact XML for document edits, the exact group subtree for lifecycle edits.
+    private bool Applied(JsonObject review, JsonObject snapshot)
+    {
+        var target = snapshot["target"]!.AsObject();
+        if (review["mode"]?.GetValue<string>() != "lifecycle") return Text(target, "semanticSha256") == Text(review, "expectedSemanticSha256");
+        return target["kind"]?.GetValue<string>() == "watchGroup" && WatchGroupManifest.Matches(
+            review["edit"]!["expectedGroup"]!.AsArray().Select(l => l!.GetValue<string>()).ToArray(), ReadRecoverySnapshot(Resolve(Artifact(target["artifact"]!.AsObject()))));
+    }
+    private static bool IsWatchPlan(EngineeringOperationRecord record) => record.Plan.Operation is "watchLiteralEdit" or "watchDocumentEdit" or "watchAuthoring" or "watchLifecycle";
     private static void ValidateSnapshotIdentity(EngineeringOperationRecord record, JsonObject snapshot, string expectedProjectPath)
     {
         var actual = Observation(snapshot); NativeTargetGuard.Validate(actual);
@@ -381,7 +392,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
             if (snapshot["processId"]!.ToJsonString() == recovery["recovered"]!["processId"]!.ToJsonString() || observation.SessionEpoch == recovery["recovered"]!["sessionEpoch"]!.GetValue<string>() ||
                 content != record.Plan.Target.Reference.ContentSha256) throw new BridgeException("FreshInstanceRequired", "Reopen the recovered project in another fresh instance and verify baseline content.");
         }
-        else if (content != record.Plan.Target.Reference.ContentSha256 && content != Text(review, "expectedSemanticSha256"))
+        else if (content != record.Plan.Target.Reference.ContentSha256 && !Applied(review, snapshot))
             throw new BridgeException("ReconciliationIncomplete", "Original project has an unreviewed outcome.");
         ValidateCapturedContent(snapshot, content);
     }

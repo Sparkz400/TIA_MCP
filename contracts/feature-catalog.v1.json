@@ -10987,6 +10987,294 @@
       ]
     },
     {
+      "featureId": "watch_table_prepare_create",
+      "domain": "watch_tables",
+      "title": "Prepare creating an empty watch table in an exact group",
+      "mcpTools": [
+        "watch_table_prepare_create"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition.Create(System.String); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one empty table in an exact existing group; refuses PLC-wide watch/force name collisions (case-insensitive). The new table's export hash is only known from readback, so verification requires exactly one added zero-row table and nothing else changed.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_rename",
+      "domain": "watch_tables",
+      "title": "Prepare renaming an exact watch table",
+      "mcpTools": [
+        "watch_table_prepare_rename"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTable.Name (setter); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Expected readback is the captured export with only the table name changed; the manual's read-only note on Name stays a native residual. Refuses PLC-wide collisions, case-only renames and tables with web/display access rules.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_delete",
+      "domain": "watch_tables",
+      "title": "Prepare deleting an exact watch table",
+      "mcpTools": [
+        "watch_table_prepare_delete"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTable.Delete; durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one exact table from its group; refuses tables with web/display access rules. References from other products are not inventoried.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_create",
+      "domain": "watch_tables",
+      "title": "Prepare creating a user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_create"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroupComposition.Create(System.String); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one empty direct child group; refuses sibling group name collisions (case-insensitive). Master-copy creation (CreateFrom) is not implemented.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_rename",
+      "domain": "watch_tables",
+      "title": "Prepare renaming a user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_rename"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroup.Name (setter); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Renames one direct child user group; every contained table and subgroup must keep its exact content under the new path. Refuses sibling collisions and case-only renames.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_delete",
+      "domain": "watch_tables",
+      "title": "Prepare deleting an empty user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_delete"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroup.Delete; durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Empty groups only: any contained watch table, force table or subgroup is refused before and again at the native boundary. No recursive delete or move.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
       "featureId": "testsuite_style_plan_prepare",
       "domain": "test_suite",
       "title": "Retain a complete bounded style plan",

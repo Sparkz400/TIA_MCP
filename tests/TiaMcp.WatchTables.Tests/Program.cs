@@ -17,7 +17,8 @@ var checks = new (string, Action)[] {
     ("Reusable template mapping, order, type and role guards", Templates),
     ("Separate address observations, optimized DB and alignment guards", Addresses),
     ("One thousand captured rows retain deterministic bounded paging intent", Scale),
-    ("Hash-bound case and native-gate separation", Claims)
+    ("Hash-bound case and native-gate separation", Claims),
+    ("Group lifecycle manifest: exact expected subtree, wildcard creation and refusals", GroupManifest)
 }.Concat(DocumentChecks.Checks).Append(("Genuine owned XML captures: hashes, no-op, reviewed delta and recovery baseline", (Action)NativeDocumentChecks.Run)).ToArray();
 int failed = 0;
 foreach (var (name, action) in checks) try { action(); Console.WriteLine("PASS " + name); } catch(Exception e) { failed++; Console.Error.WriteLine("FAIL " + name + "\n" + e); }
@@ -160,6 +161,27 @@ static void Claims()
     var d=(JsonObject)r.DiagnosticCase!.DeepClone();d["signals"]![0]!["onlineAddress"]="%DB1.DBX0.0";
     Error("InvalidRequest",()=>WatchTablePlanner.Plan(F.WithCase(r,d)));
     var p=WatchTablePlanner.Plan(r);True(!p["nativeExecutable"]!.GetValue<bool>()&&!p["nativeDocumentGenerated"]!.GetValue<bool>());Equal(6,p["pendingNativeGates"]!.AsArray().Count);
+}
+static void GroupManifest()
+{
+    string h = new('a', 64), g = new('b', 64);
+    var before = WatchGroupManifest.Build(["watch\tT1\t" + h + "\t2", "force\tForce%20table\t" + g, "group\tA", "watch\tA/Inner\t" + g + "\t1", "group\tE"]);
+    string[]? Expect(string op, string name, string? newName = null, string? renamed = null) { var r = WatchGroupManifest.Expect(before, op, name, newName, renamed, out var refusal); return r ?? [refusal]; }
+    string Lines(params string[] lines) => string.Join("\n", lines.Order(StringComparer.Ordinal));
+    var created = Expect("createTable", "New")!;
+    True(WatchGroupManifest.Matches(created, WatchGroupManifest.Build(WatchGroupManifest.Lines(before).Append("watch\tNew\t" + g + "\t0"))));
+    True(!WatchGroupManifest.Matches(created, WatchGroupManifest.Build(WatchGroupManifest.Lines(before).Append("watch\tNew\t" + g + "\t1"))));
+    True(!WatchGroupManifest.Matches(created, before));
+    Equal(Lines("force\tForce%20table\t" + g, "group\tA", "group\tE", "watch\tA/Inner\t" + g + "\t1", "watch\tT2\t" + g + "\t2"), string.Join("\n", Expect("renameTable", "T1", "T2", g)!));
+    Equal(Lines("force\tForce%20table\t" + g, "group\tA", "group\tE", "watch\tA/Inner\t" + g + "\t1"), string.Join("\n", Expect("deleteTable", "T1")!));
+    Equal(Lines("force\tForce%20table\t" + g, "group\tB", "group\tE", "watch\tB/Inner\t" + g + "\t1", "watch\tT1\t" + h + "\t2"), string.Join("\n", Expect("renameGroup", "A", "B")!));
+    Equal(Lines("force\tForce%20table\t" + g, "group\tA", "watch\tA/Inner\t" + g + "\t1", "watch\tT1\t" + h + "\t2"), string.Join("\n", Expect("deleteGroup", "E")!));
+    True(Expect("createGroup", "N")!.Contains("group\tN"));
+    foreach (var (code, result) in new[] { ("WatchTableCollision", Expect("createTable", "t1")), ("WatchTableCollision", Expect("createTable", "Force table")),
+        ("WatchTableCollision", Expect("renameTable", "T1", "t1", g)), ("WatchTableNotFound", Expect("deleteTable", "Inner")), ("InvalidRequest", Expect("renameTable", "T1", "T2")),
+        ("WatchGroupCollision", Expect("createGroup", "a")), ("WatchGroupCollision", Expect("renameGroup", "A", "e")), ("WatchGroupNotFound", Expect("deleteGroup", "Missing")),
+        ("WatchGroupNotEmpty", Expect("deleteGroup", "A")), ("UnsupportedProfile", Expect("moveGroup", "A")) })
+        Equal(code, result!.Single());
 }
 static void Integration(string samplesPath)
 {

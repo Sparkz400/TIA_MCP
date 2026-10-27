@@ -1855,6 +1855,42 @@
       ]
     },
     {
+      "featureId": "watch_table_prepare_create",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_rename",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_delete",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_create",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_rename",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_delete",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
       "featureId": "translation_capture",
       "obligations": [
         "D03",

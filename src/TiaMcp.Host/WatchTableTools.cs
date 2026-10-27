@@ -23,6 +23,30 @@ public sealed partial class TiaTools
     [Description("Prepare one exact offline Bool watch row's modifyValue as TRUE or FALSE in a worker-owned scratch. Freezes complete XML and peer manifest for review. Comment, clone, delete and reorder edits remain restricted to the isolated qualification harness.")]
     public Task<CallToolResult> WatchPrepare(string tableName, int ordinal, string idempotencyKey, CancellationToken cancellationToken, string? modifyValue = null, string? projectName = null, string? plcPath = null, string group = "root", string editKind = "modifyValue", string? culture = null, string? text = null, int? insertAt = null, int[]? order = null, bool reindexDocumentIds = false)
         => Call("watch_prepare", new { tableName, ordinal, modifyValue, idempotencyKey, projectName, plcPath, group, editKind, culture, text, insertAt, order, reindexDocumentIds }, cancellationToken);
+    [McpServerTool(Name = "watch_table_prepare_create", Destructive = false, OpenWorld = false)]
+    [Description("Review creating one empty watch table named tableName in the exact existing group (root or root/<escaped segments>) without native mutation. Freezes the group's complete subtree, all peers and the PLC-wide watch/force name check. Apply with watch_table_apply in a worker-owned saved scratch; the profile stays production-gated pending native lifecycle evidence. No rows, monitoring or forcing.")]
+    public Task<CallToolResult> WatchPrepareCreate(string tableName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "createTable", name = tableName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
+    [McpServerTool(Name = "watch_table_prepare_rename", Destructive = false, OpenWorld = false)]
+    [Description("Review renaming one exact watch table in its group to newName without native mutation. Expected readback is the captured table with only its name changed; refuses PLC-wide name collisions and tables with web/display access rules. Apply with watch_table_apply; production-gated pending native lifecycle evidence.")]
+    public Task<CallToolResult> WatchPrepareRename(string tableName, string newName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "renameTable", name = tableName, newName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
+    [McpServerTool(Name = "watch_table_prepare_delete", Destructive = false, OpenWorld = false)]
+    [Description("Review deleting one exact watch table from its group without native mutation. Refuses tables with web/display access rules; the checkpoint archive is the only restore route. Apply with watch_table_apply; production-gated pending native lifecycle evidence.")]
+    public Task<CallToolResult> WatchPrepareDelete(string tableName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "deleteTable", name = tableName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
+    [McpServerTool(Name = "watch_table_group_prepare_create", Destructive = false, OpenWorld = false)]
+    [Description("Review creating one empty user watch-table group named groupName under the exact parent group without native mutation. Freezes the parent subtree and all peers. Apply with watch_table_apply; production-gated pending native lifecycle evidence.")]
+    public Task<CallToolResult> WatchGroupPrepareCreate(string groupName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "createGroup", name = groupName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
+    [McpServerTool(Name = "watch_table_group_prepare_rename", Destructive = false, OpenWorld = false)]
+    [Description("Review renaming one direct user group of the exact parent group to newName without native mutation. Contained tables and subgroups must keep their exact content under the new path. Apply with watch_table_apply; production-gated pending native lifecycle evidence.")]
+    public Task<CallToolResult> WatchGroupPrepareRename(string groupName, string newName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "renameGroup", name = groupName, newName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
+    [McpServerTool(Name = "watch_table_group_prepare_delete", Destructive = false, OpenWorld = false)]
+    [Description("Review deleting one empty direct user group of the exact parent group without native mutation. Groups holding any table or subgroup are refused; there is no recursive delete. Apply with watch_table_apply; production-gated pending native lifecycle evidence.")]
+    public Task<CallToolResult> WatchGroupPrepareDelete(string groupName, string idempotencyKey, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string group = "root")
+        => Call("watch_prepare_lifecycle", new { operation = "deleteGroup", name = groupName, idempotencyKey, projectName, plcPath, group }, cancellationToken);
     [McpServerTool(Name = "watch_table_apply", Destructive = true, OpenWorld = false)]
     [Description("Apply an exact reviewed watch plan once in its owned scratch. Rechecks native identity under exclusive access, archives before import, verifies typed/XML readback and peers, saves. Ownership remains until fresh reopen verification; interrupted dispatch is never replayed.")]
     public Task<CallToolResult> WatchApply(string operationId, string reviewedPlanSha256, CancellationToken cancellationToken)

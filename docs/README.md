@@ -65,6 +65,7 @@ and runtime corpus remain incomplete.
 - [Project explorer](guides/project-explorer.md), [metadata index](guides/project-index.md), [persistent reviews](guides/project-reviews.md)
 - [Configured network inspection](guides/network-inspection.md)
 - [Offline bug and trace diagnostics](guides/trace-diagnostics.md)
+- [Offline watch-table lifecycle](guides/watch-tables.md)
 
 ## Reference
 
