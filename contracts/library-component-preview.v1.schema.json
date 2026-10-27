@@ -575,7 +575,53 @@
             "language",
             "obCallAdded"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "obCallAdded"
+                ],
+                "properties": {
+                  "obCallAdded": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "OB"
+                  },
+                  "mode": {
+                    "const": "existing"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "OB"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "obCallAdded": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
         },
         "instanceDb": {
           "oneOf": [
