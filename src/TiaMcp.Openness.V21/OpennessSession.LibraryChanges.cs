@@ -819,12 +819,18 @@ namespace TiaMcp.Openness.V21
                     if (item == null || use.LibraryTypeVersion?.Guid != version.Guid || !paths.TryGetValue(item, out var instancePath) || !seenPaths.Add(instancePath))
                         throw new BridgeException("LibraryContentFingerprintUnavailable", "An in-work test instance cannot be resolved to a unique exact native version and project object path.");
                     string path = Path.Combine(change.Directory, "inwork-check-" + Guid.NewGuid().ToString("N") + ".xml");
-                    if (item is PlcBlock block && version is CodeBlockLibraryTypeVersion && !block.IsKnowHowProtected)
-                        block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                    EngineeringFingerprintRules.Content<string> content;
+                    if (item is PlcBlock block && version is CodeBlockLibraryTypeVersion)
+                        content = EngineeringFingerprintRules.ReadInWorkBlockContent(block.IsKnowHowProtected,
+                            () => { block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None); return ChangeFileHash(path); },
+                            () => { var provider = block.GetService<FingerprintProvider>(); return provider == null ? null : ChangeHash(new JArray(provider.GetFingerprints().OrderBy(f => f.Id).Select(f => new JObject { ["id"] = f.Id.ToString(), ["value"] = ChangeScalar(f.Value) })).ToString(Formatting.None)); });
                     else if (item is PlcType type && version is PlcTypeLibraryTypeVersion && !type.IsKnowHowProtected)
+                    {
                         type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                    else throw new BridgeException("LibraryContentFingerprintUnavailable", "An in-work test instance is protected or has an unsupported native family; full content export is required.");
-                    instances.Add(new JObject { ["path"] = instancePath, ["plcPath"] = plc.Path, ["versionGuid"] = use.LibraryTypeVersion.Guid.ToString("D"), ["engineeringType"] = item.GetType().FullName, ["sha256"] = ChangeFileHash(path) });
+                        content = new EngineeringFingerprintRules.Content<string> { Mode = "nativeExport", Payload = ChangeFileHash(path) };
+                    }
+                    else throw new BridgeException("LibraryContentFingerprintUnavailable", "An in-work test instance is a protected PLC data type or has an unsupported native family; full content export is required.");
+                    instances.Add(new JObject { ["path"] = instancePath, ["plcPath"] = plc.Path, ["versionGuid"] = use.LibraryTypeVersion.Guid.ToString("D"), ["engineeringType"] = item.GetType().FullName, ["contentMode"] = content.Mode, ["sha256"] = content.Payload });
                 }
             }
             if (budget.Truncated || instances.Count == 0)

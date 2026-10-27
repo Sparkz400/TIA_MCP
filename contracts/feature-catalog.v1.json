@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.28",
+  "catalogVersion": "0.4.29",
   "targetTiaVersions": [
     21
   ],
@@ -1752,6 +1752,42 @@
       "limitations": [
         "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
         "The unit is created by a fixture tool, not by an MCP route."
+      ]
+    },
+    {
+      "id": "local.library_protected.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
+        "passedScope": "scripts/qualify_library_protected.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool (protect mode, random password never stored), owned TIA V21 scratch projects: a plain FB is know-how protected; block_read refuses it (ProtectedObject); library_create_master_copy copies it into a global library. An FB type's in-work test instance is protected and its release to 1.0.0 applies (the in-work content pin uses the block's native fingerprints because Openness cannot export protected content); library_publish copies the protected type; a metadata-only edit/release of the still-protected test instance gives 1.1.0, published as the new default. Native document export of the protected version is refused by Openness (ExportAsDocuments: 'The block is know-how-protected and cannot be exported', surfaced as EngineeringError). In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected (block_read refuses the instance), Main calls both, the PLC-wide update to exactly 1.1.0 applies while the cleanup guard reads the cross-references of every block, protected ones included, and proves Main reaches the protected FB, and a fresh reopen keeps both protected. 60/60 steps; all 41 retained library observations (15 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_protected.20261027.json"
+      ],
+      "limitations": [
+        "V21 Openness has no know-how protection service for PLC data types; protected UDTs are not exercised.",
+        "Protected type versions cannot be exported as documents, so library_edit_version from documents (content changes) is unavailable for them; 1.1.0 is a metadata-only release.",
+        "Protection is applied by a registered fixture tool, not an MCP route. One PLC, standard groups, no runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_unit_relations.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
+        "passedScope": "scripts/qualify_library_unit_relations.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool, owned TIA V21 scratch projects: software units TiaMcp_LibProvider and TiaMcp_LibConsumer with one SoftwareUnit relation consumer->provider. Library FB and UDT 1.0.0 instantiate into the provider; instantiating either in the related consumer unit is refused before any write (LibraryConflict, one instance of a library type per device, relations included). The seeder sets the provider instances' Access attribute Unpublished->Published (TIA accepts it on typed instances); a consumer-unit cycle OB, instance DB and UDT DB call them through the relation and compile. The PLC-wide update to exactly FB 1.1.0 applies: the cleanup guard proves the provider uses through native cross-unit references from the consumer OB; the UDT stays at 1.0.0 and every path is unchanged. A fresh reopen keeps the relation, FB 1.1.0 and placement. 58/58 steps; all 49 retained library observations (16 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_unit_relations.20261027.json"
+      ],
+      "limitations": [
+        "Units, the relation and the Access flag are set by a registered fixture tool, not by MCP routes.",
+        "One SoftwareUnit relation; NonUnitDB and TODB relations, namespaces on library instances and safety units are not exercised.",
+        "One PLC, no runtime execution."
       ]
     },
     {
@@ -5525,7 +5561,9 @@
         "evidenceIds": [
           "local.library_releases.20261024",
           "local.library_releases.20261026",
-          "local.library_dependencies.20261024"
+          "local.library_dependencies.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6842,7 +6880,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
           "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
         ]
@@ -6853,7 +6891,9 @@
           "local.library_plc_master.20261008",
           "local.library_formats.20261025",
           "local.library_releases.20261024",
-          "local.library_releases.20261026"
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6890,7 +6930,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -6898,7 +6938,9 @@
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
-          "local.library_releases.20261026"
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6935,7 +6977,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -6943,7 +6985,9 @@
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
-          "local.library_releases.20261026"
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -6980,7 +7024,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -7021,7 +7065,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -7029,7 +7073,9 @@
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
-          "local.library_releases.20261026"
+          "local.library_releases.20261026",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7066,7 +7112,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors."
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
@@ -7525,7 +7571,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7540,7 +7586,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7583,7 +7631,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7638,7 +7686,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7694,9 +7742,9 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7717,7 +7765,9 @@
           "local.library_interruption.20261025",
           "local.library_dmc_prerequisites.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025"
+          "local.library_dependencies.20261025",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7759,9 +7809,9 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025) and one software unit without relations (local.library_units.20261025; the unit is created by a fixture tool, not an MCP route). A library type is allowed once per PLC; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7779,7 +7829,9 @@
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025"
+          "local.library_dependencies.20261025",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7822,7 +7874,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, a new global instance DB, an existing LAD/FBD caller and scalar existing-tag bindings. Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
@@ -7875,7 +7927,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -7889,7 +7941,9 @@
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
-          "local.library_interruption.20261024"
+          "local.library_interruption.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -7932,7 +7986,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -7950,7 +8004,8 @@
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025"
+          "local.library_interruption.20261025",
+          "local.library_protected.20261027"
         ]
       },
       "availability": {
@@ -7993,7 +8048,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8006,7 +8061,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8049,7 +8106,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8062,7 +8119,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8105,7 +8164,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8161,7 +8220,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8174,7 +8233,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8217,7 +8278,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8273,7 +8334,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8329,7 +8390,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8385,7 +8446,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8399,7 +8460,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {
@@ -8442,7 +8505,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -8493,7 +8556,7 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
-          "Exact GUID versions and explicit destinations are required. Unsupported, incomplete and protected targets fail with structured errors.",
+          "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -8508,7 +8571,9 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024"
+          "local.library_lifecycle.20261024",
+          "local.library_protected.20261027",
+          "local.library_unit_relations.20261027"
         ]
       },
       "availability": {

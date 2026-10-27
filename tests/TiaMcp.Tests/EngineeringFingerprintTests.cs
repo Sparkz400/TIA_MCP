@@ -44,6 +44,19 @@ internal static class EngineeringFingerprintTests
             EngineeringFingerprintRules.ReadBlockContent<string>(true, true, true, true, Plc + "/blocks/DB1_C", () => "unexpected")));
     }
 
+    internal static async Task ProtectedInWorkTestInstancesUseNativeFingerprintsOnly()
+    {
+        var plain = EngineeringFingerprintRules.ReadInWorkBlockContent(false, () => "export", () => throw new InvalidOperationException("unprotected blocks are exported"));
+        Check.Equal("nativeExport", plain.Mode);
+        Check.Equal("export", plain.Payload);
+        var protectedBlock = EngineeringFingerprintRules.ReadInWorkBlockContent(true, () => throw new InvalidOperationException("protected blocks cannot be exported"), () => "fingerprints");
+        Check.Equal("protectedNativeFingerprints", protectedBlock.Mode);
+        Check.Equal("fingerprints", protectedBlock.Payload);
+        var missing = await Check.ThrowsAsync<FingerprintException>(() => Task.FromResult(
+            EngineeringFingerprintRules.ReadInWorkBlockContent(true, () => "export", () => null!)));
+        Check.Equal("LibraryContentFingerprintUnavailable", missing.Code);
+    }
+
     internal static Task NativeFingerprintValuesAndMissingProvidersStayDistinct()
     {
         var observed = EngineeringFingerprintRules.ReadBlockContent(false, false, true, false, Plc + "/blocks/User", () => "native:1");
