@@ -37,10 +37,17 @@ public sealed class OpcUaWorkflowStore
     public JsonObject Inspect(string nodeSetUploadRef)
     {
         using var gate = Lock();
-        byte[] bytes = Uploaded(nodeSetUploadRef, OpcUaModelReview.MaxBytes);
-        var report = OpcUaModelReview.Inspect(bytes);
-        return Summary(Publish("model", report, new() { ["original.xml"] = bytes }, []));
+        return Model(Uploaded(nodeSetUploadRef, OpcUaModelReview.MaxBytes));
     }
+
+    /// <summary>Retains NodeSet bytes the Host read from its own hash-checked native export, as an ordinary model record.</summary>
+    public JsonObject InspectExported(byte[] nodeSet)
+    {
+        using var gate = Lock();
+        return Model(nodeSet);
+    }
+
+    private JsonObject Model(byte[] bytes) => Summary(Publish("model", OpcUaModelReview.Inspect(bytes), new() { ["original.xml"] = bytes }, []));
 
     public JsonObject Compare(string beforeRef, string afterRef, string? consumerManifestUploadRef = null)
     {

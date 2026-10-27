@@ -87,6 +87,31 @@ Oversized rows become explicit `omitted` entries carrying their row index, byte 
 
 Errors distinguish invalid handles/sections, stale cursors/manifests, capacity limits, integrity failure, incomplete publication and a busy store. No error grants native admission. Symlinks and junctions in storage paths are refused. XML DTD/entities and network resolvers remain disabled.
 
+## Native engineering read and export
+
+Two worker-backed tools read the OPC UA configuration of one PLC CPU in the attached TIA V21 project; S7-1500 is the target profile. Select the CPU by `hardwarePath` or `plcPath` from `project_inventory` (both are accepted when they name the same CPU). They change nothing in the project and never connect to a UA server.
+
+`opcua_engineering_inspect` returns:
+
+- `serverSettings`: CPU and sub-item attributes whose native names contain `OpcUa`, with the same sensitive-name exclusion and value states as `hardware_inspect`. Settings exposed under other names are not reported.
+- `serverInterfaces`, `simaticInterfaces` and `referenceNamespaces`: name, enabled, author, timestamps and, where Openness exposes them, the NodeId and node-generation flags.
+- `namespaceAccessRestrictions` and `roleMappings`, each role with its per-namespace `browse`, `read`, `write`, `call`, `receiveEvents` and `readRolePermissions`.
+
+`serverInterfaceGroup: "notExposed"` means the PLC software did not expose the OPC UA provider; it does not prove the CPU has no server. `maxItems` (1–2000, default 500) bounds sub-items, attributes and rows together; `completeness.truncated` and `warnings` report what was not read. Comments, legacy OPC UA users, certificates and client interfaces are not read.
+
+`opcua_engineering_export` writes native XML for one `category`:
+
+| `category` | V21 API | `name` |
+| --- | --- | --- |
+| `server` | `Project.HwUtilities.Find("OPCUAExportProvider")` → `OpcUaExportProvider.Export(DeviceItem, FileInfo)`: whole address space of the CPU | not accepted |
+| `serverInterface` | `ServerInterface.Export(FileInfo)` | optional exact name |
+| `simaticInterface` | `SimaticInterface.Export(FileInfo)` | optional exact name |
+| `referenceNamespace` | `ReferenceNamespace.Export(FileInfo)` | optional exact name |
+
+At most `maxItems` (1–32, default 32) files are written as new files under `<artifacts>/exports/opcua`, each with path, byte count and SHA-256. The Host reads every file back through the artifact boundary, checks its hash and registers it as an ordinary model record, the same record `opcua_inspect` creates from an upload. Each `files[]` row then carries either `record` (with its `recordRef`) or `registrationError`, for example `OpcUaCapacity` or `OpcUaInvalidXml`; the exported file stays in place either way. Pass the record handles to `opcua_compare`, `opcua_dependencies` and the other tools above, and export the reference namespaces too when a dependency set needs them. A failed item export, such as an empty SIMATIC interface, is listed in `warnings` and the other files are kept.
+
+Neither tool is natively qualified: the whole-server utility identifier and the XML dialect of each export come from Siemens documentation. A model record holds the exported bytes, not which CPU or interface they came from; keep the export response for that.
+
 ## Verification and native boundary
 
 Run `scripts/Test-OpcUaOffline.ps1` for the parser/dependency CLI package. The combined `scripts/Test-Offline.ps1` runner includes the workflow harness and actual MCP transport checks; Python dependencies are declared in `scripts/requirements-test.txt`. The standalone workflow commands are:

@@ -128,6 +128,8 @@ namespace TiaMcp.Openness.V21
                 case "cax_export": return CaxExport(arguments);
                 case "technology_read": return TechnologyRead(arguments);
                 case "plc_alarm_inspect": return PlcAlarmInspect(arguments);
+                case "opcua_engineering_inspect": return OpcUaEngineeringInspect(arguments);
+                case "opcua_engineering_export": return OpcUaEngineeringExport(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
                 case "access_inspect": return AccessInspect(arguments);
                 case "certificate_inspect": return CertificateInspect(arguments);
