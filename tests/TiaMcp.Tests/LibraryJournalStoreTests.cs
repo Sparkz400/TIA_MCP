@@ -6,6 +6,18 @@ namespace TiaMcp.Tests;
 
 internal static class LibraryJournalStoreTests
 {
+    internal static async Task CreateTypeDocumentNamesAreBounded()
+    {
+        Check.Equal("A.scl", string.Join(",", LibraryDocumentNames.Read(new JObject { ["documentName"] = "A.scl" })));
+        Check.Equal("A.scl,B.scl", string.Join(",", LibraryDocumentNames.Read(new JObject { ["documentNames"] = new JArray("A.scl", "B.scl") })));
+        var tooMany = new JArray(Enumerable.Range(0, 101).Select(i => "T" + i + ".scl"));
+        foreach (var bad in new[] { new JObject(), new JObject { ["documentName"] = "A.scl", ["documentNames"] = new JArray("B.scl") },
+                                    new JObject { ["documentNames"] = new JArray() }, new JObject { ["documentNames"] = tooMany },
+                                    new JObject { ["documentNames"] = new JArray("A.scl", "a.SCL") }, new JObject { ["documentNames"] = new JArray(1) },
+                                    new JObject { ["documentNames"] = new JArray(" ") }, new JObject { ["documentNames"] = "A.scl" } })
+            await Check.ThrowsAsync<BridgeException>(() => Task.FromResult(LibraryDocumentNames.Read(bad)));
+    }
+
     internal static async Task AtomicRecordsAndTamper()
     {
         using var files = new Fixture();

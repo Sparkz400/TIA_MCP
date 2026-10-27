@@ -111,7 +111,13 @@ namespace TiaMcp.Openness.V21
             if (change.ComponentContentPins != null) preview["componentContentPins"] = change.ComponentContentPins.DeepClone();
             foreach (var library in new[] { change.Source, change.Destination }.Where(x => x != null).Distinct())
                 ((JArray)preview["resources"]).Add(new JObject { ["libraryId"] = library.Id, ["revision"] = LibraryRevision(library), ["path"] = library.Project?.Path?.FullName ?? library.Global.Path?.FullName, ["sourcePath"] = library.SourcePath, ["sourceHash"] = library.SourceHash });
-            if (change.Project != null) preview["projectPath"] = change.Project.Path?.FullName;
+            if (change.Project != null)
+            {
+                preview["projectPath"] = change.Project.Path?.FullName;
+                // checkpointSave persists in-memory edits before archiving, so they join the recovery baseline and the result.
+                preview["unsavedTargetEdits"] = new JObject { ["present"] = change.Project.IsModified,
+                    ["disposition"] = change.Project.IsModified ? "savedIntoCheckpointBaseline" : "none" };
+            }
             var dependencyRoots = change.Versions.ToList();
             if (kind == "library_copy_elements" || kind == "library_publish")
             {
@@ -1083,10 +1089,14 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "library_create_type":
                     VerifyLibraryDocumentSnapshot(change);
-                    var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
-                        ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
-                        : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), LibraryImportOptions.None);
-                    rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() }); break;
+                    foreach (string documentName in LibraryDocumentNames.Read(payload))
+                    {
+                        var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
+                            ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
+                            : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, LibraryImportOptions.None);
+                        rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() });
+                    }
+                    break;
                 case "library_create_master_copy":
                     var selector = (JObject)change.Selector.DeepClone(); foreach (var property in ((JObject)payload["object"]).Properties()) selector[property.Name] = property.Value.DeepClone();
                     var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)ResolveObjectTarget(selector).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;

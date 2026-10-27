@@ -1,0 +1,17 @@
+FUNCTION_BLOCK "TiaMcpWideGate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Enable : Bool;
+    Count : LInt;
+END_VAR
+VAR_OUTPUT
+    Active : Bool;
+    Pattern : LWord;
+    Elapsed : LTime;
+END_VAR
+BEGIN
+    #Active := #Enable;
+    #Pattern := LINT_TO_LWORD(#Count);
+    #Elapsed := LT#1MS;
+END_FUNCTION_BLOCK
