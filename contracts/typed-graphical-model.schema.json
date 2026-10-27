@@ -22,7 +22,7 @@
     {"if": {"properties": {"operation": {"const": "editNetwork"}}}, "then": {"properties": {"connections": {"maxItems": 0}, "nodes": {"items": {"required": ["nativeUid"], "properties": {"kind": {"enum": ["contact", "coil", "assign"]}}, "not": {"anyOf": [{"required": ["negated"]}, {"required": ["inputCount"]}, {"required": ["dataType"]}, {"required": ["comparison"]}, {"required": ["instruction"]}, {"required": ["calleePath"]}, {"required": ["instance"]}, {"required": ["allowSharedInstance"]}]}}}}}},
     {"if": {"properties": {"operation": {"enum": ["replaceNetwork", "editNetwork"]}}}, "then": {"required": ["networkId"], "not": {"anyOf": [{"required": ["creation"]}, {"required": ["insertAfterNetworkId"]}]}}, "else": {"not": {"required": ["networkId"]}}},
     {"if": {"properties": {"operation": {"const": "createBlock"}}}, "then": {"required": ["creation"], "not": {"required": ["insertAfterNetworkId"]}}, "else": {"not": {"required": ["creation"]}}},
-    {"if": {"properties": {"language": {"const": "LAD"}}}, "then": {"properties": {"nodes": {"items": {"properties": {"kind": {"enum": ["powerrail", "contact", "coil", "branch", "compare", "call", "timer", "counter"]}}}}}}, "else": {"properties": {"nodes": {"items": {"properties": {"kind": {"enum": ["and", "or", "not", "assign", "compare", "call", "timer", "counter"]}}}}}}}
+    {"if": {"properties": {"language": {"const": "LAD"}}}, "then": {"properties": {"nodes": {"items": {"properties": {"kind": {"enum": ["powerrail", "contact", "coil", "branch", "compare", "call", "timer", "counter", "move", "math", "edge"]}}}}}}, "else": {"properties": {"nodes": {"items": {"properties": {"kind": {"enum": ["and", "or", "not", "assign", "compare", "call", "timer", "counter", "move", "math", "edge"]}}}}}}}
   ],
   "$defs": {
     "key": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.-]{0,127}(?![\\s\\S])"},
@@ -33,14 +33,14 @@
       "type": "object", "additionalProperties": false, "required": ["key", "kind"],
       "properties": {
         "key": {"$ref": "#/$defs/key"},
-        "kind": {"enum": ["powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter"]},
+        "kind": {"enum": ["powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter", "move", "math", "edge"]},
         "operand": {"$ref": "#/$defs/key"},
         "inputCount": {"type": "integer", "minimum": 0, "maximum": 32},
         "comparison": {"enum": ["eq", "ne", "lt", "le", "gt", "ge"]},
         "dataType": {"$ref": "#/$defs/type"},
         "calleePath": {"$ref": "#/$defs/path"},
         "instance": {"$ref": "#/$defs/key"},
-        "instruction": {"enum": ["TON", "TOF", "TP", "CTU", "CTD", "CTUD"]},
+        "instruction": {"enum": ["TON", "TOF", "TP", "TONR", "CTU", "CTD", "CTUD", "ADD", "SUB", "MUL", "DIV", "R_TRIG", "F_TRIG"]},
         "nativeUid": {"type": "string", "pattern": "^[0-9]+(?![\\s\\S])", "maxLength": 10},
         "negated": {"type": "boolean"},
         "allowSharedInstance": {"type": "boolean", "default": false}
@@ -49,8 +49,11 @@
         {"if": {"properties": {"kind": {"enum": ["contact", "coil", "assign"]}}}, "then": {"required": ["operand"]}},
         {"if": {"properties": {"kind": {"const": "compare"}}}, "then": {"required": ["comparison", "dataType"]}},
         {"if": {"properties": {"kind": {"const": "call"}}}, "then": {"required": ["calleePath"]}},
-        {"if": {"properties": {"kind": {"enum": ["timer", "counter"]}}}, "then": {"required": ["instruction", "instance"]}},
-        {"if": {"properties": {"kind": {"const": "timer"}}}, "then": {"properties": {"instruction": {"enum": ["TON", "TOF", "TP"]}}}},
+        {"if": {"properties": {"kind": {"enum": ["timer", "counter", "edge"]}}}, "then": {"required": ["instruction", "instance"]}},
+        {"if": {"properties": {"kind": {"enum": ["move", "math"]}}}, "then": {"required": ["dataType"]}},
+        {"if": {"properties": {"kind": {"const": "math"}}}, "then": {"required": ["instruction"], "properties": {"instruction": {"enum": ["ADD", "SUB", "MUL", "DIV"]}}}},
+        {"if": {"properties": {"kind": {"const": "edge"}}}, "then": {"properties": {"instruction": {"enum": ["R_TRIG", "F_TRIG"]}}}},
+        {"if": {"properties": {"kind": {"const": "timer"}}}, "then": {"properties": {"instruction": {"enum": ["TON", "TOF", "TP", "TONR"]}}}},
         {"if": {"properties": {"kind": {"const": "counter"}}}, "then": {"properties": {"instruction": {"enum": ["CTU", "CTD", "CTUD"]}}}}
       ]
     },

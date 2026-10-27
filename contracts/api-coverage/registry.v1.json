@@ -1990,6 +1990,12 @@
       ]
     },
     {
+      "featureId": "watch_table_force_document_edit",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
       "featureId": "watch_table_apply",
       "obligations": [
         "D02"
@@ -3010,6 +3016,13 @@
       ]
     },
     {
+      "featureId": "addin_companion",
+      "obligations": [
+        "X04",
+        "F02"
+      ]
+    },
+    {
       "featureId": "multiuser_observation_review",
       "obligations": [
         "X05",
@@ -3221,6 +3234,24 @@
         "D16",
         "D17",
         "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_runtime_acquisition_compare",
+      "obligations": [
+        "D02",
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_plcsim_write",
+      "obligations": [
+        "D02",
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.42",
+  "catalogVersion": "0.4.43",
   "targetTiaVersions": [
     21
   ],
@@ -11122,16 +11122,18 @@
         "status": "available",
         "reasons": [
           "Installed V21 Classic/Unified public documentation and assembly evidence; individual operation limitations are distinct.",
-          "27 October Unified additions verified against Siemens.Engineering.WinCCUnified.xml and its assembly: HmiConnectionComposition.Create(String)/Find; HmiConnection.Partner/Station/Node (read-only) and CommunicationDriver; HmiDiscreteAlarmComposition, HmiAnalogAlarmComposition, HmiDataLogComposition and HmiAlarmLogComposition Create(String)/Find; typed setters AlarmBase.RaisedStateTag/AlarmClass/Priority/Origin/Area, HmiDiscreteAlarm.RaisedStateTagBitNumber/TriggerMode, HmiAnalogAlarm.Condition, LoggingBase.Settings with LogSettings.LogMaxSize/StorageFolder, HmiRuntimeSetting.StartScreen/ScreenResolution; reference lookups HmiTagComposition/HmiAlarmClassComposition/HmiScreenComposition.Find; GlobalDB.Export for DB member declarations. HmiTextListComposition, HmiGraphicListComposition and HmiScriptModuleComposition expose no Create and their items no writable typed property (Name is read-only), only directory Import/Export."
+          "27 October Unified additions verified against Siemens.Engineering.WinCCUnified.xml and its assembly: HmiConnectionComposition.Create(String)/Find; HmiConnection.Partner/Station/Node (read-only) and CommunicationDriver; HmiDiscreteAlarmComposition, HmiAnalogAlarmComposition, HmiDataLogComposition and HmiAlarmLogComposition Create(String)/Find; typed setters AlarmBase.RaisedStateTag/AlarmClass/Priority/Origin/Area, HmiDiscreteAlarm.RaisedStateTagBitNumber/TriggerMode, HmiAnalogAlarm.Condition, LoggingBase.Settings with LogSettings.LogMaxSize/StorageFolder, HmiRuntimeSetting.StartScreen/ScreenResolution; reference lookups HmiTagComposition/HmiAlarmClassComposition/HmiScreenComposition.Find; GlobalDB.Export for DB member declarations. HmiTextListComposition, HmiGraphicListComposition and HmiScriptModuleComposition expose no Create and their items no writable typed property (Name is read-only), only directory Import/Export.",
+          "27 October screen additions verified against Siemens.Engineering.WinCCUnified.xml and its assembly: HmiScreenComposition.Create(String)/Find with HmiScreen.Width/Height (UInt32 setters) and ScreenItems; HmiScreenItemBaseComposition.Create<T>(String)/Find for HmiRectangle, HmiText, HmiButton, HmiIOField, HmiBar, HmiGauge, HmiSlider and HmiToggleSwitch, each with typed Left/Top (Int32) and Width/Height (UInt32) setters; HmiScreenItemBase.Dynamizations with DynamizationBaseComposition.Create<T>(propertyName)/Find and TagDynamization.Tag (setter), PropertyName, DynamizationType, UseIndirectAddressing, ReadOnly and DataType; per-type EventHandlers compositions (for example HmiScreenEventHandlerComposition, HmiButtonEventHandlerComposition) with Create(eventType enum)/Find, whose handlers expose EventType and Script (IHmiScript.ScriptCode setter). No system-function list member exists for Unified event handlers in V21; ScriptDynamization exposes ScriptCode plus a Trigger part."
         ]
       },
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/screen/item/dynamization/event-handler/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
           "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, arrays, whole UDT values, software-unit tags and Classic external tags are not covered; global DB members and connection creation follow (27 October).",
           "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21 (only paired-file directory Import/Export, whose formats are unqualified), so no write is offered; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Classic classic_xml_import (27 October): imports a supplied or edited native export of one exact Classic object with ImportOptions.Override through its owning composition: ScreenComposition, ScreenTemplateComposition, ScreenPopupComposition, ScreenSlideinComposition, HmiTarget.ImportScreenGlobalElements/ImportScreenOverview, TagTableComposition, TextListComposition, GraphicListComposition, VBScriptComposition, CycleComposition and ConnectionComposition. Prepare requires one exported Hmi.* root of the same native type and Name, refuses library-linked screens/scripts and retains the current export as backup; apply re-exports the re-found object and requires equality with the supplied document apart from DocumentInfo/formatting, then the whole-HMI preservation check requires every other export unchanged. Cycles have no inspection kind and are addressed as kind hmiCycle by their preservation-capture path; the capture now keys slide-ins by SlideinType, matching inventory paths. The operation has its own unverified gate and stays refused for every profile. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Unified screen authoring (27 October, screens): four create-only operations. screen_create (target the HMI as kind hmiDevice) calls HmiSoftware.Screens.Create(name) and sets Width/Height, which must equal the size of an existing top-level screen of the same HMI (no device-resolution table is guessed), with exact typed readback; screen groups are neither searched nor targeted. item_create (target an exact hmiScreen) calls ScreenItems.Create<T>(name) for one of HmiRectangle, HmiText, HmiButton, HmiIOField, HmiBar, HmiGauge, HmiSlider or HmiToggleSwitch and sets Left/Top/Width/Height to an explicit integer rectangle wholly within the screen, with exact typed readback; item_place still only moves existing faceplate containers. dynamization_set (target an exact hmiScreenItem; one binding with property, exact same-HMI tagIdentity and dataType) creates one TagDynamization of ProcessValue, Visible or Enabled (the latter two only with a Bool tag) when the property has no dynamization yet, sets Tag and requires readback of PropertyName, DynamizationType Tag, the resolved tag name and no indirect addressing; the tag type must equal dataType and PLC-backed tags need the same proven connection owner and declaration as faceplate bindings. Script, resource-list, flashing and expression dynamizations and replacing existing dynamizations are not offered. event_handler_set (target an exact hmiScreen or hmiScreenItem; eventType, script) creates the handler through the object's most-derived EventHandlers composition Create(eventType) only when that event has no handler, and stores the script verbatim as Script.ScriptCode with exact readback. V21 documents no system-function list for Unified handlers, so the script is untrusted raw text: at most 16384 characters, no control characters other than tab/CR/LF, never executed, evaluated or syntax-checked (SyntaxCheck is not called); property-event handlers, custom web/widget container events, Async and the global definition area are not written. Each create may add only its own typed-readback subtree (<hmiPath>/screens/<name>, <screen>/items/<name>, <item>/dynamizations/<property>, <owner>/eventHandlers/<eventType>) to the whole-HMI capture; whether native creation also touches the owner node, start screen, tab order or line endings of script text is unobserved and fails closed. All four operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
           "The Unified preservation manifest adds a per-node SHA-256 of the same typed object-model readback as hmi_inspect section=model (keyed by hmi_inspect paths, bounded to 45000 nodes/64 MiB, typed-model.json retained) next to the tag-table exports, so unrelated-content comparison spans screens, items, dynamizations, events, parts, translations, tags, alarms, logs and runtime settings. tag_create may add only the created tag's subtree and binding operations only the bound interface entries. V21 has no Screen.Export; payloads without a public getter stay uncompared, so the manifest remains incomplete and the per-operation gates stay closed. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Library lifecycle stays in the library subsystem; HMI receives an exact source/destination/dependency/binding handoff.",
@@ -11146,7 +11148,7 @@
       "availability": {
         "status": "blocked",
         "reasons": [
-          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
+          "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/screen/item/dynamization/event-handler/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate."
         ]
       },
       "prerequisites": [
@@ -11191,7 +11193,8 @@
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
+          "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
+          "Added 27 October 2026, all unqualified: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). No native reference for these families has been captured yet, so the deployed catalog has no profile for them and every request is refused with GraphicalProfileUnavailable until an independently authored source is captured, extracted and qualified on the target; created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
         ]
       },
       "qualification": {
@@ -12282,7 +12285,8 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "2026-10-27: forceTable=true reads the exact force table with typed Name/Address/DisplayFormat/ForceValue/ForceIntention rows; every force table in the manifest now carries its typed rows and consistency."
         ]
       },
       "qualification": {
@@ -12328,7 +12332,8 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "2026-10-27: editKind=field (Name, Address, DisplayFormat, ModifyValue) joins the qualification-only expanded edits, and forceTable=true targets the existing force table; see watch_table_force_document_edit."
         ]
       },
       "qualification": {
@@ -12345,6 +12350,65 @@
         "TIA V21 authorized user and exact offline target for native reads",
         "One configured artifact store for cooperating Hosts",
         "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_force_document_edit",
+      "domain": "watch_tables",
+      "title": "Prepare reviewed offline force-table document edits",
+      "mcpTools": [
+        "watch_table_read",
+        "watch_table_prepare",
+        "watch_table_apply",
+        "watch_table_verify_reopen",
+        "watch_table_recover",
+        "watch_table_reconcile_recovery",
+        "watch_table_reconcile_interrupted"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableGroup.ForceTables, M:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTableComposition.Import(System.IO.FileInfo,Siemens.Engineering.ImportOptions) with ImportOptions.Override, M:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTable.Export(System.IO.FileInfo,Siemens.Engineering.ExportOptions) with WithDefaults, P:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTable.Entries/IsConsistent/Name and read-only P:Siemens.Engineering.SW.WatchAndForceTables.PlcForceTableEntry.Name/Address/DisplayFormat/ForceValue/ForceIntention; durable checkpoint/journal state is a Host service, not a vendor transaction.",
+          "Installed metadata has no setter on any PlcForceTableEntry property or on PlcForceTable.Name, and no force-table Create or Delete, so entries change only through the reviewed exported document and Import(Override). The installed metadata does not state that a PLC has exactly one force table; the manual does."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "2026-10-27: watch_table_prepare with forceTable=true edits the existing force table document through the watch preserving editor: field (Name, Address, DisplayFormat, ForceValue), comment (existing culture), clone, delete and reorder, one reviewed edit per operation. Only fields already present as plain text in the captured export can be set; no row grammar is synthesized.",
+          "ForceIntention is never set. A captured or imported force table with any typed or serialized ForceIntention other than false refuses preparation, import and save. Nothing is forced, monitored or written online.",
+          "Typed/XML readback compares a field the export omits as empty, so rows with omitted fields (for example an Undef display format) are refused until a native profile settles the omission rules. Document ID reindexing is not offered for force rows.",
+          "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
+          "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
+          "Worker-owned saved offline scratch only; prepare and apply are refused outside the isolated qualification harness, like the other expanded document edits, until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires --component-qualification and --watch-qualification (allowUnqualifiedDocumentEdits); production Hosts refuse force-table edits with UnsupportedProfile until native lifecycle evidence exists."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch",
+        "An existing force table in the selected PLC whose rows are all unselected (ForceIntention false)"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -19675,7 +19739,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified."
+          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
         ]
       },
       "qualification": {
@@ -19719,7 +19784,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified."
+          "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
         ]
       },
       "qualification": {
@@ -19743,6 +19809,49 @@
         "AC-evidence",
         "AC-recovery",
         "AC-preserve",
+        "AC-native"
+      ]
+    },
+    {
+      "featureId": "addin_companion",
+      "domain": "addins",
+      "title": "TIA Portal Add-In companion: send an exact project-tree selection to an enrolled Host",
+      "mcpTools": [],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Add-In API: Siemens.Engineering.AddIn.ProjectTreeAddInProvider.GetContextMenuAddIns, Menu.ContextMenuAddIn.BuildContextMenuItems, Menu.ChildItemFactory.AddActionItem<IEngineeringObject>, Menu.MenuSelectionProvider.GetSelection<T>, TiaPortal.GetService<MessageBoxProvider>().ShowNotification; read-only Parent/Name/Namespace/Project.Path of the selected objects. Packaged with the installed Siemens.Engineering.AddIn.Publisher.exe against Siemens.Engineering.AddIn.Publisher.xsd (V21)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified. The Publisher package builds, but no install, menu, selection, sandbox or pipe exchange has run inside TIA Portal.",
+          "Project-tree selections of projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags. Other objects, devices-and-networks, library and workflow-hook surfaces are refused. Object paths mirror the worker's project model; a path absent from the newest saved review of the same project copy is refused, never matched by name.",
+          "Declares TIA.ReadOnly, EnvironmentPermission, FileIOPermission and SecurityPermission.UnmanagedCode (pipe-server process check). Whether TIA's Add-In sandbox allows these calls, and whether its loader is a direct child of the TIA process, is unverified.",
+          "Host enrollment (--addin-handoff --addin-enrollment) pins the published module-version and configuration hashes and requires the peer to be TIA's Add-In loader below the TIA process the attached worker owns, in the live worker session generation. These are OS lineage and declared-hash checks, not attestation of the loaded package; producerAuthenticated and liveSelectionVerified stay false. Package signing is not configured."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "TIA Portal V21 with the user-installed package, TIAMCP_ARTIFACTS set for TIA, a Host started with --addin-handoff --addin-enrollment whose worker is attached to that TIA instance, and a saved review captured in that worker session."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Publisher package and enrollment file from scripts/Publish-AddIn.ps1",
+        "Saved project review captured by the same attached worker session"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
         "AC-native"
       ]
     },
@@ -20850,6 +20959,89 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "diagnostic_runtime_acquisition_compare",
+      "domain": "diagnostics",
+      "title": "Compare before/after runtime acquisitions of a diagnostic experiment",
+      "mcpTools": [
+        "diagnostic_runtime_acquisition_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host-owned offline artifact service only; this does not assert a native PLC trace API."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Rederives two retained runtime acquisitions of the same exact experiment from distinct original capture chains, then reports per hypothesis the matched, contradicted and unknown cycles on each side, an observed pattern and whether it changed, beside both capture contexts, signal sets, progress and quality.",
+          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Two retained acquisitions of one experiment whose original captures, case and saved review remain available; no target or network access."
+        ]
+      },
+      "prerequisites": [
+        "Two diagnostic_experiment_acquire_runtime records of the same experiment from distinct captures"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "diagnostic_plcsim_write",
+      "domain": "diagnostics",
+      "title": "Write diagnostic-case signals on an owned PLCSIM instance",
+      "mcpTools": [
+        "diagnostic_plcsim_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "PLCSIM Advanced V8 IInstance typed Read*/Write* methods (for example ReadBool/WriteBool, ReadUInt16/WriteUInt16) through the simulator worker, the same typed access as sim_read/sim_write; precondition and readback use the typed reads."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
+          "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Owned running PLCSIM Advanced V8 instance on Softbus whose loaded program exposes the case's symbols, and a retained diagnostic case."
+        ]
+      },
+      "prerequisites": [
+        "Owned instance from sim_create, or sim_select with creationId",
+        "Retained diagnostic_plan case with captured-declaration signals"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
         "AC-evidence"
       ]
     },

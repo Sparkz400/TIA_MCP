@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageConfiguration xmlns="http://www.siemens.com/automation/Openness/AddIn/Publisher/V21">
+  <Author>TIA MCP</Author>
+  <Description>Sends the exact selected project-tree objects to a locally enrolled TIA MCP Host for review. Reads only; makes no engineering changes.</Description>
+  <AddInVersion>0.1.0</AddInVersion>
+  <Product>
+    <Name>TIA MCP selection companion</Name>
+    <Id>TiaMcp.AddIn.V21</Id>
+    <Version>0.1.0</Version>
+  </Product>
+  <FeatureAssembly>
+    <AssemblyInfo>
+      <Assembly>TiaMcp.AddIn.V21.dll</Assembly>
+    </AssemblyInfo>
+  </FeatureAssembly>
+  <RequiredPermissions>
+    <TIAPermissions>
+      <TIA.ReadOnly />
+    </TIAPermissions>
+    <SecurityPermissions>
+      <System.Security.Permissions.EnvironmentPermission>
+        <Comment>Reads TIAMCP_ARTIFACTS and the computer name.</Comment>
+      </System.Security.Permissions.EnvironmentPermission>
+      <System.Security.Permissions.FileIOPermission>
+        <Comment>Reads the Host discovery file and saved project reviews; writes nothing.</Comment>
+      </System.Security.Permissions.FileIOPermission>
+      <System.Security.Permissions.SecurityPermission.UnmanagedCode>
+        <Comment>Verifies the local pipe server process (GetNamedPipeServerProcessId, GetProcessTimes).</Comment>
+      </System.Security.Permissions.SecurityPermission.UnmanagedCode>
+    </SecurityPermissions>
+  </RequiredPermissions>
+</PackageConfiguration>

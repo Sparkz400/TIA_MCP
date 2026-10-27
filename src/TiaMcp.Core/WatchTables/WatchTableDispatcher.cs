@@ -61,6 +61,9 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     }
     private async Task<object> Prepare(JsonObject args, CancellationToken token)
     {
+        string? targetKind = args["targetKind"]?.GetValue<string>();
+        if (targetKind is not (null or "forceTable")) throw new BridgeException("InvalidRequest", "targetKind must be omitted (watch table) or forceTable.");
+        bool force = targetKind == "forceTable";
         var before = await Snapshot(args, token);
         var observation = Observation(before);
         int ordinal = args["ordinal"]?.GetValue<int>() ?? 0;
@@ -70,6 +73,8 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
         if (WatchTableDocument.Hash(bytes) != captured.Sha256 || WatchTableDocument.SemanticHash(bytes) != observation.Reference.ContentSha256)
             throw new BridgeException("ArtifactChanged", "Native capture no longer matches its byte and content identities.");
         var document = new WatchTableDocument(bytes);
+        if (document.IsForce != force) throw new BridgeException("IdentityMismatch", "Captured document kind differs from the requested watch/force target.");
+        if (force) ValidateTypedRows(bytes, before); // refuses typed ForceIntention=true even when the export omits it
         string kind = args["editKind"]?.GetValue<string>() ?? "modifyValue";
         bool reindexDocumentIds = args["reindexDocumentIds"]?.GetValue<bool>() ?? false;
         if (kind != "modifyValue" && !allowUnqualifiedDocumentEdits)
@@ -85,6 +90,10 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
                     throw new BridgeException("UnsupportedProfile", "Literal edits require an existing Bool row and TRUE/FALSE literal.");
                 edit = new() { ["ordinal"] = ordinal, ["field"] = "ModifyValue", ["before"] = document.Field(ordinal, "ModifyValue"), ["after"] = value };
                 document.SetField(ordinal, "ModifyValue", value); break;
+            case "field":
+                string field = Text(args, "field"), fieldValue = args["value"]?.GetValue<string>() ?? throw new BridgeException("InvalidRequest", "Field value is required.");
+                edit = new() { ["kind"] = kind, ["ordinal"] = ordinal, ["field"] = field, ["before"] = document.Field(ordinal, field), ["after"] = fieldValue };
+                document.SetField(ordinal, field, fieldValue); break;
             case "comment":
                 string culture = Text(args, "culture"); string comment = args["text"]?.GetValue<string>() ?? throw new BridgeException("InvalidRequest", "Comment text is required.");
                 edit = new() { ["kind"] = kind, ["ordinal"] = ordinal, ["culture"] = culture, ["text"] = comment };
@@ -106,11 +115,11 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
         string directory = Path.Combine(root, "watch", Guid.NewGuid().ToString("N")[..12]); Directory.CreateDirectory(directory);
         var input = SaveBytes(directory, "reviewed.xml", document.ToBytes());
         var proposal = new { selector = new { projectName = args["projectName"]?.GetValue<string>(), plcPath = observation.Reference.Object.PlcPath,
-                group = args["group"]?.GetValue<string>() ?? "root", tableName = document.Name }, before,
+                group = args["group"]?.GetValue<string>() ?? "root", tableName = document.Name, targetKind }, before,
             edit, expectedSemanticSha256 = WatchTableDocument.SemanticHash(document.ToBytes()), input };
         var review = Save(directory, "review.json", proposal);
         var plan = new EngineeringOperationPlan(kind == "modifyValue" ? "watchLiteralEdit" : "watchDocumentEdit", observation,
-            [new(EngineeringResourceKey.ForPath("project", observation.ProjectFilePath), "project", "oneReviewedWatchEdit:" + kind, "projectArchiveToNewLocation")],
+            [new(EngineeringResourceKey.ForPath("project", observation.ProjectFilePath), "project", (force ? "oneReviewedForceEdit:" : "oneReviewedWatchEdit:") + kind, "projectArchiveToNewLocation")],
             [review, input], ["offline", "watchImport"], ["readback", "preservation", "saved", "freshReopen"]);
         var record = store.Prepare(plan, Text(args, "idempotencyKey"));
         return new { operation = record, review = proposal, reviewArtifact = review, applyRequires = "Exact operationId and reviewed planSha256" };
@@ -301,8 +310,11 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
         for (int i = 0; i < document.Count; i++)
         {
             if (rows[i]?["kind"]?.GetValue<string>() != document.RowKind(i)) throw new BridgeException("VerificationFailed", "Native row kind/order differs.");
-            if (document.RowKind(i) != "PlcWatchTableEntry") continue;
-            foreach (string field in new[] { "Name", "Address", "DisplayFormat", "ModifyValue" })
+            if (document.RowKind(i) == "PlcTableCommentEntry") continue;
+            bool force = document.RowKind(i) == "PlcForceTableEntry";
+            if (force && rows[i]?["forceIntention"]?.GetValue<bool>() != false)
+                throw new BridgeException("ForceSelectionRefused", "Every force row must read back with ForceIntention false; forcing is never selected or activated.");
+            foreach (string field in new[] { "Name", "Address", "DisplayFormat", force ? "ForceValue" : "ModifyValue" })
                 if ((rows[i]?[char.ToLowerInvariant(field[0]) + field[1..]]?.GetValue<string>() ?? "") != (document.Field(i, field) ?? ""))
                     throw new BridgeException("VerificationFailed", "Typed native row field/order differs: " + field);
         }

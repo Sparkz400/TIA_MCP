@@ -13,7 +13,7 @@ namespace TiaMcp.Openness.V21
 
         // Each route carries its own independently captured dependent-instance effect pair;
         // IEC instance members have their own captured pair because their native shape differs.
-        internal static readonly string[] SystemInstanceTypes = { "TON_TIME", "TOF_TIME", "TP_TIME", "CTU_INT", "CTD_INT", "CTUD_INT" };
+        internal static readonly string[] SystemInstanceTypes = { "TON_TIME", "TOF_TIME", "TP_TIME", "CTU_INT", "CTD_INT", "CTUD_INT", "TONR_TIME", "R_TRIG", "F_TRIG" };
         internal static string EffectManifestName(string route, bool systemType = false) =>
             (systemType ? "instance-effects-iec" : "instance-effects") + (route == "standard" ? "" : "-" + route) + ".v1.json";
         internal static string TransitiveManifestName(string route) =>

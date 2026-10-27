@@ -76,6 +76,23 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
         =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Acquire(store,experimentId,snapshotRef,request);
     public object ExportDiagnosticAcquisition(string acquisitionId,string format)
         =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Export(store,acquisitionId,format);
+    public object CompareDiagnosticAcquisitions(string beforeAcquisitionId,string afterAcquisitionId,JsonObject request)
+        =>new DiagnosticRuntimeAcquisitions(options.ArtifactsDirectory).Compare(store,beforeAcquisitionId,afterAcquisitionId,request);
+    /// <summary>Diagnostic-case signal writes on the exact owned PLCSIM instance; refused while a capture holds that instance.</summary>
+    public async Task<object> WriteDiagnosticPlcsim(string caseId,int instanceId,string instanceName,string creationId,DiagnosticPlcsimWrite[] writes,CancellationToken cancellationToken)
+    {
+        var (arguments,association)=DiagnosticPlcsimWrites.Admit(options.ArtifactsDirectory,caseId,instanceId,instanceName,creationId,writes);
+        if(simulator is null)throw Error("RuntimeCaptureSourceUnavailable");
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            if(disposed)throw Error("RuntimeCaptureHostStopping");
+            if(running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==creationId))throw Error("RuntimeCaptureSessionBusy");
+            // Native calls are never cancelled: a cancelled bridge call faults the simulator worker for every later tool.
+            return DiagnosticPlcsimWrites.Receipt(arguments,association,await simulator.CallAsync("sim_write_owned",arguments,CancellationToken.None));
+        }
+        finally{gate.Release();}
+    }
     public async Task<object> Export(string snapshotRef,string format,CancellationToken cancellationToken)
     {
         bool live=false;await gate.WaitAsync(cancellationToken);

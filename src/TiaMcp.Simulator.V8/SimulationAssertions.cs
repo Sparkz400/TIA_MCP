@@ -6,6 +6,10 @@ namespace TiaMcp.Simulator.V8
     /// <summary>Pure, type-preserving comparison shared by scenario execution and tests.</summary>
     internal static class SimulationAssertions
     {
+        /// <summary>Exact equality at the PLC type's own precision: a Real written as 0.1 reads back as the nearest float, not 0.1.</summary>
+        internal static bool Same(string type, JToken actual, JToken wanted) =>
+            type == "float" ? (float)(double)actual == (float)(double)wanted : Compare(type, actual, wanted, "eq", 0);
+
         internal static bool Compare(string type, JToken actual, JToken expected, string operation, double tolerance)
         {
             if (tolerance < 0 || double.IsNaN(tolerance) || double.IsInfinity(tolerance))

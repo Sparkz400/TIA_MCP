@@ -31,6 +31,8 @@ This is a separate workflow from `trace_read`, `diagnostic_experiment_review` an
 
    Formats are `json`, `markdown`, and `html`. Download the returned hashed artifact using `artifact_read`. JSON is the exact original acquisition record. Readable formats include the complete original JSON, chain hashes, selected mappings, per-read timings, quality/gaps, terminal limits, and unresolved observation counts.
 
+To compare two acquisitions of the same experiment, for example before and after `diagnostic_plcsim_write` on an owned PLCSIM instance, use `diagnostic_runtime_acquisition_compare`. See [monitor and modify a plan](../guides/trace-diagnostics.md#monitor-and-modify-a-plan-on-an-owned-plcsim-instance).
+
 A capture without the exact preexisting association cannot be retroactively attached by this tool. A replan requires a capture associated with the new exact case. Acquisition does not infer instance equivalence or reuse a previous instance's mapping.
 
 ## Evidence and interpretation

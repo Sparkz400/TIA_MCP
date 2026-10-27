@@ -12,6 +12,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
     public bool AddInHandoff { get; init; }
+    internal TiaMcp.Core.AddIns.AddInEnrollment? AddInEnrollment { get; init; }
     // Deliberately excluded from normal feature/catalog advertisements.
     public bool ComponentQualification { get; init; }
     public bool TestSuiteScopeProbe { get; init; }
@@ -37,6 +38,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var timeout = 120;
         var diagnose = false;
         var addInHandoff = false;
+        TiaMcp.Core.AddIns.AddInEnrollment? addInEnrollment = null;
 #if OFFLINE_PACKAGE
         var noNativeWorkers = true;
 #else
@@ -75,6 +77,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                         throw new ArgumentException("--ua-client-identity requires one default or 32-lowercase-hex name.");
                     uaClientIdentity = args[i]; break;
                 case "--watch-qualification": watchQualificationPoint = args[i]; break;
+                case "--addin-enrollment":
+                    if (addInEnrollment is not null) throw new ArgumentException("--addin-enrollment may be given once.");
+                    addInEnrollment = TiaMcp.Core.AddIns.AddInEnrollment.Read(args[i]); break;
                 case "--library-limits-file": libraryLimits = ReadLibraryLimits(args[i]); break;
                 case "--api-dir": api = Path.GetFullPath(args[i]); break;
                 case "--timeout-seconds":
@@ -101,7 +106,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || watchQualificationPoint is not null))
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint };
+        if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

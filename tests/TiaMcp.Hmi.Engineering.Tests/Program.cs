@@ -134,6 +134,72 @@ Check("Object property edits require an allowlisted property set and never a nam
     var composed = Edit(new JObject { ["StartScreen"] = "Overview" }); composed["composition"] = "DataLogs"; Reject(() => HmiEngineeringRules.RequireRequest(composed));
     var classic = Edit(new JObject { ["StartScreen"] = "Overview" }); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
 });
+Check("Screen creation takes an exact new name and an exact Width/Height pair, Unified only", () => {
+    JObject Screen() { var r = Device("screen_create"); r["name"] = "Overview_2"; r["properties"] = new JObject { ["Width"] = 1280, ["Height"] = 800 }; return r; }
+    HmiEngineeringRules.RequireRequest(Screen());
+    var classic = Screen(); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var unnamed = Screen(); unnamed.Remove("name"); Reject(() => HmiEngineeringRules.RequireRequest(unnamed));
+    var pathName = Screen(); pathName["name"] = "a/b"; Reject(() => HmiEngineeringRules.RequireRequest(pathName));
+    var unsized = Screen(); unsized.Remove("properties"); Reject(() => HmiEngineeringRules.RequireRequest(unsized));
+    foreach (var size in new[] { new JObject { ["Width"] = 1280 }, new JObject { ["Width"] = 0, ["Height"] = 800 }, new JObject { ["Width"] = 1280.5, ["Height"] = 800 },
+        new JObject { ["Width"] = "1280", ["Height"] = 800 }, new JObject { ["Width"] = 4294967296L, ["Height"] = 800 }, new JObject { ["Width"] = 1280, ["Height"] = 800, ["BackColor"] = "1, 2, 3" } }) {
+        var r = Screen(); r["properties"] = size; Reject(() => HmiEngineeringRules.RequireRequest(r));
+    }
+    foreach (string field in new[] { "placement", "bindings", "dataType", "composition", "itemType", "eventType", "script" }) {
+        var r = Screen(); r[field] = field == "dataType" || field == "composition" || field == "itemType" || field == "eventType" || field == "script" ? "x" : new JObject(); Reject(() => HmiEngineeringRules.RequireRequest(r));
+    }
+});
+JObject OnScreen(string operation) { var r = Scalar(); r.Remove("properties"); r["operation"] = operation; r["target"] = Identity("/devices/HMI/hmi/Runtime/screens/Main"); r["target"]["kind"] = "hmiScreen"; return r; }
+Check("Item creation takes one allowlisted type, an exact new name and an integer rectangle", () => {
+    JObject Item(string type = "HmiIOField") { var r = OnScreen("item_create"); r["name"] = "IOField_7"; r["itemType"] = type; r["placement"] = new JObject { ["left"] = 10, ["top"] = 20, ["width"] = 120, ["height"] = 40 }; return r; }
+    foreach (string type in HmiEngineeringRules.ItemTypes) HmiEngineeringRules.RequireRequest(Item(type));
+    foreach (string type in new[] { "HmiFaceplateContainer", "HmiCustomWidgetContainer", "HmiScreenWindow", "HmiLine", "HmiCircle", "hmiiofield", "Siemens.Engineering.HmiUnified.UI.Widgets.HmiIOField" })
+        Reject(() => HmiEngineeringRules.RequireRequest(Item(type)));
+    var classic = Item(); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var unnamed = Item(); unnamed.Remove("name"); Reject(() => HmiEngineeringRules.RequireRequest(unnamed));
+    var unplaced = Item(); unplaced.Remove("placement"); Reject(() => HmiEngineeringRules.RequireRequest(unplaced));
+    var partial = Item(); ((JObject)partial["placement"]).Remove("height"); Reject(() => HmiEngineeringRules.RequireRequest(partial));
+    var fractional = Item(); fractional["placement"]["left"] = 1.5; Reject(() => HmiEngineeringRules.RequireRequest(fractional));
+    var styled = Item(); styled["properties"] = new JObject { ["Visible"] = true }; Reject(() => HmiEngineeringRules.RequireRequest(styled));
+    var placeTyped = Item(); placeTyped["operation"] = "item_place"; Reject(() => HmiEngineeringRules.RequireRequest(placeTyped));
+    var placeNamed = Item(); placeNamed["operation"] = "item_place"; placeNamed.Remove("itemType"); Reject(() => HmiEngineeringRules.RequireRequest(placeNamed));
+});
+Check("Tag dynamization takes exactly one allowlisted property and an exact same-HMI tag, create-only", () => {
+    JObject Dynamize(string property = "ProcessValue", string type = "Int") { var r = Scalar(); r.Remove("properties"); r["operation"] = "dynamization_set";
+        r["bindings"] = new JArray(new JObject { ["property"] = property, ["tagIdentity"] = Identity("/devices/HMI/hmi/Runtime/tagTables/Default/tags/Speed"), ["dataType"] = type }); return r; }
+    HmiEngineeringRules.RequireRequest(Dynamize()); HmiEngineeringRules.RequireRequest(Dynamize("Visible", "Bool")); HmiEngineeringRules.RequireRequest(Dynamize("Enabled", "Bool"));
+    foreach (string property in new[] { "BackColor", "Text", "Left", "ScriptCode", "processvalue" }) Reject(() => HmiEngineeringRules.RequireRequest(Dynamize(property)));
+    Reject(() => HmiEngineeringRules.RequireRequest(Dynamize("Visible", "Int")));
+    var classic = Dynamize(); classic["target"]["family"] = "classic"; classic["bindings"][0]["tagIdentity"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var two = Dynamize(); ((JArray)two["bindings"]).Add(Dynamize("Visible", "Bool")["bindings"][0].DeepClone()); Reject(() => HmiEngineeringRules.RequireRequest(two));
+    var replacing = Dynamize(); replacing["bindings"][0]["expectedValue"] = "OldTag"; Reject(() => HmiEngineeringRules.RequireRequest(replacing));
+    var foreign = Dynamize(); foreign["bindings"][0]["tagIdentity"]["hmiPath"] = "/devices/HMI_2/hmi/Runtime"; Reject(() => HmiEngineeringRules.RequireRequest(foreign));
+    var nameOnly = Dynamize(); nameOnly["bindings"][0]["tagIdentity"] = "Speed"; Reject(() => HmiEngineeringRules.RequireRequest(nameOnly));
+    var scripted = Dynamize(); scripted["script"] = "return 1;"; Reject(() => HmiEngineeringRules.RequireRequest(scripted));
+    var placed = Dynamize(); placed["placement"] = new JObject(); Reject(() => HmiEngineeringRules.RequireRequest(placed));
+});
+Check("Event handlers take one documented event name and bounded untrusted script text", () => {
+    JObject Handler(string script = "HMIRuntime.UI.SysFct.ChangeScreen(\"Main\", null);\r\n") { var r = OnScreen("event_handler_set"); r["eventType"] = "Loaded"; r["script"] = script; return r; }
+    HmiEngineeringRules.RequireRequest(Handler());
+    var onItem = Handler(); onItem["target"] = Identity(); onItem["eventType"] = "Tapped"; HmiEngineeringRules.RequireRequest(onItem);
+    HmiEngineeringRules.RequireRequest(Handler(new string('x', HmiEngineeringRules.MaxScriptLength)));
+    foreach (string script in new[] { "", "   \r\n", new string('x', HmiEngineeringRules.MaxScriptLength + 1), "a\u0000b", "a\u001bb" }) Reject(() => HmiEngineeringRules.RequireRequest(Handler(script)));
+    foreach (string eventType in new[] { "None", "", "Tapped;", "On Click", "Loaded()" }) { var r = Handler(); r["eventType"] = eventType; Reject(() => HmiEngineeringRules.RequireRequest(r)); }
+    var noScript = Handler(); noScript.Remove("script"); Reject(() => HmiEngineeringRules.RequireRequest(noScript));
+    var objectScript = Handler(); objectScript["script"] = new JObject { ["functionList"] = new JArray() }; Reject(() => HmiEngineeringRules.RequireRequest(objectScript));
+    var noEvent = Handler(); noEvent.Remove("eventType"); Reject(() => HmiEngineeringRules.RequireRequest(noEvent));
+    var classic = Handler(); classic["target"]["family"] = "classic"; Reject(() => HmiEngineeringRules.RequireRequest(classic));
+    var named = Handler(); named["name"] = "Loaded"; Reject(() => HmiEngineeringRules.RequireRequest(named));
+    var smuggled = Scalar(); smuggled["script"] = "alert(1)"; Reject(() => HmiEngineeringRules.RequireRequest(smuggled));
+    var eventOnScalar = Scalar(); eventOnScalar["eventType"] = "Tapped"; Reject(() => HmiEngineeringRules.RequireRequest(eventOnScalar));
+});
+Check("Screen operations stay behind the closed Unified gate with their own prerequisites", () => {
+    foreach (string operation in new[] { "screen_create", "item_create", "dynamization_set", "event_handler_set" }) {
+        var unified = HmiEngineeringRules.Gate("unified", "unified-comfort", operation);
+        Assert(unified.Value<string>("bridgeImplementation") == "guarded_body" && !unified.Value<bool>("available") && unified.Value<string>("reasonCode") == "HmiPreservationUnavailable");
+        Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", operation).Value<string>("bridgeImplementation") == "unavailable");
+    }
+});
 Check("Created objects admit only their own new typed-readback subtree", () => {
     const string created = "/hmi/discreteAlarms/New_1";
     var before = new Dictionary<string, string> { ["/hmi/discreteAlarms/Old"] = "1", ["/hmi/runtimeSettings"] = "2" };
@@ -252,7 +318,11 @@ Check("Operation prerequisites include independent recovery and precise operatio
         ["external_tag_create"] = new[] { "newTagNamespaceUnique", "exactConnectionOwnership", "exactPlcDeclarationType" },
         ["connection_create"] = new[] { "newConnectionNamespaceUnique", "exactConnectionOwnership" },
         ["object_create"] = new[] { "newObjectNamespaceUnique", "exactObjectPropertyDelta", "referenceDependencyClosure" },
-        ["object_properties_set"] = new[] { "exactObjectPropertyDelta", "referenceDependencyClosure" } };
+        ["object_properties_set"] = new[] { "exactObjectPropertyDelta", "referenceDependencyClosure" },
+        ["screen_create"] = new[] { "newScreenNamespaceUnique", "exactScreenSizeReadback" },
+        ["item_create"] = new[] { "newItemNamespaceUnique", "exactRectangleWithinScreen" },
+        ["dynamization_set"] = new[] { "newDynamizationOnly", "exactTypedBindingOwnership", "bindingDependencyClosure" },
+        ["event_handler_set"] = new[] { "newEventHandlerOnly", "exactScriptTextReadback", "scriptNeverExecuted" } };
     foreach (var operation in expected) {
         var gates = HmiEngineeringRules.RequiredGates(operation.Key).Values<string>().ToArray();
         Assert(gates.Distinct().Count() == gates.Length && operation.Value.All(gates.Contains));
