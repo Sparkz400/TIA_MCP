@@ -51,8 +51,8 @@ namespace TiaMcp.Openness.V21
                     if (_session.LibraryChangeFingerprint(_plan) != _plan.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "Source or target changed after the component plan; no native mutation was dispatched.");
                     return _session.LibraryChangePrepare(arguments, (JArray)_plan.Preview["integrationPlan"]["versions"]);
                 }
-                // The captured storage profile is a qualification fixture; production uses the shipped typed instance templates.
-                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _production ? null : _session.CapturedStorageContext(_plan));
+                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one.
+                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _session.CapturedStorageContext(_plan, _production));
                 throw new BridgeException("UnsupportedComponentStep", "Coordinator can prepare only library_instantiate and graphical_typed_edit.");
             }
 

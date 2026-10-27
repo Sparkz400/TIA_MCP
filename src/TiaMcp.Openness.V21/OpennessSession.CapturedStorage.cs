@@ -23,12 +23,13 @@ namespace TiaMcp.Openness.V21
             internal LibraryChange Plan;
             internal JObject Descriptor;
             internal string CatalogPath, PlanHash, SourceBinding;
+            internal bool Production;
             internal JArray Artifacts;
         }
 
         // The native component adapter alone creates this context. It is never
         // accepted from a request or persisted/reconstructed as a live handle.
-        private CapturedStorageQualification CapturedStorageContext(LibraryChange plan)
+        private CapturedStorageQualification CapturedStorageContext(LibraryChange plan, bool production = false)
         {
             if (string.IsNullOrEmpty(plan.Source?.SourceHash)) return null;
             // native04's archive keeps its exact identity pins; any other archived
@@ -37,7 +38,8 @@ namespace TiaMcp.Openness.V21
             var names = (plan.Preview["integrationPlan"]?["versions"] as JArray)?.Select(v => v.Value<string>("typeName")) ?? Enumerable.Empty<string>();
             // The profile fixes the global instance DB only; the FBD FC caller may be new or existing (checked at typed binding).
             if (!exactArchive && !names.Contains(TypedGraphicalCapturedStorageTemplate.FbName)) return null;
-            RequireComponentScratch(plan.Project);
+            // Production combined apply binds the same captured profile by exact content; only the qualification scratch is not required.
+            if (production) EnsureProjectOffline(plan.Project); else RequireComponentScratch(plan.Project);
             string catalog = TypedCatalogPath();
             if (catalog == null) throw new BridgeException("CapturedStorageProfileUnavailable", "Trusted captured-storage profile is not deployed.");
             string file = Path.Combine(Path.GetDirectoryName(catalog), "component04-storage-profile.json");
@@ -62,7 +64,7 @@ namespace TiaMcp.Openness.V21
                 PlcComponentContentContract.ValidatePin(pin);
             }
             return new CapturedStorageQualification { Plan = plan, Descriptor = profile, CatalogPath = catalog,
-                PlanHash = ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)), Artifacts = artifacts,
+                PlanHash = ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)), Artifacts = artifacts, Production = production,
                 SourceBinding = exactArchive ? "exactNative04Archive" : "installedContentEquality" };
         }
         private static string CapturedBytesHash(byte[] bytes)
@@ -107,7 +109,8 @@ namespace TiaMcp.Openness.V21
         {
             var context = change.CapturedStorageQualification;
             if (context == null) throw new BridgeException("CapturedStorageProfileUnavailable", "Private current-session qualification context is missing.");
-            var plan = context.Plan; RequireComponentScratch(plan.Project);
+            var plan = context.Plan;
+            if (context.Production) EnsureProjectOffline(plan.Project); else RequireComponentScratch(plan.Project);
             if (!_libraryChanges.TryGetValue(plan.Id, out var current) || !ReferenceEquals(current, plan) ||
                 plan.Project.Path.FullName != change.ProjectPath || ChangeHash(plan.Preview.ToString(Newtonsoft.Json.Formatting.None)) != context.PlanHash)
                 throw new BridgeException("StaleDeclaration", "Captured-storage prepared plan/session changed.");
