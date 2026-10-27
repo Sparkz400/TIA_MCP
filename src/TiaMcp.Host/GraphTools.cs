@@ -34,6 +34,10 @@ public sealed class GraphTools(IBridgeClient bridge, HostOptions options)
     [Description("Compare two exact retained GRAPH document handles. Retain structural/content differences and before/after diagnostics, preserving opaque content and unreliable matching. Neither matching text nor an empty difference report certifies behavioral equivalence, native validity or a safe import.")]
     public CallToolResult Compare(string beforeRef, string afterRef) => Run(s => s.Compare(beforeRef, afterRef));
 
+    [McpServerTool(Name = "graph_edit", ReadOnly = false, Destructive = false, OpenWorld = false)]
+    [Description("Apply 1..32 typed edits, in order, to one exact retained GRAPH document with one chart. Ops: addStep {number,name,afterTransition}; addTransition {number,name,fromStep,toStep,jump?,condition}; removeStep/removeTransition {number} (linear-chain element; predecessor is spliced to successor); renameStep/renameTransition {number,name}; setStepComment {number,lang,text}; setSequenceTitle {sequence,lang,text}; setTransitionCondition {number,condition}. condition is 1..16 {operand,negated?}: LAD contacts in series on exact Bool members of the block interface. Unedited bytes stay identical. Results with reader errors, duplicate numbers or names, non-alternating or dangling connections or unreachable steps are refused. Retains the result as a new document whose input is the source, plus a graph_compare record. No project change; apply it with the graph_import change kind. Not natively qualified.")]
+    public CallToolResult Edit(string sourceRef, JsonElement operations) => Run(s => s.Edit(sourceRef, operations));
+
     [McpServerTool(Name = "graph_reopen", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Reopen a retained GRAPH document/comparison after restart. Verify receipt, artifacts and exact comparison inputs before returning bounded counts, diagnostics flags and download names. Native qualification stays false.")]
     public CallToolResult Reopen(string recordRef) => Run(s => s.Reopen(recordRef));

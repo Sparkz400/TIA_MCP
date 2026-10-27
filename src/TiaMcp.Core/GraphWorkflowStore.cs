@@ -65,6 +65,19 @@ public sealed class GraphWorkflowStore
         var report = GraphDocument.Parse(before.Files["original.xml"]).CompareTo(GraphDocument.Parse(after.Files["original.xml"]));
         return Summary(Publish("comparison", [beforeRef, afterRef], new() { ["report.json"] = Encoding.UTF8.GetBytes(report.ToJson()) }));
     }
+    /// <summary>Apply typed GRAPH edits to a retained document. The edited bytes become a new document whose only input is the source,
+    /// with a comparison record of source and result. No native worker or project change; graph_import applies the result.</summary>
+    public object Edit(string sourceRef, JsonElement operations)
+    {
+        using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock"));
+        Require(operations.ValueKind == JsonValueKind.Array, "GraphEditInput", "operations must be an array of typed edits.");
+        var before = GraphDocument.Parse(Document(sourceRef).Files["original.xml"]);
+        byte[] bytes = GraphEditor.Apply(before, GraphEditor.Parse(operations.GetRawText()));
+        var edited = PublishDocument(bytes, [sourceRef]);
+        var comparison = Publish("comparison", [sourceRef, edited.Reference],
+            new() { ["report.json"] = Encoding.UTF8.GetBytes(before.CompareTo(GraphDocument.Parse(bytes)).ToJson()) });
+        return new { document = Summary(edited), comparison = Summary(comparison), nativeQualified = false };
+    }
     public object Reopen(string recordRef) => Summary(Load(recordRef));
     public object ReportPage(string recordRef, string section, int offset = 0, int count = 50)
     {
@@ -136,7 +149,7 @@ public sealed class GraphWorkflowStore
             "GraphIntegrityFailure", "Invalid retained record.");
         var names = receipt.Kind == "document" ? new[] { "original.xml", "report.json", "viewer.html" } : ["report.json"];
         Require(receipt.Artifacts is not null && receipt.Artifacts.All(a => a is not null) &&
-            receipt.Artifacts.Select(a => a.Name).Order().SequenceEqual(names.Order()) && receipt.Inputs.Length == (receipt.Kind == "document" ? 0 : 2),
+            receipt.Artifacts.Select(a => a.Name).Order().SequenceEqual(names.Order()) && (receipt.Kind == "document" ? receipt.Inputs.Length <= 1 : receipt.Inputs.Length == 2),
             "GraphIntegrityFailure", "Unexpected retained artifacts or inputs.");
         var files = new Dictionary<string, byte[]>();
         foreach (var artifact in receipt.Artifacts)
@@ -144,8 +157,9 @@ public sealed class GraphWorkflowStore
             var bytes = Read(PathFor(id, artifact.Name), artifact.Name == "original.xml" ? GraphDocument.MaxInputBytes : GraphDocument.MaxReportBytes);
             Require(bytes.Length == artifact.Bytes && Hash(bytes) == artifact.Sha256, "GraphIntegrityFailure", "Retained artifact changed."); files.Add(artifact.Name, bytes);
         }
-        foreach (string input in receipt.Inputs)
-            Require(Load(input, depth + 1).Receipt.Kind == "document", "GraphIntegrityFailure", "Comparison input is not a retained document.");
+        // Direct inputs are verified; an edited document's own source lineage is verified when that document is opened itself.
+        foreach (string input in depth == 0 ? receipt.Inputs : [])
+            Require(Load(input, depth + 1).Receipt.Kind == "document", "GraphIntegrityFailure", "Record input is not a retained document.");
         return new(reference, receipt, files);
     }
     private Record Publish(string kind, string[] inputs, Dictionary<string, byte[]> files)
@@ -167,10 +181,10 @@ public sealed class GraphWorkflowStore
         foreach (string input in inputs) _ = Document(input);
         Write(PathFor(id, "receipt.json"), bytes); return new("graph:" + id + ":" + Hash(bytes), receipt, files);
     }
-    private Record PublishDocument(byte[] bytes)
+    private Record PublishDocument(byte[] bytes, string[]? inputs = null)
     {
         var document = GraphDocument.Parse(bytes);
-        return Publish("document", [], new() { ["original.xml"] = bytes,
+        return Publish("document", inputs ?? [], new() { ["original.xml"] = bytes,
             ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()), ["viewer.html"] = Encoding.UTF8.GetBytes(document.ToHtml()) });
     }
     private byte[] ArtifactBytes(string path, string? sha256)
