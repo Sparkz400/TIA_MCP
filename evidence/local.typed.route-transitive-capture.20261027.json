@@ -1,0 +1,42 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-transitive-capture.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T11:09:43+00:00",
+  "source": {
+    "commit": "3944707b13a466a9cc5ca8119d219274bbb6b882",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace).",
+  "limitations": [
+    "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "8234c1e0b2f7d045ed1049d3166601d6b614fdd1a998520a85fae3104d181a23"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "459c5d8bb78e672b9453cdc0e2597ff945d953bc660c9dd53e0579beaa84c460"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "d336d147a5102b9b3add33d0ff5cffe044690235c0f0958790b594b54d05b7d2",
+      "bytes": 19038565,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

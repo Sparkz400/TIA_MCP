@@ -10,7 +10,7 @@ from pathlib import Path
 from author_cases import cases as standard_cases
 from author_numeric_cases import cases as numeric_cases
 from author_existing_global_cases import cases as existing_global_cases
-from author_extended_cases import binding, extended_cases
+from author_extended_cases import binding, extended_cases, transitive_hosts
 from author_route_cases import ARCHIVE, ARCHIVE_SHA256
 
 ROOT = Path(__file__).resolve().parent
@@ -36,6 +36,9 @@ def main():
         source_cases += numeric_cases() + existing_global_cases()
         source_cases += [c for c in extended_cases() if c["family"] in IEC_FAMILIES
                          and c["payload"]["instances"][0]["kind"] in ("createMulti", "createGlobal")]
+        # Standard insertion composites and transitive chains have no route reference; transitive route
+        # variants are derived below with a chain in the case namespace.
+        source_cases = [c for c in source_cases if not c["fixtureId"].startswith(("typed-insert-", "typed-transitive-"))]
         scoped_cases = []
         for original in source_cases:
             case = replace_names(copy.deepcopy(original), prefix)
@@ -67,6 +70,13 @@ def main():
                     created["referenceBindings"] = [binding("Instance", "Child", name)] if storage == "createMulti" else [
                         binding("Instance", namespace + "." + global_name, namespace + "." + name, "GlobalVariable")]
                     scoped_cases.append(created)
+        # The same created multi-instance with the caller embedded two levels deep in its namespace:
+        # parents follow the captured route transitive effect.
+        for case in [c for c in scoped_cases if (c["payload"].get("instances") or [{}])[0].get("kind") == "createMulti"]:
+            nested = copy.deepcopy(case)
+            nested.update(fixtureId=case["fixtureId"].replace("typed-" + route.lower() + "-", "typed-" + route.lower() + "-transitive-", 1),
+                          dependentSources=transitive_hosts(case["blockName"], prefix, namespace))
+            scoped_cases.append(nested)
         for case in scoped_cases:
             required = [case["referenceXml"]] + [d["path"] for d in case.get("dependencyXmls", [])]
             absent = [path for path in required if not (REPO / path).is_file()]

@@ -21,6 +21,18 @@ class TransitiveEffectTests(unittest.TestCase):
         self.assertEqual({"Tgp_NestParent": 1, "Tgp_NestGrand": 1, "Tgp_NestParent_DB": 1, "Tgp_NestGrand_DB": 1},
                          verify(self.documents, self.appended))
 
+    def test_a_route_matches_hosts_by_the_namespace_qualified_changed_fb(self):
+        # Retained standard exports recast as a unit route: block keys renamed, member types namespace-qualified.
+        documents = {}
+        for (phase, block), root in self.documents.items():
+            for member in root.iter():
+                if member.get("Datatype") == '"' + EFFECT + '"':
+                    member.set("Datatype", '"TiaMcp_UnitA.TgpUnit_NestEffect"')
+            documents[(phase, block.replace("Tgp_", "TgpUnit_"))] = root
+        self.assertEqual(4, len(verify(documents, self.appended, "TgpUnit_", "TiaMcp_UnitA")))
+        with self.assertRaises(AssertionError):
+            verify(documents, self.appended, "TgpUnit_", "TiaMcp_UnitA.Alternate")
+
     def test_top_level_attributes_on_a_nested_member_are_refused(self):
         self.nested("Tgp_NestGrand_DB", "Timer_TON").set("Remanence", "NonRetain")
         with self.assertRaises(AssertionError):

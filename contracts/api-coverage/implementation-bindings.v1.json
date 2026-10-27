@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a6ac077d87a30d6fbaa32f53a884e704d40fed02139a83db170101b216f2c08c",
-      "bytes": 813223
+      "sha256": "7ad3e4edb6f416ecbb32d7708c6c7778c4a75759cb96f4c316d90bdc65c56bbf",
+      "bytes": 816113
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -76685,6 +76685,20 @@
           "artifacts": [
             "evidence/local.typed.transitive-effects.20261026.json"
           ]
+        },
+        {
+          "id": "local.typed.route-transitive-capture.20261027",
+          "profileSha256": "cf529ca64ac35a6004390b3b80b3008a206b349979b5ed70b4a7ef2a23f38d5b",
+          "artifacts": [
+            "evidence/local.typed.route-transitive-capture.20261027.json"
+          ]
+        },
+        {
+          "id": "local.typed.route-transitive-effects.20261027",
+          "profileSha256": "710cbc768b6318e1d05b67c5a40c7e2065ad9b1fc8b391fe7ea38d33129da733",
+          "artifacts": [
+            "evidence/local.typed.route-transitive-effects.20261027.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -95623,7 +95637,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "d22af9826c8aa6b7431405eb8795c29531704c4c9d4e75d53c7fd54a815a97b3"
+      "sha256": "fa886759aedcf88f5713f333bbbe760a7a4520c7821ca7936afb1a07d5a124ee"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
@@ -95971,6 +95985,16 @@
       "sha256": "3f429ec3f401afb098bec8ebe9a782d524c948af857c3f73e77ce731b48ba1e0"
     },
     {
+      "path": "evidence/local.typed.route-transitive-capture.20261027.json",
+      "state": "observed",
+      "sha256": "eb85e608dc360d8063a33ed1df2600919254759afec6eeddba5adf1ce1520d5b"
+    },
+    {
+      "path": "evidence/local.typed.route-transitive-effects.20261027.json",
+      "state": "observed",
+      "sha256": "4ae3b54eeec7d0d9232b20160a29af947859c22628cc25828952fbf078999711"
+    },
+    {
       "path": "evidence/local.typed.routes.engineering.20261025.json",
       "state": "observed",
       "sha256": "0915c51fc0bff85c435a27fe5560b9f4a81934656a3b7d951016b42aac5cd3b4"
@@ -96043,7 +96067,7 @@
     {
       "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
       "state": "observed",
-      "sha256": "e1edfda36eaaf7622e1b92e0e264313c71f997e05a6f58c1736a2926c0196b9c"
+      "sha256": "67b20941eb34c79a413147169228cc83c2017773c5a355a1032c479f74362a97"
     },
     {
       "path": "scripts/qualify_hmi_explorer_browser.mjs",
@@ -96459,6 +96483,14 @@
     {
       "id": "local.typed.route-profiles.20261025",
       "profileSha256": "94563672cc7ae92ef172cdf9e8e94a0e6ba453fa9ac83fa482f774cd7fd5b3a9"
+    },
+    {
+      "id": "local.typed.route-transitive-capture.20261027",
+      "profileSha256": "cf529ca64ac35a6004390b3b80b3008a206b349979b5ed70b4a7ef2a23f38d5b"
+    },
+    {
+      "id": "local.typed.route-transitive-effects.20261027",
+      "profileSha256": "710cbc768b6318e1d05b67c5a40c7e2065ad9b1fc8b391fe7ea38d33129da733"
     },
     {
       "id": "local.typed.routes.engineering.20261025",
