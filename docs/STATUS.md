@@ -1,5 +1,13 @@
 # Current status
 
+**New PLC, project, connection and watch-table operations — 27 October 2026:** These operations are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified` until a native run qualifies them.
+- PLC objects: `tag_create`, `constant_create`, `block_number_set` and `block_attributes_set` (header fields; OB priority, cycle time, phase offset and process-image partition).
+- Project: the read-only `project_properties` tool, plus `project_attributes_set` and `project_languages_set`.
+- Connections: the read-only `connection_inspect` tool, whose output feeds `connection_review` directly, plus `connection_create`, `connection_delete` and `connection_set`.
+- Watch tables: `watch_table_prepare_create`/`rename`/`delete` and the matching `watch_table_group_prepare_*` operations.
+
+Connection changes and project language changes now enter the change fingerprint, so interruption reconciliation can compare their outcome. Watch-table lifecycle apply stays behind unverified profiles, like authoring. [Engineering workflows](guides/engineering-workflows.md), [watch tables](guides/watch-tables.md), [network inspection](guides/network-inspection.md).
+
 **Software-unit and namespace transitive parents — 27 October 2026:** The transitive parent effect is now captured on the software-unit and namespace routes: parents in the caller's namespace reference the changed FB by its namespace-qualified name and gain the new member exactly as on the standard route. The worker already matched qualified names, so it now follows the route effect instead of refusing. All 28 route created multi-instance cells with a two-level parent chain pass the four engineering gates. Parents in another namespace or unit and custom declaration shapes stay refused. Catalog `0.4.31`.
 
 **Host-only qualification — 27 October 2026:** Actual-Host MCP runs with native workers deliberately absent now verify 65 offline features: all VCI, GRAPH, AutomationML and OPC UA NodeSet tools, offline translation review, the offline diagnostic/trace/experiment/UA-diagnostic tools and the upload tools. The release matrix moves to 416 bound and 1,132 open cells. A contract guard stops Host-only evidence from closing native, recovery, runtime or simulator criteria. No TIA, PLCSIM or device ran, and the native parts of these obligations stay open. Catalog `0.4.28`. [Record and ranked remainder](verification/host-only-qualification-20261027.md).
