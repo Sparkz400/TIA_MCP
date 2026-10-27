@@ -84,11 +84,13 @@ The viewer supports a virtualized tree, text/type/scope filtering, breadcrumbs, 
 | Technology-object hardware connections | Existing `technology_read` reference renderer | `technologyConnection` resolves only references with an exact hardware path; tags and blocks stay unresolved. |
 | Software-unit relations | Captured `PlcUnitBase.Relations` | Native relations are names; `unitRelation` resolves only a unique unit or PLC-root DB name in a complete capture. |
 | Watch/force tables and external sources | Native PLC collections | Names and groups only; no live monitoring, forcing state or source text. |
+| Project library: type folders, types, versions, master-copy folders, master copies | The library tools' metadata walk (`library_query` elements) | Unscoped captures only, at most 10,000 entries and the remaining capture budget; `libraries` coverage reports truncation and unavailable elements. Global libraries stay in the library tools. |
+| Library-instance links | Captured `metadata.libraryInstance` GUID pairs | `libraryVersion` from an FB/FC/PLC type to a captured project-library version resolves only on an exact type and version GUID match; otherwise unresolved. Version dependencies and master-copy usage are not edges. |
 | PLC alarm text lists | Native `PlcAlarmTextlistGroup` per PLC/software unit | `alarmTextList` nodes with ID, range and comments under a virtual folder; coverage is `partial`. Entries and texts come from `plc_alarm_inspect`. No relationships. |
-| Libraries | Unsupported in the tree | Reported as `unsupported` coverage; libraries use the library tools. |
 | HMI hierarchy/details/relationships | HMI workstream provider | Family/section-specific coverage and optional services; screen items load on demand. No duplicated HMI adapter. |
 | Typed LAD/FBD preview | Typed workstream provider contract | Separate instruction graph and source hash; unsupported/opaque content remains explicit. No duplicated instruction compiler. |
-| Physical ports/cables/topology | Unsupported | No invented topology derived from display ancestry. |
+| Port interconnections | `NetworkPort.ConnectedPorts` of a selected port device item | `connectedPort` is undirected (endpoints in ordinal path order) and needs both port items captured. Configured topology only: not a verified cable, link state or wiring. Not natively qualified. |
+| Cables, racks, wiring | Unsupported | No invented topology derived from display ancestry. |
 
 `metadataRevision` hashes only the scoped exposed metadata. It excludes PLC logic, detailed settings and HMI/graphical content. Detail exports and provider attachments have their own content revisions. Observations captured at different times carry a mixed-capture warning; exported metadata and detail timestamps are retained. External edits are detected only by explicit native verification of the covered metadata. Expired snapshots remain useful historical artifacts but cannot establish a current live selection.
 
@@ -160,6 +162,11 @@ retain the original record without authenticating imported data or proving
 library exports, dependency closure, runtime instance identity or safe updates.
 Older snapshots simply lack this observation. See the [implementation and native
 testing gates](../verification/plc-library-association-20261018.md).
+
+Relationships of a block, PLC type or project-library version node turn `linked`
+observations into `libraryVersion` edges. A target resolves only when a captured
+version node carries the same type and version GUID; names are never matched.
+This uses the snapshot only, with no further native read.
 
 Linked observations can also retain `dependencies`, with an ordered
 `requiredVersionGuids` list when its status is `observed`. An empty observed list
