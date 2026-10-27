@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.27",
+  "catalogVersion": "0.4.28",
   "targetTiaVersions": [
     21
   ],
@@ -3880,12 +3880,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Qualified for owned local PLCSIM Advanced V8 CPU1511 instances: refusal to a second Host until the creator exits, adoption after verified exit, and OFF confirmed through a fresh interface.",
           "Bounded public-API coverage; see target_capabilities and operation documentation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.creation.20261024",
+          "local.sim.state.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4092,12 +4096,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.sim.state.20261024",
+          "local.sim.provision.20261024"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4810,6 +4818,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for creating one ET 200SP DI 8x24VDC ST (6ES7 131-6BF01-0BA0) or AI 4xU/I 2-wire ST (6ES7 134-6HD01-0BA1 V2.0) in a vacant slot of the IM 155-6 PN ST V6.4 rack on CPU 1511-1 PN V4.1; recovery is shown by the route's whole-project checkpoint, as for change.hardware_move. Central racks and other module families are unqualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -4817,10 +4826,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
         ]
       },
       "availability": {
@@ -6731,6 +6740,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Qualified for the input start address of one ET 200SP DI 8x24VDC ST or AI 4xU/I 2-wire ST module under IM 155-6 PN ST V6.4 on CPU 1511-1 PN V4.1, including checkpoint recovery and fresh reopen; central modules, output ranges and other families are unqualified.",
           "Exact hardwarePath, ioType, oldStartAddress and startAddress select one exposed native I/O address; native controller ownership and address overlap are checked before mutation.",
           "Unknown controller ownership or conflicting ranges are rejected; native write access, mandatory compilation and a recovery checkpoint are required.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
@@ -6741,10 +6751,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.hardware.20261008",
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.remote-io.lifecycle.20261024"
         ]
       },
       "availability": {
@@ -7096,14 +7106,13 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
@@ -7138,14 +7147,13 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
@@ -7221,14 +7229,13 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008"
+          "local.library_intake.20261024"
         ]
       },
       "availability": {
@@ -7346,14 +7353,13 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts.",
-          "Shared manifest publication changed on 2026-10-17. Current bounded offline retry/recovery checks are recorded separately from the retained historical qualification profile; native package-open qualification is not promoted."
+          "Host-local bounded file transfer and package classification only; intake never proves native compatibility or executes package scripts."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261008",
+          "local.library_intake.20261024",
           "local.library_vendor.20261025",
           "local.library_upgrades.20261024"
         ]
@@ -9346,10 +9352,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "reviews.native.20261009",
-          "reviews.native.diamond.20261012"
+          "local.reviews.20261024"
         ]
       },
       "availability": {
