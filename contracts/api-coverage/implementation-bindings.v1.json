@@ -842,8 +842,8 @@
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
-      "sha256": "05ba2d150d025414d88f895ea11d64df6b0fce9200321a69cc520fdcf027a324",
-      "bytes": 5925
+      "sha256": "f5c9f33ad6d88dc1f69b5c009857ba82a50da788c0f2cb7715fcb64ce515cce4",
+      "bytes": 6170
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInHandoff.cs",
@@ -5317,8 +5317,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -9938,8 +9938,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -16770,8 +16770,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -21168,8 +21168,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -41301,8 +41301,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -42751,8 +42751,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -51042,8 +51042,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Read",
-          "line": 19,
-          "endLine": 29,
+          "line": 23,
+          "endLine": 33,
           "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
@@ -53750,8 +53750,8 @@
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
           "name": "Require",
-          "line": 59,
-          "endLine": 65,
+          "line": 63,
+          "endLine": 69,
           "sha256": "c0a8e1b81a186b6dbc90e5533a15dd47ae17cb86ee625371d5b8788f6ddb2b83"
         },
         {
