@@ -142,6 +142,34 @@ internal static class RuntimeHandoffChecks
             try { RuntimeHandoffReview.Build(root, input); throw new Exception("Bad handoff input accepted"); }
             catch (BridgeException e) when (e.Code == "InvalidRuntimeHandoff") { check(true, "Handoff duplicate field or byte bound refused"); }
         }
+        // An owned PLCSIM binding replaces the supplied target/program claims; its absence is stated, legacy requests keep their bytes.
+        var bound = new PlcsimTargetBinding("plcsim-target-binding.v1", 3, "Sim1", new string('a',32), @"C:\sim\Sim1", new string('b',64),
+            ["192.168.0.10"], new string('c',64), DateTimeOffset.UnixEpoch);
+        var bindingRef = PlcsimTargetBindings.Retain(root, bound);
+        JsonNode Endpoint(string endpoint) => JsonSerializer.SerializeToNode(WebRuntimeProtocol.Context(endpoint, new string('1',32), new string('2',32), new string('3',64)), BridgeProtocol.Json)!;
+        JsonObject Bound(Action<JsonObject>? rowChange = null, Action<JsonObject>? requestChange = null, string endpoint = "https://192.168.0.10")
+        {
+            var rows = originals.DeepClone().AsObject();
+            foreach (var row in rows) row.Value!["context"] = Endpoint(endpoint);
+            rows["target"]!["identity"] = PlcsimTargetBindings.TargetIdentity(bound); rows["program"]!["identity"] = PlcsimTargetBindings.ProgramIdentity(bound);
+            rowChange?.Invoke(rows);
+            var input = request.DeepClone().AsObject(); input["expected"]!["context"] = Endpoint(endpoint);
+            input["expected"]!["targetIdentity"] = PlcsimTargetBindings.TargetIdentity(bound); input["expected"]!["programIdentity"] = PlcsimTargetBindings.ProgramIdentity(bound);
+            input["baseline"] = References(rows); input["current"] = References(rows); input["plcsimBinding"] = bindingRef.DeepClone();
+            requestChange?.Invoke(input);
+            var report = Build(input); Gates(report); return report;
+        }
+        bool Invalid(JsonObject report) => report["summary"]!["requiresFreshEvidence"]!.GetValue<bool>();
+        var matched = Bound();
+        check(!Invalid(matched) && (string?)matched["targetBinding"]!["state"] == "boundOwnedPlcsim" &&
+            (string?)matched["targetBinding"]!["programIdentitySource"] == "boundOnlineFingerprint", "Handoff: bound owned PLCSIM identity matches");
+        check(Invalid(Bound(rows => rows["target"]!["identity"] = Identity("cpu:original"), p => p["expected"]!["targetIdentity"] = Identity("cpu:original"))),
+            "Handoff: a supplied target claim cannot replace the bound identity");
+        check(Invalid(Bound(rows => rows["program"]!["identity"] = Identity("program:original"))), "Handoff: program must match the bound fingerprint");
+        check(Invalid(Bound(endpoint: "https://192.168.0.11")), "Handoff: endpoint outside the binding stays unbound");
+        check((string?)Bound(requestChange: p => p["plcsimBinding"] = null)["targetBinding"]!["state"] == "unbound", "Handoff: explicit unbound statement");
+        check(Build(request)["targetBinding"] is null, "Handoff: requests without plcsimBinding keep their original report shape");
+        Reject("binding outside the binding store", p => p["plcsimBinding"] = new JsonObject { ["path"] = targetRef["path"]!.DeepClone(), ["sha256"] = targetRef["sha256"]!.DeepClone() });
         File.WriteAllText(Path.Combine(directory, "request.json"), request.ToJsonString(BridgeProtocol.Json));
         File.WriteAllText(Path.Combine(directory, "report.json"), Build(request).ToJsonString(BridgeProtocol.Json));
         File.WriteAllText(Path.Combine(directory, "cases.json"), cases.ToJsonString(BridgeProtocol.Json));

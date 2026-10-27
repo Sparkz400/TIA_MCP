@@ -60,6 +60,19 @@ The result keeps the complete bounded JSON in `value`, including vendor fields t
 
 The Host does not acknowledge alarms, apply filters or alarm IDs, set the clock or change the operating mode. It does not send the R/H `redundancy_id`, so redundant systems read their default CPU only. `Plc.ReadMemoryInformation` and `Plc.ReadRuntimeInformation` are not exposed. A snapshot is not lossless alarm or event history, and project information does not prove which program is loaded. Request and result shapes come from Siemens documentation and the [Siemens Web API client](https://github.com/siemens/simatic-s7-webserver-api); only protocol-fake tests cover them, no CPU.
 
+## Owned PLCSIM writes and RUN/STOP
+
+Writes and mode changes exist only for an owned PLCSIM Advanced instance, never for a physical PLC. First call `runtime_plcsim_bind` with the instance ID, name and the `creationId` it was created or adopted with. The simulator worker reports the instance name, storage path, the SHA-256 of its ownership marker and its usable controller IPv4 addresses, and the Host retains them as a content-addressed binding under `runtime-plcsim-bindings/`. With a current `downloadTicket` the Host also runs `plc_online_compare` against the same instance and records its fingerprint hash, when Siemens exposes one.
+
+`runtime_web_write` and `runtime_web_operating_mode` take that binding's `bindingSha256`. Before anything is sent, the session endpoint must be a literal controller address of the binding, and the simulator worker must still see the same owned instance. Otherwise the call fails with `RuntimeTargetNotOwnedPlcsim` or `PlcsimTargetBindingStale`. Each call also needs its acknowledgement flag and the matching permission (`write_value` or `change_operating_mode`). If `Api.Browse` did not advertise the method, the result is `unsupported` and nothing is sent.
+
+| Tool | Method | Precondition | Readback |
+| --- | --- | --- | --- |
+| `runtime_web_write` | `PlcProgram.Write`, simple mode, 1..16 selections | each `expected` equals the current `PlcProgram.Read` value | one `PlcProgram.Read` per written value |
+| `runtime_web_operating_mode` | `Plc.RequestChangeOperatingMode`, `run` or `stop` | `expectedMode` equals the current `Plc.ReadOperatingMode` | `Plc.ReadOperatingMode` for about 5 s |
+
+A failed precondition returns `preconditionMismatch` and nothing is written. Writes go out once each, in order. The sequence stops at the first provider error, unknown outcome or readback mismatch. The program scan can overwrite an assigned value. A lost response is reported and never retried. `Alarms.Acknowledge` is not implemented: its parameters and the alarm acknowledgement state are not part of the verified protocol. PLCSIM Advanced serves its web server only with TCP/IP communication, and this adapter never reconfigures an instance.
+
 ## Interruption and cleanup
 
 The Host writes intent before login. A lost or malformed login response remains `remoteSessionUnknown`; a different attempt ID cannot bypass that unresolved endpoint reservation. An authoritative login rejection is `notConnected`. Logout intent is likewise retained before dispatch, and a lost logout response is never automatically retried.
@@ -72,7 +85,7 @@ If the remote outcome cannot be established, `runtime_web_disconnect` with expli
 
 The [session baseline](../verification/physical-runtime-sessions-20261017.md) and [profile verification record](../verification/physical-runtime-profiles-20261017.md) distinguishes focused tests from frozen aggregate/package validation. The loopback harness uses actual TLS, actual DPAPI and actual MCP Host processes, including a forced restart; it does not contact a physical PLC or change OS trust.
 
-Remaining RT-02 work includes genuine firmware-specific profile transcripts, additional device/I&M observations, unresolved alternate quantity spellings and broader transport/compatibility stress cases. RT-03 capture/reopen/export, OPC UA, physical qualification of the [CPU diagnostics](#cpu-diagnostics), program association, all write/control gates and the rest of D16 remain open. These tools do not enable forcing, PLC writes, download or RUN/STOP.
+Remaining RT-02 work includes genuine firmware-specific profile transcripts, additional device/I&M observations, unresolved alternate quantity spellings and broader transport/compatibility stress cases. RT-03 capture/reopen/export, OPC UA, physical qualification of the [CPU diagnostics](#cpu-diagnostics), program association, physical write/control gates and the rest of D16 remain open. Only bound [owned PLCSIM](#owned-plcsim-writes-and-runstop) endpoints accept writes or RUN/STOP; nothing enables forcing or download.
 
 ## Sources
 

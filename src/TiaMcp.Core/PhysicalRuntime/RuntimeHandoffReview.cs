@@ -19,7 +19,9 @@ public static class RuntimeHandoffReview
     public static JsonObject Build(string artifactsRoot, byte[] bytes)
     {
         var request = ReadRequest(bytes);
-        Fields(request, "schemaVersion reviewId accessRecordId accessPhase owner expected operations baseline current");
+        // plcsimBinding is optional so retained requests without it reproduce their original report bytes.
+        bool bindable = request.ContainsKey("plcsimBinding");
+        Fields(request, "schemaVersion reviewId accessRecordId accessPhase owner expected operations baseline current" + (bindable ? " plcsimBinding" : ""));
         Require(Text(request, "schemaVersion") == "runtime-handoff-request.v1", "Unsupported handoff schema.");
         string reviewId = Text(request, "reviewId"), accessId = Text(request, "accessRecordId"), phase = Text(request, "accessPhase");
         EngineeringIdentityGuard.Sha256(reviewId, "reviewId"); EngineeringIdentityGuard.Sha256(accessId, "accessRecordId");
@@ -59,6 +61,18 @@ public static class RuntimeHandoffReview
             Require(Text(operation, "requiredOutcome") is "allowed" or "denied", "Require an explicit allowed or denied observation.");
         }
 
+        PlcsimTargetBinding? bound = null; JsonObject? bindingReference = null;
+        if (request["plcsimBinding"] is not null)
+        {
+            bindingReference = Object(request["plcsimBinding"]); Fields(bindingReference, "path sha256");
+            string sha256 = Text(bindingReference, "sha256"); EngineeringIdentityGuard.Sha256(sha256, "plcsimBinding.sha256");
+            Require(JsonNode.DeepEquals(bindingReference, PlcsimTargetBindings.Reference(sha256)), "Select a binding returned by runtime_plcsim_bind.");
+            byte[] retained = ProjectReviewStore.ReadArtifact(artifactsRoot, bindingReference, PlcsimTargetBindings.ByteLimit); Charge(retained.Length);
+            bound = PlcsimTargetBindings.Parse(retained);
+        }
+        // A bound owned PLCSIM instance replaces the supplied target claim, and its online fingerprint the program claim where one was observed.
+        JsonNode? targetIdentity = bound is null ? expected["targetIdentity"] : PlcsimTargetBindings.TargetIdentity(bound);
+        JsonNode? programIdentity = (bound is null ? null : PlcsimTargetBindings.ProgramIdentity(bound)) ?? expected["programIdentity"];
         var baseline = Load("baseline"); var current = Load("current");
         var constraints = new JsonArray();
         void Constraint(string stage, string name, string state) => constraints.Add(new JsonObject {
@@ -75,8 +89,8 @@ public static class RuntimeHandoffReview
                     Match(stage, role + "." + key, expected["context"]![key], row["context"]![key]);
                 Constraint(stage, role + ".freshness", Text(row, "freshness") == "current" ? "declaredCurrent" : Text(row, "freshness"));
             }
-            Match(stage, "targetIdentity", expected["targetIdentity"], evidence["target"]["identity"]);
-            Match(stage, "programIdentity", expected["programIdentity"], evidence["program"]["identity"]);
+            Match(stage, "targetIdentity", targetIdentity, evidence["target"]["identity"]);
+            Match(stage, "programIdentity", programIdentity, evidence["program"]["identity"]);
             var session = evidence["session"];
             foreach (string key in new[] { "subjectId", "clientId", "credential", "securityDomain", "securityMode" })
                 Match(stage, key, expected[key], session[key]);
@@ -85,6 +99,12 @@ public static class RuntimeHandoffReview
                 Constraint(stage, key, Boolean(session, key) ? "declaredTrue" : "unknown");
         }
 
+        if (bound is not null)
+        {
+            Constraint("binding", "plcsimEndpoint", PlcsimTargetBindings.Covers(bound, Text(Object(expected["context"]), "endpoint", 4096)) ? "boundOwnedPlcsim" : "mismatch");
+            Match("binding", "expectedTargetIdentity", targetIdentity, expected["targetIdentity"]);
+            if (bound.ProgramFingerprintSha256 is not null) Match("binding", "expectedProgramIdentity", programIdentity, expected["programIdentity"]);
+        }
         foreach (string role in new[] { "target", "program", "session" })
         {
             var old = baseline[role]; var next = current[role];
@@ -134,6 +154,12 @@ public static class RuntimeHandoffReview
             ["admission"] = "unavailableWithoutQualifiedNativeEvidence",
             ["mutationRecovery"] = "unknownOutcomeRequiresIndependentReconciliationNoAutomaticReplay",
             ["limits"] = "Supplied or synthetic public observations only. Separate artifact references do not authenticate independent producers. Sequence and freshness are declarations. Neither certificates, metadata hashes, successful reads nor public grants prove CPU/program identity or effective rights. Replay reproduces a review only; it never creates a session or admits an operation. Capture quality and source-to-runtime signal association require separate checks." };
+        if (bindable) report["targetBinding"] = bound is null
+            ? new JsonObject { ["state"] = "unbound", ["reason"] = "No owned PLCSIM binding was selected; target and program identity remain supplied declarations." }
+            : new JsonObject { ["state"] = "boundOwnedPlcsim", ["binding"] = bindingReference!.DeepClone(), ["instanceName"] = bound.InstanceName,
+                ["storagePath"] = bound.StoragePath, ["markerSha256"] = bound.MarkerSha256, ["controllerAddresses"] = new JsonArray(bound.ControllerAddresses.Select(a => (JsonNode)a).ToArray()),
+                ["programFingerprintSha256"] = bound.ProgramFingerprintSha256,
+                ["programIdentitySource"] = bound.ProgramFingerprintSha256 is null ? "suppliedDeclaration" : "boundOnlineFingerprint" };
         Require(JsonSerializer.SerializeToUtf8Bytes(report, Json).Length <= ReportLimit, "Report exceeds 2 MiB.");
         return report;
 

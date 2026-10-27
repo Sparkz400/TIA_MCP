@@ -162,6 +162,13 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         foreach (var node in nodes) ValidateNode(node);
         return Use(attemptId, (client, token) => client.Read(attemptId, nodes, token), ct);
     }
+    /// <summary>Gated owned-PLCSIM write; the Host verifies the target binding first. Busy acquisitions refuse.</summary>
+    public Task<object> Write(string attemptId, IReadOnlyList<OpcUaRuntimeWriteItem> writes, CancellationToken ct = default)
+    {
+        if (writes is null || writes.Count is < 1 or > 16 || writes.Any(w => w is null) || writes.Select(w => w.Node).Distinct().Count() != writes.Count) throw Error("UaRequestLimit");
+        foreach (var write in writes) ValidateNode(write.Node);
+        return Use(attemptId, (client, token) => client.Write(attemptId, writes, token), ct);
+    }
     public Task<OpcUaRuntimeBrowseResult> Browse(string attemptId, OpcUaRuntimeNode node, int maximum = 256, CancellationToken ct = default)
     {
         ValidateNode(node);

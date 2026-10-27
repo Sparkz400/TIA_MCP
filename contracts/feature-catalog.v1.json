@@ -7362,7 +7362,7 @@
         "limitations": [
           "Web API connect/browse/read/status/disconnect, retained polling captures and sequential analyses preserve observed profiles and original evidence.",
           "The isolated OPC UA client provides explicit secure connect, bounded browse/typed read and owned status/disconnect, exercised against local servers only; no catalog qualification evidence is recorded.",
-          "Physical CPU/firmware qualification, independent online program/address association, broader runtime profiles and write/control remain open.",
+          "Physical CPU/firmware qualification, independent online program/address association, broader runtime profiles and physical write/control remain open; gated writes and RUN/STOP exist only for bound owned PLCSIM endpoints (runtime_web_write, runtime_web_operating_mode, runtime_ua_write).",
           "Explicit OPC UA polling captures reuse durable bounded capture storage, preserve per-item quality/time/type metadata and reopen after Host interruption without resuming acquisition. Physical-device qualification remains open.",
           "Separate bounded UA subscription acquisition retains requested/revised settings, item failures, sequence/gap/overflow/duplicate/retransmission observations and unknown cleanup/loss. Restart only reopens committed evidence; automatic reconnect and transfer remain unsupported."
         ]
@@ -18714,6 +18714,133 @@
       ]
     },
     {
+      "featureId": "runtime_plcsim_bind",
+      "domain": "runtime",
+      "title": "Bind runtime endpoints to an owned PLCSIM instance",
+      "mcpTools": [
+        "runtime_plcsim_bind"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "PLCSIM Advanced V8 runtime API IInstance identity, StoragePath and ControllerIP through the simulator worker (sim_identity); optional Openness FingerprintDataProvider hash from plc_online_compare."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Retains a content-addressed plcsim-target-binding.v1 record of an instance this Host created or adopted: instance name, storage path, SHA-256 of its ownership marker and usable controller IPv4 addresses. The online program fingerprint is recorded only when a current downloadTicket is supplied and plc_online_compare of the same instance exposes one; otherwise it stays notObserved.",
+          "The binding is the gate for runtime_web_write, runtime_web_operating_mode and runtime_ua_write and the bound identity for runtime_handoff_review. A controller address match does not prove the program loaded in the instance beyond the recorded fingerprint. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Owned PLCSIM Advanced V8 instance selected with its creationId in the simulator worker; a fingerprint additionally needs a worker-owned TIA instance and a current downloadTicket."
+        ]
+      },
+      "prerequisites": [
+        "Installed PLCSIM Advanced V8 and an instance this Host created or adopted",
+        "Optional: TIA V21 worker-owned instance and current sim_create downloadTicket for the fingerprint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_write",
+      "domain": "runtime",
+      "title": "Write values to an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API PlcProgram.Write (write_value permission), sent only when the session advertised it; precondition and readback through PlcProgram.Read."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 host-owned selections and an exact expected simple-mode value for each; any mismatch writes nothing.",
+          "Each write is sent once in order, stops the sequence on a provider error, unknown outcome or readback mismatch, and is read back once; the PLCSIM scan may overwrite assignments. No forcing, raw mode, batch atomicity, durable intent journal or automatic retry. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises PlcProgram.Write and grants write_value."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_web_operating_mode",
+      "domain": "runtime",
+      "title": "Request RUN or STOP on an owned PLCSIM instance through the Web API",
+      "mcpTools": [
+        "runtime_web_operating_mode"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API Plc.RequestChangeOperatingMode (mode run/stop, change_operating_mode permission), sent only when advertised; precondition and outcome through Plc.ReadOperatingMode."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeModeChange and an exact expected current mode (run/stop) different from the requested mode; otherwise nothing is sent.",
+          "Boolean success only acknowledges the request; Plc.ReadOperatingMode is observed for about 5 s and readbackMatches reports the outcome. Never retried; selector or CPU conditions may refuse. HOLD, STARTUP and R/H redundancy_id are not exposed. Web API alarm acknowledgment (Alarms.Acknowledge) is not implemented: its parameters and alarm acknowledgment state are not represented in the verified protocol. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session to a bound owned PLCSIM endpoint whose firmware advertises Plc.RequestChangeOperatingMode and grants change_operating_mode."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Windows current-user credential vault for authenticated connection"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "domain": "runtime",
       "title": "Inspect retained runtime session state",
@@ -19690,7 +19817,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified."
+          "Retained supplied/synthetic observations and offline constraint/permission comparison only. Exact original bytes and saved access/model dependencies are revalidated; matches never prove authenticated producer, live CPU/program identity beyond an optional owned-PLCSIM binding, effective permissions, capture quality or operation/assertion admission. Native execution, runtime/capture lifecycle integration and client migration remain unqualified.",
+          "Optional plcsimBinding selects a runtime_plcsim_bind record: target identity is then matched against the bound owned PLCSIM instance (and program identity against its online fingerprint where one was recorded) instead of the supplied expectation, the expected endpoint must be one of its controller addresses, and the report and receipt state boundOwnedPlcsim. Without a binding the receipt states unbound and identities stay supplied declarations."
         ]
       },
       "qualification": {
@@ -20460,6 +20588,49 @@
         "AC-completeness",
         "AC-evidence",
         "AC-recovery"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_write",
+      "domain": "runtime",
+      "title": "Write scalar values to an owned PLCSIM instance through OPC UA",
+      "mcpTools": [
+        "runtime_ua_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public OPC UA Write service on the Value attribute through the isolated pinned SDK; precondition and readback through the Read service."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 distinct nodes, no running acquisition on the session and an exact expected value in runtime_ua_read encoding for each; any mismatch writes nothing.",
+          "Boolean, integer, Float/Double and String scalars only, converted to the observed built-in type with exact round-trip; one Write call, then an independent read reports per-item status codes and readbackMatches. Any failure inside the session call, including a value that does not convert, marks the session remoteSessionUnknown; nothing is retried. No arrays, structures, method calls, forcing or durable intent journal. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Current owned connected UA session to a bound owned PLCSIM endpoint whose server grants write access to the selected nodes."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Explicit endpoint, server certificate pin and application URI"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
       ]
     },
     {

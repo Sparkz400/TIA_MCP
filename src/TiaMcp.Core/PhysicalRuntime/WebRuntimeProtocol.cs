@@ -39,6 +39,9 @@ public sealed record WebRuntimeDiagnosticResult(WebRuntimeContext Context, strin
     public bool NativeQualified => false;
 }
 
+/// <summary>One gated owned-PLCSIM write: Expected must equal the current simple-mode read exactly before Value is sent.</summary>
+public sealed record WebRuntimeWriteItem(string SelectionId, JsonElement Expected, JsonElement Value);
+
 /// <summary>Pure Web API request/response contracts. Supplied context is not TLS, CPU or program authentication.</summary>
 public static class WebRuntimeProtocol
 {
@@ -253,6 +256,41 @@ public static class WebRuntimeProtocol
         return new(current, kind, method, requestId, status, value, code, entries, truncated, requestStarted.ToUniversalTime(),
             responseReceived.ToUniversalTime(), elapsed.TotalMilliseconds);
     }
+
+    // Gated owned-PLCSIM mutations, kept out of the read-only builder: Siemens Web API PlcProgram.Write (write_value) and
+    // Plc.RequestChangeOperatingMode (change_operating_mode), docs/plans/expansion-plans/physical-plc-runtime.md [W13]/[W14].
+    private static readonly Dictionary<string, string> MutationPermissions = new(StringComparer.Ordinal)
+        { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode" };
+
+    public static string MutationPermission(string method) =>
+        method is not null && MutationPermissions.TryGetValue(method, out var permission) ? permission : throw Error("RuntimeMethodUnsupported");
+
+    public static JsonElement Write(string requestId, WebRuntimeSymbol selection, JsonElement value)
+    {
+        Id(requestId);
+        if (selection is null || selection.Representation != "simple" || value.ValueKind is JsonValueKind.Undefined) throw Error("RuntimeWriteInvalid");
+        Text(selection.Symbol, 4096); ValidateJson(value, 16 * 1024);
+        return Mutation("PlcProgram.Write", requestId, new Dictionary<string, object> { ["var"] = selection.Symbol, ["value"] = value, ["mode"] = "simple" });
+    }
+
+    public static JsonElement ChangeOperatingMode(string requestId, string mode)
+    {
+        Id(requestId);
+        if (mode is not ("run" or "stop")) throw Error("RuntimeOperatingModeInvalid");
+        return Mutation("Plc.RequestChangeOperatingMode", requestId, new Dictionary<string, object> { ["mode"] = mode });
+    }
+
+    /// <summary>Boolean true only acknowledges the request; callers read back. Provider errors stay explicit and are never retried.</summary>
+    public static (string Status, int? ProviderErrorCode) MutationResult(ReadOnlyMemory<byte> response, string requestId)
+    {
+        using var document = Response(response, requestId);
+        if (document.RootElement.TryGetProperty("error", out var error)) { int code = error.GetProperty("code").GetInt32(); return (ProviderStatus(code), code); }
+        if (document.RootElement.GetProperty("result").ValueKind != JsonValueKind.True) throw Error("RuntimeResponseInvalid");
+        return ("accepted", null);
+    }
+
+    private static JsonElement Mutation(string method, string id, Dictionary<string, object> parameters) =>
+        JsonSerializer.SerializeToElement(new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = id, ["method"] = method, ["params"] = parameters });
 
     private static string ProviderStatus(int code) => code switch
     {

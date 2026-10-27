@@ -47,6 +47,7 @@ try
             builder.Services.AddSingleton<IBridgeClient>(new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, options.ArtifactsDirectory,
                 allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification));
             builder.Services.AddSingleton(simulator);
+            builder.Services.AddSingleton<PlcsimTargets>();
             var mcp = builder.Services.AddMcpServer(server => server.ServerInstructions = AuthenticationInstructions.Text +
                 (options.NoNativeWorkers ? "\nThis Host has native workers disabled. Use supplied-document workflows; native engineering and simulator calls return NativeWorkersDisabled without launching a worker. Network inventory, runtime Web API and OPC UA tools remain separate and require an explicitly selected endpoint and authentication/trust prerequisites." : ""))
                 .WithStdioServerTransport().WithTools<TiaTools>().WithTools<ArtifactTools>().WithTools<LibraryPackageTools>().WithTools<SimulatorTools>()
