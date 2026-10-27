@@ -7237,7 +7237,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog for the remaining Startdrive adapters (drive creation, telegram edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation and scalar parameter writes are tracked as drive_observe and change.drive_parameter_set."
+          "Backlog for the remaining Startdrive adapters (drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation, scalar parameter writes and telegram number/insert/erase edits are tracked as drive_observe, change.drive_parameter_set and change.drive_telegram_set."
         ]
       },
       "qualification": {
@@ -21465,6 +21465,59 @@
         "SINAMICS Startdrive V21 installed with its Openness assembly",
         "Applicable native services and project protection state",
         "A verified recovery checkpoint; compile=true to save"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.drive_telegram_set",
+      "domain": "drives",
+      "title": "Change, insert or erase one telegram of an offline drive object",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_telegram_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness offline writes: Telegram.TelegramNumber setter after Telegram.CanChangeTelegram(int); TelegramComposition.CanInsertSupplementaryTelegram/InsertSupplementaryTelegram(int), CanInsertAdditionalTelegram/InsertAdditionalTelegram(int, int) and EraseTelegram(TelegramType). Readback through DriveObject.Telegrams, Telegram.Type/TelegramNumber/GetSize/GetSizeInBytes/Addresses and HW Address.IoType/StartAddress/Length/AddressControllers/Parent."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exact hardwarePath and driveObjectNumber; expectedTelegrams must equal the drive object's complete telegram rows exactly as drive_observe reports them (at most 128 telegrams with 16 addresses each). Prepare and apply refuse any difference before the write; the rows are also part of the change fingerprint.",
+          "Operations: change the TelegramNumber of the only MainTelegram or SupplementaryTelegram; insert a SupplementaryTelegram (telegramNumber) or an AdditionalTelegram (inputSize/outputSize in native Telegram.GetSize units, read back through GetSize) when none of that type exists; erase the only SupplementaryTelegram or AdditionalTelegram. Startdrive's CanChangeTelegram/CanInsert* must agree; Openness has no erase check. Safety telegrams are refused as a safety boundary; torque/edge telegrams, main-telegram insert/erase, ChangeSize and PKW are not supported.",
+          "Startdrive assigns addresses only during the write, so the preview shows the current rows and the request. Apply reads back every telegram row, reports the address shift, and fails after the write (checkpoint recovery) on a collateral telegram type/number change or an I/O overlap. Overlaps that already exist refuse at prepare.",
+          "Overlap check: same-IoType byte ranges against every configured project address; ranges sharing an address controller, or with unresolved controllers, conflict. Matching a telegram range to its own device-item range uses native object equality or equal parent/type/start/length, which is unqualified.",
+          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles all project devices). No online write, download or RAM-to-ROM."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object exposed through DriveObjectContainer."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state",
+        "A verified recovery checkpoint; compile=true"
       ],
       "acceptanceCriteria": [
         "AC-identity",

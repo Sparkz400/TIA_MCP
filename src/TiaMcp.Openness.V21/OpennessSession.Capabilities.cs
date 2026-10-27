@@ -236,6 +236,7 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
                 AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
                 AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
+                AddTargetFeature(features, "change.drive_telegram_set", drive, "partial", "Changes the number of the one main or supplementary telegram, or inserts/erases the one supplementary or additional telegram, after Startdrive's own feasibility check. Exact expected telegram rows, readback, address-shift report and overlap refusal; safety telegrams are refused; device compile required.");
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));

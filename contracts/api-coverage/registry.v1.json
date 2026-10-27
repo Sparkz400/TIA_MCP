@@ -3355,6 +3355,12 @@
       ]
     },
     {
+      "featureId": "change.drive_telegram_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
       "featureId": "drive_observe",
       "obligations": [
         "D10"
