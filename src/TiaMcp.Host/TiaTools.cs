@@ -84,13 +84,11 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
             var result = await bridge.CallAsync(operation, arguments, cancellationToken);
             return Result(result.GetRawText(), false);
         }
-        catch (BridgeException error)
-        {
-            var json = JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
-                details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json);
-            return Result(json, true);
-        }
+        catch (BridgeException error) { return Failure(error); }
     }
+
+    private static CallToolResult Failure(BridgeException error) => Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
+        details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json), true);
 
     private static CallToolResult Result(string json, bool isError) => new()
     {

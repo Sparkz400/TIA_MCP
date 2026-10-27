@@ -125,7 +125,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set" }.Contains(change.Kind)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
@@ -175,7 +175,7 @@ namespace TiaMcp.Openness.V21
                     }
                     if (change.Kind == "hmi_engineering") VerifyHmiEngineeringPreservation(change, project);
                     VerifyHardwarePreservation(change, project);
-                    if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set" }.Contains(change.Kind))
+                    if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
                         var plc = SelectPlc(change.Selector);
                         string readback = Path.Combine(change.Directory, "after-structured-edit.xml");
@@ -354,6 +354,7 @@ namespace TiaMcp.Openness.V21
                 }
                 case "block_import_xml":
                 case "safety_import_xml":
+                case "graph_import":
                 {
                     var plc = SelectPlc(change.Selector);
                     string xml = ChangeText(payload, "xml", 2 * 1024 * 1024);
@@ -361,6 +362,7 @@ namespace TiaMcp.Openness.V21
                     var targets = EngineeringSources.BlockDeclarations(document);
                     var expected = ChangeNames(payload, "expectedBlockNames");
                     if (!new HashSet<string>(targets.Select(t => t.Name), StringComparer.Ordinal).SetEquals(expected)) throw new BridgeException("XmlScopeMismatch", "Top-level XML blocks must exactly match expectedBlockNames.");
+                    if (change.Kind == "graph_import" && (targets.Length != 1 || targets[0].Language != "GRAPH")) throw new BridgeException("UnsupportedLanguage", "graph_import accepts exactly one GRAPH block per document.");
                     bool safety = change.Kind == "safety_import_xml";
                     if (targets.Any(target => target.IsSafety != safety)) throw new BridgeException("SafetyBoundary", "Standard and safety imports use separate workflows, and cannot be mixed or converted.");
                     if (safety && targets.Any(target => target.Language != "F_LAD" && target.Language != "F_FBD" && target.Language != "F_DB"))
@@ -694,6 +696,7 @@ namespace TiaMcp.Openness.V21
                 }
                 case "block_import_xml":
                 case "safety_import_xml":
+                case "graph_import":
                 case "graphical_operand_set":
                 case "graphical_network_patch":
                 case "graphical_network_insert":

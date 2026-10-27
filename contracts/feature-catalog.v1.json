@@ -4791,6 +4791,58 @@
       ]
     },
     {
+      "featureId": "change.graph_import",
+      "domain": "language",
+      "title": "Import one validated GRAPH v6 document",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "graph_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlockComposition.Import(FileInfo, ImportOptions.Override) through the shared block_import_xml prepare/apply route; PlcBlock.Export(FileInfo, ExportOptions.WithDefaults, DocumentInfoOptions.None) for the prepare backup and the post-compile readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload is graphRef (retained GRAPH document) or path (inside the Host artifact directory) plus expectedBlockNames. The Host validates it with the net10 TiaMcp.Graph reader, which the net48 worker cannot load; structural errors, unsupported grammar outside the opaque envelope/embedded-logic boundaries, more than one chart and empty Interlock/Supervision modules without FlgNet (EmptyNativeCondition, rejected by TIA V21) are refused before native preparation.",
+          "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. No typed GRAPH edit is synthesized; the document is imported as supplied.",
+          "Apply requires compile=true. After compilation the block is re-exported and must equal the imported document beyond DocumentInfo and formatting (the existing native preservation comparer) before saving; otherwise the change is recovery_required. Documents exported without defaults can fail this check.",
+          "The GraphComparer does not run inside the worker; review the declared change beforehand with graph_export and graph_compare.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Recorded GRAPH fixture roundtrips do not establish availability or authorization for the current target; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.plc_type_import_xml",
       "domain": "data",
       "title": "Import explicit PLC type XML",
@@ -14844,6 +14896,51 @@
       "prerequisites": [
         "Compatible .NET Host runtime",
         "GRAPH XML upload up to 8 MiB or retained GRAPH record"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "graph_export",
+      "domain": "language",
+      "title": "Export a GRAPH block into the GRAPH document store",
+      "mcpTools": [
+        "graph_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlock.Export(FileInfo, ExportOptions.WithDefaults) through the existing block_read worker operation; the Host checks ProgrammingLanguage GRAPH and retains the exported bytes in the GRAPH document store."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exports one exact block; non-GRAPH, know-how protected and natively rejected blocks are refused. The language check runs after the native export, so a refused block still leaves its export artifact.",
+          "The retained record uses the offline graph-v6-structure.v2 reader; reports keep nativeQualified, fullSchemaValidated and behavioralEquivalenceCertified false.",
+          "Each export adds one record to the bounded GRAPH store (128 records, 2 GiB, no automatic eviction).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an attached offline project containing an exportable GRAPH block and available bounded Host GRAPH storage."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Exact GRAPH block selector (blockPath or unambiguous blockName)",
+        "Available bounded Host GRAPH storage"
       ],
       "acceptanceCriteria": [
         "AC-identity",

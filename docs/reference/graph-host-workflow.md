@@ -33,9 +33,42 @@ visible. The original bytes are retained without XML normalization.
    publications remain discoverable; they are not silently repaired or overwritten.
 
 The [JSON Schema](../../contracts/graph-workflow.v1.schema.json) defines all six
-tool contracts. Tool calls accept opaque handles and fixed artifact names, never
+offline tool contracts. Tool calls accept opaque handles and fixed artifact names, never
 arbitrary host paths. External XML entities and DTD resolution are rejected.
 The standalone HTML escapes source and uses a no-script content security policy.
+
+## Native export and import
+
+These steps need the V21 worker and an attached offline project. They are compiled
+against the V21 PublicAPI only and are **not natively qualified**.
+
+- `graph_export` takes an exact `blockPath` (or unambiguous `blockName`) and reuses
+  the `block_read` export (`PlcBlock.Export`, `ExportOptions.WithDefaults`). Blocks
+  whose `ProgrammingLanguage` is not `GRAPH` are refused after the export. The
+  unchanged SimaticML stays under the Host `exports` directory, and its exact bytes
+  are retained as a document record bound to the exporter's SHA-256. The result
+  carries the block, the export artifact and the record summary, so the record works
+  with every `graph_*` tool above. Each export uses one record of the bounded store.
+- The prepared change kind `graph_import` imports one GRAPH v6 document with
+  `change_prepare`/`change_apply`. The payload is `graphRef` (a retained document)
+  or `path` (a file inside the Host artifact directory), plus
+  `expectedBlockNames` naming exactly that one block. `TiaMcp.Graph` targets .NET 10
+  and cannot load in the .NET Framework 4.8 worker, so the Host validates the
+  document first. It refuses reader errors, unsupported grammar outside the opaque
+  envelope and embedded-logic boundaries, more than one chart, and empty
+  `Interlock`/`Supervision` modules without `FlgNet` (`EmptyNativeCondition`). TIA V21
+  exports that shape but rejects it on import; see the
+  [native evidence](../../tests/TiaMcp.Graph.Tests/fixtures/native-v21/README.md).
+- The worker then uses the `block_import_xml` route with its scope, number,
+  protection, language-conversion and checkpoint checks, and accepts only one GRAPH
+  block. Apply requires `compile=true`. After compilation the block is re-exported,
+  and this readback must equal the imported document apart from `DocumentInfo` and
+  formatting before the project is saved; otherwise the change is
+  `recovery_required`. Import documents exported with defaults, such as
+  `graph_export` output, because missing default attributes fail that comparison.
+- Review the declared change before applying: `graph_export` the current block, then
+  `graph_compare` it with the document to import. The GRAPH comparer runs in the
+  Host and is not part of the worker's apply gate. Typed GRAPH edits are not provided.
 
 ## Explorer
 
@@ -77,8 +110,9 @@ while a file import is pending rejects the import instead of remapping by name.
   must be reviewed through paged results or standalone HTML.
 - Transfers recheck retained inputs on each call. This favors integrity; maximum
   size transfer throughput and memory are not performance-qualified.
-- Native extraction/association, schema acceptance, import/editing, native layout,
-  compilation and runtime remain separate unexecuted gates on this workstation.
+- `graph_export` and `graph_import` are implemented but not natively qualified.
+  Typed GRAPH editing, schema acceptance, native layout and runtime remain
+  separate unexecuted gates on this workstation.
   CFC, DCC and other language products are separate X06 work, not GRAPH support.
 
 See [validation evidence](../verification/graph-host-workflow-20261016.md).

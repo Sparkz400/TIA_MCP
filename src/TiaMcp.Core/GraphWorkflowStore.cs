@@ -15,22 +15,48 @@ public sealed class GraphWorkflowStore
     private sealed record Record(string Reference, Receipt Receipt, Dictionary<string, byte[]> Files);
     private const int PageBytes = 128 << 10, MaxRecords = 128;
     private const long StoreBytes = 2L << 30;
-    private readonly string root;
+    private readonly string root, artifactsRoot;
     private readonly ArtifactUploadStore uploads;
     public GraphWorkflowStore(string artifactsDirectory, PackageIntakeLimits? uploadLimits = null)
     {
         root = Path.GetFullPath(Path.Combine(artifactsDirectory, "graph-workflow"));
         PackageStorage.EnsureNoLinks(root); Directory.CreateDirectory(root);
-        uploads = new(artifactsDirectory, uploadLimits);
+        uploads = new(artifactsDirectory, uploadLimits); artifactsRoot = Path.GetFullPath(artifactsDirectory);
     }
     public object Inspect(string xmlUploadRef)
     {
         using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock"));
         var upload = uploads.ResolveCommitted(xmlUploadRef); var bytes = Read(upload.Path, GraphDocument.MaxInputBytes);
         Require(Hash(bytes) == upload.Sha256, "GraphInputChanged", "Committed upload changed during reading.");
-        var document = GraphDocument.Parse(bytes);
-        return Summary(Publish("document", [], new() { ["original.xml"] = bytes,
-            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()), ["viewer.html"] = Encoding.UTF8.GetBytes(document.ToHtml()) }));
+        return Summary(PublishDocument(bytes));
+    }
+    /// <summary>Retain a native export inside the Host artifact directory as a document record, bound to the exporter's SHA-256.</summary>
+    public object Retain(string path, string sha256)
+    {
+        using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock"));
+        return Summary(PublishDocument(ArtifactBytes(path, sha256)));
+    }
+    /// <summary>Worker payload for a graph_import change. The exact retained (graphRef) or artifact-directory (path) document is refused
+    /// unless the offline reader finds one chart without errors, unsupported grammar or the empty Interlock/Supervision shape TIA rejects.</summary>
+    public JsonObject ImportPayload(JsonElement payload)
+    {
+        string? Text(string name) => payload.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
+        string? graphRef = Text("graphRef"), path = Text("path");
+        Require(graphRef is null != path is null, "InvalidRequest", "graph_import requires exactly one of graphRef or path.");
+        byte[] bytes;
+        using (PackageStorage.Lock(Path.Combine(root, "store.lock"))) bytes = graphRef is null ? ArtifactBytes(path!, null) : Document(graphRef).Files["original.xml"];
+        GraphInspection inspection;
+        try { inspection = GraphDocument.Parse(bytes).Inspection; }
+        catch (GraphException error) { throw new BridgeException(error.Code, error.Message); }
+        string? refused = inspection.Diagnostics.Where(d => d.Severity == "error" || d.Code == "EmptyNativeCondition").Select(d => d.Code + " at " + d.Path)
+            .Concat(inspection.Unsupported.Where(u => u.Code is not ("OpaqueEnvelope" or "OpaqueContent")).Select(u => u.Code + " at " + u.Path))
+            .FirstOrDefault() ?? (inspection.Graphs.Count == 1 ? null : "expected exactly one GRAPH chart");
+        Require(refused is null, "GraphImportRefused", "The GRAPH document is not importable: " + refused +
+            ". Structural errors, unsupported grammar and empty Interlock/Supervision modules without FlgNet (rejected by TIA V21 on import) are refused.");
+        using var reader = new StreamReader(new MemoryStream(bytes), Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        var result = new JsonObject { ["xml"] = reader.ReadToEnd(), ["sourceSha256"] = Hash(bytes), [graphRef is null ? "path" : "graphRef"] = graphRef ?? path };
+        if (payload.TryGetProperty("expectedBlockNames", out var names)) result["expectedBlockNames"] = JsonNode.Parse(names.GetRawText());
+        return result;
     }
     public object Compare(string beforeRef, string afterRef)
     {
@@ -140,6 +166,20 @@ public sealed class GraphWorkflowStore
         foreach (var file in files) Write(PathFor(id, file.Key), file.Value);
         foreach (string input in inputs) _ = Document(input);
         Write(PathFor(id, "receipt.json"), bytes); return new("graph:" + id + ":" + Hash(bytes), receipt, files);
+    }
+    private Record PublishDocument(byte[] bytes)
+    {
+        var document = GraphDocument.Parse(bytes);
+        return Publish("document", [], new() { ["original.xml"] = bytes,
+            ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()), ["viewer.html"] = Encoding.UTF8.GetBytes(document.ToHtml()) });
+    }
+    private byte[] ArtifactBytes(string path, string? sha256)
+    {
+        // ArtifactStore enforces the Host artifact-directory boundary and refuses links before the bytes are read.
+        var probe = JsonSerializer.SerializeToElement(new ArtifactStore(artifactsRoot).Read(path, 0, 1), BridgeProtocol.Json);
+        var bytes = Read(Path.Combine(artifactsRoot, probe.GetProperty("relativePath").GetString()!), GraphDocument.MaxInputBytes);
+        Require(Hash(bytes) == (sha256 ?? probe.GetProperty("sha256").GetString()), "GraphInputChanged", "Artifact changed during reading.");
+        return bytes;
     }
     private static object Summary(Record record)
     {
