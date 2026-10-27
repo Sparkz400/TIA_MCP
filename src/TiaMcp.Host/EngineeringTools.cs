@@ -178,6 +178,11 @@ public sealed partial class TiaTools
             try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
             catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
+        // The worker cannot read the upload store; only exact public DER of the committed upload is handed over.
+        if (kind == "certificate_import")
+            try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
+            catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException)
+            { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 

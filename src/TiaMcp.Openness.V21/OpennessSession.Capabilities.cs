@@ -235,6 +235,9 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
                 AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
                 metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+                var certificates = ProbeCapabilityService<Siemens.Engineering.Security.LocalCertificateManager>(hardware, "hardware", probes);
+                foreach (string feature in CertificatePayloads.Keys)
+                    AddTargetFeature(features, "change." + feature, certificates, "partial", "Device-local certificate store only, refused while the global store is enabled: template create, public DER/PEM import, assignment through a native read-write certificate attribute with the expected current Id, deletion only without any readable reference. Private keys are never read, exported or accepted; device compile and checkpoint required; not natively qualified.");
                 ApiObservation drive;
                 try { drive = ProbeDriveContainer(hardware, probes); }
                 catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }

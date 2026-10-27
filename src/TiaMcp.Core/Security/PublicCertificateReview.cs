@@ -81,19 +81,8 @@ public static class PublicCertificateReview
         {
             string encoded = Text(input, "contentBase64", 128 * 1024); byte[] bytes = Convert.FromBase64String(encoded);
             if (bytes.Length is < 1 or > 96 * 1024 || Convert.ToBase64String(bytes) != encoded) throw Error("Content must be canonical base64 of 1 byte..96 KiB.");
-            byte[] der = bytes;
-            if (format == "pem")
-            {
-                string pem = Utf8.GetString(bytes);
-                if (!PemEncoding.TryFind(pem, out var fields) || pem[fields.Label] != "CERTIFICATE") throw Error("Expected exactly one public CERTIFICATE PEM block.");
-                var (offset, length) = fields.Location.GetOffsetAndLength(pem.Length);
-                if (pem[..offset].Any(c => c is not (' ' or '\t' or '\r' or '\n')) || pem[(offset + length)..].Any(c => c is not (' ' or '\t' or '\r' or '\n'))) throw Error("Extra data around the certificate is refused.");
-                der = Convert.FromBase64String(pem[fields.Base64Data]);
-            }
-            if (der.Length is < 1 or > 64 * 1024) throw Error("Public DER certificate exceeds 64 KiB.");
-            ValidateEnvelope(der);
+            byte[] der = PublicDer(bytes, format);
             using var cert = X509CertificateLoader.LoadCertificate(der);
-            if (cert.HasPrivateKey || !cert.RawData.AsSpan().SequenceEqual(der)) throw Error("Only an exact single public DER certificate is accepted.");
             var extensions = new JsonArray(); var seen = new HashSet<string>(StringComparer.Ordinal);
             if (cert.Extensions.Count > 128) throw Error("Certificate exceeds 128 extensions.");
             foreach (X509Extension extension in cert.Extensions)
@@ -115,6 +104,41 @@ public static class PublicCertificateReview
         }
         catch (Exception e) when (e is CryptographicException or AsnContentException or FormatException or DecoderFallbackException or ArgumentException)
         { throw Error("Invalid or unsupported single public certificate payload; container/key/trailing content is not accepted."); }
+    }
+    /// <summary>Exactly one public certificate as its DER: PEM must be one CERTIFICATE block. Key containers, private keys and surplus content refuse.</summary>
+    public static byte[] PublicDer(byte[] bytes, string format)
+    {
+        try
+        {
+            byte[] der = bytes;
+            if (format == "pem")
+            {
+                string pem = Utf8.GetString(bytes);
+                if (!PemEncoding.TryFind(pem, out var fields) || pem[fields.Label] != "CERTIFICATE") throw Error("Expected exactly one public CERTIFICATE PEM block.");
+                var (offset, length) = fields.Location.GetOffsetAndLength(pem.Length);
+                if (pem[..offset].Any(c => c is not (' ' or '\t' or '\r' or '\n')) || pem[(offset + length)..].Any(c => c is not (' ' or '\t' or '\r' or '\n'))) throw Error("Extra data around the certificate is refused.");
+                der = Convert.FromBase64String(pem[fields.Base64Data]);
+            }
+            else if (format != "der") throw Error("Select explicit der or pem format.");
+            if (der.Length is < 1 or > 64 * 1024) throw Error("Public DER certificate exceeds 64 KiB.");
+            ValidateEnvelope(der);
+            using var cert = X509CertificateLoader.LoadCertificate(der);
+            if (cert.HasPrivateKey || !cert.RawData.AsSpan().SequenceEqual(der)) throw Error("Only an exact single public DER certificate is accepted.");
+            return der;
+        }
+        catch (Exception e) when (e is CryptographicException or AsnContentException or FormatException or DecoderFallbackException or ArgumentException)
+        { throw Error("Invalid or unsupported single public certificate payload; container/key/trailing content is not accepted."); }
+    }
+    /// <summary>certificate_import worker payload: the committed upload becomes exact public DER and its SHA-256. Any other field (a password, key or container) refuses.</summary>
+    public static JsonObject ImportPayload(JsonElement payload, Func<string, (string Path, string FileName, string Sha256)> resolveUpload)
+    {
+        var request = JsonNode.Parse(payload.GetRawText()) as JsonObject ?? throw Error("Expected a request object.");
+        Fields(request, "hardwarePath uploadRef format"); Text(request, "hardwarePath");
+        string path = resolveUpload(Text(request, "uploadRef")).Path;
+        if (new FileInfo(path).Length is < 1 or > 96 * 1024) throw Error("The certificate upload must hold 1 byte..96 KiB.");
+        byte[] der = PublicDer(File.ReadAllBytes(path), Text(request, "format"));
+        request["derBase64"] = Convert.ToBase64String(der); request["sha256"] = Convert.ToHexStringLower(SHA256.HashData(der));
+        return request;
     }
     private static void ValidateEnvelope(byte[] der)
     {
