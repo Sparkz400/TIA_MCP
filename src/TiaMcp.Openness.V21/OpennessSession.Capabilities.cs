@@ -113,6 +113,12 @@ namespace TiaMcp.Openness.V21
                         + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
                         blocked: protectedBlock || safetyBlock || safetyScope || generated,
                         blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-blocks and safety-unit objects require the dedicated safety workflow.");
+                var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
+                var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
+                foreach (string feature in BlockProtectionKinds)
+                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
+                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
+                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
                 AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
                     applicable: language == "SCL" || language == "STL" || block is DataBlock,
                     blocked: protectedBlock || safetyBlock || safetyScope || generated,

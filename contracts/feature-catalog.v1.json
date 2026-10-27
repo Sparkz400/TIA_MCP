@@ -4948,6 +4948,162 @@
       ]
     },
     {
+      "featureId": "change.block_protect",
+      "domain": "language",
+      "title": "Know-how protect one exact standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_protect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlock.GetService<PlcBlockProtectionProvider>().Protect(SecureString); readback PlcBlock.IsKnowHowProtected."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
+          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "blocked",
+        "reasons": [
+          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.block_unprotect",
+      "domain": "language",
+      "title": "Remove know-how protection from one exact standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_unprotect",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlock.GetService<PlcBlockProtectionProvider>().Unprotect(SecureString); readback PlcBlock.IsKnowHowProtected."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
+          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "Exact standard know-how protected block; F-blocks, safety-unit objects and generated system-group blocks are refused.",
+          "Protected content has no before-XML backup; the whole-project checkpoint archive is the recovery source.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "blocked",
+        "reasons": [
+          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.block_write_protection_set",
+      "domain": "language",
+      "title": "Define, change, enable or disable write protection of one exact standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_write_protection_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlock.GetService<PlcBlockWriteProtectionProvider>() Define/Change/Protect/Unprotect(SecureString); readback IsDefined/IsProtected."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
+          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
+          "V21 exposes no call that removes a defined write-protection password; action disable only turns protection off.",
+          "Whether Define also enables protection is undocumented, so define reads back only IsDefined. A password change is not observable; only the native call returning is evidence.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "blocked",
+        "reasons": [
+          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.graphical_operand_set",
       "domain": "language",
       "title": "Replace a supported existing LAD/FBD scalar operand",

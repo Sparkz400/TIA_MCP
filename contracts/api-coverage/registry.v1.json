@@ -964,6 +964,24 @@
       ]
     },
     {
+      "featureId": "change.block_protect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_unprotect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_write_protection_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
       "featureId": "change.graphical_operand_set",
       "obligations": [
         "L01",
