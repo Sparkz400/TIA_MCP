@@ -127,6 +127,7 @@ namespace TiaMcp.Openness.V21
             if (!actual.SequenceEqual(expected) || created && (result == null || before.Contains(result.Id)))
                 throw new BridgeException("MutationVerificationFailed", "The local certificate store does not contain exactly the expected certificates after the change.");
             var readback = new JObject { ["role"] = "certificate-readback", ["store"] = owner.Path + "/certificates", ["storeCertificateIds"] = new JArray(actual.Select(id => (JToken)id)) };
+            change.Readbacks.Add(readback); // Journaled before the checks so a refused readback keeps its observed public identity.
             if (created)
             {
                 byte[] der;
@@ -139,7 +140,6 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind == "certificate_create") RequireCreatedCertificate(CertificateCreateRequest(payload), identity, result);
             }
             if (assigned != null) readback["assignment"] = assigned;
-            change.Readbacks.Add(readback);
         }
 
         private static void RequireCreatedCertificate(JObject request, JObject identity, Certificate created)
