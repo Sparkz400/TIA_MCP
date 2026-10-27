@@ -347,8 +347,8 @@
     },
     {
       "path": "contracts/library-component-preview.v1.schema.json",
-      "sha256": "dfc82b8e29f38b173fa93537b62c3947b0ece1d00b205e9fcbbcea52d7ad1873",
-      "bytes": 29945
+      "sha256": "d3130f51b51629e75bb010f1b0d9f0f1bacd202551d6a42726818a38927dcb7a",
+      "bytes": 31054
     },
     {
       "path": "contracts/library-export-manifest.v1.schema.json",
@@ -592,8 +592,8 @@
     },
     {
       "path": "contracts/testsuite-style-review.v1.schema.json",
-      "sha256": "61cf5905ac39a059ad0639a0a3a4ecb419361e47f77b37b7f5e0ee49ed7dc1c0",
-      "bytes": 1860
+      "sha256": "c2704d9493c0a4103d52b666326aaf986b1958c2feec5f7dc9ff38d16f83183f",
+      "bytes": 2535
     },
     {
       "path": "contracts/testsuite-supplied-results.v1.schema.json",
