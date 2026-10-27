@@ -125,7 +125,7 @@ def run(args):
             return
         started = time.perf_counter()
         result = h.tool("library_query", {"request": {"libraryId": library, "query": "dependencies", "maxItems": 200, **identity(released)}})
-        h.report["chainDependencies"] = {"root": h.report["releases"][-1]["typeName"], "seconds": round(time.perf_counter() - started, 3),
+        h.report["chainDependencies"] = {"root": released["typeName"], "seconds": round(time.perf_counter() - started, 3),
                                          "items": len(result["items"]), "totalCaptured": result.get("totalCaptured"),
                                          "completeness": result.get("completeness"), "nextOffset": result.get("nextOffset")}
         h.persist()
