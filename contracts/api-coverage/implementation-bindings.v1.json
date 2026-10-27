@@ -5,9 +5,9 @@
   "releaseAccepted": false,
   "scope": "Static anchored entrypoints and mutation branches; conservative unresolved dependencies, not compiled C# call graph.",
   "counts": {
-    "tools": 306,
+    "tools": 308,
     "mutations": 105,
-    "features": 431
+    "features": 435
   },
   "sourceInputs": [
     {
@@ -27,8 +27,8 @@
     },
     {
       "path": "contracts/addin-handoff-wire.v1.schema.json",
-      "sha256": "b8ad77b22ede15cdadf43a7810f8024c1358ad6f119ed22ea6de8757784e216f",
-      "bytes": 6702
+      "sha256": "59d9aa4a223cd4aa34012b100b334df9a63f2807f8baecb4c9b89700a7a4bae0",
+      "bytes": 6707
     },
     {
       "path": "contracts/addin-owner-context.v1.schema.json",
@@ -57,8 +57,8 @@
     },
     {
       "path": "contracts/api-coverage/registry.v1.json",
-      "sha256": "1194bf05c3d654751408ac933e1683aa00112fb560022bbe06514880d9140e43",
-      "bytes": 80425
+      "sha256": "7ab1ac5f4a3bf9c655d71fbfe736f296ee8d43e01d6eb6244bcfe0342f5845a9",
+      "bytes": 80961
     },
     {
       "path": "contracts/automationml-workflow.v1.schema.json",
@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "984f85ca16ad8123571e92d7cb8cee590b0c896a5114963f9f13b99d89da0460",
-      "bytes": 1062427
+      "sha256": "6e4888c3f8415e4e84155327f5a8140b305c1e7c7d372cad49c2c52f1a94ec4a",
+      "bytes": 1079889
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -307,8 +307,8 @@
     },
     {
       "path": "contracts/hmi-engineering.v1.schema.json",
-      "sha256": "695e9c196b8c2bfe339446b0c779e1bbb661812484aef0b7e5e6cf07f50cb04c",
-      "bytes": 8842
+      "sha256": "694d656821fa30e42a3c73061b2bb383ff2ed57115c4fc5befc370cdbd5896d4",
+      "bytes": 11941
     },
     {
       "path": "contracts/hmi-identity.v2.schema.json",
@@ -697,13 +697,13 @@
     },
     {
       "path": "contracts/typed-graphical-model.schema.json",
-      "sha256": "9e7440072ba7201515a7a73e581d61829746fd018bf83eb5245defb5ce432316",
-      "bytes": 6979
+      "sha256": "338867b733006a711858b12c4a4cf2de77e5da6249cc5225617572f602e139df",
+      "bytes": 7534
     },
     {
       "path": "contracts/typed-graphical-profiles.schema.json",
-      "sha256": "be0621846e7da565423c2673283afad5398270fdececd86dbeb4b4f3d13920c5",
-      "bytes": 6076
+      "sha256": "04d1e124446a4b98a4c90dfcb242a8dc4389ee01ce5f2ee67e71115fbb2e2f17",
+      "bytes": 6100
     },
     {
       "path": "contracts/typed-graphical-read.schema.json",
@@ -816,6 +816,21 @@
       "bytes": 13740
     },
     {
+      "path": "src/TiaMcp.AddIn.V21/SelectionAddIn.cs",
+      "sha256": "56b9ff4853c7b21225fea058cd64e0ec588e6489e5150a8b00487dd7e76d309b",
+      "bytes": 1808
+    },
+    {
+      "path": "src/TiaMcp.AddIn.V21/SelectionHandoff.cs",
+      "sha256": "4a6b6746a229dc4a0a72d5eca766cd5d90bf0779403993e384ee5e716ef99f80",
+      "bytes": 12877
+    },
+    {
+      "path": "src/TiaMcp.AddIn.V21/TiaMcp.AddIn.V21.csproj",
+      "sha256": "a1800e6b36614f12020c7d5bb75289962a65fd880f4515518ad95dcbc0cf1980",
+      "bytes": 1825
+    },
+    {
       "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
       "sha256": "36f984fb937c932c905c60e6a5cf7ecc3a111fbf7fe55a83a74032f7a5bed163",
       "bytes": 7185
@@ -824,6 +839,11 @@
       "path": "src/TiaMcp.Core/AddInSelectionStore.cs",
       "sha256": "d856e7089a49dd1404daf35f7feaa46dff8926f10033678e0837be324c7bcb6f",
       "bytes": 6080
+    },
+    {
+      "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+      "sha256": "05ba2d150d025414d88f895ea11d64df6b0fce9200321a69cc520fdcf027a324",
+      "bytes": 5925
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInHandoff.cs",
@@ -936,6 +956,11 @@
       "bytes": 23357
     },
     {
+      "path": "src/TiaMcp.Core/Diagnostics/DiagnosticPlcsimWrites.cs",
+      "sha256": "07f568c288f7102ffcb308cd359a36c94498c060f41269d2f77b9fbe3ff6b6ac",
+      "bytes": 3832
+    },
+    {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticQualityExperiments.cs",
       "sha256": "8049b25e67adaf9c80e754e702c1d6bec3b5aaa4fb6b3137a9fe9d407297c1a4",
       "bytes": 8023
@@ -967,8 +992,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-      "sha256": "c364fff9fdb4c8dbfef3caa8516088cbe0993dba847b13850cf5cd4cd3ddeecf",
-      "bytes": 13331
+      "sha256": "6fff4d0e07c38a3e283a63ea3ea3e1e91e73f2b6309ab46850c1c920b9ba6847",
+      "bytes": 18003
     },
     {
       "path": "src/TiaMcp.Core/Diagnostics/DiagnosticSignalSelector.cs",
@@ -1342,8 +1367,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/SimulatorCaptureContracts.cs",
-      "sha256": "dc9dd4e4bf0394bcb48021b223301b6207514aec6e568d69c1bf396a84706755",
-      "bytes": 9799
+      "sha256": "01f9c363736517812dbea5cc7658952064b0a25a81a987ab3a30f3b0083dc256",
+      "bytes": 9800
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
@@ -1642,13 +1667,13 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-      "sha256": "36d90971d55d18cb65b9c08b050c5db1365cff2cb7cd3b94f08d1f0cba73fe26",
-      "bytes": 36972
+      "sha256": "bc8c5babfa4d0528cd6755652aad8aa9c5eaa06bd503451b9dac8e88e85133e1",
+      "bytes": 38351
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDocument.cs",
-      "sha256": "1e2d40e8ec8bf847f322a6f545bb7af40a927a86d8514b154793fbdcfb031e95",
-      "bytes": 27346
+      "sha256": "592e4fd9e0085c3daea14bd0e4d4be6cabac8efc33122205bcb4c094dfe79ebc",
+      "bytes": 28149
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableModels.cs",
@@ -1727,8 +1752,8 @@
     },
     {
       "path": "src/TiaMcp.Host/AddInHandoffService.cs",
-      "sha256": "b1294a62c8faaa840db980eeabcac7a5fb6c2c7f2e04faec4fd0f9459ed5ae2f",
-      "bytes": 734
+      "sha256": "b029eedccb55cf2ef1eacb311940c9053f598527350c807ab1120a1977016905",
+      "bytes": 859
     },
     {
       "path": "src/TiaMcp.Host/AddInSelectionTools.cs",
@@ -1822,8 +1847,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
-      "sha256": "499f8ce2ae701d51a291967f89a71ba8ea68259cb177cb613911e97272f4a76f",
-      "bytes": 8688
+      "sha256": "3b72c2c180f44ffe151dd3b05d1af3b0ca436ec8e4bf8cedeffd0fa1a1a2eca4",
+      "bytes": 9267
     },
     {
       "path": "src/TiaMcp.Host/LibraryPackageTools.cs",
@@ -1917,13 +1942,13 @@
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
-      "sha256": "0450e9e31baec5a23c392aee78574adcd31ef02073b9ed3f2d8bf6f17218f048",
-      "bytes": 9277
+      "sha256": "3bde9001d8275990ed54c393eb3c037ed74c6a40d58e12a7373f023dd746a212",
+      "bytes": 12640
     },
     {
       "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
-      "sha256": "0e9c8d94ffd46824be96f7996afdb0e8ffb97d93d579405697577b62ed7ae36a",
-      "bytes": 13039
+      "sha256": "f5591ffce0591dcf064e7cd320f27b7d2972dac26572769f8713a250ce65112f",
+      "bytes": 14435
     },
     {
       "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -2047,8 +2072,8 @@
     },
     {
       "path": "src/TiaMcp.Host/WatchTableTools.cs",
-      "sha256": "f21aa7c8fb3b94d796925ced3a663a2e661de5c2586eb00846b5969ba1e8fb48",
-      "bytes": 11644
+      "sha256": "9683185792b18e52235ba1580839379b352bb35dfab9d5ce8528cd0cf6a58a3b",
+      "bytes": 12277
     },
     {
       "path": "src/TiaMcp.Host/WebApplicationTools.cs",
@@ -2232,8 +2257,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiEngineeringRules.cs",
-      "sha256": "717e6692e3d614da5e1498d85872e8566300fe5651a5f1319d19104ee4415d50",
-      "bytes": 22884
+      "sha256": "3d57018f7a13d3f1f4de21c3702e17d61adb4fb4929137ff39b0eb93e525d5bc",
+      "bytes": 28711
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiInspectionRules.cs",
@@ -2427,8 +2452,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
-      "sha256": "a1d40a1c82c1c7853937ac1cc44de0f29c93b9074b7d487c21a9546bb5754ce9",
-      "bytes": 66601
+      "sha256": "3139c855f2c5f39191f483d743492f1653ce9095e5a93a0d1346b6bf29f18827",
+      "bytes": 79737
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiExports.cs",
@@ -2782,8 +2807,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchTables.cs",
-      "sha256": "8b2b1ed3616ea5c4db92ca81d23ffe782836e508148ff423625eafeb48b007ad",
-      "bytes": 26891
+      "sha256": "7ed44ed1b40f81e605fc505eb987284a24aea56925ffcca81efaac38a008cd2b",
+      "bytes": 28740
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
@@ -2907,18 +2932,18 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
-      "sha256": "d33ef5e8037888a4eaad3c4f2493845013dcb2d79c8f2c9f3c0c91bf74b5b05e",
-      "bytes": 51768
+      "sha256": "48d011b51e783781aa0e06ea971807cc61f6fff5085ae6b4339aba2a18f8c488",
+      "bytes": 52564
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs",
-      "sha256": "b6f3f4547a1e69caf5ce17cc76cd39733ee95a7fbd41e626973f899b0c2bccd4",
-      "bytes": 22913
+      "sha256": "1d52c2a0d041e29712bb76a52beb997e7c8328e6ae76e0ec05f8b0565570bef9",
+      "bytes": 24307
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.cs",
-      "sha256": "2481908918c6647b9f7a1e419be754ef1dc81e7c3142fbb51d6da5042504fded",
-      "bytes": 15290
+      "sha256": "b476a74c0cced0844020de535e17297184351249d0cf168b6f7fb640c7ff0fc5",
+      "bytes": 15313
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalCapturedStorageTemplate.cs",
@@ -2942,13 +2967,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "d3a232886a3adab1b26fee643a3f323faa33348a44a0de026661ba7b319c1b32",
-      "bytes": 14574
+      "sha256": "d166faab6a6c4ab7a71fe44f9981fc3722df30a0d156879c9999a01747426eb9",
+      "bytes": 14607
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
-      "sha256": "32f2a954681bc42dc06a953caf55f11613b147ce0de2d428669b97f31fe48206",
-      "bytes": 11896
+      "sha256": "39597edf6ce84192dec5fdcee4fe50a6a2ad957f25140af4a67649d4f3c4f225",
+      "bytes": 12148
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalResolution.cs",
@@ -2962,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationAssertions.cs",
-      "sha256": "930ddf9b7ee37149e195b0660888291ec3d0a5d19f37f642c74b7933f300e9c3",
-      "bytes": 2190
+      "sha256": "a9bf962f45f5d05610b019f29fb7e3c3c492e61ea34eb0d0bca274b5960448cd",
+      "bytes": 2533
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationCreationJournal.cs",
@@ -2982,13 +3007,13 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSelfTests.cs",
-      "sha256": "1ee8f32be1a65edb3b4e05de1b4f7f056d0b03d1c1d80c8f54c9058edd7f0ff1",
-      "bytes": 12418
+      "sha256": "6b2408ffc0db972f8520adfd00a30f7451646b0b6a59786791a267fca307be8d",
+      "bytes": 12799
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
-      "sha256": "1315eeb6c0ce129e04e83f4e63ac2ff5d7582a70fef1c9af8e2ed040558a0b94",
-      "bytes": 46296
+      "sha256": "241dd8d77b97f713eb31c374ea3abda82373eea42bc82a0bb5a9492174dfbc7d",
+      "bytes": 48744
     },
     {
       "path": "src/TiaMcp.Simulator.V8/TiaMcp.Simulator.V8.csproj",
@@ -3643,9 +3668,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -3969,8 +3994,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -4137,9 +4162,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -4463,8 +4488,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -4631,9 +4656,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -5097,9 +5122,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -5288,6 +5313,13 @@
           "line": 84,
           "endLine": 88,
           "sha256": "3e380faafae62fc41e383a1bfc1e701f3fab8cb1b71b81635f5ab344732948de"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -5654,9 +5686,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -5932,9 +5964,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -6196,9 +6228,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -6607,9 +6639,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -6906,9 +6938,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -7170,9 +7202,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -7331,8 +7363,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -7587,9 +7619,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -7720,6 +7752,13 @@
           "line": 12,
           "endLine": 21,
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -7927,9 +7966,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -8260,9 +8299,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -8593,9 +8632,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -8919,9 +8958,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -9196,9 +9235,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -9892,9 +9931,16 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -11023,9 +11069,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -11494,9 +11540,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -11827,8 +11873,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -11995,9 +12041,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -12258,9 +12304,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -12591,9 +12637,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -13064,9 +13110,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -13643,9 +13689,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -13969,8 +14015,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -14137,9 +14183,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -14522,9 +14568,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -14648,9 +14694,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -15113,9 +15159,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -15439,8 +15485,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -15607,9 +15653,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -16675,8 +16721,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -16720,6 +16766,13 @@
           "line": 19,
           "endLine": 19,
           "sha256": "7f719d0c015dcd358e0045306be01d66975a79112e9215254f846b5bc654d711"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -17430,8 +17483,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "AcquireDiagnostic",
-        "line": 31,
-        "endLine": 33,
+        "line": 32,
+        "endLine": 34,
         "sha256": "bcb58b6973c0b165763e9e3cb7888ab4f65fccdb04475006925ee3a851960d65"
       },
       "bridgeOperations": [],
@@ -17447,16 +17500,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "AcquireDiagnostic",
-          "line": 31,
-          "endLine": 33,
+          "line": 32,
+          "endLine": 34,
           "sha256": "bcb58b6973c0b165763e9e3cb7888ab4f65fccdb04475006925ee3a851960d65"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -17471,8 +17524,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "AcquireDiagnostic",
-          "line": 31,
-          "endLine": 33,
+          "line": 32,
+          "endLine": 34,
           "sha256": "bcb58b6973c0b165763e9e3cb7888ab4f65fccdb04475006925ee3a851960d65"
         },
         {
@@ -17618,9 +17671,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -17744,9 +17797,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -17893,6 +17946,13 @@
           "line": 12,
           "endLine": 21,
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -18238,8 +18298,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -18293,15 +18353,15 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         }
       ],
@@ -18758,6 +18818,334 @@
       ]
     },
     {
+      "tool": "diagnostic_plcsim_write",
+      "host": {
+        "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+        "name": "WriteDiagnosticPlcsim",
+        "line": 46,
+        "endLine": 51,
+        "sha256": "1521fbec3a795db93a369056e8a1c1ac851c3ed6e50c8f43cf5f760029a32529"
+      },
+      "bridgeOperations": [],
+      "localCallNames": [
+        "BridgeException",
+        "Run",
+        "WriteDiagnosticPlcsim",
+        "async"
+      ],
+      "hostDelegationAnchors": [
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "WriteDiagnosticPlcsim",
+          "line": 46,
+          "endLine": 51,
+          "sha256": "1521fbec3a795db93a369056e8a1c1ac851c3ed6e50c8f43cf5f760029a32529"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "Run",
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
+        }
+      ],
+      "workerRoutes": [],
+      "localHandlers": [
+        {
+          "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
+          "name": "Run",
+          "line": 14,
+          "endLine": 68,
+          "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
+        },
+        {
+          "path": "src/TiaMcp.Host/AccessTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "ea5d43274df249a88baa2d1a87267e083cf8afe39449acc22bcb3e041114305c"
+        },
+        {
+          "path": "src/TiaMcp.Host/AddInSelectionTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "7e9ced02e9c6444c79bf05c0ea3bd20bae49a45113135c0bea720c203aa7cd53"
+        },
+        {
+          "path": "src/TiaMcp.Host/AutomationMlTools.cs",
+          "name": "Run",
+          "line": 37,
+          "endLine": 48,
+          "sha256": "1a937367aa96df153f590b7cccc9e3ce6717a607b675c0169d93dca893e1dbb0"
+        },
+        {
+          "path": "src/TiaMcp.Host/CompositeEngineeringTools.cs",
+          "name": "Run",
+          "line": 50,
+          "endLine": 60,
+          "sha256": "3dc4fd0a550563adba4fadb6a1dd487c06330738ffe34e6ce3d4846f03a1c912"
+        },
+        {
+          "path": "src/TiaMcp.Host/ConnectionTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "cf4a0dd16383ce80ad021e6fbffcfb8a99d2f8272f1e854f0374bc528f85da9d"
+        },
+        {
+          "path": "src/TiaMcp.Host/DbSnapshotTools.cs",
+          "name": "Run",
+          "line": 31,
+          "endLine": 39,
+          "sha256": "4d1fa3f937dd02332ff72c304f27ff6c4c1ab248478b30ede7cec04cc2ebad8e"
+        },
+        {
+          "path": "src/TiaMcp.Host/DriveProfileTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "35bd690cb7bb4d4d5901a73401faf93ad146ea7eb89767a01bb499489ab9079c"
+        },
+        {
+          "path": "src/TiaMcp.Host/GraphTools.cs",
+          "name": "Run",
+          "line": 53,
+          "endLine": 64,
+          "sha256": "c3bd616efaf98eb253a4754420995ef8b56d4889cb40936b136d70ba7e67202a"
+        },
+        {
+          "path": "src/TiaMcp.Host/HmiComponentTools.cs",
+          "name": "Run",
+          "line": 28,
+          "endLine": 36,
+          "sha256": "c998898900f2f04459fa009619d9ac85fd86c2a3fa508aab0ddfbe3683b9e6ec"
+        },
+        {
+          "path": "src/TiaMcp.Host/LibraryPackageTools.cs",
+          "name": "Run",
+          "line": 56,
+          "endLine": 64,
+          "sha256": "cb8275da8427d291522f838c876bad313fdfe8d6092b57a4bd530d11b4fcde81"
+        },
+        {
+          "path": "src/TiaMcp.Host/MultiuserTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "a11a1600952cc5d1dd2ef4851d373f95c59330a981906b7ffa08e8ec5c07b499"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+          "name": "Run",
+          "line": 92,
+          "endLine": 97,
+          "sha256": "b509bf5b9740f1cae1361da95fbebe5fb85b094d99e0022796ed50b7f78e8e5a"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
+          "name": "Run",
+          "line": 38,
+          "endLine": 46,
+          "sha256": "7aedd51a9e124f3bc06733d8cf9200d151db819a1274a83734c091d0fa237339"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaTools.cs",
+          "name": "Run",
+          "line": 50,
+          "endLine": 59,
+          "sha256": "f6a940599f77a5dfc7335e441a5b082d200ffc049338483a5b02f11394637065"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+          "name": "Run",
+          "line": 69,
+          "endLine": 74,
+          "sha256": "85a5342630a3b048a649c27e3b6bcb9be156394668e0ca23363e76b551cb3e22"
+        },
+        {
+          "path": "src/TiaMcp.Host/PublicCertificateTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "16c97c177641bc01f29cd8b4dec7b5bef7296fd3a8b33f40b2b22d2ae7706be4"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "Run",
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
+          "name": "Run",
+          "line": 36,
+          "endLine": 47,
+          "sha256": "ebb8b927d8a50a1c642d739e9d8b895b4501ab8508768b434872aa5a47f09f09"
+        },
+        {
+          "path": "src/TiaMcp.Host/SafetyEvidenceTools.cs",
+          "name": "Run",
+          "line": 24,
+          "endLine": 32,
+          "sha256": "97dae0d6caca0871a0c65ef8c0b064bf3512535f8eb23c342d3d680d38ec5ae4"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/CredentialCommand.cs",
+          "name": "Run",
+          "line": 11,
+          "endLine": 65,
+          "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
+          "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "b51a57ffb6370514f50ea5721b01c9423b7a2b593cf181c315dd8b85f368b900"
+        },
+        {
+          "path": "src/TiaMcp.Host/TeamcenterTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "c4f471088a49cb85a104f125964a71f0d7f7d62068c4f6a7bcc8bb8023f7c634"
+        },
+        {
+          "path": "src/TiaMcp.Host/TechnologyProfileTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "9290dc8958cf44f6c28a5d919c65b06380bc0a7234d95bd5a9df13b5053cdc88"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "Run",
+          "line": 80,
+          "endLine": 84,
+          "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationTools.cs",
+          "name": "Run",
+          "line": 60,
+          "endLine": 69,
+          "sha256": "45ffb0199861c8607f9699d8e55ff44e60e1d495bb4c9af9b99051686c4c7f3b"
+        },
+        {
+          "path": "src/TiaMcp.Host/VciTools.cs",
+          "name": "Run",
+          "line": 71,
+          "endLine": 83,
+          "sha256": "1246beb23814868d58110d1b35ccc5514da20d34e5e10873d676aa01be64bc74"
+        },
+        {
+          "path": "src/TiaMcp.Host/WebApplicationTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "40bb4573118070275d7cd4024dcf64d8d491d6d41a60a302440b65886f70420e"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
+          "name": "WriteDiagnosticPlcsim",
+          "line": 82,
+          "endLine": 95,
+          "sha256": "f248344005b7c026cac18de6037d6d4aa7722474c26640461312cff532b6588c"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "WriteDiagnosticPlcsim",
+          "line": 46,
+          "endLine": 51,
+          "sha256": "1521fbec3a795db93a369056e8a1c1ac851c3ed6e50c8f43cf5f760029a32529"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+          "name": "async",
+          "line": 54,
+          "endLine": 55,
+          "sha256": "02a7bec9c362042309be268a76c20ab348bf55f736165705078c0553f85aa6c7"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+          "name": "async",
+          "line": 66,
+          "endLine": 67,
+          "sha256": "6a559434a5403c0971b7e90a1dde999bce2734d1eed69dbf56e71e48d9026bfa"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+          "name": "async",
+          "line": 25,
+          "endLine": 26,
+          "sha256": "8872bfd2eaae9df546ba282182ca02d3f59bd43b79b5a8ab4f2de948b1cc2b22"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+          "name": "async",
+          "line": 41,
+          "endLine": 42,
+          "sha256": "f4905b2b948f416db07182e65526b1f95cb48ffba196c53b7ad201ce97fe6ce5"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+          "name": "async",
+          "line": 61,
+          "endLine": 62,
+          "sha256": "4660db1e6e257dd8e86f74a69ecf466aefebcbe311b0aba35bed9dce2d8605cc"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "async",
+          "line": 28,
+          "endLine": 36,
+          "sha256": "c7beefd287930249b16b111978b15ce55eb13795bb211f3e06f1cf3b9633d06b"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "async",
+          "line": 40,
+          "endLine": 47,
+          "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "async",
+          "line": 51,
+          "endLine": 52,
+          "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "async",
+          "line": 64,
+          "endLine": 66,
+          "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "async",
+          "line": 70,
+          "endLine": 71,
+          "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
+        }
+      ],
+      "reviewState": "static_entrypoint_bound",
+      "gaps": [
+        "Local method-name matches may include overloads or unrelated receiver types; transitive dependencies are conservative.",
+        "No literal bridge operation in entrypoint; local/delegated route needs semantic receiver review."
+      ]
+    },
+    {
       "tool": "diagnostic_replan",
       "host": {
         "path": "src/TiaMcp.Host/DiagnosticTools.cs",
@@ -18926,8 +19314,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -18981,16 +19369,423 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
+        }
+      ],
+      "reviewState": "static_entrypoint_bound",
+      "gaps": [
+        "Local method-name matches may include overloads or unrelated receiver types; transitive dependencies are conservative.",
+        "No literal bridge operation in entrypoint; local/delegated route needs semantic receiver review."
+      ]
+    },
+    {
+      "tool": "diagnostic_runtime_acquisition_compare",
+      "host": {
+        "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+        "name": "CompareDiagnosticAcquisitions",
+        "line": 41,
+        "endLine": 43,
+        "sha256": "3b160842f1d0256caca00121756cda1e62ce10e9d42059aa85aa79f970d17e9e"
+      },
+      "bridgeOperations": [],
+      "localCallNames": [
+        "BridgeException",
+        "CompareDiagnosticAcquisitions",
+        "FromResult",
+        "GetRawText",
+        "Parse",
+        "Run"
+      ],
+      "hostDelegationAnchors": [
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "CompareDiagnosticAcquisitions",
+          "line": 41,
+          "endLine": 43,
+          "sha256": "3b160842f1d0256caca00121756cda1e62ce10e9d42059aa85aa79f970d17e9e"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "Run",
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
+        }
+      ],
+      "workerRoutes": [],
+      "localHandlers": [
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
+          "name": "CompareDiagnosticAcquisitions",
+          "line": 79,
+          "endLine": 80,
+          "sha256": "49be6c3c1b2d12554e392a019922d878f069a121431d51282bdface0f3e93a9c"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "CompareDiagnosticAcquisitions",
+          "line": 41,
+          "endLine": 43,
+          "sha256": "3b160842f1d0256caca00121756cda1e62ce10e9d42059aa85aa79f970d17e9e"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
+          "name": "Parse",
+          "line": 168,
+          "endLine": 188,
+          "sha256": "73952204ac2ddbc9b948ca3279331b925c8c531f1e6fc84d5abeea1829bdf143"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInSelection.cs",
+          "name": "Parse",
+          "line": 13,
+          "endLine": 30,
+          "sha256": "ddba50aecc0e0db167ee0f8a964c408a4d15c8247ff6ac01cf443c892f3517e5"
+        },
+        {
+          "path": "src/TiaMcp.Core/AutomationMl/AutomationMlDocument.cs",
+          "name": "Parse",
+          "line": 46,
+          "endLine": 176,
+          "sha256": "d15f37d658e6fcbbe5364593b30359786356dcea15b7c2fb3160931cfd910a06"
+        },
+        {
+          "path": "src/TiaMcp.Core/Collaboration/MultiuserReview.cs",
+          "name": "Parse",
+          "line": 14,
+          "endLine": 32,
+          "sha256": "cbf61a34f06d1a4ca882e8d6f9cc67dd41ef39135f6a1f5cb1ec7ee5897c8b74"
+        },
+        {
+          "path": "src/TiaMcp.Core/Collaboration/TeamcenterReview.cs",
+          "name": "Parse",
+          "line": 14,
+          "endLine": 32,
+          "sha256": "cbf61a34f06d1a4ca882e8d6f9cc67dd41ef39135f6a1f5cb1ec7ee5897c8b74"
+        },
+        {
+          "path": "src/TiaMcp.Core/Connections/ConnectionReview.cs",
+          "name": "Parse",
+          "line": 12,
+          "endLine": 30,
+          "sha256": "794bcad29d0f687937e9bde0359067ec1778bcfea395f271215d254ea9e5995a"
+        },
+        {
+          "path": "src/TiaMcp.Core/DbSnapshots/DbSnapshotReview.cs",
+          "name": "Parse",
+          "line": 14,
+          "endLine": 51,
+          "sha256": "743771cdb5f40273739df9bf4a28f275fca7764608c843c89956045d247c5d3e"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/TraceNumber.cs",
+          "name": "Parse",
+          "line": 29,
+          "endLine": 35,
+          "sha256": "464bfb65103aa3726ecd768168291d5436b0ed2f9683b350df0f6ba0df62ce0f"
+        },
+        {
+          "path": "src/TiaMcp.Core/Drives/DriveProfileReview.cs",
+          "name": "Parse",
+          "line": 12,
+          "endLine": 30,
+          "sha256": "794bcad29d0f687937e9bde0359067ec1778bcfea395f271215d254ea9e5995a"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CompositeEngineeringReview.cs",
+          "name": "Parse",
+          "line": 317,
+          "endLine": 328,
+          "sha256": "1b7bfd8c26c6a13c53f27bf2629302a8910c4e2bcec9e863f4bffb005074c7ed"
+        },
+        {
+          "path": "src/TiaMcp.Core/HmiComponents/HmiComponentReview.cs",
+          "name": "Parse",
+          "line": 14,
+          "endLine": 31,
+          "sha256": "6dd8853851fbb57fe1b23f06f321eeac710e1117039057658815ec0bba9e57da"
+        },
+        {
+          "path": "src/TiaMcp.Core/PhysicalRuntime/PlcsimTargetBinding.cs",
+          "name": "Parse",
+          "line": 80,
+          "endLine": 90,
+          "sha256": "4a7b45c90d838873be5058de769fdc747555e3469d5b15c8c277c62453846a7d"
+        },
+        {
+          "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeHandoffReview.cs",
+          "name": "Parse",
+          "line": 236,
+          "endLine": 251,
+          "sha256": "3bbc03604949a0b649894c6a222cbe8db1483813079321f916968968f06894bd"
+        },
+        {
+          "path": "src/TiaMcp.Core/Safety/SafetyEvidenceReview.cs",
+          "name": "Parse",
+          "line": 14,
+          "endLine": 32,
+          "sha256": "7d157d05f8a0e409b6e40eaf3d751a4077cfc6f79c82a9985a50d6536b5475b8"
+        },
+        {
+          "path": "src/TiaMcp.Core/Security/AccessReview.cs",
+          "name": "Parse",
+          "line": 12,
+          "endLine": 30,
+          "sha256": "c30014834b16ea524d7a42f62e72367db3716247f94b140bd9e9a01c594b771b"
+        },
+        {
+          "path": "src/TiaMcp.Core/Security/PublicCertificateReview.cs",
+          "name": "Parse",
+          "line": 18,
+          "endLine": 37,
+          "sha256": "f7d42479da2414cf1f9d5b2c5a8a4c6d60d3e7b65963fe1ce7ac62f98ed2de7a"
+        },
+        {
+          "path": "src/TiaMcp.Core/SoftwareUnits/SoftwareUnitReview.cs",
+          "name": "Parse",
+          "line": 12,
+          "endLine": 28,
+          "sha256": "cd1daee1460141377d8f4d390b0568547ce37bc54c67cb6051db260df15c708b"
+        },
+        {
+          "path": "src/TiaMcp.Core/TechnologyObjects/TechnologyProfileReview.cs",
+          "name": "Parse",
+          "line": 12,
+          "endLine": 30,
+          "sha256": "794bcad29d0f687937e9bde0359067ec1778bcfea395f271215d254ea9e5995a"
+        },
+        {
+          "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
+          "name": "Parse",
+          "line": 382,
+          "endLine": 391,
+          "sha256": "94bb7a1712eb7a54492b6e00d61af0786f87825df75f7eb30a46211522463989"
+        },
+        {
+          "path": "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
+          "name": "Parse",
+          "line": 13,
+          "endLine": 29,
+          "sha256": "2da4e74a754430b5ff93afc7db38d2349c044aa719d794c53f66b8f824c4bde2"
+        },
+        {
+          "path": "src/TiaMcp.Host/HostOptions.cs",
+          "name": "Parse",
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
+        },
+        {
+          "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
+          "name": "Run",
+          "line": 14,
+          "endLine": 68,
+          "sha256": "a7b1b39f2d7761867e37c5fdb3aa3bc396ccebaabe36f825209190553c8131ed"
+        },
+        {
+          "path": "src/TiaMcp.Host/AccessTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "ea5d43274df249a88baa2d1a87267e083cf8afe39449acc22bcb3e041114305c"
+        },
+        {
+          "path": "src/TiaMcp.Host/AddInSelectionTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "7e9ced02e9c6444c79bf05c0ea3bd20bae49a45113135c0bea720c203aa7cd53"
+        },
+        {
+          "path": "src/TiaMcp.Host/AutomationMlTools.cs",
+          "name": "Run",
+          "line": 37,
+          "endLine": 48,
+          "sha256": "1a937367aa96df153f590b7cccc9e3ce6717a607b675c0169d93dca893e1dbb0"
+        },
+        {
+          "path": "src/TiaMcp.Host/CompositeEngineeringTools.cs",
+          "name": "Run",
+          "line": 50,
+          "endLine": 60,
+          "sha256": "3dc4fd0a550563adba4fadb6a1dd487c06330738ffe34e6ce3d4846f03a1c912"
+        },
+        {
+          "path": "src/TiaMcp.Host/ConnectionTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "cf4a0dd16383ce80ad021e6fbffcfb8a99d2f8272f1e854f0374bc528f85da9d"
+        },
+        {
+          "path": "src/TiaMcp.Host/DbSnapshotTools.cs",
+          "name": "Run",
+          "line": 31,
+          "endLine": 39,
+          "sha256": "4d1fa3f937dd02332ff72c304f27ff6c4c1ab248478b30ede7cec04cc2ebad8e"
+        },
+        {
+          "path": "src/TiaMcp.Host/DriveProfileTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "35bd690cb7bb4d4d5901a73401faf93ad146ea7eb89767a01bb499489ab9079c"
+        },
+        {
+          "path": "src/TiaMcp.Host/GraphTools.cs",
+          "name": "Run",
+          "line": 53,
+          "endLine": 64,
+          "sha256": "c3bd616efaf98eb253a4754420995ef8b56d4889cb40936b136d70ba7e67202a"
+        },
+        {
+          "path": "src/TiaMcp.Host/HmiComponentTools.cs",
+          "name": "Run",
+          "line": 28,
+          "endLine": 36,
+          "sha256": "c998898900f2f04459fa009619d9ac85fd86c2a3fa508aab0ddfbe3683b9e6ec"
+        },
+        {
+          "path": "src/TiaMcp.Host/LibraryPackageTools.cs",
+          "name": "Run",
+          "line": 56,
+          "endLine": 64,
+          "sha256": "cb8275da8427d291522f838c876bad313fdfe8d6092b57a4bd530d11b4fcde81"
+        },
+        {
+          "path": "src/TiaMcp.Host/MultiuserTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "a11a1600952cc5d1dd2ef4851d373f95c59330a981906b7ffa08e8ec5c07b499"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+          "name": "Run",
+          "line": 92,
+          "endLine": 97,
+          "sha256": "b509bf5b9740f1cae1361da95fbebe5fb85b094d99e0022796ed50b7f78e8e5a"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
+          "name": "Run",
+          "line": 38,
+          "endLine": 46,
+          "sha256": "7aedd51a9e124f3bc06733d8cf9200d151db819a1274a83734c091d0fa237339"
+        },
+        {
+          "path": "src/TiaMcp.Host/OpcUaTools.cs",
+          "name": "Run",
+          "line": 50,
+          "endLine": 59,
+          "sha256": "f6a940599f77a5dfc7335e441a5b082d200ffc049338483a5b02f11394637065"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+          "name": "Run",
+          "line": 69,
+          "endLine": 74,
+          "sha256": "85a5342630a3b048a649c27e3b6bcb9be156394668e0ca23363e76b551cb3e22"
+        },
+        {
+          "path": "src/TiaMcp.Host/PublicCertificateTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "16c97c177641bc01f29cd8b4dec7b5bef7296fd3a8b33f40b2b22d2ae7706be4"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+          "name": "Run",
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
+        },
+        {
+          "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
+          "name": "Run",
+          "line": 36,
+          "endLine": 47,
+          "sha256": "ebb8b927d8a50a1c642d739e9d8b895b4501ab8508768b434872aa5a47f09f09"
+        },
+        {
+          "path": "src/TiaMcp.Host/SafetyEvidenceTools.cs",
+          "name": "Run",
+          "line": 24,
+          "endLine": 32,
+          "sha256": "97dae0d6caca0871a0c65ef8c0b064bf3512535f8eb23c342d3d680d38ec5ae4"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/CredentialCommand.cs",
+          "name": "Run",
+          "line": 11,
+          "endLine": 65,
+          "sha256": "d5aafdc4ce583fbc9760438fb6e797e8c948213f67e3b879897ebc39a5946d89"
+        },
+        {
+          "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+          "name": "Run",
+          "line": 9,
+          "endLine": 50,
+          "sha256": "6298f6f0d633bae4ee379b93d20417525013392af493e68d1d890c6d7a4c20d4"
+        },
+        {
+          "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "b51a57ffb6370514f50ea5721b01c9423b7a2b593cf181c315dd8b85f368b900"
+        },
+        {
+          "path": "src/TiaMcp.Host/TeamcenterTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "c4f471088a49cb85a104f125964a71f0d7f7d62068c4f6a7bcc8bb8023f7c634"
+        },
+        {
+          "path": "src/TiaMcp.Host/TechnologyProfileTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "9290dc8958cf44f6c28a5d919c65b06380bc0a7234d95bd5a9df13b5053cdc88"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
+          "name": "Run",
+          "line": 80,
+          "endLine": 84,
+          "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
+        },
+        {
+          "path": "src/TiaMcp.Host/TranslationTools.cs",
+          "name": "Run",
+          "line": 60,
+          "endLine": 69,
+          "sha256": "45ffb0199861c8607f9699d8e55ff44e60e1d495bb4c9af9b99051686c4c7f3b"
+        },
+        {
+          "path": "src/TiaMcp.Host/VciTools.cs",
+          "name": "Run",
+          "line": 71,
+          "endLine": 83,
+          "sha256": "1246beb23814868d58110d1b35ccc5514da20d34e5e10873d676aa01be64bc74"
+        },
+        {
+          "path": "src/TiaMcp.Host/WebApplicationTools.cs",
+          "name": "Run",
+          "line": 20,
+          "endLine": 28,
+          "sha256": "40bb4573118070275d7cd4024dcf64d8d491d6d41a60a302440b65886f70420e"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -19004,8 +19799,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "ExportDiagnosticAcquisition",
-        "line": 36,
-        "endLine": 37,
+        "line": 37,
+        "endLine": 38,
         "sha256": "942f06bf5e8df24d0ff49f70edc2d31ed5affcc5b98decec05175211d3996ebb"
       },
       "bridgeOperations": [],
@@ -19018,16 +19813,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "ExportDiagnosticAcquisition",
-          "line": 36,
-          "endLine": 37,
+          "line": 37,
+          "endLine": 38,
           "sha256": "942f06bf5e8df24d0ff49f70edc2d31ed5affcc5b98decec05175211d3996ebb"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -19042,8 +19837,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "ExportDiagnosticAcquisition",
-          "line": 36,
-          "endLine": 37,
+          "line": 37,
+          "endLine": 38,
           "sha256": "942f06bf5e8df24d0ff49f70edc2d31ed5affcc5b98decec05175211d3996ebb"
         },
         {
@@ -19168,9 +19963,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -19469,6 +20264,13 @@
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
         },
         {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
+        },
+        {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Compare",
           "line": 14,
@@ -19702,9 +20504,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -19828,9 +20630,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -20001,8 +20803,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Observe",
-          "line": 86,
-          "endLine": 90,
+          "line": 103,
+          "endLine": 107,
           "sha256": "e36314ce488e3d2738c14122bf0f8292ba45c8d1831c330bcfe61962d93f792c"
         },
         {
@@ -20127,9 +20929,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -20290,8 +21092,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -20345,15 +21147,15 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         },
         {
@@ -20362,6 +21164,13 @@
           "line": 41,
           "endLine": 44,
           "sha256": "f1b912a8afcfba646e4195684d354461c5f124a8ec8eb10158cfbe419f9a2589"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -20660,9 +21469,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -21385,9 +22194,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -21711,8 +22520,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -21879,9 +22688,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -22365,9 +23174,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -22752,9 +23561,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -22885,6 +23694,13 @@
           "line": 12,
           "endLine": 21,
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -23092,9 +23908,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -23414,9 +24230,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -23746,9 +24562,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -24079,9 +24895,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -24405,9 +25221,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -24682,9 +25498,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -25571,9 +26387,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -25897,8 +26713,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -26065,9 +26881,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -26547,9 +27363,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -26803,9 +27619,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -27539,9 +28355,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -27920,9 +28736,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -28267,9 +29083,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -28566,9 +29382,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -28830,9 +29646,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -29108,9 +29924,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -29269,8 +30085,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -29562,9 +30378,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -29916,8 +30732,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -30084,9 +30900,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -30550,9 +31366,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -30954,9 +31770,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -31094,6 +31910,13 @@
           "line": 12,
           "endLine": 21,
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -31301,9 +32124,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -31571,9 +32394,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -31827,9 +32650,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -32157,9 +32980,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -32616,9 +33439,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -32956,9 +33779,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -33289,9 +34112,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -33573,9 +34396,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -36059,9 +36882,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -36150,8 +36973,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Save",
-          "line": 413,
-          "endLine": 413,
+          "line": 425,
+          "endLine": 425,
           "sha256": "8abfcea588c012c382774bac364df5e3df093e9e1c2af6c35a463a9f01f58c7c"
         },
         {
@@ -36251,6 +37074,13 @@
           "line": 12,
           "endLine": 21,
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
+        },
+        {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -36990,9 +37820,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -37527,9 +38357,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -37853,8 +38683,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -38021,9 +38851,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -38335,8 +39165,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -38494,8 +39324,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -38978,8 +39808,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 219,
-          "endLine": 262,
+          "line": 228,
+          "endLine": 271,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -39083,8 +39913,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -39522,8 +40352,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
-          "line": 118,
-          "endLine": 190,
+          "line": 127,
+          "endLine": 199,
           "sha256": "6d932f7012814c428c632b48b34a20a724f0dbae145722ce4c151fe87d6c50b0"
         },
         {
@@ -39634,8 +40464,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -40430,8 +41260,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -40467,6 +41297,13 @@
           "line": 25,
           "endLine": 26,
           "sha256": "d291a424045265b98fd84f97e87ffce24213ef6b41b3173ef5fecaa1ccfac2a7"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -41293,8 +42130,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 219,
-          "endLine": 262,
+          "line": 228,
+          "endLine": 271,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -41518,8 +42355,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -41873,8 +42710,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -41910,6 +42747,13 @@
           "line": 25,
           "endLine": 26,
           "sha256": "d291a424045265b98fd84f97e87ffce24213ef6b41b3173ef5fecaa1ccfac2a7"
+        },
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
         },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
@@ -42138,8 +42982,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Stop",
-          "line": 22,
-          "endLine": 22,
+          "line": 23,
+          "endLine": 23,
           "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
         }
       ],
@@ -42253,8 +43097,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Analyze",
-        "line": 28,
-        "endLine": 28,
+        "line": 29,
+        "endLine": 29,
         "sha256": "7644e66fa865a38b49046e3e4240a74a204cb3340d468375b20f69e6186b59ee"
       },
       "bridgeOperations": [],
@@ -42270,16 +43114,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Analyze",
-          "line": 28,
-          "endLine": 28,
+          "line": 29,
+          "endLine": 29,
           "sha256": "7644e66fa865a38b49046e3e4240a74a204cb3340d468375b20f69e6186b59ee"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -42308,8 +43152,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Analyze",
-          "line": 28,
-          "endLine": 28,
+          "line": 29,
+          "endLine": 29,
           "sha256": "7644e66fa865a38b49046e3e4240a74a204cb3340d468375b20f69e6186b59ee"
         },
         {
@@ -42455,9 +43299,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -42581,9 +43425,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -42674,8 +43518,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Export",
-        "line": 40,
-        "endLine": 40,
+        "line": 54,
+        "endLine": 54,
         "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
       },
       "bridgeOperations": [],
@@ -42687,16 +43531,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -42726,8 +43570,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -42781,15 +43625,15 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         },
         {
@@ -42914,9 +43758,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -43007,8 +43851,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Page",
-        "line": 25,
-        "endLine": 25,
+        "line": 26,
+        "endLine": 26,
         "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
       },
       "bridgeOperations": [],
@@ -43021,16 +43865,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -43241,8 +44085,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -43409,9 +44253,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -43502,8 +44346,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Start",
-        "line": 16,
-        "endLine": 16,
+        "line": 17,
+        "endLine": 17,
         "sha256": "6b94f4ace79c8e1030f73bedd2c18aed06275128f0c415deb36cb049a8363c08"
       },
       "bridgeOperations": [],
@@ -43515,16 +44359,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Start",
-          "line": 16,
-          "endLine": 16,
+          "line": 17,
+          "endLine": 17,
           "sha256": "6b94f4ace79c8e1030f73bedd2c18aed06275128f0c415deb36cb049a8363c08"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -43651,9 +44495,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -43749,8 +44593,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Start",
-          "line": 16,
-          "endLine": 16,
+          "line": 17,
+          "endLine": 17,
           "sha256": "6b94f4ace79c8e1030f73bedd2c18aed06275128f0c415deb36cb049a8363c08"
         },
         {
@@ -43772,8 +44616,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Status",
-        "line": 19,
-        "endLine": 19,
+        "line": 20,
+        "endLine": 20,
         "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
       },
       "bridgeOperations": [],
@@ -43785,16 +44629,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -43921,9 +44765,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -44082,8 +44926,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -44133,8 +44977,8 @@
       "host": {
         "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
         "name": "Stop",
-        "line": 22,
-        "endLine": 22,
+        "line": 23,
+        "endLine": 23,
         "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
       },
       "bridgeOperations": [],
@@ -44146,16 +44990,16 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Stop",
-          "line": 22,
-          "endLine": 22,
+          "line": 23,
+          "endLine": 23,
           "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         }
       ],
       "workerRoutes": [],
@@ -44282,9 +45126,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -44387,8 +45231,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Stop",
-          "line": 22,
-          "endLine": 22,
+          "line": 23,
+          "endLine": 23,
           "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
         }
       ],
@@ -44601,9 +45445,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -44934,9 +45778,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -45183,9 +46027,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -45509,8 +46353,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -45677,9 +46521,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -46003,9 +46847,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -46469,9 +47313,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -46732,9 +47576,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -47017,9 +47861,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -47239,8 +48083,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -47294,15 +48138,15 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         },
         {
@@ -47427,9 +48271,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -47761,8 +48605,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -47929,9 +48773,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -48178,9 +49022,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -48276,8 +49120,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Start",
-          "line": 16,
-          "endLine": 16,
+          "line": 17,
+          "endLine": 17,
           "sha256": "6b94f4ace79c8e1030f73bedd2c18aed06275128f0c415deb36cb049a8363c08"
         },
         {
@@ -48455,9 +49299,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -48616,8 +49460,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -48823,9 +49667,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -48928,8 +49772,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Stop",
-          "line": 22,
-          "endLine": 22,
+          "line": 23,
+          "endLine": 23,
           "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
         }
       ],
@@ -49108,9 +49952,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -49386,9 +50230,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -49726,9 +50570,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -49997,9 +50841,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -50195,6 +51039,13 @@
       ],
       "workerRoutes": [],
       "localHandlers": [
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Read",
+          "line": 19,
+          "endLine": 29,
+          "sha256": "a3d593d3ba36f904e55aa00d082be7cb37d05c03c53177cc6867938458c967fb"
+        },
         {
           "path": "src/TiaMcp.Core/ArtifactStore.cs",
           "name": "Read",
@@ -50492,9 +51343,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -50812,9 +51663,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -50973,8 +51824,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -51153,8 +52004,8 @@
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "name": "Export",
           "line": 79,
-          "endLine": 101,
-          "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+          "endLine": 94,
+          "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
@@ -51208,15 +52059,15 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptures.cs",
           "name": "Export",
-          "line": 79,
-          "endLine": 85,
+          "line": 96,
+          "endLine": 102,
           "sha256": "09e46462f3d65258270d4d7e9a321c117a3bf1c867ebc6f6fa1cb6d29c5380a9"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Export",
-          "line": 40,
-          "endLine": 40,
+          "line": 54,
+          "endLine": 54,
           "sha256": "cbd19f33b8ffce2b40592144244fd9a715c0c0a4dbf7a25fcdc7d5870b2685bf"
         },
         {
@@ -51341,9 +52192,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -51675,8 +52526,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -51843,9 +52694,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -52092,9 +52943,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -52190,8 +53041,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Start",
-          "line": 16,
-          "endLine": 16,
+          "line": 17,
+          "endLine": 17,
           "sha256": "6b94f4ace79c8e1030f73bedd2c18aed06275128f0c415deb36cb049a8363c08"
         },
         {
@@ -52369,9 +53220,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -52530,8 +53381,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -52737,9 +53588,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -52842,8 +53693,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Stop",
-          "line": 22,
-          "endLine": 22,
+          "line": 23,
+          "endLine": 23,
           "sha256": "7a05377b622bd80038941dec4a656c4ad696761067140ee6e72b37381b3d634a"
         }
       ],
@@ -52896,6 +53747,13 @@
       ],
       "workerRoutes": [],
       "localHandlers": [
+        {
+          "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
+          "name": "Require",
+          "line": 59,
+          "endLine": 65,
+          "sha256": "c0a8e1b81a186b6dbc90e5533a15dd47ae17cb86ee625371d5b8788f6ddb2b83"
+        },
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoff.cs",
           "name": "Require",
@@ -53144,9 +54002,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -53305,8 +54163,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -53736,9 +54594,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -54014,9 +54872,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -54354,9 +55212,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -54618,9 +55476,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -54959,9 +55817,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -55308,9 +56166,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -55635,9 +56493,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -55955,9 +56813,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -56116,8 +56974,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -56409,9 +57267,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -56924,8 +57782,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -57092,9 +57950,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -57358,9 +58216,9 @@
         {
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
-          "line": 22,
-          "endLine": 105,
-          "sha256": "025a996be10f71ff88c8471a38f05d0bb9a30900488d4331e7d6f56fb9cb2ba6"
+          "line": 23,
+          "endLine": 111,
+          "sha256": "613c136a697da04233faa1d58e6be7996a660e8b0a22330f706761415e9ee423"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -57708,9 +58566,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -58061,15 +58919,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Create",
-              "line": 64,
-              "endLine": 116,
+              "line": 65,
+              "endLine": 117,
               "sha256": "7756c1105877dca4f76e57f5dee9187d58b3fd4da6316a55d88641cc7a7bfa4e"
             }
           ],
@@ -58139,15 +58997,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "CreationStatus",
-              "line": 118,
-              "endLine": 129,
+              "line": 119,
+              "endLine": 130,
               "sha256": "635ce21bbb3c722d1499110f1d5f52984444802978b7b1827ddfba8ad1d42f88"
             }
           ],
@@ -58224,15 +59082,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Read",
-              "line": 250,
-              "endLine": 257,
+              "line": 251,
+              "endLine": 258,
               "sha256": "c649f4915476bec768f3a9002baf35355e4073557cd9ce5313809a10efb66b9e"
             }
           ],
@@ -58378,15 +59236,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Release",
-              "line": 373,
-              "endLine": 393,
+              "line": 408,
+              "endLine": 428,
               "sha256": "a8f6c840d9bca70381d33c80895ce0b8765febb9f73400955f421a72a73f125e"
             }
           ],
@@ -58456,15 +59314,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Select",
-              "line": 131,
-              "endLine": 159,
+              "line": 132,
+              "endLine": 160,
               "sha256": "2da37527137323eadd277fc2b5b21a1989de8ff4b3024063fa4148a9a87dddbd"
             }
           ],
@@ -58533,15 +59391,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "State",
-              "line": 187,
-              "endLine": 230,
+              "line": 188,
+              "endLine": 231,
               "sha256": "ea7c0f7572469d40a3f23280a6f3ee3e718eeda7fbb9ef6c2ba738a5d5de0f47"
             }
           ],
@@ -58610,15 +59468,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Status",
-              "line": 48,
-              "endLine": 62,
+              "line": 49,
+              "endLine": 63,
               "sha256": "1da620c6d34a7f29a1963f2d2bb0630b8a5e78e2402401f9348177442c04afeb"
             }
           ],
@@ -58687,15 +59545,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Tags",
-              "line": 232,
-              "endLine": 248,
+              "line": 233,
+              "endLine": 249,
               "sha256": "8a39da27d3e706cd645b20a14fa1ebe5a9278f9da17e9a74d2c2161eb3d698d1"
             }
           ],
@@ -58773,15 +59631,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Test",
-              "line": 395,
-              "endLine": 455,
+              "line": 430,
+              "endLine": 490,
               "sha256": "7b998c26a09c2cbbceef086eb2cd319eb2fafc8e5b013708c4cae2c6f2716dcb"
             }
           ],
@@ -58935,15 +59793,15 @@
             "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
             "name": "Execute",
             "line": 21,
-            "endLine": 46,
-            "sha256": "37ff34219d74b1afe48a9b9e38299063642f2ee78746c056d05b01c9a33e2575"
+            "endLine": 47,
+            "sha256": "f734ca0bb180978497e9d8938eddbe6dd5a6e9ebefd543f44f4d70ea84b29b94"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
               "name": "Write",
-              "line": 259,
-              "endLine": 268,
+              "line": 260,
+              "endLine": 269,
               "sha256": "92e4d5c900dc70c167bf9ad7f8dc192af524eef7481c79e4a47f6dcb85ffe15b"
             }
           ],
@@ -59891,9 +60749,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -60217,8 +61075,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -60385,9 +61243,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -61021,8 +61879,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -61189,9 +62047,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -61655,9 +62513,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -61981,8 +62839,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -62149,9 +63007,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -62615,9 +63473,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -63676,8 +64534,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -64193,8 +65051,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 219,
-          "endLine": 262,
+          "line": 228,
+          "endLine": 271,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -64455,8 +65313,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -66383,8 +67241,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Analyze",
-          "line": 28,
-          "endLine": 28,
+          "line": 29,
+          "endLine": 29,
           "sha256": "7644e66fa865a38b49046e3e4240a74a204cb3340d468375b20f69e6186b59ee"
         },
         {
@@ -66620,6 +67478,13 @@
           "sha256": "af2c939f31227c07e09b0327bc8e69875b17993e7a7b5e0c1f4a5a7b0b47f7a5"
         },
         {
+          "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
+          "name": "Compare",
+          "line": 113,
+          "endLine": 152,
+          "sha256": "82375c7c207865cd6f85a35d0537bd97c076ffbe183bd96cbb32960d1b1f8bbf"
+        },
+        {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
           "name": "Compare",
           "line": 14,
@@ -66832,8 +67697,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -67144,9 +68009,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -67442,9 +68307,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -67698,9 +68563,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -68017,9 +68882,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -68357,9 +69222,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -68697,9 +69562,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -68885,8 +69750,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
-          "line": 118,
-          "endLine": 190,
+          "line": 127,
+          "endLine": 199,
           "sha256": "6d932f7012814c428c632b48b34a20a724f0dbae145722ce4c151fe87d6c50b0"
         },
         {
@@ -69025,9 +69890,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -69496,9 +70361,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -69970,8 +70835,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -70130,9 +70995,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -70822,9 +71687,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -71080,8 +71945,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 219,
-          "endLine": 262,
+          "line": 228,
+          "endLine": 271,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -71227,9 +72092,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -71619,8 +72484,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Status",
-          "line": 19,
-          "endLine": 19,
+          "line": 20,
+          "endLine": 20,
           "sha256": "acbbd814b3a54150687ed916f24ba5bbb39c1c78c60821eca39504719f23e5f3"
         },
         {
@@ -71736,8 +72601,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Prepare",
           "line": 62,
-          "endLine": 117,
-          "sha256": "a8ff46635b42a6d3a9aa619b063d945d887a28f5d011c0c52000fe7e800f083f"
+          "endLine": 126,
+          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -71896,9 +72761,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -72222,9 +73087,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -72555,9 +73420,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -72811,9 +73676,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -73223,9 +74088,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -73486,9 +74351,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -73749,9 +74614,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -74006,9 +74871,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -74269,9 +75134,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -74610,9 +75475,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -74873,9 +75738,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -75137,9 +76002,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -75401,9 +76266,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -75657,9 +76522,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -75913,9 +76778,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -76247,9 +77112,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -76835,7 +77700,7 @@
         "name": "WatchPrepare",
         "line": 24,
         "endLine": 25,
-        "sha256": "6958daf3e4e1db8e7ebc0013b1cf8e3c4e232ddfc65df3b90145040674469643"
+        "sha256": "6ae8a9a821885b6969511d372ca035ad9697b79c6852e4f30cf51e9851160677"
       },
       "bridgeOperations": [
         "watch_prepare"
@@ -76849,7 +77714,7 @@
           "name": "WatchPrepare",
           "line": 24,
           "endLine": 25,
-          "sha256": "6958daf3e4e1db8e7ebc0013b1cf8e3c4e232ddfc65df3b90145040674469643"
+          "sha256": "6ae8a9a821885b6969511d372ca035ad9697b79c6852e4f30cf51e9851160677"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -77215,7 +78080,7 @@
         "name": "WatchRead",
         "line": 20,
         "endLine": 21,
-        "sha256": "f1a8648cd3b65091a14b6e8fe92635d7bb7a49ba5124fcb0f99273676965880f"
+        "sha256": "0f46a44c4e1e6cfce3c9d610da29f79e6ebf2b2029f3e0b45a0213c8a0b15e96"
       },
       "bridgeOperations": [
         "watch_read"
@@ -77229,7 +78094,7 @@
           "name": "WatchRead",
           "line": 20,
           "endLine": 21,
-          "sha256": "f1a8648cd3b65091a14b6e8fe92635d7bb7a49ba5124fcb0f99273676965880f"
+          "sha256": "0f46a44c4e1e6cfce3c9d610da29f79e6ebf2b2029f3e0b45a0213c8a0b15e96"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -77968,9 +78833,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -78294,8 +79159,8 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Page",
-          "line": 25,
-          "endLine": 25,
+          "line": 26,
+          "endLine": 26,
           "sha256": "08c30f2e4873a68e40cb2c9bf13e0f3e93db7d44aa31f92c0d751befbdd5b235"
         },
         {
@@ -78462,9 +79327,9 @@
         {
           "path": "src/TiaMcp.Host/RuntimeCaptureTools.cs",
           "name": "Run",
-          "line": 41,
-          "endLine": 47,
-          "sha256": "4a67b3d72a62097633a59eb259b015a66469a13f3486ab6d74e5458586cd4ab6"
+          "line": 55,
+          "endLine": 61,
+          "sha256": "cabceac626e1c491bb0f6a709abb2055836a0503c090a2ce3c27631287c56622"
         },
         {
           "path": "src/TiaMcp.Host/RuntimeHandoffTools.cs",
@@ -82445,8 +83310,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 367,
-              "endLine": 378,
+              "line": 411,
+              "endLine": 422,
               "sha256": "61e6abfc2cbae2f8c0a1876f83541ea5b496ddcf60a69c4e96945e42f835da07"
             },
             {
@@ -87909,6 +88774,22 @@
       "qualificationPromoted": false
     },
     {
+      "featureId": "addin_companion",
+      "tools": [],
+      "changeKind": null,
+      "sourceDependencies": [],
+      "schemaBindings": [],
+      "schemaReview": "unresolved",
+      "evidenceRefs": [],
+      "reviewState": "partial",
+      "gaps": [
+        "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
+        "No exact source-to-schema binding established."
+      ],
+      "releaseAccepted": false,
+      "qualificationPromoted": false
+    },
+    {
       "featureId": "addin_selection_page",
       "tools": [
         "addin_selection_page"
@@ -88047,6 +88928,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
@@ -88664,6 +89546,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -89143,6 +90026,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
         "src/TiaMcp.Core/AddIns/AddInSelection.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
@@ -95697,6 +96581,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AccessWorkflowStore.cs",
         "src/TiaMcp.Core/AddInSelectionStore.cs",
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/AutomationMl/AutomationMlDocument.cs",
@@ -96067,6 +96952,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -96420,42 +97306,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -96675,6 +97533,55 @@
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
+      ],
+      "releaseAccepted": false,
+      "qualificationPromoted": false
+    },
+    {
+      "featureId": "diagnostic_plcsim_write",
+      "tools": [
+        "diagnostic_plcsim_write"
+      ],
+      "changeKind": null,
+      "sourceDependencies": [
+        "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
+        "src/TiaMcp.Host/AccessTools.cs",
+        "src/TiaMcp.Host/AddInSelectionTools.cs",
+        "src/TiaMcp.Host/AutomationMlTools.cs",
+        "src/TiaMcp.Host/CompositeEngineeringTools.cs",
+        "src/TiaMcp.Host/ConnectionTools.cs",
+        "src/TiaMcp.Host/DbSnapshotTools.cs",
+        "src/TiaMcp.Host/DriveProfileTools.cs",
+        "src/TiaMcp.Host/GraphTools.cs",
+        "src/TiaMcp.Host/HmiComponentTools.cs",
+        "src/TiaMcp.Host/LibraryPackageTools.cs",
+        "src/TiaMcp.Host/MultiuserTools.cs",
+        "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
+        "src/TiaMcp.Host/OpcUaTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+        "src/TiaMcp.Host/PublicCertificateTools.cs",
+        "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+        "src/TiaMcp.Host/RuntimeCaptures.cs",
+        "src/TiaMcp.Host/RuntimeHandoffTools.cs",
+        "src/TiaMcp.Host/SafetyEvidenceTools.cs",
+        "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+        "src/TiaMcp.Host/SoftwareUnitTools.cs",
+        "src/TiaMcp.Host/TeamcenterTools.cs",
+        "src/TiaMcp.Host/TechnologyProfileTools.cs",
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/TranslationTools.cs",
+        "src/TiaMcp.Host/VciTools.cs",
+        "src/TiaMcp.Host/WebApplicationTools.cs"
+      ],
+      "schemaBindings": [],
+      "schemaReview": "unresolved",
+      "evidenceRefs": [],
+      "reviewState": "partial",
+      "gaps": [
+        "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
+        "No exact source-to-schema binding established."
       ],
       "releaseAccepted": false,
       "qualificationPromoted": false
@@ -96960,42 +97867,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -97071,6 +97950,76 @@
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
+      ],
+      "releaseAccepted": false,
+      "qualificationPromoted": false
+    },
+    {
+      "featureId": "diagnostic_runtime_acquisition_compare",
+      "tools": [
+        "diagnostic_runtime_acquisition_compare"
+      ],
+      "changeKind": null,
+      "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
+        "src/TiaMcp.Core/AddIns/AddInSelection.cs",
+        "src/TiaMcp.Core/AutomationMl/AutomationMlDocument.cs",
+        "src/TiaMcp.Core/Collaboration/MultiuserReview.cs",
+        "src/TiaMcp.Core/Collaboration/TeamcenterReview.cs",
+        "src/TiaMcp.Core/Connections/ConnectionReview.cs",
+        "src/TiaMcp.Core/DbSnapshots/DbSnapshotReview.cs",
+        "src/TiaMcp.Core/Diagnostics/TraceNumber.cs",
+        "src/TiaMcp.Core/Drives/DriveProfileReview.cs",
+        "src/TiaMcp.Core/Engineering/CompositeEngineeringReview.cs",
+        "src/TiaMcp.Core/HmiComponents/HmiComponentReview.cs",
+        "src/TiaMcp.Core/PhysicalRuntime/PlcsimTargetBinding.cs",
+        "src/TiaMcp.Core/PhysicalRuntime/RuntimeHandoffReview.cs",
+        "src/TiaMcp.Core/Safety/SafetyEvidenceReview.cs",
+        "src/TiaMcp.Core/Security/AccessReview.cs",
+        "src/TiaMcp.Core/Security/PublicCertificateReview.cs",
+        "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
+        "src/TiaMcp.Core/SoftwareUnits/SoftwareUnitReview.cs",
+        "src/TiaMcp.Core/TechnologyObjects/TechnologyProfileReview.cs",
+        "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
+        "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
+        "src/TiaMcp.Host/AccessTools.cs",
+        "src/TiaMcp.Host/AddInSelectionTools.cs",
+        "src/TiaMcp.Host/AutomationMlTools.cs",
+        "src/TiaMcp.Host/CompositeEngineeringTools.cs",
+        "src/TiaMcp.Host/ConnectionTools.cs",
+        "src/TiaMcp.Host/DbSnapshotTools.cs",
+        "src/TiaMcp.Host/DriveProfileTools.cs",
+        "src/TiaMcp.Host/GraphTools.cs",
+        "src/TiaMcp.Host/HmiComponentTools.cs",
+        "src/TiaMcp.Host/HostOptions.cs",
+        "src/TiaMcp.Host/LibraryPackageTools.cs",
+        "src/TiaMcp.Host/MultiuserTools.cs",
+        "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
+        "src/TiaMcp.Host/OpcUaTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
+        "src/TiaMcp.Host/PublicCertificateTools.cs",
+        "src/TiaMcp.Host/RuntimeCaptureTools.cs",
+        "src/TiaMcp.Host/RuntimeCaptures.cs",
+        "src/TiaMcp.Host/RuntimeHandoffTools.cs",
+        "src/TiaMcp.Host/SafetyEvidenceTools.cs",
+        "src/TiaMcp.Host/Security/CredentialCommand.cs",
+        "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
+        "src/TiaMcp.Host/SoftwareUnitTools.cs",
+        "src/TiaMcp.Host/TeamcenterTools.cs",
+        "src/TiaMcp.Host/TechnologyProfileTools.cs",
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/TranslationTools.cs",
+        "src/TiaMcp.Host/VciTools.cs",
+        "src/TiaMcp.Host/WebApplicationTools.cs"
+      ],
+      "schemaBindings": [],
+      "schemaReview": "unresolved",
+      "evidenceRefs": [],
+      "reviewState": "partial",
+      "gaps": [
+        "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
+        "No exact source-to-schema binding established."
       ],
       "releaseAccepted": false,
       "qualificationPromoted": false
@@ -97222,6 +98171,7 @@
         "src/TiaMcp.Core/Connections/ConnectionReview.cs",
         "src/TiaMcp.Core/DbSnapshots/DbSnapshotReview.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/Diagnostics/TraceNumber.cs",
@@ -97362,6 +98312,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticExperimentReportExport.cs",
@@ -97651,42 +98602,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -98368,6 +99291,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -100267,6 +101191,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -102174,6 +103099,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -103420,6 +104346,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AccessWorkflowStore.cs",
         "src/TiaMcp.Core/AddInSelectionStore.cs",
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -103796,6 +104723,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
@@ -103992,6 +104920,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AccessWorkflowStore.cs",
         "src/TiaMcp.Core/AddInSelectionStore.cs",
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
@@ -104372,42 +105301,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -104810,42 +105711,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -105844,42 +106717,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -106380,6 +107225,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/ArtifactStore.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
@@ -106846,42 +107692,14 @@
           "conformanceProven": false
         },
         {
-          "path": "contracts/diagnostic-runtime-acquisition.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "diagnostic-runtime-acquisition.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
-          "path": "contracts/runtime-capture-analysis.v1.schema.json",
-          "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-          "sourceAnchor": {
-            "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
-            "name": "Export",
-            "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
-          },
-          "literal": "runtime-capture-analysis.v1",
-          "reviewState": "literal_contract_reference",
-          "conformanceProven": false
-        },
-        {
           "path": "contracts/diagnostic-runtime-acquisition-export.v1.schema.json",
           "source": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
           "sourceAnchor": {
             "path": "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
             "name": "Export",
             "line": 79,
-            "endLine": 101,
-            "sha256": "743183b955f4c0aa003f652127e17cd00d8386ab490e8c3864a3d8a041bb5681"
+            "endLine": 94,
+            "sha256": "856761680733037aec44f8c4d8295f316ac0927ec9a18bdc91df658707921a2f"
           },
           "literal": "diagnostic-runtime-acquisition-export.v1",
           "reviewState": "literal_contract_reference",
@@ -107186,6 +108004,7 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
+        "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
         "src/TiaMcp.Core/AddIns/AddInHandoff.cs",
         "src/TiaMcp.Core/ArtifactUploadStore.cs",
         "src/TiaMcp.Core/AutomationMl/AutomationMlDocument.cs",
@@ -110329,6 +111148,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticRepeatedExperiments.cs",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -112235,6 +113055,34 @@
       "qualificationPromoted": false
     },
     {
+      "featureId": "watch_table_force_document_edit",
+      "tools": [
+        "watch_table_read",
+        "watch_table_prepare",
+        "watch_table_apply",
+        "watch_table_verify_reopen",
+        "watch_table_recover",
+        "watch_table_reconcile_recovery",
+        "watch_table_reconcile_interrupted"
+      ],
+      "changeKind": null,
+      "sourceDependencies": [
+        "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchTableTools.cs"
+      ],
+      "schemaBindings": [],
+      "schemaReview": "unresolved",
+      "evidenceRefs": [],
+      "reviewState": "partial",
+      "gaps": [
+        "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
+        "No exact source-to-schema binding established."
+      ],
+      "releaseAccepted": false,
+      "qualificationPromoted": false
+    },
+    {
       "featureId": "watch_table_generate",
       "tools": [
         "watch_table_generate"
@@ -113285,7 +114133,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "fa886759aedcf88f5713f333bbbe760a7a4520c7821ca7936afb1a07d5a124ee"
+      "sha256": "b7b9085aed7e8d4b8a0f54450c3cf11b45dfe4628bac4e361c2b752848403081"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",
