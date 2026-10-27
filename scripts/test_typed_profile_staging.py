@@ -140,6 +140,27 @@ class CandidateTests(unittest.TestCase):
                     extractor.extract_catalog([self.report_path], stage_output=self.stage / str(ordinal))
         self.unchanged()
 
+    def test_edge_global_storage_from_an_instance_db_spec_binds_the_edge_profile(self):
+        documents = self.wave9()
+        documents["Tgp_GlobalRTrig"] = storage("R_TRIG")
+        documents["Tgp_R_TRIG_Global_FBD"] = network("FBD", '<Part Name="R_TRIG" Version="1.0" UId="5"><Instance Scope="GlobalVariable" UId="6">'
+                                                     '<Component Name="Tgp_GlobalRTrig" /></Instance></Part>', ("en", "CLK", "Q"))
+        self.capture(documents)
+        spec = self.deploy / "global-rtrig-storage.instancedb.json"
+        spec.write_text('{"name": "Tgp_GlobalRTrig", "instanceOfName": "R_TRIG"}\n', encoding="utf-8")
+        entry = self.report["fixtures"][0]
+        export = next(e for e in entry["exports"] if e["name"] == "Tgp_GlobalRTrig")
+        entry["exports"].remove(export)
+        self.report["fixtures"].append({**entry, "sourcePath": str(spec), "changeId": "spec", "authoredFormat": "instance_db_spec",
+                                        "sha256": hashlib.sha256(spec.read_text().encode()).hexdigest(), "exports": [export]})
+        self.write_report()
+        result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage)
+        edge = next(p for p in result["profiles"] if p["id"] == "v21.fw41.fbd.edge.R_TRIG.v1")
+        self.assertEqual(("R_TRIG", "R_TRIG", export["sha256"]), (edge["instanceType"], edge["globalInstanceType"], edge["globalInstanceSourceSha256"]))
+        record = next(s for s in result["sources"] if s["path"].endswith("/Tgp_GlobalRTrig.xml"))
+        self.assertEqual(("instance_db_spec", "spec"), (record["authoredFormat"], record["changeId"]))
+        self.unchanged()
+
     def test_candidates_copy_native_bytes_without_enabling_profile_or_overwriting_deployment(self):
         result, output = extractor.extract_catalog([self.report_path], stage_output=self.stage)
         self.assertTrue(result["candidateOnly"])

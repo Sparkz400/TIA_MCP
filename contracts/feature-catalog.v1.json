@@ -5753,6 +5753,58 @@
       ]
     },
     {
+      "featureId": "change.instance_db_create",
+      "domain": "language",
+      "title": "Create one instance DB of an exact FB or IEC edge system FB",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "instance_db_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Step7 PlcBlockComposition.CreateInstanceDB(String name, Boolean isAutoNumbered, Int32 number, String instanceOfName) and InstanceDB.InstanceOfName (documented father types FB/SFB/UDT/SDT); PlcBlock.Number readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload name, instanceOfName and optional number (1-65535, else auto-numbered) in the standard PLC program scope and an exact user block group; software-unit, namespace, safety and generated targets refuse. CreateInstanceDB has no namespace parameter.",
+          "instanceOfName must name exactly one unprotected standard FB of that scope, or the IEC edge system FBs R_TRIG/F_TRIG (TIA's know-how protected System blocks copy, present or not). UDT/system-data-type DBs such as IEC_TIMER/IEC_COUNTER and timer/counter FB names are not accepted; they keep the SCL source route.",
+          "A block name used anywhere in the PLC or a number used by another DB refuses at prepare; the fingerprint pins both until apply. Apply requires compile=true and reads back name, number and InstanceOfName after creation and again after compile and save.",
+          "Whether CreateInstanceDB supplies R_TRIG/F_TRIG in a PLC that has not used them yet is not natively verified.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Standard PLC program scope; software units, safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "domain": "language",
       "title": "Delete one exact standard block",

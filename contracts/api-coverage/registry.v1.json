@@ -1039,6 +1039,12 @@
       ]
     },
     {
+      "featureId": "change.instance_db_create",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "obligations": [
         "L01",

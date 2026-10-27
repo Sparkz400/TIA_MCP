@@ -20,26 +20,6 @@
       "namespace": ""
     },
     {
-      "path": "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
-      "sha256": "ad6ed90bf021b9d3df506d3cf3f05304c0866a94f91f1cf19a599949db79fd80",
-      "route": "standard",
-      "authoredFormat": "SCL",
-      "names": [
-        "Tgp_GlobalRTrig"
-      ],
-      "namespace": ""
-    },
-    {
-      "path": "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
-      "sha256": "a832276c3025bd70031fe5c580ff83cd1f16e724b2aff3f4373723dba0be72b5",
-      "route": "standard",
-      "authoredFormat": "SCL",
-      "names": [
-        "Tgp_GlobalFTrig"
-      ],
-      "namespace": ""
-    },
-    {
       "path": "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
       "sha256": "942721c0897cb853e2d0a049ca80e83201578b4e6bdcc70370cae34481377b1d",
       "route": "standard",
@@ -340,6 +320,16 @@
       "namespace": ""
     },
     {
+      "path": "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
+      "sha256": "8231d555d23265fb7f343c61e47752fa0150e10ac566b4a5d8e7088739dd57e6",
+      "route": "standard",
+      "authoredFormat": "instance_db_spec",
+      "names": [
+        "Tgp_GlobalRTrig"
+      ],
+      "namespace": ""
+    },
+    {
       "path": "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
       "sha256": "238a3855ca00b9c546b3fba3b7bcdf78527b91948b09d1175433298cb4f63e23",
       "route": "standard",
@@ -356,6 +346,16 @@
       "authoredFormat": "SIMATIC_SD",
       "names": [
         "Tgp_F_TRIG_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
+      "sha256": "b0704507bb7082fef1dc16b33fa6d37e87523fe3a80ac6a0ebfc772d52407a16",
+      "route": "standard",
+      "authoredFormat": "instance_db_spec",
+      "names": [
+        "Tgp_GlobalFTrig"
       ],
       "namespace": ""
     },
@@ -702,8 +702,6 @@
   ],
   "argsFile": [
     "fixtures/typed-graphical/sources/global-tonr-storage.scl",
-    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
-    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
     "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-lad.s7dcl",
     "fixtures/typed-graphical/sources/lt-dint-lad.s7dcl",
@@ -734,8 +732,10 @@
     "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
     "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
     "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
     "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",
@@ -776,8 +776,6 @@
     "-B",
     "scripts/capture_typed_graphical_profiles.py",
     "fixtures/typed-graphical/sources/global-tonr-storage.scl",
-    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
-    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
     "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-lad.s7dcl",
     "fixtures/typed-graphical/sources/lt-dint-lad.s7dcl",
@@ -808,8 +806,10 @@
     "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
     "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
     "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
     "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",

@@ -1,6 +1,0 @@
-DATA_BLOCK "Tgp_GlobalFTrig"
-{ S7_Optimized_Access := 'TRUE' }
-VERSION : 0.1
-"F_TRIG"
-BEGIN
-END_DATA_BLOCK
