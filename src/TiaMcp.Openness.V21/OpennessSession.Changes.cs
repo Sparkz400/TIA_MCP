@@ -60,7 +60,8 @@ namespace TiaMcp.Openness.V21
             };
             if (string.IsNullOrWhiteSpace(change.Selector.Value<string>("plcPath")))
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
-                    ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath"));
+                    ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")
+                        ?? payload.Value<string>("unitPath") ?? payload.Value<string>("objectPath"));
             try
             {
                 using (SharedMutationExclusive("TIA MCP: prepare offline change preview"))
@@ -125,7 +126,8 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect" }.Contains(change.Kind)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
@@ -451,6 +453,12 @@ namespace TiaMcp.Openness.V21
                 case "group_delete":
                     PrepareGroupEdit(change, preview);
                     break;
+                case "software_unit_create":
+                case "software_unit_relation_set":
+                case "software_unit_publication_set":
+                case "software_unit_delete":
+                    SoftwareUnitEdit(change, preview);
+                    break;
                 case "type_source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -759,6 +767,12 @@ namespace TiaMcp.Openness.V21
                 case "group_rename":
                 case "group_delete":
                     GroupEdit(change, SelectPlc(change.Selector), true);
+                    break;
+                case "software_unit_create":
+                case "software_unit_relation_set":
+                case "software_unit_publication_set":
+                case "software_unit_delete":
+                    SoftwareUnitEdit(change, null);
                     break;
                 case "type_source_upsert":
                 {

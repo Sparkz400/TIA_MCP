@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
+using TiaMcp.Model;
+
+namespace TiaMcp.Openness.V21
+{
+    internal sealed partial class OpennessSession
+    {
+        // Native evidence (library lane C, 27 October 2026): unit blocks/types carry UnitAccessType in the attribute "Access".
+        private static readonly HashSet<string> UnitAccessAttributes = new HashSet<string>(new[] { "Access" }, StringComparer.Ordinal);
+
+        // preview == null applies after repeating every prepare-time check against the current project.
+        private void SoftwareUnitEdit(EngineeringChange change, JObject preview)
+        {
+            var plc = SelectPlc(change.Selector);
+            var payload = change.Payload;
+            var provider = plc.Software.GetService<PlcUnitProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected PLC exposes no PlcUnitProvider.");
+            var budget = new ScanBudget(50000);
+            var scopes = SoftwareScopes(plc, budget);
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Software-unit lookup is incomplete.");
+            var effects = preview == null ? new JArray() : (JArray)preview["effects"];
+            Func<string, SoftwareScope> unit = key =>
+            {
+                string path = ChangeText(payload, key, 4096);
+                var scope = scopes.SingleOrDefault(item => item.Path == path) ?? throw new BridgeException("ScopeNotFound", key + " matches no exposed unit of the selected PLC.");
+                if (scope.Kind == "safetyUnit") throw new BridgeException("SafetyBoundary", "Software-unit lifecycle changes never create, relate, publish in or delete safety units.");
+                if (scope.Kind != "softwareUnit") throw new BridgeException("InvalidRequest", key + " must be an exact software-unit path.");
+                return scope;
+            };
+            Func<SoftwareScope, string, PlcUnitRelation[]> relationsTo = (owner, name) => owner.Unit.Relations
+                .Where(relation => relation.RelationType == UnitRelationType.SoftwareUnit && string.Equals(Convert.ToString(relation.RelatedObject), name, StringComparison.OrdinalIgnoreCase)).ToArray();
+            switch (change.Kind)
+            {
+                case "software_unit_create":
+                {
+                    string name = ChangeText(payload, "name", 128);
+                    string preset = payload["namespacePreset"] == null ? null : ChangeText(payload, "namespacePreset", 128);
+                    if (scopes.Any(scope => scope.Unit != null && string.Equals(scope.Name, name, StringComparison.OrdinalIgnoreCase)))
+                        throw new BridgeException("ObjectExists", "A software or safety unit already uses this name.");
+                    if (preview != null) { effects.Add(new JObject { ["createSoftwareUnit"] = name, ["unitPath"] = plc.Path + "/units/" + Segment(name), ["namespacePreset"] = preset }); break; }
+                    var created = provider.UnitGroup.Units.Create(name);
+                    if (preset != null) created.NamespacePreset = preset;
+                    var found = provider.UnitGroup.Units.Find(name);
+                    if (found == null || found.Name != name || preset != null && found.NamespacePreset != preset)
+                        throw new BridgeException("MutationVerificationFailed", "The created software unit did not read back with the requested name and namespace preset.");
+                    break;
+                }
+                case "software_unit_relation_set":
+                {
+                    var owner = unit("unitPath");
+                    var related = unit("relatedUnitPath");
+                    if (ChangeText(payload, "relationType", 32) != "SoftwareUnit")
+                        throw new BridgeException("UnsupportedRelationType", "Only SoftwareUnit relations between two exact software units are supported; NonUnitDB and TODB relations are not.");
+                    string action = ChangeText(payload, "action", 16);
+                    if (action != "add" && action != "remove") throw new BridgeException("InvalidRequest", "action must be add or remove.");
+                    var existing = relationsTo(owner, related.Name);
+                    if (action == "remove" && existing.Length != 1) throw new BridgeException("ObjectNotFound", "Exactly one SoftwareUnit relation to relatedUnitPath must exist.");
+                    if (action == "add" && existing.Length != 0) throw new BridgeException("ObjectExists", "The SoftwareUnit relation already exists.");
+                    if (action == "add" && UnitReaches(scopes, related, owner.Name))
+                        throw new BridgeException("RelationCycle", "The relation would close a SoftwareUnit relation cycle (self-relations included); cycles are refused.");
+                    change.ScopePath = owner.Path;
+                    if (preview != null) { effects.Add(new JObject { ["unitPath"] = owner.Path, ["relatedUnitPath"] = related.Path, ["relatedObject"] = related.Name, ["relationType"] = "SoftwareUnit", ["action"] = action }); break; }
+                    if (action == "add") owner.Unit.Relations.Create(related.Name, UnitRelationType.SoftwareUnit); else existing[0].Delete();
+                    if (relationsTo(owner, related.Name).Length != (action == "add" ? 1 : 0))
+                        throw new BridgeException("MutationVerificationFailed", "The SoftwareUnit relation did not read back as requested.");
+                    break;
+                }
+                case "software_unit_publication_set":
+                {
+                    var selector = (JObject)change.Selector.DeepClone();
+                    selector["plcPath"] = plc.Path; selector["objectPath"] = ChangeText(payload, "objectPath", 4096);
+                    var target = ResolveObjectTarget(selector);
+                    string kind = target.Identity.Value<string>("kind");
+                    if (target.Scope?.Kind == "safetyUnit") throw new BridgeException("SafetyBoundary", "Objects in safety units are excluded.");
+                    if (target.Scope?.Kind != "softwareUnit" || (kind != "block" && kind != "type"))
+                        throw new BridgeException("InvalidRequest", "objectPath must name one exact block or PLC data type inside a software unit.");
+                    if (ObjectIdentity.IsGeneratedPath(target.Identity.Value<string>("objectPath"))) throw new BridgeException("GeneratedObject", "Generated system-group objects are excluded.");
+                    if (target.Target is OB) throw new BridgeException("UnsupportedTarget", "Organization blocks cannot be published.");
+                    if (target.Target is PlcBlock block) EnsureEditableBlock(block, false);
+                    if (target.Target is PlcType type && type.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "Protected data types cannot be changed.");
+                    var attributes = ChangeObject(payload, "attributes");
+                    var attributeChanges = PrepareAttributes(target.Target, attributes, UnitAccessAttributes);
+                    if (attributeChanges.Count != 1 || attributeChanges[0].Value<string>("type") != typeof(UnitAccessType).FullName)
+                        throw new BridgeException("UnsupportedAttribute", "attributes must contain exactly Access with the native UnitAccessType value Published or Unpublished.");
+                    if (preview == null) { ApplyAttributes(target.Target, attributes, UnitAccessAttributes); break; }
+                    change.AttributeTarget = target.Target;
+                    change.ScopePath = target.ScopePath;
+                    preview["attributeChanges"] = attributeChanges;
+                    effects.Add(new JObject { ["objectPath"] = target.Identity["objectPath"], ["kind"] = kind });
+                    break;
+                }
+                case "software_unit_delete":
+                {
+                    var target = unit("unitPath");
+                    if (payload["dependencyPolicy"] == null) payload["dependencyPolicy"] = "rejectReferenced";
+                    try { DependencyRules.RequirePolicy(payload.Value<string>("dependencyPolicy")); }
+                    catch (ArgumentException ex) { throw new BridgeException("DependencyPolicyRequired", ex.Message); }
+                    var tables = TagTables(target.Tags, target.Path + "/tags", budget).ToArray();
+                    int members = ScopeBlocks(target, budget).Count() + ScopeTypes(target, budget).Count()
+                        + tables.Sum(table => table.Item.Tags.Count + table.Item.UserConstants.Count + table.Item.SystemConstants.Count)
+                        + target.Unit.ExternalSourceGroup.ExternalSources.Count + target.Unit.ExternalSourceGroup.Groups.Count
+                        + (target.Unit.PlcAlarmTextlistGroup?.PlcAlarmUserTextlists.Count ?? 0)
+                        + EngineeringGroupPaths(target.Blocks, "", 0).Concat(EngineeringGroupPaths(target.Types, "", 0)).Concat(EngineeringGroupPaths(target.Tags, "", 0)).Count() - 3;
+                    if (budget.Truncated) throw new BridgeException("TraversalLimit", "Unit content check is incomplete.");
+                    if (members != 0) throw new BridgeException("UnitNotEmpty", "Only an empty software unit can be deleted; delete or move its blocks, types, tags, user groups, external sources and user text lists explicitly first.");
+                    var references = new JArray(scopes.Where(scope => scope.Unit != null && scope.Path != target.Path)
+                        .SelectMany(scope => scope.Unit.Relations.Where(relation => string.Equals(Convert.ToString(relation.RelatedObject), target.Name, StringComparison.OrdinalIgnoreCase))
+                            .Select(relation => new JObject { ["unitPath"] = scope.Path, ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = Convert.ToString(relation.RelatedObject) })));
+                    var dependencies = new JObject { ["policy"] = "rejectReferenced", ["references"] = references, ["cascade"] = false,
+                        ["scope"] = "Native relations of every exposed software and safety unit of the selected PLC. The unit is empty, so none of its members can be referenced." };
+                    if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove the relations that point to this unit before deleting it; no cascade is performed.", dependencies);
+                    change.ScopePath = target.Path;
+                    if (preview != null)
+                    {
+                        preview["dependencies"] = dependencies;
+                        effects.Add(new JObject { ["deleteSoftwareUnit"] = target.Path, ["namespacePreset"] = target.Unit.NamespacePreset,
+                            ["deletedEmptyTagTables"] = new JArray(tables.Select(table => table.Path)),
+                            ["deletedOutgoingRelations"] = new JArray(target.Unit.Relations.Select(relation => new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = Convert.ToString(relation.RelatedObject) })) });
+                        break;
+                    }
+                    ((PlcUnit)target.Unit).Delete();
+                    if (provider.UnitGroup.Units.Find(target.Name) != null) throw new BridgeException("MutationVerificationFailed", "The deleted software unit still exists.");
+                    break;
+                }
+            }
+            if (preview != null) ((JArray)preview["warnings"]).Add("Unit membership, relations and publication change cross-unit visibility. compile=true reports affected consumers; recovery uses the whole-project checkpoint.");
+        }
+
+        // Conservative: follows SoftwareUnit relations by unit name; reaching target means the new relation closes a cycle.
+        private static bool UnitReaches(List<SoftwareScope> scopes, SoftwareScope start, string target)
+        {
+            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var pending = new Stack<SoftwareScope>(new[] { start });
+            while (pending.Count != 0)
+            {
+                var current = pending.Pop();
+                if (string.Equals(current.Name, target, StringComparison.OrdinalIgnoreCase)) return true;
+                if (!visited.Add(current.Name)) continue;
+                foreach (var relation in current.Unit.Relations.Where(relation => relation.RelationType == UnitRelationType.SoftwareUnit))
+                    foreach (var next in scopes.Where(scope => scope.Unit != null && string.Equals(scope.Name, Convert.ToString(relation.RelatedObject), StringComparison.OrdinalIgnoreCase)))
+                        pending.Push(next);
+            }
+            return false;
+        }
+    }
+}

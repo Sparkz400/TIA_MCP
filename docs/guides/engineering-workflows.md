@@ -104,6 +104,10 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `group_create` | `groupKind: "blocks"`, `"types"` or `"tags"`, `groupPath`, `name`, optional `scopePath` | Creates a user group below the exact existing parent `groupPath`. |
 | `group_rename` | `groupKind`, `groupPath`, `name`, optional `scopePath` | Renames the exact existing user group to `name`; generated/root groups are excluded. |
 | `group_delete` | `groupKind`, `groupPath`, `dependencyPolicy: "rejectReferenced"`, optional `scopePath` | Deletes only an empty existing user group. |
+| `software_unit_create` | `name`, optional `namespacePreset`; outer `plcPath` | Creates one standard software unit and reads back its name and preset. Name collisions with any unit are refused; templates, copy, move and rename are not included. |
+| `software_unit_relation_set` | `unitPath`, `relatedUnitPath`, `relationType: "SoftwareUnit"`, `action: "add"` or `"remove"` | Adds or removes one relation between two exact standard units of the same PLC. Duplicates, self-relations and relations that would close a cycle are refused; `NonUnitDB`/`TODB` relations are not supported. |
+| `software_unit_publication_set` | `objectPath`, `attributes: { "Access": "Published" }` or `"Unpublished"` | Writes the native `Access` (`UnitAccessType`) attribute of one exact unit block or PLC data type when metadata declares it readable and writable, then reads it back. OBs and protected, safety, generated or PLC-root objects are refused. |
+| `software_unit_delete` | `unitPath`, optional `dependencyPolicy: "rejectReferenced"` | Deletes one empty standard unit (no blocks, types, tags/constants, user groups, external sources or user text lists). It is refused while any unit relation names it; empty tag tables and the unit's own relations go with it and are listed in the preview. |
 | `hardware_add` | `typeIdentifier`, `itemName`, `deviceName`, optional `configureScratchSecurity: true` | Creates a device with the exact installed catalog identifier. The security option is restricted to newly created CPUs in the current worker-owned scratch project. |
 | `hardware_plug` | `hardwarePath`, `typeIdentifier`, `name`, `positionNumber` | Uses `CanPlugNew` and `PlugNew` for a selected parent/slot. |
 | `hardware_delete` | `hardwarePath` | Deletes a non-built-in pluggable item. CPUs, HMIs and containers holding software are excluded. |
@@ -144,6 +148,8 @@ The read-only `project_properties` tool returns one open project's author, multi
 This scan is conservative and does not prove the absence of runtime pointers, external consumers or all indirect references. It does not rewrite references or cascade-delete dependents. `hardware_delete` and `to_delete` retain their separate documented behavior; they are not covered by this symbol dependency policy.
 
 Group creation targets an existing parent; rename/delete target an existing user group. Deletion rejects contained objects and subgroups. Group moves, object moves, namespace relocation, recursive deletion, generated groups and generic safety-unit mutations remain unsupported. Native create/rename/delete outcomes are read back; the whole-project checkpoint remains the recovery mechanism.
+
+The four `software_unit_*` kinds refuse safety units, require `compile=true` and repeat their checks at apply. The change fingerprint already covers each unit's path, namespace preset and relations; for `software_unit_publication_set` it also covers the selected object's `Access` value. `Access` is not named in the V21 PublicAPI documentation; the name comes from native fixture evidence, so the route writes it only through the attribute metadata check. Relations are matched by unit name, as V21 exposes `RelatedObject` as a name. These kinds are compiled against the V21 API but not natively qualified; see the [D07 plan](../plans/expansion-plans/software-unit-lifecycle.md).
 
 ## Data inspection and nested references
 

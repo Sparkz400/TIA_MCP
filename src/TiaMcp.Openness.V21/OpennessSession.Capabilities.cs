@@ -90,6 +90,10 @@ namespace TiaMcp.Openness.V21
                     foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
                             blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
+                    foreach (string feature in new[] { "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" })
+                        AddTargetFeature(features, "change." + feature, unit, "partial", "Standard software units only: create with an optional namespace preset, add/remove SoftwareUnit relations between exact units (cycles refused), set Access of one unit block/type (not OBs), delete an empty unreferenced unit. Mandatory compile and recovery checkpoint; not natively qualified.",
+                            applicable: feature == "software_unit_create" ? kind == "plc" : kind != "plc",
+                            blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
                     AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog; Siemens validates the requested pair during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
                         blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
