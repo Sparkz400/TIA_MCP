@@ -1,0 +1,17 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_AddInt_FBD"
+VAR_INPUT
+  Left : Int;
+  Right : Int;
+END_VAR
+VAR_OUTPUT
+  Result : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+  { S7_Templates := "SrcType := Int" }
+  Add( in1 := #Left, in2 := #Right, out => #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

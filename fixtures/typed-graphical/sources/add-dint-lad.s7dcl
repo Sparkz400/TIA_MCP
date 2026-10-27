@@ -1,0 +1,17 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_AddDInt_LAD"
+VAR_INPUT
+  Left : DInt;
+  Right : DInt;
+END_VAR
+VAR_OUTPUT
+  Result : DInt;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  { S7_Templates := "SrcType := DInt" }
+  Add( in1 := #Left, in2 := #Right, out => #Result )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

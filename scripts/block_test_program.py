@@ -33,6 +33,7 @@ SYSTEM_INSTANCES = {
       for clock in ("TIME", "LTIME")],
     *[f"{counter}_{integer}" for counter in ("CTU", "CTD", "CTUD")
       for integer in ("SINT", "USINT", "INT", "UINT", "DINT", "UDINT", "LINT", "ULINT")],
+    "R_TRIG", "F_TRIG",
 }
 MAX_LEAVES = 4096
 MAX_DEPTH = 16

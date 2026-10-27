@@ -83,6 +83,12 @@ an engineering-only pass does not mark runtime verified. Failed typed applies
 retain their checkpoint recovery evidence and any separately observed compiler
 success.
 
+`author_wave9_families.py` writes the not yet captured standard-route references,
+capture packet and cases for DInt/Real comparisons, MOVE, arithmetic, TONR and
+R_TRIG/F_TRIG (`wave9-capture-packet.v1.json`, `wave9-cases.v1.json`). Their SIMATIC SD
+for MOVE, arithmetic and edge boxes is unverified. See
+[the wave 9 runbook](../../docs/verification/typed-wave9-families-runbook.md).
+
 `route-advanced-cases.v1.json` contains requests with available independent
 route references. `route-pending-references.v1.json` records requested cases
 whose reference capture remains unavailable. Their absence from the executable

@@ -1,0 +1,878 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "purpose": "Standard-route native references for the wave 9 typed families (DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR, R_TRIG/F_TRIG; LAD and FBD; local and global IEC storage). Unobserved until captured; enables nothing.",
+  "unit": "",
+  "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+  "archive": {
+    "path": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "sha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6"
+  },
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/global-tonr-storage.scl",
+      "sha256": "5eceb131ebb7e0ef66efea4628eafd757001f95d0a78ed80ce85960764622402",
+      "route": "standard",
+      "authoredFormat": "SCL",
+      "names": [
+        "Tgp_GlobalTonr"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+      "sha256": "ad6ed90bf021b9d3df506d3cf3f05304c0866a94f91f1cf19a599949db79fd80",
+      "route": "standard",
+      "authoredFormat": "SCL",
+      "names": [
+        "Tgp_GlobalRTrig"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+      "sha256": "a832276c3025bd70031fe5c580ff83cd1f16e724b2aff3f4373723dba0be72b5",
+      "route": "standard",
+      "authoredFormat": "SCL",
+      "names": [
+        "Tgp_GlobalFTrig"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
+      "sha256": "942721c0897cb853e2d0a049ca80e83201578b4e6bdcc70370cae34481377b1d",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_EqDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-dint-lad.s7dcl",
+      "sha256": "b4a5dc2d215c070870e3bdab7ca147edb4b87ebedf93da26b7670b4cb9d0ed8e",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_NeDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-dint-lad.s7dcl",
+      "sha256": "0535e2b0a8276266250d5b4f08b6838223d7502d2db358b063c6495b524e33ce",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LtDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-dint-lad.s7dcl",
+      "sha256": "e490812671c030d2fe9516fe92582cff9f501a483042d03ec5c202b9d05f230a",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LeDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-dint-lad.s7dcl",
+      "sha256": "030aa4696d7a043530296f60aa2f06752990fbb7e44cb7eda9da12e326d5f90b",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GtDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-dint-lad.s7dcl",
+      "sha256": "1bb9a8b79ef0f9a018d5ba62ebe586cc79554c0fd1cf9d8cd91cded591e6ccba",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GeDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-real-lad.s7dcl",
+      "sha256": "3bb912e4ac8ee3cff43629d17415707d822cdb16b666f7760c43f38f6355c24c",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_EqReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-real-lad.s7dcl",
+      "sha256": "f70e9c7e5662cc80a4dd94fd73ca22f265acc6bc690d529c86f40b59e19f84c1",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_NeReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-real-lad.s7dcl",
+      "sha256": "04f9d497672988d4b6f6dacf170187e85e84e4d621ab95fbce06f2e9ac9c87cf",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LtReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-real-lad.s7dcl",
+      "sha256": "916691554f6b7cae6dffdeca10558a73e60d1e4c94add10fa5058ba884d330fb",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LeReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-real-lad.s7dcl",
+      "sha256": "2f9c2488f7d3b1112e26fb8e28d916fa2cde1516a80a989a0a1be2da8f8b09b8",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GtReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-real-lad.s7dcl",
+      "sha256": "f0410718c62020115c9b9005980143bc38afb6e82e75ba8ff74e83c229607e01",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GeReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-int-lad.s7dcl",
+      "sha256": "4153db8f421a16872647b8e876c484cfb80d50477712b3951629b72768f09917",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-int-lad.s7dcl",
+      "sha256": "b9767ba2407f7935d68c3742da17d28c7079eea4045c6173bb8db4a7b075be8d",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-int-lad.s7dcl",
+      "sha256": "1cecfdab93efec7bf66edc7cf9f9f2254a869d3148b9cf085216acd1b135c68a",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-int-lad.s7dcl",
+      "sha256": "ccf564366ac6e4c12fbc752d36a5da9430cad6f456b94e19b6d81d667b679710",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-int-lad.s7dcl",
+      "sha256": "424bcbdb01f4214cca5cc2022300fc46a15442656ede77f1c6bdbee1cb051817",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-dint-lad.s7dcl",
+      "sha256": "1164790cd11b409c3edaa35d51004f1e48d654259304a32d558669d2334c3d92",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-dint-lad.s7dcl",
+      "sha256": "73d44626e9584ebe65e3fb6658f35143385f9701f3314c066f7c6770a0aca9af",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-dint-lad.s7dcl",
+      "sha256": "8015e0cd8817a14b11a2e16bf4a64ebfd4d683b63c71a983bcdbc949dbfffc09",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-dint-lad.s7dcl",
+      "sha256": "c4977f2d2c5aaf56383fbea57c95e1703f698e09fd8096856ea1500d72ba4543",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-dint-lad.s7dcl",
+      "sha256": "3b735d10b26ab565cea7f99d72826df64a3a44dc98c4172f7621f1fb2bc5384e",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivDInt_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-real-lad.s7dcl",
+      "sha256": "719a9eb413b6249c5061eaa2b8c8a5311375ac2145502981a5fe20efd533bb5e",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-real-lad.s7dcl",
+      "sha256": "1d9c5c349116d1c1dfde0eef5eb5fc5e307dca5651e2fabb58e24a9665e398b8",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-real-lad.s7dcl",
+      "sha256": "795f226e036a447220d0c1acf1bb8f87614dfbeca397223464152ce107eeb320",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-real-lad.s7dcl",
+      "sha256": "98a87dfb01f93b403efcec04bcbe6f31f1001874887fb382513f9abe536b78d7",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-real-lad.s7dcl",
+      "sha256": "88670fcc0855128c7bb7d15d1cc1a35357ce5bf5f955ea604fce8eb10a759c99",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivReal_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
+      "sha256": "a11a04a5af886cad5d1c0d2c5343f88512f564f6de7bec698a91b22e4548e021",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_TONR_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
+      "sha256": "4f048dadbb16a714eb4cd1c579bffd0a30117ab352383208afcf06b37a49d801",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_TONR_Global_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
+      "sha256": "d1ff42bbc456f96ac4fcc9ee6ccdbf32de49a069927dd3f1080445dc70812ef5",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_R_TRIG_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
+      "sha256": "238a3855ca00b9c546b3fba3b7bcdf78527b91948b09d1175433298cb4f63e23",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_R_TRIG_Global_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
+      "sha256": "3e56ac000b335ea5612abd02c7820ac88ef0efd7379e6e6a2ab5a0dbb7ef3d7a",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_F_TRIG_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
+      "sha256": "c205f70fcb182fe703593b299b308c5537a3ec1776010097ab0954462a096e79",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_F_TRIG_Global_LAD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
+      "sha256": "7defd2c91f7b303eff58e2f5d6fdb52e55c598d21d5398f7af5460af3aaac868",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_EqDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",
+      "sha256": "9ff10c5a674a40e897b57e97a7706b14d62dd7676a76763d9b6e2c945116c834",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_NeDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-dint-fbd.s7dcl",
+      "sha256": "fe4205ce2ad5f3b5bfad9baf9420a4e4bdafdabf6b7fcd24b79ee815b0f0d31b",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LtDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-dint-fbd.s7dcl",
+      "sha256": "6a1acc26a6748e14b016c7e8f01c5c8c103d90e888eda5766a8c0d38a61e6479",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LeDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-dint-fbd.s7dcl",
+      "sha256": "826a83720b28eb5dfece0b921da09256297c38a019be78f5b27f09bacbb51f21",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GtDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-dint-fbd.s7dcl",
+      "sha256": "7b6925c261557f09f33eeb875e9ea3cbb894c16673a2d6887feae9bf54b12266",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GeDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-real-fbd.s7dcl",
+      "sha256": "361ac7a9811e6952d5b0ebc83ba6c99e9210792bf6ef4dfaca04b5b47eccc5df",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_EqReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-real-fbd.s7dcl",
+      "sha256": "e9014c0536559a905a7efc860b5d4506ba26576b9fb7a82407565d4c535d78ac",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_NeReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-real-fbd.s7dcl",
+      "sha256": "8fc4dc77748727408198a02cfec8e72197f825894ec3c11a8f3b8b03531c8741",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LtReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-real-fbd.s7dcl",
+      "sha256": "386878dc5a7da0be8e519f5689017ad8e0d2c8c9d64aa38b84f286d999b83ea6",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_LeReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-real-fbd.s7dcl",
+      "sha256": "3020555f0a99d5629677e07e9b7ad213825356821085e79c16fd60c6b981786a",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GtReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-real-fbd.s7dcl",
+      "sha256": "0b1a8e2be659a2ca3298cfbce57136416ba155ed9aeb2588b90d1cda4942e1af",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_GeReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-int-fbd.s7dcl",
+      "sha256": "0fe646f3e27b5282eac918d8f47762d249052eb0aa4c2a8cc585b41c80dc4c05",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-int-fbd.s7dcl",
+      "sha256": "b5f3ddd4576246af0c41dfb4c1484383ad1134a048129b6dbd10c6ad2b474c2f",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-int-fbd.s7dcl",
+      "sha256": "857201aa62f4d0f89756c78e849fb2baab87fc117e69a13664b455410e991767",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-int-fbd.s7dcl",
+      "sha256": "f48fd7b27a3e031dbace8a9ba8ed3f315ee5d0dc52825477f46174f6e33067e5",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-int-fbd.s7dcl",
+      "sha256": "b83b65ed7fcaea66e2b5d9216ef07e74dc93dc60607591b3b1c70e153143238b",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-dint-fbd.s7dcl",
+      "sha256": "9e158deac26db71024564bbb36ad32db2f95aefc4265d77d6c1e723df2adfafd",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-dint-fbd.s7dcl",
+      "sha256": "295794bc813d0495e22e9c888f7f17b617191cc3438ea21f89b163f024a95620",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-dint-fbd.s7dcl",
+      "sha256": "d5c85f81f0ed131632ec6614f6c7502f4522231b9423c24ab754bdb4d1d8cbc9",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-dint-fbd.s7dcl",
+      "sha256": "fe193feec597540683beb711276282cd0e967b28f1bb676f86ca6c2c92f59949",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-dint-fbd.s7dcl",
+      "sha256": "24eba7865074cb6f44f579d3de111c70a05d3c783b5bcf794deb558ae900280e",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivDInt_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/move-real-fbd.s7dcl",
+      "sha256": "0d066fae9cc217951745a7bb97f09529541a44819e12743b0eb46af6cd2522be",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MoveReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/add-real-fbd.s7dcl",
+      "sha256": "1a98f7cd153e1c5d67d7f04faa5237be365d68b77b419ec9179335bc43538ea6",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_AddReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/sub-real-fbd.s7dcl",
+      "sha256": "d4aab72f84a2abb3653a0461d9c83560a9b076b78e39ecfc53dd5955df2e0cb5",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_SubReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/mul-real-fbd.s7dcl",
+      "sha256": "774b7cdeb3d7533c53c979587a8456344ac0b4661c8529936828a281419efd58",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_MulReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/div-real-fbd.s7dcl",
+      "sha256": "772d1a4dd4809027b0dcacce804fc03c7cdd6a8a1fa261a8a148fa8a10f373d3",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_DivReal_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tonr-fbd.s7dcl",
+      "sha256": "01350c68c24b205b33dd9086fb3ca35c9f9e9c73e6613c67fd1b998d5197f4a6",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_TONR_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tonr-global-fbd.s7dcl",
+      "sha256": "8effc86e5130fc58335ec7a9315b19f6629b5fc5bdf96e0d2d5cbb245375d41c",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_TONR_Global_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/rtrig-fbd.s7dcl",
+      "sha256": "e5fad812b0b77fd320670147c8651bb39081ca7b017cecf273eabc487c8d8982",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_R_TRIG_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/rtrig-global-fbd.s7dcl",
+      "sha256": "3dbf91a9ea207541d3540cb0eea6cf2cd9b295cc4c57064c74ed4735e9c42e2e",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_R_TRIG_Global_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ftrig-fbd.s7dcl",
+      "sha256": "a293f7a3e11233231e2d8c3c0ee8b6ef158b51a2d5e1d916ea7f87bb35c6ca42",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_F_TRIG_FBD"
+      ],
+      "namespace": ""
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ftrig-global-fbd.s7dcl",
+      "sha256": "3d2ade63917a97e95367908407d7d02014799e324fbb8cf28d320c14125a0aa8",
+      "route": "standard",
+      "authoredFormat": "SIMATIC_SD",
+      "names": [
+        "Tgp_F_TRIG_Global_FBD"
+      ],
+      "namespace": ""
+    }
+  ],
+  "argsFile": [
+    "fixtures/typed-graphical/sources/global-tonr-storage.scl",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+    "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ne-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/lt-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/le-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/gt-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ge-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/eq-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ne-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/lt-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/le-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/gt-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ge-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/lt-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/le-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/gt-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ge-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/eq-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ne-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/lt-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/le-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/gt-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ge-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-global-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-global-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-global-fbd.s7dcl"
+  ],
+  "probeCommand": [
+    "python",
+    "-B",
+    "scripts/capture_typed_graphical_profiles.py",
+    "fixtures/typed-graphical/sources/global-tonr-storage.scl",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+    "fixtures/typed-graphical/sources/eq-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ne-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/lt-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/le-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/gt-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ge-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/eq-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ne-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/lt-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/le-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/gt-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ge-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-int-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-dint-lad.s7dcl",
+    "fixtures/typed-graphical/sources/move-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/add-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/sub-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/mul-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/div-real-lad.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
+    "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/lt-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/le-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/gt-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ge-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/eq-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ne-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/lt-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/le-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/gt-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ge-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-int-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-dint-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/move-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/add-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/sub-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/mul-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/div-real-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/tonr-global-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/rtrig-global-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-fbd.s7dcl",
+    "fixtures/typed-graphical/sources/ftrig-global-fbd.s7dcl",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/w9p",
+    "--cpu-type-identifier",
+    "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
+  ],
+  "command": [
+    "python",
+    "-B",
+    "scripts/capture_typed_routes_owned.py",
+    "@artifacts/w9c.args",
+    "--host",
+    "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+    "--worker",
+    "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+    "--output",
+    "artifacts/w9c",
+    "--archive",
+    "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+    "--sha256",
+    "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+    "--unit",
+    ""
+  ],
+  "afterCapture": [
+    "python -B scripts/extract_typed_graphical_profiles.py artifacts/w9c/capture.json --stage-output artifacts/w9s",
+    "python -B scripts/audit_typed_profile_candidates.py --catalog artifacts/w9s/profiles.candidate.v1.json --capture artifacts/w9c/capture.json --output artifacts/w9s/audit.json"
+  ]
+}
