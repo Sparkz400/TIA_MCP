@@ -137,6 +137,7 @@ namespace TiaMcp.Openness.V21
 
         private JObject TypeRead(JObject args)
         {
+            if (args.Value<string>("format") != null) return FormatRead(args, "type", "typePath", "typeName");
             var plc = SelectInspectionPlc(args, "typePath");
             string path = args.Value<string>("typePath");
             string name = args.Value<string>("typeName");

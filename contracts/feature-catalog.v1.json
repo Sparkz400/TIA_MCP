@@ -2998,7 +2998,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export."
         ]
       },
       "qualification": {
@@ -3084,7 +3085,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "Optional format=simaticSd|generatedSource is a separate, unqualified feature (plc.document_formats); this evidence covers only the default SimaticML XML export."
         ]
       },
       "qualification": {
@@ -3103,6 +3105,139 @@
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
         "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc.document_formats",
+      "domain": "inspection",
+      "title": "Export blocks and PLC types as SIMATIC SD documents or generated sources",
+      "mcpTools": [
+        "block_read",
+        "type_read"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcBlock.ExportAsDocuments(DirectoryInfo,string) and PlcType.ExportAsDocuments(DirectoryInfo,string) returning DocumentExportResult (State, Messages).",
+          "V21 PlcExternalSourceSystemGroup.GenerateSource(IEnumerable<IGenerateSource>,FileInfo,GenerateOptions.None) on the PLC or software-unit external-source group; PlcBlock and PlcType implement IGenerateSource."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Omitting format keeps the existing SimaticML XML export unchanged; the format path returns hashed files only, no parsed members or inline XML.",
+          "generatedSource is limited to SCL/STL blocks (.scl/.awl), DBs (.db) and PLC data types (.udt), without dependencies; other languages are refused before the native call.",
+          "The V21 API documents GenerateSource as writing a file. Any external source it leaves at the root of the scope's external-source group is deleted by exact new name and the group is re-verified, otherwise ProjectSideEffect is raised; user subgroups are not compared.",
+          "Know-how protected objects are refused; F-blocks, generated system objects and language eligibility are decided by Siemens. Component-window readback refuses a format.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Exact unprotected block or PLC data type"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_document_inventory",
+      "domain": "inspection",
+      "title": "List and export native PLC documents",
+      "mcpTools": [
+        "plc_document_inventory"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcTypeGroup.Documents (PlcDocumentComposition of PlcDocument: Name) and PlcDocument.ExportAsDocuments(DirectoryInfo,string)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "V21 exposes PlcDocument only below PLC data type groups (PLC and software/safety units); system type groups and block groups have no document composition.",
+          "Listing is bounded by maxItems over a 50000-object lookup with explicit truncation; at most 100 exact exportPaths, each into a fresh hashed directory. A Failure export state aborts the request.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "plc_loadable_generate",
+      "domain": "inspection",
+      "title": "Generate a loadable file for blocks or software units",
+      "mcpTools": [
+        "plc_loadable_generate"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcSoftware.GetService<LoadableProvider>() and LoadableProvider.GenerateLoadable(FileInfo, IEnumerable<PlcBlock> | IEnumerable<PlcUnit>, TargetOption.Plc | TargetOption.PlcSim)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Requires an explicit target and exactly one of up to 100 exact non-unit blockPaths or software unitPaths; safety units are excluded.",
+          "Refuses with CompileRequired when a selected block, or any block/type of a selected unit, is inconsistent; it never compiles, downloads or connects to a PLC or PLCSIM.",
+          "The PublicAPI documents no file-name convention or project side effects for GenerateLoadable; the file is requested as 'loadable' in a fresh directory and every written file is hashed. LoadableProvider availability on the PLC software is not probed in advance.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Consistent (compiled) selected blocks or software units"
       ],
       "acceptanceCriteria": [
         "AC-identity",
