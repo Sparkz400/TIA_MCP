@@ -12,7 +12,8 @@ namespace TiaMcp.Openness.V21
     {
         // Kinds whose change fingerprint needs prepared in-memory targets; a fresh session cannot recompute them.
         private static readonly HashSet<string> AdmissionReconcileTargetKinds = new HashSet<string>(new[] {
-            "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set" }, StringComparer.Ordinal);
+            "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set",
+            "block_attributes_set", "project_attributes_set", "connection_set" }, StringComparer.Ordinal);
 
         // Read-only evidence for releasing an unresolved shared mutation admission. Runs in a fresh empty owned
         // Portal; it only opens projects, retrieves archives into new reconcile directories and closes them.
