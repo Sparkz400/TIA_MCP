@@ -15,8 +15,7 @@ namespace TiaMcp.Openness.V21
             var payload = change.Payload;
             string documentDirectory = ChangeText(payload, "documentDirectory", 4096);
             if (!ProjectPathIsAbsolute(documentDirectory) || !Directory.Exists(documentDirectory)) throw new BridgeException("InvalidRequest", "An absolute documentDirectory containing native exported library documents is required.");
-            ChangeText(payload, "documentName", 256);
-            ValidateLibraryName(payload.Value<string>("documentName"));
+            foreach (string name in LibraryDocumentNames.Read(payload)) ValidateLibraryName(name);
             documentDirectory = Path.GetFullPath(documentDirectory);
             string documentsHash = LibraryDirectoryHash(documentDirectory);
             change.DocumentDirectory = Path.Combine(change.Directory, "document-source");
@@ -38,6 +37,7 @@ namespace TiaMcp.Openness.V21
             LibraryPlcScope(change, out _);
             string composition = change.Payload.Value<string>("destinationComposition");
             if (composition != "blocks" && composition != "types") throw new BridgeException("InvalidRequest", "Document versions require destinationComposition=blocks or types and an exact selected PLC/software-unit scope.");
+            if (change.Payload["documentNames"] != null) throw new BridgeException("InvalidRequest", "A document version takes exactly one documentName.");
             PrepareLibraryDocumentSnapshot(change);
             change.Preview["versionFromDocuments"] = new JObject { ["typeGuid"] = version.TypeObject.Guid.ToString("D"), ["baseVersionGuid"] = version.Guid.ToString("D"),
                 ["createOptions"] = "None", ["scope"] = "Creates one new version of the selected type from the snapshot; an existing InWork version is never overridden." };

@@ -35,16 +35,22 @@ def network_free_source(language, name):
     return target.relative_to(ROOT.parent.parent).as_posix()
 
 
-def transitive_hosts(block):
-    """Two-level parent chain embedding the caller as a multi-instance, each instance DB with explicit start values."""
+def transitive_hosts(block, prefix="Tgp_", namespace=""):
+    """Two-level parent chain embedding the caller as a multi-instance, each instance DB with explicit start values.
+
+    A route chain lives in the caller's namespace and references its FBs by namespace-qualified name."""
+    host, grand = prefix + "Host", prefix + "HostGrand"
+    q = lambda name: (namespace + "." if namespace else "") + name
     def fb(name, member):
         return (f'FUNCTION_BLOCK "{name}"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\nEND_VAR\n'
                 f'VAR_OUTPUT\n Active : Bool;\nEND_VAR\nVAR\n RetainedMarker : Int := 17;\n {member};\nEND_VAR\nBEGIN\n #Active := #Enable;\nEND_FUNCTION_BLOCK\n\n')
     def db(name, starts):
-        return f'DATA_BLOCK "{name}_DB"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\n"{name}"\nBEGIN\n{starts}END_DATA_BLOCK\n\n'
-    source = (fb("Tgp_Host", f'Inner : "{block}"') + fb("Tgp_HostGrand", 'Middle : "Tgp_Host"')
-              + db("Tgp_Host", " RetainedMarker := 42;\n") + db("Tgp_HostGrand", " RetainedMarker := 42;\n Middle.RetainedMarker := 42;\n"))
-    return [{"language": "SCL", "source": source, "expectedBlockNames": ["Tgp_Host", "Tgp_HostGrand", "Tgp_Host_DB", "Tgp_HostGrand_DB"]}]
+        return f'DATA_BLOCK "{name}_DB"\n{{ S7_Optimized_Access := \'TRUE\' }}\nVERSION : 0.1\n"{q(name)}"\nBEGIN\n{starts}END_DATA_BLOCK\n\n'
+    source = (fb(host, f'Inner : "{q(block)}"') + fb(grand, f'Middle : "{q(host)}"')
+              + db(host, " RetainedMarker := 42;\n") + db(grand, " RetainedMarker := 42;\n Middle.RetainedMarker := 42;\n"))
+    if namespace:
+        source = f"NAMESPACE {namespace}\n{source}END_NAMESPACE\n"
+    return [{"language": "SCL", "source": source, "expectedBlockNames": [host, grand, host + "_DB", grand + "_DB"]}]
 
 
 def extended_cases():
