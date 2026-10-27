@@ -1,5 +1,26 @@
 # Current status
 
+**Native read and change routes for alarms, hardware, CAx, GRAPH, security, OPC UA, VCI, safety, drives and technology objects — 27 October 2026:** These routes are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified`.
+
+Read-only tools:
+- `plc_alarm_inspect`: text lists, instance texts and supervisions, plus alarm-text-list nodes in the explorer.
+- `access_inspect`, `certificate_inspect` and `web_inspect`: their output feeds `access_review`, `public_certificate_review` and `web_application_review`.
+- `opcua_engineering_inspect` and `opcua_engineering_export`: exports are registered in the NodeSet store.
+- `vci_workspace_inspect`.
+- `safety_validation_inspect`: activation tests, F-parameters and printouts.
+- `drive_observe`: in the format `drive_profile_review` expects.
+- `cax_export`: published to the AutomationML store.
+- `graph_export`: published to the GRAPH store.
+- `hardware_gsd_export`.
+
+Prepared kinds:
+- Hardware: `hardware_port_connect`, `hardware_port_disconnect`, `hardware_replace`.
+- CAx and GRAPH: `cax_import`, which runs outside exclusive access on worker-owned TIA only, and `graph_import`, which is validated by `TiaMcp.Graph` in the Host.
+- Technology objects: `to_connect`, `to_disconnect`, `to_child_create`.
+- Drives: `drive_parameter_set` (scalar values with expected-before; BICO, Safety Integrated and commissioning parameters are refused).
+
+V21 has no read-only VCI export, because `Workspace.ExportObject` creates a mapping, so there is no export tool. [Engineering workflows](guides/engineering-workflows.md), [drives](guides/drives.md), [network inspection](guides/network-inspection.md).
+
 **New PLC, project, connection and watch-table operations — 27 October 2026:** These operations are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified` until a native run qualifies them.
 - PLC objects: `tag_create`, `constant_create`, `block_number_set` and `block_attributes_set` (header fields; OB priority, cycle time, phase offset and process-image partition).
 - Project: the read-only `project_properties` tool, plus `project_attributes_set` and `project_languages_set`.

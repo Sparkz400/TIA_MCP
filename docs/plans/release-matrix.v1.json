@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.33",
-    "catalogSha256": "dcbaf9ec0b4ace45b7c990a07607b186c0fb32ad72e14b6da2f9cb7f946fe6e5",
+    "catalogSha256": "4b9a0e39f84225b0ecdd40090b3bf5e6fe80b4f205dbf2d9ffed0eab0a43acb5",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -12,18 +12,18 @@
     21
   ],
   "summary": {
-    "features": 376,
+    "features": 378,
     "support": {
       "deferred": 10,
       "limited": 36,
       "shipped": 85,
       "unavailable_target": 1,
-      "unqualified": 244
+      "unqualified": 246
     },
     "cells": {
       "bound": 441,
       "deferred": 30,
-      "open": 1293
+      "open": 1302
     },
     "openCellsByOwner": {
       "C02": {
@@ -72,7 +72,7 @@
       },
       "D10": {
         "role": "Drives",
-        "open": 14
+        "open": 23
       },
       "D11": {
         "role": "Alarms and HMI",
@@ -16523,6 +16523,84 @@
         },
         {
           "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.drive_parameter_set",
+      "domain": "drives",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_parameter_set",
+      "support": "unqualified",
+      "owners": [
+        "D10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "drive_observe",
+      "domain": "drives",
+      "mcpTools": [
+        "drive_observe"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
           "status": "open",
           "evidenceIds": []
         },
