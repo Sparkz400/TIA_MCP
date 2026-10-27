@@ -80,6 +80,8 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
+                if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
+                if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
                 change.Preview["targetGroupPath"] = change.GroupPath;
@@ -135,7 +137,7 @@ namespace TiaMcp.Openness.V21
             if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
-                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
@@ -149,6 +151,7 @@ namespace TiaMcp.Openness.V21
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
+                if (change.Kind == "webserver_user_pages_generate") WebSourceUnchanged(change);
                 // An unopenable credential must refuse before the checkpoint save, not after it.
                 if (BlockProtectionKinds.Contains(change.Kind)) OpenBlockProtectionCredential(change.Payload, "credential").Dispose();
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
@@ -492,6 +495,15 @@ namespace TiaMcp.Openness.V21
                 case "opcua_reference_namespace_delete":
                 case "opcua_role_mapping_set":
                     PrepareOpcUaChange(change, preview);
+                    break;
+                case "webserver_page_set":
+                    PrepareWebServerPageSet(change, preview);
+                    break;
+                case "webserver_user_pages_generate":
+                    PrepareWebServerUserPages(change, preview);
+                    break;
+                case "umac_role_set":
+                    PrepareUmacRoleSet(change, project, preview);
                     break;
                 case "type_source_upsert":
                 {
@@ -866,6 +878,15 @@ namespace TiaMcp.Openness.V21
                 case "opcua_role_mapping_set":
                     ApplyOpcUaChange(change);
                     break;
+                case "webserver_page_set":
+                    ApplyWebServerPageSet(change);
+                    break;
+                case "webserver_user_pages_generate":
+                    ApplyWebServerUserPages(change);
+                    break;
+                case "umac_role_set":
+                    ApplyUmacRoleSet(change, project);
+                    break;
                 case "type_source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -1072,7 +1093,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal))
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1240,6 +1261,8 @@ namespace TiaMcp.Openness.V21
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);
+            if (change.Kind == "webserver_page_set") snapshot["webServer"] = WebServerFingerprint(project);
+            if (change.Kind == "umac_role_set") snapshot["umac"] = UmacFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();
