@@ -255,8 +255,9 @@ namespace TiaMcp.Openness.V21
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
+            if (change.Kind == "cax_import") RecordCaxHardwareDifference(change, after);
             HardwareEngineeringRules.RequirePreserved(change.Kind, change.Payload, change.HardwareBeforeManifest, after);
-            change.Stages.Add("configured_hardware_preservation_verified");
+            change.Stages.Add(change.Kind == "cax_import" && change.Payload.Value<string>("importOption") == "OverwriteTiaDevice" ? "configured_hardware_difference_recorded" : "configured_hardware_preservation_verified");
         }
 
         private void VerifyHardwareRecovery(EngineeringChange change, Project project)

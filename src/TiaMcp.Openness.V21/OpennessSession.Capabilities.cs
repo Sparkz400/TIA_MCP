@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.Cax;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Download;
@@ -53,6 +54,10 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
                 var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
                 AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; no simulator is started.");
+                var cax = ProbeCapabilityService<CaxProvider>(project, "project", probes);
+                AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
+                AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
+                    blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
             }
 
             if (selected.Plc != null)

@@ -24,10 +24,13 @@ public sealed class AutomationMlWorkflowStore
         uploads = new(artifactsDirectory, uploadLimits);
     }
     public object Inspect(string xmlUploadRef)
+    { var upload = uploads.ResolveCommitted(xmlUploadRef); return InspectFile(upload.Path, upload.Sha256); }
+    /// <summary>Publishes a SHA-256-pinned file, such as a native CAx export inside the artifact root, as a document record.</summary>
+    public object InspectFile(string path, string sha256)
     {
         using var gate = PackageStorage.Lock(Path.Combine(root, "store.lock"));
-        var upload = uploads.ResolveCommitted(xmlUploadRef); var bytes = Read(upload.Path, AutomationMlDocument.MaxInputBytes);
-        Require(Hash(bytes) == upload.Sha256, "AutomationMlInputChanged", "Committed upload changed during reading.");
+        var bytes = Read(path, AutomationMlDocument.MaxInputBytes);
+        Require(Hash(bytes) == sha256, "AutomationMlInputChanged", "Input bytes changed during reading.");
         var document = AutomationMlDocument.Parse(bytes);
         return Summary(Publish("document", [], new() { ["original.aml"] = bytes,
             ["report.json"] = Encoding.UTF8.GetBytes(document.ToJson()) }));
@@ -95,6 +98,9 @@ public sealed class AutomationMlWorkflowStore
         return new { rows, total = directories.Length, nextOffset = offset + rows.Length == directories.Length ? (int?)null : offset + rows.Length,
             ordering = "record-id; relist after additions", nativeQualified = false };
     }
+    /// <summary>The verified original.aml of a retained document record, for a native import that reads by path.</summary>
+    public (string Path, string Sha256) ResolveDocument(string reference)
+    { var record = Document(reference); return (PathFor(record.Receipt.Id, "original.aml"), record.Receipt.Artifacts.Single(a => a.Name == "original.aml").Sha256); }
     internal byte[] ReadVerifiedDocument(string reference, Action<int>? accountBytes = null)
     { var record = Document(reference); foreach (var bytes in record.Files.Values) accountBytes?.Invoke(bytes.Length); return record.Files["original.aml"]; }
     private Record Document(string reference)

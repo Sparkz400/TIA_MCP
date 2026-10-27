@@ -127,6 +127,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
             if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
+            if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
             using (SharedMutationExclusive("TIA MCP: checkpoint and apply " + change.Kind))
@@ -540,6 +541,9 @@ namespace TiaMcp.Openness.V21
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
+                case "cax_import":
+                    PrepareCaxImport(change, project, preview);
+                    break;
                 case "hardware_plug":
                 {
                     var item = ChangeHardware(project, payload);
@@ -773,6 +777,9 @@ namespace TiaMcp.Openness.V21
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
                     break;
+                case "cax_import":
+                    ApplyCaxImport(change, project);
+                    break;
                 case "hardware_delete":
                 {
                     var item = ChangeHardware(project, payload).Item;
@@ -848,7 +855,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "cax_import")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {

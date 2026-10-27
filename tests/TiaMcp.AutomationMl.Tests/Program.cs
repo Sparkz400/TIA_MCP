@@ -104,6 +104,10 @@ var upload=Upload(Bytes(source)); var first=Json(store.Inspect(upload)); string 
 uploads.Release(upload["upload:".Length..]);store=new(output);
 Check(Download(beforeRef,"original.aml").SequenceEqual(Bytes(source)),"original bytes survive upload release and store restart");
 Check(Hash(Download(beforeRef,"receipt.json"))==beforeRef.Split(':')[2],"receipt binds immutable handle");
+var resolved=store.ResolveDocument(beforeRef);
+Check(Hash(File.ReadAllBytes(resolved.Path))==resolved.Sha256&&resolved.Sha256==Text(first,"sourceSha256"),"document resolves to its verified original for native import");
+Check(Text(Json(store.InspectFile(resolved.Path,resolved.Sha256)),"sourceSha256")==resolved.Sha256,"pinned native export publishes as a document record");
+Reject("AutomationMlInputChanged",()=>store.InspectFile(resolved.Path,new string('0',64)));
 var page=Json(store.ReportPage(beforeRef,"/objects",count:1));
 Check(page.GetProperty("rows").GetArrayLength()==1&&page.GetProperty("nextOffset").GetInt32()==1,"bounded pages continue");
 var next=Json(store.Inspect(Upload(Bytes(source.Replace("<Value>12","<Value>16")))));

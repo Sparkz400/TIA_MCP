@@ -9905,6 +9905,58 @@
       ]
     },
     {
+      "featureId": "change.cax_import",
+      "domain": "hardware",
+      "title": "Import one AML file through native CAx",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "cax_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Step7: CaxProvider.Import(FileInfo, CaxImportOptions) returning TransferResult; CaxImportOptions.MoveToParkingLot, RetainTiaDevice and OverwriteTiaDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: importOption plus a retained automationml amlRef, or a path inside the Host artifact directory with expectedSha256. The file (at most 64 MiB) is copied and hash-pinned at prepare and verified again at apply.",
+          "Siemens refuses CAx import inside exclusive access: apply releases the admitted shared-mutation lease only around the native call, so the kind is limited to a worker-owned TIA instance and the Host's admitted change_apply route.",
+          "Whole-project checkpoint, compile=true device-project compilation, and configured-hardware manifests before and after with a path difference in the readbacks. MoveToParkingLot and RetainTiaDevice must leave every existing configured row exact (additions only); OverwriteTiaDevice replaces devices as the AML file dictates, so its hardware outcome is recorded for review but cannot be matched.",
+          "The V19+ TransferResult overload writes no native log; the message tree is retained as cax-import.transfer-result.json. An error state fails into recovery_required.",
+          "Software, HMI and unexposed vendor data changed by the import are covered only by the generic engineering fingerprint; no AML-to-native identity mapping is established."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Worker-owned TIA instance with an offline project exposing CaxProvider",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "title": "Assign or disconnect one native remote-I/O connector",
@@ -14527,6 +14579,52 @@
         "AC-identity",
         "AC-completeness",
         "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "cax_export",
+      "domain": "hardware",
+      "title": "Native CAx/AutomationML export",
+      "mcpTools": [
+        "cax_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Step7: Project.GetService<CaxProvider>(), CaxProvider.Export(ProjectBase, FileInfo) and CaxProvider.Export(Device, FileInfo) returning TransferResult (State, ErrorCount, WarningCount, nested TransferResultMessage rows)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Uses the V19+ TransferResult overloads, which write no native log file; the message tree (up to 50000 messages, truncation explicit) is retained as <export>.transfer-result.json beside the AML and maxItems messages are returned. Both files are returned with SHA-256.",
+          "Whole project or one exact device path from device_inventory. Siemens excludes drives, most HMI devices and listed Scalance/system device types from CAx exchange.",
+          "Exports the in-memory project state without saving; projectModifiedBefore/After report unsaved edits. An error state or a missing AML file refuses with the retained transfer result.",
+          "The AML is published as an automationml document record (CAEX 2.15/3.0, at most 8 MiB); a publication failure is reported beside the still valid native export."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an attached project exposing CaxProvider; catalog entry is not a current-target availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the CaxProvider service",
+        "Writable Host artifact directory"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-native",
         "AC-evidence"
       ]
     },

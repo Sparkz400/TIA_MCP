@@ -106,7 +106,7 @@ public sealed partial class TiaTools
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply. Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
     public Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
-        => Call("change_prepare", new { kind, payload = ObjectArguments(payload), projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
+        => Call("change_prepare", new { kind, payload = kind == "cax_import" ? CaxImportPayload(payload) : ObjectArguments(payload), projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
 
     [McpServerTool(Name = "change_apply", Destructive = true, OpenWorld = false)]
     [Description("Apply a prepared offline change exactly once using its previewHash and unique idempotencyKey. checkpointSave explicitly saves the current in-memory project so Siemens can archive a recovery checkpoint. Returns compile diagnostics, verification and partial-failure journal; never downloads or changes runtime values.")]

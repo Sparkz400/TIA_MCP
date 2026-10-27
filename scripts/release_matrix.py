@@ -20,7 +20,7 @@ PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simul
 
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
-    "access_review": ["X03"], "addin_": ["X04"], "automationml_": ["D05"],
+    "access_review": ["X03"], "addin_": ["X04"], "automationml_": ["D05"], "cax_export": ["D05"], "change.cax_import": ["D05"],
     "change.hardware_cpu_memory_bytes": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_review": ["D08"],
     "db_snapshot": ["D09"], "device_": ["X10"], "diagnostic_": ["D17"], "drive_profile": ["D10"],
     "engineering_": ["F03"], "graph_": ["X06"], "hmi_": ["X07", "X08"], "multiuser_": ["X05"],

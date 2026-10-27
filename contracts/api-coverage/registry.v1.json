@@ -1636,6 +1636,12 @@
       ]
     },
     {
+      "featureId": "change.cax_import",
+      "obligations": [
+        "D05"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "obligations": [
         "X10"
@@ -2281,6 +2287,12 @@
       "obligations": [
         "D05",
         "C02"
+      ]
+    },
+    {
+      "featureId": "cax_export",
+      "obligations": [
+        "D05"
       ]
     },
     {

@@ -9,7 +9,7 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
-        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes" }.Contains(kind);
+        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "cax_import" }.Contains(kind);
 
         // Exact V21 attributes of a CPU device item. Openness declares each byte number only while its flag is enabled.
         internal static readonly string[] CpuMemoryByteAttributes = { "SystemMemoryByte", "SystemMemoryByteAddress", "ClockMemoryByte", "ClockMemoryByteAddress" };
@@ -65,8 +65,17 @@ namespace TiaMcp.Openness.V21
             string path = payload.Value<string>("hardwarePath");
             JObject Target(JArray rows, string target) => rows.Cast<JObject>().SingleOrDefault(row => row.Value<string>("path") == target)
                 ?? throw new BridgeException("MutationVerificationFailed", "The exact selected hardware path is absent from the preservation manifest.");
-            var selected = Target(expected, path);
-            if (kind == "hardware_plug")
+            var selected = kind == "cax_import" ? null : Target(expected, path);
+            if (kind == "cax_import")
+            {
+                // Siemens keeps every name-conflicting device for MoveToParkingLot and RetainTiaDevice, so existing rows
+                // stay exact and only new rows may appear. OverwriteTiaDevice replaces devices as the AML file dictates;
+                // no expected manifest exists for it, so its difference is only recorded for review.
+                if (payload.Value<string>("importOption") == "OverwriteTiaDevice") return;
+                var known = new HashSet<string>(before.Select(row => row.Value<string>("path")), StringComparer.Ordinal);
+                foreach (var row in after.Where(row => !known.Contains(row.Value<string>("path")))) expected.Add(row.DeepClone());
+            }
+            else if (kind == "hardware_plug")
             {
                 // Logical DeviceItems can be siblings of their physical rack.
                 // Native Container identity, not string ancestry, proves placement.
@@ -149,6 +158,17 @@ namespace TiaMcp.Openness.V21
             else Fail("Unknown hardware preservation policy.");
             JArray Sorted(JArray rows) => new JArray(rows.Cast<JObject>().OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal));
             if (!JToken.DeepEquals(Sorted(expected), Sorted(after))) Fail("An unrelated configured hardware, channel, address or network field changed; restore the checkpoint before further edits.");
+        }
+
+        // Added, removed and changed configured rows by exact path, for review of a CAx import.
+        internal static JObject Difference(JArray before, JArray after)
+        {
+            RequireIdentities(before); RequireIdentities(after);
+            var old = before.ToDictionary(row => row.Value<string>("path"), StringComparer.Ordinal);
+            var now = after.ToDictionary(row => row.Value<string>("path"), StringComparer.Ordinal);
+            JArray Paths(IEnumerable<string> paths) => new JArray(paths.OrderBy(path => path, StringComparer.Ordinal));
+            return new JObject { ["added"] = Paths(now.Keys.Where(path => !old.ContainsKey(path))), ["removed"] = Paths(old.Keys.Where(path => !now.ContainsKey(path))),
+                ["changed"] = Paths(old.Keys.Where(path => now.ContainsKey(path) && !JToken.DeepEquals(old[path], now[path]))) };
         }
 
         private static void RequireIdentities(JArray rows)
