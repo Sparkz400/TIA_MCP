@@ -1,7 +1,8 @@
 # Combined PLC/UDT/HMI recipes — 27 October 2026
 
-**Status:** implemented as plan-only `library_integrate` actions. Offline checks pass.
-The native prepare-only probe is authored; its result is recorded below once run.
+**Status:** implemented as plan-only `library_integrate` actions. Offline checks pass,
+and the native prepare-only probe passed on Unified Comfort
+([`local.hmi.plc-hmi-recipe.20261027`](../../evidence/local.hmi.plc-hmi-recipe.20261027.json)).
 Apply stays refused (`PlcIntegrationNotQualified`). No HMI preservation gate is opened.
 
 ## What was added
@@ -36,7 +37,7 @@ examples in [fixtures/libraries/plc-hmi](../../fixtures/libraries/plc-hmi). Guid
 
 | Check | Result |
 | --- | --- |
-| `dotnet run --project tests/TiaMcp.PlcLibraryIntegration.Tests` | 296 passed (11 new combined-recipe tests) |
+| `dotnet run --project tests/TiaMcp.PlcLibraryIntegration.Tests` | 296 passed (11 combined-recipe tests) |
 | `python -B -m unittest test_plc_hmi_recipe_contract test_plc_hmi_recipe_probe test_hmi_qualification test_component_text_contracts test_library_operation_observations` (in `scripts/`) | all passed |
 | V21 worker build against the installed SDK | succeeded, 0 warnings |
 | HmiSeeder build against the installed SDK | succeeded |
@@ -50,7 +51,8 @@ The probe tests use a fake bridge. They check the probe's own logic, not native 
 `PLC_A`, `MotorDB.status`, Unified tags `MotorSpeed`/`MotorRunning` bound to its
 fields, a rectangle whose `Left` is dynamized by `MotorSpeed`, `MotorDrive` 1.0.0
 (FB using `MotorStatus` 1.0.0) and `MotorStatus` 1.0.1 with `speed : LReal`. Its
-temporary 1.0.1 test instance in `PLC_B` is deleted again.
+temporary 1.0.1 test instance in `PLC_B` is deleted again. Both PLCs are then compiled
+(0 errors, 0 warnings); the bridge refuses to fingerprint uncompiled blocks.
 
 ```powershell
 python -B scripts/qualify_hmi.py --native-report <seeder>/native-report.json `
@@ -58,16 +60,33 @@ python -B scripts/qualify_hmi.py --native-report <seeder>/native-report.json `
   --report artifacts/<new>/plc-hmi-recipe.json --timeout 600 --probe-plc-hmi-recipe
 ```
 
-Expected, per profile row `plcHmiRecipe`: the install plan into `PLC_B`/`HMI_RT_2`
+Result, profile row `plcHmiRecipe` (passed): the install plan into `PLC_B`/`HMI_RT_2`
 prepares with the three HMI blockers and its apply is refused; the update plan for
 `PLC_A` to 1.0.1 is refused with exactly one breaking row (`MotorSpeed`,
 `Real` → `LReal`, consumer `MotorSpeedConsumer.Left`) and `MotorRunning` unchanged; a
 Classic recipe is refused before native work; library and HMI tag inventories are
 unchanged.
 
+Run on 27 October 2026 at `bdb061d` (Host, V21 worker and seeder built from this
+branch; the worker includes the proxy-release fix from PR #92), against a fresh
+`unified-comfort` fixture retrieved through `project_retrieve`. Owned Portal, Host and
+worker cleanup was verified. The overall `qualify_hmi.py` run accepts no profile,
+because the existing HMI gates are outside this probe.
+
+The first native runs found three defects, fixed before the passing run:
+
+- V21 FB exports inline the UDT members under the member's own `Sections` element, and
+  a UDT version export nests `SW.Types.PlcStruct` below the library type version. The
+  worker missed both, so `status.speed` was refused with `IntegrationMappingMismatch`.
+- The seeder left `MotorDrive` uncompiled, so the PLC planner refused to plan with
+  `FingerprintUnavailable`.
+- The probe left out `change_apply`'s required `checkpointSave` argument.
+
+Evidence: [`local.hmi.plc-hmi-recipe.20261027`](../../evidence/local.hmi.plc-hmi-recipe.20261027.json)
+
 ## Not covered
 
 Apply of any combined step, compile, save/reopen, recovery and runtime. Classic
-HMIs, Unified PC natively, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags,
+HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags,
 UDTs nested inside other UDTs, scripts/alarms/faceplate ports as consumers, and
 creation of member-bound HMI tags or screen items.

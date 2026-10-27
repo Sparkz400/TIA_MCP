@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.30",
+  "catalogVersion": "0.4.33",
   "targetTiaVersions": [
     21
   ],
@@ -1878,6 +1878,24 @@
       ]
     },
     {
+      "id": "local.hmi.plc-hmi-recipe.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bdb061d60d9df81100d0886d0bf29d482fbffcb5",
+        "passedScope": "Prepare-only native probe of the combined PLC/UDT/HMI library_integrate recipes (plc_hmi_component_plan, plc_hmi_update_plan) on a fresh positive Unified MTP700 Comfort HmiSeeder plchmi fixture (raw-Openness MotorStatus 1.0.0/1.0.1 Real->LReal, MotorDrive 1.0.0, MotorDB, Unified tags MotorSpeed/MotorRunning bound to MotorDB.status.*, rectangle MotorSpeedConsumer with Left dynamized by MotorSpeed; both PLCs compiled without errors), through the production Host and V21 worker after project_retrieve: the install plan into PLC_B/HMI_RT_2 prepared as planned_only with library_instantiate, graphical_typed_edit and hmi_engineering steps, plcSymbol MotorDrive_1.status.speed resolved from the pinned FB export and the HmiMemberMappingUnqualified, HmiScreenItemCreationUnavailable and HmiPreservationGateClosed blockers, and its change_apply was refused (PlcIntegrationNotQualified); the field-changing update of PLC_A to MotorStatus 1.0.1 was refused with HmiBindingWouldBreak and an impact report of exactly one breaking binding (MotorSpeed typeChanged Real->LReal, consumer MotorSpeedConsumer.Left), MotorRunning unchanged and no unresolved bindings; a Classic recipe was refused (HmiFamilyNotQualified); project library and both HMI tag inventories unchanged; owned Portal, host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.plc-hmi-recipe.20261027.json"
+      ],
+      "limitations": [
+        "No apply, compile, save/reopen, recovery or runtime of any combined step; combined apply stays refused and no Unified preservation gate is opened.",
+        "Unified Comfort only; Classic HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags, nested UDTs and scripts, alarms or faceplate ports as consumers are not exercised.",
+        "Creation of member-bound HMI tags and screen items stays a blocker in the install plan; the overall qualify_hmi run accepts no profile because the existing HMI gates are outside this probe."
+      ]
+    },
+    {
       "id": "local.typed.insertion.20261025",
       "status": "passed",
       "profile": {
@@ -2009,6 +2027,39 @@
       "limitations": [
         "Engineering-only; runtime behavior inside the parent chain is not claimed.",
         "Standard route only; software-unit and namespace parents remain refused until their transitive effect is captured."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-capture.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "3944707b13a466a9cc5ca8119d219274bbb6b882",
+        "passedScope": "Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace)."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-capture.20261027.json"
+      ],
+      "limitations": [
+        "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-effects.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "fb5fb64ea77a4ded82aef3e7cdd6f074343f0241",
+        "passedScope": "Software-unit and namespace route numeric FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep in its own namespace (<prefix>Host.Inner, <prefix>HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (28 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured route transitive effect (local.typed.route-transitive-capture.20261027); native readback matched every prediction exactly and each cell passed the four engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-effects.20261027.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+        "Parent chains share the caller's namespace; parents in another namespace or unit and custom declaration shapes stay refused."
       ]
     },
     {
@@ -2458,6 +2509,25 @@
       "limitations": [
         "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
         "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
+      ]
+    },
+    {
+      "id": "local.library_import_scale.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "316ef5bb3c43301f0baf6785d2106b4d816b5676",
+        "passedScope": "scripts/qualify_library_import_scale.py at 316ef5b on worktree Release builds of 316ef5b (worker includes the per-request Openness proxy release 8f913f6, cherry-picked from 65fd13b). One owned TIA V21 scratch session authors and releases 100 flat library types (50 SCL FBs, 50 PLC data types) in 200 single changes, publishes them in one change to a new global library and archives it (805,217 bytes). That archive is wrapped in a generated 149,702,909-byte, 29-entry package with the shape of the retained DMC Open Library V17 review (nested 27-entry toolbox ZIP with 25 executables, documentation, a corrupt decoy .zal21); it is uploaded in 2,285 x 64 KiB chunks (42.1 s), staged (3.2 s; 155,736,855 expanded bytes, 57 files, 2 candidates) and a 1,082,356,395-byte package is refused at the 1 GiB input limit (PackageLimitExceeded, 1.4 s). In a fresh owned scratch project the decoy is refused, the real library opens with complete metadata (202 items), a 101-component selection is refused (PackageLimitExceeded), and all 100 components are prepared (8.5 s, 148,091-byte preview) and applied as one library_instantiate change (22.5 s, 359,341-byte checkpoint): 100 linkVerified rows, exactly 50 blocks and 50 types added, existing content preserved, compile 0 errors. A third session applies the same 100 components as separate single-component changes (829 s total; checkpoint 359 KB to 1.05 MB). The applied package stays retained (PackageInUse). 626/626 steps."
+      },
+      "artifacts": [
+        "evidence/local.library_import_scale.20261027.json"
+      ],
+      "limitations": [
+        "Owned scratch only; observed timings on PCNico, not cross-machine budgets.",
+        "Real vendor bytes remain open: the vendor ZIPs are no longer on this PC; the package reproduces DMC V17's byte volume and shape around an owned archive.",
+        "Flat types without dependencies; PLC library_integrate (call/instance/signal) combined apply stays disabled and is not exercised.",
+        "Requires the worker's per-request proxy release; without it one session hit TIA's 500,000-instance cap at change 124."
       ]
     }
   ],
@@ -7035,7 +7105,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7301,7 +7372,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7343,7 +7415,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7426,7 +7499,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7552,7 +7626,8 @@
         "evidenceIds": [
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
-          "local.library_upgrades.20261024"
+          "local.library_upgrades.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7595,7 +7670,8 @@
         "evidenceIds": [
           "local.library_intake.20261024",
           "local.library_vendor.20261025",
-          "local.library_upgrades.20261024"
+          "local.library_upgrades.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7636,7 +7712,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7677,7 +7754,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_intake.20261024"
+          "local.library_intake.20261024",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -7912,7 +7990,8 @@
           "local.library_units.20261025",
           "local.library_dependencies.20261025",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -8023,7 +8102,7 @@
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, a new global instance DB, an existing LAD/FBD caller and scalar existing-tag bindings. Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
-          "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. Native prepare-only probe pending.",
+          "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
@@ -8089,7 +8168,8 @@
           "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -8267,7 +8347,8 @@
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -8608,7 +8689,8 @@
           "local.library_dependencies.20261024",
           "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library_import_scale.20261027"
         ]
       },
       "availability": {
@@ -9435,7 +9517,7 @@
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. On the standard route, parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect (local.typed.transitive-capture.20261026) and are engineering-qualified for created multi-instance storage (local.typed.transitive-effects.20261026); software-unit and namespace parents and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9472,7 +9554,9 @@
           "local.typed.standard-created-storage-runtime.20261026",
           "local.typed.insertion-storage.20261026",
           "local.typed.transitive-capture.20261026",
-          "local.typed.transitive-effects.20261026"
+          "local.typed.transitive-effects.20261026",
+          "local.typed.route-transitive-capture.20261027",
+          "local.typed.route-transitive-effects.20261027"
         ]
       },
       "availability": {
