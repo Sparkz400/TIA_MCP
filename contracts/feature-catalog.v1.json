@@ -5989,8 +5989,7 @@
         "evidenceIds": [
           "local.offline.v02",
           "local.conformance.v03",
-          "local.layers.units-expanded.20261008",
-          "local.typed.resolution.20261025"
+          "local.layers.units-expanded.20261008"
         ]
       },
       "availability": {

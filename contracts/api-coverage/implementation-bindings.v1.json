@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6d3b22b3f60eef5fcbb6bf7f0fdd21f452891d9133b199f9d004b4f8cb80b3ff",
-      "bytes": 1117425
+      "sha256": "5191cd2778efd5e71ec9820f4abf23cb4afec725d3711638039c22e3c968022f",
+      "bytes": 1117380
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -92421,13 +92421,6 @@
           "artifacts": [
             "artifacts/object-model-expanded.json",
             "artifacts/object-model-expanded-tag-name-collision.json"
-          ]
-        },
-        {
-          "id": "local.typed.resolution.20261025",
-          "profileSha256": "a116f110a6b257a65cd0f1adddceed310f3885f31713e489a56e5f1f693caf2c",
-          "artifacts": [
-            "evidence/local.typed.resolution.20261025.json"
           ]
         }
       ],

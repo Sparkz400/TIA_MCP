@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.44",
-    "catalogSha256": "6d3b22b3f60eef5fcbb6bf7f0fdd21f452891d9133b199f9d004b4f8cb80b3ff",
+    "catalogSha256": "5191cd2778efd5e71ec9820f4abf23cb4afec725d3711638039c22e3c968022f",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -3101,8 +3101,7 @@
       "evidenceIds": [
         "local.offline.v02",
         "local.conformance.v03",
-        "local.layers.units-expanded.20261008",
-        "local.typed.resolution.20261025"
+        "local.layers.units-expanded.20261008"
       ],
       "cells": [
         {
