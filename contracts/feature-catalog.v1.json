@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.26",
+  "catalogVersion": "0.4.27",
   "targetTiaVersions": [
     21
   ],
@@ -2246,6 +2246,40 @@
         "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
         "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
         "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
+      ]
+    },
+    {
+      "id": "local.explorer.native-providers.20261026",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7f1492d6992810fb6febd4057940987f34e2f742",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py on release tia-mcp-v21_20261026_124042_240b4494 (source 7f1492d). Fresh owned TIA V21 scratch (CPU 1511-1PN) plus IM 155-6AU02 V6.4 head, one subnet and one IO system created through prepared hardware_add, network_configure and network_io_assign. The explorer's connectedSubnet, ioSystemController and ioSystemDevice edges matched exactly the 4 associations derived from independent hardware_inspect reads, from both the hardware side (outgoing) and the subnet/IO-system side (incoming), and the portable export retained them. Capture of 95 nodes included the new subnet, ioSystem, watchTableGroup, forceTable, externalSourceGroup and externalSource nodes with a complete nativeHierarchy. The --verify-report rerun reopened the saved fixture with zero prepared changes and reproduced every edge. Capture 337/499 ms, relationship queries 325-476 ms."
+      },
+      "artifacts": [
+        "evidence/local.explorer.native-providers.20261026.json"
+      ],
+      "limitations": [
+        "One small fixture with one subnet, one IO system and one IO device; no multi-subnet, shared-device, redundant or IE/PB-coupler topologies. Configured associations only, never cables, ports or physical topology.",
+        "No technology objects or software-unit relations existed in the fixture, so the technologyConnections and softwareUnitRelations providers remain natively unqualified; watch-table and populated external-source captures were not compared against an independent oracle."
+      ]
+    },
+    {
+      "id": "local.explorer.native-providers.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "97ba3183c266ebe4ab07535dcd8401929ffcc002",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py (source 97ba318) on release tia-mcp-v21_20261027_064910_1e3d1e2a (built from 09b0e30; host and worker sources are identical at 97ba318) with scripts/native/UnitSeeder explorer-relations as the registered fixture tool. Fresh owned TIA V21 scratch (CPU 1511-1PN) with the subnet/IO-system fixture of local.explorer.native-providers.20261026 plus a TM PosInput 2 V2.0 module plugged through prepared hardware_plug; the seeder then created software units ExplorerUnitA and ExplorerUnitB with the SoftwareUnit relation A -> B and a TO_ExternalEncoder V10.0 whose sensor interface is connected to the module's technology channel, and compiled with 0 errors. The explorer's technologyConnection edges from ExplorerEncoder resolve only to the TM PosInput module, matching the hardware paths of technology_read; the unitRelation edge from ExplorerUnitA resolves to unit B and unit B has none, matching software_inspect relations; both providers report complete providerCoverage and are declared in providerScope. The configured-network edges again matched their 4 hardware_inspect associations. The --verify-report rerun reopened the saved fixture with zero prepared changes and reproduced every edge. Capture 398/1,730 ms, relationship queries 470-2,097 ms."
+      },
+      "artifacts": [
+        "evidence/local.explorer.native-providers.20261027.json"
+      ],
+      "limitations": [
+        "One small fixture: one external encoder connected to one TM PosInput channel and one SoftwareUnit relation between two empty units. Axis, measuring-input and output-cam connections, tag/block/address targets, NonUnitDB and TODB relations and unresolved/ambiguous names were not exercised natively (they keep their offline oracle tests).",
+        "Unit relations and the TO connection are authored by the native UnitSeeder fixture tool, not by an MCP route; neither has a prepared change kind. Configured associations only, never cables, ports or physical topology; single-machine timings are not a latency guarantee."
       ]
     }
   ],
@@ -8574,7 +8608,8 @@
         "evidenceIds": [
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.native-providers.20261026"
         ]
       },
       "availability": {
@@ -8771,7 +8806,9 @@
           "local.explorer.native-browser.20261008",
           "hmi.readonly.unified-comfort.20261012",
           "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "explorer.native.thousand-functions.20261012",
+          "local.explorer.native-providers.20261026",
+          "local.explorer.native-providers.20261027"
         ]
       },
       "availability": {

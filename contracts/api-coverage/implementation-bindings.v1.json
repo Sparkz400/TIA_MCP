@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b8f72e84720abfd94605bfa049760cfaa632d066445483422660b33ce8eb501c",
-      "bytes": 785685
+      "sha256": "dc5c6d9e6e22283be306ad05ecdcf3775273c97067488204d3f851aa66440e31",
+      "bytes": 789967
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -84611,6 +84611,13 @@
             "artifacts/p16r/scale-browser-01/result.json",
             "artifacts/p16r/scale-browser-02/result.json"
           ]
+        },
+        {
+          "id": "local.explorer.native-providers.20261026",
+          "profileSha256": "657b700872d61c135f33bd20bbad0aa6ad71a2beac592a6d86121f8dd8e26ade",
+          "artifacts": [
+            "evidence/local.explorer.native-providers.20261026.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -85009,6 +85016,20 @@
             "artifacts/p16r/compile-diagnostics-audit-01.json",
             "artifacts/p16r/scale-browser-01/result.json",
             "artifacts/p16r/scale-browser-02/result.json"
+          ]
+        },
+        {
+          "id": "local.explorer.native-providers.20261026",
+          "profileSha256": "657b700872d61c135f33bd20bbad0aa6ad71a2beac592a6d86121f8dd8e26ade",
+          "artifacts": [
+            "evidence/local.explorer.native-providers.20261026.json"
+          ]
+        },
+        {
+          "id": "local.explorer.native-providers.20261027",
+          "profileSha256": "b7b584015723d273ea56dd83418662fe1dd1af63b1c4b520022edbd923f99d59",
+          "artifacts": [
+            "evidence/local.explorer.native-providers.20261027.json"
           ]
         }
       ],
@@ -94909,6 +94930,16 @@
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
     },
     {
+      "path": "evidence/local.explorer.native-providers.20261026.json",
+      "state": "observed",
+      "sha256": "a8bdcc4d08901d59f3e39cf6f52d3dd21b72f8202c5bce2c5ffed680b8ebf69a"
+    },
+    {
+      "path": "evidence/local.explorer.native-providers.20261027.json",
+      "state": "observed",
+      "sha256": "33a4c6d95ec0f03c177a75e767c668e7a634ac5648f5e323ebd7130bd7c05fc6"
+    },
+    {
       "path": "evidence/local.explorer.relationship-scope.20261024.json",
       "state": "observed",
       "sha256": "febb795362cd9751c16f6862010de30fa105a5288909da2613d5803522e4328d"
@@ -95291,6 +95322,14 @@
     {
       "id": "local.explorer.native-browser.20261008",
       "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3"
+    },
+    {
+      "id": "local.explorer.native-providers.20261026",
+      "profileSha256": "657b700872d61c135f33bd20bbad0aa6ad71a2beac592a6d86121f8dd8e26ade"
+    },
+    {
+      "id": "local.explorer.native-providers.20261027",
+      "profileSha256": "b7b584015723d273ea56dd83418662fe1dd1af63b1c4b520022edbd923f99d59"
     },
     {
       "id": "local.explorer.relationship-scope.20261024",
