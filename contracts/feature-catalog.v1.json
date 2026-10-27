@@ -6953,6 +6953,212 @@
       ]
     },
     {
+      "featureId": "change.software_unit_create",
+      "domain": "software_units",
+      "title": "Create one PLC software unit with an optional namespace preset",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcUnitProvider.UnitGroup.Units (PlcUnitComposition.Create(string), Find(string)) and PlcUnitBase.NamespacePreset."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one standard unit in the selected PLC; a case-insensitive name collision with any software or safety unit is refused. Without namespacePreset the native default preset is kept.",
+          "Name and namespace preset are read back after creation. Templates, master-copy instantiation (CreateFrom), copy, move and rename are not part of this kind.",
+          "Safety units are refused for every software-unit lifecycle kind.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider; no native qualification exists for this prepared route."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact plcPath when the project has more than one PLC"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_relation_set",
+      "domain": "software_units",
+      "title": "Add or remove one SoftwareUnit relation between two exact software units",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_relation_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcUnitBase.Relations (PlcUnitRelationComposition.Create(string, UnitRelationType)), PlcUnitRelation.Delete, RelatedObject and RelationType."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Only relationType SoftwareUnit between two exact standard units of the same PLC; NonUnitDB and TODB relations are refused.",
+          "Adding refuses an existing relation, a self-relation and any relation that closes a SoftwareUnit relation cycle (conservative; native cycle acceptance is not established). Removing requires exactly one matching relation.",
+          "A relation grants access only to published members; consumer effects are reported by the mandatory compile, not modelled.",
+          "Safety units are refused for every software-unit lifecycle kind.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider; no native qualification exists for this prepared route."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact unitPath and relatedUnitPath from software_inspect or project_model"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_publication_set",
+      "domain": "software_units",
+      "title": "Set the publication (Access) of one block or PLC data type in a software unit",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_publication_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: IEngineeringObject.GetAttributeInfos/GetAttribute/SetAttribute on the Access attribute with UnitAccessType.Published/Unpublished."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "The attribute name Access is not documented in the V21 PublicAPI; it comes from native seeder evidence and is written only when native metadata declares it readable and writable and its value is a UnitAccessType.",
+          "Only one exact unit block or PLC data type; OBs, know-how protected, safety, generated and PLC-root objects are refused. The value is read back after writing.",
+          "Unpublishing can break consumers in related units; the mandatory compile reports them, the change does not rewrite consumers.",
+          "Safety units are refused for every software-unit lifecycle kind.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider; no native qualification exists for this prepared route."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact objectPath of a unit block or PLC data type"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_delete",
+      "domain": "software_units",
+      "title": "Delete one empty, unreferenced software unit",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcUnit.Delete and PlcUnitComposition.Find(string); content via BlockGroup, TypeGroup, TagTableGroup, ExternalSourceGroup and PlcAlarmTextlistGroup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "dependencyPolicy=rejectReferenced (default) is mandatory; no cascade. The unit must hold no blocks, types, tags or constants, user groups, external sources or user text lists; empty tag tables and the unit's own outgoing relations are removed with it and listed in the preview.",
+          "Refused while any software or safety unit of the PLC has a relation naming this unit. Name-based relation matching cannot see references outside the selected PLC.",
+          "Safety units are refused for every software-unit lifecycle kind.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider; no native qualification exists for this prepared route."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact unitPath from software_inspect or project_model"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.hardware_address_set",
       "domain": "hardware",
       "title": "Change one exact native configured I/O start address",

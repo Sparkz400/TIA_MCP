@@ -1228,6 +1228,31 @@
       ]
     },
     {
+      "featureId": "change.software_unit_create",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_relation_set",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_publication_set",
+      "obligations": [
+        "D07",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_delete",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
       "featureId": "change.hardware_address_set",
       "obligations": [
         "X10"
