@@ -6,8 +6,8 @@ using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.Host;
 
-/// <summary>One bounded polling worker per selected session. Restart reopens evidence, never acquisition.</summary>
-public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOptions options,TimeProvider? timeProvider) : IAsyncDisposable
+/// <summary>One bounded polling worker per selected session or owned PLCSIM instance. Restart reopens evidence, never acquisition.</summary>
+public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOptions options,TimeProvider? timeProvider,IBridgeClient? simulator=null) : IAsyncDisposable
 {
     public RuntimeCaptures(PhysicalRuntimeSessions sessions,HostOptions options):this(sessions,options,TimeProvider.System){}
     private sealed class Running(string attemptId)
@@ -41,13 +41,19 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
             }
             if (running.Values.Count(x=>!x.Work.IsCompleted)>=4 || running.Values.Any(x=>!x.Work.IsCompleted && x.AttemptId==request.AttemptId))
                 throw Error("RuntimeCaptureSessionBusy");
-            var context = await sessions.CaptureContext(request.AttemptId,request.SelectionIds,request.Representation,cancellationToken);
-            var signals = context.Signals;
+            bool plcsim = request.Simulator is not null;
+            if (plcsim && simulator is null) throw Error("RuntimeCaptureSourceUnavailable");
+            var context = plcsim ? default : await sessions.CaptureContext(request.AttemptId,request.SelectionIds,request.Representation,cancellationToken);
+            var signals = plcsim ? SimulatorCaptureContracts.Signals(request) : context.Signals;
             if (request.ReviewId is not null) _ = new ProjectReviewStore(options.ArtifactsDirectory).Read(request.ReviewId);
             var association = RuntimeCaptureAssociations.Resolve(options.ArtifactsDirectory,request,signals);
-            var handoff = RuntimeCaptureHandoffs.Resolve(options.ArtifactsDirectory, request, context.Session, signals);
+            var handoff = plcsim ? null : RuntimeCaptureHandoffs.Resolve(options.ArtifactsDirectory, request, context.Session, signals);
             var plan = new RuntimeCapturePlan(captureId,hostId,clock.GetUtcNow(),request,signals,association,handoff);
-            var writer = store.Create(plan); var entry = new Running(request.AttemptId); running.Add(captureId,entry);
+            // The worker refuses anything but the exact owned instance and enters sync-point mode before durable intent exists.
+            if (plcsim) await simulator!.CallAsync("sim_capture_begin",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);
+            RuntimeCaptureStore.Writer writer;
+            try { writer = store.Create(plan); } catch { await EndSimulator(request); throw; }
+            var entry = new Running(request.AttemptId); running.Add(captureId,entry);
             entry.Work = Task.Run(()=>Poll(plan,writer,entry));
             return Observe(captureId);
         }
@@ -118,12 +124,16 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                 }
                 if(scheduled>=durationMilliseconds || Expired())break;
                 bool finish=false;
-                foreach(var signal in plan.Signals)
+                // PLCSIM: one worker call per cycle reads every signal (after stepping one sync point in cycle-synchronous mode).
+                var sample=plan.Request.Simulator is null?null:await SimulatorSample(plan);
+                for(int index=0;index<plan.Signals.Length;index++)
                 {
-                    if(Expired())break;
+                    var signal=plan.Signals[index];
+                    if(sample is null && Expired())break;
                     lastReadCycle=cycle;accountedThrough=cycle;
                     string? result=null,error=null;
-                    try { result=JsonSerializer.Serialize(await sessions.ReadValue(plan.Request.AttemptId,signal.SelectionId,signal.Selection.Representation,deadline.Token,plan.Handoff),BridgeProtocol.Json); }
+                    if(sample is not null)(result,error)=sample[index];
+                    else try { result=JsonSerializer.Serialize(await sessions.ReadValue(plan.Request.AttemptId,signal.SelectionId,signal.Selection!.Representation,deadline.Token,plan.Handoff),BridgeProtocol.Json); }
                     catch(OperationCanceledException) { error="RuntimeCancelled"; }
                     catch(Exception failure) { error=ReadFailure(failure); }
                     try { writer.Append(new(writer.Rows,"read",signal.SelectionId,cycle,scheduled,Elapsed(),clock.GetUtcNow(),result,error,0)); }
@@ -151,7 +161,21 @@ public sealed class RuntimeCaptures(PhysicalRuntimeSessions sessions, HostOption
                 writer.Finish(reason,Elapsed());
             }
             catch {entry.Failure="RuntimeCaptureStorageFailure";}
+            if(!await EndSimulator(plan.Request))entry.Failure??="PlcsimOperatingModeRestoreFailed";
         }
+    }
+    // Native calls are never cancelled: a cancelled bridge call faults the simulator worker for every later tool.
+    private async Task<(string? Result,string? Error)[]> SimulatorSample(RuntimeCapturePlan plan)
+    {
+        try { return SimulatorCaptureContracts.Reads(plan.Request,await simulator!.CallAsync("sim_capture_sample",SimulatorCaptureContracts.Arguments(plan.Request),CancellationToken.None)); }
+        catch(Exception failure) { string code=SimulatorCaptureContracts.ReadError(failure);return plan.Signals.Select(_=>((string?)null,(string?)code)).ToArray(); }
+    }
+    /// <summary>Restores the operating mode recorded at begin; free-running captures never changed it.</summary>
+    private async Task<bool> EndSimulator(RuntimeCaptureRequest request)
+    {
+        if(request.Simulator is not { CycleSynchronous: true })return true;
+        try { await simulator!.CallAsync("sim_capture_end",SimulatorCaptureContracts.Arguments(request),CancellationToken.None);return true; }
+        catch { return false; }
     }
     private static string ReadFailure(Exception failure) => failure is BridgeException error && error.Code is
         "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "RuntimePermissionDenied" or "RuntimeSessionUnavailable" or

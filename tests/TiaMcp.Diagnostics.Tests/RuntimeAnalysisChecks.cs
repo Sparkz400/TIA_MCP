@@ -80,7 +80,7 @@ internal static class RuntimeAnalysisChecks
     {
         var report=source.DeepClone().AsObject();
         var handoff=new RuntimeCaptureHandoff("runtime-capture-handoff.v1","runtime-handoff:"+new string('b',32)+":"+new string('c',64),f.Source.ReviewId,
-            new(new string('d',32),f.Plan.Signals[0].Selection.Context,"<img src=x onerror=alert(1)>","local",
+            new(new string('d',32),f.Plan.Signals[0].Selection!.Context,"<img src=x onerror=alert(1)>","local",
                 new("protected-credential-reference.v1",new string('e',32),new string('f',32),new string('a',64),new string('b',64)),true),
             "consistentDeclarations",false,false,false,false,false,false);
         report["handoff"]=JsonSerializer.SerializeToNode(handoff,BridgeProtocol.Json);
@@ -135,7 +135,7 @@ internal static class RuntimeAnalysisChecks
             if(signal==0 && value is null)error="RuntimeTimeout";
             else
             {
-                string id=Guid.NewGuid().ToString("N");var selection=Plan.Signals[signal].Selection;
+                string id=Guid.NewGuid().ToString("N");var selection=Plan.Signals[signal].Selection!;
                 var request=WebRuntimeProtocol.Read(selection.Context,selection,id);
                 string payload=value is null?"\"error\":{\"code\":2}":"\"result\":"+(selection.Representation=="raw"?"[0,255]":value);
                 var read=WebRuntimeProtocol.ReadResult(selection.Context,request,Encoding.UTF8.GetBytes("{\"jsonrpc\":\"2.0\",\"id\":\""+id+"\","+payload+"}"),Start,Start.AddMilliseconds(backwardsClock?-1:1),TimeSpan.FromMilliseconds(1));

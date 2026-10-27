@@ -2780,7 +2780,9 @@
     {
       "featureId": "runtime_capture_start",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {
@@ -2792,7 +2794,9 @@
     {
       "featureId": "runtime_capture_stop",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {

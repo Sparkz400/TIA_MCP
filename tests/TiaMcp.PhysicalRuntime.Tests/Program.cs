@@ -10,6 +10,7 @@ if (args is ["--soak", var soakRoot, var soakSeconds]) { await RuntimeCaptureSoa
 if (args is ["--soak-long", var longRoot, var epochCount, var epochSeconds]) { await RuntimeCaptureSoakChecks.RunLong(Path.GetFullPath(longRoot), int.Parse(epochCount, System.Globalization.CultureInfo.InvariantCulture), int.Parse(epochSeconds, System.Globalization.CultureInfo.InvariantCulture)); return; }
 if (args is ["--soak-crash", var crashRoot]) { await RuntimeCaptureSoakChecks.Crash(Path.GetFullPath(crashRoot)); return; }
 if (args is ["--soak-recover", var recoverRoot]) { await RuntimeCaptureSoakChecks.Recover(Path.GetFullPath(recoverRoot)); return; }
+if (args is ["--plcsim", var plcsimRoot]) { await RuntimeCapturePlcsimChecks.Run(Path.GetFullPath(plcsimRoot)); return; }
 if (args is ["--disk-full", var volumeRoot, var ownerToken, var evidenceRoot]) { await RuntimeCaptureDiskFullChecks.Run(volumeRoot,ownerToken,Path.GetFullPath(evidenceRoot)); return; }
 
 int checks = 0;
@@ -164,6 +165,7 @@ Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "alarms",
 checks += RuntimeCaptureChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".captures" : Path.Combine(Path.GetTempPath(),"tia-capture-"+Guid.NewGuid().ToString("N")),Read("18446744073709551615"),metadata);
 checks += await RuntimePollingChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".polling" : Path.Combine(Path.GetTempPath(),"tia-polling-"+Guid.NewGuid().ToString("N")));
 checks += await RuntimeCaptureSoakChecks.CheckAcquisitionWaitBoundaries();
+checks += await RuntimeCapturePlcsimChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".plcsim" : Path.Combine(Path.GetTempPath(),"tia-plcsim-"+Guid.NewGuid().ToString("N")));
 
 if (args.Length == 1)
 {

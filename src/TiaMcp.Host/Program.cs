@@ -41,7 +41,7 @@ try
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.InventoryStore>();
             builder.Services.AddSingleton<PhysicalRuntimeSessions>();
             builder.Services.AddSingleton<OpcUaRuntimeSessions>();
-            builder.Services.AddSingleton<RuntimeCaptures>();
+            builder.Services.AddSingleton(services => new RuntimeCaptures(services.GetRequiredService<PhysicalRuntimeSessions>(), options, TimeProvider.System, simulator.Bridge));
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.IInventoryIdentityFactory, TiaMcp.Core.Inventory.SiemensWebIdentityFactory>();
             IBridgeClient native = options.WatchQualificationPoint is null ? bridge : new WatchQualificationBridge(bridge, options);
             builder.Services.AddSingleton<IBridgeClient>(new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, options.ArtifactsDirectory,
