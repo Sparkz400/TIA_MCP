@@ -99,6 +99,15 @@
         "null"
       ]
     },
+    "unsavedTargetEdits": {
+      "type": "object",
+      "properties": {
+        "present": {"type": "boolean"},
+        "disposition": {"enum": ["none", "savedIntoCheckpointBaseline"]}
+      },
+      "required": ["present", "disposition"],
+      "additionalProperties": false
+    },
     "outputAbsent": {
       "type": "string",
       "minLength": 1

@@ -26,6 +26,14 @@ namespace TiaMcp.Openness.V21
             return new Content<T> { Mode = payload == null ? "metadataNoNativeProvider" : "nativeFingerprints", Payload = payload };
         }
 
+        // Library changes compile every device after their native mutation, so an inherited inconsistent PLC data
+        // type would fail only after the checkpoint. It is refused before any write; other change kinds are unaffected.
+        internal static T RequireConsistentType<T>(string kind, Func<bool> consistent, string path, T entry)
+        {
+            if (kind == "library" && !consistent()) throw new BridgeException("InheritedDiagnostics", "A PLC data type is inconsistent before this library change; fix and compile it first. Nothing was checkpointed or changed: " + path);
+            return entry;
+        }
+
         // Openness cannot export a know-how protected block, so a protected in-work test instance is pinned by
         // its native fingerprints instead (the project fingerprint already covers protected user blocks this way).
         internal static Content<string> ReadInWorkBlockContent(bool knowHowProtected, Func<string> exportHash, Func<string> nativeFingerprints)

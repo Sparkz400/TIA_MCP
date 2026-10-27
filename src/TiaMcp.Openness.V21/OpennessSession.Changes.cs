@@ -1102,7 +1102,7 @@ namespace TiaMcp.Openness.V21
                             .Concat(EngineeringGroupPaths(scope.Types, scope.Path + "/types", 0)).Concat(EngineeringGroupPaths(scope.Tags, scope.Path + "/tags", 0))),
                         ["namespacePreset"] = scope.Unit?.NamespacePreset,
                         ["relations"] = scope.Unit == null ? null : new JArray(scope.Unit.Relations.Select(relation => new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = InspectionValue(relation.RelatedObject) })),
-                        ["types"] = new JArray(ScopeTypes(scope, budget).Select(type => new JObject { ["name"] = type.Item.Name, ["path"] = type.Path, ["modified"] = type.Item.ModifiedDate.ToString("O"), ["protected"] = type.Item.IsKnowHowProtected })),
+                        ["types"] = new JArray(ScopeTypes(scope, budget).Select(type => EngineeringFingerprintRules.RequireConsistentType(change.Kind, () => type.Item.IsConsistent, type.Path, new JObject { ["name"] = type.Item.Name, ["path"] = type.Path, ["modified"] = type.Item.ModifiedDate.ToString("O"), ["protected"] = type.Item.IsKnowHowProtected }))),
                         ["tagTables"] = new JArray(TagTables(scope.Tags, scope.Path + "/tags", budget).Select(table => new JObject { ["name"] = table.Item.Name, ["path"] = table.Path, ["modified"] = table.Item.ModifiedTimeStamp.ToString("O") })) });
                 }
             }
