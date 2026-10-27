@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "da81f3ad75eabab5aeaddcebf92e2ad24084d0bc731cc35351dc444220ebd9b7",
-      "bytes": 822745
+      "sha256": "1452856d53c142433307876b43c82c9259b424bb1e23921782ee3b9e238fe1a1",
+      "bytes": 824417
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -83739,6 +83739,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.library.native-traversal.20261027",
+          "profileSha256": "254c96f1d593c900f5ac0d970b6841aa7d7ca4f1c811022b78cf0e98e82b2a38",
+          "artifacts": [
+            "evidence/local.library.native-traversal.20261027.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -84223,6 +84230,13 @@
           "profileSha256": "e4f494896ecd62aa7819cc4dbebd87886ce706de9ea2627b5e56a6b658f8a684",
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library.native-traversal.20261027",
+          "profileSha256": "254c96f1d593c900f5ac0d970b6841aa7d7ca4f1c811022b78cf0e98e82b2a38",
+          "artifacts": [
+            "evidence/local.library.native-traversal.20261027.json"
           ]
         }
       ],
@@ -95848,6 +95862,11 @@
       "sha256": "6dcef7003d53fee8ff211a3a87c779435dccfe4045a4b59da0d645f176292746"
     },
     {
+      "path": "evidence/local.library.native-traversal.20261027.json",
+      "state": "observed",
+      "sha256": "47c959cfaf7232654fc7c44578236570ff045ddd3886253602237205e99193aa"
+    },
+    {
       "path": "evidence/local.library_compatibility.20261027.json",
       "state": "observed",
       "sha256": "8e0d1e9c2289a5db277316934a9a6c1f811e03a317efc56876768edf012e1551"
@@ -96364,6 +96383,10 @@
     {
       "id": "local.layers.units-expanded.20261008",
       "profileSha256": "c875ccbae6d69db70bb5b6479b0c22e82d18aee4e99d388e9726e1f0eb3c2233"
+    },
+    {
+      "id": "local.library.native-traversal.20261027",
+      "profileSha256": "254c96f1d593c900f5ac0d970b6841aa7d7ca4f1c811022b78cf0e98e82b2a38"
     },
     {
       "id": "local.library_compatibility.20261027",
