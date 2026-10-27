@@ -10,7 +10,12 @@ namespace TiaMcp.Core.TestSuite;
 public sealed record TestSuiteStyleSelection(string[] SelectedDefinitionIds, string[] ExcludedDefinitionIds);
 public sealed record TestSuiteStyleReviewedRun(TestSuiteRunPlan Run, EngineeringOperationPlan Operation);
 public sealed record TestSuiteStyleReview(int SchemaVersion, string ExecutionProfile, TestSuiteStyleReviewedRun[] Runs,
-    string StopSemantics = "stopBetweenRuns; active native calls are never cancelled");
+    string StopSemantics = "stopBetweenRuns; active native calls are never cancelled")
+{
+    // Omission keeps every style review hash unchanged.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TestSuiteApplicationBinding? Application { get; init; }
+}
 public sealed record TestSuiteStyleJob(string Id, string ReviewSha256, EngineeringArtifactReference Review,
     string IdempotencyKey, string[] OperationIds);
 public sealed record TestSuiteStyleJobStatus(TestSuiteStyleJob Job, bool StopRequested,
@@ -37,7 +42,7 @@ public sealed class TestSuiteStyleJobs
     }
 
     public EngineeringArtifactReference Review(TestSuiteDefinitionCapture[] definitions, TestSuiteStyleSelection[] selections,
-        NativeTargetObservation target, string executionProfile)
+        NativeTargetObservation target, string executionProfile, TestSuiteApplicationBinding? application = null)
     {
         if (selections is null || selections.Length is < 1 or > 32 || selections.Any(s => s is null) ||
             !TestSuiteRunPlanner.Text(executionProfile, 256))
@@ -45,16 +50,18 @@ public sealed class TestSuiteStyleJobs
         if (definitions is null || definitions.Length is < 1 or > 1000 || definitions.Any(d => d is null) ||
             definitions.Sum(d => (long)d.OriginalBytes.Length) > TestSuiteDefinitionBundle.MaxOriginalBytes)
             throw new BridgeException("TestSuiteJobLimit", "A job retains at most 1,000 definitions and 32 MiB of originals.");
+        if (application is not null) TestSuiteApplicationRun.Validate(application);
         var runs = new List<TestSuiteStyleReviewedRun>();
         foreach (var selection in selections)
         {
-            var run = TestSuiteRunPlanner.Prepare(definitions, selection.SelectedDefinitionIds, selection.ExcludedDefinitionIds, "style");
+            var run = TestSuiteRunPlanner.Prepare(definitions, selection.SelectedDefinitionIds, selection.ExcludedDefinitionIds, application?.ExecutionMode ?? "style");
+            if (application is not null) _ = TestSuiteApplicationRun.Route(run, application.WholeGroup);
             var bundle = TestSuiteDefinitionBundle.Capture(run, definitions.Where(d => run.RequiredDefinitionIds.Contains(d.Manifest.Id)).ToArray());
             var runArtifact = Retain(run); var bundleArtifact = RetainBytes(bundle.Bytes);
             var operation = TestSuiteStyleOperation.BuildPlan(run, target, runArtifact, bundleArtifact, bundle);
             runs.Add(new(run, operation));
         }
-        return Retain(new TestSuiteStyleReview(1, executionProfile, runs.ToArray()));
+        return Retain(new TestSuiteStyleReview(1, executionProfile, runs.ToArray()) { Application = application });
     }
 
     public TestSuiteStyleReview ReadReview(EngineeringArtifactReference review)
@@ -64,8 +71,11 @@ public sealed class TestSuiteStyleJobs
             !TestSuiteRunPlanner.Text(value.ExecutionProfile, 256) ||
             value.StopSemantics != "stopBetweenRuns; active native calls are never cancelled")
             throw new BridgeException("InvalidTestSuiteJob", "Invalid retained style review.");
+        if (value.Application is not null) TestSuiteApplicationRun.Validate(value.Application);
         foreach (var run in value.Runs)
         {
+            if (run?.Run?.ExecutionMode != (value.Application?.ExecutionMode ?? "style")) throw new BridgeException("InvalidTestSuiteJob", "Every run must use the review's execution mode.");
+            if (value.Application is not null) _ = TestSuiteApplicationRun.Route(run.Run, value.Application.WholeGroup);
             if (run?.Operation?.Inputs?.Count != 2) throw new BridgeException("InvalidTestSuiteJob", "Both immutable inputs are required.");
             var retainedRun = Read<TestSuiteRunPlan>(run.Operation.Inputs[0]);
             var bundle = TestSuiteDefinitionBundle.Restore(retainedRun, ReadBytes(run.Operation.Inputs[1]));
@@ -178,7 +188,7 @@ public sealed class TestSuiteStyleJobs
             var rawArtifact = RetainBytes(raw); // Flush the unmodified response before decoding anything.
             op = store.RecordDispatchEvidence(op.Id, op.Revision, new("dispatch.rawResults", rawArtifact));
             nativeReturned = true;
-            var captures = Parse<NativeTestResult[]>(raw);
+            var captures = TestSuiteApplicationRun.Captures(context.Run, Parse<NativeTestResult[]>(raw));
             var results = TestSuiteResultNormalizer.Normalize(context.Run, captures);
             var verified = await session.Verify(CancellationToken.None);
             ValidateScope(context.Run, verified.Scope, verified.ScopeEvidenceKind, verified.ScopeEvidence, requireComplete: false);
@@ -275,7 +285,7 @@ public sealed class TestSuiteStyleJobs
         {
             result = Read<TestSuiteStyleRetainedResult>(entry.Artifact);
             if (raw?.Artifact != result.Raw) throw new BridgeException("TestSuiteArtifactMismatch", "Report must bind the original retained response.");
-            var normalized = TestSuiteResultNormalizer.Normalize(context.Run, Parse<NativeTestResult[]>(ReadBytes(result.Raw)));
+            var normalized = TestSuiteResultNormalizer.Normalize(context.Run, TestSuiteApplicationRun.Captures(context.Run, Parse<NativeTestResult[]>(ReadBytes(result.Raw))));
             var scope = Read<TestSuiteScopeCoverageReport>(result.Scope);
             var assessment = TestSuiteScopeCoverage.Assess(context.Run, normalized, scope);
             if (Hash(normalized) != result.Results.Sha256 || Hash(assessment) != result.Assessment.Sha256 || result.Classification != Classify(normalized, scope, assessment))
@@ -365,7 +375,7 @@ public sealed class TestSuiteStyleJobs
         if (revision is not null && op.Revision != revision) throw new BridgeException("RevisionConflict", "Reread the operation revision.");
         var review = ReadReview(status.Job.Review);
         var run = review.Runs[Array.IndexOf(status.Job.OperationIds, operationId)].Run;
-        return new(root, run, TestSuiteDefinitionBundle.Restore(run, ReadBytes(op.Plan.Inputs[1])), op, review.ExecutionProfile);
+        return new(root, run, TestSuiteDefinitionBundle.Restore(run, ReadBytes(op.Plan.Inputs[1])), op, review.ExecutionProfile) { Application = review.Application };
     }
     private sealed record StopRecord(string JobId, string ReviewSha256);
     private bool Stopped(string id)

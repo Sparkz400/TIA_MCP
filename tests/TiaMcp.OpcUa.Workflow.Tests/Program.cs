@@ -56,6 +56,15 @@ Test("exact source bytes and hash retained after upload release and store reopen
     Equal(Hash(bytes), Text(record["summary"]!["sourceSha256"]));
     Equal(false, record["nativeQualified"]!.GetValue<bool>());
 }));
+Test("native export bytes register as ordinary comparable model records", () => InStore((root, store, uploads) => {
+    var bytes = Fixture("machine-v1.xml");
+    var exported = store.InspectExported(bytes);
+    Equal(Hash(bytes), Text(exported["summary"]!["sourceSha256"]));
+    Equal("model", Text(new OpcUaWorkflowStore(root).Reopen(Ref(exported))["kind"]));
+    Equal(3, store.Compare(Ref(exported), Ref(Capture(store, uploads, "machine-v2.xml")))["summary"]!["breakingChangeCount"]!.GetValue<int>());
+    Reject("OpcUaCapacity", () => store.InspectExported([]));
+    Reject("OpcUaInvalidXml", () => store.InspectExported(Encoding.UTF8.GetBytes("<not-closed")));
+}));
 Test("inspection pages and bound cursors preserve exact ordering", () => InStore((_, store, uploads) => {
     var record = Capture(store, uploads);
     var page = store.ReportPage(Ref(record), "nodes", 1);

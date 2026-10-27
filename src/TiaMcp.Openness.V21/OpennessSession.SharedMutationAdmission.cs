@@ -21,7 +21,7 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsSharedMutation(string operation) => operation == "change_apply" || operation == "change_restore" ||
             operation == "simulation_download" || operation == "simulation_provision_scratch_credential" || operation == "library_open" ||
-            operation == "scratch_create" || operation == "project_retrieve" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step";
+            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step" || operation == "plc_station_upload";
 
         private JObject SharedMutationBegin(JObject args)
         {
@@ -63,6 +63,8 @@ namespace TiaMcp.Openness.V21
                 case "library_open": return LibraryOpen(arguments);
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
+                case "project_copy": return ProjectCopy(arguments);
+                case "plc_station_upload": return PlcStationUpload(arguments);
                 case "watch_fixture_seed": return WatchFixtureSeed(arguments);
                 case "watch_authoring_source_negative": return WatchAuthoringSourceNegative(arguments);
                 case "component_window_step": return ComponentWindowExecute(arguments);
@@ -224,6 +226,19 @@ namespace TiaMcp.Openness.V21
                         observation["fingerprint"] = EngineeringFingerprint(change, project); observation["previewHash"] = change.PreviewHash; observation["idempotentReadback"] = returnedApply;
                         string expected = operation == "change_apply" ? change.BaseFingerprint : change.AfterFingerprint;
                         if (!returnedApply && observation.Value<string>("fingerprint") != expected) throw new BridgeException("StaleRevision", "Project changed since its retained preparation or outcome.");
+                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("db_snapshot_", StringComparison.Ordinal))
+                        {
+                            // Online DB snapshot kinds also reserve the owned simulator and plan the observer project before dispatch.
+                            var marker = OwnedSimulationMarker(change.Payload);
+                            add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorOnlineValues");
+                            observation["markerSha256"] = SharedMutationHash(marker);
+                            string observer = SimulationDiscoveryObserverDirectory(args);
+                            SimulationDiscoveryObserver.VerifyDestination(observer);
+                            absent("project", "discoveryObserverProject", observer);
+                        }
+                        // VCI kinds also create, write or remove files below the workspace root.
+                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("vci_", StringComparison.Ordinal))
+                            add("workspace", change.Preview["vci"].Value<string>("rootPath"), "vciWorkspaceFiles");
                         if (operation == "change_restore")
                         {
                             if (ChangeFileHash(change.ArchivePath) != change.ArchiveHash) throw new BridgeException("CheckpointInvalid", "Recovery archive changed.");
@@ -250,6 +265,26 @@ namespace TiaMcp.Openness.V21
                 string destination = SharedMutationPlannedDestination("projectRetrieve", () => Path.Combine(SharedMutationArtifactDirectory(args), "r_" + Guid.NewGuid().ToString("N").Substring(0, 12)));
                 if (destination.Length > 80) throw new BridgeException("RecoveryPathTooLong", "Planned retrieval destination exceeds the native path limit.");
                 absent("project", "retrievalDestination", destination);
+            }
+            else if (operation == "project_copy")
+            {
+                if (!_ownsPortal) throw new BridgeException("OwnedSessionRequired", "Project copy requires this worker's owned Portal.");
+                var source = SelectProject(args); string root = SharedMutationArtifactDirectory(args);
+                if (source.IsModified) throw new BridgeException("UnsavedProject", "project_copy never saves its source; save or discard its edits first.");
+                add("project", source.Path.FullName, "archiveSavedSourceUnchanged"); observation["source"] = ProjectInfo(source);
+                absent("workspace", "copyArchive", SharedMutationPlannedDestination("projectCopyArchive", () => Path.Combine(root, EngineeringPaths.NewRecoveryArchiveName(root))));
+                absent("project", "copyDestination", SharedMutationPlannedDestination("projectCopy", () => EngineeringPaths.NewRecoveryDirectory(root, source.Name)));
+            }
+            else if (operation == "plc_station_upload")
+            {
+                if (!_ownsPortal || _portal.Projects.Count != 0) throw new BridgeException("ProjectIsolationRequired", "Station upload requires this worker's empty Portal.");
+                var marker = OwnedSimulationMarker(args);
+                add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorUploadSource");
+                observation["markerSha256"] = SharedMutationHash(marker);
+                absent("project", "uploadDestination", StationUploadDestination(args));
+                string observer = SimulationDiscoveryObserverDirectory(args);
+                SimulationDiscoveryObserver.VerifyDestination(observer);
+                absent("project", "discoveryObserverProject", observer);
             }
             else if (operation == "library_open")
             {

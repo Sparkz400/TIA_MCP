@@ -181,6 +181,55 @@ internal static class ReconnectChecks
             }
             finally {server.Mode="normal";server.DropPublishResponses=0;await sessions.Disconnect(attempt);}
         }
+        // Session loss reported by the server: one replacement session, TransferSubscriptions, and on refusal a new subscription.
+        foreach(string mode in new[]{"transferred","transferRefused"})
+        {
+            string root=Path.Combine(output,"reconnect-"+mode),attempt=Id(),capture=Id();
+            await using var sessions=new OpcUaRuntimeSessionStore(Path.Combine(root,"sessions"));
+            await using var subscriptions=new OpcUaRuntimeSubscriptions(sessions,root);
+            check((await sessions.Connect(attempt,server.Selection)).State=="connected","Transfer fixture connects: "+mode);
+            int creates=Count("CreateSession"),subscribed=Count("SubscriptionCreated"),transfers=Count("TransferRequested");
+            server.DropPublishResponses=1;server.ReactivationFailure=StatusCodes.BadSessionIdInvalid;server.ReactivationFailureOnce=true;
+            if(mode=="transferRefused")server.Mode="transferRefused";
+            try
+            {
+                await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:2),default);
+                await Wait(async()=>Json(await subscriptions.Status(capture,default)).GetProperty("state").GetString()!="running");
+                var status=Json(await subscriptions.Status(capture,default));string snapshot=status.GetProperty("snapshotRef").GetString()!;
+                var rows=Json(subscriptions.Page(snapshot,0,200)).GetProperty("rows").EnumerateArray().Select(r=>r.GetProperty("event")).ToArray();
+                File.WriteAllText(Path.Combine(root,"observed.json"),JsonSerializer.Serialize(new{status,rows},BridgeProtocol.Json));
+                string Kind(JsonElement e)=>e.GetProperty("kind").GetString()!;
+                var succeeded=rows.Where(e=>Kind(e)=="reconnect" && e.GetProperty("reconnect").GetProperty("state").GetString()=="succeeded").Select(e=>e.GetProperty("reconnect")).ToArray();
+                check(succeeded.Length==1 && Count("CreateSession")==creates+1 && Count("TransferRequested")==transfers+1,"Lost session opens one replacement session and one transfer: "+mode);
+                check(status.GetProperty("transferPolicy").GetString()=="transferThenRecreateAfterSessionLoss","Status reports opt-in transfer policy: "+mode);
+                check(status.GetProperty("recordedProgress").GetProperty("notifications").GetInt64()==2,"Notifications continue after session loss: "+mode);
+                var created=rows.Where(e=>Kind(e)=="created").ToArray();
+                if(mode=="transferred")
+                {
+                    check(succeeded[0].GetProperty("transfer").GetString()=="transferred" && !succeeded[0].TryGetProperty("transferStatusCode",out _),"Transfer success reported");
+                    check(Count("SubscriptionCreated")==subscribed+1 && created.Length==1,"Transferred subscription keeps its original identity");
+                    check(rows.Any(e=>Kind(e)=="republish"),"Lost response recovered by Republish on the replacement session");
+                }
+                else
+                {
+                    check(succeeded[0].GetProperty("transfer").GetString()=="refused" && succeeded[0].GetProperty("transferStatusCode").GetString()=="0x800b0000","Server refusal reported with its status code");
+                    check(Count("SubscriptionCreated")==subscribed+2 && created.Length==2 &&
+                        created[0].GetProperty("subscriptionId").GetUInt32()!=created[1].GetProperty("subscriptionId").GetUInt32(),"Refused transfer falls back to a new subscription");
+                    check(!rows.Any(e=>Kind(e) is "republish" or "gap"),"New subscription never republishes or counts the old sequence");
+                }
+                // Reopening retained evidence reruns the independent timeline validation; forged transfer evidence refuses.
+                await subscriptions.Export(snapshot,"csv",default);
+                static JsonNode Transfer(JsonObject[] s)=>s.SelectMany(x=>x["rows"]!.AsArray()).Select(r=>r!["event"]!).First(e=>e["reconnect"]?["transfer"] is not null)["reconnect"]!;
+                await SubscriptionChecks.RetainedControls(root,sessions,capture,status,check,mode=="transferred" ? [
+                    ("transfer claimed refused without recreate",s=>{var r=Transfer(s);r["transfer"]="refused";r["transferStatusCode"]="0x800b0000";}),
+                    ("transfer status on success",s=>Transfer(s)["transferStatusCode"]="0x800b0000")
+                ] : [
+                    ("recreate without refused transfer",s=>{var r=Transfer(s).AsObject();r["transfer"]="transferred";r.Remove("transferStatusCode");}),
+                    ("refusal with good status",s=>Transfer(s)["transferStatusCode"]="0x00000000")
+                ]);
+            }
+            finally {server.Mode="normal";server.DropPublishResponses=0;server.ReactivationFailure=0;server.ReactivationFailureOnce=false;await sessions.Disconnect(attempt);}
+        }
     }
     private static async Task Wait(Func<Task<bool>> condition)
     {

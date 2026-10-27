@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
@@ -20,11 +21,13 @@ namespace TiaMcp.Openness.V21
                 if (change.Versions.Count != 1 || change.Masters.Count != 0 || !(change.Versions[0] is CodeBlockLibraryTypeVersion))
                     throw new BridgeException("UnsupportedIntegrationType", "Select one exact native FB type/version. Master copies and HMI are not PLC recipes.");
                 var scope = LibraryPlcScope(change, out var plc);
-                if (scope.Unit != null) throw new BridgeException("UnsupportedIntegrationScope", "PLC integration recipes currently require the standard PLC scope.");
-                PreparePlcLibraryInstantiation(change); // Preserve existing collision, family and completeness guards.
                 var budget = new ScanBudget(50000);
                 var blocks = ScopeBlocks(scope, budget).ToArray();
                 var types = ScopeTypes(scope, budget).ToArray();
+                // An installed same-name root is reused only with the exact-version proofs below; otherwise the import guards apply.
+                string rootName = change.Versions[0].TypeObject.Name;
+                bool rootInstalled = blocks.Any(b => string.Equals(b.Item.Name, rootName, StringComparison.OrdinalIgnoreCase)) || types.Any(t => string.Equals(t.Item.Name, rootName, StringComparison.OrdinalIgnoreCase));
+                if (!rootInstalled) PreparePlcLibraryInstantiation(change); // Preserve existing collision, family and completeness guards.
                 var tags = new JArray();
                 foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget))
                     foreach (var tag in table.Item.Tags)
@@ -86,10 +89,31 @@ namespace TiaMcp.Openness.V21
                     LibraryDependencyCapture.RequireUnchanged(version, dependencyGuids[version.Guid]);
                     versions.Add(row);
                 }
-                var inventory = new JObject { ["complete"] = true, ["objects"] = new JArray(blocks.Select(b => new JObject {
-                    ["name"] = b.Item.Name, ["path"] = b.Path, ["kind"] = BlockNumberKind(b.Item), ["number"] = b.Item.Number,
-                    ["language"] = b.Item.ProgrammingLanguage.ToString(), ["protected"] = b.Item.IsKnowHowProtected, ["namespace"] = b.Item.Namespace
-                }).Concat(types.Select(t => new JObject { ["name"] = t.Item.Name, ["path"] = t.Path, ["kind"] = "UDT" }))), ["tags"] = tags };
+                var reused = (JArray)change.Preview["reusedDependencies"];
+                if (rootInstalled)
+                {
+                    reused = new JArray();
+                    foreach (var version in nativeVersions)
+                    {
+                        var node = new JObject { ["typeName"] = version.TypeObject.Name, ["typeGuid"] = version.TypeObject.Guid.ToString("D") };
+                        RequireNoInstanceInOtherScope(change, plc, scope, node);
+                        reused.Add(ProveInstalledLibraryDependency(change, plc, node, version));
+                    }
+                }
+                string dbName = change.Payload["integration"]["instanceDb"]?.Value<string>("name");
+                var inventory = new JObject { ["complete"] = true, ["objects"] = new JArray(blocks.Select(b =>
+                {
+                    var row = new JObject { ["name"] = b.Item.Name, ["path"] = b.Path, ["kind"] = BlockNumberKind(b.Item), ["number"] = b.Item.Number,
+                        ["language"] = b.Item.ProgrammingLanguage.ToString(), ["protected"] = b.Item.IsKnowHowProtected, ["namespace"] = b.Item.Namespace };
+                    if (b.Item is InstanceDB instance)
+                    {
+                        row["instanceOfName"] = instance.InstanceOfName;
+                        if (string.Equals(b.Item.Name, dbName, StringComparison.OrdinalIgnoreCase)) row["users"] = PlcIntegrationInstanceUsers(plc, b.Path);
+                    }
+                    return row;
+                }).Concat(types.Select(t => new JObject { ["name"] = t.Item.Name, ["path"] = t.Path, ["kind"] = "UDT" }))), ["tags"] = tags,
+                    ["scope"] = new JObject { ["path"] = scope.Path, ["kind"] = scope.Kind, ["namespacePreset"] = scope.Unit?.NamespacePreset },
+                    ["reusedVersions"] = reused ?? new JArray(), ["members"] = PlcIntegrationMembers(change, blocks, types, tags) };
                 var plan = PlcLibraryIntegrationPlanner.BuildFromArtifacts(change.Payload, versions, callerArtifact, inventory);
                 plan["inventorySha256"] = ChangeHash(inventory.ToString(Newtonsoft.Json.Formatting.None));
                 plan["coordinator"] = new JObject {
@@ -105,8 +129,43 @@ namespace TiaMcp.Openness.V21
                 ((JArray)change.Preview["effects"]).Add(new JObject { ["action"] = "planPlcComponent", ["nativeMutation"] = false, ["proposedSteps"] = plan["steps"].DeepClone() });
                 ((JArray)change.Preview["warnings"]).Add("Planning only. No checkpoint or mutation is dispatched. Separate prepared steps require fresh native validation and are not an atomic combined installation.");
             }
-            catch (PlcIntegrationPlanException error) { throw new BridgeException(error.Code, error.Message); }
+            catch (PlcIntegrationPlanException error) { throw new BridgeException(error.Code, error.Message, error.Details); }
             catch (PlcComponentException error) { throw new BridgeException(error.Code, error.Message); }
+        }
+
+        // Other blocks using an existing instance DB; null when the native cross-reference read is incomplete (the planner then refuses reuse).
+        private JArray PlcIntegrationInstanceUsers(PlcSelection plc, string path)
+        {
+            var analysis = ReadNativeAnalysis(new JObject { ["projectName"] = plc.Project.Name, ["plcPath"] = plc.Path, ["blockPath"] = path, ["maxItems"] = 2000 });
+            if (analysis.IndexTruncated || analysis.Budget.Truncated || analysis.Warnings.Count > 0) return null;
+            return new JArray(analysis.References.Where(r => r.Subject?.BlockPath == path && r.Actor?.BlockPath != null && r.Actor.BlockPath != path && (r.Relation == ReferenceType.Uses || r.Relation == ReferenceType.UsedBy))
+                .Select(r => r.Actor.BlockPath).Distinct(StringComparer.Ordinal).OrderBy(p => p, StringComparer.Ordinal));
+        }
+
+        // Flattened declarations for DB-member and UDT-tag-member mappings; a missing owner stays absent so the planner refuses it.
+        private JObject PlcIntegrationMembers(LibraryChange change, BlockEntry[] blocks, TypeEntry[] types, JArray tags)
+        {
+            var result = new JObject();
+            JArray Export(Action<FileInfo> export)
+            {
+                string file = Path.Combine(change.Directory, "integration-members-" + result.Count + ".xml"); export(new FileInfo(file));
+                return PlcHmiIntegrationPlanner.Members(EngineeringSources.ReadXml(File.ReadAllText(file)));
+            }
+            foreach (JObject mapping in (JArray)change.Payload["integration"]["mappings"])
+            {
+                string owner = mapping.Value<string>("dbPath") ?? (mapping["members"] != null ? mapping.Value<string>("tagPath") : null);
+                if (owner == null || result[owner] != null) continue;
+                if (mapping["dbPath"] != null)
+                {
+                    var db = blocks.FirstOrDefault(b => b.Path == owner);
+                    if (db?.Item is DataBlock && !db.Item.IsKnowHowProtected) result[owner] = Export(f => db.Item.Export(f, ExportOptions.WithDefaults, DocumentInfoOptions.None));
+                    continue;
+                }
+                string type = tags.FirstOrDefault(t => t.Value<string>("path") == owner)?.Value<string>("dataType") ?? "";
+                var udts = types.Where(t => "\"" + (string.IsNullOrEmpty(t.Item.Namespace) ? t.Item.Name : t.Item.Namespace + "." + t.Item.Name) + "\"" == type).ToArray();
+                if (udts.Length == 1) result[owner] = Export(f => udts[0].Item.Export(f, ExportOptions.WithDefaults, DocumentInfoOptions.None));
+            }
+            return result;
         }
     }
 }

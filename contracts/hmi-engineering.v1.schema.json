@@ -8,13 +8,27 @@
   "required": ["schemaVersion", "operation", "target", "expectedContentHash"],
   "properties": {
     "schemaVersion": {"const": 1},
-    "operation": {"enum": ["scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create"]},
+    "operation": {"enum": ["scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import", "connection_create", "object_create", "object_properties_set", "screen_create", "item_create", "dynamization_set", "event_handler_set"]},
     "target": {"$ref": "hmi-identity.v2.schema.json"},
     "expectedContentHash": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$", "description": "Complete native family-specific content hash; never an explorer metadata revision or partial export hash."},
-    "properties": {"type": "object", "minProperties": 1, "maxProperties": 3, "additionalProperties": false, "properties": {
+    "properties": {"type": "object", "minProperties": 1, "maxProperties": 8, "additionalProperties": false, "description": "Operation- and family-specific allowlist; object_create/object_properties_set accept only the exact native family's documented typed setters (alarms, logs, runtime settings); screen_create takes exactly Width and Height.", "properties": {
       "BackColor": {"type": "string", "minLength": 7, "maxLength": 13, "pattern": "^[0-9]{1,3}, [0-9]{1,3}, [0-9]{1,3}$"},
-      "Enabled": {"type": "boolean"}, "Visible": {"type": "boolean"}, "TabIndex": {"type": "integer", "minimum": 0, "maximum": 4294967295}
+      "Enabled": {"type": "boolean"}, "Visible": {"type": "boolean"}, "TabIndex": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+      "RaisedStateTag": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Name of an existing HMI tag of the same HMI."},
+      "RaisedStateTagBitNumber": {"type": "integer", "minimum": 0, "maximum": 63}, "TriggerMode": {"enum": ["OnRisingEdge", "OnFallingEdge"]},
+      "Condition": {"enum": ["LowerLimit", "UpperLimit", "Equal", "NotEqual", "LowerLimitOrEqual", "UpperLimitOrEqual"]},
+      "AlarmClass": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Name of an existing alarm class of the same HMI."},
+      "Priority": {"type": "integer", "minimum": 0, "maximum": 255}, "Origin": {"type": "string", "minLength": 1, "maxLength": 256}, "Area": {"type": "string", "minLength": 1, "maxLength": 256},
+      "Settings.LogMaxSize": {"type": "integer", "minimum": 0, "maximum": 4294967295}, "Settings.StorageFolder": {"type": "string", "minLength": 1, "maxLength": 256},
+      "StartScreen": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Name of an existing top-level screen of the same HMI."},
+      "ScreenResolution": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Native ScreenResolution enum name."},
+      "Width": {"type": "integer", "minimum": 1, "maximum": 4294967295, "description": "screen_create only: must equal the width of an existing top-level screen of the same HMI, together with its Height."},
+      "Height": {"type": "integer", "minimum": 1, "maximum": 4294967295, "description": "screen_create only: must equal the height of the same existing top-level screen."}
     }},
+    "composition": {"enum": ["DiscreteAlarms", "AnalogAlarms", "DataLogs", "AlarmLogs"], "description": "object_create only: Unified HmiSoftware composition with a documented Create(name)."},
+    "itemType": {"enum": ["HmiRectangle", "HmiText", "HmiButton", "HmiIOField", "HmiBar", "HmiGauge", "HmiSlider", "HmiToggleSwitch"], "description": "item_create only: native Unified screen-item type created through HmiScreenItemBaseComposition.Create<T>(name)."},
+    "eventType": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z_][A-Za-z0-9_]*$", "not": {"const": "None"}, "description": "event_handler_set only: member name of the target screen's or item's native event-type enum, for example Tapped or Loaded."},
+    "script": {"type": "string", "minLength": 1, "maxLength": 16384, "pattern": "^[^\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F]*$", "description": "event_handler_set only: untrusted JavaScript stored verbatim as the handler's ScriptCode; never executed, evaluated or syntax-checked by the bridge. V21 exposes no system-function list for Unified event handlers."},
     "name": {"type": "string", "minLength": 1, "maxLength": 256},
     "dataType": {"enum": ["Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal"]},
     "placement": {"type": "object", "additionalProperties": false, "required": ["left", "top", "width", "height"], "properties": {
@@ -24,8 +38,11 @@
     "connection": {"$ref": "hmi-identity.v2.schema.json", "description": "Exact Unified hmiConnection on the target HMI; its PLC owner is proven from native CommunicationManagement endpoints."},
     "plcTag": {"type": "object", "additionalProperties": false, "required": ["plcPath", "objectPath", "kind"], "properties": {
       "projectPath": {"type": "string", "minLength": 1}, "plcPath": {"type": "string", "minLength": 1}, "scopePath": {"type": "string", "minLength": 1},
-      "objectPath": {"type": "string", "minLength": 1}, "kind": {"const": "tag"}, "name": {"type": "string", "minLength": 1}, "namespace": {"type": ["string", "null"]}
-    }, "description": "Exact root PLC tag-table tag identity as returned by hmi_references; it must belong to the connection's native partner PLC."},
+      "objectPath": {"type": "string", "minLength": 1}, "kind": {"enum": ["tag", "block"]}, "name": {"type": "string", "minLength": 1}, "namespace": {"type": ["string", "null"]},
+      "memberPath": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"type": "string", "minLength": 1, "maxLength": 128, "description": "One unquoted member name (letter or underscore, then letters, digits or underscores); no indices or quotes."}}
+    }, "if": {"properties": {"kind": {"const": "block"}}}, "then": {"required": ["memberPath"]}, "else": {"properties": {"memberPath": false}},
+    "description": "Exact root PLC tag-table tag identity, or exact root global DB identity plus the unquoted memberPath of one scalar non-array member, as returned by hmi_references; it must belong to the connection's native partner PLC."},
+    "xml": {"type": "string", "minLength": 1, "description": "Complete native Classic export document for exactly the target object (same exported root type and Name). Its native re-export after Import(Override) must equal it apart from DocumentInfo and formatting."},
     "bindings": {"type": "array", "minItems": 1, "maxItems": 200, "items": {"type": "object", "additionalProperties": false,
       "required": ["property", "tagIdentity", "dataType"], "properties": {
         "property": {"type": "string", "minLength": 1, "maxLength": 256}, "tagIdentity": {"$ref": "hmi-identity.v2.schema.json"},
@@ -38,8 +55,19 @@
     {"if": {"properties": {"operation": {"const": "external_tag_create"}}}, "then": {"required": ["name", "dataType", "connection", "plcTag"], "properties": {"properties": false, "placement": false, "bindings": false, "target": {"properties": {"family": {"const": "unified"}}}}}},
     {"if": {"properties": {"operation": {"enum": ["scalar_property_set", "item_properties_set"]}}}, "then": {"required": ["properties"], "properties": {"name": false, "dataType": false, "placement": false, "bindings": false, "connection": false, "plcTag": false}}},
     {"if": {"properties": {"operation": {"const": "scalar_property_set"}}}, "then": {"properties": {"properties": {"maxProperties": 1}}}},
+    {"if": {"properties": {"operation": {"const": "item_properties_set"}}}, "then": {"properties": {"properties": {"maxProperties": 3}}}},
+    {"if": {"properties": {"operation": {"const": "connection_create"}}}, "then": {"required": ["name"], "properties": {"dataType": false, "properties": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}},
+    {"if": {"properties": {"operation": {"const": "object_create"}}}, "then": {"required": ["name", "composition"], "properties": {"dataType": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}, "else": {"properties": {"composition": false}}},
+    {"if": {"properties": {"operation": {"const": "object_properties_set"}}}, "then": {"required": ["properties"], "properties": {"name": false, "dataType": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}},
     {"if": {"properties": {"operation": {"const": "item_place"}}}, "then": {"required": ["placement"], "properties": {"name": false, "dataType": false, "properties": false, "bindings": false, "connection": false, "plcTag": false}}},
+    {"if": {"properties": {"operation": {"const": "screen_create"}}}, "then": {"required": ["name", "properties"], "properties": {"properties": {"required": ["Width", "Height"], "maxProperties": 2}, "dataType": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}},
+    {"if": {"properties": {"operation": {"const": "item_create"}}}, "then": {"required": ["name", "itemType", "placement"], "properties": {"dataType": false, "properties": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}, "else": {"properties": {"itemType": false}}},
+    {"if": {"properties": {"operation": {"const": "dynamization_set"}}}, "then": {"required": ["bindings"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}},
+      "bindings": {"maxItems": 1, "items": {"properties": {"property": {"enum": ["ProcessValue", "Visible", "Enabled"]}, "expectedValue": false},
+        "if": {"properties": {"property": {"enum": ["Visible", "Enabled"]}}}, "then": {"properties": {"dataType": {"const": "Bool"}}}}}}}},
+    {"if": {"properties": {"operation": {"const": "event_handler_set"}}}, "then": {"required": ["eventType", "script"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "unified"}}}}}, "else": {"properties": {"eventType": false, "script": false}}},
     {"if": {"properties": {"operation": {"enum": ["existing_binding_set", "explicit_binding_set"]}}}, "then": {"required": ["bindings"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "connection": false, "plcTag": false}}},
-    {"if": {"properties": {"operation": {"const": "existing_binding_set"}}}, "then": {"properties": {"bindings": {"items": {"required": ["expectedValue"]}}}}}
+    {"if": {"properties": {"operation": {"const": "existing_binding_set"}}}, "then": {"properties": {"bindings": {"items": {"required": ["expectedValue"]}}}}},
+    {"if": {"properties": {"operation": {"const": "classic_xml_import"}}}, "then": {"required": ["xml"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "classic"}}}}}, "else": {"properties": {"xml": false}}}
   ]
 }

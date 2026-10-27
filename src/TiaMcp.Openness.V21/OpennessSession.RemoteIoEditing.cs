@@ -55,22 +55,28 @@ namespace TiaMcp.Openness.V21
             return item.Item;
         }
 
-        private Channel PrepareHardwareChannel(EngineeringChange change, Project project, JObject preview)
+        private Channel HardwareChannel(Project project, JObject payload)
         {
-            var item = ChangeHardware(project, change.Payload);
-            string type = ChangeText(change.Payload, "channelType", 64), ioType = ChangeText(change.Payload, "channelIoType", 64);
-            int number = HardwareIndex(change.Payload, "channelNumber");
+            var item = ChangeHardware(project, payload);
+            string type = ChangeText(payload, "channelType", 64), ioType = ChangeText(payload, "channelIoType", 64);
+            int number = HardwareIndex(payload, "channelNumber");
             var matches = item.Item.Channels.Where(channel => channel.Number == number && channel.Type.ToString() == type && channel.IoType.ToString() == ioType).Take(2).ToArray();
             if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ChannelNotFound" : "AmbiguousTarget", "hardwarePath, channelType, channelIoType and channelNumber must select one native channel.");
+            return matches[0];
+        }
+
+        private Channel PrepareHardwareChannel(EngineeringChange change, Project project, JObject preview)
+        {
+            var channel = HardwareChannel(project, change.Payload);
             var attributes = ChangeObject(change.Payload, "attributes");
             if (attributes.Count == 0 || attributes.Count > ChannelWriteAttributes.Count) throw new BridgeException("InvalidRequest", "At least one reviewed channel attribute is required.");
-            var changes = PrepareAttributes(matches[0], attributes, ChannelWriteAttributes, out var converted);
+            var changes = PrepareAttributes(channel, attributes, ChannelWriteAttributes, out var converted);
             // Store native scalar representations so the preservation comparison
             // matches native numeric/enum values rather than JSON input spelling.
             foreach (var property in attributes.Properties().ToArray())
                 attributes[property.Name] = ChangeScalar(converted[property.Name]);
             if (preview != null) preview["attributeChanges"] = changes;
-            return matches[0];
+            return channel;
         }
 
         private IoConnector PrepareIoAssignment(EngineeringChange change, Project project, JObject preview, out IoController controller)
@@ -179,8 +185,9 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("MutationVerificationFailed", "The previous I/O system still contains the moved or disconnected connector.");
         }
 
-        private JArray CaptureHardwareEngineering(Project project, bool cpuMemoryBytes = false)
+        private JArray CaptureHardwareEngineering(Project project, string kind = null)
         {
+            bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind);
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -231,6 +238,8 @@ namespace TiaMcp.Openness.V21
                 if (network != null) row["network"] = new JObject { ["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot)),
                     ["controllers"] = new JArray(network.IoControllers.Select((controller, index) => new JObject { ["index"] = index, ["system"] = System(controller.IoSystem) })),
                     ["connectors"] = new JArray(network.IoConnectors.Select((connector, index) => new JObject { ["index"] = index, ["system"] = System(connector.ConnectedToIoSystem) })) };
+                if (ports && item.GetService<NetworkPort>() is NetworkPort port)
+                    row["port"] = new JObject { ["connectedPorts"] = new JArray(port.ConnectedPorts.Select(partner => Owner(partner.OwnedBy)).OrderBy(value => value, StringComparer.Ordinal)) };
                 rows.Add(row);
             }
             return rows;
@@ -239,30 +248,35 @@ namespace TiaMcp.Openness.V21
         private void PrepareHardwarePreservation(EngineeringChange change, Project project, JObject preview)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind);
             string path = Path.Combine(change.Directory, "hardware-before.json");
             File.WriteAllText(path, change.HardwareBeforeManifest.ToString(Formatting.Indented));
             change.Backups.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
             preview["preservation"] = new JObject { ["policyVersion"] = 1, ["operation"] = change.Kind,
                 ["covered"] = "All observed hardware identities/slots, reviewed hardware/channel attributes, configured address ranges/owners, node configuration and exact I/O-system assignments; fail closed on capture failure.",
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
+            if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
+            if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }
 
         private void VerifyHardwarePreservation(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var after = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            var after = CaptureHardwareEngineering(project, change.Kind);
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
+            if (change.Kind == "hardware_replace") change.Readbacks.Add(new JObject { ["role"] = "hardware-replace-inventory",
+                ["before"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath")), ["after"] = HardwareEngineeringRules.ReplaceInventory(after, change.Payload.Value<string>("hardwarePath")) });
+            if (change.Kind == "cax_import") RecordCaxHardwareDifference(change, after);
             HardwareEngineeringRules.RequirePreserved(change.Kind, change.Payload, change.HardwareBeforeManifest, after);
-            change.Stages.Add("configured_hardware_preservation_verified");
+            change.Stages.Add(change.Kind == "cax_import" && change.Payload.Value<string>("importOption") == "OverwriteTiaDevice" ? "configured_hardware_difference_recorded" : "configured_hardware_preservation_verified");
         }
 
         private void VerifyHardwareRecovery(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var restored = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            var restored = CaptureHardwareEngineering(project, change.Kind);
             string path = Path.Combine(change.Directory, "hardware-restored.json");
             File.WriteAllText(path, restored.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-recovery", ["artifact"] = ChangeArtifact(path) });

@@ -499,6 +499,164 @@ internal static class TypedGraphicalTests
         }
     }
 
+    // Families added 27 October 2026 have no captured native profile yet: these unit-test-only
+    // profiles exercise the builder contract, not native acceptance.
+    internal static async Task RawPayloadAcceptsOnlyExactNewFamilies()
+    {
+        static JObject Payload(string node) => JObject.Parse("{\"blockPath\":\"/b\",\"model\":{\"schemaVersion\":1,\"language\":\"FBD\",\"operation\":\"insertNetwork\",\"nodes\":[" + node + "],\"connections\":[],\"operands\":[]}}");
+        foreach (var valid in new[] { "{\"key\":\"m\",\"kind\":\"move\",\"dataType\":\"DInt\"}", "{\"key\":\"a\",\"kind\":\"math\",\"instruction\":\"DIV\",\"dataType\":\"Real\"}",
+            "{\"key\":\"e\",\"kind\":\"edge\",\"instruction\":\"F_TRIG\",\"instance\":\"s\"}", "{\"key\":\"t\",\"kind\":\"timer\",\"instruction\":\"TONR\",\"dataType\":\"Time\",\"instance\":\"s\"}" })
+            TypedGraphicalPayload.Validate(Payload(valid));
+        foreach (var invalid in new[] { "{\"key\":\"m\",\"kind\":\"move\"}", "{\"key\":\"a\",\"kind\":\"math\",\"dataType\":\"Int\"}", "{\"key\":\"a\",\"kind\":\"math\",\"instruction\":\"MOD\",\"dataType\":\"Int\"}",
+            "{\"key\":\"a\",\"kind\":\"math\",\"instruction\":\"TON\",\"dataType\":\"Int\"}", "{\"key\":\"e\",\"kind\":\"edge\",\"instruction\":\"R_TRIG\"}",
+            "{\"key\":\"e\",\"kind\":\"edge\",\"instruction\":\"P_TRIG\",\"instance\":\"s\"}", "{\"key\":\"t\",\"kind\":\"timer\",\"instruction\":\"ADD\",\"instance\":\"s\"}" })
+            await Error("InvalidTypedGraphicalPayload", () => TypedGraphicalPayload.Validate(Payload(invalid)));
+    }
+
+    internal static async Task NumericComparisonsUseExactDIntAndRealOverloads()
+    {
+        foreach (string type in new[] { "DInt", "Real" })
+        foreach (string op in new[] { "eq", "ne", "lt", "le", "gt", "ge" })
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            var pins = new List<TypedGraphicalPin> { Pin("in1", "input", type), Pin("in2", "input", type), Pin("out", "output", "Bool") };
+            if (language == "LAD") pins.Insert(0, Pin("pre", "input", "Bool"));
+            string native = char.ToUpperInvariant(op[0]) + op[1..];
+            var context = Context(); context.Profiles = [Profile(language, "compare", op, type, native, $"<TemplateValue Name='SrcType' Type='Type'>{type}</TemplateValue>", [.. pins])];
+            context.Operands["left"] = Operand("left", "Left", type, false); context.Operands["right"] = Operand("right", "Right", type, false);
+            var model = BoxModel(language, new() { Key = "cmp", Kind = "compare", Comparison = op, DataType = type }, language == "LAD" ? "pre" : null, "out", ("in1", "left", false), ("in2", "right", false));
+            var built = TypedGraphical.Build(Fixture(language), model, context);
+            var part = Added(built).Descendants(Net + "Part").Single(p => p.Attribute("Name")?.Value == native);
+            Check.Equal(type, part.Elements(Net + "TemplateValue").Single(v => v.Attribute("Name")?.Value == "SrcType").Value);
+            Check.Equal("complete", Readback(built, context).Coverage);
+            context.Operands["right"] = Operand("right", "Right", type == "DInt" ? "Int" : "LReal", false);
+            await Error("OperandTypeMismatch", () => TypedGraphical.Build(Fixture(language), model, context));
+        }
+        var dint = Context();
+        dint.Operands["left"] = Operand("left", "Left", "DInt", false); dint.Operands["right"] = Operand("right", "Right", "DInt", false);
+        var request = BoxModel("FBD", new() { Key = "cmp", Kind = "compare", Comparison = "eq", DataType = "DInt" }, null, "out", ("in1", "left", false), ("in2", "right", false));
+        dint.Profiles = [ComparisonProfile()];
+        await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(Fixture("FBD"), request, dint));
+        var mislabeled = ComparisonProfile(); mislabeled.DataType = "DInt"; mislabeled.Pins = [Pin("in1", "input", "DInt"), Pin("in2", "input", "DInt"), Pin("out", "output", "Bool")];
+        dint.Profiles = [mislabeled];
+        await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(Fixture("FBD"), request, dint));
+        request.Nodes[0].DataType = "Time";
+        await Error("GraphicalComparisonUnsupported", () => TypedGraphical.Build(Fixture("FBD"), request, dint));
+    }
+
+    internal static async Task MoveAndArithmeticKeepOneExactType()
+    {
+        foreach (string type in new[] { "Int", "DInt", "Real" })
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            foreach (string op in new[] { "ADD", "SUB", "MUL", "DIV" })
+            {
+                string native = op[0] + op[1..].ToLowerInvariant();
+                var context = MathContext(language, op, type, native, $"<TemplateValue Name='SrcType' Type='Type'>{type}</TemplateValue>");
+                var model = BoxModel(language, new() { Key = "math", Kind = "math", Instruction = op, DataType = type }, "en", language == "LAD" ? "eno" : null, ("in1", "left", false), ("in2", "right", false), ("out", "result", true));
+                var built = TypedGraphical.Build(Fixture(language), model, context);
+                Check.Equal(type, Added(built).Descendants(Net + "Part").Single(p => p.Attribute("Name")?.Value == native).Element(Net + "TemplateValue")!.Value);
+                Check.Equal("complete", Readback(built, context).Coverage);
+                context.Operands["result"] = Operand("result", "Result", type == "Real" ? "LReal" : "LInt", true);
+                await Error("OperandTypeMismatch", () => TypedGraphical.Build(Fixture(language), model, context));
+            }
+            var move = Context();
+            move.Profiles = [Profile(language, "move", null, type, "Move", "<TemplateValue Name='Card' Type='Cardinality'>1</TemplateValue>", Pin("en", "input", "Bool", false), Pin("in", "input", type), Pin("out1", "output", type), Pin("eno", "output", "Bool", false))];
+            move.Operands["left"] = Operand("left", "Left", type, false); move.Operands["result"] = Operand("result", "Result", type, true);
+            var moveModel = BoxModel(language, new() { Key = "move", Kind = "move", DataType = type }, "en", language == "LAD" ? "eno" : null, ("in", "left", false), ("out1", "result", true));
+            var moved = TypedGraphical.Build(Fixture(language), moveModel, move);
+            Check.Equal("1", Added(moved).Descendants(Net + "Part").Single(p => p.Attribute("Name")?.Value == "Move").Element(Net + "TemplateValue")!.Value);
+            Check.Equal("complete", Readback(moved, move).Coverage);
+            move.Operands["left"] = Operand("left", "Left", type == "Int" ? "DInt" : "Int", false);
+            await Error("OperandTypeMismatch", () => TypedGraphical.Build(Fixture(language), moveModel, move));
+        }
+        TypedGraphicalModel Arithmetic(string op, string? type) => BoxModel("FBD", new() { Key = "math", Kind = "math", Instruction = op, DataType = type }, "en", null, ("in1", "left", false), ("in2", "right", false), ("out", "result", true));
+        const string intType = "<TemplateValue Name='SrcType' Type='Type'>Int</TemplateValue>";
+        foreach (var (op, type) in new (string, string?)[] { ("ADD", "Bool"), ("ADD", "Time"), ("MOD", "Int"), ("ADD", null) })
+            await Error("GraphicalArithmeticUnsupported", () => TypedGraphical.Build(Fixture("FBD"), Arithmetic(op, type), MathContext("FBD", "ADD", "Int", "Add", intType)));
+        await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(Fixture("FBD"), Arithmetic("ADD", "DInt"), MathContext("FBD", "ADD", "Int", "Add", intType)));
+        var wrongPins = MathContext("FBD", "ADD", "DInt", "Add", "<TemplateValue Name='SrcType' Type='Type'>DInt</TemplateValue>"); wrongPins.Profiles[0].Pins[1].DataType = "Int";
+        await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(Fixture("FBD"), Arithmetic("ADD", "DInt"), wrongPins));
+        foreach (var (native, body) in new[] { ("Add", intType), ("Add", ""), ("Sub", "<TemplateValue Name='SrcType' Type='Type'>DInt</TemplateValue>") })
+            await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(Fixture("FBD"), Arithmetic("ADD", "DInt"), MathContext("FBD", "ADD", "DInt", native, body)));
+        var moveRequest = BoxModel("FBD", new() { Key = "move", Kind = "move", DataType = "String" }, "en", null);
+        await Error("GraphicalMoveUnsupported", () => TypedGraphical.Build(Fixture("FBD"), moveRequest, Context()));
+        moveRequest.Nodes[0].DataType = "Int"; moveRequest.Nodes[0].Instruction = "ADD";
+        await Error("InvalidTypedGraphicalModel", () => TypedGraphical.Build(Fixture("FBD"), moveRequest, Context()));
+        moveRequest.Nodes[0].Instruction = null; moveRequest.Nodes[0].Instance = "state";
+        await Error("GraphicalInstanceMismatch", () => TypedGraphical.Build(Fixture("FBD"), moveRequest, Context()));
+    }
+
+    internal static async Task TonrAndEdgeDetectorsRequireExactIecStorage()
+    {
+        foreach (var (kind, instruction, type, storage, pins) in new (string, string, string?, string, TypedGraphicalPin[])[]
+        {
+            ("timer", "TONR", "Time", "TONR_TIME", [Pin("IN", "input", "Bool"), Pin("R", "input", "Bool"), Pin("PT", "input", "Time"), Pin("Q", "output", "Bool", false), Pin("ET", "output", "Time", false)]),
+            ("edge", "R_TRIG", null, "R_TRIG", [Pin("CLK", "input", "Bool"), Pin("Q", "output", "Bool", false)]),
+            ("edge", "F_TRIG", null, "F_TRIG", [Pin("CLK", "input", "Bool"), Pin("Q", "output", "Bool", false)])
+        })
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            var context = Context();
+            var profile = Profile(language, kind, instruction, type, instruction, "<Instance Scope='LocalVariable' UId='701'><Component Name='Prototype'/></Instance>", pins);
+            profile.InstanceType = storage; context.Profiles = [profile];
+            context.Operands["reset"] = Operand("reset", "Reset", "Bool", false); context.Operands["preset"] = Operand("preset", "Preset", "Time", false);
+            context.Operands["elapsed"] = Operand("elapsed", "Elapsed", "Time", true);
+            context.Instances["state"] = new() { Identity = "exact-caller::Dedicated", Scope = "LocalVariable", Components = ["Dedicated"], CalleePath = "instruction:" + instruction, DataType = storage, DeclarationHash = new string('d', 64) };
+            var node = new TypedGraphicalNode { Key = "stateful", Kind = kind, Instruction = instruction, DataType = type, Instance = "state" };
+            var model = BoxModel(language, node, kind == "timer" ? "IN" : "CLK", "Q", kind == "timer" ? [("R", "reset", false), ("PT", "preset", false), ("ET", "elapsed", true)] : []);
+            var built = TypedGraphical.Build(Fixture(language), model, context);
+            var nativeInstance = Added(built).Descendants(Net + "Instance").Single();
+            Check.Equal("Dedicated", nativeInstance.Element(Net + "Component")!.Attribute("Name")!.Value);
+            Check.Equal(false, nativeInstance.Attribute("UId")!.Value == "701");
+            Check.Equal(true, built.Effects.Any(e => e.Kind == "instanceDependency" && e.Identity == "exact-caller::Dedicated"));
+            Check.Equal("complete", Readback(built, context).Coverage);
+            context.Instances["state"].DataType = "TON_TIME";
+            await Error("GraphicalInstanceMismatch", () => TypedGraphical.Build(Fixture(language), model, context));
+            // No captured global storage type exists for the new families, so a global instance is refused.
+            context.Instances["state"].DataType = storage; context.Instances["state"].Scope = "GlobalVariable";
+            await Error("GraphicalInstanceMismatch", () => TypedGraphical.Build(Fixture(language), model, context));
+            context.Instances["state"].Scope = "LocalVariable"; node.Instance = null;
+            await Error("GraphicalInstanceUnresolved", () => TypedGraphical.Build(Fixture(language), model, context));
+            node.Instance = "state";
+            if (kind != "edge") continue;
+            node.DataType = "Bool";
+            await Error("InvalidTypedGraphicalModel", () => TypedGraphical.Build(Fixture(language), model, context));
+            node.DataType = null; node.Instruction = "P_TRIG";
+            await Error("GraphicalInstructionUnsupported", () => TypedGraphical.Build(Fixture(language), model, context));
+        }
+    }
+
+    private static TypedGraphicalContext MathContext(string language, string op, string type, string native, string body)
+    {
+        var context = Context();
+        context.Profiles = [Profile(language, "math", op, type, native, body, Pin("en", "input", "Bool", false), Pin("in1", "input", type), Pin("in2", "input", type), Pin("out", "output", type), Pin("eno", "output", "Bool", false))];
+        foreach (var (key, name, writable) in new[] { ("left", "Left", false), ("right", "Right", false), ("result", "Result", true) }) context.Operands[key] = Operand(key, name, type, writable);
+        return context;
+    }
+    private static TypedGraphicalProfile Profile(string language, string kind, string? instruction, string? type, string native, string body, params TypedGraphicalPin[] pins)
+    {
+        var profile = ComparisonProfile();
+        profile.Id = $"unit-test-only-{language}-{kind}-{instruction}-{type}"; profile.Language = language; profile.Kind = kind; profile.Instruction = instruction; profile.DataType = type;
+        profile.NativeName = native; profile.NativeTemplateXml = $"<Part xmlns='{Net}' Name='{native}' UId='700'>{body}</Part>"; profile.Pins = pins;
+        return profile;
+    }
+    private static TypedGraphicalPin Pin(string name, string direction, string type, bool required = true) => new() { Name = name, Direction = direction, DataType = type, Required = required };
+    // LAD feeds flowIn from the power rail and flowOut into a coil; FBD feeds flowIn from the Bool input operand and flowOut into an assignment.
+    private static TypedGraphicalModel BoxModel(string language, TypedGraphicalNode box, string? flowIn, string? flowOut, params (string Pin, string Operand, bool Output)[] data)
+    {
+        var nodes = new List<TypedGraphicalNode> { box };
+        var wires = new List<TypedGraphicalConnection>();
+        if (language == "LAD") { nodes.Add(new() { Key = "rail", Kind = "powerrail" }); if (flowIn != null) wires.Add(Wire("rail", "out", box.Key, flowIn)); }
+        else if (flowIn != null) wires.Add(Wire("$input", "value", box.Key, flowIn));
+        if (flowOut != null) { nodes.Add(new() { Key = "sink", Kind = language == "LAD" ? "coil" : "assign", Operand = "output" }); wires.Add(Wire(box.Key, flowOut, "sink", "in")); }
+        foreach (var (pin, operand, output) in data) wires.Add(output ? Wire(box.Key, pin, "$" + operand, "value") : Wire("$" + operand, "value", box.Key, pin));
+        return new() { SchemaVersion = 1, Language = language, Operation = "insertNetwork", InsertAfterNetworkId = "1", Nodes = [.. nodes], Connections = [.. wires], Operands = [] };
+    }
+    private static XElement Added(TypedGraphicalBuildResult built) => built.Document.Descendants("SW.Blocks.CompileUnit").Single(unit => unit.Attribute("ID")?.Value == built.NetworkId);
+    private static TypedGraphicalReadNetwork Readback(TypedGraphicalBuildResult built, TypedGraphicalContext context) =>
+        TypedGraphical.Read(built.Document, "/fixture/Independent", context.Profiles).Networks.Single(network => network.NetworkId == built.NetworkId);
+
     private static XDocument CreationFixture(string language, string blockType)
     {
         var source = Fixture(language);

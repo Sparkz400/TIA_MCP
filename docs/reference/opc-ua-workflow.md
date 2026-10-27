@@ -87,6 +87,31 @@ Oversized rows become explicit `omitted` entries carrying their row index, byte 
 
 Errors distinguish invalid handles/sections, stale cursors/manifests, capacity limits, integrity failure, incomplete publication and a busy store. No error grants native admission. Symlinks and junctions in storage paths are refused. XML DTD/entities and network resolvers remain disabled.
 
+## Native engineering read and export
+
+Two worker-backed tools read the OPC UA configuration of one PLC CPU in the attached TIA V21 project; S7-1500 is the target profile. Select the CPU by `hardwarePath` or `plcPath` from `project_inventory` (both are accepted when they name the same CPU). They change nothing in the project and never connect to a UA server.
+
+`opcua_engineering_inspect` returns:
+
+- `serverSettings`: CPU and sub-item attributes whose native names contain `OpcUa`, with the same sensitive-name exclusion and value states as `hardware_inspect`. Settings exposed under other names are not reported.
+- `serverInterfaces`, `simaticInterfaces` and `referenceNamespaces`: name, enabled, author, timestamps and, where Openness exposes them, the NodeId and node-generation flags.
+- `namespaceAccessRestrictions` and `roleMappings`, each role with its per-namespace `browse`, `read`, `write`, `call`, `receiveEvents` and `readRolePermissions`.
+
+`serverInterfaceGroup: "notExposed"` means the PLC software did not expose the OPC UA provider; it does not prove the CPU has no server. `maxItems` (1–2000, default 500) bounds sub-items, attributes and rows together; `completeness.truncated` and `warnings` report what was not read. Comments, legacy OPC UA users, certificates and client interfaces are not read.
+
+`opcua_engineering_export` writes native XML for one `category`:
+
+| `category` | V21 API | `name` |
+| --- | --- | --- |
+| `server` | `Project.HwUtilities.Find("OPCUAExportProvider")` → `OpcUaExportProvider.Export(DeviceItem, FileInfo)`: whole address space of the CPU | not accepted |
+| `serverInterface` | `ServerInterface.Export(FileInfo)` | optional exact name |
+| `simaticInterface` | `SimaticInterface.Export(FileInfo)` | optional exact name |
+| `referenceNamespace` | `ReferenceNamespace.Export(FileInfo)` | optional exact name |
+
+At most `maxItems` (1–32, default 32) files are written as new files under `<artifacts>/exports/opcua`, each with path, byte count and SHA-256. The Host reads every file back through the artifact boundary, checks its hash and registers it as an ordinary model record, the same record `opcua_inspect` creates from an upload. Each `files[]` row then carries either `record` (with its `recordRef`) or `registrationError`, for example `OpcUaCapacity` or `OpcUaInvalidXml`; the exported file stays in place either way. Pass the record handles to `opcua_compare`, `opcua_dependencies` and the other tools above, and export the reference namespaces too when a dependency set needs them. A failed item export, such as an empty SIMATIC interface, is listed in `warnings` and the other files are kept.
+
+Neither tool is natively qualified: the whole-server utility identifier and the XML dialect of each export come from Siemens documentation. A model record holds the exported bytes, not which CPU or interface they came from; keep the export response for that.
+
 ## Verification and native boundary
 
 Run `scripts/Test-OpcUaOffline.ps1` for the parser/dependency CLI package. The combined `scripts/Test-Offline.ps1` runner includes the workflow harness and actual MCP transport checks; Python dependencies are declared in `scripts/requirements-test.txt`. The standalone workflow commands are:
@@ -98,5 +123,26 @@ python -B scripts/test_opcua_host_mcp.py --host <built-Host.exe> --output <new-o
 ```
 
 The MCP harness explicitly validates every UA success/error response against the workflow JSON Schema and launches the Host twice with nonexistent worker paths. See the [delivery receipt](../verification/opc-ua-host-delivery-20261016.md).
+
+## Prepared native engineering changes
+
+Six change kinds use the normal `change_prepare` → `change_apply` → `change_status`/`change_restore` workflow. They work offline only, on one PLC selected by an exact top-level `plcPath`; `scopePath` is refused. Apply requires `checkpointSave=true` and `compile=true`. They use only the public V21 `Siemens.Engineering.SW.OpcUa` API: `OpcUaProvider.CommunicationGroup.ServerInterfaceGroup` with `ServerInterfaces`, `SimaticInterfaces`, `ReferenceNamespaces` and `AccessControl.RoleMappings`. The worker looks for the provider on the PLC software first, then on the CPU device items that own it. If neither has it, the change is refused (an S7-1500 with OPC UA is required).
+
+| Kind | Payload | Native call and readback |
+| --- | --- | --- |
+| `opcua_server_interface_import` | `interfaceName`, `mode` (`create`/`replace`), absolute `path`, `expectedSha256` | `ServerInterfaces.Create(name)` when creating, then `ServerInterface.Import(file)`. Readback gives name, `Enabled`, modification time, a native `Export` artifact and `exportMatchesInput`. |
+| `opcua_server_interface_delete` | `interfaceName` | Backup `Export`, then `Delete()`, then a check that the interface is gone. |
+| `opcua_server_interface_enable` | `interfaceName`, `enabled` | Sets `ServerInterface.Enabled` and reads it back. |
+| `opcua_reference_namespace_import` | `namespaceName`, `mode`, `path`, `expectedSha256` | `ReferenceNamespaces.Create(name, file)` or `ReferenceNamespace.Import(file)`. Readback gives `Enabled`, `GenerateNodes`, `GeneratedInterfaceName`, `UseStringNodeIds` and an export. |
+| `opcua_reference_namespace_delete` | `namespaceName` | Backup `Export`, then `Delete()`. The preview names any generated interface that may disappear with the namespace. |
+| `opcua_role_mapping_set` | `action: "create"`, `roleName`, `definedInNamespace`, optional `projectRole`, `namespacePermissions`; or `action: "remove"`, `roleName` | `RoleMappings.Create(name, namespace)`, `SetProjectRole`, then `NamespacePermission.SetPermission` for each listed namespace, all read back. Remove uses `RoleMapping.Delete()`. |
+
+Each `namespacePermissions` entry needs `namespaceUri` and explicit booleans for `Browse`, `Read`, `Write`, `Call`, `ReceiveEvents` and `ReadRolePermissions`. Namespaces you do not list keep their native defaults, which the readback reports. Payload fields outside each kind's list are refused. This means passwords, users, certificates and trust settings are never accepted. Standard-role insertion (`AddStandardOpcUaRole`), role rename and editing an existing mapping are not offered.
+
+Import files are copied into the change directory and bound to `expectedSha256` at prepare and again before apply. Use the bytes you reviewed with `opcua_inspect`; change payloads cannot resolve Host OPC UA record handles. Interface and namespace selection is case-insensitive. SIMATIC interfaces, and interfaces whose name matches a reference namespace's `GeneratedInterfaceName`, are refused as protected or generated objects.
+
+The V21 API exposes no mapping-status property. The readback export and the PLC compile diagnostics of the change are the only evidence of mapping validity. External OPC UA clients are never discovered.
+
+For these kinds the change fingerprint also includes a snapshot of every PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces with generation settings, and role mappings with their namespace permissions. Shared-mutation interruption reconciliation uses the same snapshot when it compares the project with its checkpoint and the recorded outcome. Interface and namespace content is covered only through native modification times. None of these kinds is natively qualified yet.
 
 The next native increment is the [UA-03/UA-Q00 eligibility/export packet](../verification/opc-ua-native-eligibility-packet-20261016.md). Target eligibility, Siemens mapping dialects, native engineering, security configuration, runtime endpoints and full compatibility are separate unqualified gates. None is admitted by parser, schema or offline MCP tests.

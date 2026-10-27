@@ -39,8 +39,7 @@ namespace TiaMcp.Openness.V21
                     string reference = check.ArchiveFingerprint(row, checkpoint.Value<string>("archivePath"));
                     var current = check.OpenProject(row, row.Value<string>("path"), null);
                     if (reference == null || current == null) continue;
-                    if (current.Value<string>("fingerprint") == reference) check.Prove(row, "unchanged", "Fresh fingerprint equals the retrieved pre-transaction checkpoint.");
-                    else check.Hold(row, "The project differs from its pre-transaction checkpoint.");
+                    check.ApplyProject(row, current, reference, checkpoint.Value<string>("archivePath"), false);
                 }
                 foreach (var row in check.Rows("libraryResourceAndCompanions"))
                 {

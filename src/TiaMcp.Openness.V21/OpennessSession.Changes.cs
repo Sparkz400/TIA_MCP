@@ -60,7 +60,8 @@ namespace TiaMcp.Openness.V21
             };
             if (string.IsNullOrWhiteSpace(change.Selector.Value<string>("plcPath")))
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
-                    ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath"));
+                    ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")
+                        ?? payload.Value<string>("unitPath") ?? payload.Value<string>("objectPath"));
             try
             {
                 using (SharedMutationExclusive("TIA MCP: prepare offline change preview"))
@@ -74,7 +75,10 @@ namespace TiaMcp.Openness.V21
                 change.Preview["payload"] = change.Payload.DeepClone();
                 change.Preview["baseFingerprint"] = change.BaseFingerprint;
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
+                if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_engineering") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
+                if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
+                if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
                 change.Preview["targetGroupPath"] = change.GroupPath;
@@ -123,10 +127,16 @@ namespace TiaMcp.Openness.V21
             if (save && !compile) throw new BridgeException("InvalidRequest", "Saving applied changes requires compile=true.");
             if (change.Kind == "hmi_engineering" && (!compile || !save))
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
+            if (change.Kind == "db_snapshot_load_actual" && (compile || save))
+                throw new BridgeException("InvalidRequest", "Actual-value loads change no project content; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set" }.Contains(change.Kind)))
+            if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
+                throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
+            if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
             EnsureProjectOffline(project);
             using (SharedMutationExclusive("TIA MCP: checkpoint and apply " + change.Kind))
@@ -137,6 +147,9 @@ namespace TiaMcp.Openness.V21
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
+                if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
+                // An unopenable credential must refuse before the checkpoint save, not after it.
+                if (BlockProtectionKinds.Contains(change.Kind)) OpenBlockProtectionCredential(change.Payload, "credential").Dispose();
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;
@@ -157,6 +170,8 @@ namespace TiaMcp.Openness.V21
                     {
                         ApplyEngineeringMutation(change, project);
                         change.Stages.Add("mutation_applied");
+                        // Durable stage boundaries tell reconciliation how far an interrupted apply got.
+                        WriteChangeJournal(change);
                     }
                     else change.Stages.Add("compile_only_requested");
                     CaptureTechnologyEvidence(change);
@@ -175,7 +190,7 @@ namespace TiaMcp.Openness.V21
                     }
                     if (change.Kind == "hmi_engineering") VerifyHmiEngineeringPreservation(change, project);
                     VerifyHardwarePreservation(change, project);
-                    if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set" }.Contains(change.Kind))
+                    if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
                         var plc = SelectPlc(change.Selector);
                         string readback = Path.Combine(change.Directory, "after-structured-edit.xml");
@@ -185,7 +200,7 @@ namespace TiaMcp.Openness.V21
                         change.Stages.Add("native_preservation_verified");
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
-                    if (save) { project.Save(); change.Stages.Add("changed_project_saved"); }
+                    if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = EngineeringFingerprint(change, project);
                     change.State = "applied";
@@ -302,6 +317,12 @@ namespace TiaMcp.Openness.V21
                 case "graphical_typed_edit":
                     PrepareTypedGraphical(change, preview);
                     break;
+                case "testsuite_application_import":
+                    PrepareTestSuiteApplicationImport(change, project, preview);
+                    break;
+                case "testsuite_system_import":
+                    PrepareTestSuiteSystemImport(change, project, preview);
+                    break;
                 case "project_simulation_enable":
                 {
                     bool enabled = ExplicitChangeBool(payload, "enabled");
@@ -311,6 +332,15 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("This setting affects subsequent project block compilation. It does not start a simulator or download a program.");
                     break;
                 }
+                case "project_attributes_set":
+                    change.AttributeTarget = project;
+                    preview["attributeChanges"] = PrepareAttributes(project, ChangeObject(payload, "attributes"), ProjectWriteAttributes);
+                    effects.Add(new JObject { ["projectAttributes"] = new JArray(ChangeObject(payload, "attributes").Properties().Select(p => p.Name)) });
+                    break;
+                case "project_languages_set":
+                    effects.Add(new JObject { ["languageSettings"] = new JObject { ["before"] = ProjectLanguageView(project.LanguageSettings), ["after"] = PlanProjectLanguages(project, payload, out _, out _, out _, out _) } });
+                    ((JArray)preview["warnings"]).Add("Removing an active language can discard project texts in that language; the recovery archive is the only way back.");
+                    break;
                 case "source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -345,6 +375,7 @@ namespace TiaMcp.Openness.V21
                 }
                 case "block_import_xml":
                 case "safety_import_xml":
+                case "graph_import":
                 {
                     var plc = SelectPlc(change.Selector);
                     string xml = ChangeText(payload, "xml", 2 * 1024 * 1024);
@@ -352,6 +383,7 @@ namespace TiaMcp.Openness.V21
                     var targets = EngineeringSources.BlockDeclarations(document);
                     var expected = ChangeNames(payload, "expectedBlockNames");
                     if (!new HashSet<string>(targets.Select(t => t.Name), StringComparer.Ordinal).SetEquals(expected)) throw new BridgeException("XmlScopeMismatch", "Top-level XML blocks must exactly match expectedBlockNames.");
+                    if (change.Kind == "graph_import" && (targets.Length != 1 || targets[0].Language != "GRAPH")) throw new BridgeException("UnsupportedLanguage", "graph_import accepts exactly one GRAPH block per document.");
                     bool safety = change.Kind == "safety_import_xml";
                     if (targets.Any(target => target.IsSafety != safety)) throw new BridgeException("SafetyBoundary", "Standard and safety imports use separate workflows, and cannot be mixed or converted.");
                     if (safety && targets.Any(target => target.Language != "F_LAD" && target.Language != "F_FBD" && target.Language != "F_DB"))
@@ -426,10 +458,39 @@ namespace TiaMcp.Openness.V21
                 case "constant_delete":
                     PrepareTagEdit(change, preview);
                     break;
+                case "tag_create":
+                case "constant_create":
+                    PrepareTagCreate(change, preview);
+                    break;
+                case "block_number_set":
+                case "block_attributes_set":
+                    PrepareBlockEdit(change, preview);
+                    break;
                 case "group_create":
                 case "group_rename":
                 case "group_delete":
                     PrepareGroupEdit(change, preview);
+                    break;
+                case "software_unit_create":
+                case "software_unit_relation_set":
+                case "software_unit_publication_set":
+                case "software_unit_delete":
+                    SoftwareUnitEdit(change, preview);
+                    break;
+                case "plc_alarm_text_list_import":
+                case "plc_alarm_instance_text_import":
+                case "plc_alarm_class_import":
+                case "plc_supervision_settings_import":
+                case "plc_supervision_import":
+                    PreparePlcAlarmImport(change, project, preview);
+                    break;
+                case "opcua_server_interface_import":
+                case "opcua_server_interface_delete":
+                case "opcua_server_interface_enable":
+                case "opcua_reference_namespace_import":
+                case "opcua_reference_namespace_delete":
+                case "opcua_role_mapping_set":
+                    PrepareOpcUaChange(change, preview);
                     break;
                 case "type_source_upsert":
                 {
@@ -510,6 +571,11 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Callers, instance references and interfaces may be affected. Compile the complete PLC after applying.");
                     break;
                 }
+                case "block_protect":
+                case "block_unprotect":
+                case "block_write_protection_set":
+                    PrepareBlockProtection(change, preview);
+                    break;
                 case "hardware_add":
                 {
                     string identifier = ChangeText(payload, "typeIdentifier", 256);
@@ -539,6 +605,21 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
+                    break;
+                case "connection_create":
+                case "connection_delete":
+                case "connection_set":
+                    ConnectionEdit(change, project, preview);
+                    break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    PreparePortLink(change, project, preview);
+                    break;
+                case "hardware_replace":
+                    PrepareHardwareReplace(change, project, preview);
+                    break;
+                case "cax_import":
+                    PrepareCaxImport(change, project, preview);
                     break;
                 case "hardware_plug":
                 {
@@ -606,8 +687,13 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Type/version availability is validated by Siemens during creation; a successful create can still require parameter configuration before compile succeeds.");
                     break;
                 }
+                case "to_child_create":
+                    PrepareTechnologyChildCreate(change, effects);
+                    break;
                 case "to_parameters":
                 case "to_delete":
+                case "to_connect":
+                case "to_disconnect":
                 {
                     var plc = SelectPlc(change.Selector);
                     var entry = BindTechnologySelection(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", payload);
@@ -619,9 +705,32 @@ namespace TiaMcp.Openness.V21
                     {
                         preview["parameterChanges"] = PrepareTechnologyParameters(technology, ChangeObject(payload, "parameters"), out _);
                     }
+                    else if (change.Kind != "to_delete") PrepareTechnologyConnection(change, project, plc, entry, preview);
                     effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
                     break;
                 }
+                case "db_snapshot_create":
+                case "db_snapshot_load_actual":
+                    PrepareDbSnapshotChange(change, preview);
+                    break;
+                case "vci_workspace_create":
+                case "vci_workspace_delete":
+                case "vci_mapping_add":
+                case "vci_mapping_remove":
+                case "vci_synchronize":
+                    PrepareVciChange(change, project, preview);
+                    break;
+                case "drive_parameter_set":
+                    preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(), ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Startdrive may recalculate dependent parameters; readback covers only the listed parameters. Compare drive_observe snapshots with drive_profile_review. Offline project only: no online write, download or RAM-to-ROM.");
+                    break;
+                case "drive_telegram_set":
+                    preview["telegramChange"] = Startdrive(() => DriveTelegramSet(change, project, false));
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(),
+                        ["operation"] = payload["operation"].DeepClone(), ["telegramType"] = payload["telegramType"].DeepClone(), ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("The telegram change moves PLC-side I/O addresses. Apply reads back every telegram row of the drive object and reports the address shift; a collateral telegram change or an address overlap fails after the write and requires checkpoint recovery. Technology-object connections, PLC tags and program references to the telegram are not rebound; the mandatory device compile validates the configuration. Offline project only: no download.");
+                    break;
                 default: throw new BridgeException("UnsupportedChange", "Unknown or unsupported change kind: " + change.Kind);
             }
             PrepareHardwarePreservation(change, project, preview);
@@ -637,6 +746,12 @@ namespace TiaMcp.Openness.V21
                 case "graphical_typed_edit":
                     ApplyTypedGraphical(change);
                     break;
+                case "testsuite_application_import":
+                    ApplyTestSuiteApplicationImport(change, project);
+                    break;
+                case "testsuite_system_import":
+                    ApplyTestSuiteSystemImport(change, project);
+                    break;
                 case "project_simulation_enable":
                 {
                     var settings = project.GetService<PlcSimulationSettingsProvider>() ?? throw new BridgeException("UnsupportedCapability", "Project has no PlcSimulationSettingsProvider service.");
@@ -644,6 +759,13 @@ namespace TiaMcp.Openness.V21
                     if (settings.IsSimulationDuringBlockCompilationEnabled != payload.Value<bool>("enabled")) throw new BridgeException("MutationVerificationFailed", "Project simulation setting did not match the requested value.");
                     break;
                 }
+                case "project_attributes_set":
+                    ApplyAttributes(project, ChangeObject(payload, "attributes"), ProjectWriteAttributes);
+                    change.Readbacks.Add(new JObject { ["role"] = "project-attributes", ["after"] = new JObject(ChangeObject(payload, "attributes").Properties().Select(p => new JProperty(p.Name, ChangeScalar(project.GetAttribute(p.Name))))) });
+                    break;
+                case "project_languages_set":
+                    ApplyProjectLanguages(change, project);
+                    break;
                 case "source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -665,6 +787,7 @@ namespace TiaMcp.Openness.V21
                 }
                 case "block_import_xml":
                 case "safety_import_xml":
+                case "graph_import":
                 case "graphical_operand_set":
                 case "graphical_network_patch":
                 case "graphical_network_insert":
@@ -690,10 +813,42 @@ namespace TiaMcp.Openness.V21
                 case "constant_delete":
                     ApplyTagEdit(change);
                     break;
+                case "tag_create":
+                case "constant_create":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    TagCreate(change, plc, MutationTable(change, plc), true);
+                    break;
+                }
+                case "block_number_set":
+                case "block_attributes_set":
+                    ApplyBlockEdit(change);
+                    break;
                 case "group_create":
                 case "group_rename":
                 case "group_delete":
                     GroupEdit(change, SelectPlc(change.Selector), true);
+                    break;
+                case "software_unit_create":
+                case "software_unit_relation_set":
+                case "software_unit_publication_set":
+                case "software_unit_delete":
+                    SoftwareUnitEdit(change, null);
+                    break;
+                case "plc_alarm_text_list_import":
+                case "plc_alarm_instance_text_import":
+                case "plc_alarm_class_import":
+                case "plc_supervision_settings_import":
+                case "plc_supervision_import":
+                    ApplyPlcAlarmImport(change, project);
+                    break;
+                case "opcua_server_interface_import":
+                case "opcua_server_interface_delete":
+                case "opcua_server_interface_enable":
+                case "opcua_reference_namespace_import":
+                case "opcua_reference_namespace_delete":
+                case "opcua_role_mapping_set":
+                    ApplyOpcUaChange(change);
                     break;
                 case "type_source_upsert":
                 {
@@ -733,6 +888,11 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("MutationVerificationFailed", "Block rename did not produce the expected names.");
                     break;
                 }
+                case "block_protect":
+                case "block_unprotect":
+                case "block_write_protection_set":
+                    ApplyBlockProtection(change);
+                    break;
                 case "hardware_add":
                 {
                     var device = project.Devices.CreateWithItem(payload.Value<string>("typeIdentifier"), payload.Value<string>("itemName"), payload.Value<string>("deviceName"));
@@ -772,6 +932,21 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
+                    break;
+                case "connection_create":
+                case "connection_delete":
+                case "connection_set":
+                    ConnectionEdit(change, project, null);
+                    break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    ApplyPortLink(change, project);
+                    break;
+                case "hardware_replace":
+                    ApplyHardwareReplace(change, project);
+                    break;
+                case "cax_import":
+                    ApplyCaxImport(change, project);
                     break;
                 case "hardware_delete":
                 {
@@ -815,12 +990,36 @@ namespace TiaMcp.Openness.V21
                     ApplyTechnologyParameters(technology, ChangeObject(payload, "parameters"));
                     break;
                 }
+                case "to_connect":
+                case "to_disconnect":
+                    ApplyTechnologyConnection(change, project);
+                    break;
+                case "to_child_create":
+                    ApplyTechnologyChildCreate(change);
+                    break;
+                case "drive_parameter_set":
+                    change.Readbacks.Add(new JObject { ["role"] = "drive-parameter-readback", ["parameters"] = Startdrive(() => DriveParameterSet(change, project, true)) });
+                    break;
+                case "drive_telegram_set":
+                    Startdrive(() => DriveTelegramSet(change, project, true));
+                    break;
+                case "db_snapshot_create":
+                case "db_snapshot_load_actual":
+                    ApplyDbSnapshotChange(change);
+                    break;
+                case "vci_workspace_create":
+                case "vci_workspace_delete":
+                case "vci_mapping_add":
+                case "vci_mapping_remove":
+                case "vci_synchronize":
+                    ApplyVciChange(change, project);
+                    break;
             }
         }
 
         private void CaptureTechnologyEvidence(EngineeringChange change)
         {
-            if (change.Kind != "to_create" && change.Kind != "to_parameters") return;
+            if (!new[] { "to_create", "to_parameters", "to_connect", "to_disconnect", "to_child_create" }.Contains(change.Kind)) return;
             try
             {
                 var plc = SelectPlc(change.Selector);
@@ -848,7 +1047,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || PlcAlarmProjectKinds.Contains(change.Kind))
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -951,6 +1150,7 @@ namespace TiaMcp.Openness.V21
             var missingProviders = new JArray();
             int nativeFingerprintBlocks = 0;
             var budget = new ScanBudget(50000);
+            var opcUa = change.Kind.StartsWith("opcua_", StringComparison.Ordinal) ? new JArray() : null;
             foreach (var entry in DeviceItems(project, budget))
             {
                 var item = entry.Item;
@@ -962,6 +1162,7 @@ namespace TiaMcp.Openness.V21
                 var plc = item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
                 if (plc == null) continue;
                 var selection = new PlcSelection { Project = project, Software = plc, Path = entry.Path + "/plc/" + Segment(plc.Name) };
+                opcUa?.Add(new JObject { ["plcPath"] = selection.Path, ["serverInterfaceGroup"] = OpcUaSnapshot(OpcUaProviderFor(plc)?.CommunicationGroup?.ServerInterfaceGroup, budget) });
                 var safetyState = ReadSafety(plc);
                 var safetySignatures = safetyState["signatures"] as JArray;
                 bool hasSafetySignatureCoverage = safetyState.Value<bool>("available") && safetySignatures != null && safetySignatures.Count > 0
@@ -1006,8 +1207,13 @@ namespace TiaMcp.Openness.V21
             snapshot["hardware"] = hardware;
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
+            if (opcUa != null) snapshot["opcUa"] = opcUa;
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
+            if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
+            if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
+            if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();
@@ -1024,6 +1230,17 @@ namespace TiaMcp.Openness.V21
                 }
                 snapshot["technologyParameters"] = values;
             }
+            if (change.Kind == "to_connect" || change.Kind == "to_disconnect")
+            {
+                // The identity rows below do not prove connection state; compare the selected TO's resolved connection observation.
+                var plc = SelectPlc(change.Selector);
+                var entry = RequiredTechnologyEntry(plc, change.Payload);
+                var connectionBudget = new ScanBudget(500);
+                snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
+                if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
+            }
+            if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
+            if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
             {
                 var plc = SelectPlc(change.Selector);
@@ -1064,8 +1281,11 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["name"] = node.Name, ["type"] = node.NodeType.ToString(), ["subnet"] = node.ConnectedSubnet?.Name, ["attributes"] = attributes };
         }
 
-        private void EnsureProjectOffline(Project project)
+        // Every engineering mutation route calls this; read-only callers pass write: false.
+        private void EnsureProjectOffline(Project project, bool write = true)
         {
+            if (write && !project.IsPrimary)
+                throw new BridgeException("ReadOnlyProject", "The project is open read-only (secondary); mutations are refused. Use project_copy and open the copy for edits.");
             var budget = new ScanBudget(50000);
             foreach (var entry in DeviceItems(project, budget))
             {
@@ -1076,22 +1296,22 @@ namespace TiaMcp.Openness.V21
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish complete offline state.");
         }
 
-        private HardwareEntry ChangeHardware(Project project, JObject payload)
+        private HardwareEntry ChangeHardware(Project project, JObject payload, string pathKey = "hardwarePath")
         {
-            string path = ChangeText(payload, "hardwarePath", 4096);
+            string path = ChangeText(payload, pathKey, 4096);
             var budget = new ScanBudget(50000);
             var entry = DeviceItems(project, budget).FirstOrDefault(item => item.Path == path);
-            if (entry == null) throw new BridgeException("HardwareNotFound", "No hardware item matches hardwarePath.");
+            if (entry == null) throw new BridgeException("HardwareNotFound", "No hardware item matches " + pathKey + ".");
             return entry;
         }
 
-        private Node ChangeNode(Project project, JObject payload)
+        private Node ChangeNode(Project project, JObject payload, string pathKey = "hardwarePath", string nameKey = "nodeName")
         {
-            var item = ChangeHardware(project, payload).Item;
+            var item = ChangeHardware(project, payload, pathKey).Item;
             var network = item.GetService<NetworkInterface>() ?? throw new BridgeException("UnsupportedCapability", "Selected hardware item has no network interface service.");
-            string name = payload.Value<string>("nodeName");
+            string name = payload.Value<string>(nameKey);
             var nodes = network.Nodes.Where(node => name == null || node.Name == name).Take(2).ToArray();
-            if (nodes.Length != 1) throw new BridgeException(nodes.Length == 0 ? "NodeNotFound" : "AmbiguousTarget", "Specify an exact nodeName from engineering_read.");
+            if (nodes.Length != 1) throw new BridgeException(nodes.Length == 0 ? "NodeNotFound" : "AmbiguousTarget", "Specify an exact " + nameKey + " from engineering_read.");
             return nodes[0];
         }
 

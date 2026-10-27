@@ -123,7 +123,11 @@ public sealed partial class WatchTableDispatcher
         var target = snapshot["target"]!.AsObject(); var artifact = Artifact(target["artifact"]!.AsObject());
         byte[] bytes = ReadRecoverySnapshot(Resolve(artifact));
         if (WatchTableDocument.Hash(bytes) != artifact.Sha256) throw new BridgeException("ArtifactChanged", "Captured content bytes changed.");
-        if (target["exists"]?.GetValue<bool>() == false)
+        if (target["kind"]?.GetValue<string>() == "watchGroup")
+        {
+            if (artifact.Sha256 != expected || Text(target, "semanticSha256") != expected) throw new BridgeException("ArtifactChanged", "Group subtree capture differs from its expected content.");
+        }
+        else if (target["exists"]?.GetValue<bool>() == false)
         {
             if (!bytes.SequenceEqual(WatchTableDocument.AbsentBytes(Text(target, "group"), Text(target, "name"))) ||
                 WatchTableDocument.Hash(bytes) != expected || target["rows"]?.AsArray().Count != 0)

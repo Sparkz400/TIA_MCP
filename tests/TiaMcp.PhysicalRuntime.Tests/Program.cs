@@ -10,6 +10,8 @@ if (args is ["--soak", var soakRoot, var soakSeconds]) { await RuntimeCaptureSoa
 if (args is ["--soak-long", var longRoot, var epochCount, var epochSeconds]) { await RuntimeCaptureSoakChecks.RunLong(Path.GetFullPath(longRoot), int.Parse(epochCount, System.Globalization.CultureInfo.InvariantCulture), int.Parse(epochSeconds, System.Globalization.CultureInfo.InvariantCulture)); return; }
 if (args is ["--soak-crash", var crashRoot]) { await RuntimeCaptureSoakChecks.Crash(Path.GetFullPath(crashRoot)); return; }
 if (args is ["--soak-recover", var recoverRoot]) { await RuntimeCaptureSoakChecks.Recover(Path.GetFullPath(recoverRoot)); return; }
+if (args is ["--plcsim", var plcsimRoot]) { await RuntimeCapturePlcsimChecks.Run(Path.GetFullPath(plcsimRoot)); return; }
+if (args is ["--plcsim-binding", var bindingRoot]) { Console.WriteLine($"PASS {PlcsimTargetBindingChecks.Run(Path.GetFullPath(bindingRoot))} owned-PLCSIM binding checks"); return; }
 if (args is ["--disk-full", var volumeRoot, var ownerToken, var evidenceRoot]) { await RuntimeCaptureDiskFullChecks.Run(volumeRoot,ownerToken,Path.GetFullPath(evidenceRoot)); return; }
 
 int checks = 0;
@@ -113,9 +115,59 @@ Fails(() => WebRuntimeProtocol.BrowseResult(Response("[{},{}]"),id,false), "Runt
 var browse = WebRuntimeProtocol.BrowseResult(Response("[{\"name\":\"x\",\"vendorField\":1}]"),id,false);
 Check(browse[0].GetProperty("vendorField").GetInt32()==1,"Unknown metadata preserved");
 
+// Each read-only diagnostic kind: exact Siemens method, parameters, documented result shape and bounds.
+WebRuntimeDiagnosticResult Diagnostic(string kind, string result, string? language = null, int? count = null)
+{
+    var body = WebRuntimeProtocol.Diagnostic(id, kind, language, count);
+    return WebRuntimeProtocol.DiagnosticResult(context, kind, body, Response(result), start, start.AddMilliseconds(5), TimeSpan.FromMilliseconds(5));
+}
+foreach (var (kind, method, result) in new[] {
+    ("languages", "Project.ReadLanguages", "{\"languages\":[{\"language\":\"en-US\"},{\"language\":\"de-DE\",\"active\":true}]}"),
+    ("operatingMode", "Plc.ReadOperatingMode", "\"run\""),
+    ("modeSelector", "Plc.ReadModeSelectorState", "{\"mode_selector\":\"no_switch\"}"),
+    ("systemTime", "Plc.ReadSystemTime", "{\"timestamp\":\"2026-10-27T11:46:31.172848234Z\"}"),
+    ("timeSettings", "Plc.ReadTimeSettings", "{\"current_offset\":\"PT1H\",\"utc_offset\":\"PT1H\",\"rule\":{\"std\":{\"offset\":\"PT0S\"}}}"),
+    ("projectInformation", "Project.ReadInformation", "{\"project_name\":\"Line\",\"versions\":[]}") })
+{
+    var body = WebRuntimeProtocol.Diagnostic(id, kind);
+    Check(body.GetProperty("method").GetString() == method && !body.TryGetProperty("params", out _), "Exact parameterless method " + method);
+    var observed = Diagnostic(kind, result);
+    Check(observed.Status == "read" && observed.Method == method && observed.Value!.Value.GetRawText() == JsonDocument.Parse(result).RootElement.GetRawText() &&
+        observed.Entries is null && observed.Truncated is null && !observed.ProgramMatchVerified && !observed.LosslessHistoryVerified, "Raw bounded diagnostic " + kind);
+    Fails(() => WebRuntimeProtocol.Diagnostic(id, kind, "en-US", 10), "RuntimeDiagnosticSelectionInvalid");
+}
+Check(Diagnostic("systemTime", "{\"timestamp\":\"2026-10-27T11:46:31.172848234Z\"}").Value!.Value.GetProperty("timestamp").GetString() == "2026-10-27T11:46:31.172848234Z", "CPU time kept as raw text, not reparsed");
+foreach (var (kind, method) in new[] { ("alarms", "Alarms.Browse"), ("diagnosticBuffer", "DiagnosticBuffer.Browse") })
+{
+    var body = WebRuntimeProtocol.Diagnostic(id, kind, "en-US", 2);
+    Check(body.GetProperty("method").GetString() == method && body.GetProperty("params").GetProperty("language").GetString() == "en-US" &&
+        body.GetProperty("params").GetProperty("count").GetInt32() == 2 && body.GetProperty("params").EnumerateObject().Count() == 2, "Bounded list request " + method);
+    var partial = Diagnostic(kind, "{\"entries\":[{\"id\":1},{\"id\":2}],\"count_current\":7,\"count_max\":1000,\"last_modified\":\"2026-10-27T00:00:00Z\"}", "en-US", 2);
+    Check(partial.Entries == 2 && partial.Truncated == true, "Truncation explicit against count_current " + kind);
+    Check(Diagnostic(kind, "{\"entries\":[{\"id\":1}],\"count_current\":1}", "en-US", 2).Truncated == false, "Complete list " + kind);
+    Check(Diagnostic(kind, "{\"entries\":[]}", "en-US", 2).Truncated is null, "Unknown total is not complete " + kind);
+    Fails(() => Diagnostic(kind, "{\"entries\":[{},{},{}]}", "en-US", 2), "RuntimeResponseInvalid");
+    Fails(() => Diagnostic(kind, "{\"entries\":[1]}", "en-US", 2), "RuntimeResponseInvalid");
+    foreach (var (language, count) in new (string?, int?)[] { (null, 2), ("en-US", null), ("en US", 2), ("e", 2), ("en-US", 0), ("en-US", 501) })
+        Fails(() => WebRuntimeProtocol.Diagnostic(id, kind, language, count), "RuntimeDiagnosticSelectionInvalid");
+}
+foreach (var (kind, invalid) in new[] { ("operatingMode", "{\"mode\":\"run\"}"), ("modeSelector", "\"run\""), ("systemTime", "{\"timestamp\":1}"),
+    ("timeSettings", "{\"current_offset\":\"PT1H\"}"), ("languages", "{\"languages\":[{\"language\":null}]}"), ("projectInformation", "[]") })
+    Fails(() => Diagnostic(kind, invalid), "RuntimeResponseInvalid");
+byte[] denied = Encoding.UTF8.GetBytes($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","error":{"code":2,"message":"remote-secret"}}""");
+var deniedResult = WebRuntimeProtocol.DiagnosticResult(context, "diagnosticBuffer", WebRuntimeProtocol.Diagnostic(id, "diagnosticBuffer", "en-US", 5), denied, start, start, TimeSpan.Zero);
+Check(deniedResult.Status == "permissionDenied" && deniedResult.ProviderErrorCode == 2 && deniedResult.Value is null &&
+    !JsonSerializer.Serialize(deniedResult, BridgeProtocol.Json).Contains("remote-secret"), "Diagnostic denial explicit without remote text");
+Fails(() => WebRuntimeProtocol.Diagnostic(id, "alarmsAcknowledge"), "RuntimeDiagnosticKindUnsupported");
+Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "operatingMode", WebRuntimeProtocol.Diagnostic(id, "systemTime"), Response("\"run\""), start, start, TimeSpan.Zero), "RuntimeRequestChanged");
+Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "alarms",
+    Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Alarms.Browse","params":{"language":"en-US","count":5,"alarm_id":"1"}}"""), Response("{\"entries\":[]}"), start, start, TimeSpan.Zero), "RuntimeRequestChanged");
+
 checks += RuntimeCaptureChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".captures" : Path.Combine(Path.GetTempPath(),"tia-capture-"+Guid.NewGuid().ToString("N")),Read("18446744073709551615"),metadata);
 checks += await RuntimePollingChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".polling" : Path.Combine(Path.GetTempPath(),"tia-polling-"+Guid.NewGuid().ToString("N")));
 checks += await RuntimeCaptureSoakChecks.CheckAcquisitionWaitBoundaries();
+checks += PlcsimTargetBindingChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".bindings" : Path.Combine(Path.GetTempPath(),"tia-plcsim-binding-"+Guid.NewGuid().ToString("N")));
+checks += await RuntimeCapturePlcsimChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".plcsim" : Path.Combine(Path.GetTempPath(),"tia-plcsim-"+Guid.NewGuid().ToString("N")));
 
 if (args.Length == 1)
 {

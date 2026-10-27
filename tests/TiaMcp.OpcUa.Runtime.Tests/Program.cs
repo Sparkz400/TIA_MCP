@@ -300,7 +300,7 @@ try
         }
         var allowed = new HashSet<string> { "GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse", "BrowseNext", "Continuation", "CloseSession", "CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions", "SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish" };
         allowed.UnionWith(["PublishEntered","PublishCompleted","FixtureTransportReadFailure","FixtureLostPublishResponse"]);
-        allowed.UnionWith(["FixtureEventEmitted","FixtureEventFilter"]);
+        allowed.UnionWith(["FixtureEventEmitted","FixtureEventFilter","TransferSubscriptions","TransferRequested"]);
         foreach (var audit in servers.SelectMany(s => s.Audit))
             Check(allowed.Contains(JsonSerializer.SerializeToElement(audit).GetProperty("operation").GetString()!), "Wire operation allowed");
         passed = true;

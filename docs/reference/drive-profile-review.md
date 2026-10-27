@@ -4,6 +4,8 @@
 proposal against an exact saved hardware selection. No Siemens product is needed.
 The input is this project's explicit observation format, **not a Siemens export
 format**. There is no native adapter, parameter download or motion command here.
+The separate [`drive_observe`](../guides/drives.md) tool reads offline Startdrive
+drive objects into v2 snapshots of this format.
 
 1. Import or reuse an exact saved review. Select one nonvirtual hardware
    `objectPath`; a same-name object or display folder cannot substitute for it.

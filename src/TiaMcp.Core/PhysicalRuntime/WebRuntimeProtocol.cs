@@ -24,14 +24,38 @@ public sealed record WebRuntimeReadResult(WebRuntimeSymbol Selection, string Req
     public bool ProgramMatchVerified => false;
     public bool NativeQualified => false;
 }
+/// <summary>One bounded read-only CPU diagnostic observation; RequestId is null when the method was not advertised and nothing was sent.</summary>
+public sealed record WebRuntimeDiagnosticResult(WebRuntimeContext Context, string Kind, string Method, string? RequestId, string Status,
+    JsonElement? Value, int? ProviderErrorCode, int? Entries, bool? Truncated,
+    DateTimeOffset RequestStartedUtc, DateTimeOffset ResponseReceivedUtc, double ElapsedMilliseconds)
+{
+    public string SchemaVersion => "physical-runtime-web-diagnostic.v1";
+    public string ValueEncoding => "siemens-web-api-json";
+    public string Clock => "hostUtcAndMonotonicDuration";
+    public bool HostClockWentBackwards => ResponseReceivedUtc < RequestStartedUtc;
+    public bool LosslessHistoryVerified => false;
+    public bool DeviceIdentityVerified => false;
+    public bool ProgramMatchVerified => false;
+    public bool NativeQualified => false;
+}
+
+/// <summary>One gated owned-PLCSIM write: Expected must equal the current simple-mode read exactly before Value is sent.</summary>
+public sealed record WebRuntimeWriteItem(string SelectionId, JsonElement Expected, JsonElement Value);
 
 /// <summary>Pure Web API request/response contracts. Supplied context is not TLS, CPU or program authentication.</summary>
 public static class WebRuntimeProtocol
 {
     public const int MaximumResponseBytes = 256 * 1024;
+    public const int MaximumDiagnosticEntries = 500;
     private static readonly UTF8Encoding Utf8 = new(false, true);
-    private static readonly HashSet<string> ReadMethods = new(StringComparer.Ordinal)
-        { "Api.Browse", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read" };
+    private static readonly Dictionary<string, string> DiagnosticMethods = new(StringComparer.Ordinal)
+    {
+        ["languages"] = "Project.ReadLanguages", ["alarms"] = "Alarms.Browse", ["diagnosticBuffer"] = "DiagnosticBuffer.Browse",
+        ["operatingMode"] = "Plc.ReadOperatingMode", ["modeSelector"] = "Plc.ReadModeSelectorState",
+        ["systemTime"] = "Plc.ReadSystemTime", ["timeSettings"] = "Plc.ReadTimeSettings", ["projectInformation"] = "Project.ReadInformation"
+    };
+    private static readonly HashSet<string> ReadMethods = new(DiagnosticMethods.Values.Concat(
+        ["Api.Browse", "Api.GetPermissions", "PlcProgram.Browse", "PlcProgram.Read"]), StringComparer.Ordinal);
 
     public static WebRuntimeContext Context(string endpoint, string connectionId, string epoch, string peerCertificateSha256)
     {
@@ -151,12 +175,7 @@ public static class WebRuntimeProtocol
         if (document.RootElement.TryGetProperty("error", out var error))
         {
             code = error.GetProperty("code").GetInt32();
-            status = code switch
-            {
-                2 => "permissionDenied", -32601 => "unsupportedMethod", 4 => "resourceUnavailable",
-                200 => "addressUnavailable", 201 => "invalidAddress", 203 => "invalidArrayIndex",
-                204 => "unsupportedAddress", _ => "providerError"
-            };
+            status = ProviderStatus(code.Value);
         }
         else
         {
@@ -169,6 +188,116 @@ public static class WebRuntimeProtocol
         return new(request.Selection, request.RequestId, status, value, code, requestStarted.ToUniversalTime(),
             responseReceived.ToUniversalTime(), elapsed.TotalMilliseconds);
     }
+
+    public static string DiagnosticMethod(string kind) =>
+        kind is not null && DiagnosticMethods.TryGetValue(kind, out var method) ? method : throw Error("RuntimeDiagnosticKindUnsupported");
+
+    /// <summary>Only alarms/diagnosticBuffer take a language and a bounded count; acknowledgment, filters and alarm IDs are not exposed.</summary>
+    public static JsonElement Diagnostic(string requestId, string kind, string? language = null, int? count = null)
+    {
+        Id(requestId); string method = DiagnosticMethod(kind);
+        bool listed = kind is "alarms" or "diagnosticBuffer";
+        if (listed != language is not null || listed != count is not null) throw Error("RuntimeDiagnosticSelectionInvalid");
+        if (!listed) return Request(method, requestId, null);
+        // A BCP 47 tag as returned by Project.ReadLanguages, for example en-US.
+        if (language!.Length is < 2 or > 35 || language.Any(c => !char.IsAsciiLetterOrDigit(c) && c != '-') || count is < 1 or > MaximumDiagnosticEntries)
+            throw Error("RuntimeDiagnosticSelectionInvalid");
+        return Request(method, requestId, new Dictionary<string, object> { ["language"] = language, ["count"] = count!.Value });
+    }
+
+    public static WebRuntimeDiagnosticResult DiagnosticResult(WebRuntimeContext current, string kind, JsonElement request,
+        ReadOnlyMemory<byte> response, DateTimeOffset requestStarted, DateTimeOffset responseReceived, TimeSpan elapsed)
+    {
+        Validate(current); string method = DiagnosticMethod(kind);
+        if (request.ValueKind != JsonValueKind.Object || !request.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.String ||
+            !request.TryGetProperty("method", out var sent) || sent.ValueKind != JsonValueKind.String || sent.GetString() != method)
+            throw Error("RuntimeRequestChanged");
+        string requestId = id.GetString()!; string? language = null; int? count = null;
+        if (request.TryGetProperty("params", out var parameters))
+        {
+            if (parameters.ValueKind != JsonValueKind.Object || !parameters.TryGetProperty("language", out var tag) || tag.ValueKind != JsonValueKind.String ||
+                !parameters.TryGetProperty("count", out var limit) || limit.ValueKind != JsonValueKind.Number || !limit.TryGetInt32(out int n))
+                throw Error("RuntimeRequestChanged");
+            language = tag.GetString(); count = n;
+        }
+        if (!JsonElement.DeepEquals(request, Diagnostic(requestId, kind, language, count))) throw Error("RuntimeRequestChanged");
+        if (elapsed < TimeSpan.Zero || elapsed > TimeSpan.FromMinutes(1)) throw Error("RuntimeTimingInvalid");
+        using var document = Response(response, requestId);
+        JsonElement? value = null; int? code = null, entries = null; bool? truncated = null; string status = "read";
+        if (document.RootElement.TryGetProperty("error", out var error)) { code = error.GetProperty("code").GetInt32(); status = ProviderStatus(code.Value); }
+        else
+        {
+            var result = document.RootElement.GetProperty("result");
+            static bool Field(JsonElement node, string name) => node.ValueKind == JsonValueKind.Object && node.TryGetProperty(name, out var v) &&
+                v.ValueKind == JsonValueKind.String && v.GetString()!.Length is >= 1 and <= 256;
+            static bool Rows(JsonElement node, string name, int maximum) => node.ValueKind == JsonValueKind.Object && node.TryGetProperty(name, out var v) &&
+                v.ValueKind == JsonValueKind.Array && v.GetArrayLength() <= maximum && v.EnumerateArray().All(x => x.ValueKind == JsonValueKind.Object);
+            // Only the documented top-level shape is required; unknown vendor fields stay in the raw value.
+            bool valid = kind switch
+            {
+                "operatingMode" => result.ValueKind == JsonValueKind.String && result.GetString()!.Length is >= 1 and <= 64,
+                "modeSelector" => Field(result, "mode_selector"),
+                "systemTime" => Field(result, "timestamp"),
+                "timeSettings" => Field(result, "current_offset") && Field(result, "utc_offset"),
+                "languages" => Rows(result, "languages", 64) && result.GetProperty("languages").EnumerateArray().All(x => Field(x, "language")),
+                "alarms" or "diagnosticBuffer" => Rows(result, "entries", count!.Value),
+                _ => result.ValueKind == JsonValueKind.Object
+            };
+            if (!valid) throw Error("RuntimeResponseInvalid");
+            if (count is not null)
+            {
+                entries = result.GetProperty("entries").GetArrayLength();
+                // count_current is the CPU's current record total; absent means completeness is unknown, not complete.
+                truncated = result.TryGetProperty("count_current", out var total) && total.ValueKind == JsonValueKind.Number &&
+                    total.TryGetInt64(out long n) ? n > entries : null;
+            }
+            value = result.Clone();
+        }
+        return new(current, kind, method, requestId, status, value, code, entries, truncated, requestStarted.ToUniversalTime(),
+            responseReceived.ToUniversalTime(), elapsed.TotalMilliseconds);
+    }
+
+    // Gated owned-PLCSIM mutations, kept out of the read-only builder: Siemens Web API PlcProgram.Write (write_value) and
+    // Plc.RequestChangeOperatingMode (change_operating_mode), docs/plans/expansion-plans/physical-plc-runtime.md [W13]/[W14].
+    private static readonly Dictionary<string, string> MutationPermissions = new(StringComparer.Ordinal)
+        { ["PlcProgram.Write"] = "write_value", ["Plc.RequestChangeOperatingMode"] = "change_operating_mode" };
+
+    public static string MutationPermission(string method) =>
+        method is not null && MutationPermissions.TryGetValue(method, out var permission) ? permission : throw Error("RuntimeMethodUnsupported");
+
+    public static JsonElement Write(string requestId, WebRuntimeSymbol selection, JsonElement value)
+    {
+        Id(requestId);
+        if (selection is null || selection.Representation != "simple" || value.ValueKind is JsonValueKind.Undefined) throw Error("RuntimeWriteInvalid");
+        Text(selection.Symbol, 4096); ValidateJson(value, 16 * 1024);
+        return Mutation("PlcProgram.Write", requestId, new Dictionary<string, object> { ["var"] = selection.Symbol, ["value"] = value, ["mode"] = "simple" });
+    }
+
+    public static JsonElement ChangeOperatingMode(string requestId, string mode)
+    {
+        Id(requestId);
+        if (mode is not ("run" or "stop")) throw Error("RuntimeOperatingModeInvalid");
+        return Mutation("Plc.RequestChangeOperatingMode", requestId, new Dictionary<string, object> { ["mode"] = mode });
+    }
+
+    /// <summary>Boolean true only acknowledges the request; callers read back. Provider errors stay explicit and are never retried.</summary>
+    public static (string Status, int? ProviderErrorCode) MutationResult(ReadOnlyMemory<byte> response, string requestId)
+    {
+        using var document = Response(response, requestId);
+        if (document.RootElement.TryGetProperty("error", out var error)) { int code = error.GetProperty("code").GetInt32(); return (ProviderStatus(code), code); }
+        if (document.RootElement.GetProperty("result").ValueKind != JsonValueKind.True) throw Error("RuntimeResponseInvalid");
+        return ("accepted", null);
+    }
+
+    private static JsonElement Mutation(string method, string id, Dictionary<string, object> parameters) =>
+        JsonSerializer.SerializeToElement(new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = id, ["method"] = method, ["params"] = parameters });
+
+    private static string ProviderStatus(int code) => code switch
+    {
+        2 => "permissionDenied", -32601 => "unsupportedMethod", 4 => "resourceUnavailable",
+        200 => "addressUnavailable", 201 => "invalidAddress", 203 => "invalidArrayIndex",
+        204 => "unsupportedAddress", _ => "providerError"
+    };
 
     private static JsonElement Request(string method, string id, object? parameters)
     {

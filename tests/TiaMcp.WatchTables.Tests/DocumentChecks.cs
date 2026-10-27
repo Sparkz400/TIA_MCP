@@ -52,7 +52,8 @@ internal static class DocumentChecks
         ("Document language clone refuses loss of opaque culture content", CultureCloneRefusal),
         ("Document comment cloning preserves opaque metadata and every peer", CommentClonePreservation),
         ("Document direct comment edit preserves opaque text in unselected languages", UnselectedCommentPreservation),
-        ("Document force profiles remain capture only", ForceRefusal),
+        ("Document force fields, comments, clone, delete and reorder preserve every unselected node", ForceEdits),
+        ("Document force edits refuse ForceIntention, ModifyValue, rename and selected rows atomically", ForceRefusal),
         ("Document wrong versions exports object types and ambiguous fields reject", ProfileRefusal),
         ("Document hexadecimal ID duplicates aliases malformed and missing reject", IdRefusal),
         ("Document DTD oversized deep malformed and row count limits reject", Limits),
@@ -238,11 +239,43 @@ internal static class DocumentChecks
             True(WatchTableDocument.SemanticHash(original) != WatchTableDocument.SemanticHash(Bytes(tree.ToString(SaveOptions.DisableFormatting))));
         }
     }
+    private static readonly string ForceFixture = Fixture.Replace("PlcWatchTable", "PlcForceTable").Replace("ModifyValue", "ForceValue")
+        .Replace("<DisplayFormat>", "<Address>%I0.0:P</Address><DisplayFormat>");
+    private static void ForceEdits()
+    {
+        foreach (var (field, value) in new[] { ("ForceValue", "TRUE"), ("Address", "%Q0.0:P"), ("Name", "\"Valve\""), ("DisplayFormat", "Hex"), ("ForceValue", "") })
+        {
+            var expected = Parse(Bytes(ForceFixture)); var target = Rows(expected)[0].Element("AttributeList")!.Element(field)!;
+            if (value.Length == 0) target.RemoveNodes(); else target.Value = value;
+            var doc = Open(ForceFixture); True(doc.IsForce); doc.SetField(0, field, value); XmlEqual(expected, doc.ToBytes());
+            Equal(value, new WatchTableDocument(doc.ToBytes()).Field(0, field));
+        }
+        var comment = Parse(Bytes(ForceFixture)); comment.Descendants("Text").First().Value = "Ventil {0}";
+        var edited = Open(ForceFixture); edited.SetComment(0, "de-DE", "Ventil {0}"); XmlEqual(comment, edited.ToBytes());
+        var removed = Parse(Bytes(ForceFixture)); Rows(removed)[0].Remove();
+        edited = Open(ForceFixture); edited.Remove(0); XmlEqual(removed, edited.ToBytes());
+        edited = Open(ForceFixture); edited.Reorder([1, 0]); edited.Reorder([1, 0]); XmlEqual(Parse(Bytes(ForceFixture)), edited.ToBytes());
+        edited = Open(ForceFixture); edited.Duplicate(0, 2); Equal(3, edited.Count); Equal(Prefix + "PlcForceTableEntry", Rows(Parse(edited.ToBytes()))[2].Name.LocalName);
+        foreach (string unselected in new[] { "false", "False" })
+        { var doc = Open(ForceFixture.Replace("<ForceValue>", "<ForceIntention>" + unselected + "</ForceIntention><ForceValue>")); doc.SetField(0, "ForceValue", "TRUE"); Equal("TRUE", doc.Field(0, "ForceValue")); }
+        // Genuine empty native force table: parse and no-op only; it has no rows to edit.
+        byte[] empty = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "native-owned-v21", "ForceTable.xml"));
+        var native = new WatchTableDocument(empty); True(native.IsForce); Equal(0, native.Count); True(native.ToBytes().SequenceEqual(empty));
+    }
     private static void ForceRefusal()
     {
-        var doc = Open(Fixture.Replace("PlcWatchTable", "PlcForceTable")); True(doc.IsForce); byte[] before = doc.ToBytes();
-        foreach (Action action in new Action[] { () => doc.Rename("new"), () => doc.SetField(0, "ModifyValue", "TRUE"), () => doc.SetComment(0, "de-DE", "new"), () => doc.Duplicate(0, 1), () => doc.Remove(0), () => doc.Reorder([1, 0]) }) Refuse(action);
+        var doc = Open(ForceFixture); byte[] before = doc.ToBytes();
+        foreach (Action action in new Action[] { () => doc.Rename("new"), () => doc.SetField(0, "ModifyValue", "TRUE"), () => doc.SetField(0, "ForceIntention", "true"),
+            () => doc.SetField(0, "ForceIntention", "false"), () => doc.SetField(0, "MonitorTrigger", "Permanent"), () => doc.SetField(1, "ForceValue", "TRUE") }) Refuse(action);
         True(before.SequenceEqual(doc.ToBytes()));
+        foreach (string selected in new[] { "true", "True", "TRUE", "1", "", "<v>false</v>", "false<!-- x -->" })
+        {
+            doc = Open(ForceFixture.Replace("<ForceValue>", "<ForceIntention>" + selected + "</ForceIntention><ForceValue>")); before = doc.ToBytes();
+            foreach (Action action in new Action[] { () => doc.SetField(0, "ForceValue", "TRUE"), () => doc.SetComment(0, "de-DE", "new"), () => doc.UpsertComment(0, "fr-FR", "new"),
+                () => doc.Duplicate(0, 1), () => doc.Remove(0), () => doc.Reorder([1, 0]), () => doc.RequireNoForceSelection() }) Refuse(action);
+            True(before.SequenceEqual(doc.ToBytes()));
+        }
+        Refuse(() => new WatchTableDocument(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "native-owned-v21", "ForceTable.xml"))).Rename("Other"));
     }
     private static void ProfileRefusal()
     {

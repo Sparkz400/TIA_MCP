@@ -35,6 +35,8 @@ From the repository root:
 
 If the probe reports missing prerequisites, follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md).
 
+Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll). It is not natively qualified.
+
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
 before using the retained packages; receipt verification does not qualify native compatibility.

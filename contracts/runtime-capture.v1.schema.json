@@ -14,6 +14,72 @@
     }
   ],
   "$defs": {
+    "simulatorSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instanceId",
+        "instanceName",
+        "signals",
+        "cycleSynchronous"
+      ],
+      "properties": {
+        "instanceId": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "instanceName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "signals": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "symbol",
+              "type",
+              "datatype"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "type": {
+                "enum": [
+                  "bool",
+                  "int8",
+                  "uint8",
+                  "int16",
+                  "uint16",
+                  "int32",
+                  "uint32",
+                  "int64",
+                  "uint64",
+                  "float",
+                  "double",
+                  "string",
+                  "wstring"
+                ]
+              },
+              "datatype": {
+                "type": "string",
+                "description": "Declared PLC type that fits the typed read, for example uint16 with UInt or Word."
+              }
+            }
+          }
+        },
+        "cycleSynchronous": {
+          "type": "boolean"
+        }
+      }
+    },
     "request": {
       "type": "object",
       "additionalProperties": false,
@@ -82,6 +148,12 @@
         "handoffRef": {
           "type": "string",
           "pattern": "^runtime-handoff:[0-9a-f]{32}:[0-9a-f]{64}$"
+        },
+        "source": {
+          "const": "plcsim"
+        },
+        "simulator": {
+          "$ref": "#/$defs/simulatorSource"
         }
       },
       "allOf": [
@@ -154,7 +226,15 @@
                 "$ref": "physical-runtime.v1.schema.json#/$defs/id"
               },
               "selection": {
-                "$ref": "physical-runtime.v1.schema.json#/$defs/selection"
+                "anyOf": [
+                  {
+                    "$ref": "physical-runtime.v1.schema.json#/$defs/selection"
+                  },
+                  {
+                    "type": "null",
+                    "description": "PLCSIM signals; their identity is request.simulator."
+                  }
+                ]
               },
               "metadata": {
                 "type": "object"
@@ -533,7 +613,10 @@
         "localFailure": {
           "anyOf": [
             {
-              "const": "RuntimeCaptureStorageFailure"
+              "enum": [
+                "RuntimeCaptureStorageFailure",
+                "PlcsimOperatingModeRestoreFailed"
+              ]
             },
             {
               "type": "null"

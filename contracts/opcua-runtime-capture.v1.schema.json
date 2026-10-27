@@ -872,6 +872,16 @@
           ],
           "maxLength": 80,
           "pattern": "^Ua"
+        },
+        "transfer": {
+          "enum": [
+            "transferred",
+            "refused"
+          ]
+        },
+        "transferStatusCode": {
+          "type": "string",
+          "pattern": "^0x[89ab][0-9a-f]{7}$"
         }
       },
       "allOf": [
@@ -915,6 +925,44 @@
                   "UaTimeout"
                 ]
               }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "transfer"
+            ]
+          },
+          "then": {
+            "properties": {
+              "state": {
+                "const": "succeeded"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "transfer": {
+                "const": "refused"
+              }
+            },
+            "required": [
+              "transfer"
+            ]
+          },
+          "then": {
+            "required": [
+              "transferStatusCode"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "transferStatusCode"
+              ]
             }
           }
         }

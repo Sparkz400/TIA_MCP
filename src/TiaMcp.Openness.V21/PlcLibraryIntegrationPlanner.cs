@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
+using TiaMcp.Model;
 
 namespace TiaMcp.Openness.V21
 {
@@ -24,12 +25,23 @@ namespace TiaMcp.Openness.V21
                 Fail("InvalidIntegrationRecipe", "PLC integration requires action=plc_component_plan and planOnly=true. Combined application is unavailable.");
             var source = Obj(payload, "source"); Fields(source, "source", "libraryId revision"); Text(source, "libraryId", 64); Text(source, "revision", 64);
             var target = Obj(payload, "target"); Fields(target, "target", "projectName plcPath scopePath"); Text(target, "projectName", 128); Text(target, "plcPath");
-            if (target["scopePath"] != null && Text(target, "scopePath") != Text(target, "plcPath")) Fail("UnsupportedIntegrationScope", "The first recipe supports the standard PLC scope only.");
+            string units = Text(target, "plcPath") + "/units/", scope = target["scopePath"] == null ? Text(target, "plcPath") : Text(target, "scopePath");
+            if (scope != Text(target, "plcPath") && (!scope.StartsWith(units, StringComparison.Ordinal) || scope.IndexOf('/', units.Length) >= 0 || scope.Length == units.Length))
+                Fail("UnsupportedIntegrationScope", "scopePath must be the PLC itself or one of its software units; safety units are excluded.");
             var selection = Array(payload, "selection", 1, 1); Pin(selection[0], "selection");
-            var recipe = Obj(payload, "integration"); Fields(recipe, "integration", "dependencyPins instanceDb caller mappings");
+            var recipe = Obj(payload, "integration"); Fields(recipe, "integration", "dependencyPins instanceDb multiInstance caller mappings");
             foreach (var pin in Array(recipe, "dependencyPins", 0, 999)) Pin(pin, "dependency pin");
-            var instance = Obj(recipe, "instanceDb"); Fields(instance, "instanceDb", "name numberPolicy"); Identifier(Text(instance, "name", 80));
-            if (Text(instance, "numberPolicy") != "firstAvailable") Fail("InvalidIntegrationRecipe", "numberPolicy must explicitly be firstAvailable; exact numbering is not supported by the existing typed instance route.");
+            if ((recipe["instanceDb"] == null) == (recipe["multiInstance"] == null)) Fail("InvalidIntegrationRecipe", "Select exactly one of instanceDb or multiInstance.");
+            if (recipe["multiInstance"] != null)
+            {
+                var multi = Obj(recipe, "multiInstance"); Fields(multi, "multiInstance", "name"); Identifier(Text(multi, "name", 80));
+                if (CreatesStandaloneCaller(payload)) Fail("InvalidIntegrationRecipe", "A multi-instance needs an existing FB caller; a standalone caller is an FC.");
+            }
+            else
+            {
+                var instance = Obj(recipe, "instanceDb"); Fields(instance, "instanceDb", "name numberPolicy"); Identifier(Text(instance, "name", 80));
+                if (Text(instance, "numberPolicy") != "firstAvailable") Fail("InvalidIntegrationRecipe", "numberPolicy must explicitly be firstAvailable; exact numbering is not supported by the existing typed instance route.");
+            }
             var caller = Obj(recipe, "caller");
             if (CreatesStandaloneCaller(payload))
             {
@@ -45,8 +57,13 @@ namespace TiaMcp.Openness.V21
             }
             foreach (var token in Array(recipe, "mappings", 1, 128))
             {
-                var mapping = token as JObject; Fields(mapping, "mapping", "parameter direction dataType tagPath");
-                Identifier(Text(mapping, "parameter", 128)); Text(mapping, "tagPath");
+                var mapping = token as JObject; Fields(mapping, "mapping", "parameter direction dataType tagPath dbPath members");
+                Identifier(Text(mapping, "parameter", 128));
+                bool db = mapping["dbPath"] != null;
+                if (db == (mapping["tagPath"] != null)) Fail("InvalidIntegrationRecipe", "Each mapping selects exactly one of tagPath or dbPath.");
+                Text(mapping, db ? "dbPath" : "tagPath");
+                if (db || mapping["members"] != null)
+                    foreach (var member in Array(mapping, "members", 1, 16)) if (member.Type != JTokenType.String) Fail("InvalidIntegrationRecipe", "members must be simple native member names."); else Identifier((string)member);
                 if (!new[] { "Input", "Output", "InOut" }.Contains(Text(mapping, "direction"))) Fail("InvalidIntegrationRecipe", "direction must be Input, Output or InOut.");
                 if (!Scalars.Contains(Text(mapping, "dataType", 64))) Fail("UnsupportedIntegrationType", "Only explicitly supported scalar parameter mappings are accepted.");
             }
@@ -100,10 +117,12 @@ namespace TiaMcp.Openness.V21
             var root = versions.Cast<JObject>().Single(v => SamePin(rootPin, v));
             var blocks = fbExport.Descendants().Where(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal) && e.Name.LocalName is "SW.Blocks.FB" or "SW.Blocks.FC").ToArray();
             if (blocks.Length != 1 || blocks[0].Name.LocalName != "SW.Blocks.FB") Fail("UnsupportedIntegrationType", "The selected exact version must export one standard FB.");
-            var fb = blocks[0]; var attrs = fb.Element("AttributeList"); string fbName = attrs?.Element("Name")?.Value;
+            var fb = blocks[0]; var attrs = fb.Element("AttributeList"); string fbName = attrs?.Element("Name")?.Value, fbNamespace = attrs?.Element("Namespace")?.Value ?? "";
             Identifier(fbName);
-            if (fbName != root.Value<string>("typeName") || !string.IsNullOrEmpty(attrs?.Element("Namespace")?.Value) || !new[] { "SCL", "STL", "LAD", "FBD" }.Contains(attrs?.Element("ProgrammingLanguage")?.Value))
-                Fail("UnsupportedIntegrationType", "FB export must match the selected type name and have standard language and an empty namespace.");
+            if (fbName != root.Value<string>("typeName") || !new[] { "SCL", "STL", "LAD", "FBD" }.Contains(attrs?.Element("ProgrammingLanguage")?.Value))
+                Fail("UnsupportedIntegrationType", "FB export must match the selected type name and have a standard language.");
+            string plcPath = payload["target"].Value<string>("plcPath"), scopePath = ScopePath(payload); bool unit = scopePath != plcPath;
+            if (!unit && fbNamespace.Length != 0) Fail("UnsupportedIntegrationScope", "A namespaced FB needs a software-unit scopePath; the standard PLC scope has no namespaces.");
             if (fb.Descendants().Any(e => (e.Name.LocalName == "IsKnowHowProtected" || e.Attribute("Name")?.Value == "KnowHowProtected") && e.Value.Equals("true", StringComparison.OrdinalIgnoreCase)))
                 Fail("ProtectedObject", "Protected library contents are not eligible.");
             var sections = attrs?.Element("Interface")?.Elements().SingleOrDefault(e => e.Name.LocalName == "Sections");
@@ -125,17 +144,49 @@ namespace TiaMcp.Openness.V21
 
             if (inventory.Value<bool?>("complete") != true) Fail("IntegrationInventoryIncomplete", "Complete native block/type/tag inventory is required.");
             var existing = Array(inventory, "objects", 0, 50000); var tags = Array(inventory, "tags", 0, 50000);
+            var scope = inventory["scope"] as JObject;
+            if (unit && (scope?.Value<string>("path") != scopePath || scope.Value<string>("kind") != "softwareUnit")) Fail("IntegrationInventoryIncomplete", "Software-unit planning requires the resolved native unit scope.");
+            string scopeNamespace = unit ? scope.Value<string>("namespacePreset") ?? "" : "";
             var existingNames = new HashSet<string>(existing.Select(o => o.Value<string>("name")), StringComparer.OrdinalIgnoreCase);
-            string dbName = recipe["instanceDb"].Value<string>("name");
-            if (existingNames.Contains(dbName) || versions.Any(v => string.Equals(v.Value<string>("typeName"), dbName, StringComparison.OrdinalIgnoreCase))) Fail("LibraryConflict", "Instance DB name collides with an existing or planned object.");
-            if (versions.Any(v => existingNames.Contains(v.Value<string>("typeName")))) Fail("LibraryConflict", "An existing PLC object shares a root/dependency name. Exact reuse/adoption is not enabled.");
-            var usedNumbers = new HashSet<int>(existing.Where(o => o.Value<string>("kind") == "DB").Select(o => o.Value<int>("number")));
-            int dbNumber = Enumerable.Range(1, 65535).FirstOrDefault(n => !usedNumbers.Contains(n));
-            if (dbNumber == 0) Fail("BlockNumberExhausted", "No DB number is available.");
+            // Reuse needs a native exact-version proof (type/version GUID, one link, identical metadata); a name match is never adoption.
+            var proofs = (inventory["reusedVersions"] as JArray ?? new JArray()).OfType<JObject>().ToArray();
+            bool Reused(JObject v) => proofs.Any(r => SamePin(r, v) && r.Value<string>("typeName") == v.Value<string>("typeName"));
+            if (versions.Any(v => existingNames.Contains(v.Value<string>("typeName")) && !Reused((JObject)v))) Fail("LibraryConflict", "An existing PLC object shares a root/dependency name without an exact installed-version proof; it is never adopted by name.");
+            bool fbReused = Reused(root);
+            if (fbReused && versions.Any(v => !Reused((JObject)v))) Fail("DependencyConflict", "A reused FB requires every pinned dependency to be its exact installed version.");
+            string qualifiedFb = fbNamespace.Length == 0 ? fbName : fbNamespace + "." + fbName, fbPath = ObjectIdentity.ObjectPath(scopePath + "/blocks", fbName, fbNamespace);
+            if (fbReused)
+            {
+                var installed = existing.Where(o => o.Value<string>("kind") == "FB" && o.Value<string>("name") == fbName && (o.Value<string>("namespace") ?? "") == fbNamespace).ToArray();
+                if (installed.Length != 1) Fail("LibraryConflict", "The reused FB does not resolve to exactly one native FB with the pinned name and namespace.");
+                fbPath = installed[0].Value<string>("path");
+            }
+            bool multi = recipe["multiInstance"] != null;
+            string dbName = multi ? null : recipe["instanceDb"].Value<string>("name"), multiName = multi ? recipe["multiInstance"].Value<string>("name") : null;
+            JObject reusedDb = null; int dbNumber = 0;
+            if (!multi)
+            {
+                var sameName = existing.Where(o => string.Equals(o.Value<string>("name"), dbName, StringComparison.OrdinalIgnoreCase)).ToArray();
+                if (versions.Any(v => string.Equals(v.Value<string>("typeName"), dbName, StringComparison.OrdinalIgnoreCase)) || sameName.Length != 0 && !fbReused) Fail("LibraryConflict", "Instance DB name collides with an existing or planned object.");
+                if (sameName.Length != 0)
+                {
+                    if (sameName.Length != 1 || sameName[0].Value<string>("kind") != "DB" || sameName[0].Value<string>("instanceOfName") != qualifiedFb)
+                        Fail("LibraryConflict", "The same-name block is not one instance DB of the reused FB; it is never adopted by name.");
+                    reusedDb = (JObject)sameName[0];
+                    if (!(reusedDb["users"] is JArray users)) Fail("InstanceUseUnproven", "Native cross-references could not prove the existing instance DB unused; reusing it could share state.");
+                    else if (users.Count != 0) Fail("InstanceAlreadyUsed", "The existing instance DB is already used by other blocks; reusing it would share state.", new JObject { ["instanceDbPath"] = reusedDb["path"].DeepClone(), ["users"] = users.DeepClone() });
+                }
+                else
+                {
+                    var usedNumbers = new HashSet<int>(existing.Where(o => o.Value<string>("kind") == "DB").Select(o => o.Value<int>("number")));
+                    dbNumber = Enumerable.Range(1, 65535).FirstOrDefault(n => !usedNumbers.Contains(n));
+                    if (dbNumber == 0) Fail("BlockNumberExhausted", "No DB number is available.");
+                }
+            }
 
             bool standalone = CreatesStandaloneCaller(payload);
-            string callerPath = CallerPath(payload), networkId = recipe["caller"].Value<string>("insertAfterNetworkId");
-            string language;
+            string networkId = recipe["caller"].Value<string>("insertAfterNetworkId");
+            string callerPath, language, callerKind, callerNamespace, groupPath;
             var blockers = new JArray();
             if (standalone)
             {
@@ -144,18 +195,21 @@ namespace TiaMcp.Openness.V21
                 if (existingNames.Contains(name) ||
                     versions.Any(v => string.Equals(v.Value<string>("typeName"), name, StringComparison.OrdinalIgnoreCase)) || string.Equals(dbName, name, StringComparison.OrdinalIgnoreCase))
                     Fail("LibraryConflict", "Standalone caller name collides with an existing or planned object.");
-                language = recipe["caller"].Value<string>("language");
+                language = recipe["caller"].Value<string>("language"); callerKind = "FC"; callerNamespace = scopeNamespace;
+                groupPath = scopePath + "/blocks"; callerPath = ObjectIdentity.ObjectPath(groupPath, name, callerNamespace);
             }
             else
             {
+            callerPath = CallerPath(payload);
             var callerRows = existing.Where(o => o.Value<string>("path") == callerPath).ToArray();
             if (callerRows.Length != 1) Fail("IntegrationCallerMismatch", "Caller does not resolve uniquely in the selected native scope.");
-            var caller = callerRows[0]; language = caller.Value<string>("language");
-            if (caller.Value<bool?>("protected") != false || !string.IsNullOrEmpty(caller.Value<string>("namespace")) || (language != "LAD" && language != "FBD")) Fail("UnsupportedIntegrationCaller", "Caller must be an unprotected standard LAD/FBD block with an empty namespace.");
+            var caller = callerRows[0]; language = caller.Value<string>("language"); callerKind = caller.Value<string>("kind"); callerNamespace = caller.Value<string>("namespace") ?? "";
+            if (caller.Value<bool?>("protected") != false || !unit && callerNamespace.Length != 0 || (language != "LAD" && language != "FBD")) Fail("UnsupportedIntegrationCaller", "Caller must be an unprotected LAD/FBD block; namespaces exist only in software units.");
+            string suffix = ObjectIdentity.ObjectPath("", caller.Value<string>("name"), callerNamespace);
+            if (!callerPath.StartsWith(scopePath + "/blocks/", StringComparison.Ordinal) || !callerPath.EndsWith(suffix, StringComparison.Ordinal)) Fail("IntegrationCallerMismatch", "Caller path does not match its native name and namespace in the selected scope.");
+            groupPath = callerPath.Substring(0, callerPath.Length - suffix.Length);
             var nativeCallers = callerExport.Root?.Elements().Where(e => e.Name.LocalName is "SW.Blocks.OB" or "SW.Blocks.FB" or "SW.Blocks.FC").ToArray();
-            // shortcut: OB callers stay refused until OB insertion is separately qualified.
-            if (nativeCallers?.Length == 1 && nativeCallers[0].Name.LocalName == "SW.Blocks.OB") Fail("UnsupportedIntegrationCaller", "OB insertion is not qualified; select an FC or FB caller.");
-            if (nativeCallers == null || nativeCallers.Length != 1 || nativeCallers[0].Element("AttributeList")?.Element("Name")?.Value != caller.Value<string>("name") || nativeCallers[0].Element("AttributeList")?.Element("ProgrammingLanguage")?.Value != language)
+            if (nativeCallers == null || nativeCallers.Length != 1 || nativeCallers[0].Name.LocalName != "SW.Blocks." + callerKind || nativeCallers[0].Element("AttributeList")?.Element("Name")?.Value != caller.Value<string>("name") || nativeCallers[0].Element("AttributeList")?.Element("ProgrammingLanguage")?.Value != language)
                 Fail("IntegrationCallerMismatch", "Caller XML does not match the independently resolved native block.");
             var networks = callerExport.Descendants("SW.Blocks.CompileUnit").Where(e => (string)e.Attribute("ID") == networkId).ToArray();
             if (networks.Length != 1 || networks[0].Element("AttributeList")?.Element("ProgrammingLanguage")?.Value != language) Fail("NetworkNotFound", "Exact native caller network is missing or has a different language.");
@@ -163,59 +217,127 @@ namespace TiaMcp.Openness.V21
             // Following IDs shift by the inserted count (scope decision 2026-10-25); only an unpredictable shift blocks.
             string shiftBlocker = terminal ? null : PlcComponentCallerInsertion.ShiftBlocker(callerExport);
             if (shiftBlocker != null) blockers.Add(new JObject { ["code"] = "NativeIdPreservationUnsupported", ["message"] = shiftBlocker + " Select a terminal boundary or a separate caller." });
+            if (multi)
+            {
+                if (callerKind != "FB") Fail("UnsupportedIntegrationCaller", "A multi-instance needs an existing FB caller; FC and OB callers have no static storage.");
+                var declared = callerExport.Descendants().Where(e => e.Name.LocalName == "Sections").Take(1).SelectMany(s => s.Elements()).SelectMany(s => s.Elements().Where(e => e.Name.LocalName == "Member"));
+                if (declared.Any(m => string.Equals((string)m.Attribute("Name"), multiName, StringComparison.OrdinalIgnoreCase)))
+                    Fail("DeclarationCollision", "The caller already declares " + multiName + ". An existing multi-instance is not reused: its other uses cannot be proven from the caller alone.");
+            }
             }
 
+            var reasons = new JArray();
+            void PlanOnly(string code, string message) { if (!reasons.Any(r => r.Value<string>("code") == code)) reasons.Add(new JObject { ["code"] = code, ["message"] = message }); }
+            if (unit) PlanOnly("ComponentScopeUnqualified", "Component readback covers the standard PLC scope only, and the namespace of a library instance in a software unit is not natively qualified.");
+            if (fbReused) PlanOnly("ComponentRecoveryAnchorUnavailable", "The FB is reused, so no library import step exists whose checkpoint anchors component recovery; prepare this typed step on its own.");
+            if (multi) PlanOnly("ComponentMultiInstanceUnqualified", "Component readback proves a global instance DB and an interface-preserving caller insertion only; createMulti adds a caller Static member and regenerates the caller's dependents.");
             var operands = new JArray(); var connections = new JArray(); var observedMappings = new JArray(); var writers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var mapping in mappings.OrderBy(m => parameters.FindIndex(p => p.Value<string>("name") == m.Value<string>("parameter"))))
             {
-                var matches = tags.Where(t => t.Value<string>("path") == mapping.Value<string>("tagPath")).ToArray();
-                if (matches.Length != 1) Fail("IntegrationTagMissing", "Exact mapped native tag path is missing or ambiguous.");
-                var tag = matches[0]; string name = tag.Value<string>("name"), direction = mapping.Value<string>("direction"), parameter = mapping.Value<string>("parameter");
-                if (tags.Count(t => string.Equals(t.Value<string>("name"), name, StringComparison.OrdinalIgnoreCase)) != 1) Fail("AmbiguousOperand", "The tag name is not unique in the complete software scope.");
-                if (tag.Value<bool?>("isSafety") != false) Fail("SafetyBoundary", "Safety or unclassified tags are excluded.");
-                if (tag.Value<string>("dataType") != mapping.Value<string>("dataType")) Fail("OperandTypeMismatch", "Mapping type differs from the exact native tag: " + name);
-                bool writable = direction != "Input";
-                if (writable && Regex.IsMatch(tag.Value<string>("logicalAddress") ?? "", @"^%?[IE]", RegexOptions.IgnoreCase)) Fail("OperandReadOnly", "Output/InOut mappings cannot write physical input tags.");
-                if (writable && !writers.Add(tag.Value<string>("path"))) Fail("IntegrationWriteAlias", "Multiple writable parameters map to the same tag.");
-                string key = "p" + operands.Count.ToString(CultureInfo.InvariantCulture);
-                operands.Add(new JObject { ["key"] = key, ["scope"] = "tag", ["ownerPath"] = tag["tablePath"].DeepClone(), ["components"] = new JArray(name), ["dataType"] = tag["dataType"].DeepClone() });
+                string direction = mapping.Value<string>("direction"), parameter = mapping.Value<string>("parameter"), key = "p" + operands.Count.ToString(CultureInfo.InvariantCulture), writer;
+                var members = mapping["members"]?.Select(m => (string)m).ToArray(); bool writable = direction != "Input";
+                var observed = (JObject)mapping.DeepClone();
+                if (mapping["dbPath"] != null)
+                {
+                    string dbPath = mapping.Value<string>("dbPath");
+                    var owners = existing.Where(o => o.Value<string>("path") == dbPath).ToArray();
+                    if (owners.Length != 1 || owners[0].Value<string>("kind") != "DB") Fail("IntegrationOperandMissing", "Exact mapped DB path is missing or not a data block in the selected scope.");
+                    var owner = (JObject)owners[0];
+                    if (owner.Value<bool?>("protected") != false) Fail("ProtectedObject", "Protected DBs cannot be bound.");
+                    if ((owner.Value<string>("language") ?? "").StartsWith("F_", StringComparison.Ordinal)) Fail("SafetyBoundary", "Safety DBs are excluded.");
+                    if (existing.Count(o => o.Value<string>("kind") == "DB" && string.Equals(Qualified(o), Qualified(owner), StringComparison.OrdinalIgnoreCase)) != 1) Fail("AmbiguousOperand", "The DB symbol is not unique in the complete software scope.");
+                    observed["nativeBlock"] = owner.DeepClone(); observed["nativeMember"] = Member(inventory, dbPath, members, mapping).DeepClone();
+                    operands.Add(new JObject { ["key"] = key, ["scope"] = "db", ["ownerPath"] = dbPath, ["components"] = new JArray(members), ["dataType"] = mapping["dataType"].DeepClone() });
+                    writer = dbPath + "::" + string.Join(".", members);
+                    PlanOnly("ComponentReadbackUnavailable", "Component readback re-resolves root tag mappings only; DB-member bindings are checked by the typed step alone.");
+                }
+                else
+                {
+                    var matches = tags.Where(t => t.Value<string>("path") == mapping.Value<string>("tagPath")).ToArray();
+                    if (matches.Length != 1) Fail("IntegrationTagMissing", "Exact mapped native tag path is missing or ambiguous.");
+                    var tag = matches[0]; string name = tag.Value<string>("name"), type = tag.Value<string>("dataType") ?? "";
+                    if (tags.Count(t => string.Equals(t.Value<string>("name"), name, StringComparison.OrdinalIgnoreCase)) != 1) Fail("AmbiguousOperand", "The tag name is not unique in the complete software scope.");
+                    if (tag.Value<bool?>("isSafety") != false) Fail("SafetyBoundary", "Safety or unclassified tags are excluded.");
+                    if (members == null && type != mapping.Value<string>("dataType")) Fail("OperandTypeMismatch", "Mapping type differs from the exact native tag: " + name);
+                    if (members != null && !(type.Length > 2 && type[0] == '"' && type[type.Length - 1] == '"')) Fail("OperandTypeMismatch", "Member mappings need a UDT-typed tag: " + name);
+                    if (writable && Regex.IsMatch(tag.Value<string>("logicalAddress") ?? "", @"^%?[IE]", RegexOptions.IgnoreCase)) Fail("OperandReadOnly", "Output/InOut mappings cannot write physical input tags.");
+                    observed["nativeTag"] = tag.DeepClone();
+                    if (members != null)
+                    {
+                        observed["nativeMember"] = Member(inventory, mapping.Value<string>("tagPath"), members, mapping).DeepClone();
+                        PlanOnly("UnsupportedOperandRoute", "The typed call route binds root scalar tags only; a UDT-typed tag member operand is refused at typed preparation.");
+                    }
+                    if (unit) PlanOnly("UnsupportedScopeReference", "The typed route refuses tag operands inside software units; bind DB members of the unit instead.");
+                    operands.Add(new JObject { ["key"] = key, ["scope"] = "tag", ["ownerPath"] = tag["tablePath"].DeepClone(), ["components"] = new JArray(new[] { name }.Concat(members ?? new string[0])), ["dataType"] = members == null ? tag["dataType"].DeepClone() : mapping["dataType"].DeepClone() });
+                    writer = tag.Value<string>("path") + (members == null ? "" : "::" + string.Join(".", members));
+                }
+                if (writable && !writers.Add(writer)) Fail("IntegrationWriteAlias", "Multiple writable parameters map to the same operand.");
                 connections.Add(direction == "Output" ? Wire("call", parameter, "$" + key, "value") : Wire("$" + key, "value", "call", parameter));
-                var observed = (JObject)mapping.DeepClone(); observed["nativeTag"] = tag.DeepClone(); observedMappings.Add(observed);
+                observedMappings.Add(observed);
             }
             var nodes = new JArray();
             if (language == "LAD") { nodes.Add(new JObject { ["key"] = "rail", ["kind"] = "powerrail" }); connections.Insert(0, Wire("rail", "out", "call", "en")); }
             else { operands.Add(new JObject { ["key"] = "enable", ["scope"] = "constant", ["dataType"] = "Bool", ["value"] = "true" }); connections.Add(Wire("$enable", "value", "call", "en")); }
-            string plcPath = payload["target"].Value<string>("plcPath"); string groupPath = callerPath.Substring(0, callerPath.LastIndexOf('/'));
-            nodes.Add(new JObject { ["key"] = "call", ["kind"] = "call", ["calleePath"] = plcPath + "/blocks/" + Uri.EscapeDataString(fbName), ["instance"] = "instance" });
-            var graphical = new JObject { ["blockPath"] = callerPath, ["scopePath"] = plcPath, ["groupPath"] = groupPath, ["namespace"] = "",
+            nodes.Add(new JObject { ["key"] = "call", ["kind"] = "call", ["calleePath"] = fbPath, ["instance"] = "instance" });
+            var instanceRequest = multi ? new JObject { ["key"] = "instance", ["kind"] = "createMulti", ["name"] = multiName }
+                : reusedDb != null ? new JObject { ["key"] = "instance", ["kind"] = "existingGlobal", ["blockPath"] = reusedDb["path"].DeepClone() }
+                : new JObject { ["key"] = "instance", ["kind"] = "createGlobal", ["name"] = dbName };
+            var graphical = new JObject { ["blockPath"] = callerPath, ["scopePath"] = scopePath, ["groupPath"] = groupPath, ["namespace"] = callerNamespace,
                 ["model"] = new JObject { ["schemaVersion"] = 1, ["language"] = language, ["operation"] = "insertNetwork", ["insertAfterNetworkId"] = networkId, ["nodes"] = nodes, ["operands"] = operands, ["connections"] = connections },
-                ["instances"] = new JArray(new JObject { ["key"] = "instance", ["kind"] = "createGlobal", ["name"] = dbName }) };
+                ["instances"] = new JArray(instanceRequest) };
             if (standalone)
             {
                 graphical.Remove("blockPath");
                 var model = (JObject)graphical["model"]; model["operation"] = "createBlock"; model.Remove("insertAfterNetworkId");
                 model["creation"] = new JObject { ["name"] = recipe["caller"]["name"].DeepClone(), ["blockType"] = "FC", ["interface"] = new JArray() };
             }
-            return new JObject {
+            var steps = new JArray();
+            if (!fbReused)
+                steps.Add(Step(new JObject { ["kind"] = "library_instantiate", ["prepareArguments"] = new JObject { ["kind"] = "library_instantiate", ["payload"] = new JObject { ["schemaVersion"] = 1, ["source"] = payload["source"].DeepClone(), ["selection"] = payload["selection"].DeepClone(), ["target"] = payload["target"].DeepClone() } }, ["requiresFreshPreparation"] = true },
+                    new JArray(reasons.Where(r => r.Value<string>("code") == "ComponentScopeUnqualified").Select(r => r.DeepClone()))));
+            steps.Add(Step(new JObject { ["kind"] = "graphical_typed_edit", ["prepareArguments"] = new JObject { ["kind"] = "graphical_typed_edit", ["projectName"] = payload["target"]["projectName"].DeepClone(), ["plcPath"] = plcPath, ["payload"] = graphical }, ["requiresFreshPreparation"] = true,
+                ["mustWaitFor"] = fbReused ? "Fresh typed preparation against the reused FB and the current caller." : "Exact imported FB/dependency identity and content readback; new native project fingerprint." }, reasons));
+            for (int i = 0; i < steps.Count; i++) ((JObject)steps[i]).AddFirst(new JProperty("order", i + 1));
+            var plan = new JObject {
                 ["schemaVersion"] = 1, ["status"] = "planned_only", ["applySupported"] = false, ["applyError"] = ApplyError,
                 ["nativeMutationDispatched"] = false, ["qualification"] = "offline_planner_only_native_qualification_required",
                 ["versions"] = versions.DeepClone(), ["interface"] = new JArray(parameters), ["mappings"] = observedMappings,
+                ["fb"] = new JObject { ["name"] = fbName, ["namespace"] = fbNamespace, ["scopePath"] = scopePath, ["path"] = fbPath, ["reused"] = fbReused },
+                ["reuse"] = new JObject { ["versions"] = new JArray(versions.Cast<JObject>().Where(Reused).Select(v => new JObject { ["typeName"] = v["typeName"].DeepClone(), ["typeGuid"] = v["typeGuid"].DeepClone(), ["versionGuid"] = v["versionGuid"].DeepClone() })),
+                    ["instanceDbPath"] = reusedDb?["path"].DeepClone(), ["duplicatesCreated"] = false },
                 ["caller"] = new JObject { ["mode"] = standalone ? "createStandaloneFc" : "existing", ["blockPath"] = callerPath,
-                    ["initiallyAbsent"] = standalone, ["language"] = language, ["obCallAdded"] = false },
-                ["instanceDb"] = new JObject { ["name"] = dbName, ["path"] = groupPath + "/" + Uri.EscapeDataString(dbName), ["numberPolicy"] = "firstAvailable", ["provisionalNumber"] = dbNumber, ["numberMustBeRecheckedAfterInstantiation"] = true },
+                    ["initiallyAbsent"] = standalone, ["language"] = language, ["obCallAdded"] = callerKind == "OB", ["kind"] = callerKind, ["namespace"] = callerNamespace },
                 ["blockers"] = blockers,
-                ["steps"] = new JArray(
-                    new JObject { ["order"] = 1, ["kind"] = "library_instantiate", ["prepareArguments"] = new JObject { ["kind"] = "library_instantiate", ["payload"] = new JObject { ["schemaVersion"] = 1, ["source"] = payload["source"].DeepClone(), ["selection"] = payload["selection"].DeepClone(), ["target"] = payload["target"].DeepClone() } }, ["requiresFreshPreparation"] = true },
-                    new JObject { ["order"] = 2, ["kind"] = "graphical_typed_edit", ["prepareArguments"] = new JObject { ["kind"] = "graphical_typed_edit", ["projectName"] = payload["target"]["projectName"].DeepClone(), ["plcPath"] = plcPath, ["payload"] = graphical }, ["requiresFreshPreparation"] = true, ["mustWaitFor"] = "Exact imported FB/dependency identity and content readback; new native project fingerprint." }),
+                ["steps"] = steps,
                 ["recoveryPlan"] = new JObject { ["affectedResource"] = "The complete selected project, including its project library, caller, and new FB/dependencies/instance DB.", ["requiredBeforeFirstMutation"] = "Persist an initial project checkpoint and hashes for all affected and unrelated native exports. No checkpoint is created by this plan.", ["separateStepsAreAtomic"] = false, ["automaticRetryAllowed"] = false, ["uncertainOutcome"] = "Read change_status for the dispatched step; never replay. Preserve both step journals and recover the initial project checkpoint into a new owned location, then compare after fresh reopen.", ["sourceLibraryPolicy"] = "Read-only source; no library publication, default changes or update operation." },
                 ["qualificationGates"] = new JArray("Exact native root and dependency version/content readback after import", "Fresh typed preparation: scope, protection, tag types/addresses, insertion preservation and DB collision checks", "Caller and DB native readback, exact call parameter bindings and compile diagnostics", "Unrelated native content comparison; save and fresh-session reopen", "Initial-checkpoint recovery and interruption/no-replay cases", "Independent simulator input/output and state assertions")
             };
+            if (multi) plan["multiInstance"] = new JObject { ["name"] = multiName, ["callerPath"] = callerPath, ["dataType"] = "\"" + qualifiedFb + "\"" };
+            else plan["instanceDb"] = reusedDb != null ? new JObject { ["name"] = reusedDb["name"].DeepClone(), ["path"] = reusedDb["path"].DeepClone(), ["number"] = reusedDb["number"].DeepClone(), ["reused"] = true }
+                : new JObject { ["name"] = dbName, ["path"] = ObjectIdentity.ObjectPath(groupPath, dbName, callerNamespace), ["numberPolicy"] = "firstAvailable", ["provisionalNumber"] = dbNumber, ["numberMustBeRecheckedAfterInstantiation"] = true };
+            return plan;
         }
 
         internal static bool CreatesStandaloneCaller(JObject payload) => payload?["integration"]?["caller"]?.Value<string>("mode") == "createStandaloneFc";
         internal static string CallerPath(JObject payload) => CreatesStandaloneCaller(payload)
-            ? payload["target"].Value<string>("plcPath") + "/blocks/" + Uri.EscapeDataString(payload["integration"]["caller"].Value<string>("name"))
+            ? ScopePath(payload) + "/blocks/" + Uri.EscapeDataString(payload["integration"]["caller"].Value<string>("name"))
             : payload["integration"]["caller"].Value<string>("blockPath");
+        internal static string ScopePath(JObject payload) => payload["target"].Value<string>("scopePath") ?? payload["target"].Value<string>("plcPath");
+
+        // planOnly marks a step the component route cannot dispatch or read back yet; the coordinator refuses such plans.
+        private static JObject Step(JObject step, JArray reasons) { if (reasons.Count != 0) { step["planOnly"] = true; step["planOnlyReasons"] = reasons; } return step; }
+        private static string Qualified(JToken row) => string.IsNullOrEmpty(row.Value<string>("namespace")) ? row.Value<string>("name") : row.Value<string>("namespace") + "." + row.Value<string>("name");
+        private static JObject Member(JObject inventory, string owner, string[] path, JObject mapping)
+        {
+            var rows = inventory["members"]?[owner] as JArray;
+            if (rows == null) Fail("IntegrationInventoryIncomplete", "Native member evidence is missing for " + owner);
+            var row = rows.OfType<JObject>().FirstOrDefault(r => r["path"] is JArray p && p.Select(c => (string)c).SequenceEqual(path, StringComparer.Ordinal));
+            string label = owner + ": " + string.Join(".", path);
+            if (row == null) Fail("IntegrationMappingMismatch", "Member does not exist in the native declaration: " + label);
+            if (row.Value<bool?>("scalar") != true) Fail("UnsupportedIntegrationType", "Only scalar members can be bound: " + label);
+            if (row.Value<string>("dataType") != mapping.Value<string>("dataType")) Fail("OperandTypeMismatch", "Mapping type differs from the exact native member: " + label);
+            return row;
+        }
 
         private static JObject Wire(string from, string fromPort, string to, string toPort) => new JObject { ["from"] = new JObject { ["node"] = from, ["port"] = fromPort }, ["to"] = new JObject { ["node"] = to, ["port"] = toPort } };
         private static bool SamePin(JObject a, JObject b) => GuidText(a, "typeGuid") == GuidText(b, "typeGuid") && GuidText(a, "versionGuid") == GuidText(b, "versionGuid");
@@ -226,12 +348,13 @@ namespace TiaMcp.Openness.V21
         private static JArray Array(JObject value, string key, int min, int max) { if (value?[key] is JArray a && a.Count >= min && a.Count <= max) return a; Fail("InvalidIntegrationRecipe", key + " must be a bounded array."); return null; }
         private static string Text(JObject value, string key, int max = 4096) { var t = value?[key]; if (t?.Type == JTokenType.String && !string.IsNullOrWhiteSpace((string)t) && ((string)t).Length <= max) return (string)t; Fail("InvalidIntegrationRecipe", key + " must be a nonempty bounded string."); return null; }
         private static void Fields(JObject value, string context, string fields) { var allowed = new HashSet<string>(fields.Split(' '), StringComparer.Ordinal); if (value == null || value.Properties().Any(p => !allowed.Contains(p.Name))) Fail("InvalidIntegrationRecipe", context + " must be an object with only documented fields."); }
-        private static void Fail(string code, string message) => throw new PlcIntegrationPlanException(code, message);
+        private static void Fail(string code, string message, JObject details = null) => throw new PlcIntegrationPlanException(code, message, details);
     }
 
     internal sealed class PlcIntegrationPlanException : Exception
     {
         internal string Code { get; }
-        internal PlcIntegrationPlanException(string code, string message) : base(message) { Code = code; }
+        internal JObject Details { get; }
+        internal PlcIntegrationPlanException(string code, string message, JObject details = null) : base(message) { Code = code; Details = details; }
     }
 }

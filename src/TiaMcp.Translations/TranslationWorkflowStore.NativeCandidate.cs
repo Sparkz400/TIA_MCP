@@ -6,7 +6,7 @@ using static TiaMcp.Translations.TranslationJson;
 namespace TiaMcp.Translations;
 
 internal sealed record TranslationImportCandidate(TranslationWorkbook Baseline, TranslationWorkbook Candidate,
-    string CandidateRef, string ReceiptSha256, string ApprovalSha256, string ReviewSha256);
+    string CandidateRef, string ReceiptSha256, string ApprovalSha256, string ReviewSha256, bool UpdateSourceLanguage = false);
 
 public sealed partial class TranslationWorkflowStore
 {
@@ -35,6 +35,6 @@ public sealed partial class TranslationWorkflowStore
             HashJson(ReadObject(approval, "approved-review.json")) == HashJson(rebuilt.Manifest["review"]),
             "TranslationIntegrityFailure", "Recomputed candidate or complete approved review differs.");
         return new(baseline, TranslationWorkbook.Open(bytes, baseline.Profile, baseline.Project, Sha256(bytes)),
-            candidateRef, candidate.RecordSha256, approval.RecordSha256, Text(review.Metadata, "reviewSha256"));
+            candidateRef, candidate.RecordSha256, approval.RecordSha256, Text(review.Metadata, "reviewSha256"), approved.Options?.UpdateSourceLanguage == true);
     }
 }

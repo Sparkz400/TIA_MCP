@@ -40,7 +40,7 @@ Test("predictable following ID shift no longer blocks existing-caller insertion"
     var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList><SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit><MultilingualText ID=\"2\" CompositionName=\"Title\"><ObjectList><MultilingualTextItem ID=\"3\" /></ObjectList></MultilingualText></ObjectList></SW.Blocks.FC></Document>");
     f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; Equal(0, ((JArray)f.Build()["blockers"]).Count);
 });
-Test("OB callers stay refused", () => Reject("UnsupportedIntegrationCaller", f => { f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; }));
+Test("OB caller exported as another block kind rejects", () => Reject("IntegrationCallerMismatch", f => f.Inventory["objects"][0]["kind"] = "OB"));
 Test("plan does not mutate payload or captured evidence", () => { var f = new Fixture(); string before = f.Payload.ToString() + f.Inventory.ToString() + f.Versions.ToString() + f.Fb.ToString() + f.Caller.ToString(); f.Build(); Equal(before, f.Payload.ToString() + f.Inventory.ToString() + f.Versions.ToString() + f.Fb.ToString() + f.Caller.ToString()); });
 Test("dependency versions all pinned", () => { var f = new Fixture(); f.AddDependency(); Equal(2, ((JArray)f.Build()["versions"]).Count); });
 Test("case variants of valid GUID pins match native identities", () => { var f = new Fixture(); f.Payload["selection"][0]["typeGuid"] = Fixture.Type.ToUpperInvariant(); Equal("planned_only", f.Build().Value<string>("status")); });
@@ -97,7 +97,8 @@ Test("unknown recipe fields reject", () => Reject("InvalidIntegrationRecipe", f 
 Test("coerced bool rejects", () => Reject("InvalidIntegrationRecipe", f => f.Payload["planOnly"] = "true"));
 Test("coerced schema version rejects", () => Reject("InvalidIntegrationRecipe", f => f.Payload["schemaVersion"] = "1"));
 Test("implicit or enabled execution rejects", () => Reject("InvalidIntegrationRecipe", f => f.Payload["planOnly"] = false));
-Test("software-unit scope rejects", () => Reject("UnsupportedIntegrationScope", f => f.Payload["target"]["scopePath"] = "/plc/units/Unit1"));
+Test("safety-unit scope rejects", () => Reject("UnsupportedIntegrationScope", f => f.Payload["target"]["scopePath"] = "/plc/safetyUnits/Unit1"));
+Test("nested unit scope rejects", () => Reject("UnsupportedIntegrationScope", f => f.Payload["target"]["scopePath"] = "/plc/units/Unit1/blocks"));
 Test("number override rejects", () => Reject("InvalidIntegrationRecipe", f => f.Payload["integration"]["instanceDb"]["number"] = 123));
 Test("Date is unavailable in the typed call route", () => Reject("UnsupportedIntegrationType", f => f.Payload["integration"]["mappings"][0]["dataType"] = "Date"));
 Test("Time_Of_Day is unavailable in the typed call route", () => Reject("UnsupportedIntegrationType", f => f.Payload["integration"]["mappings"][0]["dataType"] = "Time_Of_Day"));
@@ -144,6 +145,8 @@ ContentContractTests.Run(Test);
 ContentArtifactTests.Run(Test);
 PlanArtifactTests.Run(Test);
 LibraryDependencyCaptureTests.Run(Test);
+PlcHmiTests.Run(Test);
+BroadenedPlanTests.Run(Test);
 if (failed == 0 && args.Length != 0)
 {
     if (args.Length != 2 || args[0] != "--observation-fixtures") throw new ArgumentException("Expected --observation-fixtures <fresh-directory>.");

@@ -94,6 +94,13 @@ class SubscriptionContractTests(unittest.TestCase):
         validator('reconnectEvent').validate({**event, 'state':'failed', 'errorCode':'UaSessionExpired'})
         for change in ({'attempt':4}, {'errorCode':'UaAuthenticationDenied'}, {'state':'succeeded'}, {'extra':True}):
             self.assertFalse(validator('reconnectEvent').is_valid({**event, **change}))
+        succeeded = {**event, 'state':'succeeded', 'errorCode':None}
+        validator('reconnectEvent').validate({**succeeded, 'transfer':'transferred'})
+        validator('reconnectEvent').validate({**succeeded, 'transfer':'refused', 'transferStatusCode':'0x801f0000'})
+        for change in ({'transfer':'refused'}, {'transfer':'transferred', 'transferStatusCode':'0x801f0000'},
+                       {'transfer':'refused', 'transferStatusCode':'0x00000000'}, {'transfer':'resumed'}, {'transferStatusCode':'0x801f0000'}):
+            self.assertFalse(validator('reconnectEvent').is_valid({**succeeded, **change}), change)
+        self.assertFalse(validator('reconnectEvent').is_valid({**event, 'transfer':'transferred'}))
 
     def test_page_and_export_boundaries(self):
         ref = 'ua-subscription:'+'b'*32+':1:'+'c'*64

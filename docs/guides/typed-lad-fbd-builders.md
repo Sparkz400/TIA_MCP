@@ -42,8 +42,19 @@ creation resources come from separate native imports. Uncaptured combinations
 return `GraphicalProfileUnavailable` or a more specific creation/dependency
 diagnostic. They do not fall back to a standard-route profile.
 
-Safety, protected/generated blocks, set/reset coils, edge instructions,
-arithmetic, pointers, indirect access, array indexing, symbolic array bounds and
+Added 27 October 2026 and **unqualified**: the model also accepts `compare` with
+`DInt` or `Real`, `move` (one exact scalar `dataType`), `math` (`ADD`/`SUB`/`MUL`/`DIV`
+with one exact numeric `dataType`), `timer` `TONR` and `edge` (`R_TRIG`/`F_TRIG`,
+explicit `instance` storage like timers and counters). Every data pin, operand and
+native template overload must carry exactly that type; other combinations fail with
+`GraphicalComparisonUnsupported`, `GraphicalArithmeticUnsupported`,
+`GraphicalMoveUnsupported`, `GraphicalInstructionUnsupported` or `OperandTypeMismatch`.
+No native reference for these families has been captured, so the shipped catalog has
+no profile for them and they return `GraphicalProfileUnavailable` until one is
+captured and qualified. Profiles exist only for the CPU 1511 V4.1 target below.
+
+Safety, protected/generated blocks, set/reset coils, P_TRIG/N_TRIG and edge
+contacts/coils, pointers, indirect access, array indexing, symbolic array bounds and
 unprofiled compound call parameters are outside the current typed subset.
 Unsupported native instructions remain readable as opaque content.
 

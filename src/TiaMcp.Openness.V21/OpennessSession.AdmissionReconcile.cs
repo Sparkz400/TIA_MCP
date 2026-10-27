@@ -10,10 +10,6 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
-        // Kinds whose change fingerprint needs prepared in-memory targets; a fresh session cannot recompute them.
-        private static readonly HashSet<string> AdmissionReconcileTargetKinds = new HashSet<string>(new[] {
-            "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set" }, StringComparer.Ordinal);
-
         // Read-only evidence for releasing an unresolved shared mutation admission. Runs in a fresh empty owned
         // Portal; it only opens projects, retrieves archives into new reconcile directories and closes them.
         // It never saves, powers, downloads or replays. Every resource row gets a disposition or its reasons.
@@ -53,6 +49,7 @@ namespace TiaMcp.Openness.V21
                     case "simulation_download": AdmissionReconcileDownload(check); break;
                     case "scratch_create": AdmissionReconcileScratch(check); break;
                     case "project_retrieve": AdmissionReconcileRetrieve(check, observationSha256); break;
+                    case "project_copy": AdmissionReconcileCopy(check); break;
                     case "library_open": AdmissionReconcileLibraryOpen(check, observationSha256); break;
                 }
             }
@@ -92,11 +89,11 @@ namespace TiaMcp.Openness.V21
             foreach (var row in new[] { check.Row("checkpointMutationCompileSave"), check.Row("preserveAndRecover") }.Where(r => r != null))
                 if (!SameSimulationPath(row.Value<string>("path"), projectPath)) { check.HoldAll("The change journal names a different project than the admission."); return; }
             string kind = journal.Value<string>("kind") ?? "";
-            // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware.
-            bool covered = !AdmissionReconcileTargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
-            if (HardwareEngineeringRules.Applies(kind)) check.FingerprintKind = kind;
+            // The checkpoint comparison sees only what the fingerprint covers; hardware kinds add their configured hardware,
+            // PLC alarm kinds the content hash of a fresh native export of their artifact type, OPC UA kinds their server interface groups.
+            if (HardwareEngineeringRules.Applies(kind) || IsPlcAlarmKind(kind) || kind.StartsWith("opcua_", StringComparison.Ordinal)) check.FingerprintKind = kind;
             Func<Project, string> outcome = project => {
-                if (AdmissionReconcileTargetKinds.Contains(kind) || kind.StartsWith("to_", StringComparison.Ordinal) || journal.Value<string>("afterFingerprint") == null) return null;
+                if (!AdmissionReconcileRules.OutcomeRecomputable(kind) || journal.Value<string>("afterFingerprint") == null) return null;
                 var replay = new EngineeringChange { Kind = kind, Payload = journal["preview"]?["payload"] as JObject ?? new JObject() };
                 return EngineeringFingerprint(replay, project);
             };
@@ -105,15 +102,12 @@ namespace TiaMcp.Openness.V21
                 var projectRow = check.Row("checkpointMutationCompileSave");
                 if (projectRow == null) return;
                 if (!archiveValid) { check.Hold(projectRow, "No complete hash-verified checkpoint archive exists to compare the project with."); return; }
-                if (!covered) { check.Hold(projectRow, "The project fingerprint does not cover the effect of change kind " + kind + "."); return; }
                 string checkpoint = check.ArchiveFingerprint(projectRow, archive);
                 var current = check.OpenProject(projectRow, projectPath, outcome);
                 if (current == null || checkpoint == null) return;
-                if (current.Value<string>("fingerprint") == checkpoint)
-                    check.Prove(projectRow, "unchanged", "Fresh fingerprint equals the retrieved pre-mutation checkpoint; any unsaved mutation was lost with the interrupted session.");
-                else if (journal.Value<string>("state") == "applied" && current.Value<string>("outcomeFingerprint") == journal.Value<string>("afterFingerprint"))
-                    check.Prove(projectRow, "verifiedApplied", "Journal recorded the applied outcome and the fresh project fingerprint equals it.");
-                else check.Hold(projectRow, "The project differs from its checkpoint and does not match a recorded applied outcome.");
+                string after = journal.Value<string>("afterFingerprint");
+                check.ApplyProject(projectRow, current, checkpoint, archive,
+                    journal.Value<string>("state") == "applied" && after != null && current.Value<string>("outcomeFingerprint") == after);
                 return;
             }
             var original = check.Row("preserveAndRecover");
@@ -189,6 +183,23 @@ namespace TiaMcp.Openness.V21
                 "The destination is the retrieved archive (fresh fingerprints are equal).");
         }
 
+        private void AdmissionReconcileCopy(AdmissionReconcileCheck check)
+        {
+            var source = check.Row("archiveSavedSourceUnchanged");
+            var created = check.Rows("createNewDestination");
+            JObject archive = created.SingleOrDefault(r => r.Value<string>("kind") == "workspace"), destination = created.SingleOrDefault(r => r.Value<string>("kind") == "project");
+            if (source == null || archive == null || destination == null) return;
+            check.NotSavedSince(source, "project_copy never saves its source; the fresh source was not saved since admission.");
+            string reference = source["disposition"].Type == JTokenType.String ? source["evidence"]["project"]?.Value<string>("fingerprint") : null;
+            string path = archive.Value<string>("path"), staging = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+            if (!File.Exists(path) && !Directory.Exists(path) && !Directory.Exists(staging))
+                check.Prove(archive, "unchanged", "Neither the copy archive nor its staging directory was created.");
+            else if (reference != null && File.Exists(path) && check.ArchiveFingerprint(archive, path) == reference)
+                check.Prove(archive, "verifiedApplied", "The copy archive retrieves to the unchanged source (fresh fingerprints are equal).");
+            else if (!((JArray)archive["reasons"]).Any()) check.Hold(archive, "The copy archive is partial or differs from the unchanged source.");
+            check.Destination(destination, () => reference, "The destination is a copy of the unchanged source (fresh fingerprints are equal).");
+        }
+
         private void AdmissionReconcileLibraryOpen(AdmissionReconcileCheck check, string observationSha256)
         {
             var projectRow = check.Row("registerProjectLibraryHandle");
@@ -255,6 +266,15 @@ namespace TiaMcp.Openness.V21
                 var written = files.Max(File.GetLastWriteTimeUtc);
                 Evidence(row, "lastWriteUtc", written.ToString("O"));
                 if (written < AdmittedAt) Prove(row, "unchanged", basis); else Hold(row, "A file was written after admission.");
+            }
+
+            internal void ApplyProject(JObject row, JObject current, string checkpointFingerprint, string archive, bool appliedOutcomeMatches)
+            {
+                var written = File.GetLastWriteTimeUtc(archive);
+                Evidence(row, "checkpointWrittenUtc", written.ToString("O"));
+                var modified = DateTime.Parse(current.Value<string>("lastModifiedUtc"), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+                string disposition = AdmissionReconcileRules.ApplyProject(current.Value<string>("fingerprint") == checkpointFingerprint, modified, written, appliedOutcomeMatches, out string basis);
+                if (disposition != null) Prove(row, disposition, basis); else Hold(row, basis);
             }
 
             internal void NotSavedSince(JObject row, string basis)

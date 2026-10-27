@@ -1,5 +1,103 @@
 # Current status
 
+**TIA Add-In companion, force-table edits, diagnostic writes against PLCSIM, more typed LAD/FBD families, Unified screen authoring — 27 October 2026:** All compiled against the V21 PublicAPI and the PLCSIM Advanced V8 API; none run natively or inside TIA. Everything is catalog `partial`/`unverified`.
+- **Add-In (X04):** new net48 project `src/TiaMcp.AddIn.V21` with a project-tree menu entry that sends the exact selection to the Host's handoff pipe. `scripts/Publish-AddIn.ps1` builds and packages it with the Siemens Publisher and never installs it. The Host's opt-in `--addin-enrollment <file>` (requires `--addin-handoff`) admits only the TIA Add-In loader that is a direct child of the worker-owned TIA process and matches the pinned hashes; without it the Host still refuses enrollment. This is process lineage plus declared hashes, not attestation.
+- **Force tables (D02):** `watch_table_read`/`watch_table_prepare` take `forceTable=true`, with field, comment, clone, delete and reorder edits through the existing apply/verify/recover route (qualification harness only). `ForceIntention` is never set, and every readback requires it false. V21 has no force-table create, rename or delete, and access rules live only on a hardware service.
+- **Diagnostics against PLCSIM:** plan → watch table (`watch_table_generate`) and PLCSIM monitoring (`runtime_capture_start` with `source:'plcsim'` → `diagnostic_experiment_acquire_runtime`) already existed and are now documented. New: `diagnostic_plcsim_write` (owned instance only, acknowledged, exact expected values, 1–16 signals, readback) and `diagnostic_runtime_acquisition_compare` for before/after acquisitions.
+- **Typed LAD/FBD (L01):** the payload model accepts DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR and R_TRIG/F_TRIG with strict types. They stay unusable until native captures provide their profiles; there is no second-CPU capture yet. The CPU 1511 V4.1 route is unchanged.
+- **Unified screens (X08):** `hmi_engineering` gains create-only `screen_create`, `item_create` (8 item types), `dynamization_set` (tag dynamization of `ProcessValue`, `Visible` or `Enabled`) and `event_handler_set` (bounded raw script, never executed), all behind the closed preservation gate.
+
+[Add-In selections](reference/addin-selections.md), [watch tables](guides/watch-tables.md), [trace diagnostics](guides/trace-diagnostics.md), [typed LAD/FBD builders](guides/typed-lad-fbd-builders.md), [HMI engineering](guides/hmi-engineering.md).
+
+**Instance lookup, Test Suite system tests, VCI workspace changes, drive telegrams, broader component plan — 27 October 2026:** All compiled against the V21 PublicAPI; none run natively. Everything is catalog `partial`/`unverified`.
+- **Instance lookup (D17):** read-only `instance_lookup` returns, for one exact FB or FC, its instance DBs, multi-instances and instance arrays from the owners' exported interfaces, call sites with actual operands per parameter, and STL/GRAPH operand references. Each row names its source (cross-reference, interface or SimaticML). Languages it cannot prove are reported `unsupported`. Non-array rows can be passed to `diagnostic_plan` as the instance.
+- **Test Suite system tests (D06):** `testsuite_system_inventory` (also exports `.tst`), prepared kind `testsuite_system_import`, and `testsuite_system_plan_prepare` against an owned PLCSIM OPC UA endpoint, behind the disabled execution gate. Only the StandardSIMATIC interface and anonymous endpoints are possible in V21.
+- **VCI workspaces (D01):** prepared kinds `vci_workspace_create`/`delete`, `vci_mapping_add`/`remove` and `vci_synchronize`. Workspace-ward changes are verified by re-hashing the workspace; project-ward sync takes one exact object and requires compile. The project checkpoint never restores workspace files.
+- **Drive telegrams (D10):** prepared kind `drive_telegram_set` changes a main or supplementary telegram number, or inserts or erases a supplementary or additional telegram. It reads back every telegram row, reports address shifts and refuses I/O overlaps. Safety telegrams are refused.
+- **Component plan (L02):** `library_integrate`'s `plc_component_plan` now plans software units and namespaces, LAD/FBD OB callers, multi-instances, exact reuse of installed versions and unused instance DBs, and DB/UDT-tag member bindings. Steps the coordinator cannot apply yet are marked `planOnly`; production apply stays disabled.
+- **Interruption routing:** `testsuite_application_import` joins the target kinds, because the project fingerprint does not cover Test Suite objects.
+
+[Trace diagnostics](guides/trace-diagnostics.md), [Test Suite jobs](reference/testsuite-production-jobs.md), [VCI packages](reference/vci-package-workflow.md), [PLC library recipes](guides/plc-library-integration-recipes.md), [engineering workflows](guides/engineering-workflows.md).
+
+**PLCSIM-bound runtime and gated writes, DB snapshots, library maintenance, Unified connections and non-screen objects — 27 October 2026:** All compiled against the V21 PublicAPI and the PLCSIM Advanced V8 API; none run natively. Everything is catalog `partial`/`unverified`.
+- **Runtime against PLCSIM:**
+  - `runtime_plcsim_bind` retains the owned PLCSIM instance's identity: name, storage path, ownership-marker hash, controller IPs, and the online program fingerprint when `plc_online_compare` returns one. Given that binding, `runtime_handoff_review` matches target and program identity against it and states `boundOwnedPlcsim` or `unbound`.
+  - `runtime_web_write`, `runtime_web_operating_mode` and `runtime_ua_write` refuse unless the session endpoint is a controller IP of a live binding. Each needs an acknowledgement flag, exact expected values or mode and at most 16 items, and reads back what it wrote. Alarm acknowledge is not implemented: no verifiable `Alarms.Acknowledge` contract.
+- **DB snapshots:** `db_snapshot_capture` exports one DB's stored snapshot natively into a review. Prepared kinds `db_snapshot_create` (online snapshot from the owned PLCSIM instance into the project) and `db_snapshot_load_actual` (writes the stored snapshot into the owned PLCSIM instance; acknowledged and bound to the review hash). V21 has no actual-value read, so the load is reported, not read back.
+- **Libraries:** prepared kinds `library_cleanup` (project library; refuses anything still used) and `library_harmonize` (one PLC), and read-only `library_update_check`. `library_create_master_copy` accepts a PLC user group as one composite source. V21 has no API to move library types or folders.
+- **Unified HMI:** `hmi_engineering` gains `connection_create`, `object_create` (alarms, data and alarm logs), `object_properties_set` (alarms, logs, runtime settings including the start screen), DB-member external tags and bindings to PLC-backed tags, all behind the closed preservation gate. V21 offers no create or writable property for text/graphic lists or script modules.
+
+[Engineering workflows](guides/engineering-workflows.md), [physical runtime sessions](reference/physical-runtime-sessions.md), [DB snapshot review](reference/db-snapshot-review.md), [HMI engineering](guides/hmi-engineering.md).
+
+**Project texts, explorer libraries and ports, composite capture, OPC UA engineering changes, PLC alarm imports — 27 October 2026:** All compiled against the V21 PublicAPI; none run natively. Everything is catalog `partial`/`unverified`.
+- **Project texts:**
+  - `project_text_export` exports per target culture, or one workbook for explicit owners. Filtered category exports are always compared with a full export by native key, and leaked or dropped rows are reported.
+  - The native import route now accepts any active culture pair, several PLC owners and approved source-text mode. Production import stays disabled.
+- **Explorer:** unscoped captures add project-library nodes with `libraryVersion` edges from matching instance GUIDs. A selected port adds `connectedPort` edges.
+- **Composite engineering:**
+  - `composite_engineering_capture` builds a review phase from `cax_export`, `connection_inspect`, `drive_observe` and `technology_read`, marking each native, unavailable or failed.
+  - `composite_engineering_rebind_plan` proposes `to_connect` payloads for broken technology-object connections. It applies nothing.
+- **OPC UA:** prepared kinds `opcua_server_interface_import`/`delete`/`enable`, `opcua_reference_namespace_import`/`delete` and `opcua_role_mapping_set`. The server-interface group enters the fingerprint.
+- **PLC alarms:** prepared kinds `plc_alarm_text_list_import`, `plc_alarm_instance_text_import`, `plc_supervision_import`, `plc_alarm_class_import` and `plc_supervision_settings_import`. Their fingerprint hashes a fresh native export.
+
+[Engineering workflows](guides/engineering-workflows.md), [project explorer](guides/project-explorer.md), [OPC UA](reference/opc-ua-workflow.md), [translation import](reference/translation-native-import.md).
+
+**Unified and Classic HMI, online compare and upload, Test Suite application tests, block protection — 27 October 2026:** All implemented and compiled against the V21 PublicAPI. Nothing has run natively; all of it is catalog `partial`/`unverified`, or `blocked` where noted.
+- **Unified HMI:** `hmi_inspect` gains an opt-in `model` section: one bounded typed walker over 20 Unified `HmiSoftware` collections. The Unified preservation manifest now compares that walker's per-object hashes, not only tag tables. V21 still has no `Screen.Export`, so the manifest remains incomplete, and every HMI write stays gated.
+- **Classic HMI:** `hmi_engineering` gains a gated `classic_xml_import` operation for screens, templates, popups, slide-ins, global elements, overview, tag tables, text/graphic lists, VB scripts, cycles and connections. The re-export must equal the supplied document. The Classic preservation capture no longer reads `Name`/`Folders` on slide-ins, which lack them.
+- **Online compare and upload:**
+  - `plc_online_compare` uses an owned PLCSIM instance only and always goes offline afterwards. It may mark the open project modified, because it applies the PLC's target interface like provisioning does, but it never saves.
+  - `plc_station_upload` uploads into a new owned project through shared admission.
+- **Test Suite application tests:**
+  - `testsuite_application_inventory`.
+  - The prepared kind `testsuite_application_import`.
+  - `testsuite_application_plan_prepare`, whose reviews run through the existing style-job tools behind the disabled native-execution gate.
+- **Block protection:** `block_protect`, `block_unprotect` and `block_write_protection_set` carry only protected-credential references. Apply refuses with `CredentialRouteUnavailable` until a reviewed route hands a vault secret to a worker change, so they are catalog `blocked`.
+
+[HMI engineering](guides/hmi-engineering.md), [simulation](guides/simulation.md), [Test Suite jobs](reference/testsuite-production-jobs.md).
+
+**Software units, PLC documents, project copy and compare, runtime diagnostics and PLCSIM capture — 27 October 2026:** None of this has run natively. All of it is catalog `partial`/`unverified`, except the protocol and transfer code, which passes offline fakes and the loopback UA server.
+- **Software units:** prepared kinds `software_unit_create`, `software_unit_relation_set`, `software_unit_publication_set` and `software_unit_delete`. They refuse safety units and cycles; delete needs an empty, unreferenced unit.
+- **PLC documents:** `block_read`/`type_read` take a `format` of `simaticSd` or `generatedSource`. Source generation removes any external source it leaves behind. There is also `plc_document_inventory`, plus `plc_loadable_generate`, which never downloads and refuses inconsistent blocks.
+- **Projects:** `project_copy` copies via archive and secondary retrieve, leaving the source untouched. `project_open` takes `readOnly: true`, and every mutation then refuses on a non-primary project. `plc_compare` compares two PLCs, or a PLC and a library, offline.
+- **Runtime:** `runtime_web_diagnostics` covers alarms, diagnostic buffer, operating mode, mode selector, time and project info. After a session loss, OPC UA subscriptions are transferred to the replacement session, or re-created if the server refuses.
+- **PLCSIM capture:** `runtime_capture_start` takes `source: "plcsim"` with an optional cycle-synchronous single-step mode. The operating mode is restored on stop or failure.
+
+[Engineering workflows](guides/engineering-workflows.md), [physical runtime sessions](reference/physical-runtime-sessions.md).
+
+**Native read and change routes for alarms, hardware, CAx, GRAPH, security, OPC UA, VCI, safety, drives and technology objects — 27 October 2026:** These routes are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified`.
+
+Read-only tools:
+- `plc_alarm_inspect`: text lists, instance texts and supervisions, plus alarm-text-list nodes in the explorer.
+- `access_inspect`, `certificate_inspect` and `web_inspect`: their output feeds `access_review`, `public_certificate_review` and `web_application_review`.
+- `opcua_engineering_inspect` and `opcua_engineering_export`: exports are registered in the NodeSet store.
+- `vci_workspace_inspect`.
+- `safety_validation_inspect`: activation tests, F-parameters and printouts.
+- `drive_observe`: in the format `drive_profile_review` expects.
+- `cax_export`: published to the AutomationML store.
+- `graph_export`: published to the GRAPH store.
+- `hardware_gsd_export`.
+
+Prepared kinds:
+- Hardware: `hardware_port_connect`, `hardware_port_disconnect`, `hardware_replace`.
+- CAx and GRAPH: `cax_import`, which runs outside exclusive access on worker-owned TIA only, and `graph_import`, which is validated by `TiaMcp.Graph` in the Host.
+- Technology objects: `to_connect`, `to_disconnect`, `to_child_create`.
+- Drives: `drive_parameter_set` (scalar values with expected-before; BICO, Safety Integrated and commissioning parameters are refused).
+
+V21 has no read-only VCI export, because `Workspace.ExportObject` creates a mapping, so there is no export tool. [Engineering workflows](guides/engineering-workflows.md), [drives](guides/drives.md), [network inspection](guides/network-inspection.md).
+
+**Interruption matrix — 27 October 2026:** Every `change_apply` reconciliation route now passes native interruption at each durable boundary: `source_upsert`, `hardware_plug` and `to_create` were killed at checkpointing, during the mutation, after the mutation and after the save, and lost their Host while applying (15 of 15, `local.engineering.interruption-matrix.20261027`). Each reconciled exactly once without replay. Released cases recovered their checkpoint into a new directory, and held cases kept it reserved. An interrupted apply now counts as unchanged only if its project was last saved before the checkpoint archive was written, so unsaved target-dependent changes (technology objects, tag/constant set, attributes, connection set) release and any change saved after its checkpoint stays held. Own-route mutations (watch tables, translation, Test Suite jobs) stay with their owners. Catalog `0.4.37`. [Coverage](verification/interruption-coverage-20261027.md).
+
+**New PLC, project, connection and watch-table operations — 27 October 2026:** These operations are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified` until a native run qualifies them.
+- PLC objects: `tag_create`, `constant_create`, `block_number_set` and `block_attributes_set` (header fields; OB priority, cycle time, phase offset and process-image partition).
+- Project: the read-only `project_properties` tool, plus `project_attributes_set` and `project_languages_set`.
+- Connections: the read-only `connection_inspect` tool, whose output feeds `connection_review` directly, plus `connection_create`, `connection_delete` and `connection_set`.
+- Watch tables: `watch_table_prepare_create`/`rename`/`delete` and the matching `watch_table_group_prepare_*` operations.
+
+Connection changes and project language changes now enter the change fingerprint, so interruption reconciliation can compare their outcome. Watch-table lifecycle apply stays behind unverified profiles, like authoring. [Engineering workflows](guides/engineering-workflows.md), [watch tables](guides/watch-tables.md), [network inspection](guides/network-inspection.md).
+
+**Combined PLC/UDT/HMI recipes — 27 October 2026:** `library_integrate` has two new plan-only actions for WinCC Unified. `plc_hmi_component_plan` adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the existing PLC recipe; the worker proves the connection's PLC owner and checks tags, types and placement before proposing steps. `plc_hmi_update_plan` previews every proven Unified binding through one selected UDT version and refuses a field-changing update with `HmiBindingWouldBreak` and an exact impact report (binding, before/after type, screen consumers). The native prepare-only probe passed on Unified Comfort (`local.hmi.plc-hmi-recipe.20261027`): the install plan was blocked at its HMI steps and its apply refused; a `Real` → `LReal` UDT update was refused with exactly the one broken binding and its screen consumer. Apply stays refused and the Unified preservation gate stays closed. Catalog `0.4.33`. [Verification](verification/plc-hmi-recipes-20261027.md).
+
 **Native library scale — 27 October 2026:** An owned project library grew to 5,000 types (1,000 FB + 4,000 UDT on two CPU 1511 PLCs) in 50 guarded 100-type `library_create_type` changes; apply stayed at or below 370 s, prepare at or below 153 s, checkpoints reached 8.45 MB and Portal memory stayed at 3.0–4.3 GB. Its 10,004-entry library was then traversed completely: 50 pages, 10,000 items, 47 minutes, truncation reported at the item budget (`local.library.native-traversal.20261027`). The runs forced three worker fixes: Openness proxies are released after every request (TIA's 500,000-instance cap), `library_query` walks the library once per page instead of three times, and `library_create_type` accepts up to 100 `documentNames`. The scratch CPU's 4,000-object limit is recorded as a native boundary. [Verification](verification/library-native-scale-20261027.md).
 
 **Library compatibility — 27 October 2026:** Library changes now report unsaved target edits in the preview (`unsavedTargetEdits`). `checkpointSave` saves them into the recovery baseline, and they persist after reopen. A target with an inherited inconsistent PLC data type is refused before any checkpoint (`InheritedDiagnostics`). TIA's shipped V13 library is refused before any native call. S7-1500 library types instantiate into an S7-1200; a type using LInt/LWord/LTime fails compilation there without saving. V20 upgrades stay open because no V20 library input exists; V14 SP1–V19 were already qualified. Catalog `0.4.32`. [Verification](verification/library-lane-c-20261024.md#library-compatibility--27-october-2026).

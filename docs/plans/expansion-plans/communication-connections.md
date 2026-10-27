@@ -28,7 +28,8 @@ name matching. No Siemens product, SDK, simulator or PLC is installed here.
 The installed-API inventory described in the older roadmap is historical evidence,
 not a current SDK installation. The [supplied connection review](../../reference/connection-review.md)
 now delivers offline intake, explicit mapping, captured ancestry and declared
-consumer comparison. No new connection create/update/delete adapter is delivered.
+consumer comparison. Native read and create/set/delete routes are described under
+Contracts and architecture below.
 
 ## Verified documentation and limits
 
@@ -65,8 +66,10 @@ facts remain unknown; do not promote them to a generic compatibility pass.
 ## Contracts and architecture
 
 Delivered offline tools: `connection_review` and `connection_review_page`.
-Native `connection_inspect` remains proposed and unregistered. Native mutations should
-join the existing prepared-change lifecycle rather than add an independent executor.
+Native `connection_inspect` and the prepared kinds `connection_create`,
+`connection_delete` and `connection_set` now exist on the existing prepared-change
+lifecycle ([network inspection](../../guides/network-inspection.md#configured-communication-connections));
+they are compiled against the V21 PublicAPI only and not natively qualified.
 
 The delivered offline contract accepts explicitly supplied connection observations
 bound to an exact saved review, with original bytes retained. Every connection

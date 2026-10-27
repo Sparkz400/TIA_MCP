@@ -62,6 +62,17 @@ owner, subject, domain and mode. Only the existing Web-context domains
 `cpuRuntime` and `legacyWeb` are covered. This does not translate OPC UA,
 project UMAC or SIWAREX rights into Web permissions.
 
+An optional `plcsimBinding` selects the path/digest of a `runtime_plcsim_bind`
+record. The review then matches target identity against the bound owned PLCSIM
+instance (`plcsim-owned-instance`, name and marker digest) instead of the
+supplied `targetIdentity`. Program identity is matched against the bound online
+fingerprint (`plcsim-online-fingerprint-sha256`) when one was recorded. The
+expected endpoint must be one of the binding's controller addresses, and
+`binding` constraints compare the supplied expectations with the bound identity.
+The report's `targetBinding` and the receipt state `boundOwnedPlcsim`. With
+`plcsimBinding: null` the report states `unbound`. Requests without the field
+keep their original report bytes, and their receipt states `unbound`.
+
 `baseline` and `current` each name three exact artifact path/digest references:
 `target`, `program` and `session`. Every original has its own role-specific
 schema, `supplied` or `synthetic` provenance label, Host/context binding,

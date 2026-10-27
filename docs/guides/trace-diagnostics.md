@@ -44,6 +44,24 @@ Refine the request with exact `blockPath` and `instance:{dbPath,memberPath:[...]
 
 Traversal stops at 1,000 visits, depth 8 or 200 instances. `complete:false` always remains explicit. Call sites, repeated calls and shared storage are retained; captured storage resolution does not identify runtime invocation or prove that the reported machine uses that storage. Duplicate names/namespace alternatives are never silently collapsed into the first match. The caller must resolve equipment association using captured context. Missing root call evidence blocks `trace_prepare`.
 
+### Look up instances natively
+
+On an engineering workstation, `instance_lookup` reads the open project for one exact FB or FC (`blockPath` or `blockName`, optional `plcPath`). It returns:
+
+- **Instances:** single-instance DBs, multi-instance static members and arrays of instances (with declared bounds) and their owning root DB chain.
+- **Call sites:** native xref call locations, plus exported CallInfo with compile-unit ordinal, instance components and the actual operand per formal parameter.
+- **Operand references:** references into those instance DBs, from native xref and from exported code.
+
+Every row names its source: `nativeXref`, `interface` or `simaticMlExport`. `languageSupport` lists SCL, LAD, FBD, STL, GRAPH and every other language met:
+
+- SCL, LAD and FBD are `parsed`.
+- STL and GRAPH are an `unqualifiedScan` of exported symbolic Access with no binding reader. Their native xref Open, Actions, Transition, Interlock and Supervision rows are kept.
+- Any other language is `unsupported`; its compile units are skipped, never searched silently.
+
+`maxItems` bounds the rows, a fixed 2000-item native scan budget bounds the xref traversal, and `maxXmlBlocks` (max 50) and `maxDepth` (max 8) bound exports and nesting. `completeness` reports each truncation, every unresolved candidate and the protected or omitted exports.
+
+The tool is read-only and not natively qualified. Each non-array instance row carries a `diagnosticInstanceSelector` `{dbPath, memberPath}` in the shape `diagnostic_plan` takes as `instance`. The planner does not trust the live row: it re-resolves the selector against its saved review and refuses a mismatch. A live lookup therefore narrows the choice, but the saved review still has to contain the root DB, the FB exports and the call evidence. Array instances need an element selector the planner does not support yet.
+
 ## Resolve a justified signal manifest
 
 Supply up to 64 `signals` (host request budget, not native trace capacity). Each request requires `id`, `role`, `reason`, `hypothesisIds` and exact `memberPath` components from an exported DB. Optional `storagePath` defaults to the selected root DB. Other DBs must be in the same CPU. Every inclusion needs code/reference reasoning. Optional autoSignals derives a conservative bounded dependency set from exact seed symbols; see below.
@@ -213,6 +231,58 @@ Current analysis reports retain `acquisitionContext` with the original `mode`, `
 Gap detection compares consecutive timestamps against exactly 1.5 times the supplied `expectedInterval`, without rounding either side. Analysis and comparison recompute missing-value and interval-gap assessments from retained samples, including older imports. Historical imports and reports remain immutable; rerun `trace_analyze` or `trace_compare` to obtain a corrected report. Exact arithmetic does not establish acquisition authenticity or native timing qualification.
 
 `diagnostic_replan(planId, request)` requires the new reviewId, blockPath, instance, reason and signalMappings `[{id,storagePath,memberPath,reason}]` covering every old signal exactly once. It resolves all declarations and instance evidence anew, rejects changed types, retains hypothesis IDs and records prior-plan lineage. The original role template is selected again from the current template catalog; a case without a template remains without one. Template guidance never substitutes for new instance, declaration or target evidence. No substring substitution is performed. New equipment observations/context must be supplied explicitly. Native traceability always needs revalidation.
+
+## Monitor and modify a plan on an owned PLCSIM instance
+
+One diagnostic case can drive a watch table, a monitor capture, a stimulus and a
+before/after comparison on a PLCSIM Advanced instance this Host owns. Only the
+last two steps have their own tools. The rest reuse existing ones.
+
+1. **Plan and watch table.** Optionally take `diagnosticInstanceSelector` from
+   `instance_lookup`. Retain the case with `diagnostic_plan`, then compose the
+   experiment with `diagnostic_experiment_plan`. The plan's watch rows are offline.
+   For a native watch table, pass the case's `blockPath` and `selectedInstance.dbPath`
+   to `watch_table_generate`, then follow the [watch-table authoring workflow](../reference/watch-table-authoring.md).
+   Watch tables are engineering documents. They do not monitor or modify values.
+2. **Monitor.** Start `runtime_capture_start` with `source:"plcsim"` on the owned
+   instance and `association:{caseId,mappings}`. The mappings name the case signals
+   to read, in order. `intervalMilliseconds`, `durationSeconds` and `maximumSamples`
+   bound the capture. Each row keeps the read value, `status` (`read` or `readFailed`),
+   the worker request and response times and, in cycle-synchronous mode, the sync point.
+   Stop the capture, then pass its `snapshotRef` to `diagnostic_experiment_acquire_runtime`.
+   See [PLCSIM capture source](../reference/runtime-captures.md#plcsim-capture-source).
+3. **Modify.** Call `diagnostic_plcsim_write` with `caseId`, the owned instance's
+   `instanceId`, `instanceName` and `creationId`, `acknowledgeWrite:true` and 1..16 writes:
+
+   ```json
+   [{"signalId":"enable","symbol":"\"DB_Line\".Conv2.Enable","type":"bool","datatype":"Bool",
+     "expected":true,"value":false,"reason":"Drop enable to test the writer hypothesis."}]
+   ```
+
+   Each `signalId` must be a distinct captured-declaration signal of the case. It is
+   re-resolved against the saved review, and `datatype` must equal its declaration
+   and fit `type` (the capture rules). The simulator worker rechecks the exact owned
+   instance and Softbus, then reads every signal. If any value differs from
+   `expected`, nothing is written and the result is `preconditionMismatch` with the
+   values read. Otherwise each write is sent once in order and read back.
+   `readbackMatches` reports each readback. The sequence stops at the first failure
+   or mismatch. The CPU scan may overwrite a written value. Real values compare at
+   float precision. A capture running on the instance refuses the write. Physical
+   PLCs and instances this Host does not own are never written. There is no forcing
+   and no retry.
+4. **Monitor again** with a new capture and acquisition.
+5. **Compare.** Call `diagnostic_runtime_acquisition_compare(beforeAcquisitionId,
+   afterAcquisitionId, {reason})`. Both acquisitions must belong to the same experiment
+   and come from distinct captures. Both are rederived from their original chains.
+   For each hypothesis, the comparison reports matched, contradicted and unknown
+   cycles per side. It also reports the observed pattern (`matchedOnly`,
+   `contradictedOnly`, `mixed` or `notApplicable`) and `patternChanged`, beside both
+   capture contexts, signal sets and quality.
+
+Cycle counts depend on capture length. The comparison does not link the write to
+the captures. Every verdict stays `unresolved`: polling is sequential, and address
+and program identity are unverified. Neither tool proves causation or a fix, and
+neither is natively qualified.
 
 ## Persistence, repeated captures and current limits
 

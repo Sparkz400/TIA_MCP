@@ -12,11 +12,12 @@ Implemented and tested offline. All three providers and the collections have nat
 
 | Area | Implemented | Still unqualified or out of scope |
 | --- | --- | --- |
-| Configured network | Subnet and IO-system nodes; `connectedSubnet`, `ioSystemController`, `ioSystemDevice` edges. One native fixture passed (one subnet, IO system and device) | Broader topologies; cables, ports and physical topology stay unsupported |
+| Configured network | Subnet and IO-system nodes; `connectedSubnet`, `ioSystemController`, `ioSystemDevice` edges. One native fixture passed (one subnet, IO system and device). `connectedPort` edges from `NetworkPort.ConnectedPorts` of a selected port item, offline only | Broader topologies; port edges not natively qualified; cables, link state and wiring stay unsupported |
 | Technology objects | `technologyConnection` edges to exact hardware paths from `technology_read`. One native fixture passed (external encoder on a TM PosInput channel) | Axis, measuring-input and output-cam connections; tag/block targets stay unresolved |
 | Software units | `unitRelation` edges from captured unit relations; unique typed names in a complete capture resolve. One native fixture passed (`SoftwareUnit` relation) | `NonUnitDB`/`TODB` relations and ambiguous names natively |
 | PLC collections | Watch/force tables and groups, external sources and groups; captured natively on the fixture | Independent oracle for populated tables/sources |
-| Scope | Every node kind declares its providers or an `unsupported` reason (`providerScope`) | PLC alarm text lists and project/global libraries are reported unsupported, not captured |
+| Project library | Type folder, type, version, master-copy folder and master-copy nodes from the library metadata walk; `libraryVersion` edges from captured instance GUID pairs, offline only | Not natively qualified; global libraries, version dependencies and master-copy usage |
+| Scope | Every node kind declares its providers or an `unsupported` reason (`providerScope`) | PLC alarm text lists are reported unsupported, not captured |
 
 The native step is `scripts/qualify_project_explorer_relationships.py` with the registered UnitSeeder. Run it only when the TIA machine is free; use `--project` to audit other saved projects read-only.
 

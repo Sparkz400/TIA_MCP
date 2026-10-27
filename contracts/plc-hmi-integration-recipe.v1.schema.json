@@ -1,0 +1,364 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/plc-hmi-integration-recipe.v1.schema.json",
+  "title": "Plan-only combined PLC/UDT/HMI integration recipe",
+  "description": "Payload for change_prepare(kind=library_integrate). plc_hmi_component_plan reuses the PLC recipe unchanged and adds Unified HMI tag mappings, connection selection, screen placement and expected compiler outcomes. plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses with HmiBindingWouldBreak or HmiImpactIncomplete and a precise impact report. Both are plan-only; apply returns PlcIntegrationNotQualified and HMI steps stay behind the closed Unified preservation gate.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/install"
+    },
+    {
+      "$ref": "#/$defs/update"
+    }
+  ],
+  "$defs": {
+    "install": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "action",
+        "planOnly",
+        "source",
+        "selection",
+        "target",
+        "integration",
+        "hmi",
+        "expectedCompilerOutcomes"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "action": {
+          "const": "plc_hmi_component_plan"
+        },
+        "planOnly": {
+          "const": true
+        },
+        "source": {
+          "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/source"
+        },
+        "selection": {
+          "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/selection"
+        },
+        "target": {
+          "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/target"
+        },
+        "integration": {
+          "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/integration"
+        },
+        "hmi": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "family",
+            "profile",
+            "hmiPath",
+            "connection",
+            "tagTable",
+            "tags"
+          ],
+          "properties": {
+            "family": {
+              "const": "unified",
+              "description": "Classic binding integration has no preserving adapter."
+            },
+            "profile": {
+              "enum": [
+                "unified-comfort",
+                "unified-pc"
+              ]
+            },
+            "hmiPath": {
+              "$ref": "#/$defs/text"
+            },
+            "connection": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "\\S"
+            },
+            "tagTable": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "\\S"
+            },
+            "tags": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "items": {
+                "$ref": "#/$defs/tag"
+              }
+            },
+            "screenItems": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "screenPath",
+                  "itemName",
+                  "rectangle",
+                  "tag"
+                ],
+                "properties": {
+                  "screenPath": {
+                    "$ref": "#/$defs/text"
+                  },
+                  "itemName": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "rectangle": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "left",
+                      "top",
+                      "width",
+                      "height"
+                    ],
+                    "properties": {
+                      "left": {
+                        "type": "integer"
+                      },
+                      "top": {
+                        "type": "integer"
+                      },
+                      "width": {
+                        "type": "integer"
+                      },
+                      "height": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "tag": {
+                    "$ref": "#/$defs/name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expectedCompilerOutcomes": {
+          "$ref": "#/$defs/expected"
+        }
+      }
+    },
+    "update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "action",
+        "planOnly",
+        "source",
+        "selection",
+        "target",
+        "hmi",
+        "expectedCompilerOutcomes"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "action": {
+          "const": "plc_hmi_update_plan"
+        },
+        "planOnly": {
+          "const": true
+        },
+        "source": {
+          "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/source"
+        },
+        "selection": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/$defs/pin"
+          }
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "projectName",
+            "plcPath"
+          ],
+          "properties": {
+            "projectName": {
+              "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json#/properties/target/properties/projectName"
+            },
+            "plcPath": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "hmi": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "family",
+            "profile"
+          ],
+          "properties": {
+            "family": {
+              "const": "unified",
+              "description": "Classic binding integration has no preserving adapter."
+            },
+            "profile": {
+              "enum": [
+                "unified-comfort",
+                "unified-pc"
+              ]
+            }
+          }
+        },
+        "expectedCompilerOutcomes": {
+          "$ref": "#/$defs/expected"
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "errors",
+        "maxWarnings"
+      ],
+      "properties": {
+        "errors": {
+          "const": 0
+        },
+        "maxWarnings": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plc",
+        "hmi"
+      ],
+      "properties": {
+        "plc": {
+          "$ref": "#/$defs/outcome"
+        },
+        "hmi": {
+          "$ref": "#/$defs/outcome"
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "dataType",
+        "source"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/name"
+        },
+        "dataType": {
+          "$ref": "#/$defs/scalar"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "tagPath"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "plcTag"
+                },
+                "tagPath": {
+                  "$ref": "#/$defs/text"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "members"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "instanceMember"
+                },
+                "members": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "$ref": "#/$defs/identifier"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[^/\\\\\\u0000-\\u001f]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "\\S"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+    },
+    "scalar": {
+      "enum": [
+        "Bool",
+        "Byte",
+        "Word",
+        "DWord",
+        "LWord",
+        "SInt",
+        "USInt",
+        "Int",
+        "UInt",
+        "DInt",
+        "UDInt",
+        "LInt",
+        "ULInt",
+        "Real",
+        "LReal",
+        "Char",
+        "WChar",
+        "Time",
+        "LTime",
+        "Date",
+        "Time_Of_Day",
+        "LTime_Of_Day",
+        "Date_And_Time",
+        "DTL"
+      ]
+    }
+  }
+}

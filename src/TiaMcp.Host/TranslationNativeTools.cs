@@ -70,6 +70,13 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
     public Task<CallToolResult> Reconcile(string profileId, string operationId, string planSha256, int revision, CancellationToken cancellationToken) =>
         Run(async () => await Runner.Reconcile(operationId, planSha256, revision, Adapter(profileId), cancellationToken));
 
+    [McpServerTool(Name = "project_text_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read-only native project-text export for an explicit active sourceCulture and 1..32 active targetCultures into the artifact directory, each workbook with path and SHA-256. Without owners the whole project is exported with the three-argument overload, one bilingual workbook per target. With owners (exact hardware, /plc/ or /hmi/ paths from project_inventory, at most 64) one multi-target workbook uses the five-argument overload with every project text category. Optional categoryIds add a filtered export of the same owners and targets; it is evidence only: the full export always runs too and both are compared by native key, reporting leaked, dropped and changed rows (maxItems keys each; the complete comparison is retained as comparison.json). Never imports, saves or activates languages; no admission is required.")]
+    public Task<CallToolResult> ProjectTextExport(string sourceCulture, string[] targetCultures, CancellationToken cancellationToken,
+        string? projectName = null, string[]? owners = null, string[]? categoryIds = null, int maxItems = 200) => Run(async () =>
+        ProjectTextExportReport.Build(Root, await bridge.CallAsync("project_text_export",
+            new { projectName, sourceCulture, targetCultures, owners, categoryIds, artifactDirectory = Root }, cancellationToken), Math.Clamp(maxItems, 1, 1000)));
+
     private static async Task<CallToolResult> Run(Func<Task<object>> action)
     {
         try { return Format(await action(), false); }

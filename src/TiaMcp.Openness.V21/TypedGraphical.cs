@@ -94,7 +94,7 @@ namespace TiaMcp.Openness.V21
                     instanceUses[instance.Identity].Add(node);
                     effects.Add(new TypedGraphicalEffect { Kind = "instanceDependency", Identity = instance.Identity, SourceSha256 = instance.DeclarationHash, Description = "Explicit instance storage; no internal IEC offsets are synthesized." });
                 }
-                else if (node.Kind == "timer" || node.Kind == "counter" || (node.Kind == "call" && ResolveCallee(context, node.CalleePath).BlockType == "FB"))
+                else if (node.Kind == "timer" || node.Kind == "counter" || node.Kind == "edge" || (node.Kind == "call" && ResolveCallee(context, node.CalleePath).BlockType == "FB"))
                     Fail("GraphicalInstanceRequired", "Stateful instructions and FB calls require exact instance storage.");
             }
             if (instanceUses.Values.Any(v => v.Count > 1 && v.Any(n => !n.AllowSharedInstance))) Fail("GraphicalSharedInstance", "Every stateful node sharing storage must explicitly allow shared instance use.");

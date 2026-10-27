@@ -10,8 +10,11 @@ namespace TiaMcp.Core.PhysicalRuntime;
 public sealed record RuntimeCaptureRequest(string AttemptId, string[] SelectionIds, int IntervalMilliseconds,
     int DurationSeconds, int MaximumSamples = 100000, long MaximumBytes = 64L << 20, string? ReviewId = null, string Representation = "simple",
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RuntimeCaptureAssociationRequest? Association = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? HandoffRef = null);
-public sealed record RuntimeCaptureSignal(string SelectionId, WebRuntimeSymbol Selection, JsonElement Metadata);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? HandoffRef = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Source = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] SimulatorCaptureSource? Simulator = null);
+/// <summary>Selection is the Web symbol; it is null for PLCSIM signals, whose identity is the plan's request.simulator.</summary>
+public sealed record RuntimeCaptureSignal(string SelectionId, WebRuntimeSymbol? Selection, JsonElement Metadata);
 public sealed record RuntimeCapturePlan(string CaptureId, string HostId, DateTimeOffset CreatedUtc,
     RuntimeCaptureRequest Request, RuntimeCaptureSignal[] Signals,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RuntimeCaptureAssociation? Association = null,
@@ -62,6 +65,7 @@ public sealed class RuntimeCaptureStore : IDisposable
         Require(request.Representation is "simple" or "raw","RuntimeCaptureSelectionInvalid");
         RuntimeCaptureAssociations.ValidateRequest(request);
         RuntimeCaptureHandoffs.ValidateRequest(request);
+        SimulatorCaptureContracts.ValidateRequest(request);
     }
     public bool Exists(string id) => Directory.Exists(PathFor(id));
     public RuntimeCapturePlan Plan(string id) => Decode<RuntimeCapturePlan>(Read(PathFor(id,"plan.json"),PlanBytes));
@@ -69,11 +73,12 @@ public sealed class RuntimeCaptureStore : IDisposable
     {
         Id(plan.CaptureId); Id(plan.HostId); Validate(plan.Request);
         if (plan.UaContext is not null) { OpcUaCaptureContracts.ValidatePlan(plan); return; }
+        if (plan.Request.Simulator is not null) { SimulatorCaptureContracts.ValidatePlan(plan); RuntimeCaptureAssociations.ValidateRetained(plan); return; }
         Require(plan.Signals.Length == plan.Request.SelectionIds.Length && plan.Signals.Select(x=>x.SelectionId).SequenceEqual(plan.Request.SelectionIds),"RuntimeCaptureSelectionInvalid");
         foreach (var signal in plan.Signals)
         {
             var selected=signal.Selection;
-            Require(selected.Context.ConnectionId == plan.Request.AttemptId && selected.Representation == plan.Request.Representation &&
+            Require(selected is not null && selected.Context.ConnectionId == plan.Request.AttemptId && selected.Representation == plan.Request.Representation &&
                 WebRuntimeProtocol.Symbol(selected.Context,selected.Symbol,selected.Representation,signal.Metadata) == selected,"RuntimeCaptureSelectionInvalid");
         }
         RuntimeCaptureAssociations.ValidateRetained(plan);
@@ -238,6 +243,7 @@ public sealed class RuntimeCaptureStore : IDisposable
         Require(row.Reconnect is null && row.Kind == "read" && row.SkippedPolls == 0 && plan.Request.SelectionIds.Contains(row.SelectionId) &&
             (row.ReadResultJson is null) != (row.ErrorCode is null),"RuntimeCaptureIntegrityFailure");
         if (plan.UaContext is not null) { OpcUaCaptureContracts.ValidateRead(plan,row); return; }
+        if (plan.Request.Simulator is not null) { SimulatorCaptureContracts.ValidateRead(plan.Request,row.SelectionId!,row.ErrorCode,row.ReadResultJson); return; }
         if(row.ErrorCode is not null)
         {
             Require(row.ErrorCode is "RuntimeTimeout" or "RuntimeTransportFailure" or "RuntimeCancelled" or "RuntimePermissionDenied" or

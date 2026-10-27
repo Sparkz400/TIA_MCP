@@ -65,7 +65,7 @@ public static class RuntimeCaptureHandoffs
         Shape(handoff!);
         Require(handoff!.RecordRef == request.HandoffRef && handoff.ReviewId == request.ReviewId &&
             handoff.Session.Context.ConnectionId == request.AttemptId &&
-            signals.All(signal => signal.Selection.Context == handoff.Session.Context));
+            signals.All(signal => signal.Selection?.Context == handoff.Session.Context));
     }
 
     private static void Shape(RuntimeCaptureHandoff handoff)

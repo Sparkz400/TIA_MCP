@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using TiaMcp.Core;
 using TiaMcp.Core.Engineering;
 using TiaMcp.Core.EngineeringJobs;
@@ -12,8 +13,10 @@ public sealed record TranslationImportObservation(NativeTargetObservation Target
     TranslationImportScope Scope, TranslationImportPeer[] Peers, byte[] Receipt);
 public sealed record TranslationObservationReceipt(NativeTargetObservation Target, string WorkbookSha256,
     string ScopeSha256, string PeersSha256);
+/// <summary>UpdateSourceLanguage mirrors the approved review's separate source-text mode; omitted when false.</summary>
 public sealed record TranslationImportContext(string ArtifactRoot, EngineeringOperationRecord Operation,
-    string CandidateRef, string CandidateReceiptSha256, string CandidateSha256, TranslationImportScope Scope);
+    string CandidateRef, string CandidateReceiptSha256, string CandidateSha256, TranslationImportScope Scope,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool UpdateSourceLanguage = false);
 public sealed record TranslationImportCheckpoint(byte[] Archive, byte[] Receipt);
 public sealed record TranslationCheckpointReceipt(string OperationId, string PlanSha256, string ProjectResourceKey,
     string SessionEpoch, string ArchiveSha256, string BaselineContentSha256);

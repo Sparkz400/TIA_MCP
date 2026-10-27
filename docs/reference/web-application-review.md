@@ -55,6 +55,21 @@ certifies a Siemens format. An unavailable phase uses null `uploadRef`, `sha256`
 appear in that phase's configuration. IDs are caller-declared within the selected
 owner, not native identity authentication or name matching.
 
+## Native capture with `web_inspect`
+
+With TIA Portal V21 attached, `web_inspect(projectName?, hardwarePath?, maxItems)`
+returns, per CPU, an `observation` holding one phase's `configuration` and an
+unavailable `archive`. `systemPagesEnabled` comes from the system web pages feature
+and `applications` from the default web pages feature, with the native name as
+`applicationId` and empty `properties`. `webEnabled` is read only from an exposed
+Boolean `WebserverActivate` attribute and is otherwise `null`. `generationProperties`
+hold every completely captured scalar web-named CPU attribute, at most 128.
+
+web_inspect reads no page sources, so replace the archive selector with a committed
+ZIP selector to compare files, and pick `selectedApplicationId` from `applications`.
+It never generates blocks. Legacy web users are reported by `access_inspect`. The
+capture is compiled against the V21 API and not yet natively qualified.
+
 ## Results and retained evidence
 
 The receipt links original request, original ZIPs and the complete report.
@@ -106,7 +121,8 @@ These are public-data artifacts, not protected credentials or secret sanitizatio
 `nativeQualified`, `sourceAuthenticityVerified`, `associationVerified`,
 `siemensCompatibilityVerified`, `generatedBlocksVerified`, `deploymentVerified` and
 `endpointVerified` are always false. App configuration, user-page source, generated
-blocks and deployed assets remain separate. Native API/profile capture, generated
-DB ownership/collision/preservation, protected-resource recovery, actual deployment
+blocks and deployed assets remain separate. Beyond the read-only `web_inspect`
+capture, native profile capture, generated DB ownership/collision/preservation,
+protected-resource recovery, actual deployment
 and independent browser/endpoint acceptance remain required in the
 [full D12/X03 plan](../plans/expansion-plans/web-server-access-configuration.md).

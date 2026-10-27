@@ -80,8 +80,8 @@ internal static class RuntimeCapturePressureChecks
             f.Sessions.BeforeRead=async(number,token)=>{entered.Writer.TryWrite(number);await Task.Delay(Timeout.Infinite,token);};
             var original=f.Sessions.Signals[0];
             f.Sessions.Signals=Enumerable.Range(0,5).Select(_=>new RuntimeCaptureSignal(Guid.NewGuid().ToString("N"),
-                WebRuntimeProtocol.Symbol(original.Selection.Context with{ConnectionId=Guid.NewGuid().ToString("N"),Epoch=Guid.NewGuid().ToString("N")},original.Selection.Symbol,"simple",original.Metadata),original.Metadata)).ToArray();
-            RuntimeCaptureRequest Request(int index)=>new(f.Sessions.Signals[index].Selection.Context.ConnectionId,[f.Sessions.Signals[index].SelectionId],100,3600,10,64L<<20);
+                WebRuntimeProtocol.Symbol(original.Selection!.Context with{ConnectionId=Guid.NewGuid().ToString("N"),Epoch=Guid.NewGuid().ToString("N")},original.Selection.Symbol,"simple",original.Metadata),original.Metadata)).ToArray();
+            RuntimeCaptureRequest Request(int index)=>new(f.Sessions.Signals[index].Selection!.Context.ConnectionId,[f.Sessions.Signals[index].SelectionId],100,3600,10,64L<<20);
             var retained=new List<string>();
             for(int wave=0;wave<8;wave++)
             {

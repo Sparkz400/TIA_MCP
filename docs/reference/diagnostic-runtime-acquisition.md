@@ -7,7 +7,7 @@ This is a separate workflow from `trace_read`, `diagnostic_experiment_review` an
 ## Workflow
 
 1. Retain a diagnostic case with `diagnostic_plan`, explicitly selecting the saved review, FB/call/instance and justified signals. Compose its watch/manual-trace experiment with `diagnostic_experiment_plan`.
-2. When separately starting a runtime capture, supply its existing `association:{caseId,mappings:[{selectionId,signalId,reason}]}` with the exact diagnostic case ID and review ID. Selection IDs identify retained runtime symbol selections. The mapping is a declaration of intended association; matching names/types and caller-supplied program labels do not establish online program or address identity.
+2. When separately starting a runtime capture, supply its existing `association:{caseId,mappings:[{selectionId,signalId,reason}]}` with the exact diagnostic case ID and review ID. Selection IDs identify retained runtime symbol selections, or the caller-chosen signal labels of a [PLCSIM capture](runtime-captures.md#plcsim-capture-source), whose rows also retain per-row sync-point evidence. The mapping is a declaration of intended association; matching names/types and caller-supplied program labels do not establish online program or address identity.
 3. Select an immutable `snapshotRef` returned by the capture workflow. The reference binds the plan and complete committed segment prefix. An active prefix remains that same prefix after later append, stop or Host restart.
 4. Call:
 
@@ -30,6 +30,8 @@ This is a separate workflow from `trace_read`, `diagnostic_experiment_review` an
    ```
 
    Formats are `json`, `markdown`, and `html`. Download the returned hashed artifact using `artifact_read`. JSON is the exact original acquisition record. Readable formats include the complete original JSON, chain hashes, selected mappings, per-read timings, quality/gaps, terminal limits, and unresolved observation counts.
+
+To compare two acquisitions of the same experiment, for example before and after `diagnostic_plcsim_write` on an owned PLCSIM instance, use `diagnostic_runtime_acquisition_compare`. See [monitor and modify a plan](../guides/trace-diagnostics.md#monitor-and-modify-a-plan-on-an-owned-plcsim-instance).
 
 A capture without the exact preexisting association cannot be retroactively attached by this tool. A replan requires a capture associated with the new exact case. Acquisition does not infer instance equivalence or reuse a previous instance's mapping.
 

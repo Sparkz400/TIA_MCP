@@ -168,7 +168,16 @@ namespace TiaMcp.Openness.V21
 #endif
                 string output = NewDirectory("observation");
                 var definitions = (JArray)context["run"]["definitions"];
-                var receipt = StylePrerequisiteProbe.Read(project, definitions.Select(d => d.Value<string>("name")).ToArray(), output);
+                var application = context["application"] as JObject;
+                bool system = application?.Value<string>("executionMode") == "endpoint";
+                var receipt = application == null ? StylePrerequisiteProbe.Read(project, definitions.Select(d => d.Value<string>("name")).ToArray(), output)
+                    : system ? SystemTestDefinitions.Inventory(project, 1000, output) : ApplicationTestDefinitions.Inventory(project, 1000, output);
+                if (application != null)
+                {
+                    receipt["simulator"] = system ? owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), application.Value<string>("serverAddress"))
+                        : owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
+                    receipt["completeEffectiveScope"] = false; // Scope readback names only the target controller or endpoint.
+                }
                 receipt["sessionEpoch"] = owner._testSuiteEpoch;
                 receipt["processId"] = owner._processId;
                 receipt["workerSha256"] = ChangeFileHash(typeof(OpennessSession).Assembly.Location);
@@ -192,6 +201,25 @@ namespace TiaMcp.Openness.V21
             public JObject Run()
             {
                 var definitions = (JArray)context["run"]["definitions"];
+                if (context["application"] is JObject application)
+                {
+                    string output = Path.Combine(directory, "raw-results.json");
+                    if (application.Value<string>("executionMode") == "endpoint")
+                    {
+                        // Reverify the ticket-owned instance and its controller address immediately before SetScope and the one Run.
+                        string address = application.Value<string>("serverAddress");
+                        owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), address);
+                        api.RunSystemOnce(address, application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
+                            Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), output);
+                        return new JObject { ["rawResults"] = Artifact(output) };
+                    }
+                    // Reverify the ticket-owned instance immediately before SetScope and the one Run.
+                    var simulator = owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
+                    api.RunApplicationOnce(owner.SelectPlc(selector).Software, simulator.Value<string>("instanceName"), application.Value<string>("executionMode"),
+                        application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
+                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), output);
+                    return new JObject { ["rawResults"] = Artifact(output) };
+                }
                 if (definitions.Count != 1) throw new BridgeException("TestSuiteProfileUnqualified", "Only a separately reviewed single-rule dispatch is implemented.");
                 var definition = definitions[0];
                 string raw = Path.Combine(directory, "raw-results.json");

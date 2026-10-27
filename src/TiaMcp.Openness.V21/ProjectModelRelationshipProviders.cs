@@ -22,19 +22,28 @@ namespace TiaMcp.Indexing
         internal static JObject Scope(string kind)
         {
             string[] providers, edges; string reason = null;
-            if (kind == "hardware") { providers = new[] { "configuredIo", "configuredNetwork" }; edges = new[] { "configuredIo", "connectedSubnet", "ioSystemController", "ioSystemDevice" }; }
+            if (kind == "hardware") { providers = new[] { "configuredIo", "configuredNetwork", "portInterconnections" }; edges = new[] { "configuredIo", "connectedSubnet", "ioSystemController", "ioSystemDevice", "connectedPort" }; }
             else if (kind == "subnet" || kind == "ioSystem") { providers = new[] { "configuredNetwork" }; edges = new[] { "connectedSubnet", "ioSystemController", "ioSystemDevice" }; }
             else if (kind == "softwareUnit" || kind == "safetyUnit") { providers = new[] { "nativeCrossReference", "softwareUnitRelations" }; edges = new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn", "unitRelation" }; }
             else if (kind == "technologyObject") { providers = new[] { "nativeCrossReference", "technologyConnections" }; edges = new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn", "technologyConnection" }; }
-            else if (PlcObjectKinds.Contains(kind)) { providers = new[] { "nativeCrossReference" }; edges = kind == "tag" ? new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn", "configuredIo" } : new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn" }; }
+            else if (kind == "libraryTypeVersion") { providers = new[] { "plcLibraryInstances" }; edges = new[] { "libraryVersion" }; }
+            else if (PlcObjectKinds.Contains(kind))
+            {
+                bool library = kind == "block" || kind == "type";
+                providers = library ? new[] { "nativeCrossReference", "plcLibraryInstances" } : new[] { "nativeCrossReference" };
+                edges = new[] { "calls", "reads", "writes", "instanceOf", "usesType", "dependsOn" }.Concat(kind == "tag" ? new[] { "configuredIo" } : library ? new[] { "libraryVersion" } : new string[0]).ToArray();
+            }
             else if ((kind ?? "").StartsWith("hmi", StringComparison.OrdinalIgnoreCase)) { providers = new[] { "hmi.relationships" }; edges = new[] { "hmiBinding", "screenNavigation", "libraryVersion" }; }
             else
             {
                 providers = new string[0]; edges = new string[0];
-                reason = kind == "project" || kind == "folder" || kind == "deviceGroup" || kind == "namespace"
+                reason = kind == "project" || kind == "folder" || kind == "deviceGroup" || kind == "namespace" || kind == "library" || kind == "libraryTypeFolder" || kind == "masterCopyFolder"
                     ? "Containment is the captured tree itself; this organizational node has no native relationship service."
                     : kind == "device" ? "A device has no native relationship service; select its hardware items for configured I/O and network associations."
+                    : kind == "libraryType" ? "Instances link to an exact type version; select one of this type's version nodes."
+                    : kind == "masterCopy" ? "Master copies expose no instance-link service; no relationship is inferred from names."
                     : kind == "unsupportedSoftware" ? "This software family has no explorer provider; its device ancestry is not a content relationship."
+                    : kind == "alarmTextList" ? "V21 exposes no alarm-to-text-list references; plc_alarm_inspect reads text-list entries from the native export."
                     : "No relationship provider is registered for this node kind.";
             }
             return new JObject { ["kind"] = kind, ["status"] = providers.Length == 0 ? "unsupported" : "provided",
@@ -73,14 +82,56 @@ namespace TiaMcp.Indexing
             return new JArray(edges.Values);
         }
 
-        private static JObject Network(string kind, string sourcePath, string targetPath, bool ownerVerified, string location, JObject native, Func<string, JObject> node, string captured)
+        // Input: port rows of the explorer network scan. A configured port interconnection is
+        // undirected; ordinal path order gives the observations of both ports one edge identity.
+        internal static JArray PortEdges(JObject inspection, Func<string, JObject> node, string captured)
+        {
+            var edges = new Dictionary<string, JObject>(StringComparer.Ordinal);
+            foreach (var item in (inspection?["items"] as JArray ?? new JArray()).OfType<JObject>())
+                foreach (var partner in (item["port"]?["connectedPorts"] as JArray ?? new JArray()).OfType<JObject>())
+                {
+                    string path = item.Value<string>("path"), other = partner.Value<string>("resolution") == "resolved" ? partner.Value<string>("ownerHardwarePath") : null;
+                    bool swap = other != null && string.CompareOrdinal(other, path) < 0;
+                    Add(edges, Network("connectedPort", swap ? other : path, swap ? path : other, other != null, "NetworkPort.ConnectedPorts of " + path, partner, node, captured, "portInterconnections"));
+                }
+            return new JArray(edges.Values);
+        }
+
+        private static JObject Network(string kind, string sourcePath, string targetPath, bool ownerVerified, string location, JObject native, Func<string, JObject> node, string captured,
+            string provider = "configuredNetwork")
         {
             var source = sourcePath == null ? null : node(sourcePath);
             var target = targetPath == null ? null : node(targetPath);
             bool resolved = ownerVerified && source != null && target != null;
             return Edge("net-", kind, sourcePath + "\n" + (targetPath ?? native.ToString(Formatting.None)), source, target, resolved,
                 resolved ? null : "Native association owner or configured network object is not an exact captured node; names are not substituted.",
-                "configuredNetwork", sourcePath, location, captured, "configuredNetwork", native);
+                provider, sourcePath, location, captured, provider, native);
+        }
+
+        // Captured LibraryTypeInstanceInfo GUID pairs resolve only to a captured project-library
+        // version node with the same type and version GUID; names never identify a version.
+        internal static JArray LibraryVersionEdges(IEnumerable<JObject> nodes, bool libraryComplete, string captured)
+        {
+            var all = nodes.ToArray();
+            var versions = all.Where(n => n.Value<string>("kind") == "libraryTypeVersion" && n["metadata"] is JObject)
+                .ToLookup(n => n["metadata"].Value<string>("typeGuid") + "/" + n["metadata"].Value<string>("versionGuid"), StringComparer.Ordinal);
+            var edges = new Dictionary<string, JObject>(StringComparer.Ordinal);
+            foreach (var owner in all)
+            {
+                if (!(owner["metadata"]?["libraryInstance"] is JObject observed) || observed.Value<string>("status") != "linked") continue;
+                var native = new JObject { ["source"] = observed["source"], ["typeGuid"] = observed["typeGuid"], ["versionGuid"] = observed["versionGuid"] };
+                var candidates = versions[native.Value<string>("typeGuid") + "/" + native.Value<string>("versionGuid")].Take(2).ToArray();
+                bool resolved = candidates.Length == 1;
+                string path = owner.Value<string>("objectPath");
+                var edge = Edge("lib-", "libraryVersion", path + "\n" + native.ToString(Formatting.None), ModelEndpoint(owner), resolved ? candidates[0] : null, resolved,
+                    resolved ? null : candidates.Length > 1 ? "Several captured library versions carry this type/version GUID pair."
+                        : libraryComplete ? "No captured project-library version has this type/version GUID pair."
+                        : "The project library is not completely captured in this snapshot; a version is never substituted by name.",
+                    "plcLibraryInstances", path, "LibraryTypeInstanceInfo.LibraryTypeVersion", captured, "plcLibraryInstances", native);
+                if (resolved) edge["evidence"]["resolutionBasis"] = "exactTypeAndVersionGuid";
+                Add(edges, edge);
+            }
+            return new JArray(edges.Values);
         }
 
         // Input: an existing technology_read envelope. Only references the native

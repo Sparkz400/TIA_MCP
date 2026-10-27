@@ -3,7 +3,9 @@
 This workflow needs the managed Host and supplied XML, with no Siemens product.
 It inspects declared CAEX structure, compares retained documents and reports
 possible effects through declared hierarchy, links and class references.
-It neither exports a TIA project nor imports or rewrites an AML file.
+These document tools neither export a TIA project nor import or rewrite an AML file.
+The separate native [`cax_export` tool and `cax_import` change kind](#native-cax-export-and-import)
+need TIA Portal V21 and feed the same record store.
 
 ## User workflow
 
@@ -33,6 +35,54 @@ It neither exports a TIA project nor imports or rewrites an AML file.
 The [six tool contracts](../../contracts/automationml-workflow.v1.schema.json)
 accept upload/record handles and fixed artifact names, not arbitrary file paths.
 Comparison inputs must be documents; comparisons cannot be chained as documents.
+
+## Native CAx export and import
+
+Both routes use Siemens `CaxProvider` from the attached TIA Portal V21 project.
+They are compiled against the V21 PublicAPI only and are not natively qualified.
+
+`cax_export` exports the open project, or one exact device (`hardwarePath`, the
+device path from `device_inventory`), into a new `cax-<id>.aml` under the Host
+exports artifacts. The V19+ `TransferResult` overloads write no log file, so the
+worker retains the transfer result (state, error/warning counts and nested
+messages, up to 50,000) as `cax-<id>.transfer-result.json`. The response returns
+both SHA-256 values, up to `maxItems` messages with explicit truncation, and the
+`automationml` summary of a new document record. Use its `recordRef` with
+`automationml_report_page` and `automationml_compare`, or as the `cax_import`
+`amlRef`. Publication keeps the 8 MiB inspection bound; a publication error is
+reported beside the still valid export. The export reads the in-memory project
+and does not save it; `projectModifiedBefore`/`projectModifiedAfter` report
+unsaved edits. An error state or a missing AML file refuses with the retained
+transfer result. Siemens excludes drives, most HMI devices and listed
+Scalance/system device types from CAx exchange.
+
+`cax_import` is a prepared change kind (`change_prepare`, then `change_apply`).
+Its payload names `importOption`, spelled as Siemens names `CaxImportOptions`,
+and either `amlRef` or a `path` inside the Host artifact directory plus
+`expectedSha256`. The Host verifies the record or the artifact-root boundary.
+The worker copies the file (at most 64 MiB) into the change directory and pins
+its hash; apply verifies it again. Apply uses the normal whole-project checkpoint,
+requires `compile=true` and compiles the device project.
+
+Siemens states that "CAx Import APIs cannot be used within exclusive access".
+Apply therefore releases its admitted mutation lease only around the native
+import. The kind is limited to a worker-owned TIA instance and the Host's
+admitted `change_apply` route, so no interactive edit can interleave.
+
+| `importOption` | Siemens behavior for name-conflicting devices | Configured-hardware check |
+| --- | --- | --- |
+| `MoveToParkingLot` | Keeps project devices; imports the AML versions into a parking-lot folder | Existing rows unchanged; only additions |
+| `RetainTiaDevice` | Keeps project devices; skips those AML devices | Existing rows unchanged; only additions |
+| `OverwriteTiaDevice` | Replaces project devices with the AML versions | None possible; the difference is recorded for review |
+
+The change readbacks hold the native transfer result
+(`cax-import.transfer-result.json`), the configured-hardware manifest after the
+import (the prechange manifest is a backup) and `hardware-difference.json` with
+added, removed and changed hardware paths. An error state fails into
+`recovery_required`. `change_restore` verifies the restored hardware manifest
+against the prechange one. Software, HMI and unexposed vendor data changed by the
+import are covered only by the generic engineering fingerprint, and no mapping
+between AML IDs and native objects is established.
 
 ## Supported inspection profiles
 

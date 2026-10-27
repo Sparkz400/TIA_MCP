@@ -15,7 +15,7 @@
       "type": "object", "additionalProperties": false,
       "required": ["operation", "requestSha256", "scopeSha256", "sessionEpoch", "adapterSha256", "processId", "observationSha256", "resources"],
       "properties": {
-        "operation": {"enum": ["change_apply", "change_restore", "simulation_download", "simulation_provision_scratch_credential", "library_open", "scratch_create", "project_retrieve", "watch_fixture_seed", "watch_authoring_source_negative"]},
+        "operation": {"enum": ["change_apply", "change_restore", "simulation_download", "simulation_provision_scratch_credential", "library_open", "scratch_create", "project_retrieve", "project_copy", "watch_fixture_seed", "watch_authoring_source_negative"]},
         "requestSha256": {"$ref": "#/$defs/digest"}, "scopeSha256": {"$ref": "#/$defs/digest"},
         "sessionEpoch": {"type": "string", "minLength": 1, "maxLength": 128},
         "adapterSha256": {"$ref": "#/$defs/digest"}, "observationSha256": {"$ref": "#/$defs/digest"},

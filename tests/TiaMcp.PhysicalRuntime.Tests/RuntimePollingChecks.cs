@@ -112,9 +112,9 @@ internal static class RuntimePollingChecks
             f.Sessions.BeforeRead=async(number,token)=>{entered.Writer.TryWrite(number);await Task.Delay(Timeout.Infinite,token);};
             var original=f.Sessions.Signals[0];
             f.Sessions.Signals=Enumerable.Range(0,5).Select(i=>i==0?original:new RuntimeCaptureSignal(Guid.NewGuid().ToString("N"),
-                WebRuntimeProtocol.Symbol(original.Selection.Context with{ConnectionId=Guid.NewGuid().ToString("N"),Epoch=Guid.NewGuid().ToString("N")},original.Selection.Symbol,"simple",original.Metadata),original.Metadata)).ToArray();
+                WebRuntimeProtocol.Symbol(original.Selection!.Context with{ConnectionId=Guid.NewGuid().ToString("N"),Epoch=Guid.NewGuid().ToString("N")},original.Selection.Symbol,"simple",original.Metadata),original.Metadata)).ToArray();
             var ids=new List<string>();
-            RuntimeCaptureRequest Request(int i)=>new(f.Sessions.Signals[i].Selection.Context.ConnectionId,[f.Sessions.Signals[i].SelectionId],100,1,100,1<<20);
+            RuntimeCaptureRequest Request(int i)=>new(f.Sessions.Signals[i].Selection!.Context.ConnectionId,[f.Sessions.Signals[i].SelectionId],100,1,100,1<<20);
             for(int i=0;i<4;i++)
             {
                 string id=i==0?f.Id:Guid.NewGuid().ToString("N");ids.Add(id);
@@ -274,7 +274,7 @@ namespace TiaMcp.Host
             int number;lock(Reads){Reads.Add((selectionId,clock.GetTimestamp()));number=Reads.Count;}
             var signal=Signals.Single(s=>s.SelectionId==selectionId);var start=clock.GetUtcNow();long timestamp=clock.GetTimestamp();
             if(BeforeRead is not null)await BeforeRead(number,token);
-            string id=Guid.NewGuid().ToString("N");var request=WebRuntimeProtocol.Read(signal.Selection.Context,signal.Selection,id);
+            string id=Guid.NewGuid().ToString("N");var request=WebRuntimeProtocol.Read(signal.Selection!.Context,signal.Selection,id);
             return WebRuntimeProtocol.ReadResult(signal.Selection.Context,request,Encoding.UTF8.GetBytes("{\"jsonrpc\":\"2.0\",\"id\":\""+id+"\","+(ResponseMember?.Invoke(number)??"\"result\":true")+"}"),start,clock.GetUtcNow(),clock.GetElapsedTime(timestamp));
         }
     }

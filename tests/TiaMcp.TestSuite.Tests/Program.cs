@@ -154,6 +154,8 @@ var extendedReceipt = ExtendedChecks.Run();
 checks += extendedReceipt.Checks;
 checks += AvailabilityChecks.Run();
 checks += CasingResultProfileChecks.Run();
+checks += ApplicationRunChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-Application-" + Guid.NewGuid().ToString("N")));
+checks += SystemRunChecks.Run(Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-System-" + Guid.NewGuid().ToString("N")));
 var bundleReceipt = DefinitionBundleChecks.Run();
 checks += bundleReceipt.Checks;
 checks += DurableChecks.Run(args.Length == 1 ? args[0] + "-durable" : Path.Combine(Path.GetTempPath(), "TiaMcp-TestSuite-" + Guid.NewGuid().ToString("N")));

@@ -48,13 +48,18 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     public Task<CallToolResult> Inventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200)
         => Call("project_inventory", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
+    [McpServerTool(Name = "project_properties", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read the open project's metadata (author, comment, copyright, family, version, times, size, modified/primary state), used products, history entries, language settings (supported, active, reference, editing) and text categories. Each list is bounded by maxItems with explicit truncation. Change attributes and languages with change_prepare kinds project_attributes_set and project_languages_set.")]
+    public Task<CallToolResult> ProjectProperties(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200)
+        => Call("project_properties", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+
     [McpServerTool(Name = "block_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Writes a uniquely named local artifact only; no project changes.")]
+    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its SCL/STL/DB external source file without dependencies. Writes uniquely named, SHA-256 hashed local artifacts only; no project changes.")]
     public Task<CallToolResult> BlockRead(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
-        string? plcPath = null, string? projectName = null, string? scopePath = null)
+        string? plcPath = null, string? projectName = null, string? scopePath = null, string? format = null)
     {
         RequireBlock(blockPath, blockName);
-        return Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath,
+        return Call("block_read", new { projectName, plcPath, blockPath, blockName, scopePath, format,
             artifactDirectory = Path.Combine(options.ArtifactsDirectory, "exports") }, cancellationToken);
     }
 
@@ -79,13 +84,11 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
             var result = await bridge.CallAsync(operation, arguments, cancellationToken);
             return Result(result.GetRawText(), false);
         }
-        catch (BridgeException error)
-        {
-            var json = JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
-                details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json);
-            return Result(json, true);
-        }
+        catch (BridgeException error) { return Failure(error); }
     }
+
+    private static CallToolResult Failure(BridgeException error) => Result(JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message,
+        details = (error as BridgeOperationException)?.Details } }, BridgeProtocol.Json), true);
 
     private static CallToolResult Result(string json, bool isError) => new()
     {

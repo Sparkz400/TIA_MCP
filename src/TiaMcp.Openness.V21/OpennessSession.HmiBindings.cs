@@ -202,6 +202,94 @@ namespace TiaMcp.Openness.V21
             return matches[0];
         }
 
+        // Exact root global DB (by identity) plus memberPath; same spelling and declaration proof as HmiPlcDeclaration.
+        private JObject HmiDbMemberByIdentity(Project project, PlcSelection plc, JObject identity, string directory)
+        {
+            HmiValidateIdentity(project, identity);
+            if (identity.Value<string>("plcPath") != plc.Path)
+                throw new BridgeException("DependencyUnresolved", "The DB belongs to a different PLC than the connection's native partner.");
+            var budget = new ScanBudget(50000);
+            var matches = Blocks(plc.Software.BlockGroup, plc.Path + "/blocks", budget).Where(b => b.Path == identity.Value<string>("objectPath")).Take(2).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC block lookup is incomplete; uniqueness is not established.");
+            if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ObjectNotFound" : "AmbiguousTarget", "No unique root-scope block matches the exact DB identity.");
+            if (identity.Value<string>("name") is string name && name != matches[0].Item.Name) throw new BridgeException("StaleRevision", "The DB identity name changed.");
+            return HmiDbMemberDeclaration(matches[0], new[] { matches[0].Item.Name }.Concat(((JArray)identity["memberPath"]).Values<string>()).ToArray(), directory);
+        }
+
+        // Exact root-scope declaration named by an unquoted symbolic PlcTag: a root tag-table tag or a root global DB member.
+        private JObject HmiPlcDeclaration(PlcSelection plc, string plcTag, string directory)
+        {
+            var components = HmiInspectionRules.ScalarSymbolPath(plcTag);
+            if (components == null || string.Join(".", components) != plcTag)
+                throw new BridgeException("DependencyUnresolved", "The PlcTag has no unquoted, unindexed symbolic spelling; its declaration cannot be proven.");
+            var budget = new ScanBudget(50000);
+            var found = new List<JObject>();
+            if (components.Length == 1)
+            {
+                foreach (var table in TagTables(plc.Software.TagTableGroup, plc.Path + "/tags", budget))
+                    foreach (var tag in table.Item.Tags)
+                        if (budget.Take() && tag.Name == components[0])
+                            found.Add(new JObject { ["kind"] = "tag", ["objectPath"] = table.Path + "/tags/" + Segment(tag.Name), ["plcTag"] = plcTag, ["dataType"] = tag.DataTypeName });
+            }
+            else foreach (var block in Blocks(plc.Software.BlockGroup, plc.Path + "/blocks", budget))
+                if (block.Item.Name == components[0]) found.Add(HmiDbMemberDeclaration(block, components, directory));
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC declaration lookup is incomplete; uniqueness is not established.");
+            if (found.Count != 1) throw new BridgeException(found.Count == 0 ? "ObjectNotFound" : "AmbiguousTarget", "No unique root-scope PLC declaration matches the symbolic PlcTag.");
+            return found[0];
+        }
+
+        // Read from the DB's native export as hmi_references resolves it: unquoted components, no array
+        // anywhere on the path, exactly one member. Instance/array DBs and software units are not mapped.
+        private static JObject HmiDbMemberDeclaration(BlockEntry block, string[] components, string directory)
+        {
+            var db = block.Item as GlobalDB ?? throw new BridgeException("DependencyUnresolved", "Only global DB members have a proven symbolic HMI spelling; instance and array DBs are not mapped.");
+            var symbol = HmiInspectionRules.ScalarSymbolPath(string.Join(".", components));
+            if (symbol == null || !symbol.SequenceEqual(components, StringComparer.Ordinal))
+                throw new BridgeException("DependencyUnresolved", "The DB member path has no unquoted single-dotted symbolic spelling.");
+            string file = Path.Combine(directory, "hmi-plc-declaration-" + Guid.NewGuid().ToString("N") + ".xml");
+            db.Export(new FileInfo(file), ExportOptions.WithDefaults);
+            if (new FileInfo(file).Length > 16 * 1024 * 1024) throw new BridgeException("TraversalLimit", "The DB export exceeds the 16 MiB declaration parsing budget.");
+            var budget = new ScanBudget(50000);
+            OfflineEvidence.InterfaceData parsed;
+            using (var reader = XmlReader.Create(file, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 }))
+                parsed = OfflineEvidence.NormalizeInterface(XDocument.Load(reader, LoadOptions.SetLineInfo), budget.Take, () => budget.Truncated = true);
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "The DB declaration exceeds the parsing budget; the member cannot be proven unique.");
+            var matches = new List<OfflineEvidence.InterfaceMember>();
+            foreach (var section in parsed.Sections.Where(s => s.OwnerName == db.Name))
+            {
+                IEnumerable<OfflineEvidence.InterfaceMember> members = section.Members; OfflineEvidence.InterfaceMember member = null;
+                foreach (string part in components.Skip(1))
+                {
+                    var next = members.Where(m => m.Name == part).Take(2).ToArray();
+                    member = next.Length == 1 ? next[0] : null;
+                    if (member == null) break;
+                    if (member.Array != null) throw new BridgeException("DependencyUnresolved", "The DB member path crosses an array; indexed HMI spellings are not mapped.");
+                    members = member.Members;
+                }
+                if (member != null) matches.Add(member);
+            }
+            if (matches.Count != 1) throw new BridgeException(matches.Count == 0 ? "ObjectNotFound" : "AmbiguousTarget", "No unique declared DB member matches the exact member path.");
+            return new JObject { ["kind"] = "plcDeclaration", ["blockPath"] = block.Path, ["plcTag"] = string.Join(".", components), ["pathComponents"] = new JArray(components.Skip(1)),
+                ["dataType"] = matches[0].DataType, ["exportSha256"] = ChangeFileHash(file) };
+        }
+
+        // A binding target with a nonempty Connection or PlcTag is admitted only as a proven PLC-backed tag:
+        // single native endpoint owner, symbolic access, exact root declaration and type, as for external_tag_create.
+        private JObject HmiProvePlcBackedTag(Project project, JObject targetIdentity, string dataType, string connection, string plcTag, string accessMode, string plcName, string directory)
+        {
+            var evidence = new JObject { ["connection"] = connection, ["plcTag"] = plcTag, ["accessMode"] = accessMode, ["plcName"] = plcName, ["resolution"] = "unresolved" };
+            if (string.IsNullOrEmpty(connection) || string.IsNullOrEmpty(plcTag) || accessMode != "SymbolicAccess")
+                throw new BridgeException("DependencyUnresolved", "This tag's connection ownership is not completely established. A nonempty Connection may be a localized internal pseudo-connection, a broken reference or an external PLC connection; names and caller assertions cannot decide this. Only symbolic PLC tags on a proven integrated connection are bound.", evidence);
+            var plc = HmiProveIntegratedOwner(project, HmiResolveNativeTarget(project, targetIdentity), connection, evidence);
+            if (!string.IsNullOrEmpty(plcName) && plcName != plc.Software.Name)
+                throw new BridgeException("DependencyUnresolved", "The tag's PLC name differs from the connection's proven native partner.", evidence);
+            var declaration = HmiPlcDeclaration(plc, plcTag, directory);
+            if (!HmiScalarTypesAgree(dataType, declaration.Value<string>("dataType")))
+                throw new BridgeException("TargetIncompatible", "The HMI tag type does not exactly match its PLC declaration type.", evidence);
+            evidence["declaration"] = declaration; evidence["resolution"] = "resolved";
+            return evidence;
+        }
+
         private static IEnumerable<OfflineEvidence.InterfaceMember> HmiExplicitMembers(IEnumerable<OfflineEvidence.InterfaceMember> members, ScanBudget budget, int depth = 0)
         {
             if (depth > 64) { budget.Truncated = true; yield break; }

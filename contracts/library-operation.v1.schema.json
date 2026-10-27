@@ -24,7 +24,9 @@
         "library_delete",
         "library_publish",
         "library_save",
-        "library_archive"
+        "library_archive",
+        "library_cleanup",
+        "library_harmonize"
       ]
     },
     "payload": {
@@ -1475,7 +1477,14 @@
         "else": {
           "properties": {
             "payload": {
-              "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+              "anyOf": [
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+                },
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-hmi-integration-recipe.v1.schema.json"
+                }
+              ]
             },
             "result": false
           }
@@ -2447,6 +2456,246 @@
             "required": [
               "objects",
               "archive"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_cleanup"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "target": {
+                "type": "object"
+              },
+              "types": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "maxItems": 100
+              },
+              "folderPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^/types(/|(?![\\s\\S]))"
+                },
+                "maxItems": 100
+              },
+              "cleanUpMode": {
+                "enum": [
+                  "PreserveDefaultVersionOfUnusedTypes",
+                  "DeleteUnusedTypes"
+                ]
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "cleanUpMode"
+            ],
+            "additionalProperties": true,
+            "anyOf": [
+              {
+                "required": [
+                  "types"
+                ],
+                "properties": {
+                  "types": {
+                    "minItems": 1
+                  }
+                }
+              },
+              {
+                "required": [
+                  "folderPaths"
+                ],
+                "properties": {
+                  "folderPaths": {
+                    "minItems": 1
+                  }
+                }
+              }
+            ]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "removedVersionGuids": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "maxItems": 1000
+              },
+              "candidatesRetainedByNative": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "maxItems": 1000
+              },
+              "removedTypeGuids": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "maxItems": 1000
+              }
+            },
+            "required": [
+              "objects",
+              "removedVersionGuids",
+              "candidatesRetainedByNative",
+              "removedTypeGuids"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "library_harmonize"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": 1
+              },
+              "source": {
+                "$ref": "#/$defs/source"
+              },
+              "selection": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "target": {
+                "type": "object"
+              },
+              "types": {
+                "type": "array",
+                "items": {
+                  "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                },
+                "maxItems": 100
+              },
+              "folderPaths": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^/types(/|(?![\\s\\S]))"
+                },
+                "maxItems": 100
+              },
+              "harmonizeNames": {
+                "type": "boolean"
+              },
+              "harmonizePaths": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "source",
+              "target"
+            ],
+            "additionalProperties": true,
+            "anyOf": [
+              {
+                "required": [
+                  "types"
+                ],
+                "properties": {
+                  "types": {
+                    "minItems": 1
+                  }
+                }
+              },
+              {
+                "required": [
+                  "folderPaths"
+                ],
+                "properties": {
+                  "folderPaths": {
+                    "minItems": 1
+                  }
+                }
+              }
+            ]
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "objectPath": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "groupPath": {
+                      "type": "string"
+                    },
+                    "versionGuid": {
+                      "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+                    }
+                  },
+                  "required": [
+                    "objectPath",
+                    "name",
+                    "groupPath",
+                    "versionGuid"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "objects"
             ],
             "additionalProperties": false
           }

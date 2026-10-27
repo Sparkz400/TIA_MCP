@@ -547,6 +547,16 @@
         },
         "current": {
           "$ref": "#/$defs/references"
+        },
+        "plcsimBinding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reference"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
@@ -563,7 +573,8 @@
           "enum": [
             "baseline",
             "current",
-            "transition"
+            "transition",
+            "binding"
           ]
         },
         "kind": {
@@ -583,7 +594,8 @@
             "unavailable",
             "declaredTrue",
             "regressed",
-            "nondecreasingDeclaration"
+            "nondecreasingDeclaration",
+            "boundOwnedPlcsim"
           ]
         }
       }
@@ -816,6 +828,9 @@
         "limits": {
           "type": "string",
           "maxLength": 4096
+        },
+        "targetBinding": {
+          "$ref": "#/$defs/targetBinding"
         }
       }
     },
@@ -948,7 +963,8 @@
         "assertionsAdmitted",
         "nativeExecutable",
         "sourceAuthenticityVerified",
-        "liveFreshnessVerified"
+        "liveFreshnessVerified",
+        "targetBinding"
       ],
       "properties": {
         "schemaVersion": {
@@ -1075,6 +1091,12 @@
         },
         "liveFreshnessVerified": {
           "const": false
+        },
+        "targetBinding": {
+          "enum": [
+            "unbound",
+            "boundOwnedPlcsim"
+          ]
         }
       }
     },
@@ -1676,6 +1698,89 @@
           "maximum": 20
         }
       }
+    },
+    "targetBinding": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "reason"
+          ],
+          "properties": {
+            "state": {
+              "const": "unbound"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "binding",
+            "instanceName",
+            "storagePath",
+            "markerSha256",
+            "controllerAddresses",
+            "programFingerprintSha256",
+            "programIdentitySource"
+          ],
+          "properties": {
+            "state": {
+              "const": "boundOwnedPlcsim"
+            },
+            "binding": {
+              "$ref": "#/$defs/reference"
+            },
+            "instanceName": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "storagePath": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "markerSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "controllerAddresses": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "type": "string",
+                "format": "ipv4"
+              }
+            },
+            "programFingerprintSha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "programIdentitySource": {
+              "enum": [
+                "suppliedDeclaration",
+                "boundOnlineFingerprint"
+              ]
+            }
+          }
+        }
+      ]
     }
   },
   "x-tool-contracts": {

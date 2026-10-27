@@ -89,6 +89,7 @@ public static class OpcUaCaptureContracts
             Require(row.ElapsedMilliseconds>=elapsed);elapsed=row.ElapsedMilliseconds;
             if(row.Reconnect is { } e)
             {
+                Require(e.Transfer is null); // Polling owns no subscription to transfer.
                 if(e.State=="starting")Require(e.ErrorCode==error && OpcUaReconnectHistory.Retryable(error));
                 history.Apply(e);
                 if(e.State!="starting")error=e.ErrorCode;

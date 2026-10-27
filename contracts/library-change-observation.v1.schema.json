@@ -129,7 +129,9 @@
                 "library_delete",
                 "library_publish",
                 "library_save",
-                "library_archive"
+                "library_archive",
+                "library_cleanup",
+                "library_harmonize"
               ]
             },
             "sessionGeneration": {
