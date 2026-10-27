@@ -4,6 +4,26 @@
 
 See the [consolidated TODO](../TODO.md) for the current work order. This page retains detailed acceptance criteria and dated progress.
 
+## Instruction families — 27 October 2026
+
+- The builder, payload validation, JSON schemas and reader accept DInt/Real comparisons, MOVE,
+  ADD/SUB/MUL/DIV, TONR and R_TRIG/F_TRIG (IEC instance storage like the timer/counter family),
+  with exact operand/pin/overload types and explicit refusals. Offline tests use unit-test-only
+  profiles. Their 60 generated networks were checked once against the installed V21
+  `SW.PlcBlocks.LADFBD_v5.xsd` (outside the repository, so not a committed test).
+- [ ] Capture the families: author SIMATIC SD sources (the repository records no SIMATIC SD syntax
+  for MOVE, arithmetic or R_TRIG/F_TRIG), run `capture_typed_graphical_profiles.py`, add their pin
+  contracts to `extract_typed_graphical_profiles.py`, then qualify the cells. Until then every request
+  returns `GraphicalProfileUnavailable`. Created TONR/R_TRIG/F_TRIG storage also needs captured global
+  IEC storage documents and IEC dependent-instance effect members.
+- [ ] A second CPU: profiles, creation/instance templates and dependent-effect manifests are keyed by
+  the exact CPU TypeIdentifier, and every capture is CPU 1511-1 PN `OrderNumber:6ES7 511-1AL03-0AB0/V4.1`.
+  No typed capture exists for any other CPU. Missing: a capture on that CPU
+  (`capture_typed_graphical_profiles.py --cpu-type-identifier`), profile IDs that do not reuse the
+  hard-coded `v21.fw41.` prefix in `extract_typed_graphical_profiles.py`, and effect manifests whose
+  file names (`instance-effects*-<route>.v1.json`) do not collide across CPUs. The Boolean fallback
+  profile in `TypedGraphical.Validation.cs` stays bound to CPU 1511 V4.1.
+
 ## Lane A — 25 October 2026
 
 - Software-unit baseline rebuilt from a fresh UnitSeeder seed; all 24 route cases passed all four

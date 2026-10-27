@@ -51,12 +51,17 @@ namespace TiaMcp.Openness.V21
             if (template == null || template.Name != Net + "Part" || template.Descendants().Any(e => e.Name.Namespace != Net || e.Name.LocalName.StartsWith("SW.", StringComparison.Ordinal)))
                 Fail("GraphicalProfileUnavailable", "The instruction template must be one native FlgNet/v5 Part, with no foreign engineering objects.");
             template = new XElement(template);
-            string expectedName = node.Kind == "and" || node.Kind == "not" ? "A" : node.Kind == "or" || node.Kind == "branch" ? "O" : node.Kind == "compare" ? char.ToUpperInvariant(node.Comparison[0]) + node.Comparison.Substring(1) : node.Instruction;
-            if ((string)template.Attribute("Name") != expectedName) Fail("GraphicalProfileUnavailable", "The native template instruction name does not match its typed semantic family.");
+            string expectedName = node.Kind == "and" || node.Kind == "not" ? "A" : node.Kind == "or" || node.Kind == "branch" ? "O" : node.Kind == "compare" ? char.ToUpperInvariant(node.Comparison[0]) + node.Comparison.Substring(1) : node.Kind == "move" ? "MOVE" : node.Instruction;
+            // MOVE/arithmetic/edge native casing (e.g. Move, Add) comes from their capture; only the family must match.
+            bool capturedCasing = node.Kind == "move" || node.Kind == "math" || node.Kind == "edge";
+            if (!string.Equals((string)template.Attribute("Name"), expectedName, capturedCasing ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) Fail("GraphicalProfileUnavailable", "The native template instruction name does not match its typed semantic family.");
             if ((node.Kind == "and" || node.Kind == "or" || node.Kind == "branch") && template.Elements(Net + "Negated").Any())
                 Fail("GraphicalProfileUnavailable", "A non-negated Boolean operation cannot use a native template containing negated pins.");
             if (node.Kind == "compare" && !template.Elements(Net + "TemplateValue").Any(t => (string)t.Attribute("Name") == "SrcType" && t.Value == node.DataType))
                 Fail("GraphicalProfileUnavailable", "The comparison template overload does not match the exact requested numeric type.");
+            var typeValues = template.Elements(Net + "TemplateValue").Where(t => (string)t.Attribute("Type") == "Type").ToArray();
+            if ((node.Kind == "move" || node.Kind == "math") && typeValues.Any(t => t.Value != node.DataType) || node.Kind == "math" && typeValues.Length == 0)
+                Fail("GraphicalProfileUnavailable", "The MOVE/arithmetic template overload does not match the exact requested type.");
             foreach (var attribute in template.Descendants().Where(e => e.Name != Net + "Instance").Attributes("UId").ToArray()) attribute.Value = ids.Uid("template:" + node.Key + ":" + attribute.Value);
             template.SetAttributeValue("UId", uid);
             if (node.Kind == "and" || node.Kind == "or" || node.Kind == "branch" || node.Kind == "not")
@@ -66,7 +71,7 @@ namespace TiaMcp.Openness.V21
                 card.Value = (node.Kind == "not" ? 1 : node.InputCount).ToString(CultureInfo.InvariantCulture);
                 if (node.Kind == "not" && (template.Elements(Net + "Negated").Count() != 1 || (string)template.Element(Net + "Negated")?.Attribute("Name") != "in1")) Fail("GraphicalProfileUnavailable", "NOT requires exactly one observed negated input profile at in1.");
             }
-            if (node.Kind == "timer" || node.Kind == "counter")
+            if (node.Kind == "timer" || node.Kind == "counter" || node.Kind == "edge")
             {
                 var instance = template.Element(Net + "Instance");
                 if (instance == null) Fail("GraphicalProfileUnavailable", "The selected stateful profile does not contain an observed instance representation.");
