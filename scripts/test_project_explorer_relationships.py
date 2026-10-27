@@ -2,8 +2,9 @@
 import copy
 import unittest
 
-from qualify_project_explorer_relationships import (expected_network_edges, expected_technology_targets,
-                                                    validate_hardware_graph, validate_unit_edges)
+from qualify_project_explorer_relationships import (ENCODER, ENCODER_MODULE_NAME, UNIT_A, UNIT_B, expected_network_edges,
+                                                    expected_technology_targets, require_complete_coverage, validate_hardware_graph,
+                                                    validate_seeded_providers, validate_unit_edges)
 
 PLC_IF = "/projects/Fx/devices/PLC/items/PLC/items/PN"
 ET_IF = "/projects/Fx/devices/ET/items/ET/items/PN"
@@ -73,13 +74,47 @@ class TechnologyAndUnitOracleTests(unittest.TestCase):
         relations = [{"relationType": "SoftwareUnit", "relatedObject": "B"}]
         good = {"edges": [{"kind": "unitRelation", "source": {"objectPath": "/u/A"}, "target": {"objectPath": "/u/B"},
                            "evidence": {"resolution": "resolved", "native": relations[0]}}]}
-        self.assertEqual(validate_unit_edges(good, "/u/A", relations, nodes), 1)
+        self.assertEqual(validate_unit_edges(good, "/u/A", relations, nodes), [["B", "/u/B"]])
+        unresolved = copy.deepcopy(good)
+        unresolved["edges"][0]["evidence"]["resolution"] = "unresolved"
+        self.assertEqual(validate_unit_edges(unresolved, "/u/A", relations, nodes), [["B", None]])
         wrong_kind = copy.deepcopy(good)
         wrong_kind["edges"][0]["target"]["objectPath"] = "/db/B"
         with self.assertRaises(AssertionError):
             validate_unit_edges(wrong_kind, "/u/A", relations, nodes)
         with self.assertRaises(AssertionError):
             validate_unit_edges({"edges": []}, "/u/A", relations, nodes)
+
+
+class SeededFixtureTests(unittest.TestCase):
+    MODULE = "/projects/Fx/devices/PLC/items/Rail/items/" + ENCODER_MODULE_NAME
+    NODES = [{"kind": "softwareUnit", "name": UNIT_A, "objectPath": "/u/A"}, {"kind": "softwareUnit", "name": UNIT_B, "objectPath": "/u/B"},
+             {"kind": "hardware", "name": ENCODER_MODULE_NAME, "objectPath": MODULE}, {"kind": "technologyObject", "name": ENCODER, "objectPath": "/to/E"}]
+
+    def test_exact_seeded_relations_pass(self):
+        validate_seeded_providers(self.NODES, {"/to/E": [self.MODULE + "/items/Channel"]}, {"/u/A": [[UNIT_B, "/u/B"]], "/u/B": []})
+
+    def test_unresolved_reversed_or_foreign_seeded_relations_fail(self):
+        good_units, good_technology = {"/u/A": [[UNIT_B, "/u/B"]], "/u/B": []}, {"/to/E": [self.MODULE]}
+        for technology, units in (
+                (good_technology, {"/u/A": [[UNIT_B, None]], "/u/B": []}),
+                (good_technology, {"/u/A": [], "/u/B": [[UNIT_A, "/u/A"]]}),
+                ({"/to/E": []}, good_units),
+                ({"/to/E": [self.MODULE + "Other"]}, good_units)):
+            with self.assertRaises(AssertionError):
+                validate_seeded_providers(self.NODES, technology, units)
+
+    def test_partial_or_undeclared_coverage_fails(self):
+        graph = {"providerScope": {"providers": ["softwareUnitRelations"]},
+                 "coverage": [{"provider": "softwareUnitRelations", "scope": "/u/A", "status": "complete"}]}
+        require_complete_coverage(graph, "softwareUnitRelations", "/u/A")
+        partial = copy.deepcopy(graph)
+        partial["coverage"][0]["status"] = "partial"
+        undeclared = copy.deepcopy(graph)
+        undeclared["providerScope"]["providers"] = []
+        for value, scope in ((partial, "/u/A"), (undeclared, "/u/A"), (graph, "/u/B")):
+            with self.assertRaises(AssertionError):
+                require_complete_coverage(value, "softwareUnitRelations", scope)
 
 
 if __name__ == "__main__":

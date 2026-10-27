@@ -3,10 +3,13 @@
 Default mode builds a fresh owned offline scratch with one PROFINET subnet, IO
 system and ET 200SP head through prepared changes, then checks configured-network
 edges against an independent hardware_inspect oracle whose explorer paths are
-derived here from native names. --verify-report reopens that saved fixture
-read-only. --project audits another saved project read-only, for example a
-software-unit or technology-object fixture. Never run while another native
-corpus owns the TIA machine.
+derived here from native names. It also plugs a TM PosInput 2 module through a
+prepared change; the native UnitSeeder then adds two software units with one
+relation and an external-encoder TO connected to that module's channel, because
+neither has a prepared change kind. Both providers are checked against
+software_inspect and technology_read. --verify-report reopens that saved fixture
+read-only. --project audits another saved project read-only. Never run while
+another native corpus owns the TIA machine.
 """
 import argparse
 import datetime
@@ -14,6 +17,7 @@ import hashlib
 import json
 import pathlib
 import queue
+import subprocess
 import time
 import uuid
 from urllib.parse import quote
@@ -28,6 +32,10 @@ SERVER = "OrderNumber:6ES7 193-6PA00-0AA0/V1.2"
 SERVER_MODULE_NAMES = {"PROFINET interface": "Server module_1", "PROFINET-Schnittstelle": "Servermodul_1"}
 SUBNET, SYSTEM = "ExplorerProofSubnet", "ExplorerProofSystem"
 NETWORK_KINDS = ["connectedSubnet", "ioSystemController", "ioSystemDevice"]
+# Exact module of fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json.
+ENCODER_MODULE, ENCODER_MODULE_NAME, ENCODER = "OrderNumber:6ES7 551-1AB01-0AB0/V2.0", "ExplorerEncoderHardware", "ExplorerEncoder"
+UNIT_A, UNIT_B = "ExplorerUnitA", "ExplorerUnitB"
+SEEDED_PROVIDERS = ["technologyConnections", "softwareUnitRelations"]
 
 
 def segment(value):
@@ -73,6 +81,12 @@ def resolved_triples(graph, kinds):
     return triples
 
 
+def require_complete_coverage(graph, provider, scope):
+    rows = [row for row in graph.get("coverage", []) if row.get("provider") == provider and row.get("scope") == scope]
+    require(len(rows) == 1 and rows[0].get("status") == "complete", "%s coverage for %s is not complete: %r" % (provider, scope, rows))
+    require(provider in (graph.get("providerScope") or {}).get("providers", []), "Graph must declare the %s provider" % provider)
+
+
 def validate_hardware_graph(graph, hardware_path, expected):
     observed = resolved_triples(graph, NETWORK_KINDS)
     wanted = {triple for triple in expected if triple[1] == hardware_path}
@@ -107,9 +121,11 @@ def expected_technology_targets(read):
 
 
 def validate_unit_edges(graph, unit_path, relations, nodes):
+    """Returns [relatedObject, resolved target path or None] per native relation."""
     edges = [edge for edge in graph.get("edges", []) if edge.get("kind") == "unitRelation"]
     require(len(edges) == len(relations), "Every native unit relation must appear once as an edge")
     by_path = {node.get("objectPath"): node for node in nodes}
+    observed = []
     for edge in edges:
         require(edge["source"]["objectPath"] == unit_path, "Unit relation must originate at the selected unit")
         native = edge["evidence"]["native"]
@@ -119,7 +135,27 @@ def validate_unit_edges(graph, unit_path, relations, nodes):
             require(target["name"] == native["relatedObject"], "Resolved unit relation names another object")
             require(target["kind"] in ("softwareUnit", "safetyUnit") if native["relationType"] == "SoftwareUnit" else target["kind"] == "block",
                     "Resolved unit relation target has the wrong native kind")
-    return len(edges)
+        observed.append([native["relatedObject"], edge["target"]["objectPath"] if edge["evidence"]["resolution"] == "resolved" else None])
+    return sorted(observed, key=lambda row: (row[0], row[1] or ""))
+
+
+def read_only_mode(args):
+    return bool(args.verify_report or args.project)
+
+
+def validate_seeded_providers(nodes, technology, units):
+    """The seeded fixture's exact expectation: A -> B resolves and the encoder reaches its module."""
+    def one(kind, name):
+        rows = [node for node in nodes if node["kind"] == kind and node["name"] == name]
+        require(len(rows) == 1, "Seeded %s %s must appear exactly once" % (kind, name))
+        return rows[0]
+    unit_a, unit_b = one("softwareUnit", UNIT_A), one("softwareUnit", UNIT_B)
+    module = one("hardware", ENCODER_MODULE_NAME)["objectPath"]
+    require(units.get(unit_a["objectPath"]) == [[UNIT_B, unit_b["objectPath"]]], "Seeded unit relation did not resolve to unit B")
+    require(units.get(unit_b["objectPath"]) == [], "Unit B must have no relation")
+    targets = technology.get(one("technologyObject", ENCODER)["objectPath"], [])
+    require(targets and all(target == module or target.startswith(module + "/") for target in targets),
+            "Seeded encoder connection must resolve inside its TM PosInput module: %r" % targets)
 
 
 def run(args):
@@ -130,16 +166,19 @@ def run(args):
     release = pathlib.Path(args.release_file.read_text(encoding="utf-8-sig").strip()).resolve()
     host, worker = release / "host/TiaMcp.Host.exe", release / "workers/openness/TiaMcp.Openness.V21.exe"
     require(host.is_file() and worker.is_file(), "Immutable release host/worker are missing")
+    seeder = args.seeder.resolve()
+    require(read_only_mode(args) or seeder.is_file(), "Build the UnitSeeder first: " + str(seeder))
     args.report = args.report.resolve()
     args.report.parent.mkdir(parents=True, exist_ok=True)
     run_root = args.report.parent / ("ex_rel_" + uuid.uuid4().hex[:8])
     run_root.mkdir(exist_ok=False)
-    read_only = bool(prior or args.project)
+    read_only = read_only_mode(args)
     report = {"schemaVersion": 1, "completed": False, "status": "running", "steps": [], "readOnly": read_only,
               "observedAtUtc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "release": str(release), "artifactRoot": str(run_root),
               "qualificationScope": "Configured subnet/IO-system membership, technology-object hardware references, software-unit relations and the subnet/watch/external-source collections of one offline project. No cables, ports, physical topology, online or runtime claim.",
               "binaries": {"hostAssembly": {"path": str(host.with_suffix(".dll")), "sha256": hashlib.sha256(host.with_suffix(".dll").read_bytes()).hexdigest()},
-                           "worker": {"path": str(worker), "sha256": hashlib.sha256(worker.read_bytes()).hexdigest()}},
+                           "worker": {"path": str(worker), "sha256": hashlib.sha256(worker.read_bytes()).hexdigest()},
+                           "seeder": None if read_only else {"path": str(seeder), "sha256": hashlib.sha256(seeder.read_bytes()).hexdigest()}},
               "fixtureSourceSha256": hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(), "providers": {}}
     client, started, uncertain = None, False, False
 
@@ -211,6 +250,36 @@ def run(args):
                                     "Comment": "", "LocationIdentifier": "", "Name": server, "PlantDesignation": ""}}})
         report["fixture"] = {"controllerInterface": cpu["path"], "deviceInterface": remote["path"], "subnet": SUBNET, "ioSystem": SYSTEM}
 
+    def build_provider_fixture():
+        nonlocal uncertain
+        catalog = call("hardware_catalog_search", {"filter": "TM PosInput 2", "maxItems": 500})
+        require(any(row.get("typeIdentifier") == ENCODER_MODULE for row in catalog["entries"]), "Contracted TM PosInput 2 V2.0 profile is not installed")
+        inventory = call("project_inventory", {"maxItems": 2000})
+        device = inventory["plcs"][0]["hardwarePath"].split("/items/")[0] + "/items/"
+        rail = [row for row in inventory["hardware"] if row["path"].startswith(device) and row["positionNumber"] == 0 and row["path"].count("/items/") == 1]
+        require(len(rail) == 1, "PLC rack identity is ambiguous")
+        apply("hardware_plug", {"hardwarePath": rail[0]["path"], "typeIdentifier": ENCODER_MODULE, "name": ENCODER_MODULE_NAME, "positionNumber": 2}, compile_save=False)
+        authorization = run_root / "seeder-authorization.json"
+        authorization.write_text(json.dumps({"ownsPortalProcess": True, "creationTool": "tia_create_scratch", "processId": report["processId"],
+                                             "projectPath": report["projectPath"], "moduleName": ENCODER_MODULE_NAME}, indent=2), encoding="utf-8")
+        step = {"tool": "UnitSeeder explorer-relations", "passed": False}
+        report["steps"].append(step)
+        save()
+        # The seeder attaches to the owned process and saves; a timeout leaves its outcome unknown.
+        try:
+            completed = subprocess.run([str(seeder), "explorer-relations", str(authorization)], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=600)
+        except subprocess.TimeoutExpired:
+            uncertain = True
+            report["unknownOutcome"] = {"tool": step["tool"], "retried": False, "reason": "Seeder outcome is unknown; nothing is replayed."}
+            raise
+        lines = completed.stdout.strip().splitlines()
+        step.update(exitCode=completed.returncode, result=json.loads(lines[-1]) if lines else None, stderr=completed.stderr[-4000:])
+        step["passed"] = completed.returncode == 0 and (step["result"] or {}).get("completed") is True
+        save()
+        print(("PASS " if step["passed"] else "FAIL ") + step["tool"], flush=True)
+        require(step["passed"], "Native explorer relation seeding failed")
+        report["fixture"].update(encoderModule=ENCODER_MODULE_NAME, technologyObject=ENCODER, units=[UNIT_A, UNIT_B])
+
     try:
         client = Client(host, args.timeout, ["--worker", str(worker), "--artifacts", str(run_root)])
         initialize(client)
@@ -230,6 +299,7 @@ def run(args):
         project_name = inventory["project"]["name"]
         if not opened:
             build_network_fixture()
+            build_provider_fixture()
         oracle_rows = hardware_rows()
         expected = expected_network_edges(oracle_rows, project_name)
         report["oracle"] = {"networkEdges": sorted(map(list, expected))}
@@ -270,6 +340,7 @@ def run(args):
         for node in [node for node in nodes if node["kind"] == "technologyObject"][:args.max_objects]:
             read = call("technology_read", {"plcPath": node["plcPath"], "technologyPath": node["objectPath"], "maxItems": 2000})
             graph = model("relationships", reference=exact_reference(snapshot, node), kinds=["technologyConnection"], direction="out", depth=1, maxNodes=50, maxEdges=200)
+            require_complete_coverage(graph, "technologyConnections", node["objectPath"])
             observed = {triple[2] for triple in resolved_triples(graph, ["technologyConnection"])}
             wanted = expected_technology_targets(read) & set(by_path)
             require(observed == wanted, "Technology connection targets differ for " + node["objectPath"])
@@ -281,9 +352,12 @@ def run(args):
             software = call("software_inspect", {"plcPath": report["plcPath"], "maxItems": 2000})
             for unit in [row for row in software.get("units", []) if row.get("relations") is not None][:args.max_objects]:
                 graph = model("relationships", reference=exact_reference(snapshot, by_path[unit["path"]]), kinds=["unitRelation"], direction="out", depth=1, maxNodes=50, maxEdges=200)
+                require_complete_coverage(graph, "softwareUnitRelations", unit["path"])
                 units[unit["path"]] = validate_unit_edges(graph, unit["path"], unit["relations"], nodes)
-        report["providers"]["softwareUnitRelations"] = {"units": units, "positive": any(units.values())}
-        for provider in args.require:
+        report["providers"]["softwareUnitRelations"] = {"units": units, "positive": any(target for rows in units.values() for _, target in rows)}
+        if not args.project:
+            validate_seeded_providers(nodes, technology, units)
+        for provider in sorted(set(args.require) | (set() if args.project else set(SEEDED_PROVIDERS))):
             require(report["providers"][provider]["positive"], "Required positive provider evidence is absent: " + provider)
 
         exported = model("export", snapshotId=snapshot["snapshotId"])
@@ -314,9 +388,11 @@ def main():
     parser.add_argument("--release-file", type=pathlib.Path, default=ROOT / "artifacts/project-explorer-release.txt")
     parser.add_argument("--report", type=pathlib.Path, default=ROOT / "artifacts/project-explorer-native-relationships.json")
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument("--seeder", type=pathlib.Path, default=ROOT / "scripts/native/UnitSeeder/bin/Debug/net48/UnitSeeder.exe",
+                        help="Native seeder for the unit relation and TO connection of the fresh fixture.")
     parser.add_argument("--max-objects", type=int, default=20, help="Bound on technology objects and units checked per run.")
     parser.add_argument("--require", nargs="*", default=[], choices=["configuredNetwork", "technologyConnections", "softwareUnitRelations"],
-                        help="Providers that must show positive evidence (the fixture mode always requires configuredNetwork).")
+                        help="Providers that must show positive evidence (fixture and --verify-report modes always require all three).")
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--verify-report", type=pathlib.Path, help="Read-only reopen of this qualifier's completed fixture.")
     source.add_argument("--project", type=pathlib.Path, help="Read-only audit of another saved project.")

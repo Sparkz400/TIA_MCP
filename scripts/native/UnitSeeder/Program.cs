@@ -13,6 +13,7 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.ExternalSources;
+using Siemens.Engineering.SW.TechnologicalObjects.Motion;
 using Siemens.Engineering.SW.Units;
 
 internal static class Program
@@ -47,8 +48,8 @@ internal static class Program
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static JObject Run(string[] args)
     {
-        if (args.Length != 2 || (args[0] != "seed" && args[0] != "mutate-other-unit" && args[0] != "add-alternate-namespace"))
-            throw new InvalidOperationException("Usage: UnitSeeder.exe seed|mutate-other-unit|add-alternate-namespace <authorization.json>");
+        if (args.Length != 2 || (args[0] != "seed" && args[0] != "mutate-other-unit" && args[0] != "add-alternate-namespace" && args[0] != "explorer-relations"))
+            throw new InvalidOperationException("Usage: UnitSeeder.exe seed|mutate-other-unit|add-alternate-namespace|explorer-relations <authorization.json>");
         string root = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../../../artifacts"));
         string authorizationPath = GuardPath(root, args[1]);
         var authorization = JObject.Parse(File.ReadAllText(authorizationPath));
@@ -93,6 +94,27 @@ internal static class Program
                         unit.ExternalSourceGroup.GenerateSource(new[] { block }, new FileInfo(Path.Combine(Path.GetDirectoryName(authorizationPath), unitName + "-native.scl")), GenerateOptions.None);
                     }
                 }
+                else if (args[0] == "explorer-relations")
+                {
+                    // Neither unit relations nor TO hardware connections have a prepared change kind.
+                    foreach (string unitName in new[] { "ExplorerUnitA", "ExplorerUnitB" })
+                        if (provider.UnitGroup.Units.Find(unitName) != null) throw new InvalidOperationException("The explorer fixture unit already exists; do not overwrite fixtures.");
+                    provider.UnitGroup.Units.Create("ExplorerUnitB");
+                    provider.UnitGroup.Units.Create("ExplorerUnitA").Relations.Create("ExplorerUnitB", UnitRelationType.SoftwareUnit);
+                    string moduleName = authorization.Value<string>("moduleName");
+                    var module = Devices(project).SelectMany(device => Items(device.DeviceItems)).Single(item => item.Name == moduleName);
+                    var channel = Items(new[] { module }).SelectMany(item => item.Channels)
+                        .Single(candidate => candidate.Number == 0 && candidate.Type == ChannelType.Technology && candidate.IoType == ChannelIoType.Complex);
+                    // V21 exposes OperatingMode as UInt64 beside a public symbolic enum; resolve that exact enum, never a number.
+                    object before = channel.GetAttribute("OperatingMode");
+                    object mode = Enum.Parse(before.GetType().IsEnum ? before.GetType() : typeof(DeviceItem).Assembly.GetType("Siemens.Engineering.HW.OperatingMode", true), "MotionControl");
+                    channel.SetAttribute("OperatingMode", before.GetType().IsEnum ? mode : Convert.ChangeType(mode, before.GetType()));
+                    if (plc.TechnologicalObjectGroup.TechnologicalObjects.Find("ExplorerEncoder") != null) throw new InvalidOperationException("The explorer encoder fixture already exists.");
+                    var encoder = plc.TechnologicalObjectGroup.TechnologicalObjects.Create("ExplorerEncoder", "TO_ExternalEncoder", new Version("10.0"));
+                    var sensor = encoder.GetService<EncoderHardwareConnectionProvider>().SensorInterface;
+                    sensor.Connect(channel);
+                    if (!sensor.IsConnected) throw new InvalidOperationException("The encoder sensor interface did not connect to the module channel.");
+                }
                 else if (args[0] == "add-alternate-namespace")
                 {
                     var unit = provider.UnitGroup.Units.Find("TiaMcp_UnitA") ?? throw new InvalidOperationException("Seeded unit A is absent.");
@@ -117,7 +139,8 @@ internal static class Program
                     ["processId"] = pid, ["compileErrors"] = compile.ErrorCount, ["compileWarnings"] = compile.WarningCount,
                     ["compileMessages"] = new JArray(Messages(compile.Messages).Take(100)),
                     ["units"] = new JArray(provider.UnitGroup.Units.Select(unit => new JObject { ["name"] = unit.Name, ["namespacePreset"] = unit.NamespacePreset,
-                        ["blocks"] = new JArray(unit.BlockGroup.Blocks.Select(block => new JObject { ["name"] = block.Name, ["namespace"] = block.Namespace })) })) };
+                        ["blocks"] = new JArray(unit.BlockGroup.Blocks.Select(block => new JObject { ["name"] = block.Name, ["namespace"] = block.Namespace })),
+                        ["relations"] = new JArray(unit.Relations.Select(relation => new JObject { ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = relation.RelatedObject })) })) };
             }
         }
     }
