@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.native-traversal.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T15:42:51+00:00",
+  "source": {
+    "commit": "9da66939f90d5f0976d0fdef4cc44f7d8c4f529b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Owned TIA Portal V21 Portal reopening the saved scale project of run scl864f5c0f (two CPU 1511-1 PN V4.1 PLCs, project library with 1,000 FB + 4,000 UDT types InWork, 10,004 metadata entries). library_list took 54.0 s. library_query elements paged the complete library in 50 pages of 200 items (10,000 items) under one revision token in 2,805.8 s (about 56 s per page, one library walk each); completeness reports truncated=true and scopeComplete=false at the 10,000-entry item budget, as designed. The growth runs that built the library are listed with report and worker hashes in docs/verification/library-native-scale-20261027.md.",
+  "limitations": [
+    "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
+    "Flat FB and UDT types only, InWork; no dependency chain, released versions or global library at this scale. The last 2 of 10,002 rows lie beyond the item budget and are reported as truncation, not returned."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "da67e0e5474b4d8147e9ecf4cf0d35944ab312f2ee41b35b6db14c5718c1a371"
+    },
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3ee773278f85e4d40f87d73582898bc2498655e91814a6d485a30ba62d9906f9"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "bdd767b0578f4ecc0de2fa9f4a15b245fef0cff797bcf2fdb9e856f1933b3dfc",
+      "bytes": 44331,
+      "completed": true,
+      "steps": [
+        "start owned TIA reopen",
+        "open saved scale project"
+      ],
+      "toolsPassed": [
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

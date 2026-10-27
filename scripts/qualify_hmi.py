@@ -21,6 +21,7 @@ from probe_hmi_api import PROFILES
 from smoke_mcp import Client, ROOT
 from block_test_process import OwnedTiaProcessWatcher, ProcessExitNotVerified
 from hmi_fixture_copy import copy_project, safe_path, verify_source_preserved
+from plc_hmi_recipe_probe import probe_plc_hmi_recipe
 
 GATES = ("nativeFixture", "deviceDiscovery", "inspectionAccuracy", "explorerIntegration", "duplicateNames", "brokenReferences", "dynamicReferences", "scriptBehaviorInspection", "alarmTagReferences",
          "missingPrerequisites", "protectedContent", "wrongFamily", "staleTarget", "boundedInspection",
@@ -1117,6 +1118,13 @@ def qualify_bridge(args, native, report, persist):
                     except Exception as error:
                         result["externalTagCreatePrepare"] = gate("failed", str(error))
                     persist()
+                if getattr(args, "probe_plc_hmi_recipe", False) and expected_family == "unified":
+                    # Outside GATES like the external-tag probe: plans and refusals are evidence, not acceptance.
+                    try:
+                        result["plcHmiRecipe"] = probe_plc_hmi_recipe(client, profile, inspections, result["gates"]["integratedConnectionMapping"].get("proofs", []))
+                    except Exception as error:
+                        result["plcHmiRecipe"] = gate("failed", str(error))
+                    persist()
                 try:
                     qualify_alarm_references(profile, result["references"], inspections, result["gates"])
                 except Exception as error:
@@ -1195,6 +1203,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=300)
     parser.add_argument("--allow-owned-derived-open", action="store_true", help="After a known failed retrieval in the same owned empty session, allow read-only inspection of the exact independently recovered positive seeder project; preserves the failed bridge recovery result")
     parser.add_argument("--inspect-owned-recovered-copy", action="store_true", help="Inspect a hash-verified fresh copy of the exact independently recovered fixture project; no bridge retrieval/compile/save, and existing failed compile gates remain failed")
+    parser.add_argument("--probe-plc-hmi-recipe", action="store_true", help="For a plchmi HmiSeeder fixture, prepare the combined PLC/HMI install and field-changing update plans; never applies")
     parser.add_argument("--probe-external-tag-create", action="store_true", help="For Unified profiles, also send refused prepare-only hmi_engineering external_tag_create requests; never applies")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()

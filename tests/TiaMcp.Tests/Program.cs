@@ -148,6 +148,7 @@ internal static partial class Program
             ("Supplied type reviews reject ambiguous selectors and forged content", ProjectReviewTypeTests.IntakeValidation),
             ("Project reviews reject unsafe XML and mismatched identities", ProjectReviewStoreTests.UntrustedInputs),
             ("Library journals atomically preserve records and reject tampering", LibraryJournalStoreTests.AtomicRecordsAndTamper),
+            ("Library type creation takes one or 1..100 distinct document names", LibraryJournalStoreTests.CreateTypeDocumentNamesAreBounded),
             ("Library durable claims forbid mutation replay", LibraryJournalStoreTests.DurableClaimNoReplay),
             ("Library recovery intent and outcome survive restart", LibraryJournalStoreTests.RecoveryOutcomeSurvivesRestart),
             ("Library journals keep native timestamps and their preview hash", LibraryJournalStoreTests.NativeTimestampKeepsPreviewHash),
