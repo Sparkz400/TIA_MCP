@@ -63,7 +63,7 @@ public sealed partial class TiaTools
         => Call("block_interface", new { blockName, blockPath, projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "hardware_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships and native I/O-controller/connector associations with exact hardware owners or explicit unresolved coverage. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
+    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships, native I/O-controller/connector associations and port interconnections with exact hardware owners or explicit unresolved coverage, plus GSD identities. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
     public Task<CallToolResult> HardwareInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
         => Call("hardware_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
@@ -71,6 +71,11 @@ public sealed partial class TiaTools
     [Description("List configured communication connections (S7, TCP, UDP, ISO, ISO-on-TCP, FDL, PtP, HMI) from native CommunicationManagement of all hardware or one exact hardwarePath. Each row has type, name, ID, typed properties and local/partner target and interface paths resolved by native object equality. reviewSnapshot is a connection_review before/after snapshot; maxItems bounds rows and truncation is explicit. Offline configuration only; no consumers, resource checks or communication.")]
     public Task<CallToolResult> ConnectionInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
         => Call("connection_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "hardware_gsd_export", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Export the GSD file of an I-device through the native GsdExportProvider of the exact hardwarePath (hardware_inspect reports gsdExportAvailable). Writes the files Siemens produces into a fresh artifact directory and returns each with its SHA-256. Does not change the project or validate the GSD content.")]
+    public Task<CallToolResult> HardwareGsdExport(string hardwarePath, string designation, CancellationToken cancellationToken, string? description = null, string? projectName = null)
+        => Call("hardware_gsd_export", new { hardwarePath, designation, description, projectName, artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "technology_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect offline technology objects and exposed parameters. Select technologyName or technologyPath to inspect a specific object; absent selectors enumerate the PLC's objects.")]

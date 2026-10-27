@@ -5,6 +5,8 @@
 - `network.nodes`: native node name/type, exposed attributes and connected subnet reference. Global subnet paths require native equality with the observed project collection. Internal or unobserved subnets remain unresolved.
 - `network.ioControllers`: native I/O system name/number/subnet, resolved controller owner hardware path and assigned connector owners.
 - `network.ioConnectors`: native connected I/O-system reference and exposed connector attributes. `notAssigned` and `notConnected` are distinct from unavailable getters.
+- `network.ports`: each port of the interface (`portIndex`, the port's own hardware path) with the hardware paths of its configured partner ports (`NetworkPort.ConnectedPorts`).
+- `gsd` / `gsdDevice`: `GsdId`, `GsdName`, `GsdType` and the PROFINET/PROFIBUS flags of a GSD device item, and of its GSD device on root items. `gsdExportAvailable` tells whether the item exposes the I-device `GsdExportProvider`.
 
 Owner paths come from native engineering-object equality and bounded native ancestry. Names and address overlaps are never ownership proof. Individual getter failures retain earlier metadata and appear in warnings. `network.scopeComplete` becomes false on truncation, failed getters or unresolved association owners. Hardware lookup is capped at 50,000 items; global subnet resolution examines at most 5,000 subnets. The public `maxItems` budget still applies to emitted rows, attributes and associations.
 
@@ -145,13 +147,42 @@ needing its own scope and evidence:
 - cross-rack moves;
 - channel settings other than `Smoothing`.
 
+## Port topology, module replacement and GSD export
+
+Three prepared kinds and one read-only tool extend the hardware routes (ledger X10). All
+are compiled against the V21 PublicAPI only and are not natively qualified.
+
+| Kind / tool | Payload and boundary |
+|---|---|
+| `hardware_port_connect` | `hardwarePath`, `partnerHardwarePath`: two exact port device items from `network.ports`. Both ports must be free; `NetworkPort.ConnectToPort`, then forward and reverse `ConnectedPorts` must show the link. Alternative partners (tool changers) are not supported. |
+| `hardware_port_disconnect` | Same payload; the two ports must be linked. `NetworkPort.DisconnectFromPort`, then neither side may list the other. |
+| `hardware_replace` | `hardwarePath`, exact installed catalog `typeIdentifier`, optional `acceptLoss: true`. `DeviceItem.ChangeType` on one pluggable module in a rack; built-in and software-bearing items are refused. |
+| `hardware_gsd_export` | `hardwarePath`, `designation`, optional `description`. Calls `GsdExportProvider.Export` into a fresh directory under the export artifacts and returns every produced file (up to 32) with its SHA-256. The GSD content is not validated. |
+
+The three kinds use the configured-hardware preservation described above, with
+the port links of every port added to the manifest. A port change may alter only the
+two selected link entries. Compilation and the whole-project checkpoint are mandatory.
+
+V21 offers no compatibility check before `ChangeType`. The `hardware_replace` preview
+records `inventoryBefore`: the addresses (with owners) and child items of the module's
+subtree. After the write, every address must keep its I/O type, start, owners and at
+least its length, and every child path must remain; otherwise the change fails with
+`MutationVerificationFailed` and the checkpoint must be restored, unless the payload set
+`acceptLoss: true`. Name, slot and container must stay. The subtree's channels, attributes
+and children may follow the new type; everything outside it, port links included, must
+stay exact even with `acceptLoss`. The readback records the before/after inventory.
+
+`ConnectedPorts` is documented in V21 as "internal use only"; the bridge relies on it for
+readback. Which item exposes `GsdExportProvider` and whether Siemens requires a compiled
+I-device first are not observed yet.
+
 ## Preservation manifest identity checks
 
 Configured hardware preservation comparison now refuses absent manifests/payloads,
 non-object rows, missing/non-string/empty/control-bearing paths, duplicate exact
 paths and missing selected identities. It never filters malformed rows out of the
 comparison. Legitimate ordering differences and case-distinct exact paths remain
-preserved. The shared guard covers plug/move/channel/address and I/O assignment
+preserved. The shared guard covers plug/move/channel/address, I/O assignment, port link and replacement
 verification; recovery still uses the existing exact manifest comparison.
 
 [Portable regression evidence](../verification/hardware-manifest-20261016.md)

@@ -9,7 +9,22 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
-        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes" }.Contains(kind);
+        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
+            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace" }.Contains(kind);
+
+        // Port interconnections join the manifest only for kinds that change or can lose them.
+        internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
+
+        // Addresses and child items of one replaced subtree, read from a preservation manifest.
+        internal static JObject ReplaceInventory(JArray rows, string path)
+        {
+            var tree = rows.OfType<JObject>().Where(row => InTree(row, path)).OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal).ToArray();
+            return new JObject { ["typeIdentifier"] = tree.FirstOrDefault(row => row.Value<string>("path") == path)?["typeIdentifier"]?.DeepClone(),
+                ["addresses"] = new JArray(tree.SelectMany(row => (row["addresses"] as JArray ?? new JArray()).OfType<JObject>().Select(address => { var copy = (JObject)address.DeepClone(); copy["hardwarePath"] = row["path"].DeepClone(); return copy; }))),
+                ["children"] = new JArray(tree.Where(row => row.Value<string>("path") != path).Select(row => row["path"].DeepClone())) };
+        }
+
+        private static bool InTree(JToken row, string path) => row.Value<string>("path") == path || row.Value<string>("path").StartsWith(path + "/", StringComparison.Ordinal);
 
         // Exact V21 attributes of a CPU device item. Openness declares each byte number only while its flag is enabled.
         internal static readonly string[] CpuMemoryByteAttributes = { "SystemMemoryByte", "SystemMemoryByteAddress", "ClockMemoryByte", "ClockMemoryByteAddress" };
@@ -146,9 +161,53 @@ namespace TiaMcp.Openness.V21
                     }
                 }
             }
+            else if (kind == "hardware_port_connect" || kind == "hardware_port_disconnect")
+            {
+                bool connect = kind == "hardware_port_connect";
+                string partnerPath = payload.Value<string>("partnerHardwarePath");
+                if (partnerPath == path) Fail("A port cannot be linked to itself.");
+                void Link(JObject row, string other)
+                {
+                    var links = (row["port"] as JObject)?["connectedPorts"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "A selected port has no captured interconnection list.");
+                    var paths = links.Select(link => link.Value<string>()).ToList();
+                    if (paths.Contains(other) == connect) Fail(connect ? "The ports were already connected." : "The ports were not connected.");
+                    if (connect) paths.Add(other); else paths.Remove(other);
+                    row["port"]["connectedPorts"] = new JArray(paths.OrderBy(value => value, StringComparer.Ordinal));
+                }
+                Link(selected, partnerPath);
+                Link(Target(expected, partnerPath), path);
+            }
+            else if (kind == "hardware_replace")
+            {
+                var observed = Target(after, path);
+                if (selected.Value<string>("typeIdentifier") == payload.Value<string>("typeIdentifier") || observed.Value<string>("typeIdentifier") != payload.Value<string>("typeIdentifier") ||
+                    observed.Value<string>("name") != selected.Value<string>("name") || !JToken.DeepEquals(observed["positionNumber"], selected["positionNumber"]) || !JToken.DeepEquals(observed["containerPath"], selected["containerPath"]))
+                    Fail("The replaced item differs from its reviewed type identifier, or its name, slot or container changed.");
+                if (payload.Value<bool?>("acceptLoss") != true)
+                {
+                    var lost = ReplaceLosses(ReplaceInventory(before, path), ReplaceInventory(after, path));
+                    if (lost.Count != 0) Fail("The replacement lost configured addresses or child items; restore the checkpoint, or prepare again with acceptLoss: true. Lost: " + lost.ToString(Newtonsoft.Json.Formatting.None));
+                }
+                // The new type may bring its own channels, attributes and children; everything outside the subtree stays exact.
+                foreach (var row in expected.Where(row => InTree(row, path)).ToArray()) row.Remove();
+                foreach (var row in after.Where(row => InTree(row, path))) expected.Add(row.DeepClone());
+            }
             else Fail("Unknown hardware preservation policy.");
             JArray Sorted(JArray rows) => new JArray(rows.Cast<JObject>().OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal));
             if (!JToken.DeepEquals(Sorted(expected), Sorted(after))) Fail("An unrelated configured hardware, channel, address or network field changed; restore the checkpoint before further edits.");
+        }
+
+        // An address survives when the subtree still has its ioType and start with at least its length and the same owners.
+        private static JArray ReplaceLosses(JObject before, JObject after)
+        {
+            var lost = new JArray();
+            foreach (var address in before["addresses"].OfType<JObject>())
+                if (!after["addresses"].OfType<JObject>().Any(row => row.Value<string>("ioType") == address.Value<string>("ioType") && row.Value<long>("startAddress") == address.Value<long>("startAddress") &&
+                    row.Value<long>("lengthBits") >= address.Value<long>("lengthBits") && JToken.DeepEquals(row["owners"], address["owners"])))
+                    lost.Add(new JObject { ["address"] = address.DeepClone() });
+            var kept = new HashSet<string>(after["children"].Select(child => child.Value<string>()), StringComparer.Ordinal);
+            foreach (var child in before["children"]) if (!kept.Contains(child.Value<string>())) lost.Add(new JObject { ["child"] = child.DeepClone() });
+            return lost;
         }
 
         private static void RequireIdentities(JArray rows)

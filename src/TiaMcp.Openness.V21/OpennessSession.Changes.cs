@@ -564,6 +564,13 @@ namespace TiaMcp.Openness.V21
                 case "connection_set":
                     ConnectionEdit(change, project, preview);
                     break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    PreparePortLink(change, project, preview);
+                    break;
+                case "hardware_replace":
+                    PrepareHardwareReplace(change, project, preview);
+                    break;
                 case "hardware_plug":
                 {
                     var item = ChangeHardware(project, payload);
@@ -821,6 +828,13 @@ namespace TiaMcp.Openness.V21
                 case "connection_set":
                     ConnectionEdit(change, project, null);
                     break;
+                case "hardware_port_connect":
+                case "hardware_port_disconnect":
+                    ApplyPortLink(change, project);
+                    break;
+                case "hardware_replace":
+                    ApplyHardwareReplace(change, project);
+                    break;
                 case "hardware_delete":
                 {
                     var item = ChangeHardware(project, payload).Item;
@@ -1057,7 +1071,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
             if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
             if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();

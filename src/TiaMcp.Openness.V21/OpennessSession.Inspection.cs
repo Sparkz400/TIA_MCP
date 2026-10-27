@@ -223,6 +223,9 @@ namespace TiaMcp.Openness.V21
                     row["networkObservation"] = network == null ? "notExposed" : "observed";
                     if (network != null)
                         row["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings);
+                    row["gsd"] = GsdInfo(entry.Item.GetService<GsdDeviceItem>());
+                    if (entry.Item.Parent is Device device && device.IsGsd) row["gsdDevice"] = GsdInfo(device.GetService<GsdDevice>());
+                    row["gsdExportAvailable"] = entry.Item.GetService<GsdExportProvider>() != null;
                     row["attributes"] = InspectionAttributes(entry.Item, budget, warnings, entry.Path);
                 }
                 catch (Exception exception) { warnings.Add(InspectionWarning(entry.Path, exception)); }
@@ -235,7 +238,7 @@ namespace TiaMcp.Openness.V21
             result["project"] = ProjectInfo(project);
             result["items"] = items;
             result["warnings"] = warnings;
-            result["completeness"] = InspectionCoverage(budget, warnings, "Configured hardware attributes, address ranges, channels, subnet memberships and I/O-controller/connector associations exposed by V21 Openness.",
+            result["completeness"] = InspectionCoverage(budget, warnings, "Configured hardware attributes, address ranges, channels, subnet memberships, I/O-controller/connector associations, port interconnections and GSD identities exposed by V21 Openness.",
                 "Channel terminal/signal mappings only when exposed as native attributes; no guessed byte-per-channel allocation", "No electrical wiring or runtime diagnostics", "Attribute values limited to 4096 characters");
             return result;
         }

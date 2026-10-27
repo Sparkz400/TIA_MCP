@@ -174,6 +174,12 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
                 AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
                     blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
+                AddTargetFeature(features, "change.hardware_replace", directApi, "partial", "DeviceItem.ChangeType to an exact installed catalog identifier for a pluggable module without software; lost addresses/children fail after the write unless acceptLoss is true. Compiled preservation and checkpoint required.",
+                    blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be replaced by this workflow.");
+                var port = ProbeCapabilityService<NetworkPort>(hardware, "hardware", probes);
+                foreach (string feature in new[] { "change.hardware_port_connect", "change.hardware_port_disconnect" })
+                    AddTargetFeature(features, feature, port, "partial", "One exact port device item and one exact partner port; connect requires both free. Forward/reverse ConnectedPorts readback, compiled preservation and checkpoint required.");
+                AddTargetFeature(features, "hardware_gsd_export", ProbeCapabilityService<GsdExportProvider>(hardware, "hardware", probes), "partial", "I-device GSD export through the native GsdExportProvider into the artifact directory with SHA-256; content is not validated.");
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
                 AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
                 AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; shared-device/multi-controller assignments are rejected.");
