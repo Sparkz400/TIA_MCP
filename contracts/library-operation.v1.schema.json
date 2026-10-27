@@ -1475,7 +1475,14 @@
         "else": {
           "properties": {
             "payload": {
-              "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+              "anyOf": [
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+                },
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-hmi-integration-recipe.v1.schema.json"
+                }
+              ]
             },
             "result": false
           }
@@ -1532,6 +1539,23 @@
                   }
                 ]
               },
+              "documentNames": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256,
+                  "pattern": "^(?!\\.{1,2}(?![\\s\\S]))[^<>:\"/\\\\|?*\\x00-\\x1f]+(?![\\s\\S])",
+                  "allOf": [
+                    {
+                      "pattern": "\\S"
+                    }
+                  ]
+                }
+              },
               "targetEnvironment": {
                 "type": "string"
               },
@@ -1545,8 +1569,19 @@
             "required": [
               "schemaVersion",
               "destinationLibraryId",
-              "documentDirectory",
-              "documentName"
+              "documentDirectory"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "documentName"
+                ]
+              },
+              {
+                "required": [
+                  "documentNames"
+                ]
+              }
             ],
             "additionalProperties": true,
             "allOf": [

@@ -1,0 +1,58 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.plc-hmi-recipe.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T14:45:58+00:00",
+  "source": {
+    "commit": "bdb061d60d9df81100d0886d0bf29d482fbffcb5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Prepare-only native probe of the combined PLC/UDT/HMI library_integrate recipes (plc_hmi_component_plan, plc_hmi_update_plan) on a fresh positive Unified MTP700 Comfort HmiSeeder plchmi fixture (raw-Openness MotorStatus 1.0.0/1.0.1 Real->LReal, MotorDrive 1.0.0, MotorDB, Unified tags MotorSpeed/MotorRunning bound to MotorDB.status.*, rectangle MotorSpeedConsumer with Left dynamized by MotorSpeed; both PLCs compiled without errors), through the production Host and V21 worker after project_retrieve: the install plan into PLC_B/HMI_RT_2 prepared as planned_only with library_instantiate, graphical_typed_edit and hmi_engineering steps, plcSymbol MotorDrive_1.status.speed resolved from the pinned FB export and the HmiMemberMappingUnqualified, HmiScreenItemCreationUnavailable and HmiPreservationGateClosed blockers, and its change_apply was refused (PlcIntegrationNotQualified); the field-changing update of PLC_A to MotorStatus 1.0.1 was refused with HmiBindingWouldBreak and an impact report of exactly one breaking binding (MotorSpeed typeChanged Real->LReal, consumer MotorSpeedConsumer.Left), MotorRunning unchanged and no unresolved bindings; a Classic recipe was refused (HmiFamilyNotQualified); project library and both HMI tag inventories unchanged; owned Portal, host and worker cleanup verified.",
+  "limitations": [
+    "No apply, compile, save/reopen, recovery or runtime of any combined step; combined apply stays refused and no Unified preservation gate is opened.",
+    "Unified Comfort only; Classic HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags, nested UDTs and scripts, alarms or faceplate ports as consumers are not exercised.",
+    "Creation of member-bound HMI tags and screen items stays a blocker in the install plan; the overall qualify_hmi run accepts no profile because the existing HMI gates are outside this probe."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "db63ada2768064a8454674324f6d3f3cdae2b38a56bed3b7c6a49fbf7458ef54"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "5f5fa3dcbba2b3a3cca5e5075be31e949b5da28a8ebf7b4ee88fb621a621e62e"
+    },
+    {
+      "name": "s28",
+      "files": 6,
+      "sha256": "c681f24ca655c43e17417f918ff46c28f3500f7d97960fdb5a46ef2111f5e7cd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "plc-hmi-recipe.json",
+      "sha256": "13afed6e58b80159846f83b4803bd0349b6030a12a0def9f39af944df6980d84",
+      "bytes": 1774319,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "seeder-native-report.json",
+      "sha256": "cbe7e38b9b1c74e9a92325c5b892608faa35313c4261e7e9f964c492d6d5fa3e",
+      "bytes": 364836,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

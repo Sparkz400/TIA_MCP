@@ -42,7 +42,7 @@ The allowlist is exposed through `change_prepare` kind `hmi_engineering`, using 
 
 `contracts/hmi-engineering.v1.schema.json` defines operation payloads. Scalar types, rectangles, names and explicit binding ownership are validated before dispatch; a metadata revision cannot replace the required native content fingerprint. Raw exports, the narrow qualified export-time normalization, baseline/after manifests, native compiler diagnostics and recovery evidence remain in the existing change journal. Unknown write outcomes are not replayed.
 
-The library subsystem still owns library types, exact versions, release, transfer, publication and updates. Its HMI action must pass the [explicit handoff](../../contracts/hmi-library-handoff.v1.schema.json), including the resolved native source and exact destination, dependency closure, rectangle and typed bindings. The HMI adapter verifies the handoff and preservation gate; it does not create a parallel type lifecycle.
+The library subsystem still owns library types, exact versions, release, transfer, publication and updates. Its HMI action must pass the [explicit handoff](../../contracts/hmi-library-handoff.v1.schema.json), including the resolved native source and exact destination, dependency closure, rectangle and typed bindings. The HMI adapter verifies the handoff and preservation gate; it does not create a parallel type lifecycle. Combined PLC/UDT/HMI install and update planning, including the broken-binding impact report, is described in [combined recipes](plc-library-integration-recipes.md#combined-plcudthmi-recipes).
 
 ## Build and qualification
 

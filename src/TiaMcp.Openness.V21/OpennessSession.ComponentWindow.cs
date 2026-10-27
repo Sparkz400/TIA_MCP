@@ -24,7 +24,7 @@ namespace TiaMcp.Openness.V21
             if (_componentWindowManifest != null) throw new BridgeException("ResourceBusy", "This worker already has a bound component window.");
             string id = ChangeText(args, "id", 32); if (!Guid.TryParseExact(id, "N", out _)) throw new BridgeException("InvalidRequest", "Exact component window identity required.");
             string root = SharedMutationArtifactDirectory(args), planId = ChangeText(args, "planId", 64), preview = ChangeText(args, "planPreviewHash", 64);
-            if (!_libraryChanges.TryGetValue(planId, out var plan) || plan.Kind != "library_integrate" || plan.PreviewHash != preview || !plan.Project.Equals(_scratchProject) || IsHmiLibraryTarget(plan.Payload))
+            if (!_libraryChanges.TryGetValue(planId, out var plan) || plan.Kind != "library_integrate" || plan.PreviewHash != preview || !plan.Project.Equals(_scratchProject) || IsHmiLibraryTarget(plan.Payload) || PlcHmiIntegrationPlanner.IsRecipe(plan.Payload))
                 throw new BridgeException("InvalidComponentContract", "An exact current-session PLC integration plan is required.");
             if (plan.Source == null || plan.Source.Project != null || string.IsNullOrEmpty(plan.Source.SourcePath) || plan.Source.Writable)
                 throw new BridgeException("MutationScopeIncomplete", "This qualification requires the exact read-only working global source and retained original snapshot.");

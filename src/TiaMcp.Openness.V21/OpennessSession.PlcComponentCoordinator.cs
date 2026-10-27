@@ -16,7 +16,7 @@ namespace TiaMcp.Openness.V21
         private PlcComponentCoordinator CreatePlcComponentQualificationCoordinator(string planChangeId, string previewHash, string root)
         {
             EnsureAttached();
-            if (!_libraryChanges.TryGetValue(planChangeId, out var plan) || plan.Kind != "library_integrate" || plan.PreviewHash != previewHash || IsHmiLibraryTarget(plan.Payload))
+            if (!_libraryChanges.TryGetValue(planChangeId, out var plan) || plan.Kind != "library_integrate" || plan.PreviewHash != previewHash || IsHmiLibraryTarget(plan.Payload) || PlcHmiIntegrationPlanner.IsRecipe(plan.Payload))
                 throw new BridgeException("InvalidComponentContract", "An exact current-session PLC integration preview is required.");
             if (!_ownsPortal || _scratchProject == null || !plan.Project.Equals(_scratchProject) || _portal.Projects.Count != 1)
                 throw new BridgeException("OwnedScratchRequired", "Component coordinator qualification is limited to the worker's exact owned scratch project.");

@@ -105,7 +105,7 @@ namespace TiaMcp.Openness.V21
                 ((JArray)change.Preview["effects"]).Add(new JObject { ["action"] = "planPlcComponent", ["nativeMutation"] = false, ["proposedSteps"] = plan["steps"].DeepClone() });
                 ((JArray)change.Preview["warnings"]).Add("Planning only. No checkpoint or mutation is dispatched. Separate prepared steps require fresh native validation and are not an atomic combined installation.");
             }
-            catch (PlcIntegrationPlanException error) { throw new BridgeException(error.Code, error.Message); }
+            catch (PlcIntegrationPlanException error) { throw new BridgeException(error.Code, error.Message, error.Details); }
             catch (PlcComponentException error) { throw new BridgeException(error.Code, error.Message); }
         }
     }

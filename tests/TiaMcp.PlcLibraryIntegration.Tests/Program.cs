@@ -144,6 +144,7 @@ ContentContractTests.Run(Test);
 ContentArtifactTests.Run(Test);
 PlanArtifactTests.Run(Test);
 LibraryDependencyCaptureTests.Run(Test);
+PlcHmiTests.Run(Test);
 if (failed == 0 && args.Length != 0)
 {
     if (args.Length != 2 || args[0] != "--observation-fixtures") throw new ArgumentException("Expected --observation-fixtures <fresh-directory>.");
