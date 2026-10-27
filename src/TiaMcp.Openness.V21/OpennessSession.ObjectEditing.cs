@@ -165,7 +165,9 @@ namespace TiaMcp.Openness.V21
                 table.Tags.Create(name, type, detail);
                 var created = table.Tags.Find(name) ?? throw new BridgeException("MutationVerificationFailed", "Created tag is missing from its table.");
                 if (created.IsSafety) throw new BridgeException("SafetyBoundary", "The created tag is a safety tag; generic tag creation excludes safety tags. Recover from the checkpoint.");
-                if (created.DataTypeName != type || created.LogicalAddress != detail) throw new BridgeException("MutationVerificationFailed", "Created tag read-back differs from the request.");
+                // TIA may return the absolute address with a leading % and normalized case.
+                if (created.DataTypeName != type || !string.Equals(created.LogicalAddress?.TrimStart('%'), detail.TrimStart('%'), StringComparison.OrdinalIgnoreCase))
+                    throw new BridgeException("MutationVerificationFailed", "Created tag read-back differs from the request.");
             }
         }
 

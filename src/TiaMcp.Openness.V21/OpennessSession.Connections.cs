@@ -200,6 +200,17 @@ namespace TiaMcp.Openness.V21
             return rows;
         }
 
+        // Lets a fresh session recompute a connection change's outcome from the project alone.
+        private JArray ConnectionFingerprint(Project project, JObject payload)
+        {
+            var hardware = DeviceItems(project, new ScanBudget(50000)).ToArray();
+            var entry = hardware.FirstOrDefault(item => item.Path == payload.Value<string>("hardwarePath"));
+            var management = entry?.Item.GetService<CommunicationManagement>();
+            if (management == null) return null;
+            return new JArray(ConnectionManifest(management, ConnectionOwnerPath(management, entry, hardware), hardware)
+                .Select(row => row.Item2.ToString(Formatting.None)).OrderBy(row => row, StringComparer.Ordinal));
+        }
+
         private static void RequireConnectionsPreserved(IEnumerable<Tuple<Connection, JObject>> expected, IEnumerable<Tuple<Connection, JObject>> actual)
         {
             Func<IEnumerable<Tuple<Connection, JObject>>, string[]> text = rows => rows.Select(row => row.Item2.ToString(Formatting.None)).OrderBy(row => row, StringComparer.Ordinal).ToArray();
