@@ -1,4 +1,4 @@
-"""Qualify library compatibility cases: unsaved target edits, an inherited inconsistent PLC data type, a native library
+"""Qualify library compatibility cases: unsaved target edits, an inherited inconsistent (uncompiled) PLC data type, a native library
 older than the supported upgrade range, and library types instantiated into a different CPU family."""
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ V13_LIBRARY = Path(r"D:\Arbeit\Siemens\Portal V21\Data\Hmi\Styles\Predefined-Sty
 UNSAVED_SOURCE = ('FUNCTION "%s" : Void\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\nVAR_TEMP\n    Scratch : Bool;\nEND_VAR\n'
                   'BEGIN\n    #Scratch := TRUE;\nEND_FUNCTION\n') % UNSAVED
 BROKEN_TYPE_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      Value : "TiaMcpMissingType";\n   END_STRUCT;\nEND_TYPE\n' % BROKEN_TYPE
+UNCOMPILED_TYPE = "TiaMcpUncompiledType"
+UNCOMPILED_TYPE_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      Value : Bool;\n   END_STRUCT;\nEND_TYPE\n' % UNCOMPILED_TYPE
 # Typed outcomes for a library type in a CPU family it was not authored for; anything else fails the run.
 TARGET_REFUSALS = ("TargetIncompatible", "LibraryConflict")
 TARGET_FAILURES = ("CompileFailed", "NativeLibraryError", "TargetIncompatible")
@@ -123,7 +125,21 @@ def body(h):
     if broken["inconsistentTypeInMemory"]:
         broken["refusal"] = h.refuse("refuse instantiate with an inherited inconsistent PLC data type", "library_instantiate",
                                      h.selected(source, [wide], target={"plcPath": consumer}), "InheritedDiagnostics", BROKEN_TYPE)
-    h.stage("close consumer session (discards the failed type change)", lambda: h.tool("tia_detach"))
+
+    # TIA discards a type whose generation fails, so the inherited inconsistency is a valid type generated without compile.
+    def uncompiled_type():
+        prepared = h.tool("change_prepare", {"kind": "type_source_upsert", "payload": {"scopePath": consumer, "source": UNCOMPILED_TYPE_SOURCE,
+                          "expectedTypeNames": [UNCOMPILED_TYPE]}})
+        applied = h.tool("change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+        require(applied["state"] == "applied", "Uncompiled type change did not apply")
+        types = {t["name"]: t for t in h.tool("software_inspect", {"plcPath": consumer, "maxItems": 2000})["types"]}
+        require(UNCOMPILED_TYPE in types, "Uncompiled type is missing")
+        return {"changeId": prepared["changeId"], "isConsistent": types[UNCOMPILED_TYPE].get("isConsistent")}
+    uncompiled = findings["uncompiledType"] = h.stage("generate a PLC data type without compiling it", uncompiled_type)
+    require(uncompiled["isConsistent"] is False, "TIA reports the uncompiled type as consistent; no inherited inconsistency to refuse")
+    uncompiled["refusal"] = h.refuse("refuse instantiate with an inherited inconsistent PLC data type", "library_instantiate",
+                                     h.selected(source, [wide], target={"plcPath": consumer}), "InheritedDiagnostics", UNCOMPILED_TYPE)
+    h.stage("close consumer session (discards the failed and uncompiled type changes)", lambda: h.tool("tia_detach"))
 
     def reopen(label):
         h.owned_portal(label)
@@ -135,9 +151,9 @@ def body(h):
     def persisted():
         blocks = [b["name"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]]
         types = [t["name"] for t in h.tool("software_inspect", {"plcPath": consumer, "maxItems": 2000})["types"]]
-        require(UNSAVED in blocks and FB in blocks and BROKEN_TYPE not in types, "Reopened project differs: %s %s" % (blocks, types))
+        require(UNSAVED in blocks and FB in blocks and BROKEN_TYPE not in types and UNCOMPILED_TYPE not in types, "Reopened project differs: %s %s" % (blocks, types))
         return {"blocks": sorted(blocks)}
-    h.stage("reopened: unsaved edit and instance persisted, failed type absent", persisted)
+    h.stage("reopened: unsaved edit and instance persisted, failed and uncompiled types absent", persisted)
 
     # CPU family mismatch: both types were authored on an S7-1500 and are instantiated into the added S7-1200.
     for label, version in (("control", fb), ("wide", wide)):
