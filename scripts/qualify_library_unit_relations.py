@@ -70,8 +70,9 @@ def body(h):
 
     def placement():
         software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
-        rows = {x["name"]: x for key in ("blocks", "types") for x in software[key] if x["name"] in [FB, UDT] + CALLERS}
-        require(sorted(rows) == sorted([FB, UDT] + CALLERS), "Expected each library instance and caller exactly once: %s" % sorted(rows))
+        found = [x for key in ("blocks", "types") for x in software[key] if x["name"] in [FB, UDT] + CALLERS]
+        rows = {x["name"]: x for x in found}
+        require(len(found) == len(rows) == len(CALLERS) + 2, "Expected each library instance and caller exactly once: %s" % [x["path"] for x in found])
         require(all(rows[n]["scopePath"] == provider for n in (FB, UDT)), "Library instances left the provider unit")
         require(all(rows[n]["scopePath"] == consumer for n in CALLERS), "Callers left the consumer unit")
         return {n: rows[n]["path"] for n in sorted(rows)}
@@ -81,12 +82,13 @@ def body(h):
 
     # The consumer's cycle OB calls the provider's FB through the relation, so the cleanup guard can prove reachability.
     source = h.open_archive(generation_two)
-    applied = h.apply("library_update_project", h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}))
-    guard = applied["preview"]["updateCleanupGuard"]
+    prepared = h.prepare("library_update_project", h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}))
+    guard = prepared["preview"]["updateCleanupGuard"]
     h.report["cleanupGuard"] = guard
     h.stage("guard proved the provider uses through the consumer OB", lambda: require(
         h.report["placement"][FB] in guard["reachablePaths"] and h.report["placement"]["TiaMcpUnitConsumer_Cycle"] in guard["obRoots"],
         "The guard did not prove reachability from the consumer unit's OB: %s" % guard) or guard["reachablePaths"])
+    h.apply_prepared("library_update_project", prepared)
     h.stage("FB at exactly 1.1.0 in the provider", lambda: h.verify_use(consumer_library, second, 1))
     h.stage("UDT stays at 1.0.0", lambda: h.verify_use(consumer_library, udt, 1))
     h.stage("placement unchanged after the update", lambda: require(placement() == h.report["placement"], "Paths changed in the update"))
