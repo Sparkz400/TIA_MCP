@@ -106,8 +106,8 @@ def run(args):
         require(chain, "No InWork chain versions to release")
         h.report["releases"] = []
         released = None
-        for start in range(0, len(chain), BATCH):
-            batch = chain[start:start + BATCH]  # names sort callee first, which is the release order
+        for start in range(0, len(chain), args.release_batch):
+            batch = chain[start:start + args.release_batch]  # names sort callee first, which is the release order
             if stop.exists():
                 h.report["stoppedByRequest"] = batch[0]["typeName"]
                 break
@@ -223,6 +223,7 @@ if __name__ == "__main__":
     parser.add_argument("--full-paging", action="store_true", help="Page the complete library at the final probe; periodic probes read one page.")
     parser.add_argument("--reopen", type=Path, help="Open this saved scale project and only probe its project library.")
     parser.add_argument("--release-chain", action="store_true", help="With --reopen: release every InWork Chain_ type in order, then query the closure.")
+    parser.add_argument("--release-batch", type=int, default=100, help="Versions per release change (1..100); cost grows with chain depth.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))
     arguments = parser.parse_args()
     arguments.runner = __file__
