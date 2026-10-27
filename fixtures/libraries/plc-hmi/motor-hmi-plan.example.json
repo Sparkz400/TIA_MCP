@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "action": "plc_hmi_component_plan",
+  "planOnly": true,
+  "source": {
+    "libraryId": "replace-with-session-library-id",
+    "revision": "replace-with-current-revision"
+  },
+  "selection": [
+    {
+      "typeGuid": "aaaaaaaa-1111-1111-1111-111111111111",
+      "versionGuid": "bbbbbbbb-2222-2222-2222-222222222222"
+    }
+  ],
+  "target": {
+    "projectName": "OwnedMotorFixture",
+    "plcPath": "/devices/PLC_1/DeviceItems/CPU"
+  },
+  "integration": {
+    "dependencyPins": [
+      {
+        "typeGuid": "cccccccc-3333-3333-3333-333333333333",
+        "versionGuid": "dddddddd-4444-4444-4444-444444444444"
+      }
+    ],
+    "instanceDb": {
+      "name": "Motor_1",
+      "numberPolicy": "firstAvailable"
+    },
+    "caller": {
+      "mode": "createStandaloneFc",
+      "name": "MotorCaller",
+      "language": "FBD",
+      "numberPolicy": "firstAvailable"
+    },
+    "mappings": [
+      {
+        "parameter": "Enable",
+        "direction": "Input",
+        "dataType": "Bool",
+        "tagPath": "/devices/PLC_1/DeviceItems/CPU/tags/IO/tags/EnableMotor"
+      },
+      {
+        "parameter": "Active",
+        "direction": "Output",
+        "dataType": "Bool",
+        "tagPath": "/devices/PLC_1/DeviceItems/CPU/tags/IO/tags/MotorRunning"
+      }
+    ]
+  },
+  "hmi": {
+    "family": "unified",
+    "profile": "unified-comfort",
+    "hmiPath": "/devices/HMI_1/DeviceItems/HMI_RT_1/hmi/HMI_RT_1",
+    "connection": "HMI_Connection_1",
+    "tagTable": "Motor",
+    "tags": [
+      {
+        "name": "MotorSpeed",
+        "dataType": "Real",
+        "source": {
+          "kind": "instanceMember",
+          "members": [
+            "status",
+            "speed"
+          ]
+        }
+      },
+      {
+        "name": "MotorEnable",
+        "dataType": "Bool",
+        "source": {
+          "kind": "plcTag",
+          "tagPath": "/devices/PLC_1/DeviceItems/CPU/tags/IO/tags/EnableMotor"
+        }
+      }
+    ],
+    "screenItems": [
+      {
+        "screenPath": "/devices/HMI_1/DeviceItems/HMI_RT_1/hmi/HMI_RT_1/screens/Main",
+        "itemName": "MotorSpeedField",
+        "rectangle": {
+          "left": 20,
+          "top": 40,
+          "width": 120,
+          "height": 24
+        },
+        "tag": "MotorSpeed"
+      }
+    ]
+  },
+  "expectedCompilerOutcomes": {
+    "plc": {
+      "errors": 0,
+      "maxWarnings": 0
+    },
+    "hmi": {
+      "errors": 0,
+      "maxWarnings": 0
+    }
+  }
+}
