@@ -159,6 +159,8 @@ namespace TiaMcp.Openness.V21
                 case "simulation_download": return SimulationDownload(arguments);
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
                 case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
+                case "plc_online_compare": return PlcOnlineCompare(arguments);
+                case "plc_station_upload": return PlcStationUpload(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);
                 default: throw new BridgeException("UnknownOperation", "Unknown worker operation: " + operation);

@@ -862,6 +862,19 @@
       ]
     },
     {
+      "featureId": "plc_online_compare",
+      "obligations": [
+        "D09",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "plc_station_upload",
+      "obligations": [
+        "D09"
+      ]
+    },
+    {
       "featureId": "simulation_provision_reconcile",
       "obligations": [
         "L03"

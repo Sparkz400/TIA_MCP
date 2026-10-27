@@ -21,7 +21,7 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsSharedMutation(string operation) => operation == "change_apply" || operation == "change_restore" ||
             operation == "simulation_download" || operation == "simulation_provision_scratch_credential" || operation == "library_open" ||
-            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step";
+            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step", "plc_station_upload";
 
         private JObject SharedMutationBegin(JObject args)
         {
@@ -64,6 +64,7 @@ namespace TiaMcp.Openness.V21
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
                 case "project_copy": return ProjectCopy(arguments);
+                case "plc_station_upload": return PlcStationUpload(arguments);
                 case "watch_fixture_seed": return WatchFixtureSeed(arguments);
                 case "watch_authoring_source_negative": return WatchAuthoringSourceNegative(arguments);
                 case "component_window_step": return ComponentWindowExecute(arguments);
@@ -260,6 +261,17 @@ namespace TiaMcp.Openness.V21
                 add("project", source.Path.FullName, "archiveSavedSourceUnchanged"); observation["source"] = ProjectInfo(source);
                 absent("workspace", "copyArchive", SharedMutationPlannedDestination("projectCopyArchive", () => Path.Combine(root, EngineeringPaths.NewRecoveryArchiveName(root))));
                 absent("project", "copyDestination", SharedMutationPlannedDestination("projectCopy", () => EngineeringPaths.NewRecoveryDirectory(root, source.Name)));
+            }
+            else if (operation == "plc_station_upload")
+            {
+                if (!_ownsPortal || _portal.Projects.Count != 0) throw new BridgeException("ProjectIsolationRequired", "Station upload requires this worker's empty Portal.");
+                var marker = OwnedSimulationMarker(args);
+                add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorUploadSource");
+                observation["markerSha256"] = SharedMutationHash(marker);
+                absent("project", "uploadDestination", StationUploadDestination(args));
+                string observer = SimulationDiscoveryObserverDirectory(args);
+                SimulationDiscoveryObserver.VerifyDestination(observer);
+                absent("project", "discoveryObserverProject", observer);
             }
             else if (operation == "library_open")
             {
