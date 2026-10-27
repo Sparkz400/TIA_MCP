@@ -40,6 +40,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_capture_begin": return CaptureBegin(args);
                 case "sim_capture_sample": return CaptureSample(args);
                 case "sim_capture_end": return CaptureEnd(args);
+                case "sim_identity": return Identity(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -275,6 +276,23 @@ namespace TiaMcp.Simulator.V8
             if (!selected.Owned || selected.CreationReceipt?.Value<string>("creationId") != SimulationCreationJournal.ValidateId(RequiredString(args, "creationId", 32)))
                 throw new SimulatorException("SimulationOwnershipUnverified", "Runtime capture requires an instance this adapter created or adopted with the supplied creationId.");
             return selected;
+        }
+
+        // Runtime target binding: the exact owned instance, the digest of its ownership marker and its controller addresses.
+        private JObject Identity(JObject args)
+        {
+            var selected = Owned(args);
+            SimulationTicket.VerifyPlainDirectory(selected.Storage);
+            var marker = new FileInfo(Path.Combine(selected.Storage, SimulationTicket.MarkerName));
+            if (!marker.Exists || marker.Length > 16384 || (marker.Attributes & FileAttributes.ReparsePoint) != 0)
+                throw new SimulatorException("SimulationOwnershipUnverified", "The owned instance's ownership marker is unavailable. No binding was observed.");
+            var result = Envelope(selected);
+            result["instance"] = Info(selected);
+            result["creationId"] = selected.CreationReceipt.Value<string>("creationId");
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+                result["markerSha256"] = BitConverter.ToString(sha.ComputeHash(File.ReadAllBytes(marker.FullName))).Replace("-", "").ToLowerInvariant();
+            result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]);
+            return result;
         }
 
         private JObject CaptureBegin(JObject args)

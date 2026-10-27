@@ -2821,6 +2821,28 @@
       ]
     },
     {
+      "featureId": "runtime_plcsim_bind",
+      "obligations": [
+        "D16",
+        "C03",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_write",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
+      "featureId": "runtime_web_operating_mode",
+      "obligations": [
+        "D16",
+        "L03"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "obligations": [
         "D16"
@@ -3133,6 +3155,14 @@
       "obligations": [
         "D16",
         "C03"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_write",
+      "obligations": [
+        "D16",
+        "C03",
+        "L03"
       ]
     },
     {

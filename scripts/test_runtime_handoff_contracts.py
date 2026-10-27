@@ -145,7 +145,9 @@ class HandoffContractTests(unittest.TestCase):
                 if name.endswith('Input'):
                     self.assertLessEqual(set(value['required']), set(value['properties']))
                 else:
-                    self.assertEqual(set(value['required']), set(value['properties']))
+                    # The owned-PLCSIM binding is optional so retained requests and reports keep their original bytes.
+                    optional = {'request': {'plcsimBinding'}, 'report': {'targetBinding'}}.get(name, set())
+                    self.assertEqual(set(value['required']), set(value['properties']) - optional)
         for key in FLAGS:
             self.assertEqual(schema['$defs']['report']['properties'][key], {'const': False})
         for role in ('target', 'program', 'session'):

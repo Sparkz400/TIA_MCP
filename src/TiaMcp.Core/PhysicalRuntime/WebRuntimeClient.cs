@@ -231,6 +231,15 @@ public sealed class WebRuntimeClient : IDisposable
             DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken);
     }
 
+    /// <summary>One gated mutation body from WebRuntimeProtocol; nothing is sent unless the session advertised the method. Never retried.</summary>
+    public async Task<(string Status, int? ProviderErrorCode)> MutateAsync(JsonElement body, CancellationToken cancellationToken)
+    {
+        Active(); string method = body.GetProperty("method").GetString()!, id = body.GetProperty("id").GetString()!;
+        _ = WebRuntimeProtocol.MutationPermission(method);
+        if (!Methods.Contains(method)) return ("unsupported", null);
+        return await Exchange(body, bytes => WebRuntimeProtocol.MutationResult(bytes, id), cancellationToken);
+    }
+
     public async Task LogoutAsync(CancellationToken cancellationToken)
     {
         if (token is null) throw Error("RuntimeRemoteSessionUnknown");
