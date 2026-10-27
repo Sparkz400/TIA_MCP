@@ -141,6 +141,10 @@ internal static class PlcHmiTests
             foreach (var change in new Action<JObject>[] { p => p["selection"] = new JArray(), p => p["hmi"]["family"] = "classic", p => p["planOnly"] = false, p => p["target"]["scopePath"] = "/plc/u" })
             { var p = UpdatePayload(); change(p); try { PlcHmiIntegrationPlanner.ValidatePayload(p); throw new Exception("accepted"); } catch (PlcIntegrationPlanException) { } }
         });
+        test("published combined recipe examples pass the worker validator", () => {
+            foreach (string file in Directory.GetFiles(Path.Combine(RepositoryFiles.Root(), "fixtures/libraries/plc-hmi"), "*.example.json"))
+                PlcHmiIntegrationPlanner.ValidatePayload(JObject.Parse(File.ReadAllText(file)));
+        });
         test("combined recipe validation precedes native project selection; coordinator excludes combined plans", () => {
             string root = RepositoryFiles.Root(); string source = File.ReadAllText(Path.Combine(root, "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs"));
             int start = source.IndexOf("private JObject LibraryChangePrepare", StringComparison.Ordinal);

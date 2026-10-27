@@ -1475,7 +1475,14 @@
         "else": {
           "properties": {
             "payload": {
-              "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+              "anyOf": [
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json"
+                },
+                {
+                  "$ref": "https://tia-mcp.local/contracts/plc-hmi-integration-recipe.v1.schema.json"
+                }
+              ]
             },
             "result": false
           }
