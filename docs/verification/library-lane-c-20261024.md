@@ -166,3 +166,38 @@ that is never stored), `related` (two units with one `SoftwareUnit` relation) an
 
 Not covered: `NonUnitDB`/`TODB` relations, namespaces on library instances, safety units, protected UDTs, content
 changes of protected versions, MCP routes for units/relations/protection, and runtime behavior.
+
+## Library compatibility — 27 October 2026
+
+Runner commit 4b69ad2 on build c6486c8 (frozen `D:\lco\b2`, package `tia-mcp-v21_20261027_130141_7a563422`), owned
+scratch projects, no runtime. Types are authored on the scratch CPU 1511-1 PN. The consumer scratch has an added
+CPU 1214C DC/DC/DC.
+
+| Evidence | Runner | Result |
+| --- | --- | --- |
+| [`local.library_compatibility.20261027`](../../evidence/local.library_compatibility.20261027.json) | `qualify_library_compatibility.py` | 41/41 steps |
+
+- **Older library.** `library_upgrade` of TIA's own shipped native V13 library (`Predefined-Styles.al13`) is refused before any native call (`LibraryVersionUnsupported`). The copied source tree stays byte-identical.
+- **Unsaved target edits.**
+  - A compiled, unsaved source change is pending when a library type is instantiated.
+  - The preview reports `unsavedTargetEdits` `{present: true, disposition: savedIntoCheckpointBaseline}`.
+  - `checkpointSave` saves the edit before archiving, so it is part of the recovery baseline. A fresh reopen contains both the edit and the instance.
+- **Inherited diagnostics.**
+  - A PLC data type whose source generation fails is discarded by TIA (`EngineeringError`), so no inconsistent type remains.
+  - A valid PLC data type generated with `compile=false` is inconsistent (`isConsistent: false`).
+  - `library_instantiate` is then refused before any checkpoint or write (`InheritedDiagnostics`, with the type's path), and the native inventory stays unchanged.
+  - Worker change: library changes now check PLC data type consistency in the engineering fingerprint. Previously the change would have failed only at the compile after the checkpoint. Inconsistent blocks were already refused for every change kind.
+- **CPU family target.** Both S7-1500 types are instantiated into the S7-1200.
+  - The Bool-only type applies and compiles with 0 errors.
+  - The type using `LInt`/`LWord`/`LTime` is checkpointed and instantiated, then fails compilation (`CompileFailed`, 8 errors: the data types are unknown on the CPU). No save completes, and a fresh reopen equals the saved inventory before the attempt.
+  - The family mismatch is therefore not refused at preparation. It is caught by the mandatory compile.
+
+An earlier run at c6486c8 (`co_9b556199`, 39/39 steps) used only the failed-generation case. TIA had discarded that type, so
+the refusal was never reached. The runner then added the uncompiled-type case; only the rerun is retained as evidence.
+
+Not covered:
+- V20 upgrades. No V20 library input exists on this PC. V14 SP1–V18 and V19 are qualified by `local.library_upgrades.20261024` and `local.library_vendor.20261025`.
+- Firmware-version mismatches.
+- Inconsistent object kinds other than an uncompiled PLC data type.
+- Unsaved edits made in an attached TIA UI.
+- Runtime behavior.
