@@ -92,6 +92,12 @@ def run(args):
     names = (["Scale_" + str(i).zfill(5) for i in range(total - chain - udts)] + ["Udt_" + str(i).zfill(5) for i in range(udts)]
              + ["Chain_" + str(i).zfill(4) for i in range(chain)])
 
+    def reopen(h):
+        """Traverse a library an earlier run already built, without growing it again."""
+        h.owned_portal("reopen")
+        h.stage("open saved scale project", lambda: h.tool("project_open", {"path": str(args.reopen.resolve())}))
+        probe(h, h.project_library(), "reopened", args.full_paging)
+
     def body(h):
         plc = h.owned_scratch("scale")
         h.report["plcs"] = [plc]
@@ -156,7 +162,7 @@ def run(args):
             except Exception as error:
                 h.report["chainDependencies"] = {"refusal": str(error)}
 
-    h.run(body)
+    h.run(reopen if args.reopen else body)
 
 
 def page_all_items(h, library):
@@ -182,6 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--plc-capacity", type=int, default=3900, help="Types per PLC; below the CPU 1511 limit of 4,000 objects.")
     parser.add_argument("--probe-every", type=int, default=10)
     parser.add_argument("--full-paging", action="store_true", help="Page the complete library at the final probe; periodic probes read one page.")
+    parser.add_argument("--reopen", type=Path, help="Open this saved scale project and only probe its project library.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))
     arguments = parser.parse_args()
     arguments.runner = __file__

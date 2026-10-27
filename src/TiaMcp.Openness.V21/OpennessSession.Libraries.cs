@@ -196,13 +196,11 @@ namespace TiaMcp.Openness.V21
             if (max < 1 || max > 200 || offset < 0 || offset > 10000) throw new BridgeException("InvalidRequest", "maxItems must be 1..200 and offset 0..10000.");
             if (offset > 0 && args["revision"] == null) throw new BridgeException("InvalidRequest", "Paging after the first page requires its revision token.");
             JArray rows; bool complete = true;
-            if (query == "elements" && walked <= 10000) rows = snapshot; // the revision walk is the item walk when it fits the item budget
-            else if (query == "elements")
+            if (query == "elements")
             {
-                var budget = new ScanBudget(10000);
-                rows = LibraryMetadata(library, budget);
-                complete = !budget.Truncated;
-                snapshot = null;
+                // Rows come from the revision walk; above the 10,000-entry item budget they are its sorted first 10,000 (scale run: a second walk tripled page cost).
+                complete = walked <= 10000;
+                rows = complete ? snapshot : new JArray(snapshot.Take(10000));
             }
             else if (query == "versions")
             {
@@ -248,7 +246,7 @@ namespace TiaMcp.Openness.V21
             result["items"] = new JArray(rows.Skip(offset).Take(max)); result["totalCaptured"] = rows.Count;
             result["nextOffset"] = offset + max < rows.Count ? (JToken)(offset + max) : JValue.CreateNull();
             result["completeness"] = new JObject { ["scopeComplete"] = complete, ["truncated"] = !complete, ["scope"] = query == "uses" ? "Native library links in the selected project; other projects and textual references excluded." : "Native library metadata; protected or indirect runtime dependencies are not inferred." };
-            // Rows taken from the revision snapshot are consistent with it by construction; a separate walk needs the recheck.
+            // Rows taken from the revision snapshot are consistent with it by construction; other queries walk separately.
             if (snapshot == null && LibraryRevision(library) != revision) throw new BridgeException("PreviewStale", "Library changed during query. Retry inspection.");
             return result;
         }
