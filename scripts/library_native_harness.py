@@ -4,6 +4,8 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
+import time
 import traceback
 import uuid
 
@@ -133,6 +135,48 @@ class Harness:
             require(before == inventory(), "Refused preparation changed the native inventory")
             return error
         return self.stage(label, check)
+
+    def apply_or_refuse(self, label, kind, payload, codes):
+        """Where V21 behavior is not known beforehand: either the change applies, or preparation is refused with
+        one of the typed codes and no block, type or tag table changes. Untyped native errors fail the run."""
+        def check():
+            before = self.inventory()
+            result = self.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": kind, "payload": payload}})
+            if result.get("isError"):
+                error = (result.get("structuredContent") or {}).get("error") or {}
+                require(error.get("code") in codes, "Expected %s or one of %s, observed %s: %s" % (kind, codes, error.get("code"), error.get("message")))
+                require(before == self.inventory(), "Refused preparation changed the native inventory")
+                return {"outcome": "refused", "error": error}
+            return {"outcome": "applied", "applied": self.apply_prepared(kind, result["structuredContent"])}
+        return self.stage(label, check)
+
+    def seed(self, label, *arguments, required=True):
+        """Run the registered LibraryUnitSeeder fixture tool against this run's owned scratch project."""
+        def run():
+            status = self.tool("tia_session_status")
+            authorization = self.directory / ("seed-authorization-%s.json" % uuid.uuid4().hex[:8])
+            authorization.write_text(json.dumps({"processId": status["processId"], "projectPath": status["projects"][0]["path"],
+                                                 "ownsPortalProcess": True, "creationTool": "tia_create_scratch"}), encoding="utf-8")
+            command = [str(self.args.unit_seeder)] + ([arguments[0], str(authorization)] + list(arguments[1:]) if arguments else [str(authorization)])
+            completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", timeout=300)
+            result = json.loads(completed.stdout.strip().splitlines()[-1])
+            result["exitCode"] = completed.returncode
+            require(not required or completed.returncode == 0 and result.get("completed") is True, "Fixture seeding failed: %s" % result)
+            return result
+        return self.stage(label, run)
+
+    def reopen_project(self, path):
+        """project_open in an owned portal; another Openness attachment can hold TIA's project lock for up to two minutes."""
+        attempts = []
+        for _ in range(13):
+            result = self.client.request("tools/call", {"name": "project_open", "arguments": {"path": path}})
+            if not result.get("isError"):
+                return {"attempts": attempts, "opened": result.get("structuredContent")}
+            message = ((result.get("structuredContent") or {}).get("error") or {}).get("message", "")
+            require("already been opened" in message, "Reopen failed for another reason: %s" % message)
+            attempts.append(time.strftime("%H:%M:%S"))
+            time.sleep(15)
+        raise AssertionError("The project lock was not released within three minutes")
 
     def unresolved_admissions(self):
         """Shared mutation admissions of this run still owning resources (dispatchIntent or outcomeUnknown)."""
