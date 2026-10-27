@@ -1,5 +1,14 @@
 # Current status
 
+**Software units, PLC documents, project copy and compare, runtime diagnostics and PLCSIM capture — 27 October 2026:** None of this has run natively. All of it is catalog `partial`/`unverified`, except the protocol and transfer code, which passes offline fakes and the loopback UA server.
+- **Software units:** prepared kinds `software_unit_create`, `software_unit_relation_set`, `software_unit_publication_set` and `software_unit_delete`. They refuse safety units and cycles; delete needs an empty, unreferenced unit.
+- **PLC documents:** `block_read`/`type_read` take a `format` of `simaticSd` or `generatedSource`. Source generation removes any external source it leaves behind. There is also `plc_document_inventory`, plus `plc_loadable_generate`, which never downloads and refuses inconsistent blocks.
+- **Projects:** `project_copy` copies via archive and secondary retrieve, leaving the source untouched. `project_open` takes `readOnly: true`, and every mutation then refuses on a non-primary project. `plc_compare` compares two PLCs, or a PLC and a library, offline.
+- **Runtime:** `runtime_web_diagnostics` covers alarms, diagnostic buffer, operating mode, mode selector, time and project info. After a session loss, OPC UA subscriptions are transferred to the replacement session, or re-created if the server refuses.
+- **PLCSIM capture:** `runtime_capture_start` takes `source: "plcsim"` with an optional cycle-synchronous single-step mode. The operating mode is restored on stop or failure.
+
+[Engineering workflows](guides/engineering-workflows.md), [physical runtime sessions](reference/physical-runtime-sessions.md).
+
 **Native read and change routes for alarms, hardware, CAx, GRAPH, security, OPC UA, VCI, safety, drives and technology objects — 27 October 2026:** These routes are implemented and compiled against the installed V21 PublicAPI, but have not been run natively. All are catalog `partial`/`unverified`.
 
 Read-only tools:
