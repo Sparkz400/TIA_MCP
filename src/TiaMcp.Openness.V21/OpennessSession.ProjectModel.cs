@@ -204,7 +204,7 @@ namespace TiaMcp.Openness.V21
                     new JArray("Direct version GUID lists only, limited to 1000 entries per observation and 20000 collection/iterator read operations across the capture. Duplicate observations remain distinct; unavailable lists never mean empty. No complete library or project-consumer closure is established.")),
                 ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables or electrical wiring. Configured port interconnections are a separate relationship read of a selected port item (portInterconnections).")),
                 ModelCoverage("plcAlarmTextLists", root, "partial", capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"), capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"),
-                    new JArray("User and system text-list identities with ID, range and comments per PLC/software unit. Entries and texts are not in the tree; plc_alarm_inspect reads them from the native user text-list XLSX export.")),
+                    new JArray("User and system text-list identities with ID, range and comments per PLC/software unit. Entries and texts are not in the tree; plc_alarm_inspect reads them from the native user text-list XLSX export.")));
             foreach (var providerCoverage in capture.ProviderCoverage) coverage.Add(providerCoverage);
             var warnings = ModelWarnings(capture.Warnings);
             string revision = ProjectIndexStore.Hash(project.Path.FullName + "\n" + capture.Nodes.ToString(Formatting.None));
