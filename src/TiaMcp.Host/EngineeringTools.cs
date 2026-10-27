@@ -71,6 +71,12 @@ public sealed partial class TiaTools
     public Task<CallToolResult> TechnologyRead(CancellationToken cancellationToken, string? technologyName = null, string? technologyPath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? parameterPrefix = null, bool exportXml = false)
         => Call("technology_read", new { technologyName, technologyPath, projectName, plcPath, parameterPrefix, exportXml, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
+    [McpServerTool(Name = "drive_observe", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read offline SINAMICS drive objects through Startdrive Openness for one exact drive hardwarePath or all drives. Each drive object returns a drive-profile-review v2 snapshot (identity, parameters with name/number/arrayIndex/unit/value/limits, BICO source references, telegrams with byte sizes and addresses) usable as before/after in drive_profile_review. maxItems bounds all rows; parameters page per drive object with parameterOffset/nextParameterOffset; parameterNumbers filters exact numbers. Motor/encoder configuration entries are read only for explicitly listed motorDataSets/encoderNumbers. Parameter access is reported unknown. Without Startdrive: UnsupportedCapability. No online access, upload, download or write.")]
+    public Task<CallToolResult> DriveObserve(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500,
+        int parameterOffset = 0, int[]? parameterNumbers = null, int[]? motorDataSets = null, int[]? encoderNumbers = null)
+        => Call("drive_observe", new { hardwarePath, projectName, parameterOffset, parameterNumbers, motorDataSets, encoderNumbers, maxItems = Limit(maxItems) }, cancellationToken);
+
     [McpServerTool(Name = "call_graph", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Build a bounded offline call graph using native cross-references and optional exported call-site evidence. Unresolved, indirect and protected coverage is explicit. This is static evidence, not a running call stack.")]
     public Task<CallToolResult> CallGraph(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null,

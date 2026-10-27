@@ -1013,6 +1013,12 @@
       ]
     },
     {
+      "featureId": "change.drive_parameter_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
       "featureId": "change.to_delete",
       "obligations": [
         "D13"
@@ -2357,6 +2363,12 @@
         "D10",
         "F02",
         "L05"
+      ]
+    },
+    {
+      "featureId": "drive_observe",
+      "obligations": [
+        "D10"
       ]
     },
     {

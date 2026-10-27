@@ -622,6 +622,11 @@ namespace TiaMcp.Openness.V21
                     effects.Add(new JObject { ["technologyObject"] = technology.Name, ["technologyPath"] = entry.Path, ["action"] = change.Kind });
                     break;
                 }
+                case "drive_parameter_set":
+                    preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(), ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Startdrive may recalculate dependent parameters; readback covers only the listed parameters. Compare drive_observe snapshots with drive_profile_review. Offline project only: no online write, download or RAM-to-ROM.");
+                    break;
                 default: throw new BridgeException("UnsupportedChange", "Unknown or unsupported change kind: " + change.Kind);
             }
             PrepareHardwarePreservation(change, project, preview);
@@ -815,6 +820,9 @@ namespace TiaMcp.Openness.V21
                     ApplyTechnologyParameters(technology, ChangeObject(payload, "parameters"));
                     break;
                 }
+                case "drive_parameter_set":
+                    change.Readbacks.Add(new JObject { ["role"] = "drive-parameter-readback", ["parameters"] = Startdrive(() => DriveParameterSet(change, project, true)) });
+                    break;
             }
         }
 
@@ -848,7 +856,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1024,6 +1032,7 @@ namespace TiaMcp.Openness.V21
                 }
                 snapshot["technologyParameters"] = values;
             }
+            if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
             {
                 var plc = SelectPlc(change.Selector);

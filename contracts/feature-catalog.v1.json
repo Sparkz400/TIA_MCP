@@ -5332,6 +5332,58 @@
       ]
     },
     {
+      "featureId": "change.drive_parameter_set",
+      "domain": "drives",
+      "title": "Write explicit scalar parameters on one offline drive object",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "drive_parameter_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness offline write: DriveObject.Parameters.Find(string) and the DriveParameter.Value setter (documented to throw EngineeringTargetInvocationException on failure), with DriveParameter.Value readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exact hardwarePath and driveObjectNumber; 1..200 exact parameter names, each with the expected current value exactly as drive_observe reports it. Prepare and apply refuse any difference before the first write; the requested values are also part of the change fingerprint.",
+          "Scalar values only, converted to the current native CLR type; BICO interconnections, unavailable values, Safety Integrated parameters (p9300..p10999) and commissioning/reset/save/motor-identification parameters (p0009, p0010, p0970-p0972, p0976, p0977, p1900, p1910, p1960, p3900) are refused.",
+          "Openness exposes no per-parameter write access: a read-only or rejected value fails at the native setter after earlier writes and requires checkpoint recovery. Startdrive may recalculate dependent parameters; readback covers only the listed parameters, so compare drive_observe snapshots with drive_profile_review.",
+          "compile=true compiles all project devices; no online write, download or RAM-to-ROM."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness, an offline project and a drive object exposed through DriveObjectContainer."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state",
+        "A verified recovery checkpoint; compile=true to save"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.to_delete",
       "domain": "technology",
       "title": "Delete a technology object with checkpoint",
@@ -6041,7 +6093,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Backlog for the remaining Startdrive adapters (drive creation, telegram edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation and scalar parameter writes are tracked as drive_observe and change.drive_parameter_set."
         ]
       },
       "qualification": {
@@ -14968,6 +15020,53 @@
         "AC-recovery",
         "AC-preserve",
         "AC-native"
+      ]
+    },
+    {
+      "featureId": "drive_observe",
+      "domain": "drives",
+      "title": "Read offline SINAMICS drive objects, parameters and telegrams",
+      "mcpTools": [
+        "drive_observe"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Startdrive Openness: DeviceItem.GetService<DriveObjectContainer>().DriveObjects; DriveObject.DriveObjectNumber, Parameters (DriveParameter Name/Number/ArrayIndex/ArrayLength/Unit/Value/MinValue/MaxValue/ParameterText/EnumValueList) and Telegrams (Telegram Type/TelegramNumber/GetSizeInBytes(AddressIoType)/Addresses); DriveObject.GetService<DriveFunctionInterface>().HardwareProjection.GetCurrentMotorConfiguration/GetCurrentEncoderConfiguration (ConfigurationEntry Name/Number/Value/Unit)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Siemens.Engineering.Startdrive is optional: drive code is JIT-isolated, so a missing assembly or DriveObjectContainer service reports UnsupportedCapability without affecting worker start or other tools.",
+          "Each drive object returns a drive-profile-review-request.v2 snapshot (identity, offline valueDomain, parameters, telegrams). driveId is the local handle DO<driveObjectNumber>; family and parameter set are null with a reason, order number/firmware come from the hosting hardware item's attributes.",
+          "Parameter access is always unknown: Openness exposes no per-parameter write access and the CLR Value setter exists on every parameter. Bits sub-compositions and ReadParameters are not expanded; BICO sources resolve to DO<n> plus the exact parameter name or stay unresolved with a reason.",
+          "Telegram addresses use the repository's hardware Address convention (start byte, length in bits); PLC ownership, PKW and hardware identifiers are not resolved.",
+          "maxItems bounds all rows; parameters page per drive object with parameterOffset/nextParameterOffset and a 50,000-parameter scan bound. Motor/encoder configuration is read only for caller-supplied dataset/encoder numbers because their index ranges are undocumented; side-effect freedom of GetCurrent*Configuration is not natively verified.",
+          "No online values, upload, download, RAM-to-ROM, activation, safety or motion."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SINAMICS Startdrive V21 Openness and a project with Startdrive drive devices; probe with target_capabilities on the drive hardware item."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "SINAMICS Startdrive V21 installed with its Openness assembly",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
       ]
     },
     {

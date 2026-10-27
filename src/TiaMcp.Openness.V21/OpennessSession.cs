@@ -123,6 +123,7 @@ namespace TiaMcp.Openness.V21
                 case "block_interface": return BlockInterface(arguments);
                 case "hardware_inspect": return HardwareInspect(arguments);
                 case "technology_read": return TechnologyRead(arguments);
+                case "drive_observe": return Startdrive(() => DriveObserve(arguments));
                 case "safety_inspect": return SafetyInspect(arguments);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
@@ -179,6 +180,7 @@ namespace TiaMcp.Openness.V21
                 Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade."),
                 Capability("software_inspect", "conditional", "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."),
                 Capability("hardware_inspect", "conditional", "Offline hardware attributes, configured address ranges, network and exposed channel metadata; coverage varies by module."),
+                Capability("drive_observe", "conditional", "Offline SINAMICS drive objects, parameters, BICO references and telegrams through the optional Startdrive Openness assembly; absent Startdrive reports UnsupportedCapability."),
                 Capability("static_analysis", "conditional", "Native cross-reference call graphs, readers/writers, I/O associations and change impact. Indirect access and unresolved instance propagation remain explicit gaps."),
                 Capability("recoverable_changes", "conditional", "Prepare/apply with preview hashes, conflict detection, recovery archive, persistent journal and compile results. Supported source/XML and typed engineering subsets only."),
                 Capability("library_management", "conditional", "Managed global/project libraries, exact native type/version inspection, native copies, constrained authoring/update operations and durable resource journals. HMI products and native target qualification remain separate prerequisites."),
