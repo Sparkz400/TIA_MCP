@@ -192,6 +192,16 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(self.native.read_bytes(), (self.stage / "native/Tgp_TON_LAD.xml").read_bytes())
         self.unchanged()
 
+    def test_identical_recapture_in_a_later_run_confirms_the_first(self):
+        again = self.report_path.with_name("capture-again.json")
+        self.report["fixtures"][0]["changeId"] = "fixture-again"
+        again.write_text(json.dumps(self.report), encoding="utf-8")
+        result, _ = extractor.extract_catalog([self.report_path, again], stage_output=self.stage)
+        self.assertEqual(1, len(result["sources"]))
+        self.assertEqual("fixture", result["sources"][0]["changeId"])
+        self.assertEqual(["fixture-again"], [c["changeId"] for c in result["sources"][0]["confirmingCaptures"]])
+        self.unchanged()
+
     def test_wrong_scope_identity_is_rejected_before_writing_native_candidate(self):
         self.report["fixtures"][0]["namespace"] = "other"
         self.write_report()

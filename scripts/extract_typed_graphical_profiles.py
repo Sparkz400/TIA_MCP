@@ -12,6 +12,7 @@ import json
 import pathlib
 from xml.dom import minidom
 
+from engineering_preservation import native_payload_hash
 from smoke_mcp import ROOT
 
 NET = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5"
@@ -82,7 +83,15 @@ def extract(reports, route="standard", *, stage_output=None):
                         or target.parent.resolve() != native.resolve()):
                     raise ValueError("Candidate native filename must remain directly inside staging/native.")
                 if stage_output is not None and target.exists():
-                    raise ValueError("Candidate native filename collision; select exact source/route identities: " + str(target))
+                    # A source admitted again in a later capture run only confirms the first capture: same authored
+                    # source and the same native payload. Anything else is a real collision.
+                    first = next((s for s in sources if s["path"] == target.relative_to(ROOT).as_posix()), None)
+                    if (first is None or first["transportSourceSha256"] != entry["sha256"] or first["changeId"] == entry["changeId"]
+                            or native_payload_hash(target.read_text(encoding="utf-8-sig")) != native_payload_hash(raw.decode("utf-8-sig"))):
+                        raise ValueError("Candidate native filename collision; select exact source/route identities: " + str(target))
+                    first.setdefault("confirmingCaptures", []).append({"captureReport": report_path.relative_to(ROOT).as_posix(),
+                        "changeId": entry["changeId"], "sha256": hashlib.sha256(raw).hexdigest()})
+                    continue
                 target.write_bytes(raw)
                 source_hash = hashlib.sha256(raw).hexdigest()
                 source_bytes = source_path.read_bytes()

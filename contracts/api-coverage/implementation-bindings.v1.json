@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c06f054324ca68ad535ebbcd5f7e6d246a86a1804f367935935dfed462bb1e64",
-      "bytes": 1117174
+      "sha256": "6d3b22b3f60eef5fcbb6bf7f0fdd21f452891d9133b199f9d004b4f8cb80b3ff",
+      "bytes": 1117425
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2822,8 +2822,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
-      "sha256": "5a1e530ae6162a9e2c6afcc5a131abae296d64a0323ea8ff97edf64987be447b",
-      "bytes": 28747
+      "sha256": "389a2c914e5742738a8dd98fa74f322521e7f2f7b7c863993fa3a823b9ec026d",
+      "bytes": 30726
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
@@ -83800,8 +83800,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareUmacRoleSet",
-              "line": 283,
-              "endLine": 308,
+              "line": 299,
+              "endLine": 324,
               "sha256": "cc28153dbdf7fcb153c3d1f6140f3176f36e19dedc5796b89c0bd40c30cc8626"
             },
             {
@@ -83814,15 +83814,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerPageSet",
-              "line": 88,
-              "endLine": 118,
-              "sha256": "d5c43a0432c9cc118132c489fc02e27b66842ff27d900e19315883f092162f38"
+              "line": 91,
+              "endLine": 133,
+              "sha256": "2e64f0a74896c42de09c84d68863f1f3202ba75508862a50102b0b8a00961fc0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerUserPages",
-              "line": 163,
-              "endLine": 192,
+              "line": 179,
+              "endLine": 208,
               "sha256": "9f33913b5c3badd67596bd89db6dc73e54597905e5a6e7a8f90572b9ef76bc5f"
             },
             {
@@ -84086,8 +84086,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyUmacRoleSet",
-              "line": 310,
-              "endLine": 339,
+              "line": 326,
+              "endLine": 355,
               "sha256": "d68eab244a36c8aaca8ceb6e91d867f0f54e21fcbff4126ebd4c8dd457fe11b3"
             },
             {
@@ -84100,15 +84100,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerPageSet",
-              "line": 120,
-              "endLine": 137,
-              "sha256": "a75e3165495aa23ffb19a7e365a4378b7da5363815809a0902d4ba6ba11b2395"
+              "line": 135,
+              "endLine": 153,
+              "sha256": "9f83353726c56f113bd795079377131702e6da99dde06cf5c5c5800fe4bca63c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerUserPages",
-              "line": 194,
-              "endLine": 211,
+              "line": 210,
+              "endLine": 227,
               "sha256": "5c20f306604183f4bec28eb364b37fae75eb5d2d9b527d3b5e001ec94f2f78d9"
             },
             {
@@ -89191,8 +89191,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareUmacRoleSet",
-              "line": 283,
-              "endLine": 308,
+              "line": 299,
+              "endLine": 324,
               "sha256": "cc28153dbdf7fcb153c3d1f6140f3176f36e19dedc5796b89c0bd40c30cc8626"
             }
           ]
@@ -89211,8 +89211,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyUmacRoleSet",
-              "line": 310,
-              "endLine": 339,
+              "line": 326,
+              "endLine": 355,
               "sha256": "d68eab244a36c8aaca8ceb6e91d867f0f54e21fcbff4126ebd4c8dd457fe11b3"
             }
           ]
@@ -89497,9 +89497,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerPageSet",
-              "line": 88,
-              "endLine": 118,
-              "sha256": "d5c43a0432c9cc118132c489fc02e27b66842ff27d900e19315883f092162f38"
+              "line": 91,
+              "endLine": 133,
+              "sha256": "2e64f0a74896c42de09c84d68863f1f3202ba75508862a50102b0b8a00961fc0"
             }
           ]
         },
@@ -89517,9 +89517,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerPageSet",
-              "line": 120,
-              "endLine": 137,
-              "sha256": "a75e3165495aa23ffb19a7e365a4378b7da5363815809a0902d4ba6ba11b2395"
+              "line": 135,
+              "endLine": 153,
+              "sha256": "9f83353726c56f113bd795079377131702e6da99dde06cf5c5c5800fe4bca63c"
             }
           ]
         }
@@ -89548,8 +89548,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerUserPages",
-              "line": 163,
-              "endLine": 192,
+              "line": 179,
+              "endLine": 208,
               "sha256": "9f33913b5c3badd67596bd89db6dc73e54597905e5a6e7a8f90572b9ef76bc5f"
             }
           ]
@@ -89568,8 +89568,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerUserPages",
-              "line": 194,
-              "endLine": 211,
+              "line": 210,
+              "endLine": 227,
               "sha256": "5c20f306604183f4bec28eb364b37fae75eb5d2d9b527d3b5e001ec94f2f78d9"
             }
           ]

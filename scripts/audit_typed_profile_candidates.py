@@ -54,22 +54,28 @@ def elements(document):
 
 def audit(catalog_path, capture_path, prerequisites=()):
     catalog = json.loads(pathlib.Path(catalog_path).read_bytes())
-    capture = json.loads(pathlib.Path(capture_path).read_bytes())
+    # One or more capture reports of the same CPU; a source re-admitted in a later run must be identical.
+    captures = [json.loads(pathlib.Path(path).read_bytes()) for path in (capture_path if isinstance(capture_path, (list, tuple)) else [capture_path])]
     findings = []
     def check(condition, message):
         if not condition:
             findings.append(message)
-    fixtures = {pathlib.Path(entry["sourcePath"]).resolve(): entry for entry in capture["fixtures"]}
-    receipts = {call["result"]["artifact"]["sha256"] for call in capture["calls"]
-                if call["tool"] == "block_read" and call.get("status") == "passed"}
-    cpu = next(a["value"] for item in capture["hardware"]["items"] if item.get("classification") == "CPU"
-               for a in item["attributes"] if a["name"] == "TypeIdentifier")
+    fixtures, receipts, cpus = {}, set(), set()
+    for capture in captures:
+        for entry in capture["fixtures"]:
+            fixtures.setdefault(pathlib.Path(entry["sourcePath"]).resolve(), []).append(entry)
+        receipts |= {call["result"]["artifact"]["sha256"] for call in capture["calls"]
+                     if call["tool"] == "block_read" and call.get("status") == "passed"}
+        cpus |= {a["value"] for item in capture["hardware"]["items"] if item.get("classification") == "CPU"
+                 for a in item["attributes"] if a["name"] == "TypeIdentifier"}
+    check(len(cpus) == 1, "capture reports disagree on the CPU")
+    cpu = next(iter(cpus))
     sources = {}
     for source in catalog["sources"]:
         path, authored = ROOT / source["path"], (ROOT / source["authoredSourcePath"]).resolve()
         check(sha(path) == source["sha256"], "source hash: " + source["path"])
         check(sha(authored) == source["authoredSourceSha256"], "authored hash: " + source["authoredSourcePath"])
-        entry = fixtures.get(authored)
+        entry = next((e for e in fixtures.get(authored, []) if e.get("changeId") == source["changeId"]), None)
         check(entry is not None and entry.get("changeId") == source["changeId"] and entry.get("engineeringVerified") is True,
               "capture entry: " + source["path"])
         check(entry is not None and source["sha256"] in {export["sha256"] for export in entry.get("exports", [])}, "capture export: " + source["path"])
@@ -113,7 +119,9 @@ def audit(catalog_path, capture_path, prerequisites=()):
         equivalence.append({"committed": str(pathlib.Path(committed).as_posix()), "committedSha256": sha(committed),
                             "reexport": str(staged.relative_to(ROOT).as_posix()), "reexportSha256": sha(staged), "equivalent": same})
     return {"schemaVersion": 1, "catalog": str(pathlib.Path(catalog_path).resolve().relative_to(ROOT).as_posix()), "catalogSha256": sha(catalog_path),
-            "capture": str(pathlib.Path(capture_path).resolve().relative_to(ROOT).as_posix()), "captureSha256": sha(capture_path),
+            **({"capture": str(pathlib.Path(capture_path).resolve().relative_to(ROOT).as_posix()), "captureSha256": sha(capture_path)}
+               if not isinstance(capture_path, (list, tuple)) else
+               {"captures": [{"capture": str(pathlib.Path(path).resolve().relative_to(ROOT).as_posix()), "captureSha256": sha(path)} for path in capture_path]}),
             "counts": {"sources": len(catalog["sources"]), "profiles": len(catalog["profiles"]),
                        "templates": sum(len(catalog.get(k, [])) for k in ("creationTemplates", "globalInstanceTemplates", "multiInstanceTemplates"))},
             "prerequisiteEquivalence": equivalence, "findings": findings, "passed": not findings}
@@ -122,11 +130,11 @@ def audit(catalog_path, capture_path, prerequisites=()):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=pathlib.Path, required=True)
-    parser.add_argument("--capture", type=pathlib.Path, required=True)
+    parser.add_argument("--capture", type=pathlib.Path, action="append", required=True, help="Capture report; repeat for several runs of one CPU.")
     parser.add_argument("--prerequisite", type=pathlib.Path, action="append", default=[], help="Committed export a staged re-export must match.")
     parser.add_argument("--output", type=pathlib.Path, required=True)
     args = parser.parse_args()
-    result = audit(args.catalog, args.capture, args.prerequisite)
+    result = audit(args.catalog, args.capture[0] if len(args.capture) == 1 else args.capture, args.prerequisite)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"passed": result["passed"], "findings": result["findings"][:10], **result["counts"]}))
     raise SystemExit(0 if result["passed"] else 1)
