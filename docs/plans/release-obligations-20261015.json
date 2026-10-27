@@ -1,6 +1,23 @@
 {
   "schemaVersion": 1,
   "auditDate": "2026-10-15",
+  "statusRefresh": {
+    "date": "2026-10-27",
+    "fields": [
+      "implementation",
+      "qualification",
+      "currentResult",
+      "planStatus",
+      "prompts[].planExists"
+    ],
+    "sources": [
+      "contracts/feature-catalog.v1.json (catalog 0.4.30)",
+      "docs/plans/release-matrix.v1.json",
+      "docs/verification/",
+      "src/"
+    ],
+    "note": "Per-obligation status reflects current code and retained evidence. counts, remainingWork, nextAction, dependencies, blockers and the historical sections keep the 15 October audit; the 15 October values of the refreshed fields are in commit 9c0b021."
+  },
   "release": "1.0",
   "releaseReady": false,
   "scopePolicy": "All feasible capabilities in existing plans, prompts, roadmap and newly discovered residuals are release obligations. Missing prerequisites and unresolved feasibility remain blockers, not exclusions.",
@@ -38,10 +55,10 @@
       "title": "Release scope and evidence reconciliation",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "audit_delivered",
-      "qualification": "file_audit_only",
+      "implementation": "partial_matrix_generated_variant_cells_open",
+      "qualification": "offline_matrix_ci_test_audits_passed",
       "releaseAccepted": false,
-      "currentResult": "User decision: every feasible capability is required for 1.0. Current source and retained outcomes are reconciled by this audit; live owners are not observed.",
+      "currentResult": "scripts/release_matrix.py freezes catalog 0.4.30 and this ledger into release-matrix.v1.json (340 rows; 441 bound, 1,107 open, 30 deferred cells), and test_release_matrix.py checks it in hosted CI. On 27 October the matrix audit and the Host-only sweep re-bound 281 cells from retained evidence, and this ledger's status fields were refreshed. Per-variant profile cells and the X12/X13 feasibility dispositions remain open.",
       "remainingWork": "Maintain operation/profile closure, current owner handoffs and unresolved feasibility dispositions; no reduced release by default.",
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells.",
       "ownerRole": "Coordinator",
@@ -51,7 +68,11 @@
       "evidenceAndSourceRefs": [
         "docs/TODO.md",
         "docs/STATUS.md",
-        "docs/plans/1.0-release-checklist-20261013.md"
+        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/verification/release-matrix-audit-20261027.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "scripts/release_matrix.py",
+        "docs/plans/release-matrix.v1.json"
       ],
       "packages": [
         "AC-00"
@@ -66,10 +87,10 @@
       "title": "Public API coverage registry and residual inventory",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "planning_inventory_only",
-      "qualification": "semantic_registry_not_qualified",
+      "implementation": "partial_collector_seed_semantics_unreviewed",
+      "qualification": "offline_registry_tests_semantics_open",
       "releaseAccepted": false,
-      "currentResult": "30 named families and 26 AC packages exist; raw 14 October inventory exists. No production coverage collector/registry implementation found.",
+      "currentResult": "The AC-01 first slice exists: metadata-only Inspect-PublicApi.ps1, the api_coverage.py collector/diff and a reviewed seed of 13 operation groups (24 overloads); 39,873 of 39,927 SDK symbols stay untriaged and all 30 manual residual rows are not fully enumerated. The source-binding registry (265 tools, 57 mutation kinds, 340 features) is validated in hosted CI. Semantic, handler/schema and native probe review remain open.",
       "remainingWork": "Reproducible public metadata collector, semantic classification, tool/change/evidence mapping, manual/schema residual queue and update detection. All feasible residuals enter 1.0.",
       "nextAction": "Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns.",
       "ownerRole": "Coverage",
@@ -80,7 +101,11 @@
       "blockers": [],
       "evidenceAndSourceRefs": [
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
-        "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
+        "docs/plans/expansion-plans/api-coverage-inventory-20261014.json",
+        "scripts/api_coverage.py",
+        "contracts/api-coverage/registry.v1.json",
+        "contracts/api-coverage/implementation-bindings.v1.json",
+        "docs/verification/ac01-planning-wave-20261015.md"
       ],
       "packages": [
         "AC-01"
@@ -95,10 +120,10 @@
       "title": "Shared identity signal and target contracts",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial_existing",
-      "qualification": "scoped_existing_evidence",
+      "implementation": "partial_core_contracts_family_identities_missing",
+      "qualification": "offline_contracts_native_rerun_open",
       "releaseAccepted": false,
-      "currentResult": "Object, HMI, diagnostic and UA identities exist; target availability cannot be inferred from catalog labels.",
+      "currentResult": "Shared capture identities (EngineeringIdentity), NativeTargetObservation probes and the operation journal exist and pass offline adapter checks (16 October hardening). Native use is limited to the 15 October watch Bool ModifyValue runs, which predate the hardened binary. target_capabilities and object_resolve have no current run; new-family identities, program lineage and optional-service probes remain open.",
       "remainingWork": "New-family identities, runtime/program lineage, compatible signal references, target observations and bounded optional-service probes.",
       "nextAction": "Reuse existing identities and diagnostic signal schema; define additive contracts before domain integration.",
       "ownerRole": "Integration and identity",
@@ -109,7 +134,11 @@
       "blockers": [],
       "evidenceAndSourceRefs": [
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
-        "contracts/diagnostic-signal-manifest.v1.schema.json"
+        "contracts/diagnostic-signal-manifest.v1.schema.json",
+        "src/TiaMcp.Core/Engineering/EngineeringIdentity.cs",
+        "src/TiaMcp.Core/Engineering/NativeTargetObservation.cs",
+        "docs/reference/engineering-operation-journal.md",
+        "docs/verification/ac0203-adapter-hardening-20261016.md"
       ],
       "packages": [
         "AC-02"
@@ -124,10 +153,10 @@
       "title": "Change jobs interruption and resource recovery",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial_existing",
-      "qualification": "native_family_gates_open",
+      "implementation": "partial_reconcile_core_kinds_families_missing",
+      "qualification": "native_scoped_interruption_passed_families_open",
       "releaseAccepted": false,
-      "currentResult": "Existing prepared changes, journals and scoped recovery are implemented. Offline failure-boundary checks do not prove actual native interruption.",
+      "currentResult": "engineering_admission_reconcile releases unknown admissions only on fresh native proof, without replay. Native kills and cancellation passed for change apply/restore, retrieve, scratch, library_open and two-resource library changes (local.engineering.interruption.rerun.20261024, local.engineering.boundaries.20261024, local.library_interruption.20261025). HMI/technology kinds stay held; other families, power/disk/remote faults remain open.",
       "remainingWork": "New-family jobs/freshness, actual interrupted mutation/cancel/unknown reconciliation, complete multi-resource recovery and fresh host/reopen for every feasible mutation family.",
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet.",
       "ownerRole": "Integration and recovery",
@@ -140,7 +169,11 @@
       ],
       "evidenceAndSourceRefs": [
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-        "docs/verification/session-reliability.md"
+        "docs/verification/session-reliability.md",
+        "docs/verification/admission-reconciliation-20261024.md",
+        "docs/verification/library-lane-c-20261024.md",
+        "src/TiaMcp.Core/EngineeringJobs/AdmissionReconciliation.cs",
+        "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcile.cs"
       ],
       "packages": [
         "AC-03"
@@ -155,10 +188,10 @@
       "title": "Typed LAD and FBD completion",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial",
-      "qualification": "engineering_subsets_passed_runtime_open",
+      "implementation": "partial_builder_scoped_parents_shapes_missing",
+      "qualification": "native_engineering_runtime_passed_matrix_open",
       "releaseAccepted": false,
-      "currentResult": "28 standard and 12 advanced-unit engineering cases have scoped passes. Reference packet covers 38 inputs/45 blocks; 28 candidate rows remain inactive. Original c03 cleanup remains failed.",
+      "currentResult": "All 38 standard and 28 standard created-storage cells pass runtime (local.typed.runtime.reruns.20261024, local.typed.standard-created-storage-runtime.20261026); all 140 unit/namespace route cells pass five gates (local.typed.scoped-runtime.iec-createmulti.20261026). Insertion variants pass engineering. Candidate lineage, unit/namespace transitive parents, custom shapes, native network_insert/call_connection_set and remote guest stay open.",
       "remainingWork": "Candidate source lineage and activation, real builder effects/preservation/reopen/recovery, remaining operands/namespaces/storage families, strict insertion IDs and numeric/FB/timer/counter runtime.",
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs.",
       "ownerRole": "Typed",
@@ -174,7 +207,11 @@
         "docs/plans/typed-lad-fbd-todo.md",
         "docs/verification/typed-p17-qualification.md",
         "artifacts/p17t/workstream-handoff-02.json",
-        "artifacts/p17t/reference-packet-independent-audit-01.json"
+        "artifacts/p17t/reference-packet-independent-audit-01.json",
+        "docs/verification/typed-lad-fbd-qualification-20261024.md",
+        "docs/verification/typed-lad-fbd-route-runtime-20261026.md",
+        "docs/verification/typed-lad-fbd-route-created-storage-20261026.md",
+        "docs/verification/typed-lad-fbd-insertion-20261025.md"
       ],
       "packages": [
         "AC-11",
@@ -190,10 +227,10 @@
       "title": "Reusable PLC component installation",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "guarded_partial",
-      "qualification": "latest_installation_failed",
+      "implementation": "partial_qualification_route_combined_apply_disabled",
+      "qualification": "native_install_runtime_passed_production_open",
       "releaseAccepted": false,
-      "currentResult": "Component05/06 first-checkpoint recovery passed separately. Component07 failed tia_start: AccessDenied with detach/owned_process_exit cleanup failure; installation preservation/reopen/runtime are false.",
+      "currentResult": "Fresh FB/UDT component install with FC/DB/call/bindings, compile, preservation, reopen and first-checkpoint recovery passed (local.plc_component.install.20261024), plus PLCSIM runtime (local.plc_component.runtime.20261024); install into an existing FBD FC caller passed (local.plc_component.existing_caller.20261025). Production library_integrate apply stays disabled; LAD/FB/OB callers, existing-caller runtime and the native05 audit remain open.",
       "remainingWork": "Fresh exact FB/UDT/FC/DB/call/binding installation, full compile and peer preservation, fresh reopen, first-checkpoint recovery and independent runtime; production combined apply stays disabled.",
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation.",
       "ownerRole": "Libraries and components",
@@ -209,7 +246,11 @@
         "docs/plans/library-management-todo.md",
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
-        "artifacts/p17n/component-recovery-06/result.json"
+        "artifacts/p17n/component-recovery-06/result.json",
+        "docs/verification/component-fresh-install-20261024.md",
+        "docs/verification/component-existing-caller-20261025.md",
+        "docs/guides/plc-library-integration-recipes.md",
+        "src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs"
       ],
       "packages": [
         "AC-18"
@@ -224,10 +265,10 @@
       "title": "Owned simulator and full runtime corpus",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial",
-      "qualification": "full_corpus_failed_incomplete",
+      "implementation": "partial_provisioning_simulation_enable_partial",
+      "qualification": "native_frozen_corpus_passed_vm_open",
       "releaseAccepted": false,
-      "currentResult": "Latest full attempt has 48/65 passing cases and 371 assertions. Five probes did not resolve the zero-address observation; later RUN diagnostic failed card/source inventory preservation. Runtime requested-stop remains unqualified.",
+      "currentResult": "The frozen 65-case/358-step/478-assertion corpus passed in one run with an independent audit (local.runtime.frozen.20261024); requested stop, card inventory and lock release passed on this PC (local.runtime.requested-stop.20261024, local.runtime.card-and-lock.20261024). Credential provisioning AC-preserve and project_simulation_enable stay open (10 cells), as do the card-staging access-denied cause and VM items.",
       "remainingWork": "Reviewed isolation resolution, .info/card/project preservation, bounded numeric diagnostic, actual requested stop, then one frozen 65-case/358-step/478-assertion corpus plus separate typed/component behavior.",
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass.",
       "ownerRole": "Runtime",
@@ -242,7 +283,11 @@
       "evidenceAndSourceRefs": [
         "docs/plans/runtime-proof-todo.md",
         "artifacts/continuation-20261009/runtime06-final-audit.json",
-        "artifacts/p15/programmed-runtime-01/report.json"
+        "artifacts/p15/programmed-runtime-01/report.json",
+        "docs/verification/runtime-frozen-20261024.md",
+        "docs/verification/requested-stop-20261024.md",
+        "docs/verification/card-inventory-and-lock-release-20261024.md",
+        "docs/verification/plcsim-startup-discovery-20261024.md"
       ],
       "packages": [
         "AC-25"
@@ -257,10 +302,10 @@
       "title": "Explorer project reviews and analysis",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial",
-      "qualification": "native_and_browser_subsets_passed",
+      "implementation": "partial_alarm_library_providers_unsupported",
+      "qualification": "native_scoped_passed_desktop_roundtrip_open",
       "releaseAccepted": false,
-      "currentResult": "Diamond review, scoped 1000-function native workload and browser checks passed. Full provider breadth and real desktop MCP Apps acceptance remain open.",
+      "currentResult": "Native V21 fixtures passed for the configured-network, technology-connection and software-unit-relation providers and new collections (local.explorer.native-providers.20261026/20261027), scoped relationship completeness (local.explorer.relationship-scope.20261024) and reviews (local.reviews.20261024). VS Code rendered retained snapshots only. Native desktop roundtrip, broader topologies/relations, alarm text lists and libraries remain open.",
       "remainingWork": "All feasible provider/object relationships, exact truncation/completeness, native capture/detail and transport/render performance, desktop host, packaged assets and current-binary qualification.",
       "nextAction": "Map each missing provider to its domain owner; retain 1000-function evidence and prepare real desktop acceptance when its host is available.",
       "ownerRole": "Explorer and integration",
@@ -274,7 +319,11 @@
       "evidenceAndSourceRefs": [
         "docs/plans/project-explorer-plan.md",
         "docs/verification/review-explorer-p16-qualification.md",
-        "docs/verification/project-explorer-large-qualification.md"
+        "docs/verification/project-explorer-large-qualification.md",
+        "docs/verification/explorer-relationship-providers-20261026.md",
+        "docs/verification/explorer-desktop-20261025.md",
+        "docs/verification/project-explorer-relationship-native-20261024.md",
+        "src/TiaMcp.Openness.V21/ProjectModelRelationshipProviders.cs"
       ],
       "packages": [
         "AC-02",
@@ -290,10 +339,10 @@
       "title": "Compatibility vendor fixtures and scale",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial",
-      "qualification": "matrix_incomplete",
+      "implementation": "partial_upgrade_vendor_routes_matrix_incomplete",
+      "qualification": "native_scoped_upgrades_vendor_scale_open",
       "releaseAccepted": false,
-      "currentResult": "Accepted VM offline/SSH/recovery evidence remains valid within its scope. Broad library/vendor/target/scale promises are not completed.",
+      "currentResult": "Native DMC V14 SP1 to V19 library upgrades into V21, vendor intake and locked-source refusal passed (local.library_upgrades.20261024, local.library_vendor.20261025, local.library_units.20261025), and the independent vendor intake review is complete. Scale is measured only in managed code. Native 10,000-element/100-component scale, a V20 library, PAL native import, Unicode/transfer cases and the VM requalification remain open.",
       "remainingWork": "Independent PLC and PLC/HMI vendor packages; compatible V14-V20 libraries upgraded into V21; incompatible/locked/Unicode/quota/transfer cases; 10000 elements/1000 dependency nodes/100 components; target/product matrix.",
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates.",
       "ownerRole": "Qualification and libraries",
@@ -307,7 +356,11 @@
       "evidenceAndSourceRefs": [
         "docs/plans/library-management-plan.md",
         "docs/plans/1.0-release-checklist-20261013.md",
-        "docs/verification/deployment-reliability-status.md"
+        "docs/verification/deployment-reliability-status.md",
+        "docs/verification/library-scale-20261023.md",
+        "docs/verification/vendor-intake-review-20261025.md",
+        "docs/verification/library-lane-c-20261024.md",
+        "docs/plans/library-management-todo.md"
       ],
       "packages": [
         "AC-25"
@@ -322,10 +375,10 @@
       "title": "Combined release CI packaging and installation",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial",
-      "qualification": "release_not_accepted",
+      "implementation": "partial_ci_offline_package_release_missing",
+      "qualification": "offline_hosted_ci_passed_release_open",
       "releaseAccepted": false,
-      "currentResult": "Retained p17 combined validation and 14 October 13-suite offline regression passed their frozen scopes. Current contract check passes. Hosted CI/final combined release and installed-package acceptance are unproved.",
+      "currentResult": "Hosted CI (Python contracts with the release-matrix check, four managed shards, OPC UA, full portable package and relocation, Explorer Playwright) passed on main 376cfa4 on 27 October; on 23 October runs had been refused for billing. The 23 October local aggregate passed 1,712 Python tests and 53 package stages. Native/runtime combined release, the immutable engineering bundle, an installation/rollback receipt and VM requalification remain open.",
       "remainingWork": "All feasible obligation gates closed; source/binary/profile freeze; current combined offline/browser/native/runtime evidence, hosted CI, immutable bundle/launcher/relocation/shutdown, notices/version consistency and final installation/rollback receipt.",
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close.",
       "ownerRole": "Coordinator and release",
@@ -382,7 +435,11 @@
         "artifacts/p17r/combined-validation-02.json",
         "artifacts/trace-diagnostics-full-20261014/regression/result.json",
         "scripts/Test-Offline.ps1",
-        "scripts/Package.ps1"
+        "scripts/Package.ps1",
+        ".github/workflows/offline.yml",
+        "docs/verification/todo-integration-20261023.md",
+        "docs/verification/catalog-requalification-20261024.md",
+        "scripts/Test-OfflinePackage.ps1"
       ],
       "packages": [
         "AC-25"
@@ -397,10 +454,10 @@
       "title": "VCI and external Git",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_host_git_tools_native_missing",
+      "qualification": "host_only_verified_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Existing export/artifact/review infrastructure is reusable; no VCI adapter/tool found.",
+      "currentResult": "12 Host vci_* tools (local Git prepare/commit/history/branches/materialize, package manifests, three-way conflict reports) pass local.hostonly.vci.20261027 (72 checks, real Git, no worker). A 15 Oct native probe exported 12 SCL/DB/SimaticML/SimaticSD profiles; SCL drops en-GB, SD omits comments and .s7res. Native workspace/mapping/sync, import, isolated restore and remote Git remain open.",
       "remainingWork": "Workspace/mapping/group lifecycle, formats and companions, directed synchronization, two-sided conflicts, external Git provenance and isolated revision restore.",
       "nextAction": "Run prompt 01; start manifest/diff design after shared identity/recovery contracts.",
       "ownerRole": "VCI",
@@ -412,7 +469,11 @@
       ],
       "blockers": [],
       "evidenceAndSourceRefs": [
-        "docs/guides/project-reviews.md"
+        "docs/guides/project-reviews.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/plans/expansion-plans/vci-and-git.md",
+        "docs/reference/vci-native-profiles-20261015.md",
+        "src/TiaMcp.Host/VciTools.cs"
       ],
       "packages": [
         "AC-06"
@@ -431,7 +492,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/01-vci-and-git.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
       "executionNotes": [
@@ -447,10 +508,10 @@
       "title": "Watch and force table engineering",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_watch_authoring_force_edit_missing",
+      "qualification": "native_scoped_passed_artifacts_not_retained",
       "releaseAccepted": false,
-      "currentResult": "Diagnostic signal manifests exist; no native table adapter found. Offline force intentions and active forcing are distinct capabilities.",
+      "currentResult": "Watch read/prepare/apply/authoring/recovery tools and a preserving document editor exist; force tables are capture-only and table rename/delete, access-rule edits and live monitoring/forcing are absent. Scoped native Bool edit and creation lifecycles passed on 15-16 October (production-watch-wave, WT-05, WT-06), but no local.* record is retained, so 0/81 matrix cells are bound and a native rerun is needed.",
       "remainingWork": "Table/group lifecycle, ordered entries/comments/formats, diagnostic generation and access rules; separately establish feasibility and acceptance of live monitoring/force operations.",
       "nextAction": "Run prompt 02; resolve public entry grammar/accessors and prepare PR-02, then AC-05 without waiting for AX.",
       "ownerRole": "Diagnostics and watch tables",
@@ -463,7 +524,11 @@
         "B01"
       ],
       "evidenceAndSourceRefs": [
-        "contracts/diagnostic-signal-manifest.v1.schema.json"
+        "contracts/diagnostic-signal-manifest.v1.schema.json",
+        "docs/verification/production-watch-wave-20261015.md",
+        "docs/verification/wt06-exact-authoring-20261016.md",
+        "docs/verification/production-host-qualification-20261016.md",
+        "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
       ],
       "packages": [
         "AC-05"
@@ -482,7 +547,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/02-watch-and-force-table-engineering.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "interfaceDependencies": [
         "Existing D17 signal manifest and exact instance resolution; native AX acquisition is not a prerequisite."
       ],
@@ -494,10 +559,10 @@
       "title": "Project translations",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_offline_review_native_import_disabled",
+      "qualification": "native_one_fixture_passed_categories_failed",
       "releaseAccepted": false,
-      "currentResult": "Bilingual HMI resource evidence exists; no project-wide translation adapter found.",
+      "currentResult": "The 10 offline translation_* tools are verified Host-only (local.hostonly.translation.20261027). A narrow native de-DE/en-GB packet (no-op and one block-comment import with readback, compile, reopen and checkpoint recovery) passed on one fixture on 16 October, but category filtering leaked rows, so production import stays disabled. Language lifecycle, filtered export and native catalog rows remain open.",
       "remainingWork": "Filtered keyed XLSX export/reimport, language lifecycle, source/translation distinctions, placeholders, glossary, stale keys, partial import and unrelated-language preservation.",
       "nextAction": "Run prompt 03; agree native keys and text ownership with HMI and alarms.",
       "ownerRole": "Translations and HMI",
@@ -508,7 +573,11 @@
       ],
       "blockers": [],
       "evidenceAndSourceRefs": [
-        "fixtures/hmi/unified-text-list/README.md"
+        "fixtures/hmi/unified-text-list/README.md",
+        "docs/verification/translation-native-import-20261016.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/plans/expansion-plans/project-translations.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.TranslationImport.cs"
       ],
       "packages": [
         "AC-07"
@@ -527,7 +596,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/03-project-translations.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
       "executionNotes": [
@@ -543,10 +612,10 @@
       "title": "OPC UA engineering",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "offline_module_implemented_native_missing",
-      "qualification": "offline_frozen_scope_passed_native_not_run",
+      "implementation": "partial_offline_nodeset_tools_native_missing",
+      "qualification": "host_only_verified_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "31 managed and 9 Python checks plus CLI impact/preservation passed. No Host UA registration/native adapter. 11 shared inputs differ from that frozen source manifest.",
+      "currentResult": "The offline module is integrated as 8 Host opcua_* NodeSet tools (inspect, compare, dependencies, paging, reopen, artifacts), verified by local.hostonly.opcua.20261027 (53 checks, no worker). The worker has no OPC UA engineering adapter; the UA-03 eligibility/export packet is prepared but not run. Native discovery/export, mappings, category mutations, security and preserve/reopen/recovery remain open.",
       "remainingWork": "Integrate existing module; native discovery/export, exact PLC mappings, category lifecycle/generation, roles/certificates, preserve/reopen/recover, failure/scale/profile breadth and runtime handoff.",
       "nextAction": "Use existing UA handoff; integrate with current shared sources, validate combined build, then UA-03/UA-Q00 before mapping mutations.",
       "ownerRole": "OPC UA",
@@ -563,7 +632,11 @@
       "evidenceAndSourceRefs": [
         "docs/reference/opc-ua-api.md",
         "docs/verification/opc-ua-offline-20261014.md",
-        "docs/plans/expansion-plans/opc-ua-engineering.md"
+        "docs/plans/expansion-plans/opc-ua-engineering.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/verification/opc-ua-host-delivery-20261016.md",
+        "docs/verification/opc-ua-native-eligibility-packet-20261016.md",
+        "src/TiaMcp.Host/OpcUaTools.cs"
       ],
       "packages": [
         "AC-08"
@@ -598,10 +671,10 @@
       "title": "AutomationML and CAx",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_offline_aml_tools_native_missing",
+      "qualification": "host_only_verified_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Existing hardware identities and checkpoints are reusable; no CAx adapter found.",
+      "currentResult": "6 Host automationml_* tools inspect and compare CAEX 2.15/3.0 uploads against pinned embedded XSDs, verified by local.hostonly.automationml.20261027 (69 checks, no worker). The worker has no CaxProvider adapter. Native AML export/import, device/topology identities, transfer diagnostics, merge effects and recovery remain open.",
       "remainingWork": "AML inspect/export/diff/import, exact device/topology/catalog profiles, companion/library references, full transfer diagnostics, wider merge effects and recovery.",
       "nextAction": "Run prompt 05 with communications owner; obtain supported schema and independently authored ECAD fixture.",
       "ownerRole": "Hardware exchange",
@@ -614,7 +687,11 @@
         "B04"
       ],
       "evidenceAndSourceRefs": [
-        "docs/guides/network-inspection.md"
+        "docs/guides/network-inspection.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/verification/automationml-workflow-20261016.md",
+        "docs/plans/expansion-plans/automationml-cax.md",
+        "src/TiaMcp.Host/AutomationMlTools.cs"
       ],
       "packages": [
         "AC-09"
@@ -633,7 +710,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/05-automationml-cax.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
       "executionNotes": [
@@ -649,10 +726,10 @@
       "title": "Native Siemens Test Suite",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_style_jobs_app_system_missing",
+      "qualification": "offline_checks_native_execution_not_run",
       "releaseAccepted": false,
-      "currentResult": "Custom block harness exists; no native TestSuite bridge found. Custom corpus remains required.",
+      "currentResult": "Style plan/job/result tools, a V21 Test Suite worker and supplied-result import/review exist, with native execution and recovery profiles disabled; application and system tests are only counted by probes. A 16 October native scope-editor probe and license key check ran, but no executor run, effective-scope proof or local.* record exists; 0/104 matrix cells are bound.",
       "remainingWork": "Style/application/system definitions and results, bounded jobs, actual cancel/interruption semantics, license absence and endpoint behavior.",
       "nextAction": "Run prompt 06 now; implement pure result/job layer independently; schedule application tests in exclusive simulator window.",
       "ownerRole": "Test Suite",
@@ -667,7 +744,11 @@
       ],
       "evidenceAndSourceRefs": [
         "scripts/run_block_tests.py",
-        "docs/guides/block-testing.md"
+        "docs/guides/block-testing.md",
+        "docs/verification/testsuite-worker-integration-20261016.md",
+        "docs/verification/testsuite-result-review-20261016.md",
+        "docs/plans/expansion-plans/native-test-suite.md",
+        "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs"
       ],
       "packages": [
         "AC-17"
@@ -686,7 +767,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/06-native-test-suite.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "interfaceDependencies": [
         "D16 only for system-test endpoints; simulator exclusive window for application tests."
       ],
@@ -698,10 +779,10 @@
       "title": "Software unit lifecycle",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_scoped_object_support",
-      "qualification": "scoped_unit_fixtures_only",
+      "implementation": "partial_scoped_edits_review_lifecycle_missing",
+      "qualification": "native_unit_scope_passed_lifecycle_open",
       "releaseAccepted": false,
-      "currentResult": "Inspection and edits inside selected units exist; lifecycle/create/move breadth remains backlog.",
+      "currentResult": "Typed edits, library instantiation and relation reads pass natively inside fixture-seeded units (local.typed.scoped-runtime.20261026, local.library_units.20261025, local.library_unit_relations.20261027, local.explorer.native-providers.20261027); software_unit_review tools are offline-verified only. No MCP route creates, copies, renames, deletes, relates, publishes or moves units or blocks; units come from UnitSeeder fixtures.",
       "remainingWork": "Create/copy/rename/delete, relations/publication/namespaces, dependency/visibility/cycle rules, unit-library templates and identity-preserving move feasibility.",
       "nextAction": "Run prompt 07 with typed/library owners; use the existing scope resolver.",
       "ownerRole": "Units and typed/library owners",
@@ -713,7 +794,11 @@
       "blockers": [],
       "evidenceAndSourceRefs": [
         "docs/reference/object-model.md",
-        "docs/plans/typed-lad-fbd-todo.md"
+        "docs/plans/typed-lad-fbd-todo.md",
+        "src/TiaMcp.Core/SoftwareUnits/SoftwareUnitReview.cs",
+        "docs/plans/expansion-plans/software-unit-lifecycle.md",
+        "docs/verification/software-unit-review-20261016.md",
+        "docs/verification/library-lane-c-20261024.md"
       ],
       "packages": [
         "AC-11"
@@ -732,7 +817,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/07-software-unit-lifecycle.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -741,10 +826,10 @@
       "title": "Communication connection engineering",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_inspection_only",
-      "qualification": "hmi_endpoint_subset_only",
+      "implementation": "partial_offline_review_no_native_adapter",
+      "qualification": "native_hmi_endpoint_probe_only",
       "releaseAccepted": false,
-      "currentResult": "HmiBindings uses CommunicationManagement for native endpoint evidence; no general transport mutation adapter found.",
+      "currentResult": "Offline connection_review/connection_review_page compare supplied before/after observations (79 managed and 33 MCP checks, 16 Oct; catalog unverified). Native transport connection create/update/delete, resources/TSAPs and communication proof do not exist. Native endpoint evidence is limited to the HMI CommunicationManagement owner proof in the prepare-only probe local.hmi.external-tag-prepare.20261026.",
       "remainingWork": "Supported S7/TCP/UDP/ISO/FDL/PtP/HMI connection operations, resources/partners/TSAPs, both-device preservation/compile and separate runtime communication evidence.",
       "nextAction": "Run prompt 08 with CAx; native endpoint identity contract first. AML dependency only for paths that use AML.",
       "ownerRole": "Connections and hardware",
@@ -757,7 +842,11 @@
         "B04"
       ],
       "evidenceAndSourceRefs": [
-        "src/TiaMcp.Openness.V21/OpennessSession.HmiBindings.cs"
+        "src/TiaMcp.Openness.V21/OpennessSession.HmiBindings.cs",
+        "docs/verification/connection-review-20261016.md",
+        "docs/plans/expansion-plans/communication-connections.md",
+        "src/TiaMcp.Core/Connections/ConnectionReview.cs",
+        "docs/verification/hmi-external-tag-create-20261026.md"
       ],
       "packages": [
         "AC-10"
@@ -776,7 +865,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/08-communication-connections.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "interfaceDependencies": [
         "D05 only where a workflow uses AML; ordinary typed connections need no completed CAx adapter."
       ],
@@ -788,10 +877,10 @@
       "title": "Online comparison DB snapshots and station upload",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found_outside_simulation",
-      "qualification": "not_run",
+      "implementation": "partial_offline_snapshot_review_only",
+      "qualification": "offline_checks_passed_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Offline project comparisons and simulator provisioning exist; neither implements physical online comparison/snapshot/upload.",
+      "currentResult": "db_snapshot_review and db_snapshot_review_page inspect and compare supplied DB snapshot XML against an exact saved DB; 67 managed and 30 actual Host MCP checks passed on 16 October, uncurated (0/14 cells bound). No online compare, fingerprint read, snapshot capture/export, upload to a new project or value write exists; OnlineProvider is used only for offline guards and PLCSIM provisioning.",
       "remainingWork": "Authenticated target/program identity, fingerprints, actual/snapshot/start values, upload to a new project; separately qualify feasible writes/download/control.",
       "nextAction": "Run prompt 09 jointly with runtime/security contracts; first read-only compare and snapshot export.",
       "ownerRole": "Online diagnostics",
@@ -805,7 +894,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs"
+        "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
+        "docs/verification/db-snapshot-review-20261016.md",
+        "docs/plans/expansion-plans/online-compare-snapshots-upload.md",
+        "src/TiaMcp.Core/DbSnapshots/DbSnapshotReview.cs",
+        "src/TiaMcp.Host/DbSnapshotTools.cs"
       ],
       "packages": [
         "AC-16"
@@ -824,7 +917,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/09-online-compare-snapshots-upload.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -833,10 +926,10 @@
       "title": "Startdrive",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_offline_profile_review_no_adapter",
+      "qualification": "offline_review_checks_catalog_unverified",
       "releaseAccepted": false,
-      "currentResult": "Catalog lists drives.engineering not implemented; no Startdrive adapter found.",
+      "currentResult": "drive_profile_review/_page compare supplied parameter, BICO and v2 telegram/address observations offline (74 managed checks on 17 Oct, typed telegrams 18 Oct); catalog unverified. drives.engineering stays not_implemented: no Startdrive/DriveParameter adapter exists in the worker, and no product, online read, transfer or drive trace has been run.",
       "remainingWork": "Drive/component/parameter lifecycle, types/units/ranges, BICO/telegrams/DRIVE-CLiQ where feasible; separately qualified online reads/transfers/activation and drive trace.",
       "nextAction": "Run prompt 10 with motion owner; define one complete offline drive profile and obtain product/license/fixture evidence.",
       "ownerRole": "Drives",
@@ -851,7 +944,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/reference/engineering-coverage.md"
+        "docs/reference/engineering-coverage.md",
+        "docs/plans/expansion-plans/startdrive.md",
+        "docs/verification/drive-profile-review-20261017.md",
+        "docs/verification/drive-telegrams-20261018.md",
+        "src/TiaMcp.Core/Drives/DriveProfileReview.cs"
       ],
       "packages": [
         "AC-13"
@@ -870,7 +967,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/10-startdrive.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -879,10 +976,10 @@
       "title": "PLC alarms and ProDiag",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_supplied_analysis_no_native_adapter",
+      "qualification": "offline_supplied_checks_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "HMI alarms and static graph infrastructure exist; no dedicated PLC alarm/ProDiag adapter found.",
+      "currentResult": "Offline supplied-evidence slices (17-18 October) pass frozen aggregates: alarm context in diagnostics, UDT/supervision impact paths in reviews, alarm-text inheritance in translation review and executable/runtime-capture alarm bindings. No alarm class, PLC alarm text, supervision or ProDiag adapter exists in src and there are no catalog rows; Explorer reports alarm text lists unsupported.",
       "remainingWork": "Classes/text lists/supervision lifecycle, stable alarm IDs, translations and generated dependencies, broken-member impact, separately tested runtime acknowledgment/text substitution.",
       "nextAction": "Run prompt 11 after translation contract agreement; preserve PLC-owned and HMI-owned alarm distinction.",
       "ownerRole": "Alarms and HMI",
@@ -896,7 +993,11 @@
         "B04"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/hmi-remaining-work.md"
+        "docs/plans/hmi-remaining-work.md",
+        "docs/plans/expansion-plans/plc-alarms-prodiag.md",
+        "docs/verification/alarm-executable-bindings-20261018.md",
+        "docs/verification/alarm-types-20261017.md",
+        "src/TiaMcp.Core/Diagnostics/DiagnosticAlarmBindings.cs"
       ],
       "packages": [
         "AC-12"
@@ -915,7 +1016,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/11-plc-alarms-prodiag.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -924,10 +1025,10 @@
       "title": "PLC web applications access and security",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found_general_adapter",
-      "qualification": "not_run",
+      "implementation": "partial_offline_reviews_no_native_adapter",
+      "qualification": "host_only_loopback_checks_catalog_unverified",
       "releaseAccepted": false,
-      "currentResult": "Scratch simulator security helpers exist; they are not general minimum-rights engineering.",
+      "currentResult": "Offline web_application_review (108 managed checks) and the read-only runtime_web_* Web API client (188 checks against loopback TLS with DPAPI and Host restart, 17 Oct) exist; all catalog rows stay unverified. No native web-app, default-page, webserver-user or access-control adapter exists; scratch security helpers remain simulator-only. No physical CPU or deployment run.",
       "remainingWork": "Web apps/default pages, CPU users/roles/access/certificates and external effects; separately qualified asset deployment and supported online actions.",
       "nextAction": "Run prompt 12 with UA/runtime owners; freeze distinct UMAC/CPU/legacy-web/UA role identities.",
       "ownerRole": "Security and web",
@@ -941,7 +1042,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/guides/environment-diagnostics.md"
+        "docs/guides/environment-diagnostics.md",
+        "docs/plans/expansion-plans/web-server-access-configuration.md",
+        "docs/verification/web-application-review-20261017.md",
+        "docs/verification/physical-runtime-sessions-20261017.md",
+        "docs/verification/host-only-qualification-20261027.md"
       ],
       "packages": [
         "AC-14"
@@ -960,7 +1065,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/12-web-server-access-configuration.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -969,10 +1074,10 @@
       "title": "Motion and technology objects",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial",
-      "qualification": "selected_axis_encoder_only",
+      "implementation": "partial_lifecycle_reviews_connection_writes_missing",
+      "qualification": "native_axis_encoder_fixtures_only",
       "releaseAccepted": false,
-      "currentResult": "technology_read and TO create/parameter/delete exist; connected encoder/selected axis evidence does not cover all families.",
+      "currentResult": "technology_read (with read-only connection-service observation), to_create/to_parameters/to_delete and offline technology_profile_review v1-v4 exist. Native lifecycle evidence is still only the 8 Oct axis/encoder records, now unretained and predating the 17 Oct repairs; local.explorer.native-providers.20261027 re-read one seeded encoder connection. MCP connection writes, version profiles, cams, interpreter and other families are open.",
       "remainingWork": "Version/type profiles, drive/telegram/axis/encoder links, cams/measuring inputs/kinematics/PID/counting/Ident/interpreter mappings; separate runtime and commissioning evidence.",
       "nextAction": "Run prompt 13 with Startdrive; extend accepted encoder evidence, then complete connected profiles.",
       "ownerRole": "Technology and drives",
@@ -988,7 +1093,11 @@
       ],
       "evidenceAndSourceRefs": [
         "fixtures/technology-profiles/README.md",
-        "docs/verification/engineering-gap-qualification.md"
+        "docs/verification/engineering-gap-qualification.md",
+        "docs/plans/expansion-plans/motion-and-technology-objects.md",
+        "docs/verification/technology-profile-review-20261017.md",
+        "docs/verification/explorer-relationship-providers-20261026.md",
+        "docs/verification/release-matrix-audit-20261027.md"
       ],
       "packages": [
         "AC-13"
@@ -1007,7 +1116,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/13-motion-and-technology-objects.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "interfaceDependencies": [
         "D10 drive profile for connected drive/axis recipes; independent non-drive TO profiles can proceed separately."
       ],
@@ -1019,10 +1128,10 @@
       "title": "Safety and F IO validation tooling",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_inspection_comment_import",
-      "qualification": "narrow_comment_fixture_only",
+      "implementation": "partial_inspect_comment_import_offline_review",
+      "qualification": "native_comment_fixture_only_unretained",
       "releaseAccepted": false,
-      "currentResult": "Safety inspection and narrow comment import evidence exist; no broad F-logic/F-I/O/Safety Validation acceptance.",
+      "currentResult": "safety_inspect, the narrow safety_import_xml comment route and offline safety_evidence_review/report (96 managed and 87 MCP checks) exist; 17-18 Oct work hardened the safety harness offline. Native evidence remains the 8 Oct comment fixture (local.layers.safety-requalified.20261008), unretained and predating later inspection changes. No F-I/O, F-logic, signature admin or Safety Validation adapter; no safety CPU run since.",
       "remainingWork": "Signatures/admin/reports, activation definitions and execution, reviewed F-I/O profiles, feasible F-logic/runtime-group changes, protection and interruption/recovery. Bridge tests do not establish functional-safety approval.",
       "nextAction": "Run prompt 14; read/report first, then exact F-module and activation profiles with specialist bench prerequisites.",
       "ownerRole": "Safety",
@@ -1037,7 +1146,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/verification/safety-verification.md"
+        "docs/verification/safety-verification.md",
+        "docs/plans/expansion-plans/safety-validation-and-fio.md",
+        "docs/verification/safety-evidence-review-20261017.md",
+        "docs/verification/release-matrix-audit-20261027.md",
+        "src/TiaMcp.Core/Safety/SafetyEvidenceReview.cs"
       ],
       "packages": [
         "AC-15"
@@ -1056,7 +1169,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/14-safety-validation-and-fio.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -1065,10 +1178,10 @@
       "title": "SiVArc HMI generation",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "not_found_sivarc_adapter_offline_comparison_only",
+      "qualification": "not_run_public_sivarc_api_absent",
       "releaseAccepted": false,
-      "currentResult": "Recorded installed public API inventory lacks SiVArc; no local adapter or qualified generation.",
+      "currentResult": "No SiVArc adapter or Sivarc reference exists in src or scripts, and the installed V21 PublicAPI has no Sivarc assembly. Only the portable SV-02 slice landed: component review v3/v4 compares supplied output files and derives the Classic BackColor expectation (17-18 October, offline). Generation, rules, layouts and preserving regeneration remain unimplemented and unqualified.",
       "remainingWork": "Rule/template/expression/layout lifecycle, initial generation and preserving regeneration, exact PLC/library/HMI bindings, manual edits, native visual/runtime and interrupted generation.",
       "nextAction": "Run prompt 15 feasibility now; obtain licensed compatible product/API/fixtures while HMI/library prerequisites progress.",
       "ownerRole": "SiVArc with HMI and libraries",
@@ -1087,7 +1200,10 @@
       ],
       "evidenceAndSourceRefs": [
         "docs/plans/hmi-integration-plan.md",
-        "docs/plans/library-management-plan.md"
+        "docs/plans/library-management-plan.md",
+        "docs/plans/expansion-plans/sivarc-hmi-generation.md",
+        "docs/verification/hmi-derived-effects-20261018.md",
+        "docs/verification/hmi-output-effects-20261017.md"
       ],
       "packages": [
         "AC-19"
@@ -1106,7 +1222,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/15-sivarc-hmi-generation.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
       "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
     },
@@ -1115,10 +1231,10 @@
       "title": "Physical PLC runtime",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_readonly_web_ua_no_control",
+      "qualification": "host_only_loopback_passed_physical_not_run",
       "releaseAccepted": false,
-      "currentResult": "Only owned PLCSIM Advanced runtime is implemented; no physical Web/UA runtime adapter.",
+      "currentResult": "Read-only Web API sessions (browse/read/status), bounded polling captures with analysis, and an OPC UA client with polling, subscriptions, events and same-session reconnect exist; write, control and download do not. Only loopback TLS/UA fixture checks ran (17-25 October); no physical CPU, program association or curated record exists, so 0/27 D16 cells are bound.",
       "remainingWork": "Exact endpoint/program/session/permissions, reads/browse/subscriptions/capture, timing/quality/dropouts/reconnect; assess and independently qualify every feasible write/control/download capability.",
       "nextAction": "Run prompt 16 with 09/12; build protocol fakes without connecting to a network; obtain owned bench prerequisites.",
       "ownerRole": "Physical runtime",
@@ -1132,7 +1248,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/guides/simulation.md"
+        "docs/guides/simulation.md",
+        "docs/plans/expansion-plans/physical-plc-runtime.md",
+        "docs/verification/physical-runtime-sessions-20261017.md",
+        "docs/verification/runtime-captures-20261017.md",
+        "docs/verification/opcua-controlled-reconnect-20261025.md"
       ],
       "packages": [
         "AC-16"
@@ -1151,7 +1271,7 @@
         ]
       },
       "prompt": "docs/plans/expansion-prompts/16-physical-plc-runtime.md",
-      "planStatus": "missing_standalone_plan",
+      "planStatus": "present",
       "interfaceDependencies": [
         "D04 for configured UA model handoff; Web-only and already configured UA targets do not require all UA engineering mutations first."
       ],
@@ -1163,10 +1283,10 @@
       "title": "Bug driven native trace diagnostics",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "offline_partial",
-      "qualification": "offline_passed_native_incomplete",
+      "implementation": "partial_offline_tools_native_trace_missing",
+      "qualification": "host_only_verified_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Eight tools, 18 offline groups and authored conveyor fixture passed; actual native mapping/settings/lifecycle/acquisition are not achieved. Latest source receipt matches 21/22 files; mismatch is later AX documentation only.",
+      "currentResult": "18 D17 diagnostic, trace, experiment and UA-diagnostic features are verified Host-only (local.hostonly.diagnostics/.diagnostic-experiments/.diagnostic-ua.20261027; 54 cells bound). diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export stay unverified (6 cells). Native instance oracle, trace configuration/lifecycle, actual fault capture and the AX route (B06) remain open.",
       "remainingWork": "Native instance/call/binding oracle, language/storage fidelity, supported trace backend, full settings readback, preserved lifecycle, actual fault capture and real measurement dialects; long-term/project/drive/safety families separately.",
       "nextAction": "Prepare native fidelity packet independently. TD-AX-01 waits for licensed package/schema and trigger/readback/interoperability resolution; watch tables do not wait for it.",
       "ownerRole": "Diagnostics",
@@ -1184,7 +1304,11 @@
         "docs/verification/trace-diagnostics-completion-audit-20261014.md",
         "docs/plans/expansion-plans/bug-driven-trace-simatic-ax-feasibility.md",
         "artifacts/trace-diagnostics-ax-audit-20261014/result.json",
-        "docs/plans/expansion-plans/bug-driven-trace-diagnostics.md"
+        "docs/plans/expansion-plans/bug-driven-trace-diagnostics.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/verification/diagnostic-experiments-20261020.md",
+        "docs/verification/diagnostic-runtime-acquisition-20261020.md",
+        "docs/verification/diagnostic-ua-binding-20261022.md"
       ],
       "packages": [
         "AC-04"
@@ -1219,10 +1343,10 @@
       "title": "Platform project lifecycle and metadata",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial",
-      "qualification": "scoped_native_evidence",
+      "implementation": "partial_session_tools_project_ops_missing",
+      "qualification": "native_scoped_tools_verified_ops_open",
       "releaseAccepted": false,
-      "currentResult": "Project/session/identity/capability infrastructure exists.",
+      "currentResult": "Eight session/project tools (tia_discover, tia_start, tia_attach, tia_detach, tia_capabilities, tia_session_status, project_open, project_retrieve) are natively verified on one owned scratch project (local.smoke.20261024, local.reliability.20261024, local.reopen.20261024); tia_create_scratch stays unverified. The worker has no project upgrade, copy, properties, language/settings, read-only, native compare or CustomIdentity operation.",
       "remainingWork": "All feasible project copy/upgrade/properties/languages/settings/read-only/compare/custom identity operations, exact metadata coverage, failure/reconnect/scale.",
       "nextAction": "Use AC-01 residual review to split missing operation/profile cells from already qualified tools.",
       "ownerRole": "Platform",
@@ -1236,7 +1360,10 @@
         "B01"
       ],
       "evidenceAndSourceRefs": [
-        "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs"
+        "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
+        "docs/verification/release-matrix-audit-20261027.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
+        "src/TiaMcp.Openness.V21/PortalProcesses.cs"
       ],
       "packages": [
         "AC-02",
@@ -1262,10 +1389,10 @@
       "title": "Library lifecycle and engineering documents",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial",
-      "qualification": "selected_lifecycle_only",
+      "implementation": "partial_plc_lifecycle_hmi_combined_missing",
+      "qualification": "native_plc_passed_hmi_scale_open",
       "releaseAccepted": false,
-      "currentResult": "18 library change kinds and earlier 63-stage lifecycle evidence exist; complete component/HMI/lifecycle acceptance remains open.",
+      "currentResult": "18 library change kinds and Host-only package intake exist. Native V21 runs passed releases with PLCSIM behavior (local.library_releases.20261026), dependencies, lifecycle, formats, V14-V18 upgrades, two PLCs, units, protected FBs, unit relations (local.library_unit_relations.20261027) and kill-point multi-resource recovery (local.library_interruption.20261025). HMI lifecycles, combined integrate, namespaces, V20/PAL import and native scale open.",
       "remainingWork": "Exact version/default/release/edit/discard/copy/publish/delete/cleanup, dependency closure/collisions/cycles, PLC/UDT/unit/HMI formats, vendor/upgrade/scale, actual interruption and multi-resource recovery.",
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes.",
       "ownerRole": "Libraries",
@@ -1279,7 +1406,11 @@
       ],
       "evidenceAndSourceRefs": [
         "docs/plans/library-management-plan.md",
-        "docs/plans/library-management-todo.md"
+        "docs/plans/library-management-todo.md",
+        "docs/verification/library-lane-c-20261024.md",
+        "docs/verification/library-scale-20261023.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
+        "src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs"
       ],
       "packages": [
         "AC-18"
@@ -1304,10 +1435,10 @@
       "title": "UMAC UMC certificates and operational settings",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_scratch_helpers",
-      "qualification": "general_scope_not_run",
+      "implementation": "partial_offline_reviews_scratch_umac_only",
+      "qualification": "offline_review_checks_catalog_unverified",
       "releaseAccepted": false,
-      "currentResult": "Authentication/scratch security patterns exist; broad project/central security adapter absent.",
+      "currentResult": "Offline access_review (73 managed, 42 MCP checks) and public_certificate_review (96 managed, 68 MCP checks) exist; catalog unverified. Native UMAC use is limited to the scratch runtime user for simulator provisioning (local.sim.provision.20261024, AC-preserve open). No project/UMC rights, password policy, certificate lifecycle, syslog or confidential-settings adapter exists.",
       "remainingWork": "Roles/groups/function rights, passwords policies, UMC consistency, certificate lifecycle, confidential settings, syslog/time/access and externally consistent recovery.",
       "nextAction": "Extend prompt 12 with X03 residuals and exact external-resource boundaries; no generic credential reset.",
       "ownerRole": "Security",
@@ -1321,7 +1452,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/reference/capabilities.md"
+        "docs/reference/capabilities.md",
+        "docs/verification/access-review-20261017.md",
+        "docs/verification/public-certificate-review-20261017.md",
+        "docs/plans/expansion-plans/web-server-access-configuration.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.ScratchRuntimeUser.cs"
       ],
       "packages": [
         "AC-14"
@@ -1346,10 +1481,10 @@
       "title": "Native TIA Add In companion",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_detached_review_native_companion_missing",
+      "qualification": "host_only_passed_uncurated_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Public API roadmap exists; no companion project/source implementation found.",
+      "currentResult": "addin_selection_review/page review supplied V21 selections (29 actual-Host MCP checks, 18 Oct). An opt-in --addin-handoff pipe receiver and one-use challenge lifecycle exist with synthetic authority only. None is curated evidence, so all 14 cells stay open. No net48 companion, publisher package, workflow hooks, enrollment or UI lifecycle exists.",
       "remainingWork": "Packaged public Add-In, exact selection handoff, VCI/CAx/safety hooks where feasible, permissions/lifetime/stale context and real interactive acceptance.",
       "nextAction": "Create detailed AC-22 plan now; share plain-data identity and journal, with UI resume/product prerequisites retained.",
       "ownerRole": "Add In",
@@ -1363,7 +1498,11 @@
         "B03"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/plans/expansion-plans/tia-addin-companion.md",
+        "docs/verification/addin-selection-20261018.md",
+        "docs/verification/addin-receiver-20261018.md",
+        "src/TiaMcp.Core/AddIns/AddInHandoff.cs"
       ],
       "packages": [
         "AC-22"
@@ -1388,10 +1527,10 @@
       "title": "Multiuser and Project Server",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_supplied_review_native_adapter_missing",
+      "qualification": "host_only_passed_uncurated_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "No multiuser adapter or qualified endpoint/session fixture recorded.",
+      "currentResult": "multiuser_observation_review/page compare supplied server/session/lock/marking declarations (61 managed, 65 actual-Host MCP checks, 18 Oct); none is curated, so all 14 cells stay open. A ten-package plan and 27-route map exist. No Project Server adapter, session create/commit, lock/freshness readback or endpoint fixture exists.",
       "remainingWork": "Server/project/session inventory, lock/freshness/marking, local session create/commit and response-loss reconciliation with immutable local backups.",
       "nextAction": "Create detailed AC-21 Project Server plan and request isolated server/version/account/fixture.",
       "ownerRole": "Collaboration",
@@ -1405,7 +1544,11 @@
         "B10"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/plans/expansion-plans/multiuser-project-server.md",
+        "docs/plans/expansion-plans/collaboration-route-map-20261018.json",
+        "docs/verification/multiuser-review-20261018.md",
+        "src/TiaMcp.Core/Collaboration/MultiuserReview.cs"
       ],
       "packages": [
         "AC-21"
@@ -1430,10 +1573,10 @@
       "title": "GRAPH CFC DCC and interpreter documents",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found_semantic_adapters",
-      "qualification": "not_run",
+      "implementation": "partial_graph_review_cfc_dcc_missing",
+      "qualification": "host_only_verified_native_fixture_only",
       "releaseAccepted": false,
-      "currentResult": "Raw exports/language enums do not implement semantic editing.",
+      "currentResult": "6 Host graph_* v6 document tools are verified by local.hostonly.graph.20261027 (43 checks, no worker). On 16 Oct an isolated test runner passed four GRAPH profiles natively on V21 Update 2 (import, compile, unchanged re-import, reopen, archive recovery); the empty-condition roundtrip fails. No product GRAPH import/edit, CFC, DCC or interpreter adapter exists.",
       "remainingWork": "Independent chart/document/libraries/pins/run-order/protection models, export/no-op import before edits, compile/preservation/recovery and behavioral timing.",
       "nextAction": "Create AC-20 detailed plan with separate GRAPH/CFC/DCC profiles; coordinate DCC/interpreter with drives/TOs.",
       "ownerRole": "Optional languages",
@@ -1447,7 +1590,11 @@
         "B04"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/verification/host-only-qualification-20261027.md",
+        "docs/verification/graph-host-workflow-20261016.md",
+        "tests/TiaMcp.Graph.Tests/fixtures/native-v21/README.md",
+        "src/TiaMcp.Host/GraphTools.cs"
       ],
       "packages": [
         "AC-20"
@@ -1482,10 +1629,10 @@
       "title": "Classic HMI full supported breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_production_writes_gated",
-      "qualification": "inspection_subsets_only",
+      "implementation": "partial_inspection_backcolor_write_families_missing",
+      "qualification": "native_readonly_passed_compile_mapping_failed",
       "releaseAccepted": false,
-      "currentResult": "Classic fixtures exist, but clean compile/start-screen, valid binding grammar and recovery/visual gates remain open; RT Professional target unavailable in recorded inventory.",
+      "currentResult": "Bridge retrieval, read-only inspection, Explorer and save/reopen/archive recovery passed natively for Classic Comfort, RT Advanced and Basic (local.hmi.bridge.20261025). Compile fails without a configured start screen, Classic PLC declaration mapping fails and RT Professional stays blocked (CanPlugNew refuses). Writes beyond gated BackColor, scripts/recipes/logs/schedulers/themes and visual/runtime gates remain open.",
       "remainingWork": "Comfort/Basic/Advanced/Professional feasible profiles; screens/templates/popups/global/slide-in, faceplates/scripts/resources/recipes/reports/logs/security/schedulers/themes; preserving engineering/visual/runtime.",
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings.",
       "ownerRole": "HMI",
@@ -1501,7 +1648,11 @@
       "evidenceAndSourceRefs": [
         "docs/plans/hmi-remaining-work.md",
         "docs/verification/hmi-qualification.md",
-        "artifacts/p17h/copy-inspection01-audit.json"
+        "artifacts/p17h/copy-inspection01-audit.json",
+        "docs/verification/hmi-bridge-retrieval-20261025.md",
+        "docs/verification/hmi-rt-professional-20261025.md",
+        "docs/verification/classic-screen-inventory-20261023.md",
+        "evidence/local.hmi.bridge.20261025.json"
       ],
       "packages": [
         "AC-18"
@@ -1526,10 +1677,10 @@
       "title": "Unified HMI full supported breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_production_writes_gated",
-      "qualification": "inspection_resources_only",
+      "implementation": "partial_inspection_gated_writes_families_missing",
+      "qualification": "native_readonly_prepare_passed_apply_open",
       "releaseAccepted": false,
-      "currentResult": "Copied bilingual resource/binding/explorer audit passed; clean compile and bridge recovery are false/unqualified. Original failed run remains failed.",
+      "currentResult": "Bridge retrieval, read-only inspection, binding chains, Explorer and save/reopen/recovery passed natively for Unified Comfort and PC (local.hmi.bridge.20261025); the 12 October retrieval denial did not recur. external_tag_create prepare passed (local.hmi.external-tag-prepare.20261026). Apply, preserving writes, bridge compile, logging/audit/OPC alarms/CPM and visual/runtime remain open.",
       "remainingWork": "Clean security/transfer prerequisites, screens/events/dynamics/scripts/types/faceplates, resources/logging/audit/runtime/OPC alarms/CPM, native preserving writes and visual/runtime acceptance.",
       "nextAction": "Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope.",
       "ownerRole": "HMI",
@@ -1545,7 +1696,11 @@
       "evidenceAndSourceRefs": [
         "docs/plans/hmi-remaining-work.md",
         "docs/verification/hmi-qualification.md",
-        "artifacts/p17h/copy-inspection01-audit.json"
+        "artifacts/p17h/copy-inspection01-audit.json",
+        "docs/verification/hmi-bridge-retrieval-20261025.md",
+        "docs/verification/hmi-external-tag-create-20261026.md",
+        "docs/verification/hmi-configured-recovery-20261021.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs"
       ],
       "packages": [
         "AC-18"
@@ -1570,10 +1725,10 @@
       "title": "Teamcenter Gateway",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "not_found",
-      "qualification": "not_run",
+      "implementation": "partial_supplied_review_native_adapter_missing",
+      "qualification": "host_only_passed_uncurated_native_not_run",
       "releaseAccepted": false,
-      "currentResult": "Public module is inventoried; no bridge/server entitlement/fixture qualified.",
+      "currentResult": "teamcenter_observation_review/page compare supplied connection/item/revision/dataset/lock declarations with up to 16 hash-checked local manifests (77 managed, 75 actual-Host MCP checks, 18 Oct); none is curated, so all 14 cells stay open. No Gateway adapter, SSO/connect, search/download, checkout/checkin or nonproduction endpoint fixture exists.",
       "remainingWork": "SSO/connect/search/download and supported checkout/checkin/cancel/item/revision/publication with exact external commit reconciliation.",
       "nextAction": "Create separate AC-21 Teamcenter plan and obtain a nonproduction endpoint/account/fixture.",
       "ownerRole": "Collaboration",
@@ -1587,7 +1742,11 @@
         "B10"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/plans/expansion-plans/teamcenter-gateway.md",
+        "docs/plans/expansion-plans/collaboration-route-map-20261018.json",
+        "docs/verification/teamcenter-review-20261018.md",
+        "src/TiaMcp.Core/Collaboration/TeamcenterReview.cs"
       ],
       "packages": [
         "AC-21"
@@ -1612,10 +1771,10 @@
       "title": "Hardware network and remote IO breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial",
-      "qualification": "limited_module_lifecycle_passed",
+      "implementation": "partial_et200sp_route_topology_profiles_missing",
+      "qualification": "native_scoped_et200sp_route_passed",
       "releaseAccepted": false,
-      "currentResult": "Native07 passes nine scoped lifecycle gates, preservation/reopen/recovery/cleanup; channelWriteQualified and fullRemoteIoRouteQualified are false.",
+      "currentResult": "local.remote-io.full-route.20261024 passed all ten gates on one CPU 1511/IM 155-6/AI route, including the Smoothing channel write, so channelWriteQualified and fullRemoteIoRouteQualified are true for that profile; local.cpu_memory_bytes.20261026 and local.hardware.20261024 add CPU memory bytes and catalog search. Replacement, GSD/HSP, topology/ports, shared devices, redundancy and other families remain open.",
       "remainingWork": "Reviewed writable channel, replacement/copy/catalog/HSP/GSD, topology/shared devices/redundancy/IO-Link/couplers/telecontrol/resources/energy profiles and partial failures; physical effects separately.",
       "nextAction": "Do not rerun native07 by default. Select a genuinely writable reviewed channel and expand independent topology/profile coverage.",
       "ownerRole": "Hardware and remote IO",
@@ -1629,7 +1788,11 @@
       ],
       "evidenceAndSourceRefs": [
         "docs/guides/network-inspection.md",
-        "artifacts/p17n/native07-independent-audit.json"
+        "artifacts/p17n/native07-independent-audit.json",
+        "docs/verification/cpu-memory-bytes-20261026.md",
+        "docs/verification/release-matrix-audit-20261027.md",
+        "docs/verification/explorer-relationship-providers-20261026.md",
+        "evidence/local.remote-io.full-route.20261024.json"
       ],
       "packages": [
         "AC-09",
@@ -1655,10 +1818,10 @@
       "title": "PLC objects languages and document breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial",
-      "qualification": "scoped_standard_evidence",
+      "implementation": "partial_move_protection_nvt_loadable_missing",
+      "qualification": "native_reads_typed_passed_mutations_open",
       "releaseAccepted": false,
-      "currentResult": "SCL/STL/raw graphical/source/tag/type/group and selected SIMATIC SD/typed routes exist.",
+      "currentResult": "Source/SimaticML/SIMATIC SD import, typed LAD/FBD, tag/type/group/block CRUD, plc_compile and model reads exist; move, copy, renumber, protection, OB metadata, NVT, loadable and system-type writes do not. Reads were requalified natively (local.smoke.20261024, local.milestones.20261024); typed edits passed engineering and PLCSIM runtime (local.typed.scoped-runtime.20261026). Object mutations and plc_compile lack current native qualification.",
       "remainingWork": "Explicit move/copy/interface/namespace/number/protection/OB metadata/document-format/loadable/NVT/system-type and mixed-language operation cells, transitive storage and behavior.",
       "nextAction": "Use AC-01 plus prompt 07 to enumerate exact missing profiles; reuse L01 and existing resolver rather than duplicate them.",
       "ownerRole": "PLC and typed",
@@ -1673,7 +1836,11 @@
       ],
       "evidenceAndSourceRefs": [
         "docs/reference/engineering-coverage.md",
-        "docs/plans/typed-lad-fbd-todo.md"
+        "docs/plans/typed-lad-fbd-todo.md",
+        "docs/verification/catalog-requalification-20261024.md",
+        "docs/verification/typed-lad-fbd-route-runtime-20261026.md",
+        "docs/verification/plc-baseline-20261017.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
       "packages": [
         "AC-11"
@@ -1701,7 +1868,7 @@
       "implementation": "not_found",
       "qualification": "not_run",
       "releaseAccepted": false,
-      "currentResult": "Current worker is V21 only; older installation directories are not support evidence.",
+      "currentResult": "The worker and Test Suite adapter remain V21/net48 only (TiaMcp.Openness.V21, TiaMcp.TestSuite.V21); tia.multiversion is not implemented and no AC-23 version matrix exists. Only library_upgrade imports V14 to V20 libraries into V21, which is L05 scope. PAL V16 sources need an intermediate V17 to V20 installation that is not present.",
       "remainingWork": "Public API/SDK inventory per major/update, feasibility resolution, separate workers/build/loaders and exact conversion/refusal/upgrade/qualification matrix for feasible versions.",
       "nextAction": "Create AC-23 version matrix; identify feasible supported SDK/target combinations. Missing installation is a blocker, not an exclusion.",
       "ownerRole": "Version adapters",
@@ -1715,7 +1882,9 @@
         "B11"
       ],
       "evidenceAndSourceRefs": [
-        "contracts/feature-catalog.v1.json"
+        "contracts/feature-catalog.v1.json",
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/verification/library-lane-c-20261024.md"
       ],
       "packages": [
         "AC-23"
@@ -1740,10 +1909,10 @@
       "title": "Other supported Siemens interfaces",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "advanced_v8_only",
-      "qualification": "other_routes_unresolved",
+      "implementation": "partial_advanced_v8_only_others_missing",
+      "qualification": "native_scoped_v8_other_routes_unresolved",
       "releaseAccepted": false,
-      "currentResult": "Advanced V8 exists; standard PLCSIM, Automation Tool, ODK, WinCC runtime and AX need separate route/license/target findings.",
+      "currentResult": "PLCSIM Advanced V8 (TiaMcp.Simulator.V8) is natively qualified on owned CPU1511 instances (local.sim.state.20261024, local.runtime.frozen.20261024). Standard PLCSIM, SIMATIC Automation Tool, ODK, WinCC runtime and AX still have no feasibility record or adapter; only the 14 October AX trace CLI audit exists, and no AC-24 interface matrix was created.",
       "remainingWork": "Feasibility rows for each public SDK and useful workflow; implement and qualify every feasible row. Private API workarounds and directory presence are not proof.",
       "nextAction": "Create AC-24 interface matrix now, including dedicated feasibility experiments and missing package/target requests.",
       "ownerRole": "SDK feasibility",
@@ -1758,7 +1927,10 @@
         "B11"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/verification/runtime-frozen-20261024.md",
+        "docs/plans/expansion-plans/bug-driven-trace-simatic-ax-feasibility.md",
+        "docs/plans/offline-scope-reconciliation-20261017.md"
       ],
       "packages": [
         "AC-24"
@@ -1783,10 +1955,10 @@
       "title": "PLC library and generated HMI workflow",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "partial_components",
-      "qualification": "end_to_end_open",
+      "implementation": "partial_offline_review_native_pieces_unqualified",
+      "qualification": "offline_slices_passed_native_e2e_open",
       "releaseAccepted": false,
-      "currentResult": "Individual library/HMI pieces exist; complete preserving combined install/update/regeneration is unqualified.",
+      "currentResult": "Offline component-to-HMI review v1-v7 (interfaces, consumers, output effects, library-export and dependency associations) and bounded Unified text-list generation/regeneration pass frozen aggregates (17-20 October). Native Unified faceplate_create/bind and external_tag_create exist but are unqualified. No combined PLC/UDT/HMI install, update or broken-binding run exists, and Classic faceplate XML is missing.",
       "remainingWork": "Exact PLC/UDT/version to HMI tags/faceplates/SiVArc mappings, broken binding impact, preserving update and behavior/visual proof.",
       "nextAction": "Define one independently authored composite fixture after component contracts align.",
       "ownerRole": "Library and HMI integration",
@@ -1804,7 +1976,11 @@
         "B04"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/library-management-plan.md"
+        "docs/plans/library-management-plan.md",
+        "docs/verification/hmi-bound-generation-20261020.md",
+        "docs/verification/hmi-coordinated-generation-20261020.md",
+        "docs/verification/hmi-library-association-20261018.md",
+        "src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs"
       ],
       "packages": [
         "AC-18",
@@ -1820,10 +1996,10 @@
       "title": "ECAD communication and motion rebind workflow",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "not_integrated",
-      "qualification": "end_to_end_open",
+      "implementation": "partial_offline_composite_review_no_native",
+      "qualification": "end_to_end_open_offline_checks_only",
       "releaseAccepted": false,
-      "currentResult": "No complete AML-to-connection-to-drive/TO workflow is qualified.",
+      "currentResult": "Five offline composite_engineering_* tools retain supplied AML/connection/drive/TO observations with v3 telegram/address/encoder selectors (50 managed and 70 MCP checks, 18 Oct); catalog unverified. No native connection, drive or TO adapter feeds the review and no rebind, dependent recovery or runtime proof exists.",
       "remainingWork": "External hardware delta, exact network/transport/drive/TO impact, rebind, complete dependent preservation/recovery and separate runtime proof.",
       "nextAction": "Agree shared endpoint/telegram/encoder identities before individual adapter integration.",
       "ownerRole": "Hardware integration",
@@ -1840,7 +2016,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/api-coverage-and-roadmap.md"
+        "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
+        "docs/plans/expansion-plans/composite-identity-contracts.md",
+        "docs/verification/composite-engineering-workflow-20261018.md",
+        "docs/verification/composite-engineering-typed-20261018.md",
+        "src/TiaMcp.Core/Engineering/CompositeEngineeringReview.cs"
       ],
       "packages": [
         "AC-09",
@@ -1857,10 +2037,10 @@
       "title": "Secure engineering to physical runtime workflow",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "not_integrated",
-      "qualification": "end_to_end_open",
+      "implementation": "partial_offline_handoff_loopback_clients",
+      "qualification": "end_to_end_open_loopback_only",
       "releaseAccepted": false,
-      "currentResult": "Offline UA review exists; secure native engineering-to-live identity/permission handoff is not qualified.",
+      "currentResult": "runtime_handoff_* retain supplied security/runtime observations and bind them to owned Web/UA sessions; the bound lifecycle (response loss, Host kill, credential and certificate rotation) passes about 1,444 loopback checks (18 Oct). runtime_ua_* passed in the UA-diagnostic loopback run but stay unverified (AC-recovery). No PLCSIM Advanced, physical CPU or native engineering-to-live identity handoff has run.",
       "remainingWork": "Exact deployed model/CPU/program/security identity, allowed/denied access, breaking-client migration, certificate rotation/recovery and observation quality.",
       "nextAction": "Freeze UA/security/runtime handoff; protocol-fake tests can proceed before bench acquisition.",
       "ownerRole": "UA security and runtime integration",
@@ -1876,7 +2056,11 @@
         "B05"
       ],
       "evidenceAndSourceRefs": [
-        "docs/plans/expansion-plans/opc-ua-engineering.md"
+        "docs/plans/expansion-plans/opc-ua-engineering.md",
+        "docs/verification/security-runtime-lifecycle-20261018.md",
+        "docs/verification/security-runtime-workflow-20261018.md",
+        "docs/plans/expansion-plans/composite-identity-contracts.md",
+        "src/TiaMcp.Core/PhysicalRuntime/RuntimeHandoffReview.cs"
       ],
       "packages": [
         "AC-08",
@@ -1900,10 +2084,10 @@
       "title": "Alarm bug watch trace and test workflow",
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
-      "implementation": "offline_partial",
-      "qualification": "native_end_to_end_open",
+      "implementation": "partial_offline_composite_native_orchestration_missing",
+      "qualification": "host_only_parts_verified_native_open",
       "releaseAccepted": false,
-      "currentResult": "Offline diagnostic pipeline exists; orchestration of native watch/alarm/test/acquisition does not.",
+      "currentResult": "Alarm and Test Suite finding selection, diagnostic cases, watch plans, before/after experiments and UA observation composition are connected offline and verified Host-only (local.hostonly.diagnostics/.diagnostic-experiments/.diagnostic-ua.20261027). Runtime acquisition from retained captures is implemented but unverified. No native alarm association, native watch-table handoff, trace capture or Test Suite execution runs end to end.",
       "remainingWork": "Alarm-to-exact-instance selection, watch table, independently verified native trace/event, hypothesis result and before/after repeatability with Test Suite where feasible.",
       "nextAction": "Deliver watch-table branch while trace route remains blocked; retain the native acquisition gate.",
       "ownerRole": "Diagnostic integration",
@@ -1921,7 +2105,11 @@
         "B06"
       ],
       "evidenceAndSourceRefs": [
-        "docs/verification/trace-diagnostics-completion-audit-20261014.md"
+        "docs/verification/trace-diagnostics-completion-audit-20261014.md",
+        "docs/verification/alarm-executable-bindings-20261018.md",
+        "docs/verification/diagnostic-repeated-experiments-20261020.md",
+        "docs/verification/diagnostic-runtime-acquisition-20261020.md",
+        "docs/verification/host-only-qualification-20261027.md"
       ],
       "packages": [
         "AC-04",
@@ -2033,7 +2221,7 @@
       "id": "01",
       "path": "docs/plans/expansion-prompts/01-vci-and-git.md",
       "target": "docs/plans/expansion-plans/vci-and-git.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D01"
       ],
@@ -2046,7 +2234,7 @@
       "id": "02",
       "path": "docs/plans/expansion-prompts/02-watch-and-force-table-engineering.md",
       "target": "docs/plans/expansion-plans/watch-and-force-table-engineering.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D02"
       ],
@@ -2059,7 +2247,7 @@
       "id": "03",
       "path": "docs/plans/expansion-prompts/03-project-translations.md",
       "target": "docs/plans/expansion-plans/project-translations.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D03"
       ],
@@ -2085,7 +2273,7 @@
       "id": "05",
       "path": "docs/plans/expansion-prompts/05-automationml-cax.md",
       "target": "docs/plans/expansion-plans/automationml-cax.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D05"
       ],
@@ -2098,7 +2286,7 @@
       "id": "06",
       "path": "docs/plans/expansion-prompts/06-native-test-suite.md",
       "target": "docs/plans/expansion-plans/native-test-suite.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D06"
       ],
@@ -2111,7 +2299,7 @@
       "id": "07",
       "path": "docs/plans/expansion-prompts/07-software-unit-lifecycle.md",
       "target": "docs/plans/expansion-plans/software-unit-lifecycle.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D07"
       ],
@@ -2124,7 +2312,7 @@
       "id": "08",
       "path": "docs/plans/expansion-prompts/08-communication-connections.md",
       "target": "docs/plans/expansion-plans/communication-connections.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D08"
       ],
@@ -2137,7 +2325,7 @@
       "id": "09",
       "path": "docs/plans/expansion-prompts/09-online-compare-snapshots-upload.md",
       "target": "docs/plans/expansion-plans/online-compare-snapshots-upload.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D09"
       ],
@@ -2150,7 +2338,7 @@
       "id": "10",
       "path": "docs/plans/expansion-prompts/10-startdrive.md",
       "target": "docs/plans/expansion-plans/startdrive.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D10"
       ],
@@ -2163,7 +2351,7 @@
       "id": "11",
       "path": "docs/plans/expansion-prompts/11-plc-alarms-prodiag.md",
       "target": "docs/plans/expansion-plans/plc-alarms-prodiag.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D11"
       ],
@@ -2176,7 +2364,7 @@
       "id": "12",
       "path": "docs/plans/expansion-prompts/12-web-server-access-configuration.md",
       "target": "docs/plans/expansion-plans/web-server-access-configuration.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D12"
       ],
@@ -2189,7 +2377,7 @@
       "id": "13",
       "path": "docs/plans/expansion-prompts/13-motion-and-technology-objects.md",
       "target": "docs/plans/expansion-plans/motion-and-technology-objects.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D13"
       ],
@@ -2202,7 +2390,7 @@
       "id": "14",
       "path": "docs/plans/expansion-prompts/14-safety-validation-and-fio.md",
       "target": "docs/plans/expansion-plans/safety-validation-and-fio.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D14"
       ],
@@ -2215,7 +2403,7 @@
       "id": "15",
       "path": "docs/plans/expansion-prompts/15-sivarc-hmi-generation.md",
       "target": "docs/plans/expansion-plans/sivarc-hmi-generation.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D15"
       ],
@@ -2228,7 +2416,7 @@
       "id": "16",
       "path": "docs/plans/expansion-prompts/16-physical-plc-runtime.md",
       "target": "docs/plans/expansion-plans/physical-plc-runtime.md",
-      "planExists": false,
+      "planExists": true,
       "obligations": [
         "D16"
       ],
