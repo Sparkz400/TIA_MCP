@@ -65,6 +65,7 @@ namespace TiaMcp.Openness.V21
             if (!LibraryChangeKinds.Contains(kind)) throw new BridgeException("UnsupportedChangeKind", "Unknown library change kind: " + kind);
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             if (payload.Value<int?>("schemaVersion") != 1) throw new BridgeException("InvalidRequest", "Library payload schemaVersion=1 is required.");
+            if (kind == "library_integrate" && PlcHmiIntegrationPlanner.IsRecipe(payload)) ValidatePlcHmiRecipe(payload);
             var change = new LibraryChange { Id = "lib-" + Guid.NewGuid().ToString("N"), Kind = kind, Payload = (JObject)payload.DeepClone(), Selector = (JObject)args.DeepClone(), State = "preparing" };
             if (componentContentPins != null)
             {
@@ -234,7 +235,7 @@ namespace TiaMcp.Openness.V21
                         change.Preview["targetPreview"] = PrepareLibraryHmiAction(change.Project, payload, change.Versions.FirstOrDefault(), change.Masters.FirstOrDefault());
                         break;
                     }
-                    if (change.Kind == "library_integrate") { PreparePlcLibraryIntegrationPlan(change); break; }
+                    if (change.Kind == "library_integrate") { if (PlcHmiIntegrationPlanner.IsRecipe(payload)) PreparePlcHmiIntegrationPlan(change); else PreparePlcLibraryIntegrationPlan(change); break; }
                     PreparePlcLibraryInstantiation(change);
                     break;
                 case "library_update_project":
@@ -1088,10 +1089,14 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "library_create_type":
                     VerifyLibraryDocumentSnapshot(change);
-                    var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
-                        ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
-                        : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), payload.Value<string>("documentName"), LibraryImportOptions.None);
-                    rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() }); break;
+                    foreach (string documentName in LibraryDocumentNames.Read(payload))
+                    {
+                        var createdType = payload.Value<string>("targetEnvironment") == "selectedPlc"
+                            ? change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, payload.Value<string>("destinationComposition") == "blocks" ? (IEngineeringObject)LibraryPlcScope(change, out _).Blocks : LibraryPlcScope(change, out _).Types, LibraryImportOptions.None)
+                            : change.Destination.Native.TypeFolder.Types.CreateFromDocuments(new DirectoryInfo(change.DocumentDirectory), documentName, LibraryImportOptions.None);
+                        rows.Add(new JObject { ["typeGuid"] = createdType.CreatedType.Guid.ToString("D"), ["name"] = createdType.CreatedType.Name, ["transferState"] = createdType.TransferResultState.ToString() });
+                    }
+                    break;
                 case "library_create_master_copy":
                     var selector = (JObject)change.Selector.DeepClone(); foreach (var property in ((JObject)payload["object"]).Properties()) selector[property.Name] = property.Value.DeepClone();
                     var copyResult = change.Destination.Native.MasterCopyFolder.MasterCopies.Create((IMasterCopySource)ResolveObjectTarget(selector).Target); rows.Add(new JObject { ["masterCopy"] = copyResult.Name }); break;

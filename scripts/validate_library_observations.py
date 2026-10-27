@@ -165,6 +165,7 @@ def _schema_registry():
     schemas["component-preview"] = json.loads((ROOT / "contracts/library-component-preview.v1.schema.json").read_bytes())
     schemas["preview-effects"] = json.loads((ROOT / "contracts/library-preview-effects.v1.schema.json").read_bytes())
     schemas["recipe"] = json.loads((ROOT / "contracts/plc-library-integration-recipe.v1.schema.json").read_bytes())
+    schemas["plc-hmi-recipe"] = json.loads((ROOT / "contracts/plc-hmi-integration-recipe.v1.schema.json").read_bytes())
     for schema in schemas.values():
         Draft202012Validator.check_schema(schema)
     registry = Registry().with_resources((schema["$id"], Resource.from_contents(schema)) for schema in schemas.values())

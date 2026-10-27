@@ -190,3 +190,54 @@ planner/coordinator test project, and the new
 `TiaMcp.ComponentQualification.Boundary.Tests` net48 executable. The latter invokes
 the actual worker dispatcher on unattached sessions to verify default-off and
 owned-scratch refusal; it never constructs or starts a native TIA session.
+
+## Combined PLC/UDT/HMI recipes
+
+Two more plan-only `library_integrate` actions cover WinCC Unified. Schema:
+[plc-hmi-integration-recipe.v1](../../contracts/plc-hmi-integration-recipe.v1.schema.json);
+examples: [install](../../fixtures/libraries/plc-hmi/motor-hmi-plan.example.json) and
+[update](../../fixtures/libraries/plc-hmi/motor-status-update-plan.example.json).
+Both are validated completely before the worker selects a project. Apply returns
+`PlcIntegrationNotQualified`, as for PLC recipes.
+
+**Install (`plc_hmi_component_plan`).** Send the PLC recipe above unchanged, with
+`action: "plc_hmi_component_plan"`, plus:
+
+- `hmi`: `family: "unified"`, `profile` (`unified-comfort` or `unified-pc`, must match
+  the observed target), the exact `hmiPath`, the integrated `connection` name and the
+  `tagTable` name. Each of 1–64 `tags` has a name, a scalar `dataType` and a `source`:
+  `{"kind":"plcTag","tagPath":...}` for an existing root PLC tag, or
+  `{"kind":"instanceMember","members":["status","speed"]}` for a member of the new
+  instance DB (one UDT level is expanded from the pinned dependency export). Optional
+  `screenItems` place a new item with an exact rectangle on an existing screen.
+- `expectedCompilerOutcomes`: `plc` and `hmi`, each `errors: 0` and `maxWarnings`.
+
+The worker proves the connection's PLC owner natively and refuses a different PLC
+(`HmiConnectionPlcMismatch`), existing tag or item names (`HmiNameConflict`), type
+differences (`OperandTypeMismatch`) and rectangles outside the screen
+(`HmiPlacementInvalid`). The plan keeps the two PLC steps and adds one
+`hmi_engineering` `external_tag_create` proposal per root-tag mapping. Its blockers
+stay explicit: `HmiMemberMappingUnqualified` (no operation creates member-bound tags),
+`HmiScreenItemCreationUnavailable` and `HmiPreservationGateClosed`.
+
+**Field-changing update (`plc_hmi_update_plan`).** Select one UDT version and one PLC
+(`target.projectName`, `target.plcPath`). The PLC must contain exactly one use of that
+type. The worker compares the installed and selected declarations and checks every
+Unified HMI tag whose connection proves to be that PLC. A tag bound through the UDT
+(for example `MotorDB.status.speed`) becomes an impact row with its status, before
+and after type, and direct screen-item consumers. The plan is refused:
+
+- `HmiBindingWouldBreak` when any row is `typeChanged`, `memberRemoved` or
+  `structureChanged`;
+- `HmiImpactIncomplete` when any binding cannot be proven: Classic HMIs, unproven
+  connection owners, absolute or non-scalar spellings, UDT-typed tag-table tags, UDTs
+  nested in another UDT, a member missing before the update or another profile.
+
+The error `details` hold the full impact report (`memberChanges`, `bindings`,
+`unresolved`, `breakingCount`, `affectedConsumerCount`). Nothing is rewired
+automatically. A clean preview proposes a freshly prepared `library_update_project`
+step; bindings must be previewed again after any type update.
+
+The internal component coordinator refuses combined plans. Scripts, alarms and
+faceplate ports are not parsed as consumers. Evidence and the native probe:
+[combined recipes](../verification/plc-hmi-recipes-20261027.md).

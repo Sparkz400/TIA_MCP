@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.35",
+  "catalogVersion": "0.4.37",
   "targetTiaVersions": [
     21
   ],
@@ -2529,6 +2529,42 @@
         "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
         "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced. The inherited inconsistency is an uncompiled PLC data type; other inconsistent object kinds are not exercised.",
         "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); the CPU-family mismatch surfaces as CompileFailed after checkpoint, not as a refusal at preparation. Firmware-version mismatches are not exercised. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library.native-traversal.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9da66939f90d5f0976d0fdef4cc44f7d8c4f529b",
+        "passedScope": "Owned TIA Portal V21 Portal reopening the saved scale project of run scl864f5c0f (two CPU 1511-1 PN V4.1 PLCs, project library with 1,000 FB + 4,000 UDT types InWork, 10,004 metadata entries). library_list took 54.0 s. library_query elements paged the complete library in 50 pages of 200 items (10,000 items) under one revision token in 2,805.8 s (about 56 s per page, one library walk each); completeness reports truncated=true and scopeComplete=false at the 10,000-entry item budget, as designed. The growth runs that built the library are listed with report and worker hashes in docs/verification/library-native-scale-20261027.md."
+      },
+      "artifacts": [
+        "evidence/local.library.native-traversal.20261027.json"
+      ],
+      "limitations": [
+        "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
+        "Flat FB and UDT types only, InWork; no dependency chain, released versions or global library at this scale. The last 2 of 10,002 rows lie beyond the item budget and are reported as truncation, not returned.",
+        "Growth runs that built the library (prepare/apply, checkpoint and memory per 100-type change up to 5,000 types) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
+      ]
+    },
+    {
+      "id": "local.hmi.plc-hmi-recipe.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bdb061d60d9df81100d0886d0bf29d482fbffcb5",
+        "passedScope": "Prepare-only native probe of the combined PLC/UDT/HMI library_integrate recipes (plc_hmi_component_plan, plc_hmi_update_plan) on a fresh positive Unified MTP700 Comfort HmiSeeder plchmi fixture (raw-Openness MotorStatus 1.0.0/1.0.1 Real->LReal, MotorDrive 1.0.0, MotorDB, Unified tags MotorSpeed/MotorRunning bound to MotorDB.status.*, rectangle MotorSpeedConsumer with Left dynamized by MotorSpeed; both PLCs compiled without errors), through the production Host and V21 worker after project_retrieve: the install plan into PLC_B/HMI_RT_2 prepared as planned_only with library_instantiate, graphical_typed_edit and hmi_engineering steps, plcSymbol MotorDrive_1.status.speed resolved from the pinned FB export and the HmiMemberMappingUnqualified, HmiScreenItemCreationUnavailable and HmiPreservationGateClosed blockers, and its change_apply was refused (PlcIntegrationNotQualified); the field-changing update of PLC_A to MotorStatus 1.0.1 was refused with HmiBindingWouldBreak and an impact report of exactly one breaking binding (MotorSpeed typeChanged Real->LReal, consumer MotorSpeedConsumer.Left), MotorRunning unchanged and no unresolved bindings; a Classic recipe was refused (HmiFamilyNotQualified); project library and both HMI tag inventories unchanged; owned Portal, host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.plc-hmi-recipe.20261027.json"
+      ],
+      "limitations": [
+        "No apply, compile, save/reopen, recovery or runtime of any combined step; combined apply stays refused and no Unified preservation gate is opened.",
+        "Unified Comfort only; Classic HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags, nested UDTs and scripts, alarms or faceplate ports as consumers are not exercised.",
+        "Creation of member-bound HMI tags and screen items stays a blocker in the install plan; the overall qualify_hmi run accepts no profile because the existing HMI gates are outside this probe."
       ]
     }
   ],
@@ -7836,7 +7872,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library.native-traversal.20261027"
         ]
       },
       "availability": {
@@ -7883,7 +7920,8 @@
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.library.native-traversal.20261027"
         ]
       },
       "availability": {
@@ -8789,6 +8827,7 @@
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, a new global instance DB, an existing LAD/FBD caller and scalar existing-tag bindings. Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
+          "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."

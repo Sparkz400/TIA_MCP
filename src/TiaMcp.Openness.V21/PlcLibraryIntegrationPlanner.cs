@@ -232,6 +232,7 @@ namespace TiaMcp.Openness.V21
     internal sealed class PlcIntegrationPlanException : Exception
     {
         internal string Code { get; }
-        internal PlcIntegrationPlanException(string code, string message) : base(message) { Code = code; }
+        internal JObject Details { get; }
+        internal PlcIntegrationPlanException(string code, string message, JObject details = null) : base(message) { Code = code; Details = details; }
     }
 }
