@@ -154,6 +154,9 @@ namespace TiaMcp.Openness.V21
                         if (Encoding.UTF8.GetByteCount(output) > MaxResponseBytes)
                             output = Error(id, new BridgeException("ResponseTooLarge", "Response exceeds 16 MiB. Request fewer items. Export artifacts remain in the requested artifact directory.")).ToString(Formatting.None);
                         writer.WriteLine(output);
+                        // TIA caps live Openness object instances per Portal (500,000); proxies release them only when
+                        // finalized, so large library walks accumulated until EngineeringOutOfMemoryException (scale run).
+                        GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect();
                     }
                 }
             }
