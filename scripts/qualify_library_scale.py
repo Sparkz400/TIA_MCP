@@ -1,7 +1,7 @@
 """Native library scale measurement: a 10,000-type project library in an owned scratch, built 100 types per change.
 
-Flat FB types, flat PLC data types (they do not count toward the CPU's block limit; the scratch CPU allows 4,000 blocks)
-and a dependency chain (each chain FC calls the previous one). Every change records wall time, the
+Flat FB types, flat PLC data types and a dependency chain (each chain FC calls the previous one). The scratch CPU 1511
+allows 4,000 blocks and PLC data types together, so every --plc-capacity types the run adds another PLC of that CPU. Every change records wall time, the
 checkpoint archive size and TIA/worker memory; every --probe-every changes the library is listed and paged completely,
 with truncation flags. A stop file ends the run between changes. Measurements are observations on this host, not budgets.
 """
@@ -82,7 +82,9 @@ def probe(h, library, label, full=False):
 
 def run(args):
     total, chain, udts = args.types, args.chain, args.udts
-    require(total % BATCH == 0 and chain % BATCH == 0 and udts % BATCH == 0 and chain + udts <= total, "Type, UDT and chain counts must be multiples of 100.")
+    require(total % BATCH == 0 and chain % BATCH == 0 and udts % BATCH == 0 and args.plc_capacity % BATCH == 0 and chain + udts <= total,
+            "Type, UDT, chain and PLC capacity counts must be multiples of 100.")
+    require(chain == 0 or total <= args.plc_capacity, "A dependency chain must stay within one PLC.")
     stop = args.stop_file.resolve()
     h = Harness(args, "scl", "library-scale-" + str(total), ["Owned scratch only; observed timings on this host, not cross-machine budgets.",
                 "Types stay InWork; release, global publication and component apply are not measured."], [])
@@ -92,12 +94,23 @@ def run(args):
 
     def body(h):
         plc = h.owned_scratch("scale")
+        h.report["plcs"] = [plc]
         library = h.project_library()
         probe(h, library, "empty")
         for start in range(0, total, BATCH):
             if stop.exists():
                 h.report["stoppedByRequest"] = start
                 break
+            if start and start % args.plc_capacity == 0:
+                known = set(h.report["plcs"])
+                name = str(len(known) + 1)
+                h.apply("hardware_add", {"typeIdentifier": h.scratch_cpu, "deviceName": "ScratchStation" + name, "itemName": "ScratchPLC" + name,
+                        "configureScratchSecurity": True})  # a new S7-1500 needs its confidential-data password before it compiles
+                added = [x["path"] for x in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if x["path"] not in known]
+                require(len(added) == 1, "Expected exactly one added PLC")
+                plc = added[0]
+                h.report["plcs"].append(plc)
+                h.persist()
             documents = h.directory / "docs" / str(start // BATCH).zfill(3)
             documents.mkdir(parents=True)
             batch = names[start:start + BATCH]
@@ -106,7 +119,7 @@ def run(args):
                 index = int(name.split("_")[1])
                 source = udt_source(name) if udt else chain_source(name, "Chain_" + str(index - 1).zfill(4) if index else None) if name.startswith("Chain_") else flat_source(name)
                 (documents / (name + (".udt" if udt else ".scl"))).write_bytes(source.encode("utf-8"))
-            row = {"batch": start // BATCH, "first": batch[0], "last": batch[-1]}
+            row = {"batch": start // BATCH, "first": batch[0], "last": batch[-1], "plc": plc}
             started = time.perf_counter()
             prepared = h.prepare("library_create_type", {"schemaVersion": 1, "destinationLibraryId": library, "documentDirectory": str(documents),
                                  "documentNames": batch, "targetEnvironment": "selectedPlc",  # native document names omit the extension
@@ -163,6 +176,7 @@ if __name__ == "__main__":
     parser.add_argument("--types", type=int, default=10000)
     parser.add_argument("--chain", type=int, default=1000)
     parser.add_argument("--udts", type=int, default=0, help="PLC data types among --types; they keep the PLC under its block limit.")
+    parser.add_argument("--plc-capacity", type=int, default=3900, help="Types per PLC; below the CPU 1511 limit of 4,000 objects.")
     parser.add_argument("--probe-every", type=int, default=10)
     parser.add_argument("--full-paging", action="store_true", help="Page the complete library at the final probe; periodic probes read one page.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))

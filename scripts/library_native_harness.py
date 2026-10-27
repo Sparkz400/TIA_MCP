@@ -165,6 +165,7 @@ class Harness:
         self.owned_portal(label)
         created = self.stage("create owned scratch " + label, lambda: self.tool("tia_create_scratch"))
         require(created.get("completed") is True and created.get("compile", {}).get("errorCount") == 0, "Scratch compile failed")
+        self.scratch_cpu = created["selectedCpu"]["typeIdentifier"]
         inventory = self.tool("project_inventory", {"maxItems": 1000})
         require(len(inventory.get("plcs", [])) == 1, "Expected one owned PLC")
         return inventory["plcs"][0]["path"]
