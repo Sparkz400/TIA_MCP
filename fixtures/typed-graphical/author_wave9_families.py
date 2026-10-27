@@ -36,11 +36,19 @@ def var(section, members):
     return section + "\n" + "".join("  " + name + " : " + data_type + ";\n" for name, data_type in members) + "END_VAR"
 
 
+def storage_source(instruction):
+    name, system = STORAGE[instruction]
+    if instruction in EDGES:
+        # SCL DATA_BLOCKs of R_TRIG/F_TRIG vanish after compile and save (wave 10 native slot); instance_db_create builds them.
+        return "global-" + slug(instruction) + "-storage.instancedb.json", name, json.dumps({"name": name, "instanceOfName": system}) + "\n"
+    return ("global-" + slug(instruction) + "-storage.scl", name,
+            'DATA_BLOCK "' + name + '"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"' + system + '"\nBEGIN\nEND_DATA_BLOCK\n')
+
+
 def references():
-    """(file name, block name, text); storage DBs first so the global callers resolve."""
-    rows = [("global-" + slug(instruction) + "-storage.scl", name,
-             'DATA_BLOCK "' + name + '"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"' + system + '"\nBEGIN\nEND_DATA_BLOCK\n')
-            for instruction, (name, system) in STORAGE.items()]
+    """(file name, block name, text); each storage DB before its global callers. The edge storage DBs follow the
+    first multi-instance use, which makes TIA copy the R_TRIG/F_TRIG system FB into the project."""
+    rows = [storage_source("TONR")]
     for language in ("LAD", "FBD"):
         lad = language == "LAD"
         plain = "RUNG wire#powerrail" if lad else "RUNG"
@@ -71,6 +79,8 @@ def references():
             declarations = var("VAR_INPUT", (("Signal", "Bool"),)) + "\n" + var("VAR_OUTPUT", (("Pulse", "Bool"),))
             body = enabled + "\n  %s." + instruction + "( clk := #Signal, q => #Pulse )\nEND_RUNG"
             add(slug(instruction), "Tgp_" + instruction, declarations + "\n" + var("VAR", (("Storage", instruction),)), body % "#Storage")
+            if lad:
+                rows.append(storage_source(instruction))
             add(slug(instruction) + "-global", "Tgp_" + instruction + "_Global", declarations, body % ('"' + STORAGE[instruction][0] + '"'))
     return rows
 
@@ -131,8 +141,9 @@ def main():
     for file, block, text in references():
         path = ROOT / "sources" / file
         path.write_bytes(text.encode("utf-8"))
+        form = "SCL" if file.endswith(".scl") else "instance_db_spec" if file.endswith(".instancedb.json") else "SIMATIC_SD"
         sources.append({"path": path.relative_to(REPO).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "route": "standard",
-                        "authoredFormat": "SCL" if file.endswith(".scl") else "SIMATIC_SD", "names": [block], "namespace": ""})
+                        "authoredFormat": form, "names": [block], "namespace": ""})
     paths = [row["path"] for row in sources]
     document = {"schemaVersion": 1, "status": "authored-not-executed",
                 "purpose": "Standard-route native references for the wave 9 typed families (DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR, "

@@ -52,8 +52,11 @@ sources assume:
    FC/FB calls do). The pins are MOVE `en in out1 eno`, math `en in1 in2 out eno`
    and edge `en CLK Q eno`.
 3. R_TRIG/F_TRIG use the IEC instance syntax `#Storage.R_TRIG( clk := …, q => … )`,
-   multi-instance type `R_TRIG`/`F_TRIG`, and global instance DBs declared in SCL as
-   `"R_TRIG"`/`"F_TRIG"`, quoted like the committed `"IEC_TIMER"` storage.
+   and multi-instance type `R_TRIG`/`F_TRIG`. Their global instance DBs come from the
+   specs `global-rtrig-storage.instancedb.json`/`global-ftrig-storage.instancedb.json`
+   through `instance_db_create` (`CreateInstanceDB`), each admitted after the first
+   multi-instance use so TIA has copied the system FB. SCL `DATA_BLOCK`s of `"R_TRIG"`
+   vanished after compile and save on 27 October.
 4. TONR has pins `IN R PT Q ET`, multi-instance type `TONR_TIME` and an `IEC_TIMER`
    global DB.
 
@@ -107,7 +110,7 @@ Expected results:
 - `git status` prints nothing.
 - All three test files print `OK`.
 - The hash check prints `True`.
-- `artifacts/w9c.args` lists the 69 sources, storage DBs first.
+- `artifacts/w9c.args` lists the 69 sources, each storage DB before its global callers.
 
 ## Step 1: syntax probe (diagnostic, not evidence)
 
@@ -145,6 +148,25 @@ The first failure stops admission: exit 2, `status: "blocked"`, with `failure` a
 for a tracked change, `failureRecovery`. Keep that report, fix the source and capture
 again into a new directory such as `artifacts/w9c2`. Use the new directory in steps 3
 and 4.
+
+### Edge global storage only
+
+The 27 October run captured everything except the R_TRIG/F_TRIG global storage. This
+capture adds it. It re-admits the four multi-instance edge references first: TIA then
+copies the R_TRIG/F_TRIG system FBs into the project before `CreateInstanceDB`, and the
+extractor needs them to attach `globalInstanceType` to the edge profiles.
+
+```powershell
+$edge = 'rtrig-lad.s7dcl', 'global-rtrig-storage.instancedb.json', 'rtrig-global-lad.s7dcl', 'ftrig-lad.s7dcl', 'global-ftrig-storage.instancedb.json', 'ftrig-global-lad.s7dcl', 'rtrig-fbd.s7dcl', 'rtrig-global-fbd.s7dcl', 'ftrig-fbd.s7dcl', 'ftrig-global-fbd.s7dcl' | ForEach-Object { "fixtures/typed-graphical/sources/$_" }
+python -B scripts/capture_typed_routes_owned.py @edge --host $hostExe --worker $worker --output artifacts/w9e --archive $archive --sha256 $archiveSha --unit ''
+python -B scripts/extract_typed_graphical_profiles.py artifacts/w9e/capture.json --stage-output artifacts/w9es
+python -B scripts/audit_typed_profile_candidates.py --catalog artifacts/w9es/profiles.candidate.v1.json --capture artifacts/w9e/capture.json --prerequisite fixtures/typed-graphical/native/Tgp_R_TRIG_LAD.xml --prerequisite fixtures/typed-graphical/native/Tgp_F_TRIG_LAD.xml --prerequisite fixtures/typed-graphical/native/Tgp_R_TRIG_FBD.xml --prerequisite fixtures/typed-graphical/native/Tgp_F_TRIG_FBD.xml --output artifacts/w9es/audit.json
+```
+
+Expected: 10 `CAPTURED` lines and exit 0, then `Staged 4 exact native
+profiles`, each with `globalInstanceType` `R_TRIG` or `F_TRIG`. The four edge profile ids
+are already deployed without global storage, so promotion replaces them instead of
+appending, and keeps the committed multi-instance exports.
 
 ## Step 3: stage candidates
 

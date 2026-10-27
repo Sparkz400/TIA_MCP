@@ -217,6 +217,65 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["AutoNumber"] = false, ["Number"] = number };
         }
 
+        // IEC edge FBs that TIA copies know-how protected into System blocks/Program resources on first use (wave 10 native slot).
+        // Timers and counters stay out: their single-instance DBs are typed by the data types IEC_TIMER/IEC_COUNTER, not by an FB.
+        private static readonly string[] SystemInstanceFbs = { "R_TRIG", "F_TRIG" };
+
+        private void PrepareInstanceDbCreate(EngineeringChange change, JObject preview)
+        {
+            var plc = SelectPlc(change.Selector);
+            string name = ChangeText(change.Payload, "name", 128), requested = ChangeText(change.Payload, "instanceOfName", 128);
+            int number = InstanceDbNumber(change.Payload);
+            var budget = new ScanBudget(50000);
+            var blocks = AllBlocks(plc, budget).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "Instance DB collision check is incomplete.");
+            if (blocks.Any(block => string.Equals(block.Item.Name, name, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ObjectExists", "A block of this PLC already has the requested name.");
+            if (number != 0 && blocks.Any(block => block.Item.Number == number && BlockNumberKind(block.Item) == "DB")) throw new BridgeException("BlockNumberCollision", "Another DB already uses number " + number + ".");
+            change.BlockNames = new[] { name };
+            PrepareMutationScope(change, plc, "block", change.BlockNames);
+            var scope = ResolveSoftwareScope(plc, change.ScopePath);
+            if (scope.Unit != null) throw new BridgeException("UnsupportedScope", "CreateInstanceDB takes no namespace; instance DBs are created only in the standard PLC program scope.");
+            var fbs = ScopeBlocks(scope, budget).Where(block => block.Item is FB && string.Equals(block.Item.Name, requested, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "instanceOfName lookup is incomplete.");
+            if (fbs.Length > 1) throw new BridgeException("AmbiguousTarget", "instanceOfName matches more than one FB.");
+            var fb = fbs.FirstOrDefault();
+            string system = SystemInstanceFbs.FirstOrDefault(item => string.Equals(item, requested, StringComparison.OrdinalIgnoreCase));
+            if (fb == null && system == null) throw new BridgeException("BlockNotFound", "instanceOfName must name one FB of the selected scope, or R_TRIG/F_TRIG.");
+            if (fb != null && fb.NativeSystemGroup && system == null) throw new BridgeException("GeneratedObject", "Only R_TRIG and F_TRIG may be instantiated from a generated system group.");
+            if (fb != null && !fb.NativeSystemGroup) EnsureEditableBlock(fb.Item, false);
+            change.Payload["instanceOfName"] = fb?.Item.Name ?? system;
+            ((JArray)preview["effects"]).Add(new JObject { ["action"] = "create", ["blockType"] = "InstanceDB", ["blockName"] = name, ["groupPath"] = change.GroupPath,
+                ["number"] = number == 0 ? (JToken)"auto" : number, ["instanceOfName"] = change.Payload["instanceOfName"], ["instanceOfPath"] = fb?.Path, ["systemFb"] = system != null });
+            if (fb == null) ((JArray)preview["warnings"]).Add(system + " is not yet in System blocks; whether CreateInstanceDB supplies it without an earlier use is not natively verified.");
+        }
+
+        private void ApplyInstanceDbCreate(EngineeringChange change)
+        {
+            var plc = SelectPlc(change.Selector);
+            int number = InstanceDbNumber(change.Payload);
+            // The number argument is ignored when auto-numbered; 1 is only a valid placeholder.
+            MutationBlockGroup(change, plc).Blocks.CreateInstanceDB(change.BlockNames[0], number == 0, number == 0 ? 1 : number, change.Payload.Value<string>("instanceOfName"));
+            var db = VerifyInstanceDb(change, plc);
+            change.Readbacks.Add(new JObject { ["role"] = "instance-db", ["name"] = db.Name, ["number"] = db.Number, ["instanceOfName"] = db.InstanceOfName });
+        }
+
+        private InstanceDB VerifyInstanceDb(EngineeringChange change, PlcSelection plc)
+        {
+            var db = FindBlockByName(plc, change.BlockNames[0], true, change).Item as InstanceDB;
+            int number = InstanceDbNumber(change.Payload);
+            if (db == null || db.InstanceOfName != change.Payload.Value<string>("instanceOfName") || (number != 0 && db.Number != number))
+                throw new BridgeException("MutationVerificationFailed", "Created instance DB read-back differs from the request.");
+            return db;
+        }
+
+        private static int InstanceDbNumber(JObject payload)
+        {
+            if (payload["number"] == null) return 0;
+            long number = payload["number"].Type == JTokenType.Integer ? payload.Value<long>("number") : 0;
+            if (number < 1 || number > 65535) throw new BridgeException("InvalidRequest", "number must be an integer from 1 to 65535.");
+            return (int)number;
+        }
+
         private JObject CheckDeleteDependencies(EngineeringChange change, PlcSelection plc, IEngineeringObject target, string name)
         {
             try { DependencyRules.RequirePolicy(change.Payload.Value<string>("dependencyPolicy")); }
