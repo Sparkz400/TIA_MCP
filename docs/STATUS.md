@@ -1,5 +1,19 @@
 # Current status
 
+**Unified and Classic HMI, online compare and upload, Test Suite application tests, block protection — 27 October 2026:** All implemented and compiled against the V21 PublicAPI. Nothing has run natively; all of it is catalog `partial`/`unverified`, or `blocked` where noted.
+- **Unified HMI:** `hmi_inspect` gains an opt-in `model` section: one bounded typed walker over 20 Unified `HmiSoftware` collections. The Unified preservation manifest now compares that walker's per-object hashes, not only tag tables. V21 still has no `Screen.Export`, so the manifest remains incomplete, and every HMI write stays gated.
+- **Classic HMI:** `hmi_engineering` gains a gated `classic_xml_import` operation for screens, templates, popups, slide-ins, global elements, overview, tag tables, text/graphic lists, VB scripts, cycles and connections. The re-export must equal the supplied document. The Classic preservation capture no longer reads `Name`/`Folders` on slide-ins, which lack them.
+- **Online compare and upload:**
+  - `plc_online_compare` uses an owned PLCSIM instance only and always goes offline afterwards. It may mark the open project modified, because it applies the PLC's target interface like provisioning does, but it never saves.
+  - `plc_station_upload` uploads into a new owned project through shared admission.
+- **Test Suite application tests:**
+  - `testsuite_application_inventory`.
+  - The prepared kind `testsuite_application_import`.
+  - `testsuite_application_plan_prepare`, whose reviews run through the existing style-job tools behind the disabled native-execution gate.
+- **Block protection:** `block_protect`, `block_unprotect` and `block_write_protection_set` carry only protected-credential references. Apply refuses with `CredentialRouteUnavailable` until a reviewed route hands a vault secret to a worker change, so they are catalog `blocked`.
+
+[HMI engineering](guides/hmi-engineering.md), [simulation](guides/simulation.md), [Test Suite jobs](reference/testsuite-production-jobs.md).
+
 **Software units, PLC documents, project copy and compare, runtime diagnostics and PLCSIM capture — 27 October 2026:** None of this has run natively. All of it is catalog `partial`/`unverified`, except the protocol and transfer code, which passes offline fakes and the loopback UA server.
 - **Software units:** prepared kinds `software_unit_create`, `software_unit_relation_set`, `software_unit_publication_set` and `software_unit_delete`. They refuse safety units and cycles; delete needs an empty, unreferenced unit.
 - **PLC documents:** `block_read`/`type_read` take a `format` of `simaticSd` or `generatedSource`. Source generation removes any external source it leaves behind. There is also `plc_document_inventory`, plus `plc_loadable_generate`, which never downloads and refuses inconsistent blocks.
