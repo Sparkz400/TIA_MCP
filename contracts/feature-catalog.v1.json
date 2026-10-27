@@ -3977,6 +3977,51 @@
       ]
     },
     {
+      "featureId": "instance_lookup",
+      "domain": "analysis",
+      "title": "Look up exact FB/FC instances, call sites and bindings",
+      "mcpTools": [
+        "instance_lookup"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base CrossReferenceService.GetCrossReferences(CrossReferenceFilter) with SourceObject.References, ReferenceObject.Locations and Location.Access/ReferenceType/ReferenceLocation; Siemens.Engineering.Step7 PlcBlock.Export(FileInfo, ExportOptions), InstanceDB.InstanceOfName, PlcBlock.ProgrammingLanguage/IsKnowHowProtected; SimaticML SCL_v4, LADFBD_v5, STL_v5 and Graph_v6 Access/CallInfo schemas."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exact FB or FC in one PLC. Instance DBs resolve through the shared native InstanceType/TypeInstance or unnamespaced InstanceOfName resolver; multi-instance owners are FBs the native xref reports as users, confirmed by an exact same-scope Static declaration (including arrays with literal bounds) in their exported interface, up to maxDepth 8.",
+          "Call sites list native xref call locations plus exported SCL/LAD/FBD CallInfo with compile-unit ordinal, instance components and simple symbolic actual operands; expressions, wired logic and indirect operands stay unresolved.",
+          "STL and GRAPH are an unqualified symbolic scan of exported Access/CallInfo per the V21 schemas with no binding reader; native xref Open/Actions/Transition/Interlock/Supervision rows are retained. Other languages are reported unsupported and skipped.",
+          "maxItems bounds rows, a 2000-item native scan budget bounds xref traversal, maxXmlBlocks (max 50) bounds exports; every truncation and unresolved candidate is explicit. No runtime call context, dataflow or online address is inferred."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Writable Host artifact directory for SimaticML exports"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "engineering_read",
       "domain": "engineering",
       "title": "Describe typed engineering targets and change metadata",
