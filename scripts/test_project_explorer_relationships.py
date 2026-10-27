@@ -106,10 +106,10 @@ class SeededFixtureTests(unittest.TestCase):
 
     def test_partial_or_undeclared_coverage_fails(self):
         graph = {"providerScope": {"providers": ["softwareUnitRelations"]},
-                 "coverage": [{"provider": "softwareUnitRelations", "scope": "/u/A", "status": "complete"}]}
+                 "providerCoverage": [{"provider": "softwareUnitRelations", "scope": "/u/A", "status": "complete"}]}
         require_complete_coverage(graph, "softwareUnitRelations", "/u/A")
         partial = copy.deepcopy(graph)
-        partial["coverage"][0]["status"] = "partial"
+        partial["providerCoverage"][0]["status"] = "partial"
         undeclared = copy.deepcopy(graph)
         undeclared["providerScope"]["providers"] = []
         for value, scope in ((partial, "/u/A"), (undeclared, "/u/A"), (graph, "/u/B")):

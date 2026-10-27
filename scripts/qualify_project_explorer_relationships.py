@@ -82,7 +82,7 @@ def resolved_triples(graph, kinds):
 
 
 def require_complete_coverage(graph, provider, scope):
-    rows = [row for row in graph.get("coverage", []) if row.get("provider") == provider and row.get("scope") == scope]
+    rows = [row for row in graph.get("providerCoverage", []) if row.get("provider") == provider and row.get("scope") == scope]
     require(len(rows) == 1 and rows[0].get("status") == "complete", "%s coverage for %s is not complete: %r" % (provider, scope, rows))
     require(provider in (graph.get("providerScope") or {}).get("providers", []), "Graph must declare the %s provider" % provider)
 
