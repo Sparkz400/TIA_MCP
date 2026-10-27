@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.32",
-    "catalogSha256": "6f57cd76c5f27b7cd0682ddddff94cffbbb547ddf12eaf79d0e51ae6ba5972dc",
+    "catalogSha256": "7cd249a934e6f4b03a41c3381f834972263f742c8b95ffef1316f8c94a57e035",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -12,18 +12,18 @@
     21
   ],
   "summary": {
-    "features": 357,
+    "features": 367,
     "support": {
       "deferred": 10,
       "limited": 36,
       "shipped": 85,
       "unavailable_target": 1,
-      "unqualified": 225
+      "unqualified": 235
     },
     "cells": {
       "bound": 441,
       "deferred": 30,
-      "open": 1209
+      "open": 1252
     },
     "openCellsByOwner": {
       "C02": {
@@ -62,9 +62,13 @@
         "role": "Drives",
         "open": 14
       },
+      "D11": {
+        "role": "Alarms and HMI",
+        "open": 3
+      },
       "D12": {
         "role": "Security and web",
-        "open": 38
+        "open": 44
       },
       "D13": {
         "role": "Technology and drives",
@@ -108,7 +112,7 @@
       },
       "L04": {
         "role": "Explorer and integration",
-        "open": 36
+        "open": 39
       },
       "L05": {
         "role": "Qualification and libraries",
@@ -128,7 +132,7 @@
       },
       "X03": {
         "role": "Security",
-        "open": 28
+        "open": 34
       },
       "X04": {
         "role": "Add In",
@@ -137,6 +141,10 @@
       "X05": {
         "role": "Collaboration",
         "open": 14
+      },
+      "X06": {
+        "role": "Optional languages",
+        "open": 10
       },
       "X07": {
         "role": "HMI",
@@ -152,7 +160,7 @@
       },
       "X10": {
         "role": "Hardware and remote IO",
-        "open": 39
+        "open": 60
       },
       "X11": {
         "role": "PLC and typed",
@@ -802,6 +810,36 @@
       ]
     },
     {
+      "featureId": "hardware_gsd_export",
+      "domain": "hardware",
+      "mcpTools": [
+        "hardware_gsd_export"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
       "featureId": "technology_read",
       "domain": "technology",
       "mcpTools": [
@@ -816,6 +854,37 @@
         "local.hardware.v02",
         "local.layers.encoder-connected.20261008"
       ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "plc_alarm_inspect",
+      "domain": "inspection",
+      "mcpTools": [
+        "plc_alarm_inspect"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D11",
+        "L04"
+      ],
+      "evidenceIds": [],
       "cells": [
         {
           "gate": "AC-identity",
@@ -2114,6 +2183,54 @@
         "local.conformance.v03",
         "local.units.v03"
       ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.graph_import",
+      "domain": "language",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "graph_import",
+      "support": "unqualified",
+      "owners": [
+        "X06"
+      ],
+      "evidenceIds": [],
       "cells": [
         {
           "gate": "AC-identity",
@@ -7208,6 +7325,150 @@
       ]
     },
     {
+      "featureId": "change.hardware_port_connect",
+      "domain": "hardware",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_port_connect",
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_disconnect",
+      "domain": "hardware",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_port_disconnect",
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.hardware_replace",
+      "domain": "hardware",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_replace",
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "mcpTools": [
@@ -11761,6 +12022,41 @@
       ]
     },
     {
+      "featureId": "graph_export",
+      "domain": "language",
+      "mcpTools": [
+        "graph_export"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "X06"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
       "featureId": "vci_branches",
       "domain": "version_control",
       "mcpTools": [
@@ -12782,6 +13078,97 @@
         },
         {
           "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "access_inspect",
+      "domain": "security-access",
+      "mcpTools": [
+        "access_inspect"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "X03",
+        "D12"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "certificate_inspect",
+      "domain": "public-certificates",
+      "mcpTools": [
+        "certificate_inspect"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "X03"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "web_inspect",
+      "domain": "web-applications",
+      "mcpTools": [
+        "web_inspect"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D12"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
           "status": "open",
           "evidenceIds": []
         }
