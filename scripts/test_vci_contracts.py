@@ -21,8 +21,10 @@ class VciContracts(unittest.TestCase):
         registry = json.loads((ROOT/'contracts/api-coverage/registry.v1.json').read_text(encoding='utf-8'))
         for name in expected:
             row = next(row for row in catalog['features'] if row['featureId']==name)
-            self.assertEqual('unverified',row['qualification']['status'])
-            self.assertEqual([],row['qualification']['evidenceIds'])
+            # Actual-Host Git runs may verify the rows; native VCI evidence may not.
+            evidence = row['qualification']['evidenceIds']
+            self.assertEqual('verified' if evidence else 'unverified', row['qualification']['status'])
+            self.assertTrue(all('.hostonly.' in e for e in evidence), evidence)
             self.assertIn('D01',next(row for row in registry['featureObligations'] if row['featureId']==name)['obligations'])
 
     def test_file_input_distinguishes_empty_upload_and_deletion(self):

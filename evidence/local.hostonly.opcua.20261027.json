@@ -1,0 +1,115 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hostonly.opcua.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T08:49:36+00:00",
+  "source": {
+    "commit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/test_opcua_host_mcp.py on the Release Host: 53 stdio checks. NodeSet inspect/compare/dependencies/dependency compare/report pages/reopen/list/artifact reads against the JSON contract, stale consumer refusal, bounded pages over 4,000 references, upload retries and no target probe.",
+  "limitations": [
+    "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+    "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+    "Offline NodeSet documents only; no native OPC UA engineering, endpoint, runtime, security or compatibility certification."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "51ca5ae12795045de3464705e6f20a2bd525904747c258a9b6b6f60ce21f9f89"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "80c73a9c78c2e287904296d5900c4ff75b5ba624b0e62db07dab25958e9bc6e9",
+      "bytes": 43217,
+      "completed": true,
+      "steps": [
+        "all eight production OPC UA tools registered",
+        "all OPC UA tools are closed-world with no path/output/overwrite input",
+        "no production native OPC UA engineering tools advertised",
+        "exact original content hash and offline flags",
+        "exact original download",
+        "independent retained copy survives upload release",
+        "actual MCP cursor roundtrip",
+        "opcua_report_page rejects OpcUaStaleCursor",
+        "opcua_report_page rejects OpcUaPageLimit",
+        "opcua_report_page rejects OpcUaInvalidSection",
+        "three independent breaking changes and affected consumers",
+        "exact supplied manifest retained with unknown consumers",
+        "annotations retain exact original uploaded bytes",
+        "node and outside-root annotations are visible through MCP",
+        "annotation consumer impact survives report paging",
+        "annotation text offsets remain significant without false payload changes",
+        "explicit model set digest independently computed",
+        "selected edges resolve without completeness or version certification",
+        "v2 consumer transitive impact has actual dependency path",
+        "nested before dependency section is pageable",
+        "missing and unsupported dependencies remain explicit",
+        "opcua_dependencies rejects OpcUaInvalidSources",
+        "opcua_dependencies rejects OpcUaInvalidSources",
+        "opcua_dependency_compare rejects OpcUaInvalidReference",
+        "opcua_reopen rejects OpcUaInvalidReference",
+        "opcua_reopen rejects OpcUaInvalidReference",
+        "opcua_reopen rejects OpcUaInvalidReference",
+        "opcua_inspect rejects InvalidRequest",
+        "opcua_artifact_read rejects OpcUaInvalidReference",
+        "opcua_artifact_read rejects OpcUaPageLimit",
+        "opcua_artifact_read rejects OpcUaInvalidCursor",
+        "opcua_inspect rejects OpcUaInvalidXml",
+        "opcua_inspect rejects OpcUaInvalidXml",
+        "opcua_inspect rejects OpcUaCapacity",
+        "opcua_compare rejects OpcUaCapacity",
+        "opcua_compare rejects OpcUaWorkflowFailed",
+        "opcua_compare rejects OpcUaStaleConsumers",
+        "opcua_dependency_compare rejects OpcUaStaleConsumers",
+        "artifact_upload_chunk rejects UploadNotWritable",
+        "opcua_inspect rejects UploadIncomplete",
+        "repeated inspection creates new record without overwriting previous publication",
+        "oversize row is explicitly omitted while full report preserves all data",
+        "real Host restart retains exact dependency comparison",
+        "real Host restart retains exact original bytes",
+        "real Host restart retains annotation comparison",
+        "restart discovery includes all complete records",
+        "opcua_reopen rejects OpcUaIntegrityFailure",
+        "opcua_reopen rejects OpcUaIntegrityFailure",
+        "opcua_artifact_read rejects OpcUaIntegrityFailure",
+        "opcua_reopen rejects OpcUaPublicationIncomplete",
+        "incomplete and integrity-failed records remain discoverable",
+        "offline workflow creates no native operation records",
+        "worker path remains nonexistent"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "artifact_upload_release",
+        "opcua_artifact_read",
+        "opcua_compare",
+        "opcua_dependencies",
+        "opcua_dependency_compare",
+        "opcua_inspect",
+        "opcua_list",
+        "opcua_reopen",
+        "opcua_report_page"
+      ],
+      "toolsRejected": [
+        "artifact_upload_chunk",
+        "opcua_artifact_read",
+        "opcua_compare",
+        "opcua_dependencies",
+        "opcua_dependency_compare",
+        "opcua_inspect",
+        "opcua_reopen",
+        "opcua_report_page"
+      ]
+    }
+  ]
+}
