@@ -64,6 +64,9 @@ internal static partial class Program
             var table = b.TagTableGroup.TagTables.Find("QualificationTags");
             table.Tags.Create("MotorEnable", "Bool", "%M10.0"); table.Tags.Create("MotorActive", "Bool", "%M10.1");
             result["installTarget"] = new JObject { ["plc"] = b.Name, ["tags"] = new JArray("MotorEnable", "MotorActive"), ["motorStatusRemoved"] = b.TypeGroup.Types.Find("MotorStatus") == null };
+            // Uncompiled blocks have no reliable native fingerprint, so the bridge would refuse to plan.
+            var compile = Compile(new Software[] { a, b }); result["plcCompile"] = compile;
+            if (compile.Any(row => row["error"] != null || row.Value<int>("errorCount") != 0)) throw new InvalidOperationException("The plchmi PLCs do not compile cleanly.");
             result["plcA"] = a.Name; result["plcB"] = b.Name; result["hmiA"] = hmiA.Name; result["connectionA"] = connectionA;
             result["status"] = "created";
         }
