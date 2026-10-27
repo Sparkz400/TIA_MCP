@@ -641,17 +641,24 @@ internal static class TypedGraphicalTests
         DirectoryInfo? root = new(AppContext.BaseDirectory);
         while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "instance-effects-transitive.v1.json"))) root = root.Parent;
         if (root == null) throw new InvalidOperationException("Missing captured transitive effect.");
-        XDocument Read(string name) => EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", "instance-effects-transitive", name + ".xml")));
+        XDocument Read(string name, string capture = "instance-effects-transitive") => EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "native", capture, name + ".xml")));
         string[] added = { "Child", "Timer_TON", "Timer_TOF", "Timer_TP", "Counter_CTU", "Counter_CTD", "Counter_CTUD" };
-        var members = Read("after-Tgp_NestEffect_DB").Descendants().Where(e => e.Name.LocalName == "Member" && added.Contains((string?)e.Attribute("Name"))
+        XElement[] Members(string prefix, string capture) => Read("after-" + prefix + "NestEffect_DB", capture).Descendants().Where(e => e.Name.LocalName == "Member" && added.Contains((string?)e.Attribute("Name"))
             && e.Parent!.Attribute("Name")?.Value == "Static" && e.Parent.Parent!.Parent!.Name.LocalName == "Interface").ToArray();
-        Check.Equal(string.Join(",", added), string.Join(",", members.Select(m => (string?)m.Attribute("Name"))));
-        // Both depths, parent FBs and parent DBs: the captured direct members reproduce the native after state exactly.
-        foreach (var parent in new[] { "Tgp_NestParent", "Tgp_NestGrand", "Tgp_NestParent_DB", "Tgp_NestGrand_DB" })
+        var members = Members("Tgp_", "instance-effects-transitive");
+        // Every route, both depths, parent FBs and parent DBs: the captured direct members reproduce the native after state exactly.
+        foreach (var (capture, prefix, changed) in new[] { ("instance-effects-transitive", "Tgp_", "Tgp_NestEffect"),
+            ("instance-effects-transitive-softwareUnit", "TgpUnit_", "TiaMcp_UnitA.TgpUnit_NestEffect"),
+            ("instance-effects-transitive-namespace", "TgpNamespace_", "TiaMcp_UnitA.Alternate.TgpNamespace_NestEffect") })
         {
-            var expected = Read("before-" + parent);
-            foreach (var member in members) expected = TypedGraphicalMultiInstanceTemplate.AppendNested(expected, "Tgp_NestEffect", member);
-            EngineeringSources.RequireNativePreservation(Read("after-" + parent), expected);
+            var routeMembers = Members(prefix, capture);
+            Check.Equal(string.Join(",", added), string.Join(",", routeMembers.Select(m => (string?)m.Attribute("Name"))));
+            foreach (var parent in new[] { "NestParent", "NestGrand", "NestParent_DB", "NestGrand_DB" })
+            {
+                var expected = Read("before-" + prefix + parent, capture);
+                foreach (var member in routeMembers) expected = TypedGraphicalMultiInstanceTemplate.AppendNested(expected, changed, member);
+                EngineeringSources.RequireNativePreservation(Read("after-" + prefix + parent, capture), expected);
+            }
         }
         Check.Equal("instance-effects-transitive.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("standard"));
         Check.Equal("instance-effects-transitive-softwareUnit.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("softwareUnit"));
