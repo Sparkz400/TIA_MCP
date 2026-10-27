@@ -24,6 +24,17 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   file names (`instance-effects*-<route>.v1.json`) do not collide across CPUs. The Boolean fallback
   profile in `TypedGraphical.Validation.cs` stays bound to CPU 1511 V4.1.
 
+## Cross-scope calls — 27 October 2026
+
+- The builder accepts calls to another namespace of the caller's unit through the route's
+  `namespaceQualified` call profile, and calls into another software unit only with a direct
+  `SoftwareUnit` relation, a `Published` callee and a separate `crossUnitQualified` profile.
+  Callee scope, access, namespace and interface are in the preview and rechecked at apply.
+  Offline tests only.
+- [ ] Capture `route-capture-crossscope-call-packet.v1.json` (the cross-unit part needs a
+  prepared archive with unit B, the relation and the publication), bind the cross-unit
+  profile in `extract_typed_graphical_profiles.py`, then add and run route cases for both.
+
 ## Lane A — 25 October 2026
 
 - Software-unit baseline rebuilt from a fresh UnitSeeder seed; all 24 route cases passed all four

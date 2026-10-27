@@ -263,35 +263,82 @@ internal static class TypedGraphicalTests
         (model, context) = CallFixture(false);
         model.Connections[0].To.Port = "Result";
         await Error("InvalidGraphTopology", () => TypedGraphical.Build(Fixture("FBD"), model, context));
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            // Same namespace: unchanged, and the result equals the native capture.
+            var (captured, authored, qualified) = CapturedUnitCall(language);
+            var actual = TypedGraphical.Build(captured, authored, qualified);
+            var info = actual.Document.Descendants(Net + "CallInfo").Single();
+            Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", info.Attribute("Name")!.Value);
+            Check.Equal(null, info.Attribute("Namespace"));
+            EngineeringSources.RequireNativePreservation(captured, actual.Document);
+            // A caller in another namespace of the same unit uses the same absolute qualified Name and namespace-route profile.
+            qualified.TargetNamespace = "TiaMcp_UnitA.Alternate"; qualified.Route = "namespace";
+            var crossNamespace = TypedGraphical.Build(captured, authored, qualified);
+            Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", crossNamespace.Document.Descendants(Net + "CallInfo").Single().Attribute("Name")!.Value);
+            Check.Equal(true, crossNamespace.Profiles.Contains("v21.fw41.namespace." + language.ToLowerInvariant() + ".call.v1"));
+            // Without a bound namespace-qualified profile the namespaced call stays refused.
+            qualified.Profiles = qualified.Profiles.Select(p => { var copy = JObject.FromObject(p).ToObject<TypedGraphicalProfile>()!; if (copy.Kind == "call") copy.CalleeNameEncoding = null; return copy; }).ToArray();
+            await Error("GraphicalCalleeUnsupported", () => TypedGraphical.Build(captured, authored, qualified));
+        }
+    }
+
+    internal static async Task CrossUnitCallsRequireRelationPublicationAndTheirOwnProfile()
+    {
+        foreach (string language in new[] { "LAD", "FBD" })
+        {
+            var (captured, authored, context) = CapturedUnitCall(language);
+            var catalog = context.Profiles;
+            var callee = context.Callees.Values.Single();
+            // Caller in TiaMcp_UnitB calls TiaMcp_UnitA's block. The cross-unit profile is unit-test-only: none is captured.
+            context.TargetScopePath = "Devices/PLC/units/TiaMcp_UnitB"; context.TargetNamespace = "TiaMcp_UnitB";
+            callee.ScopePath = "Devices/PLC/units/TiaMcp_UnitA"; callee.UnitAccess = "Published";
+            context.RelatedScopePaths = [callee.ScopePath];
+            var crossUnit = JObject.FromObject(catalog.Single(p => p.Kind == "call" && p.Route == "softwareUnit" && p.Language == language)).ToObject<TypedGraphicalProfile>()!;
+            crossUnit.Id += ".crossunit-test"; crossUnit.CalleeNameEncoding = "crossUnitQualified";
+            context.Profiles = catalog.Concat([crossUnit]).ToArray();
+            var accepted = TypedGraphical.Build(captured, authored, context);
+            Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", accepted.Document.Descendants(Net + "CallInfo").Single().Attribute("Name")!.Value);
+            Check.Equal(true, accepted.Profiles.Contains(crossUnit.Id));
+            context.RelatedScopePaths = [];
+            await Error("GraphicalUnitRelationMissing", () => TypedGraphical.Build(captured, authored, context));
+            context.RelatedScopePaths = [callee.ScopePath];
+            callee.UnitAccess = "Unpublished";
+            await Error("GraphicalCalleeUnpublished", () => TypedGraphical.Build(captured, authored, context));
+            callee.UnitAccess = "Published";
+            // The in-unit namespace-qualified profile never serves a cross-unit call.
+            context.Profiles = catalog;
+            await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(captured, authored, context));
+            // A same-unit call ignores the cross-unit slot and keeps its captured profile.
+            context.Profiles = catalog.Concat([crossUnit]).ToArray();
+            callee.ScopePath = context.TargetScopePath;
+            Check.Equal(false, TypedGraphical.Build(captured, authored, context).Profiles.Contains(crossUnit.Id));
+        }
+    }
+
+    // The captured software-unit numeric FC caller with its exact callee and the deployed catalog profiles.
+    private static (XDocument Captured, TypedGraphicalModel Model, TypedGraphicalContext Context) CapturedUnitCall(string language)
+    {
         DirectoryInfo? root = new(AppContext.BaseDirectory);
         while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
         if (root == null) throw new InvalidOperationException("Missing qualified native call corpus.");
         string fixtures = Path.Combine(root.FullName, "fixtures", "typed-graphical");
         var profiles = JObject.Parse(File.ReadAllText(Path.Combine(fixtures, "profiles.v1.json")))["profiles"]!.ToObject<TypedGraphicalProfile[]>()!;
         var cases = JObject.Parse(File.ReadAllText(Path.Combine(fixtures, "numeric-cases.v1.json")))["cases"]!;
-        foreach (string language in new[] { "LAD", "FBD" })
-        {
-            var captured = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(fixtures, "native", "TgpUnit_NumericFC_" + language + ".xml")));
-            var authored = cases.Single(c => c.Value<string>("family") == "numeric-fc" && c.Value<string>("language") == language)["payload"]!["model"]!.ToObject<TypedGraphicalModel>()!;
-            authored.NetworkId = "3";
-            const string calleePath = "/captured/unit/TgpUnit_NumericFC";
-            authored.Nodes.Single(n => n.Kind == "call").CalleePath = calleePath;
-            var qualified = Context(); qualified.Route = "softwareUnit"; qualified.TargetNamespace = "TiaMcp_UnitA"; qualified.Profiles = profiles;
-            qualified.Operands.Clear();
-            foreach (var operand in authored.Operands)
-                qualified.Operands[operand.Key] = operand.Scope == "constant" ? new() { Identity = "literal:true", Scope = "LiteralConstant", DataType = "Bool", Value = "true", DeclarationHash = "captured" }
-                    : new() { Identity = "/captured/" + operand.Key, Scope = "LocalVariable", Components = operand.Components, DataType = "Int", Writable = operand.Key != "Value", DeclarationHash = "captured" };
-            qualified.Callees[calleePath] = new() { Path = calleePath, Name = "TgpUnit_NumericFC", Namespace = "TiaMcp_UnitA", BlockType = "FC", InterfaceHash = new string('a', 64), Parameters = [
-                new() { Name = "Value", Section = "Input", DataType = "Int" }, new() { Name = "Result", Section = "Output", DataType = "Int" },
-                new() { Name = "Accumulator", Section = "InOut", DataType = "Int" }, new() { Name = "Ret_Val", Section = "Return", DataType = "Int" }] };
-            var actual = TypedGraphical.Build(captured, authored, qualified);
-            var info = actual.Document.Descendants(Net + "CallInfo").Single();
-            Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", info.Attribute("Name")!.Value);
-            Check.Equal(null, info.Attribute("Namespace"));
-            EngineeringSources.RequireNativePreservation(captured, actual.Document);
-            qualified.TargetNamespace = "TiaMcp_UnitA.Alternate";
-            await Error("GraphicalCalleeUnsupported", () => TypedGraphical.Build(captured, authored, qualified));
-        }
+        var captured = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(fixtures, "native", "TgpUnit_NumericFC_" + language + ".xml")));
+        var authored = cases.Single(c => c.Value<string>("family") == "numeric-fc" && c.Value<string>("language") == language)["payload"]!["model"]!.ToObject<TypedGraphicalModel>()!;
+        authored.NetworkId = "3";
+        const string calleePath = "/captured/unit/TgpUnit_NumericFC";
+        authored.Nodes.Single(n => n.Kind == "call").CalleePath = calleePath;
+        var qualified = Context(); qualified.Route = "softwareUnit"; qualified.TargetNamespace = "TiaMcp_UnitA"; qualified.Profiles = profiles;
+        qualified.Operands.Clear();
+        foreach (var operand in authored.Operands)
+            qualified.Operands[operand.Key] = operand.Scope == "constant" ? new() { Identity = "literal:true", Scope = "LiteralConstant", DataType = "Bool", Value = "true", DeclarationHash = "captured" }
+                : new() { Identity = "/captured/" + operand.Key, Scope = "LocalVariable", Components = operand.Components, DataType = "Int", Writable = operand.Key != "Value", DeclarationHash = "captured" };
+        qualified.Callees[calleePath] = new() { Path = calleePath, Name = "TgpUnit_NumericFC", Namespace = "TiaMcp_UnitA", BlockType = "FC", InterfaceHash = new string('a', 64), Parameters = [
+            new() { Name = "Value", Section = "Input", DataType = "Int" }, new() { Name = "Result", Section = "Output", DataType = "Int" },
+            new() { Name = "Accumulator", Section = "InOut", DataType = "Int" }, new() { Name = "Ret_Val", Section = "Return", DataType = "Int" }] };
+        return (captured, authored, qualified);
     }
 
     internal static async Task FbInstancesRequireExactOwnershipAndIntentionalSharing()

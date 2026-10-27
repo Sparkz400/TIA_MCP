@@ -265,6 +265,7 @@ internal static partial class Program
             ("Typed comparisons retain independently specified pins and overload", TypedGraphicalTests.ComparisonUsesIndependentPinAndOverloadExpectations),
             ("Typed constants enforce numeric and time bounds without implicit conversions", TypedGraphicalTests.ConstantsRespectExactSignedUnsignedAndTimeBounds),
             ("Typed calls bind exact interfaces and reject wrong parameter direction", TypedGraphicalTests.CallsBindExactInterfacesAndRejectInvalidDirections),
+            ("Typed cross-unit calls require a relation, publication and their own profile", TypedGraphicalTests.CrossUnitCallsRequireRelationPublicationAndTheirOwnProfile),
             ("Typed FB calls require exact instance ownership and explicit sharing", TypedGraphicalTests.FbInstancesRequireExactOwnershipAndIntentionalSharing),
             ("Typed bounded edits preserve IDs and reject shared opaque access", TypedGraphicalTests.BoundedEditsPreserveIdsAndRejectSharedUnknownAccess),
             ("Typed IDs and separately qualified target routes fail closed", TypedGraphicalTests.OpaqueDuplicateIdsAndUnsupportedRoutesFailClosed),

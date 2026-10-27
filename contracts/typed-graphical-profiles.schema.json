@@ -45,7 +45,7 @@
         "sourceSha256": {"$ref": "#/$defs/hash"}, "provenance": {"type": "string", "minLength": 1},
         "nativeFormatValidated": {"type": "boolean"},
         "readerOnly": {"type": "boolean"},
-        "calleeNameEncoding": {"enum": ["simple", "namespaceQualified", null]},
+        "calleeNameEncoding": {"enum": ["simple", "namespaceQualified", "crossUnitQualified", null]},
         "engineeringVerified": {"type": "boolean"}, "preservationVerified": {"type": "boolean"},
         "persistenceVerified": {"type": "boolean"}, "recoveryVerified": {"type": "boolean"}, "runtimeVerified": {"type": "boolean"},
         "instanceType": {"type": ["string", "null"]},

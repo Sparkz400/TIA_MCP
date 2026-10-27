@@ -54,6 +54,20 @@ def main():
             source = rewrite((ROOT / ("instance-effect-" + phase + ".scl")).read_text())
             (ROOT / ("route-" + route + "-instance-effect-" + phase + ".scl")).write_text(
                 envelope(namespace, qualify(source)), encoding="utf-8")
+    cross_scope()
+
+
+def cross_scope():
+    """Callers of TiaMcp_UnitA's numeric FC from its alternate namespace and from the related unit TiaMcp_UnitB.
+
+    The callee is always named absolutely; captures of these bind the cross-namespace check and the
+    crossUnitQualified call profile (route-capture-crossscope-call-packet.v1.json).
+    """
+    for label, namespace in (("CrossNamespace", "TiaMcp_UnitA.Alternate"), ("CrossUnit", "TiaMcp_UnitB")):
+        for language in ("lad", "fbd"):
+            source = (ROOT / ("numeric-fc-" + language + ".s7dcl")).read_text()
+            source = source.replace('"Tgp_NumericFC_', '"Tgp' + label + '_NumericFC_').replace('"Tgp_NumericFC"', '"TiaMcp_UnitA.TgpUnit_NumericFC"')
+            (ROOT / ("route-" + label + "-numeric-fc-" + language + ".s7dcl")).write_text(envelope(namespace, source), encoding="utf-8")
 
 
 if __name__ == "__main__":
