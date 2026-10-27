@@ -14324,7 +14324,7 @@
     {
       "featureId": "qualification_translation_prepare",
       "domain": "qualification",
-      "title": "Qualification-session only: bind fresh capture to an explicit no-op or single target edit and exact durable review.",
+      "title": "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
       "mcpTools": [
         "qualification_translation_prepare"
       ],
@@ -14338,7 +14338,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Qualification-session only: bind fresh capture to an explicit no-op or single target edit and exact durable review.",
+          "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
         ]
       },
@@ -15157,7 +15157,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15203,7 +15204,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15249,7 +15251,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15295,7 +15298,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15341,7 +15345,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15387,7 +15392,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified."
+          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
         ]
       },
       "qualification": {
@@ -15412,6 +15418,51 @@
         "AC-preserve",
         "AC-native",
         "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_text_export",
+      "domain": "translations",
+      "title": "Read-only native project-text export with filtered-export leak check",
+      "mcpTools": [
+        "project_text_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase.ExportProjectTexts(FileInfo,CultureInfo,CultureInfo) for whole-project bilingual workbooks and ExportProjectTexts(FileInfo,Language,IEnumerable<Language>,IEnumerable<TextCategory>,IEnumerable<IEngineeringObject>) for explicit owners, several targets and categories; LanguageSettings.ActiveLanguages, ProjectBase.TextCategories and TextCategoryComposition.Find."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Whole-project mode uses the three-argument overload, one bilingual workbook per target culture. The five-argument overload refuses null or empty owner lists natively, so category filtering requires explicit owners.",
+          "Filtered exports are evidence only: earlier native probes showed category filtering leaking rows. The full all-category export of the same owners and targets always runs, and the Host reports leaked, dropped and changed rows by native key; see docs/reference/translation-native-import.md.",
+          "The multi-target workbook layout is unobserved. The Host reader expects one column per target between the source and ref=\"0\" headers and fails closed on any other layout; category rows are matched by the observed \"<Identifier>\" label form, and any other label makes the comparison unavailable.",
+          "Owner-mode exports omitted project-level texts such as alarm classes in earlier PLC probes; HMI owner coverage is unobserved. Never imports, saves or activates languages."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an open V21 project in the worker-owned TIA instance with the source and every target culture active."
+        ]
+      },
+      "prerequisites": [
+        "Open project in a worker-owned TIA instance",
+        "Active source and target cultures",
+        "Exact owner paths from project_inventory for owner or filtered mode"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
         "AC-evidence"
       ]
     },
