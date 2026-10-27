@@ -318,6 +318,37 @@ namespace TiaMcp.Openness.V21
                 HmiRequireReferences((Siemens.Engineering.HmiUnified.HmiSoftware)ResolveHmiTarget(project, (JObject)payload["target"]).Software, properties);
                 return result;
             }
+            if (operation == "screen_create")
+            {
+                var hmi = native as Siemens.Engineering.HmiUnified.HmiSoftware ?? throw new BridgeException("HmiTargetMismatch", "screen_create requires the exact native Unified HMI software identity (kind hmiDevice).");
+                if (hmi.Screens.Find(payload.Value<string>("name")) != null) throw new BridgeException("HmiNameConflict", "The requested screen already exists in this HMI.");
+                var size = (JObject)payload["properties"];
+                HmiTypedValues(typeof(Siemens.Engineering.HmiUnified.UI.Screens.HmiScreen), null, size);
+                // No device-resolution table is guessed: the size is copied from an existing top-level screen.
+                if (!hmi.Screens.Any(s => s.Width == size.Value<long>("Width") && s.Height == size.Value<long>("Height")))
+                    throw new BridgeException("DependencyUnresolved", "Width and Height must equal the size of an existing top-level screen of this HMI.", size);
+                result["name"] = payload["name"].DeepClone(); result["createdPath"] = HmiCreatedPath(payload); result["properties"] = size.DeepClone();
+                return result;
+            }
+            if (operation == "item_create")
+            {
+                var screen = native as Siemens.Engineering.HmiUnified.UI.Screens.HmiScreen ?? throw new BridgeException("HmiTargetMismatch", "item_create requires an exact native Unified screen identity (kind hmiScreen).");
+                if (screen.ScreenItems.Find(payload.Value<string>("name")) != null) throw new BridgeException("HmiNameConflict", "The requested item already exists on this screen.");
+                var rectangle = (JObject)payload["placement"];
+                HmiRecipeRules.RequirePlacement(rectangle.Value<long>("left"), rectangle.Value<long>("top"), rectangle.Value<long>("width"), rectangle.Value<long>("height"), screen.Width, screen.Height);
+                result["itemType"] = payload["itemType"].DeepClone(); result["name"] = payload["name"].DeepClone(); result["placement"] = rectangle.DeepClone();
+                result["screenSize"] = new JObject { ["width"] = screen.Width, ["height"] = screen.Height }; result["createdPath"] = HmiCreatedPath(payload);
+                return result;
+            }
+            if (operation == "event_handler_set")
+            {
+                if (HmiEventHandler(native, payload.Value<string>("eventType"), false) != null)
+                    throw new BridgeException("HmiNameConflict", "The object already handles this event; existing handlers and their scripts are never replaced.");
+                string script = payload.Value<string>("script");
+                result["eventType"] = payload["eventType"].DeepClone(); result["createdPath"] = HmiCreatedPath(payload);
+                result["script"] = new JObject { ["sha256"] = HmiPreservationRules.Hash(script), ["length"] = script.Length, ["executed"] = false };
+                return result;
+            }
             var item = native as Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase ?? throw new BridgeException("HmiTargetMismatch", "The operation requires an exact native Unified screen-item identity.");
             if (operation == "scalar_property_set" || operation == "item_properties_set")
             {
@@ -329,6 +360,19 @@ namespace TiaMcp.Openness.V21
                     before[property.Name] = ChangeScalar(value);
                 }
                 result["before"] = before; result["after"] = payload["properties"].DeepClone();
+            }
+            else if (operation == "dynamization_set")
+            {
+                var binding = (JObject)payload["bindings"][0];
+                string property = binding.Value<string>("property");
+                HmiTypedSetter(item.GetType(), property);
+                if (item.Dynamizations.Find(property) != null) throw new BridgeException("HmiNameConflict", "The item already has a dynamization of this property; existing dynamizations are never replaced.");
+                var tag = HmiResolveNativeObject(project, (JObject)binding["tagIdentity"]).Native as Siemens.Engineering.HmiUnified.HmiTags.HmiTag
+                    ?? throw new BridgeException("DependencyUnresolved", "Dynamization target is not an exact native HMI tag.");
+                HmiRecipeRules.RequireTypeCompatibility(binding.Value<string>("dataType"), tag.DataType);
+                if (!string.IsNullOrEmpty(tag.Connection) || !string.IsNullOrEmpty(tag.PlcTag))
+                    result["plcBackedTag"] = HmiProvePlcBackedTag(project, (JObject)payload["target"], tag.DataType, tag.Connection, tag.PlcTag, tag.AccessMode.ToString(), tag.PlcName, change.Directory);
+                result["property"] = property; result["tag"] = tag.Name; result["dataType"] = tag.DataType; result["createdPath"] = HmiCreatedPath(payload);
             }
             else
             {
@@ -432,10 +476,59 @@ namespace TiaMcp.Openness.V21
             return matches[0];
         }
 
-        // The created object's typed-readback (hmi_inspect section=model) path.
+        // The created object's typed-readback (hmi_inspect section=model) path. Dynamizations and
+        // event handlers are keyed by their PropertyName and EventType, as in the model walk.
         private static string HmiCreatedPath(JObject payload)
-            => payload["target"].Value<string>("hmiPath") + "/" + HmiModelWalk.CompositionSegment(payload.Value<string>("operation") == "connection_create" ? "Connections" : payload.Value<string>("composition"))
-                + "/" + Segment(payload.Value<string>("name"));
+        {
+            string operation = payload.Value<string>("operation");
+            switch (operation)
+            {
+                case "item_create": return payload["target"].Value<string>("objectPath") + "/" + HmiModelWalk.CompositionSegment("ScreenItems") + "/" + Segment(payload.Value<string>("name"));
+                case "dynamization_set": return payload["target"].Value<string>("objectPath") + "/" + HmiModelWalk.CompositionSegment("Dynamizations") + "/" + Segment(payload["bindings"][0].Value<string>("property"));
+                case "event_handler_set": return payload["target"].Value<string>("objectPath") + "/" + HmiModelWalk.CompositionSegment("EventHandlers") + "/" + Segment(payload.Value<string>("eventType"));
+            }
+            string composition = operation == "connection_create" ? "Connections" : operation == "screen_create" ? "Screens" : payload.Value<string>("composition");
+            return payload["target"].Value<string>("hmiPath") + "/" + HmiModelWalk.CompositionSegment(composition) + "/" + Segment(payload.Value<string>("name"));
+        }
+
+        // The allowlisted item types (HmiEngineeringRules.ItemTypes) through the documented generic Create<T>(name).
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase UnifiedCreateItem(Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBaseComposition items, string itemType, string name)
+        {
+            switch (itemType)
+            {
+                case "HmiRectangle": return items.Create<Siemens.Engineering.HmiUnified.UI.Shapes.HmiRectangle>(name);
+                case "HmiText": return items.Create<Siemens.Engineering.HmiUnified.UI.Shapes.HmiText>(name);
+                case "HmiButton": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiButton>(name);
+                case "HmiIOField": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiIOField>(name);
+                case "HmiBar": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiBar>(name);
+                case "HmiGauge": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiGauge>(name);
+                case "HmiSlider": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiSlider>(name);
+                case "HmiToggleSwitch": return items.Create<Siemens.Engineering.HmiUnified.UI.Widgets.HmiToggleSwitch>(name);
+                default: throw new BridgeException("InvalidRequest", "itemType is outside the allowlist.");
+            }
+        }
+
+        // Item subclasses redeclare EventHandlers, so the most-derived declaration is used; its documented
+        // Create/Find take the object's event-type enum. Custom control containers (string-keyed) are not mapped.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static object HmiEventHandler(IEngineeringObject native, string eventType, bool create)
+        {
+            if (!(native is Siemens.Engineering.HmiUnified.UI.Screens.HmiScreen) && !(native is Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase))
+                throw new BridgeException("HmiTargetMismatch", "event_handler_set requires an exact native Unified screen or screen-item identity.");
+            System.Reflection.PropertyInfo property = null;
+            for (var type = native.GetType(); property == null && type != null; type = type.BaseType)
+                property = type.GetProperty("EventHandlers", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly);
+            object handlers = property?.GetValue(native, null) ?? throw new BridgeException("HmiTargetMismatch", "The exact native object documents no EventHandlers composition.");
+            var method = property.PropertyType.GetMethod(create ? "Create" : "Find");
+            var parameters = method?.GetParameters();
+            if (parameters?.Length != 1 || !parameters[0].ParameterType.IsEnum)
+                throw new BridgeException("HmiTargetMismatch", "Only event-type-keyed handler compositions are mapped; custom control containers are not.");
+            var names = Enum.GetNames(parameters[0].ParameterType).Where(n => n != "None").ToArray();
+            if (!names.Contains(eventType, StringComparer.Ordinal))
+                throw new BridgeException("InvalidRequest", "eventType is not a documented event of this object.", new JObject { ["eventType"] = eventType, ["allowed"] = new JArray(names) });
+            return method.Invoke(handlers, new[] { Enum.Parse(parameters[0].ParameterType, eventType, false) });
+        }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static IEngineeringObject UnifiedCompositionObject(Siemens.Engineering.HmiUnified.HmiSoftware hmi, string composition, string name, bool create)
@@ -676,6 +769,48 @@ namespace TiaMcp.Openness.V21
                 change.HmiEvidence["createdObjectReadback"] = HmiSetTypedValues(created, payload["properties"] as JObject);
             }
             else if (operation == "object_properties_set") change.HmiEvidence["objectReadback"] = HmiSetTypedValues(native, (JObject)payload["properties"]);
+            else if (operation == "screen_create")
+            {
+                var screen = ((Siemens.Engineering.HmiUnified.HmiSoftware)native).Screens.Create(payload.Value<string>("name"));
+                if (screen.Name != payload.Value<string>("name")) throw new BridgeException("PreservationMismatch", "The created screen's native name differs from the request.");
+                change.HmiEvidence["createdScreenReadback"] = HmiSetTypedValues(screen, (JObject)payload["properties"]);
+            }
+            else if (operation == "item_create")
+            {
+                var p = (JObject)payload["placement"];
+                var created = UnifiedCreateItem(((Siemens.Engineering.HmiUnified.UI.Screens.HmiScreen)native).ScreenItems, payload.Value<string>("itemType"), payload.Value<string>("name"));
+                if (created.Name != payload.Value<string>("name")) throw new BridgeException("PreservationMismatch", "The created item's native name differs from the request.");
+                var readback = HmiSetTypedValues(created, new JObject { ["Left"] = p["left"].DeepClone(), ["Top"] = p["top"].DeepClone(), ["Width"] = p["width"].DeepClone(), ["Height"] = p["height"].DeepClone() });
+                readback["nativeType"] = created.GetType().FullName;
+                change.HmiEvidence["createdItemReadback"] = readback;
+            }
+            else if (operation == "dynamization_set")
+            {
+                var binding = (JObject)payload["bindings"][0];
+                string property = binding.Value<string>("property");
+                var tag = (Siemens.Engineering.HmiUnified.HmiTags.HmiTag)HmiResolveNativeObject(project, (JObject)binding["tagIdentity"]).Native;
+                var dynamization = ((Siemens.Engineering.HmiUnified.UI.Base.HmiScreenItemBase)native).Dynamizations.Create<Siemens.Engineering.HmiUnified.UI.Dynamization.TagDynamization>(property);
+                dynamization.Tag = tag.Name;
+                var readback = new JObject { ["propertyName"] = dynamization.PropertyName, ["dynamizationType"] = dynamization.DynamizationType.ToString(), ["tag"] = dynamization.Tag,
+                    ["dataType"] = dynamization.DataType, ["useIndirectAddressing"] = dynamization.UseIndirectAddressing, ["readOnly"] = dynamization.ReadOnly };
+                change.HmiEvidence["dynamizationReadback"] = readback;
+                if (dynamization.PropertyName != property || dynamization.DynamizationType != Siemens.Engineering.HmiUnified.UI.Dynamization.DynamizationType.Tag || dynamization.Tag != tag.Name || dynamization.UseIndirectAddressing)
+                    throw new BridgeException("PreservationMismatch", "The created tag dynamization does not read back the exact property and resolved HMI tag.", readback);
+            }
+            else if (operation == "event_handler_set")
+            {
+                string code = payload.Value<string>("script");
+                object handler = HmiEventHandler(native, payload.Value<string>("eventType"), true);
+                var script = handler?.GetType().GetProperty("Script")?.GetValue(handler, null) as Siemens.Engineering.HmiUnified.UI.Dynamization.Script.IHmiScript
+                    ?? throw new BridgeException("HmiAttributeUnavailable", "The created event handler exposes no script.");
+                // Untrusted text is stored verbatim; the bridge never executes, evaluates or syntax-checks it.
+                script.ScriptCode = code;
+                var readback = new JObject { ["eventType"] = Convert.ToString(handler.GetType().GetProperty("EventType")?.GetValue(handler, null)),
+                    ["scriptSha256"] = HmiPreservationRules.Hash(script.ScriptCode ?? ""), ["scriptLength"] = script.ScriptCode?.Length ?? 0, ["async"] = script.Async, ["executed"] = false };
+                change.HmiEvidence["eventHandlerReadback"] = readback;
+                if (script.ScriptCode != code || readback.Value<string>("eventType") != payload.Value<string>("eventType"))
+                    throw new BridgeException("PreservationMismatch", "The created event handler does not read back the exact event type and script text.", readback);
+            }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
             {
                 foreach (var property in ((JObject)payload["properties"]).Properties())
@@ -734,7 +869,7 @@ namespace TiaMcp.Openness.V21
                 // Tag creation changes the table's export files and adds the created tag's typed nodes, both keyed below its objectPath.
                 if (operation == "tag_create" || operation == "external_tag_create")
                     HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/", changed + "/tags/" + Segment(change.Payload.Value<string>("name")));
-                else if (operation == "connection_create" || operation == "object_create")
+                else if (operation == "connection_create" || operation == "object_create" || operation == "screen_create" || operation == "item_create" || operation == "dynamization_set" || operation == "event_handler_set")
                     HmiPreservationRules.RequireOnlyCreatedSubtree(beforeHashes, afterHashes, HmiCreatedPath(change.Payload));
                 else
                 {

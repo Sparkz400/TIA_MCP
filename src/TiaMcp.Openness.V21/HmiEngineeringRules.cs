@@ -7,7 +7,13 @@ namespace TiaMcp.Model
 {
     internal static class HmiEngineeringRules
     {
-        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import", "connection_create", "object_create", "object_properties_set" };
+        internal static readonly string[] Operations = { "scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import", "connection_create", "object_create", "object_properties_set",
+            "screen_create", "item_create", "dynamization_set", "event_handler_set" };
+        private static readonly string[] ScreenOperations = { "screen_create", "item_create", "dynamization_set", "event_handler_set" };
+        // Each documents typed Left/Top (Int32) and Width/Height (UInt32) setters in V21.
+        internal static readonly string[] ItemTypes = { "HmiRectangle", "HmiText", "HmiButton", "HmiIOField", "HmiBar", "HmiGauge", "HmiSlider", "HmiToggleSwitch" };
+        internal static readonly string[] DynamizedProperties = { "ProcessValue", "Visible", "Enabled" };
+        internal const int MaxScriptLength = 16384;
         // Documented typed V21 setters per Unified composition. Tag, alarm-class and screen names are
         // resolved natively at prepare; Part.Property addresses a documented part's setter.
         internal static readonly Dictionary<string, string[]> FamilyProperties = new Dictionary<string, string[]>(StringComparer.Ordinal)
@@ -25,15 +31,19 @@ namespace TiaMcp.Model
         internal static void RequireRequest(JObject payload)
         {
             if (payload == null || payload.Value<int?>("schemaVersion") != 1) throw new ArgumentException("HMI engineering requires payload.schemaVersion=1.");
-            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition" }, StringComparer.Ordinal);
+            var permitted = new HashSet<string>(new[] { "schemaVersion", "operation", "target", "expectedContentHash", "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag", "xml", "composition", "itemType", "eventType", "script" }, StringComparer.Ordinal);
             foreach (var property in payload.Properties())
                 if (!permitted.Contains(property.Name)) throw new ArgumentException("Unsupported HMI engineering field: " + property.Name);
             string operation = Text(payload, "operation");
             if (!Operations.Contains(operation, StringComparer.Ordinal)) throw new ArgumentException("Unknown HMI engineering operation.");
             if (operation != "classic_xml_import" && payload["xml"] != null) throw new ArgumentException("xml is not applicable to this operation.");
             if (operation != "object_create" && payload["composition"] != null) throw new ArgumentException("composition is not applicable to this operation.");
+            if (operation != "item_create" && payload["itemType"] != null) throw new ArgumentException("itemType is not applicable to this operation.");
+            if (operation != "event_handler_set" && (payload["eventType"] != null || payload["script"] != null)) throw new ArgumentException("eventType and script are not applicable to this operation.");
             var target = payload["target"] as JObject ?? throw new ArgumentException("An exact HMI target identity is required.");
             HmiRecipeRules.RequireFamily(Text(target, "family"));
+            if (ScreenOperations.Contains(operation) && Text(target, "family") != "unified")
+                throw new ArgumentException(operation + " uses documented Unified screen compositions; Classic screens use classic_xml_import.");
             foreach (string key in new[] { "projectCopyId", "sessionGeneration", "hmiPath", "objectPath" }) Text(target, key, 4096);
             string hash = Text(payload, "expectedContentHash");
             if (hash.Length != 64 || hash.Any(c => !Uri.IsHexDigit(c))) throw new ArgumentException("expectedContentHash must be the full native-content SHA-256; metadataRevision is insufficient.");
@@ -107,6 +117,26 @@ namespace TiaMcp.Model
                 }
                 RejectFields(payload, "dataType", "placement", "bindings", "connection", "plcTag");
             }
+            else if (operation == "screen_create")
+            {
+                HmiRecipeRules.RequireName(Text(payload, "name"), "name");
+                // The size must equal an existing screen's size of the same HMI; that native set is the allowlist.
+                var size = payload["properties"] as JObject;
+                if (size == null || size.Count != 2 || new[] { "Width", "Height" }.Any(k => size[k]?.Type != JTokenType.Integer || (long)size[k] < 1 || (long)size[k] > uint.MaxValue))
+                    throw new ArgumentException("screen_create requires properties with exactly Width and Height (positive integers) copied from an existing screen of the same HMI.");
+                RejectFields(payload, "dataType", "placement", "bindings", "connection", "plcTag");
+            }
+            else if (operation == "event_handler_set")
+            {
+                string eventType = Text(payload, "eventType", 64);
+                if (eventType == "None" || !UnquotedComponent(eventType)) throw new ArgumentException("eventType must name one documented native event type, such as Tapped or Loaded.");
+                // Untrusted script text: bounded and stored verbatim, never executed, evaluated or syntax-checked.
+                if (payload["script"]?.Type != JTokenType.String) throw new ArgumentException("script must be an explicit string.");
+                string script = (string)payload["script"];
+                if (script.Trim().Length == 0 || script.Length > MaxScriptLength || script.Any(c => char.IsControl(c) && c != '\t' && c != '\r' && c != '\n'))
+                    throw new ArgumentException("script must be 1 to " + MaxScriptLength + " characters without control characters other than tab, CR and LF.");
+                RejectFields(payload, "name", "properties", "dataType", "placement", "bindings", "connection", "plcTag");
+            }
             else if (operation == "scalar_property_set" || operation == "item_properties_set")
             {
                 var properties = payload["properties"] as JObject ?? throw new ArgumentException("properties is required.");
@@ -135,18 +165,24 @@ namespace TiaMcp.Model
                 catch (System.Xml.XmlException error) { throw new ArgumentException("xml is not a well-formed native export: " + error.Message); }
                 RejectFields(payload, "properties", "name", "dataType", "placement", "bindings", "connection", "plcTag");
             }
-            else if (operation == "item_place")
+            else if (operation == "item_place" || operation == "item_create")
             {
                 var placement = payload["placement"] as JObject ?? throw new ArgumentException("An explicit placement rectangle is required.");
                 if (placement.Count != 4) throw new ArgumentException("Placement requires exactly left, top, width and height.");
                 foreach (string key in new[] { "left", "top", "width", "height" })
                     if (placement[key]?.Type != JTokenType.Integer) throw new ArgumentException("Placement requires integer " + key + ".");
-                RejectFields(payload, "name", "dataType", "properties", "bindings", "connection", "plcTag");
+                if (operation == "item_create")
+                {
+                    HmiRecipeRules.RequireName(Text(payload, "name"), "name");
+                    if (!ItemTypes.Contains(Text(payload, "itemType"), StringComparer.Ordinal)) throw new ArgumentException("itemType must be one of: " + string.Join(", ", ItemTypes) + ".");
+                }
+                else RejectFields(payload, "name");
+                RejectFields(payload, "dataType", "properties", "bindings", "connection", "plcTag");
             }
             else
             {
                 var bindings = payload["bindings"] as JArray ?? throw new ArgumentException("An explicit binding array is required.");
-                if (bindings.Count < 1 || bindings.Count > 200) throw new ArgumentException("At most 200 explicit bindings are accepted.");
+                if (bindings.Count < 1 || bindings.Count > (operation == "dynamization_set" ? 1 : 200)) throw new ArgumentException("At most 200 explicit bindings, or one tag dynamization, are accepted.");
                 var seen = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var token in bindings)
                 {
@@ -158,6 +194,14 @@ namespace TiaMcp.Model
                     var tag = binding["tagIdentity"] as JObject ?? throw new ArgumentException("Binding requires an exact HMI tag identity, never only a name.");
                     RequireSameHmi(target, tag, "binding");
                     if (operation == "existing_binding_set" && binding["expectedValue"] == null) throw new ArgumentException("Changing an existing binding requires its observed expectedValue.");
+                    if (operation == "dynamization_set")
+                    {
+                        // Create-only: an existing dynamization is never replaced, so no expectedValue applies.
+                        string property = Text(binding, "property");
+                        if (!DynamizedProperties.Contains(property, StringComparer.Ordinal) || binding["expectedValue"] != null)
+                            throw new ArgumentException("dynamization_set creates one tag dynamization of ProcessValue, Visible or Enabled; script dynamizations and replacing existing ones are not offered.");
+                        if (property != "ProcessValue" && Text(binding, "dataType") != "Bool") throw new ArgumentException(property + " can only be dynamized by a Bool tag.");
+                    }
                 }
                 RejectFields(payload, "name", "dataType", "properties", "placement", "connection", "plcTag");
             }
@@ -175,8 +219,10 @@ namespace TiaMcp.Model
                     : "Document import is the Classic route; installed V21 Unified exposes no screen export to verify a preserving import."
                 : family == "unified" && operation == "external_tag_create"
                 ? "The Unified external-tag body proves the integrated connection's PLC owner through native CommunicationManagement endpoints and the exact root PLC tag/type before writing. Tag-table export dependency closure, unrelated-resource preservation, compiler, save/reopen, archive-recovery and PLC communication gates have not passed for this exact device/runtime profile."
-                : family != "unified" && (operation == "connection_create" || operation == "object_create" || operation == "object_properties_set")
-                ? "Unified-only operation: the inspected Classic V21 surface has no typed connection, alarm, log or runtime-settings creation/setter route; Classic objects use the preserving classic_xml_import."
+                : family != "unified" && (operation == "connection_create" || operation == "object_create" || operation == "object_properties_set" || ScreenOperations.Contains(operation))
+                ? "Unified-only operation: the inspected Classic V21 surface has no typed connection, alarm, log, runtime-settings, screen, screen-item, dynamization or event-handler creation/setter route; Classic objects use the preserving classic_xml_import."
+                : ScreenOperations.Contains(operation)
+                ? "HmiScreenComposition.Create(name), HmiScreenItemBaseComposition.Create<T>(name), DynamizationBaseComposition.Create<TagDynamization>(propertyName) and the object's EventHandlers Create(eventType) are documented. Bodies create one new screen (size copied from an existing screen), allowlisted item (rectangle within the screen), tag dynamization or event handler (script stored verbatim, never executed) with exact typed readback, and may add only that object's own typed-readback subtree. Created-subtree readback, unrelated-content preservation, compile, save/reopen, archive-recovery and visual gates have not passed for this exact device/runtime profile."
                 : operation == "connection_create"
                 ? "HmiConnectionComposition.Create(name) is documented, but Partner/Station/Node are read-only. The body creates only the software connection of one valid native CommunicationManagement endpoint pair of that name with exactly one partner PLC, then verifies the derived Partner and a driver. That derivation, unrelated-content preservation, compile, save/reopen and archive-recovery gates have not passed for this exact device/runtime profile."
                 : operation == "object_create" || operation == "object_properties_set"
@@ -215,6 +261,10 @@ namespace TiaMcp.Model
                 case "connection_create": gates.Add("newConnectionNamespaceUnique"); gates.Add("exactConnectionOwnership"); break;
                 case "object_create": gates.Add("newObjectNamespaceUnique"); gates.Add("exactObjectPropertyDelta"); gates.Add("referenceDependencyClosure"); break;
                 case "object_properties_set": gates.Add("exactObjectPropertyDelta"); gates.Add("referenceDependencyClosure"); break;
+                case "screen_create": gates.Add("newScreenNamespaceUnique"); gates.Add("exactScreenSizeReadback"); break;
+                case "item_create": gates.Add("newItemNamespaceUnique"); gates.Add("exactRectangleWithinScreen"); break;
+                case "dynamization_set": gates.Add("newDynamizationOnly"); gates.Add("exactTypedBindingOwnership"); gates.Add("bindingDependencyClosure"); break;
+                case "event_handler_set": gates.Add("newEventHandlerOnly"); gates.Add("exactScriptTextReadback"); gates.Add("scriptNeverExecuted"); break;
             }
             return gates;
         }
