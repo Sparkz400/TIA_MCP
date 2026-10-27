@@ -654,7 +654,14 @@ internal static class TypedGraphicalTests
             EngineeringSources.RequireNativePreservation(Read("after-" + parent), expected);
         }
         Check.Equal("instance-effects-transitive.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("standard"));
-        var once = TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestParent"), "Tgp_NestEffect", members[0]);
+        Check.Equal("instance-effects-transitive-softwareUnit.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("softwareUnit"));
+        // A route host references the changed FB by its namespace-qualified name (as native route exports do); only that name matches.
+        var scoped = Read("before-Tgp_NestParent");
+        foreach (var host in scoped.Descendants().Where(e => (string?)e.Attribute("Datatype") == "\"Tgp_NestEffect\""))
+            host.SetAttributeValue("Datatype", "\"TiaMcp_UnitA.TgpUnit_NestEffect\"");
+        TypedGraphicalMultiInstanceTemplate.AppendNested(scoped, "TiaMcp_UnitA.TgpUnit_NestEffect", members[0]);
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(scoped, "TgpUnit_NestEffect", members[0]));
+        var once =TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestParent"), "Tgp_NestEffect", members[0]);
         await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(once, "Tgp_NestEffect", members[0]));
         await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestEffect_DB"), "Tgp_NestEffect", members[0]));
     }
