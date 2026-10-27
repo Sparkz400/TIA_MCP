@@ -42,12 +42,11 @@
       "id": "crossUnit",
       "unit": "TiaMcp_UnitB",
       "prerequisites": [
-        "The capture runner neither creates units nor edits relations or publication. Prepare a scratch project from the baseline archive with these recoverable changes (compile=true, save=true), archive it and pass that archive and its SHA-256 as --archive/--sha256:",
-        "source_upsert of fixtures/typed-graphical/sources/route-Unit-advanced-callees.scl into scopePath <plcPath>/units/TiaMcp_UnitA, namespace TiaMcp_UnitA (or start from the saved crossNamespace capture).",
-        "software_unit_create {\"name\": \"TiaMcp_UnitB\", \"namespacePreset\": \"TiaMcp_UnitB\"}",
-        "software_unit_relation_set {\"unitPath\": \"<plcPath>/units/TiaMcp_UnitB\", \"relatedUnitPath\": \"<plcPath>/units/TiaMcp_UnitA\", \"relationType\": \"SoftwareUnit\", \"action\": \"add\"}",
-        "software_unit_publication_set {\"objectPath\": \"<plcPath>/units/TiaMcp_UnitA/blocks/namespaces/TiaMcp_UnitA/TgpUnit_NumericFC\", \"attributes\": {\"Access\": \"Published\"}}"
+        "The capture runner neither creates units nor edits relations or publication. scripts/prepare_crossunit_capture_archive.py (owned TIA only) retrieves the baseline archive above into a new owned project and applies, each with compile=true and save=true and read back from a complete native snapshot: source_upsert of fixtures/typed-graphical/sources/route-Unit-advanced-callees.scl into <plcPath>/units/TiaMcp_UnitA, namespace TiaMcp_UnitA; software_unit_relation_set {\"unitPath\": \"<plcPath>/units/TiaMcp_UnitB\", \"relatedUnitPath\": \"<plcPath>/units/TiaMcp_UnitA\", \"relationType\": \"SoftwareUnit\", \"action\": \"add\"}; software_unit_publication_set {\"objectPath\": \"<plcPath>/units/TiaMcp_UnitA/blocks/namespaces/TiaMcp_UnitA/TgpUnit_NumericFC\", \"attributes\": {\"Access\": \"Published\"}}.",
+        "The baseline already holds TiaMcp_UnitB (namespace preset TiaMcp_UnitB, no relations), so no software_unit_create is applied.",
+        "A compile-only checkpoint archives the result to artifacts/crossunit-prep/<sha256>.zap21 with a receipt <sha256>.json (path, SHA-256, baseline hash, applied change ids); the runner prints this command with --archive/--sha256 filled in."
       ],
+      "preparation": ["python", "-B", "scripts/prepare_crossunit_capture_archive.py", "--host", "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe", "--worker", "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe", "--output", "D:/wp/prep-crossunit"],
       "sources": [
         {
           "path": "fixtures/typed-graphical/sources/route-CrossUnit-numeric-fc-lad.s7dcl",

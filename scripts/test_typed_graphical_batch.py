@@ -17,6 +17,7 @@ from qualify_typed_resolution import unqualified_outer_fixture, verify_untouched
 from run_conformance import native_document, structural_xml
 from qualify_typed_tag_ambiguity import verify_native_setup
 from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile
+from prepare_crossunit_capture_archive import block_access, capture_command
 from qualify_typed_multi_dependency import verify_append
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend, file_inventory, inventory_difference
 
@@ -651,6 +652,22 @@ class RouteCapturePacketTests(unittest.TestCase):
                 if "-numeric-fc-" in entry["path"]:
                     self.assertIn('"TiaMcp_UnitA.TgpUnit_NumericFC"(', (root / entry["path"]).read_text(encoding="utf-8-sig"))
         self.assertEqual(["crossNamespace", "crossUnit"], [capture["id"] for capture in packet["captures"]])
+
+    def test_crossunit_preparation_binds_the_capture_command_and_reads_publication(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json").read_bytes())
+        capture = packet["captures"][1]
+        self.assertEqual("scripts/prepare_crossunit_capture_archive.py", capture["preparation"][2])
+        command = capture_command(capture, "artifacts/crossunit-prep/a.zap21", "a" * 64, "h.exe", "w.exe", "D:/wp/cap")
+        option = lambda name: command[command.index(name) + 1]
+        self.assertEqual(("artifacts/crossunit-prep/a.zap21", "a" * 64, "h.exe", "w.exe", "D:/wp/cap", "TiaMcp_UnitB"),
+                         tuple(map(option, ("--archive", "--sha256", "--host", "--worker", "--output", "--unit"))))
+        self.assertEqual([entry["path"] for entry in capture["sources"]], command[3:3 + len(capture["sources"])])
+        with self.assertRaises(RuntimeError):
+            capture_command({**capture, "command": [t for t in capture["command"] if t != "--worker"]}, "a", "b", "h", "w", "o")
+        xml = (root / "fixtures/typed-graphical/native/instance-effects-iec-softwareUnit/after-caller.xml").read_text(encoding="utf-8-sig")
+        self.assertEqual("Unpublished", block_access(xml))
+        self.assertEqual("Published", block_access(xml.replace("<Access>Unpublished</Access>", "<Access>Published</Access>", 1)))
 
     def test_transitive_route_cases_embed_the_caller_in_its_own_namespace(self):
         root = pathlib.Path(__file__).resolve().parents[1]
