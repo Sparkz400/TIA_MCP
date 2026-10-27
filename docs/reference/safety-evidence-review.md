@@ -13,7 +13,8 @@ keeps native capture, F-I/O, activation-test management and specialist acceptanc
    `artifact_upload_chunk`, `artifact_upload_commit`, then `project_snapshot_import`.
    Select the exact captured PLC object path from that review.
 2. Upload original before/after `safety_inspect` JSON responses through the same
-   upload tools. Preserve original bytes; do not round signatures through a
+   upload tools. `safety_validation_inspect` responses are accepted too; their
+   F-parameter and activation-test sections compare as other reported content. Preserve original bytes; do not round signatures through a
    client that stores all JSON numbers as floating point.
 3. Call `safety_evidence_review` with `reviewId`, `plcPath`, `uploadRef` (before),
    and `comparisonUploadRef` (after). Optionally supply `sources`, an array of

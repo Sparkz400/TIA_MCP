@@ -124,6 +124,7 @@ namespace TiaMcp.Openness.V21
                 case "hardware_inspect": return HardwareInspect(arguments);
                 case "technology_read": return TechnologyRead(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
+                case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);

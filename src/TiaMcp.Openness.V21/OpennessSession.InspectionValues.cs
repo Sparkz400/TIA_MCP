@@ -17,7 +17,7 @@ namespace TiaMcp.Openness.V21
     {
         private delegate JToken InspectionValueRenderer(object value, out bool complete);
 
-        private static JArray InspectionAttributes(IEngineeringObject target, ScanBudget budget, JArray warnings, string path, InspectionValueRenderer render = null)
+        private static JArray InspectionAttributes(IEngineeringObject target, ScanBudget budget, JArray warnings, string path, InspectionValueRenderer render = null, Func<string, bool> include = null)
         {
             var rows = new JArray();
             try
@@ -34,6 +34,7 @@ namespace TiaMcp.Openness.V21
                 var counts = metadata.GroupBy(info => info.Name, StringComparer.Ordinal).ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal);
                 foreach (var attribute in metadata)
                 {
+                    if (include != null && !include(attribute.Name)) continue;
                     if (!budget.Take()) break;
                     string name = attribute.Name;
                     var row = new JObject { ["name"] = name, ["readAccessKnown"] = false, ["readable"] = null,

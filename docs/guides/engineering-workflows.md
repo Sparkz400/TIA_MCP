@@ -182,9 +182,20 @@ No public method for enumerating every supported CPU-specific type/version combi
 
 ## Safety boundary
 
-Safety inspection returns offline login status, signatures and runtime-group names/timing. It does not return passwords. The dedicated import checks existing safety access and retains the safety-language boundary. It does not log in, remove protection, convert F-blocks to standard blocks, disable safety mode, or import generated F-system blocks through an unrestricted route.
+Safety inspection returns offline login status, signatures and runtime-group names/timing; `safety_validation_inspect` adds F-parameters and activation tests (below). It does not return passwords. The dedicated import checks existing safety access and retains the safety-language boundary. It does not log in, remove protection, convert F-blocks to standard blocks, disable safety mode, or import generated F-system blocks through an unrestricted route.
 
 Successful import/compilation is engineering evidence. It does not establish acceptance of a safety application or machine commissioning. Safety runtime groups, F-I/O configuration and their complete combinations still require dedicated native integration fixtures before broader mutations are claimed.
+
+### Safety validation and F-I/O inspection
+
+`safety_validation_inspect` is read-only and takes the `safety_inspect` selectors (`projectName`, `plcPath`, optional `blockName`/`blockPath`), `maxItems` (default 2000) and `exportArtifacts`. Its result keeps every `safety_inspect` field, so it can be uploaded to [`safety_evidence_review`](../reference/safety-evidence-review.md) as is; the added sections are compared there as other reported content. It adds:
+
+- `plcFParameters`: the `Failsafe_*` attributes of the PLC DeviceItem that owns `SafetyAdministration`, for example `Failsafe_CentralFSourceAddress`.
+- `fIoModules`: every device item in the project that exposes `Failsafe_FDestinationAddress`, with its `Failsafe_*` attributes (F-source/F-destination address, F-monitoring time, F-parameter signatures, F-I/O DB, SIL, CRC length). A module whose `Failsafe_FSourceAddress` differs from the PLC's central F-source address is only counted in `fIoModulesWithOtherFSource`; if either address is unreadable the module is kept with `fSourceAddressMatchesPlc: null`. I-device and shared-device ownership is not resolved.
+- `safetyValidation`: Safety Validation Assistant activation tests from `Project.GetService<SafetyValidationAssistant>()`, including user-group paths, author, evaluation device name, overall state, safety functions (test name, description, recorded `TestState`, trace flag), conditions (signal usage, device/signal name, initial/executed/response values) and the native `TestValidity.CheckValidity` state, error count and messages for tests, functions, conditions and trace configurations. Activation tests are project-level; `evaluationDeviceNameMatchesPlc` compares names only. Without the service or assembly the section reports `available: false` and `code: "UnsupportedCapability"`, and a warning marks the scope incomplete.
+- With `exportArtifacts: true`: a SimaticML export and an `ActivationTestPrintout` XLSX per activation test, and the `SafetyPrintout` PDF (Microsoft Print to PDF, `DocuInfo_ISO_A4_Portrait`, option `All`) in the export directory, each with path, size and SHA-256. The files are not parsed. A missing service, printer or failed export becomes a warning.
+
+Sensitive attribute names stay excluded. The tool does not log in, execute activation tests, reset test results, change F-parameters or approve the safety program. It is compiled against the V21 PublicAPI and not yet natively qualified.
 
 ## Recovery
 

@@ -293,10 +293,10 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        private JObject SafetyInspect(JObject args)
+        private JObject SafetyInspect(JObject args, bool validation = false)
         {
             var plc = SelectPlc(args);
-            var administration = SafetyAdministrationFor(plc.Software);
+            var administration = SafetyAdministrationFor(plc.Software, out var cpu);
             if (administration == null) throw new BridgeException("UnsupportedCapability", "SafetyAdministration is not available for this PLC/software configuration.");
             var budget = new ScanBudget(Limit(args, 500));
             var warnings = new JArray();
@@ -339,13 +339,20 @@ namespace TiaMcp.Openness.V21
                 result["blockSignatures"] = blockSignatures;
                 result["blockSignatureServiceAvailable"] = provider != null;
             }
+            if (validation) InspectSafetyValidation(plc, cpu, args, budget, warnings, result);
             result["warnings"] = warnings;
-            result["completeness"] = InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings and program/block signatures.",
-                "Reading signatures does not validate or approve a safety program", "No safety login, compile, download, acceptance or runtime operation performed");
+            result["completeness"] = validation
+                ? InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings, program/block signatures, Failsafe_* parameters of the PLC and its F-I/O, and Safety Validation Assistant activation tests.",
+                    "Reading signatures, F-parameters or test validity does not validate or approve a safety program", "Activation tests are project-level; evaluation-device correlation is by name only",
+                    "No safety login, compile, download, activation-test execution, result reset, acceptance or runtime operation performed")
+                : InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings and program/block signatures.",
+                    "Reading signatures does not validate or approve a safety program", "No safety login, compile, download, acceptance or runtime operation performed");
             return result;
         }
 
-        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software)
+        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software) => SafetyAdministrationFor(software, out _);
+
+        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software, out DeviceItem cpu)
         {
             // V21 exposes this service on the PLC DeviceItem, not PlcSoftware.
             // Follow native ownership rather than selecting another CPU by name.
@@ -354,8 +361,9 @@ namespace TiaMcp.Openness.V21
             {
                 if (!(owner is DeviceItem device)) continue;
                 var administration = device.GetService<SafetyAdministration>();
-                if (administration != null) return administration;
+                if (administration != null) { cpu = device; return administration; }
             }
+            cpu = null;
             return null;
         }
 

@@ -37,6 +37,10 @@
       <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Safety.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Siemens.Engineering.SafetyValidation">
+      <HintPath>$(TiaApiDirectory)\Siemens.Engineering.SafetyValidation.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Reference Include="Siemens.Engineering.Base">
       <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath>
