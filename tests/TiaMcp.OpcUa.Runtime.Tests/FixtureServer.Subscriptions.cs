@@ -92,6 +92,12 @@ internal sealed partial class FixtureServer
         if(Mode=="subscriptionRepublishStatus")response.NotificationMessage.NotificationData=[new ExtensionObject(new StatusChangeNotification {Status=StatusCodes.BadTimeout})];
         return response;
     }
+    public override Task<TransferSubscriptionsResponse> TransferSubscriptionsAsync(SecureChannelContext channel,RequestHeader header,UInt32Collection subscriptions,bool sendInitialValues,CancellationToken ct)
+    {
+        Audit.Enqueue(new {operation="TransferRequested",subscriptions=subscriptions.ToArray(),sendInitialValues});
+        if(Mode=="transferRefused")throw new ServiceResultException(StatusCodes.BadServiceUnsupported);
+        return base.TransferSubscriptionsAsync(channel,header,subscriptions,sendInitialValues,ct);
+    }
     public override Task<DeleteSubscriptionsResponse> DeleteSubscriptionsAsync(SecureChannelContext channel,RequestHeader header,UInt32Collection subscriptions,CancellationToken ct)
     {
         Audit.Enqueue(new {operation="SubscriptionDeleteRequested",subscriptions=subscriptions.ToArray()});

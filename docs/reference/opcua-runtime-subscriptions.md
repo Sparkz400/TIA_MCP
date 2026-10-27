@@ -1,6 +1,6 @@
 # Bounded OPC UA subscription acquisition
 
-`runtime_ua_subscription_start`, `status`, `stop`, `page` and `export` operate on the existing encrypted, pinned, owned `runtime_ua_connect` session. The client explicitly invokes CreateSubscription, CreateMonitoredItems, Publish, bounded Republish and DeleteSubscriptions. It does not register an SDK background subscription, transfer, call methods, or write process values. Optional `maximumReconnectAttempts: 1..3` permits [bounded same-session recovery](opcua-runtime.md#controlled-acquisition-reconnect); the default is zero. Durable local evidence is separate from the OPC UA server's optional durable-subscription feature; SetSubscriptionDurable is not invoked.
+`runtime_ua_subscription_start`, `status`, `stop`, `page` and `export` operate on the existing encrypted, pinned, owned `runtime_ua_connect` session. The client explicitly invokes CreateSubscription, CreateMonitoredItems, Publish, bounded Republish and DeleteSubscriptions. It does not register an SDK background subscription, call methods, or write process values. Optional `maximumReconnectAttempts: 1..3` permits [bounded recovery](opcua-runtime.md#controlled-acquisition-reconnect), including TransferSubscriptions after the server reports the session gone; the default is zero. Durable local evidence is separate from the OPC UA server's optional durable-subscription feature; SetSubscriptionDurable is not invoked.
 
 ## Acceptance and workflow
 
@@ -29,7 +29,7 @@ Publish envelopes retain original sequence number, publish time, available retra
 
 Duplicate notification messages retain the original received envelope with `duplicate=true`; their notifications do not increase the unique notification count. Sequence gaps retain the original inclusive range and observed missing count even when a later Republish recovers it. The missing count describes detected gaps, not final unrecovered sample loss. Retransmissions have their own original sequence/time/data envelope. Bad_MessageNotAvailable remains a failure event with its requested sequence and exact status. The counter excludes sequence zero and wraps from 4294967295 to 1.
 
-At most the requested total number of missing messages is republished. With recovery disabled, service failure ends acquisition. Opt-in recovery only reactivates the original session after a transport error or timeout; it cannot transfer or recreate a subscription. Messages are acknowledged only after their complete local envelope has been committed. An acknowledgement is not a guarantee that every intermediate PLC value was sampled or retained by the server.
+At most the requested total number of missing messages is republished. With recovery disabled, service failure ends acquisition. Opt-in recovery starts only after a transport error or timeout. It reactivates the original session, or transfers or recreates the subscription only when the server reports that session gone (see [Recovery evidence](#recovery-evidence)). Messages are acknowledged only after their complete local envelope has been committed. An acknowledgement is not a guarantee that every intermediate PLC value was sampled or retained by the server.
 
 ## Bounds and lifecycle
 
@@ -47,7 +47,8 @@ Contract: [opcua-runtime-subscription.v1](../../contracts/opcua-runtime-subscrip
 
 ## Recovery evidence
 
-Each `reconnect` event contains `reconnect: {attempt, state, errorCode}`. Attempts
+Each `reconnect` event contains `reconnect: {attempt, state, errorCode}`, plus
+`transfer` and `transferStatusCode` after a [session loss](#session-loss-and-transfer). Attempts
 are numbered across the entire capture. `starting` and its `succeeded`/`failed`
 result are committed separately, so a crash can retain an unfinished attempt as
 uncertain evidence. An interruption is not a known count of lost notifications.
@@ -60,6 +61,31 @@ that budget ends acquisition with `UaReconnectRepublishLimit`, rather than silen
 skipping recovery. A zero Republish budget therefore permits session reactivation
 but cannot continue the subscription. Notification limits and server status changes
 can also end the drain. No values or missing source times are interpolated.
+
+### Session loss and transfer
+
+If reactivation fails with `Bad_SessionIdInvalid` or `Bad_SessionClosed`, the server
+has dropped the original session. The client then opens one replacement session to
+the same pinned endpoint description with the same client certificate and user
+identity, inside the same attempt budget. The namespace table, server URI table and
+server start time must match the original; a restarted server is refused. The client
+calls TransferSubscriptions for the owned subscription without initial values.
+
+The `succeeded` reconnect event records the outcome in `transfer`:
+
+- `transferred`: the subscription keeps its ID, items and sequence. The Republish
+  drain above continues on the replacement session.
+- `refused`: `transferStatusCode` keeps the server's bad status. The capture then
+  re-creates the subscription with the original request and records a second
+  `created` event. The new subscription starts its own sequence; the old one's
+  undelivered messages are unknown loss and are not counted as gaps. A server may
+  keep the old subscription until its lifetime ends.
+
+A transport failure or timeout during the transfer is a failed attempt, not a
+refusal. Status reports `transferPolicy: transferThenRecreateAfterSessionLoss` when
+recovery is enabled. Polling captures own no subscription and never open a
+replacement session. Only the loopback fixture covers transfer; Siemens documents
+it from S7-1500 firmware 3.1.4, and no CPU has been tested.
 
 The chronological reader rejects impossible attempt order, data after failed
 recovery, Publish before the recovery drain completes, and acknowledgements of
@@ -113,7 +139,7 @@ in distinct messages remain separate observations and are labelled in readable
 timelines. EventQueueOverflowEventType is explicit and, as required by the
 protocol, bypasses the severity filter. It establishes unknown delivery loss,
 not an exact lost-event count. Existing sequence gaps, bounded Republish,
-same-session reconnect and restart-without-replay rules also apply to events.
+reconnect, transfer and restart-without-replay rules also apply to events.
 
 HTML and Markdown timelines are limited to 10,000 original rows and 8 MiB;
 exceeding these limits refuses the readable export without silently shortening
