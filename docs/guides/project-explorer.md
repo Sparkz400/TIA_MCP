@@ -84,7 +84,8 @@ The viewer supports a virtualized tree, text/type/scope filtering, breadcrumbs, 
 | Technology-object hardware connections | Existing `technology_read` reference renderer | `technologyConnection` resolves only references with an exact hardware path; tags and blocks stay unresolved. |
 | Software-unit relations | Captured `PlcUnitBase.Relations` | Native relations are names; `unitRelation` resolves only a unique unit or PLC-root DB name in a complete capture. |
 | Watch/force tables and external sources | Native PLC collections | Names and groups only; no live monitoring, forcing state or source text. |
-| PLC alarm text lists, libraries | Unsupported in the tree | Reported as `unsupported` coverage; libraries use the library tools. |
+| PLC alarm text lists | Native `PlcAlarmTextlistGroup` per PLC/software unit | `alarmTextList` nodes with ID, range and comments under a virtual folder; coverage is `partial`. Entries and texts come from `plc_alarm_inspect`. No relationships. |
+| Libraries | Unsupported in the tree | Reported as `unsupported` coverage; libraries use the library tools. |
 | HMI hierarchy/details/relationships | HMI workstream provider | Family/section-specific coverage and optional services; screen items load on demand. No duplicated HMI adapter. |
 | Typed LAD/FBD preview | Typed workstream provider contract | Separate instruction graph and source hash; unsupported/opaque content remains explicit. No duplicated instruction compiler. |
 | Physical ports/cables/topology | Unsupported | No invented topology derived from display ancestry. |

@@ -3269,6 +3269,50 @@
       ]
     },
     {
+      "featureId": "plc_alarm_inspect",
+      "domain": "inspection",
+      "title": "Read PLC alarm text lists, alarm texts, alarm classes and ProDiag supervisions",
+      "mcpTools": [
+        "plc_alarm_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcSoftware/PlcUnitBase.PlcAlarmTextlistGroup (PlcAlarmUserTextlists, PlcAlarmSystemTextlists; PlcAlarmTextlist.Name/ID/ListRange/Comment), PlcAlarmTextListProvider.ExportToXlsx(FileInfo), PlcAlarmTextProvider.ExportInstanceTextsToXlsx(FileInfo, IEnumerable<Language>, PlcAlarmTextXlsxExportOption), SupervisionProvider.ExportSupervisionsToXlsx(FileInfo) via PLC/unit GetService, and AlarmClassDataProvider.Export(FileInfo) / SupervisionSettingsProvider.Export(FileInfo) via Project.GetService."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Text-list identities come from the object model; entries and per-culture texts only from the native XLSX export, which V21 offers for user text lists only. System text-list entries are not exposed.",
+          "Worksheet rows are returned as exported cell text by column, bounded by maxItems; the Siemens column layout is not interpreted. Alarm-class and ProDiag-setting .dat exports are retained with SHA-256 but not parsed.",
+          "Supervisions owned by individual ProDiag FBs are not exported; only the global PLC/unit supervision export is used.",
+          "Each part reports notExposed, unavailable (with the native message, e.g. no user text list or a missing ProDiag option) or observed independently; no runtime alarm state, acknowledgement or text substitution."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native alarm/ProDiag services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "safety_inspect",
       "domain": "safety",
       "title": "Read native safety groups and signatures",

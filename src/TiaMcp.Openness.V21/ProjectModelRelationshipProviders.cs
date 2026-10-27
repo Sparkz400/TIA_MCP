@@ -35,6 +35,7 @@ namespace TiaMcp.Indexing
                     ? "Containment is the captured tree itself; this organizational node has no native relationship service."
                     : kind == "device" ? "A device has no native relationship service; select its hardware items for configured I/O and network associations."
                     : kind == "unsupportedSoftware" ? "This software family has no explorer provider; its device ancestry is not a content relationship."
+                    : kind == "alarmTextList" ? "V21 exposes no alarm-to-text-list references; plc_alarm_inspect reads text-list entries from the native export."
                     : "No relationship provider is registered for this node kind.";
             }
             return new JObject { ["kind"] = kind, ["status"] = providers.Length == 0 ? "unsupported" : "provided",
