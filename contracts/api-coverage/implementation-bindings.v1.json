@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b8f72e84720abfd94605bfa049760cfaa632d066445483422660b33ce8eb501c",
-      "bytes": 785685
+      "sha256": "c539f6bb2b088ddc4e7a12f1a9c56a9adfd2066ecd9403c49466bd2d43f0760e",
+      "bytes": 785874
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -75188,10 +75188,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_intake.20261008",
-          "profileSha256": "edabc31cbf979b49c27bae9826289ff128d63ab70005adf68b18f822505601ee",
+          "id": "local.library_intake.20261024",
+          "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f",
           "artifacts": [
-            "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
+            "evidence/local.library_intake.20261024.json"
           ]
         }
       ],
@@ -75256,10 +75256,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_intake.20261008",
-          "profileSha256": "edabc31cbf979b49c27bae9826289ff128d63ab70005adf68b18f822505601ee",
+          "id": "local.library_intake.20261024",
+          "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f",
           "artifacts": [
-            "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
+            "evidence/local.library_intake.20261024.json"
           ]
         }
       ],
@@ -75314,10 +75314,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_intake.20261008",
-          "profileSha256": "edabc31cbf979b49c27bae9826289ff128d63ab70005adf68b18f822505601ee",
+          "id": "local.library_intake.20261024",
+          "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f",
           "artifacts": [
-            "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
+            "evidence/local.library_intake.20261024.json"
           ]
         }
       ],
@@ -76791,17 +76791,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.hardware.20261008",
-          "profileSha256": "03f8628a02c0cb49d9ff70b288fd6d0d0e9c698b757ebb14aae04110063230df",
-          "artifacts": [
-            "artifacts/hardware-families-expanded.json"
-          ]
-        },
-        {
           "id": "local.remote-io.full-route.20261024",
           "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
           "artifacts": [
             "evidence/local.remote-io.full-route.20261024.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.lifecycle.20261024",
+          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "artifacts": [
+            "evidence/local.remote-io.lifecycle.20261024.json"
           ]
         }
       ],
@@ -77031,18 +77031,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
-          "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
           "id": "local.remote-io.full-route.20261024",
           "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
           "artifacts": [
             "evidence/local.remote-io.full-route.20261024.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.lifecycle.20261024",
+          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "artifacts": [
+            "evidence/local.remote-io.lifecycle.20261024.json"
           ]
         }
       ],
@@ -83539,10 +83538,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_intake.20261008",
-          "profileSha256": "edabc31cbf979b49c27bae9826289ff128d63ab70005adf68b18f822505601ee",
+          "id": "local.library_intake.20261024",
+          "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f",
           "artifacts": [
-            "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
+            "evidence/local.library_intake.20261024.json"
           ]
         },
         {
@@ -85416,20 +85415,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "reviews.native.20261009",
-          "profileSha256": "9e03c0000ef188545baf60621b70864c8e453e045067155208cd822e478b5294",
+          "id": "local.reviews.20261024",
+          "profileSha256": "c86c85871f443223a9aea4a868db995ae482f6341168ae39fc0382099dc2ad1d",
           "artifacts": [
-            "artifacts/continuation-20261009/reviews-native-01.json"
-          ]
-        },
-        {
-          "id": "reviews.native.diamond.20261012",
-          "profileSha256": "647c87e855eabd9ad25e9d3afea02506332fa0cdca19626c7d288669887c4a23",
-          "artifacts": [
-            "artifacts/p16r/rv02/result.json",
-            "artifacts/p16r/rv02-strict-audit.json",
-            "artifacts/p16r/rv02-dom-leaf-audit.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json"
+            "evidence/local.reviews.20261024.json"
           ]
         }
       ],
@@ -90469,7 +90458,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.sim.creation.20261024",
+          "profileSha256": "b56649fd5ba528b4c1faf7883ad513c591d243bcf876941e35f061a1d66d196d",
+          "artifacts": [
+            "evidence/local.sim.creation.20261024.json"
+          ]
+        },
+        {
+          "id": "local.sim.state.20261024",
+          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
+          "artifacts": [
+            "evidence/local.sim.state.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -90591,7 +90595,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.sim.state.20261024",
+          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
+          "artifacts": [
+            "evidence/local.sim.state.20261024.json"
+          ]
+        },
+        {
+          "id": "local.sim.provision.20261024",
+          "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913",
+          "artifacts": [
+            "evidence/local.sim.provision.20261024.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
