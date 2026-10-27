@@ -232,6 +232,58 @@ Gap detection compares consecutive timestamps against exactly 1.5 times the supp
 
 `diagnostic_replan(planId, request)` requires the new reviewId, blockPath, instance, reason and signalMappings `[{id,storagePath,memberPath,reason}]` covering every old signal exactly once. It resolves all declarations and instance evidence anew, rejects changed types, retains hypothesis IDs and records prior-plan lineage. The original role template is selected again from the current template catalog; a case without a template remains without one. Template guidance never substitutes for new instance, declaration or target evidence. No substring substitution is performed. New equipment observations/context must be supplied explicitly. Native traceability always needs revalidation.
 
+## Monitor and modify a plan on an owned PLCSIM instance
+
+One diagnostic case can drive a watch table, a monitor capture, a stimulus and a
+before/after comparison on a PLCSIM Advanced instance this Host owns. Only the
+last two steps have their own tools. The rest reuse existing ones.
+
+1. **Plan and watch table.** Optionally take `diagnosticInstanceSelector` from
+   `instance_lookup`. Retain the case with `diagnostic_plan`, then compose the
+   experiment with `diagnostic_experiment_plan`. The plan's watch rows are offline.
+   For a native watch table, pass the case's `blockPath` and `selectedInstance.dbPath`
+   to `watch_table_generate`, then follow the [watch-table authoring workflow](../reference/watch-table-authoring.md).
+   Watch tables are engineering documents. They do not monitor or modify values.
+2. **Monitor.** Start `runtime_capture_start` with `source:"plcsim"` on the owned
+   instance and `association:{caseId,mappings}`. The mappings name the case signals
+   to read, in order. `intervalMilliseconds`, `durationSeconds` and `maximumSamples`
+   bound the capture. Each row keeps the read value, `status` (`read` or `readFailed`),
+   the worker request and response times and, in cycle-synchronous mode, the sync point.
+   Stop the capture, then pass its `snapshotRef` to `diagnostic_experiment_acquire_runtime`.
+   See [PLCSIM capture source](../reference/runtime-captures.md#plcsim-capture-source).
+3. **Modify.** Call `diagnostic_plcsim_write` with `caseId`, the owned instance's
+   `instanceId`, `instanceName` and `creationId`, `acknowledgeWrite:true` and 1..16 writes:
+
+   ```json
+   [{"signalId":"enable","symbol":"\"DB_Line\".Conv2.Enable","type":"bool","datatype":"Bool",
+     "expected":true,"value":false,"reason":"Drop enable to test the writer hypothesis."}]
+   ```
+
+   Each `signalId` must be a distinct captured-declaration signal of the case. It is
+   re-resolved against the saved review, and `datatype` must equal its declaration
+   and fit `type` (the capture rules). The simulator worker rechecks the exact owned
+   instance and Softbus, then reads every signal. If any value differs from
+   `expected`, nothing is written and the result is `preconditionMismatch` with the
+   values read. Otherwise each write is sent once in order and read back.
+   `readbackMatches` reports each readback. The sequence stops at the first failure
+   or mismatch. The CPU scan may overwrite a written value. Real values compare at
+   float precision. A capture running on the instance refuses the write. Physical
+   PLCs and instances this Host does not own are never written. There is no forcing
+   and no retry.
+4. **Monitor again** with a new capture and acquisition.
+5. **Compare.** Call `diagnostic_runtime_acquisition_compare(beforeAcquisitionId,
+   afterAcquisitionId, {reason})`. Both acquisitions must belong to the same experiment
+   and come from distinct captures. Both are rederived from their original chains.
+   For each hypothesis, the comparison reports matched, contradicted and unknown
+   cycles per side. It also reports the observed pattern (`matchedOnly`,
+   `contradictedOnly`, `mixed` or `notApplicable`) and `patternChanged`, beside both
+   capture contexts, signal sets and quality.
+
+Cycle counts depend on capture length. The comparison does not link the write to
+the captures. Every verdict stays `unresolved`: polling is sequential, and address
+and program identity are unverified. Neither tool proves causation or a fix, and
+neither is natively qualified.
+
 ## Persistence, repeated captures and current limits
 
 Diagnostic cases/specifications/imports/reports are content-addressed JSON in `artifacts/trace-diagnostics`; artifact receipts work with the existing artifact reader. Repeating an identical save reuses its hash, and reopening verifies content integrity. Publication uses a cross-process storage lock, with ArtifactBusy on contention. Limits are 8 MiB per stored document and 256 MiB retained files; selected artifacts must be explicitly archived when full. No automatic eviction/deletion touches user measurements. A source-review, target, instance, binding or firmware change requires a new plan and revalidation; no claim of live freshness is made.
