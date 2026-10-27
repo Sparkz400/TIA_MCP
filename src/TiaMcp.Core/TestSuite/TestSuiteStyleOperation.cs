@@ -8,6 +8,7 @@ namespace TiaMcp.Core.TestSuite;
 public static class TestSuiteStyleOperation
 {
     private static readonly string[] Probes = ["testsuite.product", "testsuite.license", "testsuite.styleService", "testsuite.scope"];
+    private static readonly string[] ApplicationProbes = ["testsuite.product", "testsuite.license", "testsuite.applicationService", "testsuite.scope", "simulator.ownedInstance"];
     private static readonly string[] Gates = ["testsuite.results", "testsuite.scope", "testsuite.rawResults", "project.compile", "project.preservation", "project.freshReopen", "resource.cleanup"];
 
     public static EngineeringOperationPlan BuildPlan(TestSuiteRunPlan run, NativeTargetObservation target,
@@ -15,9 +16,11 @@ public static class TestSuiteStyleOperation
         TestSuiteDefinitionBundle definitions)
     {
         TestSuiteRunPlanner.Validate(run);
-        if (run.ExecutionMode != "style" || run.Blockers.Length != 0)
-            throw new BridgeException("TestSuiteStyleNotReady", "A blocker-free style-only plan is required; application/system execution needs separate resource admission.");
-        NativeTargetGuard.EnsureFresh(target, target, Probes);
+        bool application = TestSuiteApplicationRun.Applies(run.ExecutionMode);
+        if (run.ExecutionMode != "style" && !application || run.Blockers.Length != 0)
+            throw new BridgeException("TestSuiteStyleNotReady", "A blocker-free style or application plan is required; system execution needs separate endpoint admission.");
+        var probes = application ? ApplicationProbes : Probes;
+        NativeTargetGuard.EnsureFresh(target, target, probes);
         foreach (var definition in run.Definitions) EngineeringIdentityGuard.EnsureSameSnapshot(target.Reference, definition.Reference);
         string projectResourceKey = EngineeringResourceKey.ForPath("project", target.ProjectFilePath);
         ValidateArtifact(runArtifact); ValidateArtifact(definitionBundleArtifact);
@@ -26,9 +29,10 @@ public static class TestSuiteStyleOperation
         if (runArtifact.RelativePath == definitionBundleArtifact.RelativePath || runArtifact.Sha256 != CanonicalHash(run) ||
             definitionBundleArtifact.Sha256 != definitions.Sha256)
             throw new BridgeException("TestSuiteArtifactMismatch", "Retain the exact canonical run plan and its verified original-definition bundle as separate artifacts.");
-        return new("testSuite.style.run", target,
-            [new(projectResourceKey, "project", "nativeStyleExecutionAndCheckpoint", "projectArchiveToNewLocation")],
-            [runArtifact, definitionBundleArtifact], Probes.ToArray(), Gates.ToArray());
+        // Application runs also persist SetScope on reviewed cases; the same checkpoint precedes it.
+        return new(application ? "testSuite.application.run" : "testSuite.style.run", target,
+            [new(projectResourceKey, "project", application ? "nativeApplicationScopeExecutionAndCheckpoint" : "nativeStyleExecutionAndCheckpoint", "projectArchiveToNewLocation")],
+            [runArtifact, definitionBundleArtifact], probes.ToArray(), Gates.ToArray());
     }
 
     /// <summary>Successful native outcomes need separately retained scope evidence; raw ScopeVerified alone is insufficient.</summary>

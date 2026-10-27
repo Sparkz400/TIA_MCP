@@ -2537,6 +2537,24 @@
       ]
     },
     {
+      "featureId": "testsuite_application_inventory",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_application_import",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
       "featureId": "software_unit_review",
       "obligations": [
         "D07",

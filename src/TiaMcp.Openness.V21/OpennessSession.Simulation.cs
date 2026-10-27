@@ -209,23 +209,23 @@ namespace TiaMcp.Openness.V21
             if (SimulationRuntimeManager.IsInitialized) SimulationRuntimeManager.Shutdown();
         }
 
-        private static IInstance VerifySimulationInstance(JObject marker)
+        private static IInstance VerifySimulationInstance(JObject marker, bool requireOff = true)
         {
             int id = marker.Value<int>("instanceId"); string name = marker.Value<string>("instanceName");
             if (!SimulationRuntimeManager.RegisteredInstanceInfo.Any(info => info.ID == id && info.Name == name))
                 throw new BridgeException("SimulationTargetMismatch", "The exact adapter-owned instance is no longer registered locally.");
             var instance = SimulationRuntimeManager.CreateInterface(id);
-            try { VerifySimulationIdentity(instance, marker); return instance; }
+            try { VerifySimulationIdentity(instance, marker, requireOff); return instance; }
             catch { RetainSimulationInterface(instance); throw; }
         }
 
-        private static void VerifySimulationIdentity(IInstance instance, JObject marker)
+        private static void VerifySimulationIdentity(IInstance instance, JObject marker, bool requireOff = true)
         {
             if (instance.ID != marker.Value<int>("instanceId") || instance.Name != marker.Value<string>("instanceName") ||
                 !string.Equals(Path.GetFullPath(instance.StoragePath).TrimEnd(Path.DirectorySeparatorChar),
                     Path.GetFullPath(marker.Value<string>("storagePath")).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("SimulationTargetMismatch", "Simulator identity or storage changed. No substitute target is selected.");
-            if (instance.OperatingState != EOperatingState.Off)
+            if (requireOff && instance.OperatingState != EOperatingState.Off)
                 throw new BridgeException("SimulationMustBeOff", "The verified simulated instance must remain powered off during memory-card generation.");
             if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
                 throw new BridgeException("SoftbusRequired", "Simulation memory-card generation requires existing local Softbus mode.");
