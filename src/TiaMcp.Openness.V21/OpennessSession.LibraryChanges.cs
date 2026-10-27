@@ -256,12 +256,14 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "library_edit_version": case "library_release_version": case "library_discard_version": case "library_set_default": case "library_type_policy":
-                    if (change.Versions.Count != 1 || change.Masters.Count != 0) throw new BridgeException("InvalidRequest", "Exactly one version selection is required.");
+                    if (change.Kind != "library_release_version" && (change.Versions.Count != 1 || change.Masters.Count != 0)) throw new BridgeException("InvalidRequest", "Exactly one version selection is required.");
                     if (change.Kind == "library_release_version")
                     {
+                        // Up to 100 releases per change, in selection order; one release per change cost about 150 s at 1,000 types (scale run).
+                        if (change.Versions.Count < 1 || change.Masters.Count != 0) throw new BridgeException("InvalidRequest", "Select 1..100 InWork versions in release order.");
                         if (!Version.TryParse(ChangeText(payload, "versionNumber", 32), out _)) throw new BridgeException("InvalidRequest", "versionNumber must be a native numeric version.");
                         ChangeText(payload, "author", 128); ChangeText(payload, "comment", 4096);
-                        if (change.Versions[0].State != LibraryTypeVersionState.InWork) throw new BridgeException("InvalidChangeState", "Release requires an InWork version.");
+                        if (change.Versions.Any(x => x.State != LibraryTypeVersionState.InWork)) throw new BridgeException("InvalidChangeState", "Release requires InWork versions.");
                     }
                     if (new[] { "library_edit_version", "library_release_version", "library_discard_version" }.Contains(change.Kind) && change.Source.Project == null) throw new BridgeException("TargetIncompatible", "Native version authoring is performed in a project library; publish released results to a global working library.");
                     if (change.Kind == "library_edit_version" && (change.Versions[0] is CodeBlockLibraryTypeVersion || change.Versions[0] is PlcTypeLibraryTypeVersion) && payload["documentDirectory"] != null)
@@ -1110,9 +1112,13 @@ namespace TiaMcp.Openness.V21
                     else edited = change.Versions[0].Edit();
                     rows.Add(LibraryVersionInfo(edited)); break;
                 case "library_release_version":
-                    change.Versions[0].Release(CreateOrReleaseDependenciesMode.DoNotAutomaticallyCreateOrReleaseDependencies, Version.Parse(payload.Value<string>("versionNumber")), payload.Value<string>("author"), payload.Value<string>("comment"));
-                    if (change.Versions[0].State != LibraryTypeVersionState.Committed || change.Versions[0].VersionNumber != Version.Parse(payload.Value<string>("versionNumber"))) throw new BridgeException("PreservationMismatch", "Native released state/version differs from the requested release.");
-                    rows.Add(LibraryVersionInfo(change.Versions[0])); break;
+                    foreach (var released in change.Versions)
+                    {
+                        released.Release(CreateOrReleaseDependenciesMode.DoNotAutomaticallyCreateOrReleaseDependencies, Version.Parse(payload.Value<string>("versionNumber")), payload.Value<string>("author"), payload.Value<string>("comment"));
+                        if (released.State != LibraryTypeVersionState.Committed || released.VersionNumber != Version.Parse(payload.Value<string>("versionNumber"))) throw new BridgeException("PreservationMismatch", "Native released state/version differs from the requested release.");
+                        rows.Add(LibraryVersionInfo(released));
+                    }
+                    break;
                 case "library_discard_version":
                     var discardedGuid = change.Versions[0].Guid; change.Versions[0].Discard();
                     result["discardedVersionGuid"] = discardedGuid.ToString("D"); result["remainingType"] = change.Source.Native.FindVersion(discardedGuid) == null ? JValue.CreateNull() : LibraryVersionInfo(change.Source.Native.FindVersion(discardedGuid)); break;

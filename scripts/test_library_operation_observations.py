@@ -138,6 +138,9 @@ class LibraryOperationObservations(unittest.TestCase):
             self.reject(self.plan('library_release_version', versionNumber=bad))
         self.validate(self.plan('library_release_version', versionNumber='+1. 0.0'))
         self.reject(self.plan('library_release_version', author='😀' * 65))
+        pins = [{**self.pin, 'typeGuid': '%08d-3333-3333-3333-%012d' % (i, i), 'versionGuid': '%08d-4444-4444-4444-%012d' % (i, i)} for i in range(101)]
+        self.validate(self.plan('library_release_version', selection=pins[:100]))
+        self.reject(self.plan('library_release_version', selection=pins))
         self.validate(self.plan('library_release_version', author='😀' * 64))
         self.reject(self.plan('library_create', name=' '))
         self.reject(self.plan('library_create', name='../outside'))

@@ -100,22 +100,25 @@ def run(args):
         release_chain(h, library) if args.release_chain else probe(h, library, "reopened", args.full_paging)
 
     def release_chain(h, library):
-        """TIA records library dependencies between released versions only: release Chain_0000.. in order, then close."""
+        """TIA records library dependencies between released versions only: release Chain_0000.. in order, 100 per change, then close."""
         chain = sorted((x for x in page_all_items(h, library) if x.get("kind") == "version" and x.get("typeName", "").startswith("Chain_")
                         and x.get("state") == "InWork"), key=lambda x: x["typeName"])
         require(chain, "No InWork chain versions to release")
         h.report["releases"] = []
         released = None
-        for version in chain:
+        for start in range(0, len(chain), BATCH):
+            batch = chain[start:start + BATCH]  # names sort callee first, which is the release order
             if stop.exists():
-                h.report["stoppedByRequest"] = version["typeName"]
+                h.report["stoppedByRequest"] = batch[0]["typeName"]
                 break
             started = time.perf_counter()
-            applied = h.apply("library_release_version", h.selected(library, [version], versionNumber="1.0.0", author="TIA MCP qualification",
+            applied = h.apply("library_release_version", h.selected(library, batch, versionNumber="1.0.0", author="TIA MCP qualification",
                               comment="Scale chain release"))
-            released = applied["journal"]["result"]["objects"][0]
-            h.report["steps"][-1]["result"] = {"state": applied["state"]}
-            h.report["releases"].append({"typeName": version["typeName"], "seconds": round(time.perf_counter() - started, 3)})
+            objects = applied["journal"]["result"]["objects"]
+            require([x["typeName"] for x in objects] == [x["typeName"] for x in batch], "Released versions differ from the batch")
+            released = objects[-1]
+            h.report["steps"][-1]["result"] = {"state": applied["state"], "released": len(objects)}
+            h.report["releases"].append({"first": batch[0]["typeName"], "last": batch[-1]["typeName"], "seconds": round(time.perf_counter() - started, 3)})
             h.persist()
             print("RELEASE " + json.dumps(h.report["releases"][-1]), flush=True)
         if released is None:
