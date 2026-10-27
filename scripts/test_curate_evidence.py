@@ -37,6 +37,18 @@ class CurateEvidenceTests(unittest.TestCase):
         self.assertEqual(["inspect", "reopen"], summary["steps"])
         self.assertEqual((["vci_prepare"], ["vci_commit"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_accepts_passed_status_and_string_steps(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "result.json")
+            path.write_text(json.dumps({"status": "passed", "steps": ["tool refusal kept"], "hostExits": [
+                {"toolCalls": [{"name": "trace_analyze", "isError": False}]}]}), encoding="utf-8")
+            summary = run(path)
+            path.write_text(json.dumps({"status": "failed", "steps": []}), encoding="utf-8")
+            failed = run(path)
+        self.assertEqual((True, ["tool refusal kept"], ["trace_analyze"]),
+                         (summary["completed"], summary["steps"], summary["toolsPassed"]))
+        self.assertFalse(failed["completed"])
+
     def test_tree_hash_changes_with_any_binary(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

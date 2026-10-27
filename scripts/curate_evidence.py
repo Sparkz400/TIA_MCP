@@ -36,10 +36,11 @@ def run(path):
     calls = (report.get("toolCalls")
              or [c for receipt in report.get("hostExits", []) for c in receipt.get("toolCalls", [])]
              or [{"name": st["tool"], "isError": st["isError"]}
-                 for st in report.get("steps", []) if "tool" in st and "isError" in st])
-    steps = [step.get("name") or step.get("tool") for step in report.get("steps", [])] or list(report.get("checks", []))
+                 for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st])
+    steps = [step if isinstance(step, str) else step.get("name") or step.get("tool")
+             for step in report.get("steps", [])] or list(report.get("checks", []))
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
-            "completed": report.get("completed") is True,
+            "completed": report.get("completed") is True or report.get("status") == "passed",
             "steps": steps,
             "toolsPassed": sorted({c["name"] for c in calls if not c["isError"]}),
             "toolsRejected": sorted({c["name"] for c in calls if c["isError"]})}
