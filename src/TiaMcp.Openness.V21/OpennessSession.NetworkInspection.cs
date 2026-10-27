@@ -140,6 +140,7 @@ namespace TiaMcp.Openness.V21
                 else if (item is IoController controller) item = controller.Parent;
                 else if (item is IoConnector connector) item = connector.Parent;
                 else if (item is NetworkInterface network) item = network.OwnedBy;
+                else if (item is Node node) item = node.Parent;
                 else break;
             }
             return new JObject { ["resolution"] = "unresolved", ["ownerHardwarePath"] = null,

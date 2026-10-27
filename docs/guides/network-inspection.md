@@ -159,6 +159,43 @@ includes the retained native V21 server fixture, but does not qualify a newly bu
 native worker. Broader communication connection engineering is tracked separately
 in the [D08 plan](../plans/expansion-plans/communication-connections.md).
 
+## Configured communication connections
+
+`connection_inspect` reads `CommunicationManagement.Connections` of every hardware
+item that exposes the service, or of one exact `hardwarePath`. It returns S7, TCP,
+UDP, ISO, ISO-on-TCP, FDL, PtP and HMI connections as exposed by the installed V21
+`Siemens.Engineering.HW.CommunicationConnections` types:
+
+- `owners`: the hardware paths whose connection tables were read. Use one of them as
+  `hardwarePath` for the `connection_*` change kinds.
+- `reviewSnapshot`: a ready `before`/`after` snapshot for a
+  [connection review](../reference/connection-review.md). Each row has `id`
+  (owner path + `/connections/` + `LocalConnectionName`), `origin: "engineering"`,
+  `protocol`, `local`/`partner` endpoints and `properties`.
+- Endpoint `ownerPath` is the native `LocalTarget`/`PartnerTarget` device item,
+  `interfacePath` the device item owning the `LocalInterface`/`PartnerInterface` node.
+  Both come from native object equality; an unset, unreadable or unresolved endpoint
+  is `null` with a `reason`.
+- `properties` holds every public typed property of the connection type, such as
+  `ConnectionType`, `IsValid`, `LocalConnectionName`, `LocalConnectionId`, ports,
+  TSAPs and establishment flags. Interface nodes appear with `nodeName`, `nodeId` and
+  `interfacePath`.
+
+`maxItems` bounds the rows; `completeness.truncated` reports truncation. The
+snapshot claims `connectionsComplete` only for an untruncated whole-project read
+without warnings. Program-created connection descriptions, HMI software connection
+objects and consumers are not read, so `consumersComplete` is always false. A review
+`id` longer than 256 characters is rejected by `connection_review`.
+
+The prepared kinds `connection_create`, `connection_delete` and `connection_set`
+([payloads](engineering-workflows.md)) use the same owner table. Each requires a
+checkpoint and a whole-project device compile, refuses a changed owner table at
+apply time and verifies that every other connection of the owner reads back
+unchanged. Partner-side counterparts are not read back.
+
+These routes are compiled against the V21 PublicAPI only. They have no native
+qualification yet, and resource, capacity and runtime communication are not assessed.
+
 ## Supplied connection comparison without Siemens
 
 Use [connection review](../reference/connection-review.md) to retain supplied

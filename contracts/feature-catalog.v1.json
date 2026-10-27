@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.35",
+  "catalogVersion": "0.4.36",
   "targetTiaVersions": [
     21
   ],
@@ -2992,6 +2992,47 @@
       ]
     },
     {
+      "featureId": "project_properties",
+      "domain": "project",
+      "title": "Read project metadata, history, languages and text categories",
+      "mcpTools": [
+        "project_properties"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase Author/Comment/Copyright/Family/Version/CreationTime/LastModified/LastModifiedBy/Size/IsModified/IsPrimary, UsedProducts, HistoryEntries, TextCategories, GetAttributeInfos and LanguageSettings Languages/ActiveLanguages/ReferenceLanguage/EditingLanguage."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Each list (supported languages, comment items, used products, history entries in native order, text categories) is bounded by maxItems with explicit truncation; this is a point-in-time observation, not a revision guarantee."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "One selected open project"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "software_inspect",
       "domain": "inspection",
       "title": "Read exposed software scopes, types, tags and block identities",
@@ -4932,6 +4973,106 @@
       ]
     },
     {
+      "featureId": "change.block_number_set",
+      "domain": "language",
+      "title": "Set an explicit number on one standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_number_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/SetAttribute/GetAttribute for PlcBlock AutoNumber and Number (documented PlcBlock properties), PlcBlock.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One standard, unprotected, non-generated block; sets AutoNumber=false then Number and reads both back. Native attribute infos must report both as readable and writable; AutoNumber is read-only for protected blocks and several OBs.",
+          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.block_attributes_set",
+      "domain": "language",
+      "title": "Set reviewed header or OB attributes on one standard block",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "block_attributes_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/SetAttribute/GetAttribute on PlcBlock; HeaderAuthor/HeaderFamily/HeaderName/HeaderVersion are documented PlcBlock properties, OB names come from the V21 Openness manual block-attribute table."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "domain": "language",
       "title": "Delete one exact standard block",
@@ -5550,6 +5691,104 @@
         "PLCSIM Advanced V8 installed and usable",
         "Compatible simulated CPU/program",
         "No physical PLC route"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_attributes_set",
+      "domain": "project",
+      "title": "Set reviewed project attributes",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "project_attributes_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase GetAttributeInfos/GetAttribute/SetAttribute for Author, Copyright, Family and Version (System.String)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Allowlist Author, Copyright, Family and Version; each must be reported readable and writable by native attribute info. Comment is a MultilingualText without a scalar attribute route and is not writable here.",
+          "Preview shows before/requested values; apply verifies native type/value readback and records it. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Offline project and a verified recovery checkpoint (checkpointSave=true)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_languages_set",
+      "domain": "project",
+      "title": "Change project active, reference and editing languages",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "project_languages_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 LanguageSettings Languages.Find(CultureInfo), ActiveLanguages.Add/Remove/Contains and settable ReferenceLanguage/EditingLanguage."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Languages must be supported by the project; removing the current or requested reference/editing language is refused, and both must be active after the change. Apply adds, then sets reference/editing, then removes, and verifies the complete active/reference/editing readback.",
+          "Removing an active language may discard project texts in that language; only the recovery archive restores them. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Offline project and a verified recovery checkpoint (checkpointSave=true)"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -6834,6 +7073,107 @@
         "status": "conditional",
         "reasons": [
           "Recorded fixtures do not establish availability or authorization for the current target; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_create",
+      "domain": "data",
+      "title": "Create one PLC tag in an existing tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "tag_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcTagTable.Tags (PlcTagComposition.Create(string,string,string), PlcTagComposition.Find(string)), PlcTag.DataTypeName/LogicalAddress/IsSafety readback, PlcTagTable.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
+          "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.constant_create",
+      "domain": "data",
+      "title": "Create one user constant in an existing tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "constant_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcTagTable.UserConstants (PlcUserConstantComposition.Create(string,string,string), PlcUserConstantComposition.Find(string)), PlcUserConstant.DataTypeName/Value readback, PlcTagTable.Export backup."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Exact existing table selector plus explicit name, dataTypeName and value; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
+          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
@@ -11080,6 +11420,294 @@
       ]
     },
     {
+      "featureId": "watch_table_prepare_create",
+      "domain": "watch_tables",
+      "title": "Prepare creating an empty watch table in an exact group",
+      "mcpTools": [
+        "watch_table_prepare_create"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTableComposition.Create(System.String); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one empty table in an exact existing group; refuses PLC-wide watch/force name collisions (case-insensitive). The new table's export hash is only known from readback, so verification requires exactly one added zero-row table and nothing else changed.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_rename",
+      "domain": "watch_tables",
+      "title": "Prepare renaming an exact watch table",
+      "mcpTools": [
+        "watch_table_prepare_rename"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTable.Name (setter); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Expected readback is the captured export with only the table name changed; the manual's read-only note on Name stays a native residual. Refuses PLC-wide collisions, case-only renames and tables with web/display access rules.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_prepare_delete",
+      "domain": "watch_tables",
+      "title": "Prepare deleting an exact watch table",
+      "mcpTools": [
+        "watch_table_prepare_delete"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchTable.Delete; durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one exact table from its group; refuses tables with web/display access rules. References from other products are not inventoried.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_create",
+      "domain": "watch_tables",
+      "title": "Prepare creating a user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_create"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroupComposition.Create(System.String); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one empty direct child group; refuses sibling group name collisions (case-insensitive). Master-copy creation (CreateFrom) is not implemented.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_rename",
+      "domain": "watch_tables",
+      "title": "Prepare renaming a user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_rename"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI P:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroup.Name (setter); durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Renames one direct child user group; every contained table and subgroup must keep its exact content under the new path. Refuses sibling collisions and case-only renames.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "watch_table_group_prepare_delete",
+      "domain": "watch_tables",
+      "title": "Prepare deleting an empty user watch-table group",
+      "mcpTools": [
+        "watch_table_group_prepare_delete"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI M:Siemens.Engineering.SW.WatchAndForceTables.PlcWatchAndForceTableUserGroup.Delete; durable checkpoint/journal state is a Host service, not a vendor transaction."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Empty groups only: any contained watch table, force table or subgroup is refused before and again at the native boundary. No recursive delete or move.",
+          "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
+          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization or broad qualification; exact native receipts and outstanding failures are retained separately."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for native reads",
+        "One configured artifact store for cooperating Hosts",
+        "Matching immutable review digest, checkpoint and native epoch for dispatch"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
       "featureId": "testsuite_style_plan_prepare",
       "domain": "test_suite",
       "title": "Retain a complete bounded style plan",
@@ -14885,6 +15513,199 @@
         "AC-recovery",
         "AC-preserve",
         "AC-native"
+      ]
+    },
+    {
+      "featureId": "connection_inspect",
+      "domain": "connections",
+      "title": "Inspect configured communication connections and native endpoints",
+      "mcpTools": [
+        "connection_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: DeviceItem.GetService<CommunicationManagement>(), CommunicationManagement.Connections/OwnedBy, Connection.ConnectionType/IsValid/LocalTarget/LocalInterface/PartnerTarget/PartnerInterface/LocalSubnetName/PartnerSubnetName, the typed S7/TCP/UDP/ISO/ISO-on-TCP/FDL/PtP/HMI connection properties, and Node.Parent/NetworkInterface.OwnedBy for interface owners."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Enumerates CommunicationManagement.Connections of all bounded hardware (50000-item lookup, maxItems rows) or one exact hardwarePath; owners are deduplicated by CommunicationManagement.OwnedBy. Which device items expose the service and whether a bilateral connection appears in both owners' tables are not natively observed.",
+          "Typed properties are read by reflection over the public V21 CommunicationConnections members. Endpoint targets and interfaces resolve to hardware paths by native object equality only; unset, unreadable or unresolved endpoints carry an explicit reason.",
+          "reviewSnapshot uses the connection_review snapshot and row shape (id = owner path + /connections/ + LocalConnectionName). Program-created connection descriptions, HMI software connection objects, consumers, resource/capacity rules and runtime communication are not covered."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_create",
+      "domain": "connections",
+      "title": "Create one configured communication connection between exact endpoints",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: CommunicationManagement.Connections and ConnectionComposition.Create<T>(Node localInterface, DeviceItem partnerTarget, Node partnerInterface) for the eight CommunicationConnections types; readback through Connection.ConnectionType/LocalInterface/PartnerTarget/PartnerInterface."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Explicit connectionType (S7Connection, TcpConnection, UdpConnection, IsoConnection, IsoOnTcpConnection, FdlConnection, PtpConnection or HmiConnection), exact owner hardwarePath, local interface node, partner target and partner interface node. Unspecified partners are not supported. Siemens decides type/endpoint compatibility; generated names, IDs and parameters are kept.",
+          "Verifies native type and endpoint equality and that every other connection of the owner reads back unchanged. Partner-side counterparts, program instructions and HMI tags are covered only by the mandatory whole-project device compile; resource/capacity rules are not assessed."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_delete",
+      "domain": "connections",
+      "title": "Delete exactly one configured communication connection",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: CommunicationManagement.Connections and Connection.Delete()."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exactly one connection of the exact owner by LocalConnectionName and optional LocalConnectionId; missing or ambiguous matches are rejected.",
+          "No dependency scan of program instructions or HMI tags: the mandatory whole-project device compile is the only consumer check. Verifies the owner's remaining connections read back exactly as before; partner-side counterparts are not checked."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.connection_set",
+      "domain": "connections",
+      "title": "Set allowlisted attributes of one configured communication connection",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "connection_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: Connection.GetAttributeInfos/GetAttribute/SetAttribute with EngineeringAttributeAccessMode on one connection of CommunicationManagement.Connections."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Allowlist LocalActiveEstablishment, PartnerActiveEstablishment, LocalPort, PartnerPort, PartnerAddress, LocalTsap, PartnerTsap, LocalLsap, PartnerLsap; each must also be declared native read/write on the selected connection. Names, IDs and resource IDs are excluded. Whether the typed properties are exposed through the attribute route is not natively observed.",
+          "Native readback of each requested value and unchanged readback of every other connection of the owner. Dependent changes on the selected connection itself are reported, not restricted; partner-side counterparts are covered only by the mandatory device compile."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact owner hardwarePath exposing native CommunicationManagement"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
       ]
     },
     {
