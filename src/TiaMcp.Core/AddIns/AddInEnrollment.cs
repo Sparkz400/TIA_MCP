@@ -6,6 +6,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Win32.SafeHandles;
 
+// HostOptions.cs is compiled into these test assemblies too.
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("TiaMcp.Library.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("TiaMcp.PhysicalRuntime.Tests")]
+
 namespace TiaMcp.Core.AddIns;
 
 /// <summary>Explicit opt-in producer enrollment for the published V21 companion: OS lineage plus pinned package hashes, not attestation.</summary>
