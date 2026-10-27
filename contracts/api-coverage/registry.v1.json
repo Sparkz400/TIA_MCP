@@ -3224,6 +3224,24 @@
       ]
     },
     {
+      "featureId": "diagnostic_runtime_acquisition_compare",
+      "obligations": [
+        "D02",
+        "D16",
+        "D17",
+        "C04"
+      ]
+    },
+    {
+      "featureId": "diagnostic_plcsim_write",
+      "obligations": [
+        "D02",
+        "D16",
+        "D17",
+        "L03"
+      ]
+    },
+    {
       "featureId": "runtime_ua_client_identity",
       "obligations": [
         "D16",

@@ -20854,6 +20854,89 @@
       ]
     },
     {
+      "featureId": "diagnostic_runtime_acquisition_compare",
+      "domain": "diagnostics",
+      "title": "Compare before/after runtime acquisitions of a diagnostic experiment",
+      "mcpTools": [
+        "diagnostic_runtime_acquisition_compare"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Host-owned offline artifact service only; this does not assert a native PLC trace API."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Rederives two retained runtime acquisitions of the same exact experiment from distinct original capture chains, then reports per hypothesis the matched, contradicted and unknown cycles on each side, an observed pattern and whether it changed, beside both capture contexts, signal sets, progress and quality.",
+          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Two retained acquisitions of one experiment whose original captures, case and saved review remain available; no target or network access."
+        ]
+      },
+      "prerequisites": [
+        "Two diagnostic_experiment_acquire_runtime records of the same experiment from distinct captures"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "diagnostic_plcsim_write",
+      "domain": "diagnostics",
+      "title": "Write diagnostic-case signals on an owned PLCSIM instance",
+      "mcpTools": [
+        "diagnostic_plcsim_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "PLCSIM Advanced V8 IInstance typed Read*/Write* methods (for example ReadBool/WriteBool, ReadUInt16/WriteUInt16) through the simulator worker, the same typed access as sim_read/sim_write; precondition and readback use the typed reads."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
+          "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
+          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Owned running PLCSIM Advanced V8 instance on Softbus whose loaded program exposes the case's symbols, and a retained diagnostic case."
+        ]
+      },
+      "prerequisites": [
+        "Owned instance from sim_create, or sim_select with creationId",
+        "Retained diagnostic_plan case with captured-declaration signals"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "runtime_ua_client_identity",
       "domain": "runtime",
       "title": "Inspect the owned OPC UA client application identity",

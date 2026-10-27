@@ -41,6 +41,7 @@ namespace TiaMcp.Simulator.V8
                 case "sim_capture_sample": return CaptureSample(args);
                 case "sim_capture_end": return CaptureEnd(args);
                 case "sim_identity": return Identity(args);
+                case "sim_write_owned": return WriteOwned(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -294,6 +295,40 @@ namespace TiaMcp.Simulator.V8
             result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]);
             return result;
         }
+
+        // Diagnostic plan writes: the exact owned instance only. Nothing is written unless every signal first reads as its expected value;
+        // then each write is sent once and read back, stopping at the first failure or mismatch (the scan may overwrite assignments).
+        private JObject WriteOwned(JObject args)
+        {
+            var selected = Owned(args);
+            EnsureSoftbus(selected);
+            var writes = Signals(args["writes"], true);
+            var expected = Signals(new JArray(args["writes"].Select(w => new JObject { ["symbol"] = w["symbol"], ["type"] = w["type"], ["value"] = w["expected"] })), true);
+            if (writes.Count > 16 || writes.Select(w => w.Symbol).Distinct(StringComparer.Ordinal).Count() != writes.Count)
+                throw new SimulatorException("InvalidRequest", "Provide 1–16 writes with distinct symbols.");
+            var result = Envelope(selected);
+            var before = Capture(selected, writes);
+            result["before"] = before;
+            if (Enumerable.Range(0, writes.Count).Any(i => !Matches(before[i], expected[i])))
+            { result["state"] = "preconditionMismatch"; result["dispatched"] = 0; return result; }
+            var items = new JArray(); bool complete = true;
+            for (int i = 0; i < writes.Count && complete; i++)
+            {
+                var item = new JObject { ["symbol"] = writes[i].Symbol, ["type"] = writes[i].Type, ["value"] = writes[i].Value };
+                items.Add(item);
+                try { WriteValue(selected.Instance, writes[i]); item["dispatch"] = "accepted"; item["appliedAtUtc"] = DateTime.UtcNow.ToString("O"); }
+                catch (Exception ex) { item["dispatch"] = "failed"; item["errorCode"] = ErrorCode(ex); complete = false; break; }
+                var readback = Capture(selected, new List<Signal> { writes[i] })[0];
+                item["readback"] = readback;
+                item["readbackMatches"] = complete = Matches(readback, writes[i]);
+            }
+            result["state"] = complete ? "written" : "incomplete";
+            result["dispatched"] = items.Count;
+            result["items"] = items;
+            return result;
+        }
+
+        private static bool Matches(JToken read, Signal wanted) => read.Value<string>("quality") == "good" && SimulationAssertions.Same(wanted.Type, read["value"], wanted.Value);
 
         private JObject CaptureBegin(JObject args)
         {

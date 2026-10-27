@@ -81,14 +81,7 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
         var (extension, mediaType) = format switch { "json" => (".json", "application/json"),
             "markdown" => (".md", "text/markdown"), "html" => (".html", "text/html"),
             _ => throw new BridgeException("InvalidRequest", "format must be json, markdown or html.") };
-        var store = new DiagnosticStore(artifactsRoot); byte[] source = store.ReadBytes(acquisitionId);
-        var retained = JsonNode.Parse(source)!.AsObject();
-        if (D.Text(retained, "schemaVersion") != "diagnostic-runtime-acquisition.v1" || retained["request"] is not JsonObject request)
-            throw new BridgeException("InvalidRequest", "Expected a retained runtime acquisition.");
-        var derived = Build(captures, D.Required(retained, "experimentId", 64), D.Required(retained, "snapshotRef", 160), request);
-        if (!JsonNode.DeepEquals(retained, derived) ||
-            !JsonNode.DeepEquals(store.Read(D.Required(retained, "analysisId", 64), "runtime-capture-analysis.v1"), derived["analysis"]))
-            throw new BridgeException("CaptureMismatch", "Retained acquisition or analysis differs from its original source chain and experiment.");
+        var store = new DiagnosticStore(artifactsRoot); var (retained, source) = Reopen(captures, acquisitionId);
         byte[] bytes = format == "json" ? source : Encoding.UTF8.GetBytes(Render(retained, acquisitionId, Encoding.UTF8.GetString(source), format == "html"));
         if (bytes.Length > DiagnosticStore.MaxBytes) throw new BridgeException("ArtifactCapacity", "Readable acquisition exceeds 8 MiB; use exact JSON.");
         var receipt = store.Publish(bytes, extension);
@@ -98,6 +91,64 @@ public sealed class DiagnosticRuntimeAcquisitions(string artifactsRoot)
         receipt["format"] = format; receipt["mediaType"] = mediaType; receipt["sourceEvidenceRevalidated"] = true;
         receipt["analysisRecomputed"] = true; foreach (string field in FalseClaims) receipt[field] = false;
         receipt["limits"] = Limits; return receipt;
+    }
+
+    /// <summary>Rederives a retained acquisition from its original capture chain and experiment; altered records refuse.</summary>
+    private (JsonObject Retained, byte[] Source) Reopen(RuntimeCaptureStore captures, string acquisitionId)
+    {
+        var store = new DiagnosticStore(artifactsRoot); byte[] source = store.ReadBytes(acquisitionId);
+        var retained = JsonNode.Parse(source)!.AsObject();
+        if (D.Text(retained, "schemaVersion") != "diagnostic-runtime-acquisition.v1" || retained["request"] is not JsonObject request)
+            throw new BridgeException("InvalidRequest", "Expected a retained runtime acquisition.");
+        var derived = Build(captures, D.Required(retained, "experimentId", 64), D.Required(retained, "snapshotRef", 160), request);
+        if (!JsonNode.DeepEquals(retained, derived) ||
+            !JsonNode.DeepEquals(store.Read(D.Required(retained, "analysisId", 64), "runtime-capture-analysis.v1"), derived["analysis"]))
+            throw new BridgeException("CaptureMismatch", "Retained acquisition or analysis differs from its original source chain and experiment.");
+        return (retained, source);
+    }
+
+    public const string ComparisonLimits = "Descriptive comparison of two retained sequential acquisitions of one experiment against its case's declarative predictions. Cycle counts depend on each capture's duration and coverage; patterns are not rates, statistics or synchronized events. Stimuli between the captures are not linked or verified by this record. All verdicts remain unresolved; no causation or fix proof.";
+
+    /// <summary>Before/after hypothesis pattern counts of two distinct captures of one experiment; both acquisitions are rederived first.</summary>
+    public JsonObject Compare(RuntimeCaptureStore captures, string beforeAcquisitionId, string afterAcquisitionId, JsonObject request)
+    {
+        D.Bound(request);
+        if (request.Any(p => p.Key != "reason")) throw new BridgeException("InvalidRequest", "Supply exactly reason.");
+        D.Required(request, "reason", 2000);
+        var before = Reopen(captures, beforeAcquisitionId).Retained; var after = Reopen(captures, afterAcquisitionId).Retained;
+        if (D.Text(before, "experimentId") != D.Text(after, "experimentId") ||
+            D.Text(before, "snapshotRef").Split(':')[1] == D.Text(after, "snapshotRef").Split(':')[1])
+            throw new BridgeException("MeasurementLineageMismatch", "Compare acquisitions of two distinct captures of the same exact experiment.");
+        JsonObject Side(JsonObject acquisition, string id)
+        {
+            var analysis = acquisition["analysis"]!;
+            return new() { ["acquisitionId"] = id, ["snapshotRef"] = acquisition["snapshotRef"]!.DeepClone(), ["analysisId"] = acquisition["analysisId"]!.DeepClone(),
+                ["context"] = analysis["capture"]!["context"]?.DeepClone(), ["recordedProgress"] = analysis["capture"]!["recordedProgress"]!.DeepClone(),
+                ["signalIds"] = D.Strings(analysis["association"]!["signals"]!.AsArray().Select(s => D.Text(s, "signalId"))),
+                ["qualityAssessment"] = analysis["qualityAssessment"]!.DeepClone(), ["qualityLimits"] = acquisition["qualityLimits"]!.DeepClone() };
+        }
+        JsonObject Counts(JsonNode hypothesis)
+        {
+            int matched = hypothesis["matchedCycles"]!.GetValue<int>(), contradicted = hypothesis["contradictedCycles"]!.GetValue<int>();
+            return new() { ["matchedCycles"] = matched, ["contradictedCycles"] = contradicted, ["unknownCycles"] = hypothesis["unknownCycles"]!.DeepClone(),
+                ["pattern"] = (matched > 0, contradicted > 0) switch { (true, false) => "matchedOnly", (false, true) => "contradictedOnly", (true, true) => "mixed", _ => "notApplicable" } };
+        }
+        // Same experiment, same immutable case: both analyses list its hypotheses in the same order.
+        var a = before["analysis"]!["hypotheses"]!.AsArray(); var b = after["analysis"]!["hypotheses"]!.AsArray();
+        var hypotheses = new JsonArray(a.Select((h, i) =>
+        {
+            var x = Counts(h!); var y = Counts(b[i]!);
+            return (JsonNode?)new JsonObject { ["id"] = h!["id"]!.DeepClone(), ["statement"] = h["statement"]!.DeepClone(), ["prediction"] = h["prediction"]?.DeepClone(),
+                ["before"] = x, ["after"] = y, ["patternChanged"] = D.Text(x, "pattern") != D.Text(y, "pattern"), ["verdict"] = "unresolved", ["causationProven"] = false };
+        }).ToArray());
+        var beforeSide = Side(before, beforeAcquisitionId); var afterSide = Side(after, afterAcquisitionId);
+        var comparison = new JsonObject { ["schemaVersion"] = "diagnostic-runtime-acquisition-comparison.v1", ["experimentId"] = before["experimentId"]!.DeepClone(),
+            ["request"] = request.DeepClone(), ["before"] = beforeSide, ["after"] = afterSide, ["hypotheses"] = hypotheses,
+            ["sameCaptureContext"] = JsonNode.DeepEquals(beforeSide["context"], afterSide["context"]),
+            ["sameSignals"] = JsonNode.DeepEquals(beforeSide["signalIds"], afterSide["signalIds"]),
+            ["verdict"] = "unresolved", ["sourceEvidenceRevalidated"] = true, ["limits"] = ComparisonLimits };
+        foreach (string field in FalseClaims) comparison[field] = false;
+        var receipt = new DiagnosticStore(artifactsRoot).Save(comparison); receipt["comparison"] = comparison; return receipt;
     }
 
     private static string Render(JsonObject value, string id, string raw, bool html)

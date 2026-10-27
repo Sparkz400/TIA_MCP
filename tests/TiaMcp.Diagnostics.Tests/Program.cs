@@ -12,6 +12,7 @@ var tests = new (string, Action)[] {
     ("Versioned measurement quality and timing retain incomplete original evidence", QualityMeasurementChecks.Run),
     ("Retained runtime acquisition preserves original chains and unresolved sequential observations", RuntimeAcquisitionChecks.Run),
     ("PLCSIM captures feed the unchanged runtime acquisition and export path", PlcsimAcquisitionChecks.Run),
+    ("PLCSIM plan-signal writes are admitted against the case and before/after acquisitions compare against its predictions", PlcsimWriteCompareChecks.Run),
     ("Repeated experiment windows and combined exports retain original evidence without promoting quality", RepeatedExperimentChecks.Run),
     ("Retained experiments compose exact diagnostic evidence and review explicit before/after lineage", ExperimentChecks.Run),
     ("Runtime captures retain selected alarm evidence without granting runtime authority", RuntimeAlarmBindingChecks.Run),

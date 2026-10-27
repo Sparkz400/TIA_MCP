@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using TiaMcp.Core;
+using TiaMcp.Core.Diagnostics;
 using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.Host;
@@ -35,13 +36,26 @@ public sealed class RuntimeCaptureTools(RuntimeCaptures captures)
     [Description("Export a retained diagnostic runtime acquisitionId as json, markdown or html. Reopens and rederives its original experiment, associated immutable capture snapshot and sequential analysis before returning hashed artifacts for artifact_read. Readable bounded previews include complete acquisition JSON, exact source references, per-read timing, errors/gaps, terminal state and unresolved identity/quality limits. HTML is escaped and self-contained without scripts or external resources. Existing retention and 8 MiB output bounds apply. No network acquisition, source authentication, synchronized clocks, causal inference or native qualification.")]
     public Task<CallToolResult> ExportDiagnosticAcquisition(string acquisitionId,string format)
         =>Run(()=>Task.FromResult(captures.ExportDiagnosticAcquisition(acquisitionId,format)));
+    [McpServerTool(Name="diagnostic_runtime_acquisition_compare",ReadOnly=true,Destructive=false,OpenWorld=false)]
+    [Description("Compare two retained diagnostic runtime acquisitions (before/after, for example around diagnostic_plcsim_write) of the same exact experimentId against its case's declarative hypothesis predictions. request:{reason}. Both acquisitions are rederived from their original capture chains and experiment as in diagnostic_runtime_acquisition_export; they must come from two distinct captures. Per hypothesis reports matched/contradicted/unknown cycles on each side, the observed pattern (matchedOnly, contradictedOnly, mixed, notApplicable) and patternChanged, beside both capture contexts, signal sets, progress and quality. Persists a diagnostic-runtime-acquisition-comparison.v1 record. Verdicts stay unresolved: cycle counts depend on capture duration, polling is sequential, address/program identity is unverified and stimuli between captures are not linked. No target access, causation or fix proof.")]
+    public Task<CallToolResult> CompareDiagnosticAcquisitions(string beforeAcquisitionId,string afterAcquisitionId,JsonElement request)
+        =>Run(()=>Task.FromResult(captures.CompareDiagnosticAcquisitions(beforeAcquisitionId,afterAcquisitionId,
+            JsonNode.Parse(request.GetRawText()) as JsonObject??throw new BridgeException("InvalidRequest","Expected a request object."))));
+    [McpServerTool(Name="diagnostic_plcsim_write",ReadOnly=false,Destructive=true,OpenWorld=false)]
+    [Description("Write 1..16 signals of an exact retained diagnostic_plan caseId on a PLCSIM Advanced instance this Host owns (instanceId, instanceName and the creationId it was created or adopted with) through the simulator worker. writes:[{signalId,symbol,type,datatype,expected,value,reason}]: each signalId maps to a distinct captured-declaration signal of the case, re-resolved against its saved review; symbol/type/datatype follow runtime_capture_start source:'plcsim' rules and datatype must equal the saved declaration. Requires acknowledgeWrite=true. The worker rechecks the exact owned instance (ID, name, storage, creation receipt) and Softbus, reads every signal and writes nothing unless each equals its expected value (state preconditionMismatch, with the values read). Then each write is sent once in order and read back; the sequence stops at the first failure or readback mismatch (readbackMatches; the scan may overwrite assignments). Refused while a capture holds the instance. Physical PLCs and instances this Host does not own are never written. No forcing, retries, batch atomicity or program-identity proof.")]
+    public Task<CallToolResult> WriteDiagnosticPlcsim(string caseId,int instanceId,string instanceName,string creationId,DiagnosticPlcsimWrite[] writes,bool acknowledgeWrite,CancellationToken cancellationToken)
+        =>Run(async()=>
+        {
+            if(!acknowledgeWrite)throw new BridgeException("RuntimeAcknowledgementRequired","Set the explicit acknowledgement flag; nothing was sent.");
+            return await captures.WriteDiagnosticPlcsim(caseId,instanceId,instanceName,creationId,writes,cancellationToken);
+        },"Write refused before dispatch, or its outcome is unknown; see the code. Never retried and never sent to a physical PLC.");
     [McpServerTool(Name="runtime_capture_export",ReadOnly=false,Destructive=false,OpenWorld=false)]
     [Description("Export a verified capture snapshotRef as json or csv. CSV includes companion JSON retaining plan, context, quality and terminal state. Values remain exact JSON strings; exports do not interpolate failures/gaps or prove program identity. Download returned hashed files through artifact_read and open capture JSON in Explorer. Global retained data limit is 512 MiB; no eviction or target access.")]
     public Task<CallToolResult> Export(string snapshotRef,CancellationToken cancellationToken,string format="json") => Run(()=>captures.Export(snapshotRef,format,cancellationToken));
-    private static async Task<CallToolResult> Run(Func<Task<object>> action)
+    private static async Task<CallToolResult> Run(Func<Task<object>> action,string message="Capture unavailable or incomplete. No remote error text, credentials or automatic restart.")
     {
         object result;bool failed=false;
-        try{result=await action();}catch(Exception error){failed=true;result=new {error=new{code=error is BridgeException e?e.Code:"RuntimeCaptureFailed",message="Capture unavailable or incomplete. No remote error text, credentials or automatic restart."}};}
+        try{result=await action();}catch(Exception error){failed=true;result=new {error=new{code=error is BridgeException e?e.Code:"RuntimeCaptureFailed",message}};}
         var json=JsonSerializer.SerializeToElement(result,BridgeProtocol.Json);
         return new(){IsError=failed,StructuredContent=json,Content=[new TextContentBlock{Text=json.GetRawText()}]};
     }

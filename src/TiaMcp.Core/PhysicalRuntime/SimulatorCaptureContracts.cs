@@ -109,7 +109,7 @@ public static class SimulatorCaptureContracts
     public static string ReadError(Exception error) =>
         error is BridgeException e && ReadErrors.Contains(e.Code, StringComparer.Ordinal) ? e.Code : "PlcsimCaptureReadFailed";
 
-    private static bool Value(SimulatorCaptureSignal signal, JsonElement value) => signal.Type switch {
+    internal static bool Value(SimulatorCaptureSignal signal, JsonElement value) => signal.Type switch {
         "bool" => value.ValueKind is JsonValueKind.True or JsonValueKind.False,
         "string" or "wstring" => value.ValueKind == JsonValueKind.String && value.GetString()!.Length <= 16384,
         "float" or "double" => value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out double real) && double.IsFinite(real),

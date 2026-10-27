@@ -27,6 +27,9 @@ namespace TiaMcp.Simulator.V8
                 Require(SimulationAssertions.Compare("double", new JValue(1e300), new JValue(1e299), "gt", 0)));
             Check(checks, "float equality tolerance", () =>
                 Require(SimulationAssertions.Compare("float", new JValue(0.10000000149011612), new JValue(0.1), "eq", 0.00001)));
+            Check(checks, "owned write precondition and readback compare at Real precision", () =>
+                Require(SimulationAssertions.Same("float", new JValue((double)0.1f), new JValue(0.1)) && !SimulationAssertions.Same("double", new JValue((double)0.1f), new JValue(0.1))
+                    && !SimulationAssertions.Same("float", new JValue(0.5), new JValue(0.25))));
             Check(checks, "NaN cannot pass comparison", () => Throws(() => SimulationAssertions.Compare("double", new JValue(double.NaN), new JValue(1.0), "eq", 0)));
             Check(checks, "boolean relational comparison rejected", () => Throws(() => SimulationAssertions.Compare("bool", new JValue(true), new JValue(false), "gt", 0)));
             Check(checks, "negative tolerance rejected", () => Throws(() => SimulationAssertions.Compare("int32", new JValue(2), new JValue(1), "eq", -1)));
