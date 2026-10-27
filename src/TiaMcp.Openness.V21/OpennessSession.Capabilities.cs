@@ -420,6 +420,7 @@ namespace TiaMcp.Openness.V21
             var probe = api.ToJson();
             probe["owner"] = "owningCpu"; probe["serviceType"] = typeof(SafetyAdministration).FullName; probes.Add(probe);
             AddTargetFeature(features, "safety_inspect", api, "partial", "Reads exposed offline configuration/signatures only; it does not validate or accept the safety program.");
+            AddTargetFeature(features, "safety_validation_inspect", api, "partial", "Adds Failsafe_* F-parameters and Safety Validation Assistant activation tests (read-only); no test execution, result reset or approval.");
             AddTargetFeature(features, "change.safety_import_xml", api, "partial", "Dedicated acknowledged F-LAD/F-FBD/F-DB import only; explicit group/scope, protection, native consistency and signature checks apply.",
                 applicable: importApplicable, blocked: blocked || generated || targetBlocker != null,
                 blocker: generated ? "Generated system-group objects are excluded from direct mutations." : targetBlocker ?? "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");

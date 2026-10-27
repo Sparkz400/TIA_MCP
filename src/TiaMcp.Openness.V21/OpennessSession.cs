@@ -135,6 +135,7 @@ namespace TiaMcp.Openness.V21
                 case "certificate_inspect": return CertificateInspect(arguments);
                 case "web_inspect": return WebInspect(arguments);
                 case "vci_workspace_inspect": return VciWorkspaceInspect(arguments);
+                case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);

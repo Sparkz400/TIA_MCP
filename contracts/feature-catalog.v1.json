@@ -3401,6 +3401,53 @@
       ]
     },
     {
+      "featureId": "safety_validation_inspect",
+      "domain": "safety",
+      "title": "Read F-I/O F-parameters and Safety Validation Assistant activation tests",
+      "mcpTools": [
+        "safety_validation_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Project.GetService<SafetyValidationAssistant>() with ActivationTests/ActivationTestGroups, ActivationTestUserGroup.ActivationTests/Groups, ActivationTest.Name/Author/EvaluationDeviceName/OverallState/SafetyFunctions/Export(FileInfo, ExportOptions), SafetyFunction.Name/TestName/Description/TestState/Conditions/TraceConfiguration, Condition.SignalUsage/DeviceName/SignalName/Comment/InitialInput/ExecutedInput/Response, TraceConfiguration.IsTraced, GetService<TestValidity>().CheckValidity() (TestValidationResult.State/ErrorCount/Messages) and ActivationTest.GetService<ActivationTestPrintout>().Generate(FileInfo).",
+          "V21 DeviceItem.GetService<SafetyPrintout>().Print(SafetyPrintoutFilePrinter.MicrosoftPrintToPdf, FileInfo, \"DocuInfo_ISO_A4_Portrait\", SafetyPrintoutOption.All) on the PLC DeviceItem owning SafetyAdministration.",
+          "F-parameters are the documented Failsafe_* hardware attributes (for example Failsafe_FSourceAddress, Failsafe_FDestinationAddress, Failsafe_FMonitoringtime, Failsafe_FParameterSignatureWithAddresses, Failsafe_CentralFSourceAddress) read through IEngineeringObject.GetAttributeInfos/GetAttribute."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
+          "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
+          "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
+          "Validity uses the native TestValidity.CheckValidity query; side effects are not natively verified. Activation-test execution, ResetTestResult, F-parameter writes and safety login are not implemented.",
+          "Optional exports require the Windows Microsoft Print to PDF driver for the safety printout; XLSX/PDF/SimaticML files are retained opaquely with SHA-256 and not parsed. Missing services or failed exports are warnings and mark the scope incomplete."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SafetyAdministration on the PLC; the Safety Validation Assistant service is reported as UnsupportedCapability when absent."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "xref_query",
       "domain": "analysis",
       "title": "Read native cross-reference locations",

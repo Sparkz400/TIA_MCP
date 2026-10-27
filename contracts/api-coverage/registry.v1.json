@@ -760,6 +760,12 @@
       ]
     },
     {
+      "featureId": "safety_validation_inspect",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
       "featureId": "xref_query",
       "obligations": [
         "L04"

@@ -173,5 +173,10 @@ public sealed partial class TiaTools
     [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state and supported file formats. Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, export or synchronization.")]
     public Task<CallToolResult> VciWorkspaceInspect(CancellationToken cancellationToken, string? projectName = null, int maxItems = 500)
         => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+
+    [McpServerTool(Name = "safety_validation_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Inspect one safety PLC like safety_inspect, plus Failsafe_* F-parameters of the CPU and its F-I/O modules (F-source/F-destination address, F-monitoring time, F-parameter signature) and Safety Validation Assistant activation tests, groups, safety functions, conditions, validity checks and recorded test states. exportArtifacts writes activation-test SimaticML and XLSX reports and the safety printout PDF to the export directory with SHA-256. The result is accepted by safety_evidence_review. Does not log in, execute activation tests, reset results, change F-parameters or approve the safety program.")]
+    public Task<CallToolResult> SafetyValidationInspect(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? blockName = null, string? blockPath = null, int maxItems = 2000, string? scopePath = null, bool exportArtifacts = false)
+        => Call("safety_validation_inspect", new { projectName, plcPath, blockName, blockPath, scopePath, maxItems = Limit(maxItems), exportArtifacts, artifactDirectory = ExportDirectory }, cancellationToken);
     private static JsonElement ObjectArguments(JsonElement value) => value.ValueKind == JsonValueKind.Object ? value : throw new McpException("An object is required.");
 }
