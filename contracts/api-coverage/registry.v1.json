@@ -3152,6 +3152,18 @@
       "obligations": [
         "D05"
       ]
+    },
+    {
+      "featureId": "change.drive_parameter_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "drive_observe",
+      "obligations": [
+        "D10"
+      ]
     }
   ],
   "manualResiduals": [

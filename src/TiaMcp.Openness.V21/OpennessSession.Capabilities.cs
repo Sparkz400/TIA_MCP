@@ -195,6 +195,11 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
                 AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
                 metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+                ApiObservation drive;
+                try { drive = ProbeDriveContainer(hardware, probes); }
+                catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
+                AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
+                AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
