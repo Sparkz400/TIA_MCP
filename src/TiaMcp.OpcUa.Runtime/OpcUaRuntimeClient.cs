@@ -248,7 +248,9 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
 
     private ISession Session => session is { Connected: true } s && !Unusable ? s : throw Error("UaSessionUnavailable");
     internal void Invalidate(bool reconnectable = false) { Unusable = true; CanReconnect = reconnectable && session is not null; }
-    internal async Task Reconnect(CancellationToken ct)
+    /// <summary>Reactivates the original session. Only when the server reports that session gone while this client owns a
+    /// subscription does it open one replacement session and call TransferSubscriptions; Transfer is null otherwise.</summary>
+    internal async Task<(string? Transfer, string? Status)> Reconnect(CancellationToken ct)
     {
         if(!CanReconnect || session is null) throw Error("UaReconnectUnavailable");
         using var leaf=CertificateFactory.Create(session.ConfiguredEndpoint.Description.ServerCertificate);
@@ -256,12 +258,48 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
         await configuration.CertificateValidator.ValidateAsync(leaf,ct);
         configuration.CertificateValidator.ValidateDomains(leaf,session.ConfiguredEndpoint);
         var original=session.SessionId;
-        await session.ReconnectAsync(null,null,ct);
+        try {await session.ReconnectAsync(null,null,ct);}
+        catch(ServiceResultException e) when(subscriptionId!=0 && e.StatusCode is StatusCodes.BadSessionIdInvalid or StatusCodes.BadSessionClosed)
+        {return await Transfer(ct);}
         session.KeepAliveInterval=Timeout.Infinite;
         if(session.SessionId!=original) throw Error("UaSessionIdentityChanged");
         Unusable=false;
         try {await VerifyIdentity(ct);CanReconnect=false;}
         catch {Unusable=true;throw;}
+        return (null,null);
+    }
+    private async Task<(string?, string?)> Transfer(CancellationToken ct)
+    {
+        // Same pinned endpoint description, client certificate and user identity; the server checks the identity matches the owner.
+        var old=session!;
+        session=await new DefaultSessionFactory(null!).CreateAsync(configuration,old.ConfiguredEndpoint,false,true,
+            "TIA MCP owned read-only",60_000,old.Identity,null,ct);
+        session.KeepAliveInterval=Timeout.Infinite;
+        session.TransferSubscriptionsOnReconnect=false;
+        session.DeleteSubscriptionsOnClose=true;
+        Unusable=false;
+        try
+        {
+            // A restarted server has a new start time: refuse rather than adopt it.
+            await VerifyIdentity(ct);
+            string? refused;
+            try
+            {
+                var response=await session.TransferSubscriptionsAsync(null,[subscriptionId],false,ct);
+                if(response.Results.Count!=1) throw Error("UaResponseInvalid");
+                refused=StatusCode.IsGood(response.Results[0].StatusCode) ? null : $"0x{response.Results[0].StatusCode.Code:x8}";
+            }
+            catch(ServiceResultException e) when(e.StatusCode is not (StatusCodes.BadConnectionClosed or StatusCodes.BadSecureChannelClosed or
+                StatusCodes.BadCommunicationError or StatusCodes.BadNoCommunication or StatusCodes.BadNotConnected or StatusCodes.BadTimeout or
+                StatusCodes.BadRequestTimeout or StatusCodes.BadRequestCancelledByClient))
+            {refused=$"0x{e.StatusCode:x8}";}
+            // A refused subscription is no longer owned here; the acquisition creates a new one with a new sequence.
+            if(refused is not null) {subscriptionId=0;monitoredItems=[];eventItem=null;}
+            CanReconnect=false;
+            return (refused is null ? "transferred" : "refused", refused);
+        }
+        catch {Unusable=true;throw;}
+        finally {try {old.Dispose();} catch { }}
     }
     internal async Task<bool> Close()
     {

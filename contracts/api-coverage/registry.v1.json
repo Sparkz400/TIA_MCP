@@ -2760,6 +2760,12 @@
       ]
     },
     {
+      "featureId": "runtime_web_diagnostics",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "obligations": [
         "D16"

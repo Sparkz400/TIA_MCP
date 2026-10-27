@@ -17,7 +17,7 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
     private int republish,recoveryProbes;
     private bool deleted,failed;
     private readonly OpcUaReconnectHistory reconnect=new(plan.Request.MaximumReconnectAttempts);
-    private bool recovering;
+    private bool recovering,recreatePending;
     internal long Rows,Notifications,Duplicates,Missing;
     internal double Elapsed;
     internal bool Cleanup;
@@ -39,16 +39,22 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
         OpcUaSubscriptionContracts.ValidateRow(plan,row);
         Require(row.Sequence==Rows && row.ElapsedMilliseconds>=Elapsed && !deleted);
         var e=row.Event;
-        if(e.Kind=="created") {Require(Rows==0 && created is null && !failed);created=e.Created;}
+        if(e.Kind=="created")
+        {
+            Require(!failed && (Rows==0 && created is null || recreatePending && reconnect.Healthy && !reconnect.Pending));
+            // Only after a refused transfer: the replacement subscription starts its own sequence space.
+            if(recreatePending){seen.Clear();gaps.Clear();committedSeen=[];expected=1;recreatePending=false;}
+            created=e.Created;
+        }
         else if(e.Kind=="reconnect")
         {
             Require(created is not null && e.SubscriptionId==created.SubscriptionId && !failed && !serverStatus && pendingGap is null);
             reconnect.Apply(e.Reconnect!);
-            if(e.Reconnect!.State=="succeeded")recovering=true;
+            if(e.Reconnect!.State=="succeeded"){recreatePending|=e.Reconnect.Transfer=="refused";recovering=!recreatePending;}
         }
         else if(e.Kind is "publish" or "republish" or "gap")
         {
-            Require(created is not null && !failed && !serverStatus && reconnect.Healthy && !reconnect.Pending && e.SubscriptionId==created.SubscriptionId);
+            Require(created is not null && !failed && !serverStatus && !recreatePending && reconnect.Healthy && !reconnect.Pending && e.SubscriptionId==created.SubscriptionId);
             foreach(var value in e.Notifications??[])
             {
                 var item=created.Items[(int)value.ClientHandle-1];
@@ -89,7 +95,7 @@ internal sealed class OpcUaSubscriptionTimeline(OpcUaSubscriptionPlan plan)
         {
             if(e.ErrorCode=="UaRepublishUnavailable")
             {
-                Require(created is not null && reconnect.Healthy && !reconnect.Pending && e.SubscriptionId==created.SubscriptionId && ++republish<=plan.Request.MaximumRepublish &&
+                Require(created is not null && !recreatePending && reconnect.Healthy && !reconnect.Pending && e.SubscriptionId==created.SubscriptionId && ++republish<=plan.Request.MaximumRepublish &&
                     (recovering ? e.RequestedSequenceNumber==expected && pendingGap is null : InGap(e.RequestedSequenceNumber!.Value)));
                 if(recovering){recoveryProbes++;recovering=false;}
             }

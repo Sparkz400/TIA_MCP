@@ -5,7 +5,7 @@ using TiaMcp.Core.PhysicalRuntime;
 
 namespace TiaMcp.OpcUa.Runtime;
 
-/// <summary>Explicit bounded Publish/Republish acquisition. Recovery never transfers or recreates subscriptions.</summary>
+/// <summary>Explicit bounded Publish/Republish acquisition. Recovery transfers or recreates a subscription only after the server reports the original session gone.</summary>
 public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,string artifactsRoot) : IAsyncDisposable
 {
     private sealed class Running(string attemptId)
@@ -73,7 +73,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
         bool Expired()=>entry.Stop.IsCancellationRequested || Elapsed()>=plan.Request.DurationSeconds*1000d;
         void Append(OpcUaSubscriptionEvent e)=>writer.Append(new(writer.Rows,Elapsed(),DateTimeOffset.UtcNow,e));
         var seen=new HashSet<uint>();var missingRanges=new List<(uint From,long Count)>(); var acknowledgements=new HashSet<uint>(); uint expected=1;int republished=0;
-        int reconnects=0;bool recovering=false;
+        int reconnects=0;bool recovering=false,recreate=false;
         using var duration=new CancellationTokenSource(TimeSpan.FromSeconds(plan.Request.DurationSeconds));
         using var recoveryStop=CancellationTokenSource.CreateLinkedTokenSource(entry.Stop.Token,duration.Token);
         void Recovery(OpcUaReconnectEvent e) {Append(new("reconnect",subscription,Reconnect:e));writer.Flush(Elapsed());}
@@ -81,11 +81,11 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
         {
             while(!Expired() && OpcUaReconnectHistory.Retryable(error) && reconnects<plan.Request.MaximumReconnectAttempts)
             {
-                int attempt=++reconnects;Recovery(new(attempt,"starting",error));string? failure=null;
-                try {await Task.Delay(500,recoveryStop.Token);await sessions.ReconnectAcquisition(plan.Request.AttemptId,plan.CaptureId,recoveryStop.Token);}
+                int attempt=++reconnects;Recovery(new(attempt,"starting",error));string? failure=null;(string? Transfer,string? Status) transfer=default;
+                try {await Task.Delay(500,recoveryStop.Token);transfer=await sessions.ReconnectAcquisition(plan.Request.AttemptId,plan.CaptureId,recoveryStop.Token);}
                 catch(Exception e) {failure=e is BridgeException b && b.Code.StartsWith("Ua",StringComparison.Ordinal)?b.Code:recoveryStop.IsCancellationRequested?"UaCancelled":"UaReconnectFailed";}
-                Recovery(new(attempt,failure is null?"succeeded":"failed",failure));
-                if(failure is null){recovering=true;return true;}
+                Recovery(new(attempt,failure is null?"succeeded":"failed",failure,transfer.Transfer,transfer.Status));
+                if(failure is null){recreate|=transfer.Transfer=="refused";recovering=!recreate;return true;}
                 error=failure;
             }
             return false;
@@ -102,6 +102,15 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
             {
                 try
                 {
+                if(recreate)
+                {
+                    // Transfer was refused: undelivered data of the old subscription is unknown; the new one starts a new sequence.
+                    var again=await sessions.CreateSubscription(plan.CaptureId,plan.Request,CancellationToken.None);
+                    subscription=again.SubscriptionId;Append(new("created",subscription,Created:again));
+                    recreate=false;seen.Clear();missingRanges.Clear();acknowledgements.Clear();expected=1;
+                    if(OpcUaSubscriptionContracts.AllItemsFailed(again))throw OpcUaRuntimeClient.Error("UaSubscriptionRecreateFailed");
+                    continue;
+                }
                 if(recovering)
                 {
                     // Drain potentially lost responses before issuing another Publish; each envelope stays original.

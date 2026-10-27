@@ -220,6 +220,17 @@ public sealed class WebRuntimeClient : IDisposable
             DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken);
     }
 
+    public async Task<WebRuntimeDiagnosticResult> DiagnosticAsync(string kind, string? language, int? count, CancellationToken cancellationToken)
+    {
+        Active(); string method = WebRuntimeProtocol.DiagnosticMethod(kind);
+        var body = WebRuntimeProtocol.Diagnostic(Id(), kind, language, count);
+        DateTimeOffset start = DateTimeOffset.UtcNow; long tick = Stopwatch.GetTimestamp();
+        // Not advertised by Api.Browse means unsupported on this session; nothing is sent.
+        if (!Methods.Contains(method)) return new(Context, kind, method, null, "unsupported", null, null, null, null, start, start, 0);
+        return await Exchange(body, bytes => WebRuntimeProtocol.DiagnosticResult(Context, kind, body, bytes, start,
+            DateTimeOffset.UtcNow, Stopwatch.GetElapsedTime(tick)), cancellationToken);
+    }
+
     public async Task LogoutAsync(CancellationToken cancellationToken)
     {
         if (token is null) throw Error("RuntimeRemoteSessionUnknown");

@@ -22,7 +22,7 @@ Bounds are fixed: four live owned clients per artifact store, 1,024 retained att
 
 Retained records are under `runtime-ua` with a single owner lock. No private key, password, UA authentication token or reusable session handle is recorded. An interrupted connect/read or unconfirmed close remains `remoteSessionUnknown`; an actually different Host observes `hostEndedRemoteUnknown`. An unresolved endpoint reservation blocks fresh IDs in the same artifact store. Explicit `acknowledgeUnknown=true` records `abandonedRemoteUnknown` and releases only the local reservation; it does not claim remote logout. Browse cleanup failure is retained separately from the original operation error where both occurred. Record publication failure cannot skip closing other captured live transports or releasing the original owner lock.
 
-The [contract](../../contracts/opcua-runtime.v1.schema.json), [session qualification](../verification/opcua-runtime-wave4-20261020.md) and [array/matrix checks](../verification/opcua-array-values-20261025.md) describe the session profile and actual local evidence. Siemens CPU model/firmware, security configuration, real trust provisioning and runtime license compatibility remain physical qualification prerequisites. The [bounded polling capture workflow](opcua-runtime-capture.md) reuses these exact secure reads and retains their quality/status/timestamps. [Bounded subscriptions](opcua-runtime-subscriptions.md) have a separate retained contract and qualification. Captures can explicitly opt into [bounded same-session reconnect](#controlled-acquisition-reconnect). Session replacement, subscription transfer and mutation workflows remain unsupported.
+The [contract](../../contracts/opcua-runtime.v1.schema.json), [session qualification](../verification/opcua-runtime-wave4-20261020.md) and [array/matrix checks](../verification/opcua-array-values-20261025.md) describe the session profile and actual local evidence. Siemens CPU model/firmware, security configuration, real trust provisioning and runtime license compatibility remain physical qualification prerequisites. The [bounded polling capture workflow](opcua-runtime-capture.md) reuses these exact secure reads and retains their quality/status/timestamps. [Bounded subscriptions](opcua-runtime-subscriptions.md) have a separate retained contract and qualification. Captures can explicitly opt into [bounded reconnect](#controlled-acquisition-reconnect); only a subscription capture may open a replacement session, to transfer its subscription after the server reports the session gone. Mutation workflows remain unsupported.
 
 An active polling capture or subscription exclusively reserves its owned session. Manual read, browse, disconnect and another acquisition refuse with `UaSessionAcquisitionBusy` until it stops and releases that reservation. Retained status remains available. Stop the original acquisition first, then explicitly disconnect; stopping acquisition and closing the session have separate outcomes.
 
@@ -70,8 +70,13 @@ rechecks protected credential admission and client/server certificate validity,
 reactivates the original session on an encrypted channel, and verifies its original
 session ID, namespace and server-URI tables, and server start time. Identity changes,
 expired/lost sessions, retired credentials, authentication failures and invalid
-responses stop recovery. There is no replacement session, subscription transfer,
-trust update or release of an unresolved endpoint reservation.
+responses stop recovery. There is no trust update or release of an unresolved
+endpoint reservation. One exception applies to subscription captures: if
+reactivation fails because the server reports the session gone, the client opens
+one replacement session with the same endpoint, certificates and identity and calls
+TransferSubscriptions; a refused transfer re-creates the subscription. See
+[session loss and transfer](opcua-runtime-subscriptions.md#session-loss-and-transfer).
+Polling captures never open a replacement session.
 
 The journal commits a `starting` event before network recovery, followed by
 `succeeded` or `failed` with a bounded error code. Their original monotonic elapsed
@@ -90,5 +95,4 @@ continues to report its own outcome.
 
 This uses the pinned SDK's session reactivation, following the
 [OPC Foundation reconnect sequence](https://reference.opcfoundation.org/specs/OPC-10000-4/6.7).
-No background SDK reconnect handler, subscription recreation, ResendData method or
-write service is enabled. See [local implementation evidence](../verification/opcua-controlled-reconnect-20261025.md).
+No background SDK reconnect handler, ResendData method or write service is enabled. See [local implementation evidence](../verification/opcua-controlled-reconnect-20261025.md).

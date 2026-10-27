@@ -7023,6 +7023,7 @@
         "runtime_web_connect",
         "runtime_web_browse",
         "runtime_web_read",
+        "runtime_web_diagnostics",
         "runtime_web_status",
         "runtime_web_disconnect",
         "runtime_ua_client_identity",
@@ -17862,6 +17863,48 @@
       ]
     },
     {
+      "featureId": "runtime_web_diagnostics",
+      "domain": "runtime",
+      "title": "Read CPU diagnostics through an owned Web API session",
+      "mcpTools": [
+        "runtime_web_diagnostics"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Documented Siemens Web API read methods Project.ReadLanguages, Alarms.Browse, DiagnosticBuffer.Browse, Plc.ReadOperatingMode, Plc.ReadModeSelectorState, Plc.ReadSystemTime, Plc.ReadTimeSettings and Project.ReadInformation; each is sent only when the session advertised it."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Bounded raw JSON per kind with only the documented top-level shape checked; alarms and diagnostic buffer take a language and count 1..500 and report truncation against count_current. No alarm acknowledgment, filters, alarm IDs, R/H redundancy_id, clock setting or mode change; Plc.ReadMemoryInformation and Plc.ReadRuntimeInformation are not exposed.",
+          "Request/response shapes come from Siemens documentation and the Siemens Web API client; protocol-fake tests only. No CPU/firmware qualification, lossless alarm/event history or program-identity claim from project information."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Connected owned runtime_web session on firmware that advertises the method, plus the CPU's current permissions for that read."
+        ]
+      },
+      "prerequisites": [
+        "Windows current-user credential vault for authenticated connection",
+        "Explicit endpoint and independently obtained certificate pin; no local TIA installation required"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-recovery"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "domain": "runtime",
       "title": "Inspect retained runtime session state",
@@ -19825,7 +19868,7 @@
         "status": "partial",
         "limitations": [
           "Retains original requested/revised settings, item failures, typed values/status/times and Publish/Republish evidence; repeated capture IDs observe without acquisition replay.",
-          "Bounded read-only subscription profile on an existing owned encrypted UA session. No automatic reconnect, transfer, writes, methods, forcing or downloads. Local encrypted-server tests do not qualify physical devices, synchronized clocks or executable program/address association."
+          "Bounded read-only subscription profile on an existing owned encrypted UA session. Opt-in bounded reconnect only; when the server reports the session gone it opens one replacement session to the same pinned endpoint and identity and calls TransferSubscriptions, and on refusal re-creates the subscription with the refusal status retained (transfer is not natively qualified). No writes, methods, forcing or downloads. Local encrypted-server tests do not qualify physical devices, synchronized clocks or executable program/address association."
         ]
       },
       "qualification": {
