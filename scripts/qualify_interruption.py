@@ -65,7 +65,7 @@ def reconciliation_class(kind):
         return "library"
     if kind in TARGET_KINDS or kind.startswith("to_"):
         return "target"
-    return "hardware" if kind in HARDWARE_RULE_KINDS else "software"
+    return "hardware" if kind in HARDWARE_RULE_KINDS else "project"
 
 
 def stages(journal):

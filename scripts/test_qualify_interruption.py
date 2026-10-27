@@ -20,10 +20,10 @@ class InterruptionMatrixTests(unittest.TestCase):
         kinds = {f["changeKind"] for f in catalog["features"] if f["changeKind"]}
         self.assertGreater(len(kinds), 50)
         routes = {kind: q.reconciliation_class(kind) for kind in kinds}
-        self.assertEqual({"software", "hardware", "target", "library"}, set(routes.values()))
+        self.assertEqual({"project", "hardware", "target", "library"}, set(routes.values()))
         # Every engineering route has a native representative; library transactions use qualify_library_interruption.py.
         represented = {q.reconciliation_class(kind) for kind, _, _ in q.KINDS.values()}
-        self.assertEqual({"software", "hardware", "target"}, represented)
+        self.assertEqual({"project", "hardware", "target"}, represented)
 
     def test_kind_sets_match_the_worker(self):
         self.assertEqual(q.TARGET_KINDS, csharp_set("src/TiaMcp.Openness.V21/AdmissionReconcileRules.cs", r"TargetKinds = new HashSet<string>\(new\[\] \{(.*?)\}"))
