@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Units;
 using TiaMcp.Analysis;
 using TiaMcp.Model;
 
@@ -191,6 +192,12 @@ namespace TiaMcp.Openness.V21
             return string.IsNullOrEmpty(blockNamespace) && scope.Unit == null ? "standard" : "namespace";
         }
 
+        // UnitAccessType is exposed only as the native attribute "Access" (see UnitAccessAttributes).
+        private static string TypedUnitAccess(PlcBlock block) => Convert.ToString(block.GetAttribute("Access"), System.Globalization.CultureInfo.InvariantCulture);
+        // Matched by unit name like software_unit_relation_set, since V21 exposes RelatedObject as a name.
+        private static bool TypedUnitRelated(SoftwareScope caller, SoftwareScope callee) => caller.Unit != null && callee.Kind == "softwareUnit"
+            && caller.Unit.Relations.Count(relation => relation.RelationType == UnitRelationType.SoftwareUnit && string.Equals(Convert.ToString(relation.RelatedObject), callee.Name, StringComparison.OrdinalIgnoreCase)) == 1;
+
         private static bool TypedScalar(string type) => new[] { "Bool", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal", "Byte", "Word", "DWord", "LWord", "Time", "LTime", "Void" }.Contains(type);
 
         private sealed class TypedResolutionCapture
@@ -222,17 +229,21 @@ namespace TiaMcp.Openness.V21
                 Change.TypedDependencies.Add(new JObject { ["kind"] = "block", ["path"] = block.Path, ["artifact"] = ChangeArtifact(path), ["nativeHash"] = Hashes[block.Path] });
                 return document;
             }
-            internal BlockEntry Block(string path)
+            internal BlockEntry Block(string path, bool call = false)
             {
                 var block = TypedGraphicalResolution.Exact(Blocks, b => b.Path == path, "ExactTargetRequired", "No unique exact block identity matches " + path);
-                if (ObjectIdentity.ScopePath(Plc.Path, path) != Change.ScopePath) throw new BridgeException("UnsupportedScopeReference", "Typed references across software scopes require an explicitly qualified inter-unit route.");
+                string scope = ObjectIdentity.ScopePath(Plc.Path, path);
+                // Only a call may reach another software unit; the builder then requires a direct relation and a Published callee.
+                if (scope != Change.ScopePath && !(call && ResolveSoftwareScope(Plc, scope).Kind == "softwareUnit" && ResolveSoftwareScope(Plc, Change.ScopePath).Kind == "softwareUnit"))
+                    throw new BridgeException("UnsupportedScopeReference", call ? "A typed call may leave the caller's software scope only between two standard software units."
+                        : "Typed operand and instance-DB references must stay in the caller's exact software scope; only calls may reach a related software unit.");
                 return block;
             }
             internal TypedGraphicalContext Resolve(TypedGraphicalModel model)
             {
                 var scope = ResolveSoftwareScope(Plc, Change.ScopePath);
                 string cpuType = TypedCpuIdentifier(Plc);
-                var context = new TypedGraphicalContext { CpuFamily = cpuType, Route = TypedRoute(scope, Change.Namespace), TargetNamespace = Change.Namespace ?? "" };
+                var context = new TypedGraphicalContext { CpuFamily = cpuType, Route = TypedRoute(scope, Change.Namespace), TargetNamespace = Change.Namespace ?? "", TargetScopePath = scope.Path };
                 context.Profiles = LoadTypedProfiles(Change);
                 foreach (var requested in model.Operands ?? new TypedGraphicalOperandRequest[0])
                 {
@@ -241,14 +252,26 @@ namespace TiaMcp.Openness.V21
                 }
                 foreach (string path in (model.Nodes ?? new TypedGraphicalNode[0]).Where(n => n != null && n.Kind == "call").Select(n => n.CalleePath).Distinct(StringComparer.Ordinal))
                 {
-                    var callee = Block(path);
+                    var callee = Block(path, call: true);
                     if (!(callee.Item is FC) && !(callee.Item is FB)) throw new BridgeException("UnsupportedCallee", "A typed call requires an exact FC or FB.");
                     if (callee.Item.ProgrammingLanguage.ToString().StartsWith("F_", StringComparison.Ordinal)) throw new BridgeException("SafetyBoundary", "Typed standard calls cannot target safety blocks.");
+                    var entry = new TypedGraphicalCallee { Path = path, Name = callee.Item.Name, Namespace = callee.Item.Namespace ?? "", BlockType = callee.Item is FB ? "FB" : "FC", ScopePath = ObjectIdentity.ScopePath(Plc.Path, path) };
+                    if (entry.ScopePath != scope.Path)
+                    {
+                        var owner = ResolveSoftwareScope(Plc, entry.ScopePath);
+                        entry.UnitAccess = TypedUnitAccess(callee.Item);
+                        if (TypedUnitRelated(scope, owner)) context.RelatedScopePaths = context.RelatedScopePaths.Concat(new[] { owner.Path }).Distinct(StringComparer.Ordinal).ToArray();
+                        // Relations are in the change fingerprint; the callee's Access is not, so apply rechecks it.
+                        Change.TypedDependencies.Add(new JObject { ["kind"] = "calleeUnitAccess", ["path"] = path, ["callerScopePath"] = scope.Path, ["calleeScopePath"] = owner.Path,
+                            ["relatedObject"] = owner.Name, ["unitAccess"] = entry.UnitAccess });
+                    }
+                    TypedGraphical.RequireCalleeAccess(context, entry);
                     var xml = Export(callee);
                     var parameters = Members(xml).Where(m => new[] { "Input", "Output", "InOut", "Return" }.Contains(m.Section) && m.Path.Length == 1 && m.DataType != "Void").ToArray();
                     if (parameters.Any(p => !TypedScalar(p.DataType))) throw new BridgeException("UnsupportedParameterType", "Call interface contains a compound, unresolved or unsupported parameter type.");
-                    context.Callees[path] = new TypedGraphicalCallee { Path = path, Name = callee.Item.Name, Namespace = callee.Item.Namespace ?? "", BlockType = callee.Item is FB ? "FB" : "FC", InterfaceHash = Hashes[path],
-                        Parameters = parameters.Select(p => new TypedGraphicalParameter { Name = p.Name, Section = p.Section, DataType = p.DataType, Required = true }).ToArray() };
+                    entry.InterfaceHash = Hashes[path];
+                    entry.Parameters = parameters.Select(p => new TypedGraphicalParameter { Name = p.Name, Section = p.Section, DataType = p.DataType, Required = true }).ToArray();
+                    context.Callees[path] = entry;
                 }
                 return context;
             }

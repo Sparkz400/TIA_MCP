@@ -42,6 +42,19 @@ creation resources come from separate native imports. Uncaptured combinations
 return `GraphicalProfileUnavailable` or a more specific creation/dependency
 diagnostic. They do not fall back to a standard-route profile.
 
+Cross-scope calls (27 October 2026, offline tests only, **unqualified**): a call to a
+block in another namespace of the caller's own software unit emits the callee's absolute
+`Namespace.Name` as the CallInfo `Name` through the route's captured `namespaceQualified`
+call profile; without that profile it fails with `GraphicalCalleeUnsupported`. A call
+into another software unit needs a direct `SoftwareUnit` relation from the caller's unit
+(`GraphicalUnitRelationMissing`), a `Published` callee (`GraphicalCalleeUnpublished`) and
+its own `crossUnitQualified` call profile. No capture binds that profile yet, so these
+calls return `GraphicalProfileUnavailable`. The preview lists the callee's scope, access,
+namespace and interface hash, and apply rechecks them. Cross-unit FB calls accept
+existing storage in the caller's scope only; storage creation and instance DBs in other
+units are refused. Capture inputs are in
+`fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json`.
+
 Added 27 October 2026 and **unqualified**: the model also accepts `compare` with
 `DInt` or `Real`, `move` (one exact scalar `dataType`), `math` (`ADD`/`SUB`/`MUL`/`DIV`
 with one exact numeric `dataType`), `timer` `TONR` and `edge` (`R_TRIG`/`F_TRIG`,

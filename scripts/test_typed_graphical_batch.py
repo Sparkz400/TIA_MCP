@@ -636,6 +636,22 @@ class RouteCapturePacketTests(unittest.TestCase):
                 if label:  # the after phase declares a Child of the route's own template FB
                     self.assertLess(order.index("Tgp" + label + "_TemplateFB_LAD.xml"), order.index(stem + "after.scl"))
 
+    def test_crossscope_call_packet_parses_exactly_and_names_the_callee_absolutely(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json").read_bytes())
+        self.assertEqual("authored-not-executed", packet["status"])
+        self.assertFalse(packet["nativeReferenceQualification"] or packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        for capture in packet["captures"]:
+            self.assertEqual(capture["unit"], capture["command"][capture["command"].index("--unit") + 1])
+            for entry in capture["sources"]:
+                observed, _, _ = authored_reference(root / entry["path"], capture["unit"])
+                for key in ("names", "namespace", "route", "authoredFormat"):
+                    self.assertEqual(entry[key], observed[key], entry["path"])
+                self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+                if "-numeric-fc-" in entry["path"]:
+                    self.assertIn('"TiaMcp_UnitA.TgpUnit_NumericFC"(', (root / entry["path"]).read_text(encoding="utf-8-sig"))
+        self.assertEqual(["crossNamespace", "crossUnit"], [capture["id"] for capture in packet["captures"]])
+
     def test_transitive_route_cases_embed_the_caller_in_its_own_namespace(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         cases = [c for c in json.loads((root / "fixtures/typed-graphical/route-advanced-cases.v1.json").read_bytes())["cases"]
