@@ -8708,6 +8708,48 @@
       ]
     },
     {
+      "featureId": "library_update_check",
+      "domain": "libraries",
+      "title": "Library update check",
+      "mcpTools": [
+        "library_update_check"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ILibrary.UpdateCheck(Project, UpdateCheckMode) returning UpdateCheckResult.Messages (UpdateCheckResultMessage.Description, MessageParts, Messages)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Depth-first walk of native log messages bounded by maxItems (1..1000), depth 64 and 50 message parts, with explicit truncation. Message text is Siemens output and is not interpreted.",
+          "Read-only by intent; the response reports projectModifiedByCheck if the native check marked a clean project modified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "A registered libraryId and an open project."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "library_close",
       "domain": "libraries",
       "title": "Library close",
@@ -9668,7 +9710,8 @@
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "object.groupKind (blocks, types or tags) with groupPath and optional scopePath selects a native PLC user group as one composite master-copy source (MasterCopyComposition.Create(IMasterCopySource)); compiled against the V21 PublicAPI only, not natively qualified. Several unrelated objects in one master copy have no V21 API."
         ]
       },
       "qualification": {
@@ -10093,6 +10136,105 @@
       "prerequisites": [
         "TIA V21, matching optional HMI modules when applicable, and an authorized engineering session.",
         "Review exact identities and prepare preview before any mutation."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.library_cleanup",
+      "domain": "libraries",
+      "title": "Library cleanup of unused type versions",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "library_cleanup",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ProjectLibrary.CleanUpLibrary(IEnumerable<ILibraryTypeOrFolderSelection>, CleanUpMode) with CleanUpMode.PreserveDefaultVersionOfUnusedTypes or DeleteUnusedTypes."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Project libraries only: UserGlobalLibrary.CleanUpLibrary is not used because consumers of a global library in other projects cannot be enumerated.",
+          "The preview lists the maximum deletion set: committed versions of the selected types/folders with no native use in any project software (LibraryTypeVersion.FindInstances), no master-copy embedding and no retained dependent. Incomplete use search, in-work versions or more than 1000 scope versions refuse.",
+          "Under PreserveDefaultVersionOfUnusedTypes the default and highest version of a fully unused type are kept. Native retention rules are inferred from the API documentation, not qualified.",
+          "Apply verifies by readback that every library version outside the previewed set remains and none was added; previewed candidates that native kept are reported, not treated as failure."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "A project library from library_list or library_open kind=project, offline project, compile=true, save=true and checkpointSave=true."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.library_harmonize",
+      "domain": "libraries",
+      "title": "Library harmonize project names and paths",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "library_harmonize",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Siemens.Engineering.Library.ILibrary.HarmonizeProject(IEnumerable<ILibraryTypeOrFolderSelection>, IEnumerable<IUpdateProjectScope>, HarmonizeProjectOptions) on ProjectLibrary or GlobalLibrary, with the selected PlcSoftware as the only scope and HarmonizeNames and/or HarmonizePaths."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "PLC code-block and PLC data types only; the scope is exactly one selected PLC. HMI scopes are not offered.",
+          "The preview lists every affected instance with its current and expected name and user-group path; the expected group path mirrors the type's library folder and is inferred, not natively qualified. Name collisions in the same software scope refuse.",
+          "Apply verifies by readback the exact instance names, group paths and version links, and that every other PLC block/type path is unchanged; other PLCs and object content are not compared."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires installed/licensed V21 products, Openness authorization and eligible native resources."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and an authorized engineering session.",
+        "Source library and an exact target projectName/plcPath; offline project, compile=true, save=true and checkpointSave=true."
       ],
       "acceptanceCriteria": [
         "AC-identity",

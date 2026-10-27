@@ -1424,6 +1424,13 @@
       ]
     },
     {
+      "featureId": "library_update_check",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
       "featureId": "library_close",
       "obligations": [
         "X02",
@@ -1607,6 +1614,20 @@
     },
     {
       "featureId": "change.library_delete",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_cleanup",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "change.library_harmonize",
       "obligations": [
         "X02",
         "L02"
