@@ -214,4 +214,27 @@ var inventory = HardwareEngineeringRules.ReplaceInventory(inventoryRows, module)
 if (inventory.Value<string>("typeIdentifier") != "Catalog:DI" || ((JArray)inventory["addresses"]).Count != 1 || inventory["addresses"][0].Value<string>("hardwarePath") != module || !JToken.DeepEquals(inventory["children"], new JArray(child)))
     throw new Exception("Replace inventory differs: " + inventory);
 count++; Console.WriteLine("PASS replace inventory lists subtree addresses and children");
+// Interrupted-apply project disposition: an equal fingerprint releases only when nothing was saved after the checkpoint.
+var archived = new DateTime(2026, 10, 27, 13, 0, 0, DateTimeKind.Utc);
+void Disposition(string name, bool equal, double savedSeconds, bool applied, string expected, string reason = null)
+{
+    string actual = AdmissionReconcileRules.ApplyProject(equal, archived.AddSeconds(savedSeconds), archived, applied, out string basis);
+    if (actual != expected || reason != null && !basis.Contains(reason)) throw new Exception("Unexpected disposition: " + name + " -> " + (actual ?? "held") + ": " + basis);
+    count++; Console.WriteLine("PASS " + name);
+}
+Disposition("unsaved mutation lost releases unchanged", true, -1, false, "unchanged");
+Disposition("save after checkpoint holds an equal fingerprint", true, 0.5, false, null, "saved after its checkpoint");
+Disposition("save at the archive time holds", true, 0, false, null, "saved after its checkpoint");
+Disposition("save one tick after the archive holds", true, 0.0000001, false, null, "saved after its checkpoint");
+Disposition("recorded applied outcome verifies", false, 5, true, "verifiedApplied");
+Disposition("no-op applied change verifies", true, 5, true, "verifiedApplied");
+Disposition("unsaved checkpoint wins over a recorded outcome", true, -1, true, "unchanged");
+Disposition("differing project without outcome holds", false, 5, false, null, "differs from its checkpoint");
+Disposition("differing unsaved project holds", false, -1, false, null, "differs from its checkpoint");
+try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
+catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
+foreach (var kind in new[] { "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
+    if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
+foreach (var kind in new[] { "source_upsert", "hardware_plug", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
+    if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
 Console.WriteLine($"{count} hardware preservation checks passed.");
