@@ -11,6 +11,7 @@ using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Alarm.TextLists;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.ExternalSources;
 using Siemens.Engineering.SW.Tags;
@@ -200,7 +201,8 @@ namespace TiaMcp.Openness.V21
                     capture.Nodes.Count(n => n["metadata"]?["libraryInstance"]?["dependencies"]?.Value<string>("status") == "observed"),
                     new JArray("Direct version GUID lists only, limited to 1000 entries per observation and 20000 collection/iterator read operations across the capture. Duplicate observations remain distinct; unavailable lists never mean empty. No complete library or project-consumer closure is established.")),
                 ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables, port connectivity or electrical wiring.")),
-                ModelCoverage("plcAlarmTextLists", root, "unsupported", 0, 0, new JArray("PLC alarm text lists are not captured in the explorer tree.")),
+                ModelCoverage("plcAlarmTextLists", root, "partial", capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"), capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"),
+                    new JArray("User and system text-list identities with ID, range and comments per PLC/software unit. Entries and texts are not in the tree; plc_alarm_inspect reads them from the native user text-list XLSX export.")),
                 ModelCoverage("libraries", root, "unsupported", 0, 0, new JArray("Project and global libraries are read through the library tools; the tree carries only per-object library-instance observations.")));
             foreach (var providerCoverage in capture.ProviderCoverage) coverage.Add(providerCoverage);
             var warnings = ModelWarnings(capture.Warnings);
@@ -368,6 +370,8 @@ namespace TiaMcp.Openness.V21
                 catch (Exception error) { capture.Unavailable(scope.Path + "/types", id, error); }
                 try { CaptureModelTags(scope.Tags, scope.Path + "/tags", id, plc.Path, scope.Path, capture, scopeDepth + 1); }
                 catch (Exception error) { capture.Unavailable(scope.Path + "/tags", id, error); }
+                try { CaptureModelAlarmTextLists(AlarmTextListGroup(plc, scope), scope.Path + "/alarmTextLists", id, plc.Path, scope.Path, capture, scopeDepth + 1); }
+                catch (Exception error) { capture.Unavailable(scope.Path + "/alarmTextLists", id, error); }
             }
             if (capture.ScopePath == null || capture.ScopePath == plc.Path)
             {
@@ -429,6 +433,18 @@ namespace TiaMcp.Openness.V21
                 if (capture.Add(plc + "/forceTables/" + groupPath + "/" + Segment(table.Name), id, "forceTable", table.Name, plc, plc,
                     new JObject { ["valueSemantics"] = "Offline table declaration; no active forcing state" }) == null) return;
             foreach (var child in BoundedModelItems(group.Groups, capture, id)) CaptureModelWatchTables(child, plc, groupPath + "/" + Segment(child.Name), id, capture, depth + 1);
+        }
+
+        // Same object paths as plc_alarm_inspect; the group has no native name, so its folder is virtual.
+        private static void CaptureModelAlarmTextLists(PlcAlarmTextlistGroup group, string path, string parent, string plc, string scope, ModelCapture capture, int depth)
+        {
+            if (group == null || !capture.Depth(depth)) return;
+            string id = capture.Add(path, parent, "folder", "PLC alarm text lists", plc, scope, null, false);
+            if (id == null) return;
+            foreach (var list in BoundedModelItems(group.PlcAlarmUserTextlists, capture, id))
+                if (capture.Add(path + "/user/" + Segment(list.Name), id, "alarmTextList", list.Name, plc, scope, AlarmTextListInfo(list, "user")) == null) return;
+            foreach (var list in BoundedModelItems(group.PlcAlarmSystemTextlists, capture, id))
+                if (capture.Add(path + "/system/" + Segment(list.Name), id, "alarmTextList", list.Name, plc, scope, AlarmTextListInfo(list, "system")) == null) return;
         }
 
         private static void CaptureModelExternalSources(PlcExternalSourceGroup group, string path, string parent, string plc, ModelCapture capture, int depth)

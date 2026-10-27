@@ -735,6 +735,13 @@
       ]
     },
     {
+      "featureId": "plc_alarm_inspect",
+      "obligations": [
+        "D11",
+        "L04"
+      ]
+    },
+    {
       "featureId": "safety_inspect",
       "obligations": [
         "D14"

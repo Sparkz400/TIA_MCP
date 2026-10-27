@@ -71,6 +71,11 @@ public sealed partial class TiaTools
     public Task<CallToolResult> TechnologyRead(CancellationToken cancellationToken, string? technologyName = null, string? technologyPath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? parameterPrefix = null, bool exportXml = false)
         => Call("technology_read", new { technologyName, technologyPath, projectName, plcPath, parameterPrefix, exportXml, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
+    [McpServerTool(Name = "plc_alarm_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read offline PLC alarm configuration for one PLC and its software units: user/system alarm text lists (name, ID, range, comment per culture) and the native exports of user text-list entries, alarm instance texts, global ProDiag supervisions, project alarm classes and ProDiag settings. Exports are retained with SHA-256; worksheet rows are bounded by maxItems. A missing service, option or empty list is reported per part with the native message. scopePath narrows to one software unit.")]
+    public Task<CallToolResult> PlcAlarmInspect(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null, int maxItems = 500)
+        => Call("plc_alarm_inspect", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+
     [McpServerTool(Name = "call_graph", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Build a bounded offline call graph using native cross-references and optional exported call-site evidence. Unresolved, indirect and protected coverage is explicit. This is static evidence, not a running call stack.")]
     public Task<CallToolResult> CallGraph(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null,

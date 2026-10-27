@@ -135,7 +135,7 @@ internal static class ProjectModelNativeProviderTests
         string[] provided = { "hardware", "plc", "softwareUnitGroup", "softwareUnit", "safetyUnit", "blockGroup", "systemBlockGroup", "block", "typeGroup",
             "systemTypeGroup", "type", "tagGroup", "tagTable", "tag", "constant", "systemConstant", "technologyGroup", "technologyObject", "hmi",
             "subnet", "ioSystem", "watchTableGroup", "watchTable", "forceTable", "externalSourceGroup", "externalSource" };
-        string[] unsupported = { "project", "folder", "deviceGroup", "device", "namespace", "unsupportedSoftware", "notAKnownKind" };
+        string[] unsupported = { "project", "folder", "deviceGroup", "device", "namespace", "unsupportedSoftware", "alarmTextList", "notAKnownKind" };
         string[] schemaKinds = { "contains", "calls", "instanceOf", "reads", "writes", "usesType", "dependsOn", "configuredIo", "connectedSubnet", "ioSystemController",
             "ioSystemDevice", "technologyConnection", "unitRelation", "hmiBinding", "screenNavigation", "libraryVersion" };
         foreach (string kind in provided)
