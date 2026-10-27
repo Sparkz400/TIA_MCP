@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://tia-mcp.local/contracts/plc-library-integration-recipe.v1.schema.json",
   "title": "Plan-only PLC component integration recipe",
-  "description": "Payload for change_prepare(kind=library_integrate). This plans separate existing operations; it cannot authorize or execute combined installation. Exact dependency closure, unique native tag names, parameter directions/types, collisions, standard scope, protection and native caller identity are checked from actual observations. scopePath, when supplied, must equal plcPath. All native qualification remains separate.",
+  "description": "Payload for change_prepare(kind=library_integrate). This plans separate existing operations; it cannot authorize or execute combined installation. Exact dependency closure, unique native tag names, parameter directions/types, collisions, scope, protection and native caller identity are checked from actual observations. scopePath, when supplied, is the PLC or one of its software units. Exact installed versions and unused instance DBs are reused only with native proofs. Steps the component route cannot apply carry planOnly reasons. All native qualification remains separate.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -78,7 +78,8 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 4096,
-          "pattern": "\\S"
+          "pattern": "\\S",
+          "description": "plcPath or plcPath/units/<unit>; safety units are refused."
         }
       }
     },
@@ -87,7 +88,6 @@
       "additionalProperties": false,
       "required": [
         "dependencyPins",
-        "instanceDb",
         "caller",
         "mappings"
       ],
@@ -114,6 +114,20 @@
             },
             "numberPolicy": {
               "const": "firstAvailable"
+            }
+          }
+        },
+        "multiInstance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "description": "New Static multi-instance in an existing FB caller, instead of instanceDb.",
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,79}(?![\\s\\S])"
             }
           }
         },
@@ -184,8 +198,7 @@
             "required": [
               "parameter",
               "direction",
-              "dataType",
-              "tagPath"
+              "dataType"
             ],
             "properties": {
               "parameter": {
@@ -225,11 +238,56 @@
                 "minLength": 1,
                 "maxLength": 4096,
                 "pattern": "\\S"
+              },
+              "dbPath": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "\\S"
+              },
+              "members": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 16,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}(?![\\s\\S])"
+                },
+                "description": "Member path below the tag (UDT-typed) or DB; the final member must be scalar."
               }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "tagPath"
+                ]
+              },
+              {
+                "required": [
+                  "dbPath"
+                ]
+              }
+            ],
+            "dependentRequired": {
+              "dbPath": [
+                "members"
+              ]
             }
           }
         }
-      }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "instanceDb"
+          ]
+        },
+        {
+          "required": [
+            "multiInstance"
+          ]
+        }
+      ]
     }
   },
   "$defs": {

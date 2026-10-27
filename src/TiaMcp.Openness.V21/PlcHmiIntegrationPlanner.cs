@@ -137,7 +137,7 @@ namespace TiaMcp.Openness.V21
             var conflicts = observed["existingTagNames"] as JArray ?? new JArray();
             if (conflicts.Count != 0) Fail("HmiNameConflict", "Requested HMI tag names already exist: " + string.Join(", ", conflicts));
             var instanceMembers = observed["instanceMembers"] as JArray ?? new JArray();
-            string db = payload["integration"]["instanceDb"].Value<string>("name");
+            string db = payload["integration"]["instanceDb"]?.Value<string>("name");
             var tags = new JArray(); var steps = new JArray(plcPlan["steps"].Select(s => s.DeepClone()));
             foreach (JObject tag in (JArray)hmi["tags"])
             {
@@ -156,6 +156,7 @@ namespace TiaMcp.Openness.V21
                 else
                 {
                     var members = source["members"].Select(m => (string)m).ToArray();
+                    if (db == null) Fail("UnsupportedIntegrationType", "instanceMember HMI tags need a global instanceDb; a multi-instance member has no qualified HMI symbol.");
                     var member = Find(instanceMembers, members);
                     if (member == null) Fail("IntegrationMappingMismatch", "Instance member does not exist in the pinned FB/UDT interface: " + string.Join(".", members));
                     if (member.Value<bool>("scalar") != true) Fail("UnsupportedIntegrationType", "Only scalar instance members can be mapped: " + string.Join(".", members));

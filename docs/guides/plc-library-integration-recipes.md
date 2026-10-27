@@ -27,11 +27,11 @@ retained unchanged; changed files refuse before a plan is returned. See
 
 Use the [payload schema](../../contracts/plc-library-integration-recipe.v1.schema.json) and [motor example](../../fixtures/libraries/integration/motor-plan.example.json). The example GUIDs and paths are illustrative; replace them with native observations from the selected owned project/library.
 
-Call `change_prepare` with `kind: "library_integrate"` and the recipe as `payload`. Set `action: "plc_component_plan"`, `planOnly: true` and `schemaVersion: 1`. Supply the exact library ID/current revision and one selected FB type/version pair. `integration.dependencyPins` must equal the full observed native dependency closure excluding that root. Even dependencies that seem unrelated to the mapped parameters must be pinned. The planner rejects missing/extra versions, duplicate type/version pins, noncommitted or DoNotUse versions, and target name collisions. Already installed objects are never silently adopted by name or GUID.
+Call `change_prepare` with `kind: "library_integrate"` and the recipe as `payload`. Set `action: "plc_component_plan"`, `planOnly: true` and `schemaVersion: 1`. Supply the exact library ID/current revision and one selected FB type/version pair. `integration.dependencyPins` must equal the full observed native dependency closure excluding that root. Even dependencies that seem unrelated to the mapped parameters must be pinned. The planner rejects missing/extra versions, duplicate type/version pins, noncommitted or DoNotUse versions, and target name collisions. Already installed objects are never adopted by name; exact reuse needs a native proof (see [broadened plans](#broadened-plans-27-october)).
 
-Each mapping supplies the exported parameter name, its exact `Input`, `Output` or `InOut` direction and scalar type, plus an exact existing PLC tag path. Every exposed parameter must appear once. Native tag types and unique symbolic names are checked; safety tags and writing physical input tags are rejected. This initial recipe does not create tags or map local variables, DB members, arrays, UDT parameters, constants or omitted default parameters. It can still pin UDTs used internally by the selected FB. Physical aliasing between different tag addresses and cross-program writers are outside this planner's analysis.
+Each mapping supplies the exported parameter name, its exact `Input`, `Output` or `InOut` direction and scalar type, plus an exact existing PLC tag path. Every exposed parameter must appear once. Native tag types and unique symbolic names are checked; safety tags and writing physical input tags are rejected. The recipe does not create tags or map local variables, arrays, UDT parameters, constants or omitted default parameters; DB and UDT-tag members are described under [broadened plans](#broadened-plans-27-october). It can still pin UDTs used internally by the selected FB. Physical aliasing between different tag addresses and cross-program writers are outside this planner's analysis.
 
-The explicit instance DB name uses `numberPolicy: "firstAvailable"`, matching the current typed creation route. Its preview number is provisional and must be rechecked after library import. Exact numeric allocation and reuse of an existing instance DB are not offered. The planner requires a standard PLC scope and empty namespace. Existing-caller mode requires a standard unprotected LAD/FBD FC or FB caller and one exact existing compile-unit ID in `insertAfterNetworkId`. OB callers are refused (`UnsupportedIntegrationCaller`) until OB insertion is separately qualified. All names used for the new FB/DB and parameters are simple identifiers.
+The explicit instance DB name uses `numberPolicy: "firstAvailable"`, matching the current typed creation route. Its preview number is provisional and must be rechecked after library import. Exact numeric allocation is not offered. Existing-caller mode requires an unprotected LAD/FBD FC, FB or OB caller and one exact existing compile-unit ID in `insertAfterNetworkId`. All names used for the new FB/DB and parameters are simple identifiers. Software units, OB callers, multi-instances, reuse and member bindings are described under [broadened plans](#broadened-plans-27-october).
 
 For a new standalone caller, use the [standalone example](../../fixtures/libraries/integration/motor-standalone-plan.example.json) and set:
 
@@ -44,6 +44,50 @@ This explicit alternative requires that the name is absent from the complete sta
 The original caller object remains supported, with optional `mode: "existing"`. Its preservation guard follows the [insertion-ID scope decision](../plans/insertion-id-renumbering-decision-20261025.md): only the IDs after the inserted network may change, each by the inserted network's ID count.
 
 The generated call executes unconditionally when that caller/network is executed: LAD uses a power rail; FBD uses a `Bool` true constant connected to `en`. This is explicit in the generated model. Conditional execution can be supplied through the FB's own mapped Enable input when its interface supports that behavior; it is not inferred by the planner.
+
+## Broadened plans (27 October)
+
+The plan covers five more shapes. Each one either yields exact, typed steps or refuses
+with a structured code. These are offline planner tests only; none is natively qualified.
+
+- **Software units and namespaces.** Set `target.scopePath` to `<plcPath>/units/<unit>`
+  (safety units are refused). The FB keeps the namespace from its pinned export, the
+  caller keeps its native namespace, and both appear in `plan.fb.path`, the call's
+  `calleePath`, the typed step's `scopePath`/`groupPath`/`namespace` and the instance DB
+  path. A new standalone FC uses the unit's namespace preset. A namespaced FB in the
+  standard scope is refused (`UnsupportedIntegrationScope`).
+- **OB callers.** An unprotected LAD/FBD OB is an ordinary existing caller. The call is
+  inserted after the exact network, and `caller.kind` is `OB` with `obCallAdded: true`.
+- **Multi-instance.** Replace `instanceDb` with `"multiInstance": {"name": "Motor1"}`.
+  The caller must be an existing FB; the typed step uses `createMulti`. An existing
+  member with that name is refused (`DeclarationCollision`) and never adopted.
+- **Exact reuse.** A same-name object is reused only when the worker proves the exact
+  installed type/version GUID, one native link and identical version metadata (the
+  `library_instantiate` proof). Reused dependencies keep the import step. A reused FB
+  drops it. An existing instance DB of the reused FB is reused (`existingGlobal`) only
+  when native cross-references show no other user; otherwise the plan refuses with
+  `InstanceUseUnproven` or `InstanceAlreadyUsed`. `plan.reuse` lists what is reused, and
+  nothing is duplicated.
+- **UDT and DB-member bindings.** A mapping may use
+  `{"dbPath": "<exact DB path>", "members": ["cmd", "enable"]}` or a UDT-typed tag with
+  `"tagPath"` plus `"members"`. The worker exports the DB or UDT declaration, and the
+  final member must be scalar with the exact parameter type. Nested UDTs inside a UDT
+  stay opaque.
+
+A step the component coordinator cannot run yet has `planOnly: true` and
+`planOnlyReasons`. The coordinator refuses any plan with such a step; the step is still
+an exact proposal for separate preparation.
+
+| Code | Cause |
+|---|---|
+| `ComponentScopeUnqualified` | Software-unit scope: readback covers the standard scope only, and namespaces of library instances in units are unqualified. |
+| `ComponentRecoveryAnchorUnavailable` | Reused FB: no import step whose checkpoint anchors recovery. |
+| `ComponentMultiInstanceUnqualified` | `createMulti` changes the caller interface; readback proves interface-preserving insertion only. |
+| `ComponentReadbackUnavailable` | DB-member binding: readback re-resolves root tags only. |
+| `UnsupportedOperandRoute` | UDT-typed tag member: the typed route binds root scalar tags only. |
+| `UnsupportedScopeReference` | Tag binding inside a software unit: the typed route refuses unit tags. |
+
+A combined HMI `instanceMember` tag needs a global `instanceDb`.
 
 ## Reviewing and applying separate operations
 
@@ -181,7 +225,7 @@ The explicit policy `v21-fb-explicit-source-oracle-three-properties-v1` records 
 
 The comparison preserves every remaining base XML node after verifying/removing only those three exact direct FB additions from the installed comparison copy. It separately compares the complete source and installed full-oracle trees, permitting only the three exact `ReadOnly="true"` markers to become absent, the version's direct `OriginalLibrary` to equal the reviewed source global name, and the content FB's direct `CreationDate` provenance value to differ. Both creation-date leaves must be explicit native UTC XML scalars with the expected read-only marker. Their bytes remain retained; native DateTime ticks/Kind are observations only, with no inferred timezone conversion or temporal-bound claim. All other read-only fields, timestamps, content, IDs, comments, unknown XML and significant whitespace remain protected by the full comparison. `DocumentInfo` is forbidden, so the generic native envelope exception cannot apply. Missing, duplicate, nondefault, namespaced-substitute, altered or extra fields fail closed. No generic default inference or metadata ignore list is used.
 
-The revised qualification driver independently checks the pinned full-source oracle before consumer import and retains `sourceContentEvidenceAttempt` before validation. Returned readback observations remain durably retained as `importEvidenceAttempt`, `preTypedEvidenceAttempt` or `installationEvidenceAttempt` before validation; attempted fields never establish a verified stage. Successful evidence adds `contentVerification` with the policy ID, all four hashes and both full-comparison results. Native04 must qualify the complete standalone sequence on a new build/evidence freeze. Production combined apply, OB insertion and runtime remain unavailable under this evidence.
+The revised qualification driver independently checks the pinned full-source oracle before consumer import and retains `sourceContentEvidenceAttempt` before validation. Returned readback observations remain durably retained as `importEvidenceAttempt`, `preTypedEvidenceAttempt` or `installationEvidenceAttempt` before validation; attempted fields never establish a verified stage. Successful evidence adds `contentVerification` with the policy ID, all four hashes and both full-comparison results. Native04 must qualify the complete standalone sequence on a new build/evidence freeze. Production combined apply and runtime remain unavailable under this evidence; OB insertion is planned but not natively qualified.
 
 For an explicitly requested recovery of a failed run while preserving its original evidence, use a fresh output/native directory and append `--recover-from-report <failed-result.json>` to the command above. This separate mode validates the original first-import checkpoint identity and hash plus all baseline XML hashes, calls existing `project_retrieve` once in an empty owned session, compares the complete baseline after retrieval and fresh reopen, and verifies absence of component library types. It uses no installation `change_apply`, does not resume the component, and leaves the original first-import journal unchanged. A failed or lost retrieval response causes cleanup without retry. Success qualifies only first-checkpoint recovery; installation and runtime flags stay false.
 

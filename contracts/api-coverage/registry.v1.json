@@ -808,6 +808,14 @@
       ]
     },
     {
+      "featureId": "instance_lookup",
+      "obligations": [
+        "D17",
+        "L04",
+        "X11"
+      ]
+    },
+    {
       "featureId": "engineering_read",
       "obligations": [
         "X11"
@@ -2491,6 +2499,36 @@
       ]
     },
     {
+      "featureId": "change.vci_workspace_create",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_workspace_delete",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_add",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_mapping_remove",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_synchronize",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
       "featureId": "project_snapshot_import",
       "obligations": [
         "L04",
@@ -2577,6 +2615,24 @@
     },
     {
       "featureId": "change.testsuite_application_import",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_system_inventory",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_system_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_system_import",
       "obligations": [
         "D06"
       ]
@@ -3350,6 +3406,12 @@
     },
     {
       "featureId": "change.drive_parameter_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "change.drive_telegram_set",
       "obligations": [
         "D10"
       ]

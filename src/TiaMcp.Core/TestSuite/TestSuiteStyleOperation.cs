@@ -9,6 +9,7 @@ public static class TestSuiteStyleOperation
 {
     private static readonly string[] Probes = ["testsuite.product", "testsuite.license", "testsuite.styleService", "testsuite.scope"];
     private static readonly string[] ApplicationProbes = ["testsuite.product", "testsuite.license", "testsuite.applicationService", "testsuite.scope", "simulator.ownedInstance"];
+    private static readonly string[] SystemProbes = ["testsuite.product", "testsuite.license", "testsuite.systemService", "testsuite.scope", "simulator.ownedInstance"];
     private static readonly string[] Gates = ["testsuite.results", "testsuite.scope", "testsuite.rawResults", "project.compile", "project.preservation", "project.freshReopen", "resource.cleanup"];
 
     public static EngineeringOperationPlan BuildPlan(TestSuiteRunPlan run, NativeTargetObservation target,
@@ -16,10 +17,10 @@ public static class TestSuiteStyleOperation
         TestSuiteDefinitionBundle definitions)
     {
         TestSuiteRunPlanner.Validate(run);
-        bool application = TestSuiteApplicationRun.Applies(run.ExecutionMode);
-        if (run.ExecutionMode != "style" && !application || run.Blockers.Length != 0)
-            throw new BridgeException("TestSuiteStyleNotReady", "A blocker-free style or application plan is required; system execution needs separate endpoint admission.");
-        var probes = application ? ApplicationProbes : Probes;
+        bool application = TestSuiteApplicationRun.Applies(run.ExecutionMode), system = run.ExecutionMode == "endpoint";
+        if (run.ExecutionMode != "style" && !TestSuiteApplicationRun.Bound(run.ExecutionMode) || run.Blockers.Length != 0)
+            throw new BridgeException("TestSuiteStyleNotReady", "A blocker-free style, application or system plan is required.");
+        var probes = system ? SystemProbes : application ? ApplicationProbes : Probes;
         NativeTargetGuard.EnsureFresh(target, target, probes);
         foreach (var definition in run.Definitions) EngineeringIdentityGuard.EnsureSameSnapshot(target.Reference, definition.Reference);
         string projectResourceKey = EngineeringResourceKey.ForPath("project", target.ProjectFilePath);
@@ -29,9 +30,9 @@ public static class TestSuiteStyleOperation
         if (runArtifact.RelativePath == definitionBundleArtifact.RelativePath || runArtifact.Sha256 != CanonicalHash(run) ||
             definitionBundleArtifact.Sha256 != definitions.Sha256)
             throw new BridgeException("TestSuiteArtifactMismatch", "Retain the exact canonical run plan and its verified original-definition bundle as separate artifacts.");
-        // Application runs also persist SetScope on reviewed cases; the same checkpoint precedes it.
-        return new(application ? "testSuite.application.run" : "testSuite.style.run", target,
-            [new(projectResourceKey, "project", application ? "nativeApplicationScopeExecutionAndCheckpoint" : "nativeStyleExecutionAndCheckpoint", "projectArchiveToNewLocation")],
+        // Application and system runs also persist SetScope on reviewed cases; the same checkpoint precedes it.
+        return new(system ? "testSuite.system.run" : application ? "testSuite.application.run" : "testSuite.style.run", target,
+            [new(projectResourceKey, "project", system ? "nativeSystemScopeExecutionAndCheckpoint" : application ? "nativeApplicationScopeExecutionAndCheckpoint" : "nativeStyleExecutionAndCheckpoint", "projectArchiveToNewLocation")],
             [runArtifact, definitionBundleArtifact], probes.ToArray(), Gates.ToArray());
     }
 

@@ -1,5 +1,15 @@
 # Current status
 
+**Instance lookup, Test Suite system tests, VCI workspace changes, drive telegrams, broader component plan — 27 October 2026:** All compiled against the V21 PublicAPI; none run natively. Everything is catalog `partial`/`unverified`.
+- **Instance lookup (D17):** read-only `instance_lookup` returns, for one exact FB or FC, its instance DBs, multi-instances and instance arrays from the owners' exported interfaces, call sites with actual operands per parameter, and STL/GRAPH operand references. Each row names its source (cross-reference, interface or SimaticML). Languages it cannot prove are reported `unsupported`. Non-array rows can be passed to `diagnostic_plan` as the instance.
+- **Test Suite system tests (D06):** `testsuite_system_inventory` (also exports `.tst`), prepared kind `testsuite_system_import`, and `testsuite_system_plan_prepare` against an owned PLCSIM OPC UA endpoint, behind the disabled execution gate. Only the StandardSIMATIC interface and anonymous endpoints are possible in V21.
+- **VCI workspaces (D01):** prepared kinds `vci_workspace_create`/`delete`, `vci_mapping_add`/`remove` and `vci_synchronize`. Workspace-ward changes are verified by re-hashing the workspace; project-ward sync takes one exact object and requires compile. The project checkpoint never restores workspace files.
+- **Drive telegrams (D10):** prepared kind `drive_telegram_set` changes a main or supplementary telegram number, or inserts or erases a supplementary or additional telegram. It reads back every telegram row, reports address shifts and refuses I/O overlaps. Safety telegrams are refused.
+- **Component plan (L02):** `library_integrate`'s `plc_component_plan` now plans software units and namespaces, LAD/FBD OB callers, multi-instances, exact reuse of installed versions and unused instance DBs, and DB/UDT-tag member bindings. Steps the coordinator cannot apply yet are marked `planOnly`; production apply stays disabled.
+- **Interruption routing:** `testsuite_application_import` joins the target kinds, because the project fingerprint does not cover Test Suite objects.
+
+[Trace diagnostics](guides/trace-diagnostics.md), [Test Suite jobs](reference/testsuite-production-jobs.md), [VCI packages](reference/vci-package-workflow.md), [PLC library recipes](guides/plc-library-integration-recipes.md), [engineering workflows](guides/engineering-workflows.md).
+
 **PLCSIM-bound runtime and gated writes, DB snapshots, library maintenance, Unified connections and non-screen objects — 27 October 2026:** All compiled against the V21 PublicAPI and the PLCSIM Advanced V8 API; none run natively. Everything is catalog `partial`/`unverified`.
 - **Runtime against PLCSIM:**
   - `runtime_plcsim_bind` retains the owned PLCSIM instance's identity: name, storage path, ownership-marker hash, controller IPs, and the online program fingerprint when `plc_online_compare` returns one. Given that binding, `runtime_handoff_review` matches target and program identity against it and states `boundOwnedPlcsim` or `unbound`.

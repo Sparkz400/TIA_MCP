@@ -275,6 +275,10 @@ internal static class CoordinatorTests
             var s = new Scenario(create: false); ((JArray)s.PreparedPlan["preview"]["integrationPlan"]["blockers"]).Add(new JObject { ["code"] = "NativeIdPreservationUnsupported" }); s.RehashPlan();
             Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);
         });
+        test("planOnly steps cannot be dispatched by coordinator", () => {
+            var s = new Scenario(create: false); s.PreparedPlan["preview"]["integrationPlan"]["steps"][1]["planOnly"] = true; s.RehashPlan();
+            Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);
+        });
     }
 
     private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
