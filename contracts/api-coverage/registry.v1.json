@@ -688,6 +688,12 @@
       ]
     },
     {
+      "featureId": "project_properties",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "software_inspect",
       "obligations": [
         "L04",
@@ -1040,6 +1046,19 @@
       "featureId": "change.project_simulation_enable",
       "obligations": [
         "L03"
+      ]
+    },
+    {
+      "featureId": "change.project_attributes_set",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "change.project_languages_set",
+      "obligations": [
+        "X01",
+        "D03"
       ]
     },
     {

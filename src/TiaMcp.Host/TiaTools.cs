@@ -48,6 +48,11 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     public Task<CallToolResult> Inventory(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200)
         => Call("project_inventory", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
+    [McpServerTool(Name = "project_properties", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read the open project's metadata (author, comment, copyright, family, version, times, size, modified/primary state), used products, history entries, language settings (supported, active, reference, editing) and text categories. Each list is bounded by maxItems with explicit truncation. Change attributes and languages with change_prepare kinds project_attributes_set and project_languages_set.")]
+    public Task<CallToolResult> ProjectProperties(CancellationToken cancellationToken, string? projectName = null, int maxItems = 200)
+        => Call("project_properties", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+
     [McpServerTool(Name = "block_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Writes a uniquely named local artifact only; no project changes.")]
     public Task<CallToolResult> BlockRead(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,

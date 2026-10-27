@@ -105,6 +105,7 @@ namespace TiaMcp.Openness.V21
                 case "session_status": return Status();
                 case "detach": return Detach();
                 case "project_inventory": return Inventory(arguments);
+                case "project_properties": return ProjectProperties(arguments);
                 case "device_inventory_capture": return DeviceInventoryCapture(arguments);
                 case "hmi_inspect": return HmiInspect(arguments);
                 case "hmi_references": return HmiReferences(arguments);
