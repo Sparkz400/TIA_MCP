@@ -22,7 +22,7 @@ PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simul
 PREFIX_OWNERS = {
     "access_inspect": ["X03", "D12"], "access_review": ["X03"], "certificate_inspect": ["X03"], "change.graph_import": ["X06"], "plc_alarm_inspect": ["D11", "L04"], "web_inspect": ["D12"], "addin_": ["X04"], "automationml_": ["D05"], "cax_export": ["D05"], "change.cax_import": ["D05"],
     "change.block_attributes_set": ["X11"], "change.block_number_set": ["X11"], "change.connection_": ["D08"], "change.constant_create": ["X11"],
-    "change.project_attributes_set": ["X01"], "change.project_languages_set": ["X01", "D03"], "change.tag_create": ["X11"],
+    "change.project_attributes_set": ["X01"], "change.project_languages_set": ["X01", "D03"], "change.tag_create": ["X11"], "change.to_child_create": ["D13"], "change.to_connect": ["D13", "C02"], "change.to_disconnect": ["D13"],
     "change.hardware_cpu_memory_bytes": ["X10"], "change.hardware_port_": ["X10"], "change.hardware_replace": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_inspect": ["D08"], "connection_review": ["D08"],
     "db_snapshot": ["D09"], "device_": ["X10"], "diagnostic_": ["D17"], "drive_profile": ["D10"],
     "engineering_": ["F03"], "graph_": ["X06"], "hardware_gsd_export": ["X10"], "hmi_": ["X07", "X08"], "multiuser_": ["X05"],
@@ -30,7 +30,7 @@ PREFIX_OWNERS = {
     "qualification_component": ["L02"], "qualification_testsuite": ["D06"],
     "qualification_translation": ["D03"], "qualification_watch": ["D02"],
     "runtime.physical_plc": ["D16"], "runtime_capture": ["D16"], "runtime_handoff": ["C03"],
-    "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"],
+    "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],
