@@ -808,6 +808,14 @@
       ]
     },
     {
+      "featureId": "instance_lookup",
+      "obligations": [
+        "D17",
+        "L04",
+        "X11"
+      ]
+    },
+    {
       "featureId": "engineering_read",
       "obligations": [
         "X11"

@@ -80,7 +80,7 @@ namespace TiaMcp.Openness.V21
                 if (!blockTarget && xref.Status == "unavailable")
                     analysisApi = ApiObservation.Unknown("No PLC-level CrossReferenceService. Analysis can fall back to individual block services, which were not recursively probed by this bounded target inspection.");
                 AddTargetFeature(features, "xref_query", xref, "implemented", "Native cross-references are queried only by a separate operation; current consistency and result completeness are not tested here.");
-                foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact" })
+                foreach (string feature in new[] { "call_graph", "symbol_trace", "change_impact", "instance_lookup" })
                     AddTargetFeature(features, feature, analysisApi, "partial", "Static native reference analysis; indirect/runtime aliases and unresolved propagation remain explicit gaps.");
                 var unit = ProbeCapabilityService<PlcUnitProvider>(plc.Software, "plc", probes);
                 metadata["softwareUnitService"] = unit.ToJson();

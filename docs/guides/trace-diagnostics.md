@@ -44,6 +44,24 @@ Refine the request with exact `blockPath` and `instance:{dbPath,memberPath:[...]
 
 Traversal stops at 1,000 visits, depth 8 or 200 instances. `complete:false` always remains explicit. Call sites, repeated calls and shared storage are retained; captured storage resolution does not identify runtime invocation or prove that the reported machine uses that storage. Duplicate names/namespace alternatives are never silently collapsed into the first match. The caller must resolve equipment association using captured context. Missing root call evidence blocks `trace_prepare`.
 
+### Look up instances natively
+
+On an engineering workstation, `instance_lookup` reads the open project for one exact FB or FC (`blockPath` or `blockName`, optional `plcPath`). It returns:
+
+- **Instances:** single-instance DBs, multi-instance static members and arrays of instances (with declared bounds) and their owning root DB chain.
+- **Call sites:** native xref call locations, plus exported CallInfo with compile-unit ordinal, instance components and the actual operand per formal parameter.
+- **Operand references:** references into those instance DBs, from native xref and from exported code.
+
+Every row names its source: `nativeXref`, `interface` or `simaticMlExport`. `languageSupport` lists SCL, LAD, FBD, STL, GRAPH and every other language met:
+
+- SCL, LAD and FBD are `parsed`.
+- STL and GRAPH are an `unqualifiedScan` of exported symbolic Access with no binding reader. Their native xref Open, Actions, Transition, Interlock and Supervision rows are kept.
+- Any other language is `unsupported`; its compile units are skipped, never searched silently.
+
+`maxItems` bounds the rows, a fixed 2000-item native scan budget bounds the xref traversal, and `maxXmlBlocks` (max 50) and `maxDepth` (max 8) bound exports and nesting. `completeness` reports each truncation, every unresolved candidate and the protected or omitted exports.
+
+The tool is read-only and not natively qualified. Each non-array instance row carries a `diagnosticInstanceSelector` `{dbPath, memberPath}` in the shape `diagnostic_plan` takes as `instance`. The planner does not trust the live row: it re-resolves the selector against its saved review and refuses a mismatch. A live lookup therefore narrows the choice, but the saved review still has to contain the root DB, the FB exports and the call evidence. Array instances need an element selector the planner does not support yet.
+
 ## Resolve a justified signal manifest
 
 Supply up to 64 `signals` (host request budget, not native trace capacity). Each request requires `id`, `role`, `reason`, `hypothesisIds` and exact `memberPath` components from an exported DB. Optional `storagePath` defaults to the selected root DB. Other DBs must be in the same CPU. Every inclusion needs code/reference reasoning. Optional autoSignals derives a conservative bounded dependency set from exact seed symbols; see below.
