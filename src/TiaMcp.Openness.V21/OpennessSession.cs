@@ -66,6 +66,7 @@ namespace TiaMcp.Openness.V21
                 case "translation_begin": return TranslationBegin(arguments);
                 case "translation_stage": return TranslationStage(arguments);
                 case "translation_end": return TranslationEnd(arguments);
+                case "project_text_export": return ProjectTextExport(arguments);
                 case "testsuite_style_begin": return TestSuiteBegin(arguments);
                 case "testsuite_scope_probe": return TestSuiteScopeProbe(arguments);
 #if TESTSUITE_QUALIFICATION
@@ -73,6 +74,7 @@ namespace TiaMcp.Openness.V21
                 case "testsuite_qualification_fault": return TestSuiteQualificationFault(arguments);
 #endif
                 case "testsuite_style_prerequisites": return TestSuitePrerequisites(arguments);
+                case "testsuite_application_inventory": return TestSuiteApplicationInventory(arguments);
                 case "testsuite_style_observe": return TestSuiteStage("observe", arguments);
                 case "testsuite_style_checkpoint": return TestSuiteStage("checkpoint", arguments);
                 case "testsuite_style_run": return TestSuiteStage("run", arguments);
@@ -159,6 +161,8 @@ namespace TiaMcp.Openness.V21
                 case "simulation_download": return SimulationDownload(arguments);
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
                 case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
+                case "plc_online_compare": return PlcOnlineCompare(arguments);
+                case "plc_station_upload": return PlcStationUpload(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);
                 default: throw new BridgeException("UnknownOperation", "Unknown worker operation: " + operation);

@@ -178,7 +178,9 @@ namespace TiaMcp.Openness.V21
                     string ungrouped = capture.Add(root + "/ungrouped", rootId, "deviceGroup", "Ungrouped devices", null, null);
                     if (ungrouped != null) CaptureModelDevices(project.UngroupedDevicesGroup.Devices, root + "/ungrouped", ungrouped, capture, 1, project);
                     CaptureModelDeviceGroups(project.DeviceGroups, root, rootId, capture, 1, project);
-                    if (capture.PlcPath == null) CaptureModelSubnets(project, root, rootId, capture);
+                    if (capture.PlcPath == null) { CaptureModelSubnets(project, root, rootId, capture); CaptureModelLibrary(project, root, rootId, capture); }
+                    else capture.ProviderCoverage.Add(ModelCoverage("libraries", root, "unsupported", 0, 0,
+                        new JArray("PLC-scoped captures omit the project library; library-instance GUID pairs stay unresolved.")));
                 }
             }
             timer.Stop();
@@ -200,10 +202,9 @@ namespace TiaMcp.Openness.V21
                 ModelCoverage("plcLibraryDependencies", root, "partial", capture.LibraryDependencyBudget.Used,
                     capture.Nodes.Count(n => n["metadata"]?["libraryInstance"]?["dependencies"]?.Value<string>("status") == "observed"),
                     new JArray("Direct version GUID lists only, limited to 1000 entries per observation and 20000 collection/iterator read operations across the capture. Duplicate observations remain distinct; unavailable lists never mean empty. No complete library or project-consumer closure is established.")),
-                ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables, port connectivity or electrical wiring.")),
+                ModelCoverage("physicalTopology", root, "unsupported", 0, 0, new JArray("Device/item composition and exposed position numbers do not prove racks, cables or electrical wiring. Configured port interconnections are a separate relationship read of a selected port item (portInterconnections).")),
                 ModelCoverage("plcAlarmTextLists", root, "partial", capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"), capture.Nodes.Count(n => n.Value<string>("kind") == "alarmTextList"),
-                    new JArray("User and system text-list identities with ID, range and comments per PLC/software unit. Entries and texts are not in the tree; plc_alarm_inspect reads them from the native user text-list XLSX export.")),
-                ModelCoverage("libraries", root, "unsupported", 0, 0, new JArray("Project and global libraries are read through the library tools; the tree carries only per-object library-instance observations.")));
+                    new JArray("User and system text-list identities with ID, range and comments per PLC/software unit. Entries and texts are not in the tree; plc_alarm_inspect reads them from the native user text-list XLSX export.")));
             foreach (var providerCoverage in capture.ProviderCoverage) coverage.Add(providerCoverage);
             var warnings = ModelWarnings(capture.Warnings);
             string revision = ProjectIndexStore.Hash(project.Path.FullName + "\n" + capture.Nodes.ToString(Formatting.None));
@@ -417,6 +418,38 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception error) { capture.Unavailable(path, id, error); }
             }
+        }
+
+        // Reuses the library tools' bounded metadata walk. Folders get their own path prefix
+        // because a folder and a type (or master copy) of equal name share a library path.
+        private static void CaptureModelLibrary(Project project, string root, string rootId, ModelCapture capture)
+        {
+            string libraryRoot = root + "/projectLibrary";
+            var budget = new ScanBudget(Math.Min(10000, capture.Remaining));
+            var warnings = new JArray(); int returned = 0; bool stopped = false; string status;
+            try
+            {
+                string libraryId = capture.Add(libraryRoot, rootId, "library", "Project library", null, null, new JObject { ["libraryKind"] = "project" });
+                var ids = new Dictionary<string, string>(StringComparer.Ordinal);
+                stopped = libraryId == null;
+                if (!stopped) foreach (var row in LibraryMetadata(new ManagedLibrary { Native = project.ProjectLibrary, Project = project }, budget).OfType<JObject>())
+                {
+                    string kind = row.Value<string>("kind"), path = row.Value<string>("path") ?? row.Value<string>("masterCopyPath");
+                    bool folder = kind.EndsWith("Folder", StringComparison.Ordinal);
+                    int cut = kind == "version" ? path.LastIndexOf("/versions/", StringComparison.Ordinal) : path.LastIndexOf('/');
+                    string parent = cut <= 0 ? libraryId : ids.TryGetValue((kind == "version" ? "item:" : "folder:") + path.Substring(0, cut), out var found) ? found : null;
+                    if (row.Value<bool?>("unavailable") == true) warnings.Add("Library element " + path + " is unavailable: " + row.Value<string>("reason"));
+                    string id = parent == null ? null : capture.Add(libraryRoot + (folder ? "/folders" : "") + path, parent,
+                        kind == "typeFolder" ? "libraryTypeFolder" : kind == "type" ? "libraryType" : kind == "version" ? "libraryTypeVersion" : kind,
+                        kind == "version" ? row.Value<string>("version") : row.Value<string>("name"), null, null, row);
+                    if (id == null) { stopped = true; break; }
+                    ids[(folder ? "folder:" : "item:") + path] = id; returned++;
+                }
+                status = budget.Truncated || stopped ? "truncated" : warnings.Count != 0 ? "partial" : "complete";
+            }
+            catch (Exception error) { status = "unavailable"; warnings.Add(InspectionWarning(libraryRoot, error)); }
+            warnings.Add("Project-library folders, types, versions and master copies from the library tools' metadata walk (at most 10000 entries and the remaining capture budget). Global libraries are not captured; use the library tools.");
+            capture.ProviderCoverage.Add(ModelCoverage("libraries", libraryRoot, status, budget.Used, returned, warnings));
         }
 
         // Tables keep the watch tools' object paths; groups use their own prefix so
@@ -648,6 +681,8 @@ namespace TiaMcp.Openness.V21
                     return ProjectModelHardwareRelationships(id, document, selected, reference, request, kinds, direction, depth, maxNodes, maxEdges);
                 if (selected.Value<string>("kind") == "subnet" || selected.Value<string>("kind") == "ioSystem")
                     return ProjectModelNetworkRelationships(id, document, selected, reference, request, kinds, direction, depth, maxNodes, maxEdges);
+                if (selected.Value<string>("kind") == "libraryTypeVersion")
+                    return ProjectModelLibraryRelationships(id, document, selected, reference, kinds, direction, depth, maxNodes, maxEdges);
                 JObject providerResult = null;
                 ReadHmiProjectModelRelationships(document, reference, selected, request, ref providerResult);
                 if (providerResult != null)
@@ -887,6 +922,34 @@ namespace TiaMcp.Openness.V21
             return BoundProjectModelGraphResponse(result);
         }
 
+        // Instance links come from captured GUID pairs and captured version nodes; no native read follows.
+        private JObject ProjectModelLibraryRelationships(string id, JObject document, JObject selected, JObject reference,
+            string[] kinds, string direction, int depth, int maxNodes, int maxEdges)
+        {
+            var edges = new JArray(); string captured = DateTime.UtcNow.ToString("O");
+            var coverage = new JArray(ModelLibraryEdges(document, selected.Value<string>("objectPath"), edges, captured));
+            document["edges"] = edges;
+            var result = ProjectModelStore.QueryRelationships(document, selected.Value<string>("nodeId"), kinds, direction, depth, maxNodes, maxEdges);
+            result["reference"] = reference; result["nativeCoverage"] = coverage; result["warnings"] = coverage[0]["warnings"].DeepClone();
+            result["providerScope"] = ProjectModelRelationshipProviders.Scope(selected.Value<string>("kind"));
+            result["freshness"] = "metadataVerifiedAtResponse"; result["capturedAtUtc"] = captured;
+            try { _projectModels.RememberRelationships(id, (JArray)result["edges"], coverage, result); result["retainedForExport"] = true; }
+            catch (ProjectModelStore.ModelException error) when (error.Code == "ModelCapacity")
+            { result["retainedForExport"] = false; ((JArray)result["warnings"]).Add("Query completed but snapshot observation retention is full: " + error.Message); }
+            return BoundProjectModelGraphResponse(result);
+        }
+
+        private static JObject ModelLibraryEdges(JObject document, string scope, JArray edges, string captured)
+        {
+            var coverage = document["coverage"].OfType<JObject>().ToArray();
+            // Byte trimming removes library nodes last captured; a truncated hierarchy cannot prove a GUID absent.
+            bool complete = coverage.Any(c => c.Value<string>("provider") == "libraries" && c.Value<string>("status") == "complete")
+                && !coverage.Any(c => c.Value<string>("provider") == "nativeHierarchy" && c.Value<string>("status") == "truncated");
+            var observed = ProjectModelRelationshipProviders.LibraryVersionEdges(document["nodes"].OfType<JObject>(), complete, captured);
+            AddModelEdges(edges, observed);
+            return ModelCoverage("plcLibraryInstances", scope, complete ? "complete" : "partial", observed.Count, observed.Count, new JArray("Captured FB/FC/PLC-type library-instance GUID pairs resolve only to a captured project-library version with the same type and version GUID. Global libraries and version dependencies are not resolved."));
+        }
+
         private void ReadModelNetworkEdges(JObject document, string hardwarePath, int maximum, JArray edges, JArray coverage, JArray warnings, string captured)
         {
             var nodes = ModelNodesByPath(document);
@@ -894,17 +957,28 @@ namespace TiaMcp.Openness.V21
             try
             {
                 var inspection = InspectModelNetworks(SelectProject(new JObject { ["projectName"] = document["project"]["name"] }), maximum, hardwarePath);
-                var observed = ProjectModelRelationshipProviders.NetworkEdges(inspection, path => nodes.TryGetValue(path, out var node) ? node : null, captured);
+                Func<string, JObject> lookup = path => nodes.TryGetValue(path, out var node) ? node : null;
+                var observed = ProjectModelRelationshipProviders.NetworkEdges(inspection, lookup, captured);
                 AddModelEdges(edges, observed);
                 var networkWarnings = (JArray)inspection["warnings"];
                 foreach (var warning in ModelWarnings(networkWarnings)) warnings.Add(warning);
-                coverage.Add(ModelCoverage("configuredNetwork", scope, inspection["completeness"].Value<bool>("scopeComplete") ? "complete" : "partial",
-                    inspection["completeness"].Value<int>("visitedItems"), observed.Count, networkWarnings));
+                string status = inspection["completeness"].Value<bool>("scopeComplete") ? "complete" : "partial";
+                coverage.Add(ModelCoverage("configuredNetwork", scope, status, inspection["completeness"].Value<int>("visitedItems"), observed.Count, networkWarnings));
+                if (hardwarePath != null)
+                {
+                    var ports = ProjectModelRelationshipProviders.PortEdges(inspection, lookup, captured);
+                    AddModelEdges(edges, ports);
+                    bool port = inspection["items"].Any(item => item["port"] != null);
+                    coverage.Add(ModelCoverage("portInterconnections", scope, port || status != "complete" ? status : "unsupported", port ? 1 : 0, ports.Count, new JArray(port
+                        ? "Configured port interconnections (NetworkPort.ConnectedPorts) of the selected port only; not a verified cable or link state."
+                        : "The selected item exposes no NetworkPort service; select a port device item.")));
+                }
             }
             catch (Exception error)
             {
                 warnings.Add("Configured network inspection: " + error.Message);
                 coverage.Add(ModelCoverage("configuredNetwork", scope, "unavailable", 0, 0, new JArray(error.Message)));
+                if (hardwarePath != null) coverage.Add(ModelCoverage("portInterconnections", scope, "unavailable", 0, 0, new JArray(error.Message)));
             }
         }
 
@@ -936,6 +1010,7 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception error) { coverage.Add(ModelCoverage("technologyConnections", path, "unavailable", 0, 0, new JArray(error.Message))); }
             }
+            if (kind == "block" || kind == "type") coverage.Add(ModelLibraryEdges(document, path, edges, captured));
             return coverage;
         }
 

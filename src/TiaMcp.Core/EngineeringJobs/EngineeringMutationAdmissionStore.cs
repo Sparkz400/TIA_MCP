@@ -157,7 +157,7 @@ public sealed class EngineeringMutationAdmissionStore
     }
 
     public static bool IsMutation(string operation) => operation is "change_apply" or "change_restore" or "simulation_download" or
-        "simulation_provision_scratch_credential" or "library_open" or "scratch_create" or "project_retrieve" or "project_copy" or "watch_fixture_seed" or "watch_authoring_source_negative";
+        "simulation_provision_scratch_credential" or "library_open" or "scratch_create" or "project_retrieve" or "project_copy" or "watch_fixture_seed" or "watch_authoring_source_negative" or "plc_station_upload";
     private static string[] ScopeKeys(EngineeringMutationScope scope) => scope.Resources.Select(r => EngineeringResourceKey.ForPath(r.Kind, r.Path)).Order(StringComparer.Ordinal).ToArray();
     private static void State(EngineeringMutationAdmission record, string expected)
     { if (record.State != expected) throw new BridgeException("RecoveryRequired", "An attempted native dispatch is never replayed."); }

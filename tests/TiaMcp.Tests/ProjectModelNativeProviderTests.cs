@@ -13,6 +13,9 @@ internal static class ProjectModelNativeProviderTests
     private const string HmiIf = Root + "/devices/HMI_1/items/HMI_1/items/PN", Dq = Root + "/devices/ET_1/items/ET_1/items/DQ_1";
     private const string Axis = Plc + "/technology/Axis_1", UnitA = Plc + "/units/Unit_A", UnitB = Plc + "/units/Unit_B";
     private const string Captured = "2026-10-26T00:00:00Z";
+    private const string PlcPort = PlcIf + "/items/Port_1", EtPort = EtIf + "/items/Port_1", EtPort2 = EtIf + "/items/Port_2";
+    private const string TypeGuid = "11111111-1111-1111-1111-111111111111", VersionGuid = "22222222-2222-2222-2222-222222222222";
+    private const string Library = Root + "/projectLibrary", Version = Library + "/types/Motor/versions/" + VersionGuid;
 
     private static JArray Nodes()
     {
@@ -36,9 +39,29 @@ internal static class ProjectModelNativeProviderTests
             Node("sharedDb", "plc", "block", "Shared_DB", Plc + "/blocks/Shared_DB", Plc, Plc, new JObject { ["kind"] = "GlobalDB" }),
             Node("unitDb", "unitB", "block", "Shared_DB", UnitB + "/blocks/Shared_DB", Plc, UnitB, new JObject { ["kind"] = "GlobalDB" }),
             Node("dup1", "plc", "block", "Dup_DB", Plc + "/blocks/Dup_DB", Plc, Plc, new JObject { ["kind"] = "GlobalDB" }),
-            Node("dup2", "plc", "block", "Dup_DB", Plc + "/blocks/groups/G/Dup_DB", Plc, Plc, new JObject { ["kind"] = "InstanceDB" }));
+            Node("dup2", "plc", "block", "Dup_DB", Plc + "/blocks/groups/G/Dup_DB", Plc, Plc, new JObject { ["kind"] = "InstanceDB" }),
+            Node("plcport", "plcif", "hardware", "Port_1", PlcPort), Node("etport", "etif", "hardware", "Port_1", EtPort), Node("etport2", "etif", "hardware", "Port_2", EtPort2),
+            Node("lib", "root", "library", "Project library", Library), Node("libtype", "lib", "libraryType", "Motor", Library + "/types/Motor"),
+            Node("libver", "libtype", "libraryTypeVersion", "1.0.0", Version, metadata: new JObject { ["kind"] = "version", ["typeGuid"] = TypeGuid, ["versionGuid"] = VersionGuid }),
+            Node("motor", "plc", "block", "Motor", Plc + "/blocks/Motor", Plc, Plc, new JObject { ["kind"] = "FB", ["libraryInstance"] = Linked(VersionGuid) }),
+            // Adversarial: a version GUID absent from the library, and an observation without a link.
+            Node("old", "plc", "block", "Old", Plc + "/blocks/Old", Plc, Plc, new JObject { ["kind"] = "FB", ["libraryInstance"] = Linked("33333333-3333-3333-3333-333333333333") }),
+            Node("plain", "plc", "block", "Plain", Plc + "/blocks/Plain", Plc, Plc, new JObject { ["kind"] = "FC", ["libraryInstance"] = new JObject { ["status"] = "noService" } }));
         return nodes;
     }
+
+    private static JObject Linked(string version) => new() { ["schemaVersion"] = "plc-library-instance-observation.v1", ["source"] = "LibraryTypeInstanceInfo.LibraryTypeVersion",
+        ["status"] = "linked", ["typeGuid"] = TypeGuid, ["versionGuid"] = version, ["dependencies"] = new JObject { ["status"] = "observed", ["requiredVersionGuids"] = new JArray() } };
+
+    // Both port sides report the same interconnection; partners outside the capture stay unresolved.
+    private static JObject PortInspection() => new()
+    {
+        ["items"] = new JArray(
+            new JObject { ["path"] = PlcPort, ["port"] = new JObject { ["connectedPorts"] = new JArray(Resolved(EtPort), Resolved(Root + "/devices/A_missing/items/P")) } },
+            new JObject { ["path"] = EtPort, ["port"] = new JObject { ["connectedPorts"] = new JArray(Resolved(PlcPort)) } },
+            new JObject { ["path"] = EtPort2, ["port"] = new JObject { ["connectedPorts"] = new JArray(new JObject { ["resolution"] = "unresolved", ["ownerHardwarePath"] = null }) } },
+            new JObject { ["path"] = PlcIf, ["network"] = new JObject() })
+    };
 
     private static JObject Relation(string type, string name) => new() { ["relationType"] = type, ["relatedObject"] = name };
 
@@ -116,8 +139,23 @@ internal static class ProjectModelNativeProviderTests
             .All(e => e["target"]!.Type == JTokenType.Null && e["unresolved"]!["reason"]!.ToString().Contains("partial")));
         Check.Equal(0, ProjectModelRelationshipProviders.UnitRelationEdges(byPath[UnitB], nodes, true, Captured).Count);
 
+        var ports = ProjectModelRelationshipProviders.PortEdges(PortInspection(), Lookup, Captured);
+        Expect(ports, $"connectedPort|{EtPort}|{PlcPort}|resolved", $"connectedPort||{PlcPort}|unresolved", $"connectedPort|{EtPort2}||unresolved");
+        Check.Equal(true, ports.All(e => (string?)e["evidence"]!["provider"] == "portInterconnections" && (string?)e["evidence"]!["contentRevision"]!["scope"] == "portInterconnections"));
+        Check.Equal(0, ProjectModelRelationshipProviders.PortEdges(HardwareInspection(), Lookup, Captured).Count);
+
+        var library = ProjectModelRelationshipProviders.LibraryVersionEdges(nodes, true, Captured);
+        Expect(library, $"libraryVersion|{Plc}/blocks/Motor|{Version}|resolved", $"libraryVersion|{Plc}/blocks/Old||unresolved");
+        Check.Equal("exactTypeAndVersionGuid", (string?)library.Single(e => e["target"]!.Type != JTokenType.Null)["evidence"]!["resolutionBasis"]);
+        Check.Equal(true, library.All(e => e["evidence"]!["native"]!["dependencies"] == null));
+        Check.Equal(true, ProjectModelRelationshipProviders.LibraryVersionEdges(nodes, false, Captured)
+            .Single(e => e["target"]!.Type == JTokenType.Null)["unresolved"]!["reason"]!.ToString().Contains("not completely captured"));
+        // A second version node with the same GUID pair is ambiguous, never a first match.
+        var twin = (JObject)byPath[Version].DeepClone(); twin["nodeId"] = "twin"; twin["objectPath"] = Version + "-twin";
+        Check.Equal(0, ProjectModelRelationshipProviders.LibraryVersionEdges(nodes.Append(twin), true, Captured).Count(e => e["target"]!.Type != JTokenType.Null));
+
         // The real store must accept every provider edge and traverse it from the network side.
-        var edges = new JArray(network.Concat(technology).Concat(units).Select(e => e.DeepClone()));
+        var edges = new JArray(network.Concat(technology).Concat(units).Concat(ports).Concat(library).Select(e => e.DeepClone()));
         var document = new JObject { ["sessionGeneration"] = "native-providers", ["project"] = new JObject { ["name"] = "Fx", ["projectPath"] = "D:/fixture/Fx.ap21", ["host"] = "fixture" },
             ["nodes"] = new JArray(nodes.Select(n => n.DeepClone())), ["edges"] = edges, ["coverage"] = new JArray() };
         var store = new ProjectModelStore(); string id = (string)store.Capture(document)["snapshotId"]!;
@@ -127,6 +165,9 @@ internal static class ProjectModelNativeProviderTests
         Check.Equal(3, system["edges"]!.Count());
         var ioDevice = store.Relationships(id, "etif", new[] { "ioSystemDevice" }, "out", 2, 100, 100);
         Check.Equal(IoSystem, (string)ioDevice["edges"]![0]!["target"]!["objectPath"]!);
+        Check.Equal(2, store.Relationships(id, "plcport", new[] { "connectedPort" }, "both", 1, 100, 100)["edges"]!.Count());
+        var instances = store.Relationships(id, "libver", new[] { "libraryVersion" }, "in", 1, 100, 100);
+        Check.Equal(Plc + "/blocks/Motor", (string)instances["edges"]!.Single()["source"]!["objectPath"]!);
         return Task.CompletedTask;
     }
 
@@ -134,10 +175,11 @@ internal static class ProjectModelNativeProviderTests
     {
         string[] provided = { "hardware", "plc", "softwareUnitGroup", "softwareUnit", "safetyUnit", "blockGroup", "systemBlockGroup", "block", "typeGroup",
             "systemTypeGroup", "type", "tagGroup", "tagTable", "tag", "constant", "systemConstant", "technologyGroup", "technologyObject", "hmi",
-            "subnet", "ioSystem", "watchTableGroup", "watchTable", "forceTable", "externalSourceGroup", "externalSource" };
-        string[] unsupported = { "project", "folder", "deviceGroup", "device", "namespace", "unsupportedSoftware", "alarmTextList", "notAKnownKind" };
+            "subnet", "ioSystem", "watchTableGroup", "watchTable", "forceTable", "externalSourceGroup", "externalSource", "libraryTypeVersion" };
+        string[] unsupported = { "project", "folder", "deviceGroup", "device", "namespace", "unsupportedSoftware", "alarmTextList", "notAKnownKind",
+            "library", "libraryTypeFolder", "libraryType", "masterCopyFolder", "masterCopy" };
         string[] schemaKinds = { "contains", "calls", "instanceOf", "reads", "writes", "usesType", "dependsOn", "configuredIo", "connectedSubnet", "ioSystemController",
-            "ioSystemDevice", "technologyConnection", "unitRelation", "hmiBinding", "screenNavigation", "libraryVersion" };
+            "ioSystemDevice", "technologyConnection", "unitRelation", "hmiBinding", "screenNavigation", "libraryVersion", "connectedPort" };
         foreach (string kind in provided)
         {
             var scope = ProjectModelRelationshipProviders.Scope(kind);
@@ -154,6 +196,9 @@ internal static class ProjectModelNativeProviderTests
         Check.Equal(true, ProjectModelRelationshipProviders.Scope("hardware")["edgeKinds"]!.Values<string>().Contains("ioSystemDevice"));
         Check.Equal(true, ProjectModelRelationshipProviders.Scope("technologyObject")["providers"]!.Values<string>().Contains("technologyConnections"));
         Check.Equal(true, ProjectModelRelationshipProviders.Scope("safetyUnit")["edgeKinds"]!.Values<string>().Contains("unitRelation"));
+        Check.Equal(true, ProjectModelRelationshipProviders.Scope("hardware")["edgeKinds"]!.Values<string>().Contains("connectedPort"));
+        Check.Equal(true, ProjectModelRelationshipProviders.Scope("type")["edgeKinds"]!.Values<string>().Contains("libraryVersion"));
+        Check.Equal(false, ProjectModelRelationshipProviders.Scope("tag")["edgeKinds"]!.Values<string>().Contains("libraryVersion"));
         return Task.CompletedTask;
     }
 }

@@ -8,7 +8,7 @@
   "required": ["schemaVersion", "operation", "target", "expectedContentHash"],
   "properties": {
     "schemaVersion": {"const": 1},
-    "operation": {"enum": ["scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create"]},
+    "operation": {"enum": ["scalar_property_set", "existing_binding_set", "tag_create", "item_properties_set", "item_place", "explicit_binding_set", "external_tag_create", "classic_xml_import"]},
     "target": {"$ref": "hmi-identity.v2.schema.json"},
     "expectedContentHash": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$", "description": "Complete native family-specific content hash; never an explorer metadata revision or partial export hash."},
     "properties": {"type": "object", "minProperties": 1, "maxProperties": 3, "additionalProperties": false, "properties": {
@@ -26,6 +26,7 @@
       "projectPath": {"type": "string", "minLength": 1}, "plcPath": {"type": "string", "minLength": 1}, "scopePath": {"type": "string", "minLength": 1},
       "objectPath": {"type": "string", "minLength": 1}, "kind": {"const": "tag"}, "name": {"type": "string", "minLength": 1}, "namespace": {"type": ["string", "null"]}
     }, "description": "Exact root PLC tag-table tag identity as returned by hmi_references; it must belong to the connection's native partner PLC."},
+    "xml": {"type": "string", "minLength": 1, "description": "Complete native Classic export document for exactly the target object (same exported root type and Name). Its native re-export after Import(Override) must equal it apart from DocumentInfo and formatting."},
     "bindings": {"type": "array", "minItems": 1, "maxItems": 200, "items": {"type": "object", "additionalProperties": false,
       "required": ["property", "tagIdentity", "dataType"], "properties": {
         "property": {"type": "string", "minLength": 1, "maxLength": 256}, "tagIdentity": {"$ref": "hmi-identity.v2.schema.json"},
@@ -40,6 +41,7 @@
     {"if": {"properties": {"operation": {"const": "scalar_property_set"}}}, "then": {"properties": {"properties": {"maxProperties": 1}}}},
     {"if": {"properties": {"operation": {"const": "item_place"}}}, "then": {"required": ["placement"], "properties": {"name": false, "dataType": false, "properties": false, "bindings": false, "connection": false, "plcTag": false}}},
     {"if": {"properties": {"operation": {"enum": ["existing_binding_set", "explicit_binding_set"]}}}, "then": {"required": ["bindings"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "connection": false, "plcTag": false}}},
-    {"if": {"properties": {"operation": {"const": "existing_binding_set"}}}, "then": {"properties": {"bindings": {"items": {"required": ["expectedValue"]}}}}}
+    {"if": {"properties": {"operation": {"const": "existing_binding_set"}}}, "then": {"properties": {"bindings": {"items": {"required": ["expectedValue"]}}}}},
+    {"if": {"properties": {"operation": {"const": "classic_xml_import"}}}, "then": {"required": ["xml"], "properties": {"name": false, "dataType": false, "properties": false, "placement": false, "bindings": false, "connection": false, "plcTag": false, "target": {"properties": {"family": {"const": "classic"}}}}}, "else": {"properties": {"xml": false}}}
   ]
 }

@@ -58,6 +58,9 @@ public sealed class CompositeEngineeringWorkflowStore
 
     public object Reopen(string recordRef) => Summary(Load(recordRef));
 
+    public object RebindPlan(string recordRef, bool toConnectAvailable) =>
+        CompositeEngineeringRebind.Plan(artifactsRoot, JsonNode.Parse(Load(recordRef).Report)!.AsObject(), recordRef, toConnectAvailable);
+
     public object Page(string recordRef, string section = "mappings", int offset = 0, int count = 50)
     {
         Require(offset >= 0 && count is > 0 and <= 200, "CompositePageLimit", "Use a nonnegative offset and 1..200 rows.");

@@ -124,4 +124,25 @@ python -B scripts/test_opcua_host_mcp.py --host <built-Host.exe> --output <new-o
 
 The MCP harness explicitly validates every UA success/error response against the workflow JSON Schema and launches the Host twice with nonexistent worker paths. See the [delivery receipt](../verification/opc-ua-host-delivery-20261016.md).
 
+## Prepared native engineering changes
+
+Six change kinds use the normal `change_prepare` → `change_apply` → `change_status`/`change_restore` workflow. They work offline only, on one PLC selected by an exact top-level `plcPath`; `scopePath` is refused. Apply requires `checkpointSave=true` and `compile=true`. They use only the public V21 `Siemens.Engineering.SW.OpcUa` API: `OpcUaProvider.CommunicationGroup.ServerInterfaceGroup` with `ServerInterfaces`, `SimaticInterfaces`, `ReferenceNamespaces` and `AccessControl.RoleMappings`. The worker looks for the provider on the PLC software first, then on the CPU device items that own it. If neither has it, the change is refused (an S7-1500 with OPC UA is required).
+
+| Kind | Payload | Native call and readback |
+| --- | --- | --- |
+| `opcua_server_interface_import` | `interfaceName`, `mode` (`create`/`replace`), absolute `path`, `expectedSha256` | `ServerInterfaces.Create(name)` when creating, then `ServerInterface.Import(file)`. Readback gives name, `Enabled`, modification time, a native `Export` artifact and `exportMatchesInput`. |
+| `opcua_server_interface_delete` | `interfaceName` | Backup `Export`, then `Delete()`, then a check that the interface is gone. |
+| `opcua_server_interface_enable` | `interfaceName`, `enabled` | Sets `ServerInterface.Enabled` and reads it back. |
+| `opcua_reference_namespace_import` | `namespaceName`, `mode`, `path`, `expectedSha256` | `ReferenceNamespaces.Create(name, file)` or `ReferenceNamespace.Import(file)`. Readback gives `Enabled`, `GenerateNodes`, `GeneratedInterfaceName`, `UseStringNodeIds` and an export. |
+| `opcua_reference_namespace_delete` | `namespaceName` | Backup `Export`, then `Delete()`. The preview names any generated interface that may disappear with the namespace. |
+| `opcua_role_mapping_set` | `action: "create"`, `roleName`, `definedInNamespace`, optional `projectRole`, `namespacePermissions`; or `action: "remove"`, `roleName` | `RoleMappings.Create(name, namespace)`, `SetProjectRole`, then `NamespacePermission.SetPermission` for each listed namespace, all read back. Remove uses `RoleMapping.Delete()`. |
+
+Each `namespacePermissions` entry needs `namespaceUri` and explicit booleans for `Browse`, `Read`, `Write`, `Call`, `ReceiveEvents` and `ReadRolePermissions`. Namespaces you do not list keep their native defaults, which the readback reports. Payload fields outside each kind's list are refused. This means passwords, users, certificates and trust settings are never accepted. Standard-role insertion (`AddStandardOpcUaRole`), role rename and editing an existing mapping are not offered.
+
+Import files are copied into the change directory and bound to `expectedSha256` at prepare and again before apply. Use the bytes you reviewed with `opcua_inspect`; change payloads cannot resolve Host OPC UA record handles. Interface and namespace selection is case-insensitive. SIMATIC interfaces, and interfaces whose name matches a reference namespace's `GeneratedInterfaceName`, are refused as protected or generated objects.
+
+The V21 API exposes no mapping-status property. The readback export and the PLC compile diagnostics of the change are the only evidence of mapping validity. External OPC UA clients are never discovered.
+
+For these kinds the change fingerprint also includes a snapshot of every PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces with generation settings, and role mappings with their namespace permissions. Shared-mutation interruption reconciliation uses the same snapshot when it compares the project with its checkpoint and the recorded outcome. Interface and namespace content is covered only through native modification times. None of these kinds is natively qualified yet.
+
 The next native increment is the [UA-03/UA-Q00 eligibility/export packet](../verification/opc-ua-native-eligibility-packet-20261016.md). Target eligibility, Siemens mapping dialects, native engineering, security configuration, runtime endpoints and full compatibility are separate unqualified gates. None is admitted by parser, schema or offline MCP tests.

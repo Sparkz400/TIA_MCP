@@ -223,3 +223,4 @@ Console.WriteLine($"PASS composite engineering evaluator: {checks.Count} checks;
 CompositeWorkflowTests.Run(root);
 CompositeConsumerTests.Run(root);
 CompositeTypedTests.Run(root, request, typedDrive, encoderProfile);
+CompositeCaptureTests.Run(root);

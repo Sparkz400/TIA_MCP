@@ -4,7 +4,10 @@ using TiaMcp.Core.EngineeringJobs;
 namespace TiaMcp.Core.TestSuite;
 
 public sealed record TestSuiteStyleContext(string ArtifactRoot, TestSuiteRunPlan Run,
-    TestSuiteDefinitionBundle Definitions, EngineeringOperationRecord Operation, string ExecutionProfile);
+    TestSuiteDefinitionBundle Definitions, EngineeringOperationRecord Operation, string ExecutionProfile)
+{
+    public TestSuiteApplicationBinding? Application { get; init; }
+}
 public sealed record TestSuiteStyleObservation(NativeTargetObservation Target,
     IReadOnlyDictionary<string, byte[]> OriginalDefinitions, TestSuiteScopeObservation[] Scope,
     string ScopeEvidenceKind, EngineeringArtifactReference ScopeEvidence,
@@ -53,7 +56,7 @@ public sealed class TestSuiteProductionAdapter : ITestSuiteStyleAdapter
     public static string[] QualifiedProfiles => [];
     public void RequireQualification(TestSuiteStyleContext context, string action) =>
         throw new BridgeException("TestSuiteProfileUnqualified",
-            "No production Test Suite style " + action + " profile has native qualification. TS-Q01 requires current product/license observations, independent complete effective scope, preservation, fresh reopen and recovery evidence.");
+            "No production Test Suite " + (context?.Run?.ExecutionMode ?? "style") + " " + action + " profile has native qualification. TS-Q01/TS-Q02 require current product/license observations, independent complete effective scope, preservation, fresh reopen and recovery evidence.");
     public Task<ITestSuiteStyleSession> OpenExclusive(TestSuiteStyleContext context, CancellationToken token)
     {
         RequireQualification(context, "openExclusive");
