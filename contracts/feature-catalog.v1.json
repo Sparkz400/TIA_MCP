@@ -14971,6 +14971,142 @@
       ]
     },
     {
+      "featureId": "access_inspect",
+      "domain": "security-access",
+      "title": "Read native UMAC, PLC protection and legacy web users without secrets",
+      "mcpTools": [
+        "access_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Umac.UmacConfigurator (Project service): ProjectUsers, AnonymousUser, UmcUsers, UmcUserGroups, CustomRoles, SystemRoles; User.Name/Roles; ProjectUser/UmcUser/UmcUserGroup.IsActive; Role.Identifier/Name.",
+          "V21 CustomRole/SystemRole.AssignedEngineeringRights, CustomRole.GetAssignedDeviceFunctionRights(UmacDevice), SystemRole.GetAssignedSystemDeviceFunctionRights(UmacDevice); UmacDevice as Device service.",
+          "V21 HW.Features.PlcAccessLevelProvider.PlcProtectionAccessLevel, PlcAccessControlConfigurationProvider (PlcAccessControlConfiguration, UmcConnectionState, UmcServerAddress, UmcServerId, UmcTrustedCertificateIds), PlcMasterSecretConfigurator.MasterSecretConfiguration.",
+          "V21 HW.Features.WebserverUserManagement/SimpleWebserverUserManagement.WebserverUsers with WebserverUser.UserName/Permissions and SimpleWebserverUser.UserName/Permissions/Active."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Read-only and secret-free: password setters, password hashes, secrets and private keys are never read or returned.",
+          "Output is shaped as access_review identity/snapshot observations bounded to its limits (512 entities, 64 rights and links per entity); truncation is reported as incomplete.",
+          "Roles expose no activation state (enabled null). UMC group membership is resolved by the UMC server and is not exposed (UMC users report assignmentsComplete false).",
+          "CPU runtime rights appear as device-scoped projectUmac rights; no separate cpuRuntime, SIWAREX or OPC UA observation. Password policy, effective rights and UMC synchronization are not read."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project; UMAC and CPU protection/web user services where the CPU exposes them"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "certificate_inspect",
+      "domain": "public-certificates",
+      "title": "Read native CPU certificate stores and syslog servers as public data",
+      "mcpTools": [
+        "certificate_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Security.LocalCertificateManager (DeviceItem service): LocalCertificateStore, EnableGlobalCertificatesStore; LocalCertificateStore.Certificates; Certificate.Id/SubjectCommonName/ValidUntil/HasPrivateKey/Export(FileInfo).",
+          "V21 HW.Features.CertificateManagementConfiguration: Usage, CertificateExpirationEventActivated, RemainingCertificateLifetime, CertificateSupportedServices (CertificateSupportedService Id/Guid/ServiceType/ServiceGroupName/ApplicationUri).",
+          "V21 Siemens.Engineering.Security.SyslogServerProvider (Project service).Servers: SyslogServer Name/Address/Port/Tls/Comment/AssignedModules; certificate/syslog-named DeviceItem attributes via GetAttributeInfos/GetAttribute."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Certificate.Export output is accepted only when X509Certificate2.GetCertContentType reports one certificate without a private key; it is returned as re-encoded public DER and the export file is deleted. Native export format behavior is unverified.",
+          "V21 exposes no per-certificate usage or web server/OPC UA assignment; association.usage is unspecified and assignment evidence is limited to certificate-named attributes and supported services.",
+          "The global (project) certificate store is not exposed, only the CPU enable flag. No chain, revocation, trust or endpoint evaluation."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project; CPU certificate manager and project syslog services where exposed"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "web_inspect",
+      "domain": "web-applications",
+      "title": "Read native CPU web server and web application configuration",
+      "mcpTools": [
+        "web_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 HW.Features.SystemWebPagesFeature.EnableSystemWebPages; DefaultWebPagesFeature.WebApplicationConfigurations (WebApplicationConfiguration Name/ApplicationType/IsDefault); WebserverUserDefinedPages presence only.",
+          "V21 DeviceItem.GetAttributeInfos/GetAttribute for web-named CPU attributes."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Output is shaped as a web_application_review phase; the archive selector is always unavailable because page sources and archives are not read.",
+          "webEnabled is taken only from an exposed Boolean attribute named WebserverActivate (name not verified on a native CPU); otherwise null.",
+          "WebserverUserDefinedPages exposes only GenerateBlocks, which is never called; user-defined page settings appear only as web-named attributes. Legacy web users are reported by access_inspect."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project; CPU web server features where exposed"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "access_review",
       "domain": "security-access",
       "title": "Compare supplied public grants and explicit monitoring policy",

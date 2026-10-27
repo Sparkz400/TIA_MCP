@@ -66,6 +66,25 @@ formatting retain the same public identity and distinct original-input hashes.
 Missing bytes produce unknown comparison, not equality or safe removal. Association
 changes are changes in declarations, not evidence of actual assignment or deployment.
 
+## Native capture with `certificate_inspect`
+
+With TIA Portal V21 attached, `certificate_inspect(projectName?, hardwarePath?, maxItems)`
+lists each CPU's local certificate store. Per certificate it reports the native ID,
+subject common name and `hasPrivateKey` flag, plus subject, issuer, serial, SHA-1
+thumbprint, SHA-256 and `notBeforeUtc`/`notAfterUtc` read from the exported public
+certificate. Its `observation` is one phase of this request: re-encoded public DER,
+`storeId` `<cpu path>/certificates`, the native certificate ID and
+`usage: "unspecified"`, because V21 exposes no per-certificate usage or web server/
+OPC UA assignment. An export that is not exactly one public certificate becomes an
+unavailable phase with a reason. Private keys are never exported, and the temporary
+export file is deleted.
+
+The result also lists dynamic certificate-management services and certificate- or
+syslog-named CPU attributes as the exposed assignment evidence, the global-store
+enable flag and the project syslog servers. Supply the saved owner and
+`evaluatedAtUtc` yourself. The capture is compiled against the V21 API and not yet
+natively qualified.
+
 Bounds: 384 KiB request JSON, 96 KiB decoded input/phase, 64 KiB DER/phase, 128
 extensions, 512 SAN entries and 128 EKU OIDs. Reports are limited to 16 MiB; retained
 storage to 512 MiB including unfinished files. Pages have at most 200 rows and
@@ -78,7 +97,8 @@ outside this operation's control; do not submit secrets expecting them to be era
 The tool never requests private-key availability, accesses a certificate store,
 builds a chain, fetches revocation/AIA data, connects to an endpoint or invokes Siemens.
 A valid public certificate is not an authenticated, trusted, suitable or deployable
-certificate. Native stores/assignment and secure key/trust recovery remain WA-08/09
+certificate. Read-only native store inventory is `certificate_inspect` above; native
+assignment, lifecycle and secure key/trust recovery remain WA-08/09
 in the [full D12/X03 plan](../plans/expansion-plans/web-server-access-configuration.md).
 
 Implementation uses the platform [single-certificate loader](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificateloader.loadcertificate?view=net-10.0)
