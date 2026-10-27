@@ -50,6 +50,22 @@ namespace TiaMcp.Model
             return result;
         }
 
+        // A Classic import document carries exactly one exported object; with current, it must be
+        // that object's native type and exported name. The envelope is Engineering/DocumentInfo only.
+        internal static XElement ClassicImportRoot(XDocument document, XElement current = null)
+        {
+            if (document?.Root?.Name != XName.Get("Document")) throw new ArgumentException("A Classic import requires a native /Document export.");
+            if (document.Declaration?.Encoding is string encoding && !string.Equals(encoding, "utf-8", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("A Classic import document must be UTF-8.");
+            var roots = document.Root.Elements().Where(e => e.Name != XName.Get("Engineering") && e.Name != XName.Get("DocumentInfo")).ToArray();
+            if (roots.Length != 1 || roots[0].Name.Namespace != XNamespace.None || !roots[0].Name.LocalName.StartsWith("Hmi.", StringComparison.Ordinal))
+                throw new ArgumentException("A Classic import document must contain exactly one exported Hmi.* engineering object.");
+            Func<XElement, string[]> names = e => e.Elements("AttributeList").Elements("Name").Select(n => n.Value).ToArray();
+            if (current != null && (roots[0].Name != current.Name || !names(roots[0]).SequenceEqual(names(current))))
+                throw new ArgumentException("The supplied document does not describe the exact current Classic object type and name.");
+            return roots[0];
+        }
+
         internal static int[] ClassicColor(string value)
         {
             var parts = (value ?? "").Split(',');
@@ -138,13 +154,16 @@ namespace TiaMcp.Model
 
         // A tag-table export directory has no qualified per-file layout: every file under the
         // created tag's table export may change or appear; any other artifact must stay identical.
-        internal static void RequireUnrelatedPreservedOutside(IDictionary<string, string> before, IDictionary<string, string> after, string exportPrefix)
+        // The created object's own typed-readback subtree may appear, but never pre-exist.
+        internal static void RequireUnrelatedPreservedOutside(IDictionary<string, string> before, IDictionary<string, string> after, string exportPrefix, string createdObjectPath = "")
         {
             if (string.IsNullOrEmpty(exportPrefix) || !exportPrefix.EndsWith("/export/", StringComparison.Ordinal))
                 throw new ArgumentException("The prepared preservation delta is contradictory.");
             Func<string, bool> inside = path => path.StartsWith(exportPrefix, StringComparison.Ordinal);
+            Func<string, bool> created = path => !string.IsNullOrEmpty(createdObjectPath) && (path == createdObjectPath || path.StartsWith(createdObjectPath + "/", StringComparison.Ordinal));
             if (!after.Keys.Any(inside)) throw new ArgumentException("PreservationMismatch: the changed tag table no longer exports any native artifact.");
-            RequireUnrelatedPreserved(before, after, before.Keys.Where(inside), after.Keys.Where(k => inside(k) && !before.ContainsKey(k)));
+            if (before.Keys.Any(created)) throw new ArgumentException("The prepared preservation delta is contradictory.");
+            RequireUnrelatedPreserved(before, after, before.Keys.Where(inside), after.Keys.Where(k => (inside(k) || created(k)) && !before.ContainsKey(k)));
         }
     }
 }

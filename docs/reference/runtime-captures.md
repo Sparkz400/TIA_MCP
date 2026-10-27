@@ -2,6 +2,8 @@
 
 Six `runtime_capture_*` tools extend the [owned Web session](physical-runtime-sessions.md) with bounded acquisition, local evidence and diagnostic observation reports. This implementation needs no local Siemens installation. Acquiring physical data still needs a reachable configured controller; all current execution evidence uses a disposable loopback server.
 
+The same tools can instead poll an owned local PLCSIM Advanced V8 instance, optionally one sample per PLC cycle; see [PLCSIM capture source](#plcsim-capture-source).
+
 ## Workflow
 
 1. Connect an explicit protected-credential Web session and browse exact symbols with `children:false`. Retain the returned attempt and selection IDs.
@@ -95,6 +97,36 @@ bounded synchronous file work and can contribute to skipped polling slots;
 this is not a hard real-time acquisition path. See the
 [integration verification](../verification/security-runtime-capture-20261018.md)
 for executed checks and remaining gates.
+
+## PLCSIM capture source
+
+`runtime_capture_start` can read an owned local PLCSIM Advanced V8 instance through the [simulator worker](../guides/simulation.md) instead of a Web session:
+
+```json
+{"attemptId":"<creationId>","selectionIds":["<32-hex>","<32-hex>"],"intervalMilliseconds":100,"durationSeconds":60,
+ "source":"plcsim","simulator":{"instanceId":3,"instanceName":"TiaMcp_<GUID>","cycleSynchronous":true,
+  "signals":[{"symbol":"\"DB_Line\".Conv2.Enable","type":"bool","datatype":"Bool"},
+             {"symbol":"\"DB_Line\".Conv2.Step","type":"uint16","datatype":"UInt"}]}}
+```
+
+- `attemptId` is the instance's `creationId` from `sim_create`, or the `creationId` used to adopt it with `sim_select`. On every call the worker rechecks the instance ID, name, owned storage and that creation receipt. Instances this Host does not own are refused before capture intent exists. One capture per instance.
+- `selectionIds` are caller-chosen 32-hex labels for the signals, in order. Association mappings reference them.
+- `type` is the typed PLCSIM read (the `sim_read` types). `datatype` is the declared PLC type and must fit it: `bool`→Bool, `int8`→SInt, `uint8`→USInt/Byte, `int16`→Int, `uint16`→UInt/Word, `int32`→DInt, `uint32`→UDInt/DWord, `int64`→LInt, `uint64`→ULInt/LWord, `float`→Real, `double`→LReal, `string`→String, `wstring`→WString. Diagnostic mappings compare this declared type; PLCSIM tag metadata is not read. A tag of another type fails the native typed read.
+- `representation` must be `simple`; `handoffRef` is not accepted.
+
+Each scheduled cycle makes one worker call that reads every signal. Each signal still gets its own row. Its `readResultJson` is a `plcsim-runtime-read.v1` record: instance, symbol, type, `status` (`read` or `readFailed`), exact value, `providerErrorCode` for a bad-quality read, worker UTC request/response times and `syncPoint`. A call-level failure (ownership, target mismatch, sync-point timeout, worker or bridge loss) becomes one explicit error row and ends the capture with `sessionUnavailable`. Bounds, gaps, stop, status, page, export and restart behave as for Web captures.
+
+### Cycle-synchronous mode
+
+`cycleSynchronous:true` requires a running instance. Start records the current `OperatingMode`, registers the sync-point event, switches to `SingleStep_C` and waits until the CPU holds at its next cycle end. Each sample calls `RunToNextSyncPoint`, waits up to 5 s for the sync point, then reads every signal while the CPU holds. The rows of one cycle share that `syncPoint` (count and nanoseconds since the previous sync points). The interval paces the steps, so the simulated CPU runs one cycle per sample; in `SingleStep_C` its virtual time is not frozen between steps.
+
+Stop, a terminal failure, any capture limit and Host shutdown restore the recorded mode and unregister the event. `sim_release` without `deleteOwned` and closing the simulator worker also restore it. If the restore cannot be confirmed, for example after a lost worker, status reports `localFailure: PlcsimOperatingModeRestoreFailed` and the instance can remain in single-step mode until restored with PLCSIM tooling.
+
+The per-row `syncPoint` is the retained evidence. Capture status, analysis and diagnostic acquisition keep `atomicAcrossSignals` and `scanSynchronized` false. The mode is compiled against the installed V8 API only and is not natively qualified.
+
+### Diagnostics
+
+PLCSIM captures with `request.association` work with `runtime_capture_analyze`, `diagnostic_experiment_acquire_runtime` and `diagnostic_runtime_acquisition_export` like Web captures. The analysis `capture.context` is the simulator source. Project Explorer **Open capture** accepts Web captures only.
 
 ## Limits and timing
 

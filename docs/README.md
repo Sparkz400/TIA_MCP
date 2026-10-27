@@ -66,6 +66,7 @@ and runtime corpus remain incomplete.
 - [Configured network inspection](guides/network-inspection.md)
 - [Offline bug and trace diagnostics](guides/trace-diagnostics.md)
 - [Offline watch-table lifecycle](guides/watch-tables.md)
+- [SINAMICS drives (Startdrive)](guides/drives.md)
 
 ## Reference
 

@@ -11,6 +11,7 @@ var tests = new (string, Action)[] {
     ("Prebound UA observations retain exact experiment and session intent without online authority", UaBindingChecks.Run),
     ("Versioned measurement quality and timing retain incomplete original evidence", QualityMeasurementChecks.Run),
     ("Retained runtime acquisition preserves original chains and unresolved sequential observations", RuntimeAcquisitionChecks.Run),
+    ("PLCSIM captures feed the unchanged runtime acquisition and export path", PlcsimAcquisitionChecks.Run),
     ("Repeated experiment windows and combined exports retain original evidence without promoting quality", RepeatedExperimentChecks.Run),
     ("Retained experiments compose exact diagnostic evidence and review explicit before/after lineage", ExperimentChecks.Run),
     ("Runtime captures retain selected alarm evidence without granting runtime authority", RuntimeAlarmBindingChecks.Run),
@@ -55,10 +56,11 @@ var tests = new (string, Action)[] {
     ("Nanosecond timestamps and separate documented AX capability remain explicit", NanosecondsAndAxRoute),
 };
 int failures = 0;
-foreach (var (name, run) in tests)
+var selected = args is ["--only", var only] ? tests.Where(t => t.Item1.Contains(only, StringComparison.Ordinal)).ToArray() : tests;
+foreach (var (name, run) in selected)
     try { run(); Console.WriteLine("PASS " + name); }
     catch (Exception e) { failures++; Console.Error.WriteLine("FAIL " + name + "\n" + e); }
-Console.WriteLine($"{tests.Length - failures}/{tests.Length} offline diagnostic groups passed. No Siemens/native acquisition qualification.");
+Console.WriteLine($"{selected.Length - failures}/{selected.Length} offline diagnostic groups passed. No Siemens/native acquisition qualification.");
 if (failures == 0 && args.Length == 1)
 {
     using var f = new Fixture(); f.AddVirtualGroups(); var plan = f.Plan(); var trace = f.Prepare(plan); var measurement = f.Capture(Id(trace));

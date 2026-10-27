@@ -62,6 +62,16 @@ Check("plug physical rack with logical sibling", "hardware_plug", plug, rows => 
 Check("wrong physical container rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["containerPath"] = "/another/rack"; rows.Add(row); }, false);
 Check("wrong plug type rejected", "hardware_plug", plug, rows => { var row = Row(station + "/items/DO", 3); row["typeIdentifier"] = "Wrong"; rows.Add(row); }, false);
 Check("unrelated addition rejected", "hardware_plug", plug, rows => { rows.Add(Row(station + "/items/DO", 3)); rows.Add(Row(station + "/items/Stranger", 4)); }, false);
+var retain = new JObject { ["importOption"] = "RetainTiaDevice" };
+const string parked = "/projects/P/groups/Parking/devices/Remote/items/Rack";
+Check("CAx import adds devices", "cax_import", retain, rows => rows.Add(Row(parked)), true);
+Check("CAx retain rejects a changed existing row", "cax_import", retain, rows => rows[0]["attributes"]["Comment"] = "imported", false);
+Check("CAx parking lot rejects a removed existing row", "cax_import", new JObject { ["importOption"] = "MoveToParkingLot" }, rows => rows.RemoveAt(1), false);
+Check("CAx overwrite is recorded, not matched", "cax_import", new JObject { ["importOption"] = "OverwriteTiaDevice" }, rows => { rows.RemoveAt(1); rows[0]["attributes"]["Comment"] = "imported"; }, true);
+var caxAfter = Baseline(); caxAfter.RemoveAt(1); caxAfter[0]["attributes"]["Comment"] = "imported"; caxAfter.Add(Row(parked));
+if (HardwareEngineeringRules.Difference(Baseline(), caxAfter).ToString() != new JObject { ["added"] = new JArray(parked), ["removed"] = new JArray(module), ["changed"] = new JArray(station) }.ToString())
+    throw new Exception("CAx hardware difference differs.");
+count++; Console.WriteLine("PASS CAx hardware difference by exact path");
 var assign = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 0, ["controllerHardwarePath"] = controller, ["controllerIndex"] = 0, ["addressControllerOwnerPath"] = controller };
 void Assigned(JArray rows) { rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray(controller); }
 Check("exact assignment plus ownership", "network_io_assign", assign, Assigned, true);
@@ -170,6 +180,40 @@ Memory("byte above 65535 refused", new JObject { ["ClockMemoryByteAddress"] = 65
 Memory("fractional byte refused", new JObject { ["ClockMemoryByteAddress"] = 1.5 }, "InvalidRequest");
 Memory("string byte refused", new JObject { ["ClockMemoryByteAddress"] = "10" }, "InvalidRequest");
 Memory("same enabled byte refused", new JObject { ["SystemMemoryByte"] = true, ["SystemMemoryByteAddress"] = 0 }, "AddressConflict");
+const string portA = controller + "/items/P1", portB = remote + "/items/P1";
+JObject PortRow(string path, params string[] links) { var row = Row(path); row["port"] = new JObject { ["connectedPorts"] = new JArray(links) }; return row; }
+void FreePorts(JArray rows) { rows.Add(PortRow(portA)); rows.Add(PortRow(portB)); }
+void LinkedPorts(JArray rows) { rows.Add(PortRow(portA, portB)); rows.Add(PortRow(portB, portA)); }
+void SetLinks(JArray rows, bool linked) { rows[4]["port"]["connectedPorts"] = linked ? new JArray(portB) : new JArray(); rows[5]["port"]["connectedPorts"] = linked ? new JArray(portA) : new JArray(); }
+var portLink = new JObject { ["hardwarePath"] = portA, ["partnerHardwarePath"] = portB };
+Check("port connect links both ends", "hardware_port_connect", portLink, rows => SetLinks(rows, true), true, FreePorts);
+Check("one-sided port connect rejected", "hardware_port_connect", portLink, rows => rows[4]["port"]["connectedPorts"] = new JArray(portB), false, FreePorts);
+Check("unchanged port connect rejected", "hardware_port_connect", portLink, _ => { }, false, LinkedPorts);
+Check("port connect collateral rejected", "hardware_port_connect", portLink, rows => { SetLinks(rows, true); rows[0]["attributes"]["Comment"] = "lost"; }, false, FreePorts);
+Check("port connect without captured port rejected", "hardware_port_connect", new JObject { ["hardwarePath"] = module, ["partnerHardwarePath"] = portB }, _ => { }, false, FreePorts);
+Check("self port link rejected", "hardware_port_connect", new JObject { ["hardwarePath"] = portA, ["partnerHardwarePath"] = portA }, _ => { }, false, FreePorts);
+Check("port disconnect unlinks both ends", "hardware_port_disconnect", portLink, rows => SetLinks(rows, false), true, LinkedPorts);
+Check("partial port disconnect rejected", "hardware_port_disconnect", portLink, rows => rows[4]["port"]["connectedPorts"] = new JArray(), false, LinkedPorts);
+const string child = module + "/items/Sub";
+var replace = new JObject { ["hardwarePath"] = module, ["typeIdentifier"] = "Catalog:DI32" };
+void WithChild(JArray rows) => rows.Add(Row(child, 1));
+void Replaced(JArray rows) { rows[1]["typeIdentifier"] = "Catalog:DI32"; rows[1]["channels"] = new JArray(); rows[1]["addresses"][0]["lengthBits"] = 32; rows[4]["typeIdentifier"] = "Catalog:Sub32"; }
+Check("replace keeps addresses and children", "hardware_replace", replace, Replaced, true, WithChild);
+Check("replace losing an address rejected", "hardware_replace", replace, rows => { Replaced(rows); rows[1]["addresses"] = new JArray(); }, false, WithChild);
+Check("replace shrinking an address rejected", "hardware_replace", replace, rows => { Replaced(rows); rows[1]["addresses"][0]["lengthBits"] = 8; }, false, WithChild);
+Check("replace losing a child rejected", "hardware_replace", replace, rows => { Replaced(rows); rows.RemoveAt(4); }, false, WithChild);
+var replaceLoss = (JObject)replace.DeepClone(); replaceLoss["acceptLoss"] = true;
+Check("replace loss accepted explicitly", "hardware_replace", replaceLoss, rows => { Replaced(rows); rows[1]["addresses"] = new JArray(); rows.RemoveAt(4); }, true, WithChild);
+Check("replace wrong type rejected", "hardware_replace", replace, rows => rows[1]["typeIdentifier"] = "Catalog:Other", false, WithChild);
+Check("replace unchanged type rejected", "hardware_replace", new JObject { ["hardwarePath"] = module, ["typeIdentifier"] = "Catalog:DI" }, _ => { }, false, WithChild);
+Check("replace moving the slot rejected", "hardware_replace", replace, rows => { Replaced(rows); rows[1]["positionNumber"] = 5; }, false, WithChild);
+Check("replace collateral outside subtree rejected", "hardware_replace", replaceLoss, rows => { Replaced(rows); rows[0]["attributes"]["Comment"] = "lost"; }, false, WithChild);
+Check("replace losing a port link outside subtree rejected", "hardware_replace", replaceLoss, rows => { Replaced(rows); rows[5]["port"]["connectedPorts"] = new JArray(); rows[6]["port"]["connectedPorts"] = new JArray(); }, false, rows => { WithChild(rows); rows.Add(PortRow(child + "/P1", portB)); rows.Add(PortRow(portB, child + "/P1")); });
+var inventoryRows = Baseline(); WithChild(inventoryRows);
+var inventory = HardwareEngineeringRules.ReplaceInventory(inventoryRows, module);
+if (inventory.Value<string>("typeIdentifier") != "Catalog:DI" || ((JArray)inventory["addresses"]).Count != 1 || inventory["addresses"][0].Value<string>("hardwarePath") != module || !JToken.DeepEquals(inventory["children"], new JArray(child)))
+    throw new Exception("Replace inventory differs: " + inventory);
+count++; Console.WriteLine("PASS replace inventory lists subtree addresses and children");
 // Interrupted-apply project disposition: an equal fingerprint releases only when nothing was saved after the checkpoint.
 var archived = new DateTime(2026, 10, 27, 13, 0, 0, DateTimeKind.Utc);
 void Disposition(string name, bool equal, double savedSeconds, bool applied, string expected, string reason = null)

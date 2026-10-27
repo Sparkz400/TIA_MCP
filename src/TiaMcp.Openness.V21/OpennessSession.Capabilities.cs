@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using Siemens.Engineering.Cax;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.Download;
@@ -10,9 +11,13 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.Safety;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Alarm;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Supervision;
+using Siemens.Engineering.SW.OpcUa;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.TechnologicalObjects;
+using Siemens.Engineering.SW.TechnologicalObjects.Motion;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Units;
 using TiaMcp.Model;
@@ -56,6 +61,13 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
                 AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
                 AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");
+                var cax = ProbeCapabilityService<CaxProvider>(project, "project", probes);
+                AddTargetFeature(features, "cax_export", cax, "partial", "Whole-project or exact-device AML export with the retained native transfer result; Siemens excludes drives, most HMI devices and listed Scalance items.");
+                AddTargetFeature(features, "change.cax_import", cax, "partial", "One hash-pinned AML file with an explicit CaxImportOptions value, checkpoint, device compile and configured-hardware readback. Runs outside exclusive access.",
+                    blocked: !_ownsPortal, blocker: "CAx import must run outside exclusive access and is limited to a worker-owned TIA instance.");
+                AddTargetFeature(features, "change.testsuite_application_import", directApi, "partial", "Strict .tat/.ttst import into the optional Test Suite application group; the Test Suite service and license are not probed here. Names are verified by readback; nothing executes.");
+                AddTargetFeature(features, "change.plc_alarm_class_import", ProbeCapabilityService<AlarmClassDataProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound DAT import with retained native result and fresh-export readback; the DAT grammar is not interpreted.");
+                AddTargetFeature(features, "change.plc_supervision_settings_import", ProbeCapabilityService<SupervisionSettingsProvider>(project, "project", probes), "partial", "Project-wide supplied hash-bound ProDiag settings DAT import; the service can be absent without ProDiag. ErrorRollback is a failure.");
             }
 
             if (selected.Plc != null)
@@ -76,7 +88,7 @@ namespace TiaMcp.Openness.V21
                 {
                     AddTargetFeature(features, "software_inspect", directApi, "partial", "Bounded exposed software scopes, tags and data types; native protected content remains inaccessible.");
                     AddTargetFeature(features, "technology_read", directApi, "partial", "Enumerates PLC technology groups and the OutputCams/MeasuringInputs child compositions; it does not infer unit-local TO support or other service coverage.");
-                    foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "plc_type_import_xml", "tag_table_import_xml" })
+                    foreach (string feature in new[] { "source_upsert", "type_source_upsert", "block_import_xml", "graph_import", "plc_type_import_xml", "tag_table_import_xml" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Standard and software-unit scopes use explicit native group routing; payload language/type, collision, protection and compile checks occur during prepare/apply. Unit routes require separate qualification.",
                             blocked: safetyScope, blocker: "Safety-unit mutations require the dedicated safety import workflow.");
                     AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Versioned separate LAD/FBD models, explicit declaration/storage effects and immutable native artifacts use the existing checkpoint workflow. Exact CPU, instruction, data type, language and route profiles are required. Native-format evidence and runtime qualification are separate; inspect the shipped typed profile catalog.",
@@ -84,8 +96,26 @@ namespace TiaMcp.Openness.V21
                     foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
                             blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
+                    foreach (string feature in new[] { "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" })
+                        AddTargetFeature(features, "change." + feature, unit, "partial", "Standard software units only: create with an optional namespace preset, add/remove SoftwareUnit relations between exact units (cycles refused), set Access of one unit block/type (not OBs), delete an empty unreferenced unit. Mandatory compile and recovery checkpoint; not natively qualified.",
+                            applicable: feature == "software_unit_create" ? kind == "plc" : kind != "plc",
+                            blocked: safetyScope, blocker: "Safety units are excluded from software-unit lifecycle changes.");
                     AddTargetFeature(features, "change.to_create", directApi, "partial", "The installed API does not expose a complete CPU-specific TO type/version catalog; Siemens validates the requested pair during creation. Optional initial scalar parameters are resolved, type/write-access checked and read back after creation within the same checkpoint before compile. Invalid initial configuration requires recovery; only exact recorded CPU/type/version fixture profiles are qualified.",
                         blocked: kind != "plc", blocker: "Technology creation currently targets the standard PLC technology-object group.");
+                    const string alarmBlocker = "Safety units are excluded from PLC alarm and ProDiag imports.";
+                    AddTargetFeature(features, "change.plc_alarm_text_list_import", ProbeCapabilityService<PlcAlarmTextListProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX with explicit None/Override and expected list names; native result/log, fresh-export readback and list-name verification. The workbook layout is not interpreted.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_alarm_instance_text_import", ProbeCapabilityService<PlcAlarmTextProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound XLSX updating existing alarm instance texts; native result/log and fresh-export readback only.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    AddTargetFeature(features, "change.plc_supervision_import", ProbeCapabilityService<SupervisionProvider>(selected.Target, kind, probes), "partial", "Supplied hash-bound ProDiag supervision XLSX with explicit None/Override; the service can be absent without ProDiag.",
+                        blocked: safetyScope, blocker: alarmBlocker);
+                    if (kind == "plc")
+                    {
+                        var opcUa = ProbeCapabilityService<OpcUaProvider>(plc.Software, "plc", probes);
+                        if (opcUa.Status != "available") opcUa = ProbeOwningHardwareService<OpcUaProvider>(plc.Software, probes);
+                        foreach (string feature in OpcUaPayloadFields.Keys)
+                            AddTargetFeature(features, "change." + feature, opcUa, "partial", "Public SW.OpcUa API only: user-defined server interface import/delete/enable, reference namespace import/delete and role mapping create/remove with explicit namespace permissions. SIMATIC and generated companion interfaces are excluded; passwords and certificates are never accepted. Checkpoint and PLC compile are mandatory; not natively qualified.");
+                    }
                     var download = ProbeOwningHardwareService<DownloadProvider>(plc.Software, probes);
                     AddTargetFeature(features, "simulation_download", download, "partial", "Requires a compatible program/CPU, simulation compilation setting and an independently verified owned OFF PLCSIM Advanced instance with a fresh ticket. Runtime licensing is not probed here.");
                 }
@@ -116,6 +146,12 @@ namespace TiaMcp.Openness.V21
                         + (feature == "block_delete" ? " Deletion defaults to rejectReferenced and repeats the conservative exported-XML dependency scan at prepare/apply; exact own declaration is excluded, references and incomplete evidence are rejected." : ""),
                         blocked: protectedBlock || safetyBlock || safetyScope || generated,
                         blocker: protectedBlock ? "The selected block is know-how protected." : generated ? "Generated system-group objects are excluded from direct mutations." : "F-blocks and safety-unit objects require the dedicated safety workflow.");
+                var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
+                var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
+                foreach (string feature in BlockProtectionKinds)
+                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
+                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
+                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
                 AddTargetFeature(features, "change.source_upsert", directApi, "partial", "SCL and STL/AWL source writes preserve the existing language; no implicit language conversion is supported.",
                     applicable: language == "SCL" || language == "STL" || block is DataBlock,
                     blocked: protectedBlock || safetyBlock || safetyScope || generated,
@@ -174,6 +210,12 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
                 AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
                     blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
+                AddTargetFeature(features, "change.hardware_replace", directApi, "partial", "DeviceItem.ChangeType to an exact installed catalog identifier for a pluggable module without software; lost addresses/children fail after the write unless acceptLoss is true. Compiled preservation and checkpoint required.",
+                    blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be replaced by this workflow.");
+                var port = ProbeCapabilityService<NetworkPort>(hardware, "hardware", probes);
+                foreach (string feature in new[] { "change.hardware_port_connect", "change.hardware_port_disconnect" })
+                    AddTargetFeature(features, feature, port, "partial", "One exact port device item and one exact partner port; connect requires both free. Forward/reverse ConnectedPorts readback, compiled preservation and checkpoint required.");
+                AddTargetFeature(features, "hardware_gsd_export", ProbeCapabilityService<GsdExportProvider>(hardware, "hardware", probes), "partial", "I-device GSD export through the native GsdExportProvider into the artifact directory with SHA-256; content is not validated.");
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
                 AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
                 AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; shared-device/multi-controller assignments are rejected.");
@@ -183,6 +225,11 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.connection_delete", communication, "partial", "Exactly one connection by connectionName and optional connectionId; program/HMI consumers are checked only by the mandatory device compile.");
                 AddTargetFeature(features, "change.connection_set", communication, "partial", "Both native write access and ConnectionWriteAttributes allowlist must permit each requested field; owner-table preservation and device compile required.");
                 metadata["connectionWriteAllowlist"] = new JArray(ConnectionWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
+                ApiObservation drive;
+                try { drive = ProbeDriveContainer(hardware, probes); }
+                catch (Exception error) when (StartdriveMissing(error)) { drive = ApiObservation.Unavailable("SINAMICS Startdrive Openness is not installed or cannot be loaded."); }
+                AddTargetFeature(features, "drive_observe", drive, "partial", "Offline drive objects, parameters, BICO references and telegrams; parameter access is reported unknown.");
+                AddTargetFeature(features, "change.drive_parameter_set", drive, "partial", "Scalar offline parameter writes on one drive object with exact expected values and readback. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; dependent recalculation is not read back.");
                 metadata["channelWriteAllowlist"] = new JArray(ChannelWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["hardwareWriteAllowlist"] = new JArray(HardwareWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
                 metadata["networkWriteAllowlist"] = new JArray(NetworkWriteAttributes.OrderBy(value => value, StringComparer.Ordinal));
@@ -196,6 +243,10 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "technology_read", directApi, "implemented", "Offline configuration parameters only; no runtime axis state or motion commands.");
                 AddTargetFeature(features, "change.to_parameters", directApi, "partial", "Each selected parameter requires native write access and a supported scalar value. Range/unit constraints not exposed in metadata remain unknown.");
                 AddTargetFeature(features, "change.to_delete", directApi, "partial", "Deletion requires a recoverable checkpoint and native dependency/compile checks.");
+                foreach (var feature in new[] { "to_connect", "to_disconnect" })
+                    AddTargetFeature(features, "change." + feature, directApi, "partial", "One role slot per change (actor, sensor, torque, encoder, measuringInput, outputCam); the role's connection service and the target/overload pair are checked at prepare. Requires compile=true; not natively qualified.");
+                AddTargetFeature(features, "change.to_child_create", ProbeCapabilityService<OutputCamMeasuringInputContainer>(technology, "technology", probes), "partial",
+                    "Creates one OutputCams or MeasuringInputs child under this owner; Siemens validates the type/version pair during creation. Not natively qualified.");
                 metadata["technologyParameters"] = CapabilityTechnologyParameters(technology, budget, warnings);
                 metadata["technologyType"] = technology.OfSystemLibElement;
                 metadata["technologyVersion"] = technology.OfSystemLibVersion.ToString();
@@ -404,6 +455,7 @@ namespace TiaMcp.Openness.V21
             var probe = api.ToJson();
             probe["owner"] = "owningCpu"; probe["serviceType"] = typeof(SafetyAdministration).FullName; probes.Add(probe);
             AddTargetFeature(features, "safety_inspect", api, "partial", "Reads exposed offline configuration/signatures only; it does not validate or accept the safety program.");
+            AddTargetFeature(features, "safety_validation_inspect", api, "partial", "Adds Failsafe_* F-parameters and Safety Validation Assistant activation tests (read-only); no test execution, result reset or approval.");
             AddTargetFeature(features, "change.safety_import_xml", api, "partial", "Dedicated acknowledged F-LAD/F-FBD/F-DB import only; explicit group/scope, protection, native consistency and signature checks apply.",
                 applicable: importApplicable, blocked: blocked || generated || targetBlocker != null,
                 blocker: generated ? "Generated system-group objects are excluded from direct mutations." : targetBlocker ?? "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");

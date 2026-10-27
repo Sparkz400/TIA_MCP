@@ -37,6 +37,9 @@ namespace TiaMcp.Simulator.V8
                 case "sim_write": return Write(args);
                 case "sim_test": return Test(args);
                 case "sim_release": return Release(args);
+                case "sim_capture_begin": return CaptureBegin(args);
+                case "sim_capture_sample": return CaptureSample(args);
+                case "sim_capture_end": return CaptureEnd(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -263,6 +266,92 @@ namespace TiaMcp.Simulator.V8
             return result;
         }
 
+        // Runtime captures read only an exact owned instance: ID, name and its creation receipt must all match.
+        private Selection Owned(JObject args)
+        {
+            var selected = Get(args);
+            if (selected.Name != RequiredString(args, "instanceName", 128))
+                throw new SimulatorException("SimulationTargetMismatch", "The exact local simulated instance name does not match. No action was performed.");
+            if (!selected.Owned || selected.CreationReceipt?.Value<string>("creationId") != SimulationCreationJournal.ValidateId(RequiredString(args, "creationId", 32)))
+                throw new SimulatorException("SimulationOwnershipUnverified", "Runtime capture requires an instance this adapter created or adopted with the supplied creationId.");
+            return selected;
+        }
+
+        private JObject CaptureBegin(JObject args)
+        {
+            var selected = Owned(args);
+            Signals(args["signals"], false);
+            bool synchronous = args.Value<bool?>("cycleSynchronous") ?? false;
+            var result = Envelope(selected);
+            if (synchronous)
+            {
+                if (selected.CaptureRestoreMode != null) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture already holds this instance.");
+                if (selected.Instance.OperatingState != EOperatingState.Run) throw new SimulatorException("SimulationNotRunning", "Cycle-synchronous capture requires a running simulated CPU.");
+                var previous = selected.Instance.OperatingMode;
+                selected.Instance.RegisterOnSyncPointReachedEvent();
+                selected.CaptureRestoreMode = previous;
+                try
+                {
+                    selected.Instance.OperatingMode = EOperatingMode.SingleStep_C;
+                    // The CPU now holds at its next cycle end; confirm that before the first sample steps it.
+                    result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs));
+                }
+                // Keep the original failure; an unrestored mode stays recorded and blocks the next begin until release retries it.
+                catch { try { RestoreCaptureMode(selected); } catch { } throw; }
+                result["previousOperatingMode"] = previous.ToString();
+            }
+            result["cycleSynchronous"] = synchronous;
+            return result;
+        }
+
+        private JObject CaptureSample(JObject args)
+        {
+            var selected = Owned(args);
+            var signals = Signals(args["signals"], false);
+            bool synchronous = args.Value<bool?>("cycleSynchronous") ?? false;
+            if (synchronous != (selected.CaptureRestoreMode != null))
+                throw new SimulatorException("SimulationCaptureModeInactive", "The requested capture mode does not match this instance's capture state.");
+            var result = Envelope(selected);
+            if (synchronous) { selected.Instance.RunToNextSyncPoint(); result["syncPoint"] = SyncPoint(selected.Instance.WaitForOnSyncPointReachedEvent(SyncTimeoutMs)); }
+            else result["syncPoint"] = null;
+            // In single-step mode the CPU holds at the reached sync point while every signal is read.
+            result["values"] = Capture(selected, signals);
+            return result;
+        }
+
+        private JObject CaptureEnd(JObject args)
+        {
+            var selected = Owned(args);
+            var result = Envelope(selected);
+            result["restoredOperatingMode"] = selected.CaptureRestoreMode?.ToString();
+            RestoreCaptureMode(selected);
+            result["operatingMode"] = selected.Instance.OperatingMode.ToString();
+            return result;
+        }
+
+        private static void RestoreCaptureMode(Selection selected)
+        {
+            if (selected.CaptureRestoreMode == null) return;
+            var previous = selected.CaptureRestoreMode.Value;
+            selected.Instance.OperatingMode = previous;
+            selected.Instance.UnregisterOnSyncPointReachedEvent();
+            if (selected.Instance.OperatingMode != previous)
+                throw new SimulatorException("SimulationOperatingModeNotRestored", "The recorded operating mode " + previous + " was not observed after restore.");
+            selected.CaptureRestoreMode = null;
+        }
+
+        private const uint SyncTimeoutMs = 5000;
+        private static JObject SyncPoint(SOnSyncPointReachedResult reached)
+        {
+            if (reached.ErrorCode != ERuntimeErrorCode.OK)
+                throw new SimulatorException("SimulationSyncPointTimeout", "No sync point was confirmed within " + SyncTimeoutMs + " ms: " + reached.ErrorCode);
+            return new JObject { ["count"] = reached.SyncPointCount, ["timeSinceSameSyncPointNanoseconds"] = reached.TimeSinceSameSyncPoint_ns,
+                ["timeSinceAnySyncPointNanoseconds"] = reached.TimeSinceAnySyncPoint_ns };
+        }
+
+        private static string ErrorCode(Exception error) => (error as SimulatorException)?.Code
+            ?? (error as SimulationRuntimeException)?.RuntimeErrorCode.ToString() ?? "SimulatorReadFailed";
+
         private JObject Release(JObject args)
         {
             var selected = Get(args);
@@ -278,6 +367,7 @@ namespace TiaMcp.Simulator.V8
                     SimulationCreationJournal.Save(selected.CreationRoot, selected.CreationReceipt);
                 }
             }
+            else RestoreCaptureMode(selected);
             selected.Instance.Dispose();
             _instances.Remove(selected.Id);
             return new JObject { ["instanceId"] = selected.Id, ["instanceName"] = selected.Name, ["unregistered"] = remove,
@@ -362,7 +452,8 @@ namespace TiaMcp.Simulator.V8
                         throw new SimulatorException("NonFiniteValue", "PLC real value is NaN or infinite; JSON capture cannot represent it as a finite number.");
                     value["value"] = observed; value["quality"] = "good";
                 }
-                catch (Exception ex) { value["quality"] = "bad"; value["error"] = ex.Message; }
+                catch (Exception ex) { value["quality"] = "bad"; value["error"] = ex.Message; value["errorCode"] = ErrorCode(ex); }
+                value["completedAtUtc"] = DateTime.UtcNow.ToString("O");
                 values.Add(value);
             }
             return values;
@@ -595,13 +686,17 @@ namespace TiaMcp.Simulator.V8
         public void Dispose()
         {
             // Interface disposal does not unregister/power off CPUs. Cleanup is explicit.
-            foreach (var selected in _instances.Values) { try { selected.Instance.Dispose(); } catch (Exception ex) { Console.Error.WriteLine("Simulator interface release: " + ex.Message); } }
+            foreach (var selected in _instances.Values)
+            {
+                try { RestoreCaptureMode(selected); } catch (Exception ex) { Console.Error.WriteLine("Simulator capture mode restore: " + ex.Message); }
+                try { selected.Instance.Dispose(); } catch (Exception ex) { Console.Error.WriteLine("Simulator interface release: " + ex.Message); }
+            }
             _instances.Clear();
             if (_initialized) { try { SimulationRuntimeManager.Shutdown(); } catch (Exception ex) { Console.Error.WriteLine("Simulator API shutdown: " + ex.Message); } }
         }
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
-            internal string CreationRoot; internal JObject CreationReceipt; }
+            internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
     }
 }

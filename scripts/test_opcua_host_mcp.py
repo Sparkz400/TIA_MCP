@@ -134,7 +134,7 @@ def main():
             tools[name]["annotations"]["openWorldHint"] is False and
             not {"path", "outputPath", "overwrite"} & tools[name]["inputSchema"].get("properties", {}).keys()
             for name in TOOLS))
-        check("no production native OPC UA engineering tools advertised", {name for name in tools if name.startswith("opcua_")} == TOOLS)
+        check("offline OPC UA tool set unchanged beside worker-backed engineering tools", {name for name in tools if name.startswith("opcua_") and not name.startswith("opcua_engineering_")} == TOOLS)
 
         original = (fixture / "machine-v1.xml").read_bytes()
         original_upload = upload("machine-v1.xml", original)

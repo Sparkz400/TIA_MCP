@@ -10,10 +10,10 @@ namespace TiaMcp.Translations;
 
 /// <summary>Internal owning-worker binding; no request can supply its admission delegate.</summary>
 internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root, string projectPath, string plcPath,
-    Action<TranslationImportContext, string> admission) : ITranslationImportAdapter
+    Action<TranslationImportContext, string> admission, string sourceCulture = "de-DE", string targetCulture = "en-GB", string[]? plcPaths = null) : ITranslationImportAdapter
 {
     private readonly TranslationImportArtifacts artifacts = new(root);
-    private object Selector => new { projectPath, plcPath, artifactDirectory = root };
+    private object Selector => new { projectPath, plcPath, plcPaths = plcPaths ?? [plcPath], sourceCulture, targetCulture, artifactDirectory = root };
     internal Action<string>? AfterNativeReturn { get; set; }
     internal bool DriftSourceAfterCheckpoint { get; set; }
     public void RequireQualification(TranslationImportContext context, string action) => admission(context, action);
@@ -28,6 +28,8 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
         return new Session(this, context, opened["leaseToken"]!.GetValue<string>());
     }
     internal byte[] ReadNative(JsonNode reference)
+    { byte[] bytes = ReadArtifact(root, reference); artifacts.RetainBytes(bytes); return bytes; }
+    internal static byte[] ReadArtifact(string root, JsonNode reference)
     {
         string path = Path.GetFullPath(reference["path"]!.GetValue<string>());
         Require(path.StartsWith(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase),
@@ -36,7 +38,7 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
         Require(new FileInfo(path).Length <= TranslationRetention.WorkbookLimit, "TranslationArtifactLimit", "Native artifact exceeds bound.");
         byte[] bytes = File.ReadAllBytes(path);
         Require(Sha256(bytes) == reference["sha256"]!.GetValue<string>(), "TranslationArtifactChanged", "Native artifact changed.");
-        artifacts.RetainBytes(bytes); return bytes;
+        return bytes;
     }
     internal (TranslationImportObservation, WorkbookProfile) Decode(JsonElement element)
     {
@@ -53,7 +55,9 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             var evidence = artifacts.RetainBytes(ReadNative(p!["artifact"]!));
             return new TranslationImportPeer(p["identity"]!.GetValue<string>(), evidence.Sha256, evidence, p["profile"]!.GetValue<string>());
         }).ToArray();
-        var scope = new TranslationImportScope("de-DE", "en-GB", value["activeCultures"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray(),
+        Require(profile.SourceCulture == sourceCulture && TranslationCategoryScope.NativeTargetCulture(workbook) == targetCulture,
+            "TranslationScopeMismatch", "Exported workbook cultures differ from the requested source/target pair.");
+        var scope = new TranslationImportScope(sourceCulture, targetCulture, value["activeCultures"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray(),
             ["whole-project:legacy-bilingual"], value["categoryIds"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray());
         var target = new NativeTargetObservation(reference, path, value["sessionEpoch"]!.GetValue<string>(), value["workerSha256"]!.GetValue<string>(),
             HashJson(profile), value["hardwareIdentity"]!.GetValue<string>(), name, value["offline"]!.GetValue<bool>(),
@@ -62,7 +66,8 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
         var receipt = JsonBytes(new TranslationObservationReceipt(target, Sha256(bytes), HashJson(scope), HashJson(peers)));
         return (new(target, bytes, scope, peers, receipt), profile);
     }
-    internal static WorkbookProfile NativeProfile(byte[] bytes)
+    // Cultures come from the native header row: E1 is "<source>*", then one column per target until ref="0".
+    internal static WorkbookProfile NativeProfile(byte[] bytes, string id = "tia21-whole-project-bilingual-qualification-v1")
     {
         var package = new BoundedOpcPackage(bytes, new()); var s = BoundedOpcPackage.Sheet;
         var strings = package.Xml["xl/sharedStrings.xml"].Root!.Elements(s + "si").ToArray();
@@ -75,6 +80,12 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             Require(text.Elements().Count() == 1 && text.Element(s + "t") != null, "UnsupportedTranslationScopeLayout", "Plain native cells required.");
             return text.Element(s + "t")!.Value;
         }
+        var header = package.Xml["xl/worksheets/sheet1.xml"].Descendants(s + "row").First();
+        string source = Cell(header, "E");
+        Require(source.EndsWith('*'), "UnsupportedTranslationScopeLayout", "Source culture header must end with '*'.");
+        var targets = new List<string>();
+        for (string name; !(name = Cell(header, TranslationWorkbook.ColumnName(6 + targets.Count))).StartsWith("ref=\"", StringComparison.Ordinal);)
+        { targets.Add(name); Require(targets.Count <= 64, "UnsupportedTranslationScopeLayout", "At most 64 target culture columns are supported."); }
         var rows = new List<TranslationRow>();
         for (int i = 1; i <= 2; i++)
         {
@@ -83,10 +94,10 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             {
                 string number = (string)row.Attribute("r")!;
                 rows.Add(new(Cell(row, "C"), Cell(row, "A"), new(part, "C" + number), new(part, "E" + number),
-                    [new("en-GB", new(part, "F" + number))], "brace-literals-v1"));
+                    targets.Select((culture, index) => new TranslationCell(culture, new(part, TranslationWorkbook.ColumnName(6 + index) + number))).ToArray(), "brace-literals-v1"));
             }
         }
-        return new("tia21-whole-project-bilingual-qualification-v1", "unqualified-explicit", "de-DE", rows.ToArray(), AllowSharedStringToInline: true);
+        return new(id, "unqualified-explicit", source[..^1], rows.ToArray(), AllowSharedStringToInline: true);
     }
     internal static byte[] JsonBytes<T>(T value) => Encoding.UTF8.GetBytes(CanonicalJson.Serialize(Node(value)));
     private sealed class Session(TranslationWorkerAdapter owner, TranslationImportContext context, string lease) : ITranslationImportSession
@@ -138,7 +149,7 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             // Preserve the original vendor result before reading its fields. The durable
             // result is the typed operation binding; the original remains content-addressed.
             var returned = JsonNode.Parse(raw)!;
-            bool accepted = returned["state"]!.GetValue<string>() == "Info" && returned["updateSourceLanguage"]!.GetValue<bool>() == false &&
+            bool accepted = returned["state"]!.GetValue<string>() == "Info" && returned["updateSourceLanguage"]!.GetValue<bool>() == context.UpdateSourceLanguage &&
                 returned["operationId"]!.GetValue<string>() == context.Operation.Id && returned["planSha256"]!.GetValue<string>() == context.Operation.PlanSha256 &&
                 returned["candidateSha256"]!.GetValue<string>() == context.CandidateSha256;
             return new(JsonBytes(new TranslationImportResultReceipt(context.Operation.Id, context.Operation.PlanSha256, ProjectKey,

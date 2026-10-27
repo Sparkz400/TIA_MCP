@@ -111,6 +111,16 @@ Check("Tag-table preservation delta admits only the changed table's export files
     Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, emptied, prefix));
     Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, "/hmi/tagTables/Default"));
 });
+Check("Tag creation admits only the created tag's own typed-readback subtree", () => {
+    const string prefix = "/hmi/tagTables/Default/export/", created = "/hmi/tagTables/Default/tags/Linked";
+    var before = new Dictionary<string, string> { [prefix + "Tags.xml"] = "1", ["/hmi/tagTables/Default"] = "2", ["/hmi/tagTables/Default/tags/Old"] = "3" };
+    var after = new Dictionary<string, string>(before) { [prefix + "Tags.xml"] = "4", [created] = "5", [created + "/thresholds/High"] = "6" };
+    HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix, created);
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, new Dictionary<string, string>(after) { ["/hmi/tagTables/Default"] = "7" }, prefix, created));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, new Dictionary<string, string>(after) { [created + "Suffix"] = "8" }, prefix, created));
+    Reject(() => HmiPreservationRules.RequireUnrelatedPreservedOutside(before, after, prefix, "/hmi/tagTables/Default/tags/Old"));
+});
 Check("Classic scalar patch selects export-local owner, preserving duplicate member names", () => {
     var before = HmiPreservationRules.ReadXml(xml);
     var expected = HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "0", "BackColor", "204, 204, 204", "128, 128, 128");
@@ -222,6 +232,25 @@ Check("Whole-document preservation retains opaque CDATA node boundaries", () => 
     var before = HmiPreservationRules.ReadXml("<Document><Opaque><![CDATA[unchanged]]></Opaque></Document>");
     var after = HmiPreservationRules.ReadXml("<Document><Opaque>unchanged</Opaque></Document>");
     Reject(() => HmiPreservationRules.RequireExactDocument(before, after));
+});
+Check("Classic XML import accepts one exact exported object and refuses other shapes", () => {
+    JObject Import(string document = xml) { var r = Scalar(); r.Remove("properties"); r["operation"] = "classic_xml_import"; r["target"]["family"] = "classic"; r["xml"] = document; return r; }
+    HmiEngineeringRules.RequireRequest(Import());
+    var unified = Import(); unified["target"]["family"] = "unified"; Reject(() => HmiEngineeringRules.RequireRequest(unified));
+    var mixed = Import(); mixed["properties"] = new JObject { ["BackColor"] = "1, 2, 3" }; Reject(() => HmiEngineeringRules.RequireRequest(mixed));
+    var smuggled = Scalar(); smuggled["xml"] = xml; Reject(() => HmiEngineeringRules.RequireRequest(smuggled));
+    var notText = Import(); notText["xml"] = new JObject(); Reject(() => HmiEngineeringRules.RequireRequest(notText));
+    foreach (string document in new[] { "<Document>", "<Root/>", "<Document><Engineering/></Document>", xml.Replace("</Document>", "<Hmi.Tag.TagTable ID='9'/></Document>"),
+        xml.Replace("Hmi.Screen.Screen", "Screen"), "<?xml version='1.0' encoding='utf-16'?>" + xml, "<!DOCTYPE Document [<!ENTITY x 'y'>]>" + xml })
+        Reject(() => HmiEngineeringRules.RequireRequest(Import(document)));
+    var current = HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(xml));
+    HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(xml.Replace("204, 204, 204</BackColor><UnknownX>", "1, 2, 3</BackColor><UnknownX>")), current);
+    Reject(() => HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(xml.Replace("<Name>Main</Name><BackColor>204, 204, 204</BackColor><UnknownX>", "<Name>Other</Name><BackColor>204, 204, 204</BackColor><UnknownX>")), current));
+    Reject(() => HmiPreservationRules.ClassicImportRoot(HmiPreservationRules.ReadXml(xml.Replace("Hmi.Screen.Screen", "Hmi.Screen.ScreenPopup")), current));
+    Assert(HmiEngineeringRules.RequiredGates("classic_xml_import").Values<string>().Contains("exactDocumentDelta"));
+    var gate = HmiEngineeringRules.Gate("classic", "classic-comfort", "classic_xml_import");
+    Assert(gate.Value<string>("bridgeImplementation") == "guarded_body" && !gate.Value<bool>("available"));
+    Assert(HmiEngineeringRules.Gate("unified", "unified-comfort", "classic_xml_import").Value<string>("bridgeImplementation") == "unavailable");
 });
 Console.WriteLine($"{passed} passed; {failed} failed. These are pure guard/preservation tests, not native qualification.");
 return failed == 0 ? 0 : 1;

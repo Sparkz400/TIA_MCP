@@ -15,6 +15,8 @@ Save that public binding and run `TiaMcp.Host.exe --credential-store create --bi
 3. `runtime_web_read` accepts the attempt and selection IDs, with `representation: simple` or `raw`. Before reading it checks the protected credential, advertised session identity, current permissions and exact symbol metadata again. An error has no previous good value. Successful JSON retains 64-bit numbers; consumers must use a lossless JSON reader if their ordinary numeric type cannot represent them.
 4. `runtime_web_status` reads retained local state without network activity. A connected state is a local observation, not a new authentication probe. `runtime_web_disconnect` invalidates local selections and sends one logout for this Host's owned token.
 
+5. `runtime_web_diagnostics` reads one CPU diagnostic `kind` in a connected session (see [CPU diagnostics](#cpu-diagnostics)).
+
 Read results retain host UTC request/receive times and monotonic elapsed duration. Source/server timestamps remain absent; no scan synchronization, atomic multi-signal sampling, device/program verification or native qualification is claimed. The [protocol contract](physical-runtime-contracts.md) describes the result format.
 
 ## Trust, ownership and bounds
@@ -37,6 +39,27 @@ New observations use `runtime-web-session.v2`; existing v1 records reopen in the
 
 Profile methods are optional for compatibility with older advertised method sets. Their absence does not establish identity, limits or mode support. Malformed/denied advertised profile responses do not silently fall back to a weaker result. Retained status remains an observation, not a fresh network probe. A session username match is not proof of CPU identity or downloaded-program match.
 
+## CPU diagnostics
+
+`runtime_web_diagnostics` takes the attempt ID and one `kind`. Each kind sends exactly one documented read-only Siemens method:
+
+| `kind` | Method | Inputs | Checked result shape |
+| --- | --- | --- | --- |
+| `languages` | `Project.ReadLanguages` | none | `languages`: at most 64 objects with a `language` tag |
+| `alarms` | `Alarms.Browse` | `language`, `count` 1..500 | `entries`: at most `count` objects |
+| `diagnosticBuffer` | `DiagnosticBuffer.Browse` | `language`, `count` 1..500 | `entries`: at most `count` objects |
+| `operatingMode` | `Plc.ReadOperatingMode` | none | a string such as `run` or `stop` |
+| `modeSelector` | `Plc.ReadModeSelectorState` | none | `mode_selector` string |
+| `systemTime` | `Plc.ReadSystemTime` | none | `timestamp` string |
+| `timeSettings` | `Plc.ReadTimeSettings` | none | `current_offset` and `utc_offset` strings |
+| `projectInformation` | `Project.ReadInformation` | none | an object |
+
+Take the `language` tag from a `languages` read, for example `en-US`. The Host checks the credential and session identity first, as for `runtime_web_read`. If `Api.Browse` did not advertise the method, the result is `unsupported` and nothing is sent. Provider errors keep their code (`permissionDenied` for code 2) and never return remote text.
+
+The result keeps the complete bounded JSON in `value`, including vendor fields the Host does not interpret, and the host request/receive times. Alarm and diagnostic-buffer results also report `entries` and `truncated`. `truncated` compares the entries returned with the CPU's `count_current`; it is null when the CPU does not report a total. CPU times stay as the CPU's text and are not reparsed. Use the host times to bound the latency of a clock comparison.
+
+The Host does not acknowledge alarms, apply filters or alarm IDs, set the clock or change the operating mode. It does not send the R/H `redundancy_id`, so redundant systems read their default CPU only. `Plc.ReadMemoryInformation` and `Plc.ReadRuntimeInformation` are not exposed. A snapshot is not lossless alarm or event history, and project information does not prove which program is loaded. Request and result shapes come from Siemens documentation and the [Siemens Web API client](https://github.com/siemens/simatic-s7-webserver-api); only protocol-fake tests cover them, no CPU.
+
 ## Interruption and cleanup
 
 The Host writes intent before login. A lost or malformed login response remains `remoteSessionUnknown`; a different attempt ID cannot bypass that unresolved endpoint reservation. An authoritative login rejection is `notConnected`. Logout intent is likewise retained before dispatch, and a lost logout response is never automatically retried.
@@ -49,7 +72,7 @@ If the remote outcome cannot be established, `runtime_web_disconnect` with expli
 
 The [session baseline](../verification/physical-runtime-sessions-20261017.md) and [profile verification record](../verification/physical-runtime-profiles-20261017.md) distinguishes focused tests from frozen aggregate/package validation. The loopback harness uses actual TLS, actual DPAPI and actual MCP Host processes, including a forced restart; it does not contact a physical PLC or change OS trust.
 
-Remaining RT-02 work includes genuine firmware-specific profile transcripts, additional device/I&M observations, unresolved alternate quantity spellings and broader transport/compatibility stress cases. RT-03 capture/reopen/export, OPC UA, diagnostics, program association, all write/control gates and the rest of D16 remain open. These tools do not enable forcing, PLC writes, download or RUN/STOP.
+Remaining RT-02 work includes genuine firmware-specific profile transcripts, additional device/I&M observations, unresolved alternate quantity spellings and broader transport/compatibility stress cases. RT-03 capture/reopen/export, OPC UA, physical qualification of the [CPU diagnostics](#cpu-diagnostics), program association, all write/control gates and the rest of D16 remain open. These tools do not enable forcing, PLC writes, download or RUN/STOP.
 
 ## Sources
 

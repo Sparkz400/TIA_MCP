@@ -19,6 +19,7 @@ internal sealed partial class FixtureServer : StandardServer
     internal int FailValueReads, DropPublishResponses;
     internal int ActivationRequests;
     internal uint ReactivationFailure;
+    internal bool ReactivationFailureOnce;
     internal string? ModeAfterReactivation;
     internal string? TrustedClientSha256;
     internal readonly ConcurrentQueue<object> ClientCertificateChecks = new();
@@ -153,7 +154,7 @@ internal sealed partial class FixtureServer : StandardServer
         SignatureData userSignature,CancellationToken ct)
     {
         Interlocked.Increment(ref ActivationRequests);
-        if(ReactivationFailure!=0)throw new ServiceResultException(ReactivationFailure);
+        if(ReactivationFailure!=0){uint failure=ReactivationFailure;if(ReactivationFailureOnce)ReactivationFailure=0;throw new ServiceResultException(failure);}
         var result=await base.ActivateSessionAsync(channel,header,signature,certificates,locales,identity,userSignature,ct);
         if(ModeAfterReactivation is { } mode){Mode=mode;ModeAfterReactivation=null;}
         return result;

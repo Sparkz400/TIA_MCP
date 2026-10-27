@@ -24,6 +24,8 @@ public sealed class FeatureCatalog
         return new FeatureCatalog(reader.ReadToEnd());
     }
 
+    public bool HasChangeKind(string kind) => _features.Any(f => f.TryGetProperty("changeKind", out var k) && k.ValueKind == JsonValueKind.String && k.GetString() == kind);
+
     public object Query(string? featureId = null, string? domain = null, string? implementationStatus = null,
         int offset = 0, int maxItems = 100)
     {

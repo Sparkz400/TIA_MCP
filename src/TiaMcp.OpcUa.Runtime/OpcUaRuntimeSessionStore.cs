@@ -220,8 +220,9 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
     }
     internal async Task Release(string attemptId,string captureId)
     { await gate.WaitAsync();try {if(acquisition.GetValueOrDefault(attemptId)==captureId)acquisition.Remove(attemptId);}finally{gate.Release();} }
-    internal async Task ReconnectAcquisition(string attemptId,string captureId,CancellationToken ct)
+    internal async Task<(string? Transfer,string? Status)> ReconnectAcquisition(string attemptId,string captureId,CancellationToken ct)
     {
+        (string?,string?) transfer=default;
         using var deadline=Deadline(ct);await gate.WaitAsync(deadline.Token);
         try
         {
@@ -234,8 +235,8 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             {
                 if(ClientCertificateState(certificate)!="current")throw Error("UaClientIdentityTimeInvalid");
                 if(status.Selection.Authentication=="username")
-                    credentialConsumer(status.Selection,_=>entry.Client.Reconnect(deadline.Token).GetAwaiter().GetResult());
-                else await entry.Client.Reconnect(deadline.Token);
+                    credentialConsumer(status.Selection,_=>transfer=entry.Client.Reconnect(deadline.Token).GetAwaiter().GetResult());
+                else transfer=await entry.Client.Reconnect(deadline.Token);
                 status=status with {State="connected",ErrorCode=null,OperationErrorCode=null,UpdatedAt=DateTimeOffset.UtcNow};
             }
             catch(Exception e)
@@ -248,6 +249,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             // Never expose a recovered transport if its durable status could not be published.
             try {Save(status);live[attemptId]=new(entry.Client,status);}
             catch {entry.Client.Invalidate();throw;}
+            return transfer;
         }
         finally {gate.Release();}
     }

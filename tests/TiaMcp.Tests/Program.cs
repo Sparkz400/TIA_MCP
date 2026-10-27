@@ -112,6 +112,8 @@ internal static partial class Program
             ("Technology selection and fingerprints refuse incomplete scans", TechnologySelectionTests.TraversalBounds),
             ("Technology deletion verifies the selected path without replay", TechnologySelectionTests.DeleteVerification),
             ("Technology fingerprints retain group paths and type identity", TechnologySelectionTests.FingerprintIdentity),
+            ("Alarm workbook rows keep exported cell text within row and cell bounds", AlarmWorkbookTests.RowsAndBounds),
+            ("Alarm workbook parts reject DTDs", AlarmWorkbookTests.RejectsDtd),
             ("Technology reads exclude sensitive and unknown-access values before getters", TechnologyReadTests.AccessAndExclusions),
             ("Technology reads preserve scalar types and explicit capture errors", TechnologyReadTests.ValuesAndErrors),
             ("Technology parameter capture bounds filtered traversal", TechnologyReadTests.BoundedCapture),

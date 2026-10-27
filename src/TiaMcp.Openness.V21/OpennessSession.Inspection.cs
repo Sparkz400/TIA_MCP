@@ -137,6 +137,7 @@ namespace TiaMcp.Openness.V21
 
         private JObject TypeRead(JObject args)
         {
+            if (args.Value<string>("format") != null) return FormatRead(args, "type", "typePath", "typeName");
             var plc = SelectInspectionPlc(args, "typePath");
             string path = args.Value<string>("typePath");
             string name = args.Value<string>("typeName");
@@ -223,6 +224,9 @@ namespace TiaMcp.Openness.V21
                     row["networkObservation"] = network == null ? "notExposed" : "observed";
                     if (network != null)
                         row["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings);
+                    row["gsd"] = GsdInfo(entry.Item.GetService<GsdDeviceItem>());
+                    if (entry.Item.Parent is Device device && device.IsGsd) row["gsdDevice"] = GsdInfo(device.GetService<GsdDevice>());
+                    row["gsdExportAvailable"] = entry.Item.GetService<GsdExportProvider>() != null;
                     row["attributes"] = InspectionAttributes(entry.Item, budget, warnings, entry.Path);
                 }
                 catch (Exception exception) { warnings.Add(InspectionWarning(entry.Path, exception)); }
@@ -235,7 +239,7 @@ namespace TiaMcp.Openness.V21
             result["project"] = ProjectInfo(project);
             result["items"] = items;
             result["warnings"] = warnings;
-            result["completeness"] = InspectionCoverage(budget, warnings, "Configured hardware attributes, address ranges, channels, subnet memberships and I/O-controller/connector associations exposed by V21 Openness.",
+            result["completeness"] = InspectionCoverage(budget, warnings, "Configured hardware attributes, address ranges, channels, subnet memberships, I/O-controller/connector associations, port interconnections and GSD identities exposed by V21 Openness.",
                 "Channel terminal/signal mappings only when exposed as native attributes; no guessed byte-per-channel allocation", "No electrical wiring or runtime diagnostics", "Attribute values limited to 4096 characters");
             return result;
         }
@@ -293,10 +297,10 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        private JObject SafetyInspect(JObject args)
+        private JObject SafetyInspect(JObject args, bool validation = false)
         {
             var plc = SelectPlc(args);
-            var administration = SafetyAdministrationFor(plc.Software);
+            var administration = SafetyAdministrationFor(plc.Software, out var cpu);
             if (administration == null) throw new BridgeException("UnsupportedCapability", "SafetyAdministration is not available for this PLC/software configuration.");
             var budget = new ScanBudget(Limit(args, 500));
             var warnings = new JArray();
@@ -339,13 +343,20 @@ namespace TiaMcp.Openness.V21
                 result["blockSignatures"] = blockSignatures;
                 result["blockSignatureServiceAvailable"] = provider != null;
             }
+            if (validation) InspectSafetyValidation(plc, cpu, args, budget, warnings, result);
             result["warnings"] = warnings;
-            result["completeness"] = InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings and program/block signatures.",
-                "Reading signatures does not validate or approve a safety program", "No safety login, compile, download, acceptance or runtime operation performed");
+            result["completeness"] = validation
+                ? InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings, program/block signatures, Failsafe_* parameters of the PLC and its F-I/O, and Safety Validation Assistant activation tests.",
+                    "Reading signatures, F-parameters or test validity does not validate or approve a safety program", "Activation tests are project-level; evaluation-device correlation is by name only",
+                    "No safety login, compile, download, activation-test execution, result reset, acceptance or runtime operation performed")
+                : InspectionCoverage(budget, warnings, "Offline native safety runtime-group configuration, settings and program/block signatures.",
+                    "Reading signatures does not validate or approve a safety program", "No safety login, compile, download, acceptance or runtime operation performed");
             return result;
         }
 
-        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software)
+        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software) => SafetyAdministrationFor(software, out _);
+
+        private static SafetyAdministration SafetyAdministrationFor(PlcSoftware software, out DeviceItem cpu)
         {
             // V21 exposes this service on the PLC DeviceItem, not PlcSoftware.
             // Follow native ownership rather than selecting another CPU by name.
@@ -354,8 +365,9 @@ namespace TiaMcp.Openness.V21
             {
                 if (!(owner is DeviceItem device)) continue;
                 var administration = device.GetService<SafetyAdministration>();
-                if (administration != null) return administration;
+                if (administration != null) { cpu = device; return administration; }
             }
+            cpu = null;
             return null;
         }
 

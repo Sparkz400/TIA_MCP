@@ -675,7 +675,25 @@
       ]
     },
     {
+      "featureId": "project_open.read_only",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
       "featureId": "project_retrieve",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "project_copy",
+      "obligations": [
+        "X01"
+      ]
+    },
+    {
+      "featureId": "plc_compare",
       "obligations": [
         "X01"
       ]
@@ -735,13 +753,32 @@
       ]
     },
     {
+      "featureId": "hardware_gsd_export",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
       "featureId": "technology_read",
       "obligations": [
         "D13"
       ]
     },
     {
+      "featureId": "plc_alarm_inspect",
+      "obligations": [
+        "D11",
+        "L04"
+      ]
+    },
+    {
       "featureId": "safety_inspect",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "safety_validation_inspect",
       "obligations": [
         "D14"
       ]
@@ -822,6 +859,19 @@
       "featureId": "simulation_provision_scratch_credential",
       "obligations": [
         "L03"
+      ]
+    },
+    {
+      "featureId": "plc_online_compare",
+      "obligations": [
+        "D09",
+        "C03"
+      ]
+    },
+    {
+      "featureId": "plc_station_upload",
+      "obligations": [
+        "D09"
       ]
     },
     {
@@ -982,6 +1032,24 @@
       ]
     },
     {
+      "featureId": "change.block_protect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_unprotect",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_write_protection_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
       "featureId": "change.graphical_operand_set",
       "obligations": [
         "L01",
@@ -1032,6 +1100,25 @@
     },
     {
       "featureId": "change.to_delete",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.to_connect",
+      "obligations": [
+        "D13",
+        "C02"
+      ]
+    },
+    {
+      "featureId": "change.to_disconnect",
+      "obligations": [
+        "D13"
+      ]
+    },
+    {
+      "featureId": "change.to_child_create",
       "obligations": [
         "D13"
       ]
@@ -1268,6 +1355,31 @@
       "featureId": "change.group_delete",
       "obligations": [
         "X11"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_create",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_relation_set",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_publication_set",
+      "obligations": [
+        "D07",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_delete",
+      "obligations": [
+        "D07"
       ]
     },
     {
@@ -1674,6 +1786,24 @@
     },
     {
       "featureId": "change.hardware_cpu_memory_bytes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_connect",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_port_disconnect",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_replace",
       "obligations": [
         "X10"
       ]
@@ -2148,6 +2278,18 @@
       ]
     },
     {
+      "featureId": "opcua_engineering_inspect",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_engineering_export",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
       "featureId": "qualification_watch_authoring_source_negative",
       "obligations": [
         "D02"
@@ -2191,6 +2333,12 @@
     },
     {
       "featureId": "translation_native_reconcile",
+      "obligations": [
+        "D03"
+      ]
+    },
+    {
+      "featureId": "project_text_export",
       "obligations": [
         "D03"
       ]
@@ -2298,7 +2446,25 @@
       ]
     },
     {
+      "featureId": "graph_export",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
+      "featureId": "change.graph_import",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
       "featureId": "vci_branches",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_workspace_inspect",
       "obligations": [
         "D01"
       ]
@@ -2374,6 +2540,24 @@
       "obligations": [
         "D06",
         "C04"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_inventory",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "testsuite_application_plan_prepare",
+      "obligations": [
+        "D06"
+      ]
+    },
+    {
+      "featureId": "change.testsuite_application_import",
+      "obligations": [
+        "D06"
       ]
     },
     {
@@ -2460,6 +2644,25 @@
         "D10",
         "F02",
         "L05"
+      ]
+    },
+    {
+      "featureId": "access_inspect",
+      "obligations": [
+        "X03",
+        "D12"
+      ]
+    },
+    {
+      "featureId": "certificate_inspect",
+      "obligations": [
+        "X03"
+      ]
+    },
+    {
+      "featureId": "web_inspect",
+      "obligations": [
+        "D12"
       ]
     },
     {
@@ -2612,6 +2815,12 @@
       ]
     },
     {
+      "featureId": "runtime_web_diagnostics",
+      "obligations": [
+        "D16"
+      ]
+    },
+    {
       "featureId": "runtime_web_status",
       "obligations": [
         "D16"
@@ -2626,7 +2835,9 @@
     {
       "featureId": "runtime_capture_start",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {
@@ -2638,7 +2849,9 @@
     {
       "featureId": "runtime_capture_stop",
       "obligations": [
-        "D16"
+        "D16",
+        "D17",
+        "L03"
       ]
     },
     {
@@ -2739,6 +2952,18 @@
         "C02",
         "F02",
         "L05"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_capture",
+      "obligations": [
+        "C02"
+      ]
+    },
+    {
+      "featureId": "composite_engineering_rebind_plan",
+      "obligations": [
+        "C02"
       ]
     },
     {
@@ -3034,6 +3259,114 @@
         "D16",
         "D17",
         "C04"
+      ]
+    },
+    {
+      "featureId": "change.cax_import",
+      "obligations": [
+        "D05"
+      ]
+    },
+    {
+      "featureId": "cax_export",
+      "obligations": [
+        "D05"
+      ]
+    },
+    {
+      "featureId": "change.drive_parameter_set",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "drive_observe",
+      "obligations": [
+        "D10"
+      ]
+    },
+    {
+      "featureId": "plc.document_formats",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_document_inventory",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_loadable_generate",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_text_list_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_instance_text_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_alarm_class_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_settings_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.plc_supervision_import",
+      "obligations": [
+        "D11"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_server_interface_enable",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "change.opcua_role_mapping_set",
+      "obligations": [
+        "D04"
       ]
     }
   ],

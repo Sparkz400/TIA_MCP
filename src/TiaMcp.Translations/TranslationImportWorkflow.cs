@@ -302,7 +302,7 @@ public sealed class TranslationImportWorkflow
             binding.BaselineContentSha256 == Content(candidate.Baseline) && binding.CandidateContentSha256 == Content(candidate.Candidate),
             "TranslationIntegrityFailure", "Operation differs from its exact approved candidate and original capture.");
         _ = artifacts.ReadBytes(binding.Candidate); _ = Open(binding.Baseline, candidate); VerifyReceipt(binding.Baseline);
-        return new(root, op, binding.CandidateRef, binding.CandidateReceiptSha256, binding.Candidate.Sha256, Clone(binding.Baseline.Scope));
+        return new(root, op, binding.CandidateRef, binding.CandidateReceiptSha256, binding.Candidate.Sha256, Clone(binding.Baseline.Scope), candidate.UpdateSourceLanguage);
     }
     private TranslationImportBinding Binding(EngineeringOperationRecord op) => artifacts.Read<TranslationImportBinding>(op.Plan.Inputs[0]);
     private TranslationImportCandidate Candidate(TranslationImportBinding b)
@@ -342,12 +342,13 @@ public sealed class TranslationImportWorkflow
     {
         foreach (var row in value.Baseline.Profile.Rows)
         {
-            Require(value.Baseline.ReadText(row.SourceCell) == value.Candidate.ReadText(row.SourceCell),
-                "TranslationImportShapeUnqualified", "The initial import packet permits no source-language edits.");
-            foreach (var cell in row.Targets)
+            // Source cells may change only under the review's separately approved source-text mode, with the target rules below.
+            foreach (var location in row.Targets.Select(t => t.Location).Prepend(row.SourceCell))
             {
-                var before = value.Baseline.ReadText(cell.Location); var after = value.Candidate.ReadText(cell.Location);
+                var before = value.Baseline.ReadText(location); var after = value.Candidate.ReadText(location);
                 if (before == after) continue;
+                Require(location != row.SourceCell || value.UpdateSourceLanguage,
+                    "TranslationImportShapeUnqualified", "Source-language edits require the separately approved source-text mode.");
                 Require(before.State == "text" && after.State == "text" && !before.RichText && !after.RichText &&
                     !string.IsNullOrWhiteSpace(before.Text) && !string.IsNullOrWhiteSpace(after.Text),
                     "TranslationImportShapeUnqualified", "Only nonempty plain existing targets are eligible for this disabled adapter; clear, missing, empty and rich-text writes need separate qualification.");

@@ -66,6 +66,7 @@ namespace TiaMcp.Openness.V21
                 case "translation_begin": return TranslationBegin(arguments);
                 case "translation_stage": return TranslationStage(arguments);
                 case "translation_end": return TranslationEnd(arguments);
+                case "project_text_export": return ProjectTextExport(arguments);
                 case "testsuite_style_begin": return TestSuiteBegin(arguments);
                 case "testsuite_scope_probe": return TestSuiteScopeProbe(arguments);
 #if TESTSUITE_QUALIFICATION
@@ -73,6 +74,7 @@ namespace TiaMcp.Openness.V21
                 case "testsuite_qualification_fault": return TestSuiteQualificationFault(arguments);
 #endif
                 case "testsuite_style_prerequisites": return TestSuitePrerequisites(arguments);
+                case "testsuite_application_inventory": return TestSuiteApplicationInventory(arguments);
                 case "testsuite_style_observe": return TestSuiteStage("observe", arguments);
                 case "testsuite_style_checkpoint": return TestSuiteStage("checkpoint", arguments);
                 case "testsuite_style_run": return TestSuiteStage("run", arguments);
@@ -118,19 +120,33 @@ namespace TiaMcp.Openness.V21
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_open": return ProjectOpen(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
+                case "plc_compare": return PlcCompare(arguments);
                 case "software_inspect": return SoftwareInspect(arguments);
                 case "type_read": return TypeRead(arguments);
                 case "tag_table_read": return TagTableRead(arguments);
                 case "block_interface": return BlockInterface(arguments);
                 case "hardware_inspect": return HardwareInspect(arguments);
                 case "connection_inspect": return ConnectionInspect(arguments);
+                case "hardware_gsd_export": return HardwareGsdExport(arguments);
+                case "cax_export": return CaxExport(arguments);
                 case "technology_read": return TechnologyRead(arguments);
+                case "plc_alarm_inspect": return PlcAlarmInspect(arguments);
+                case "opcua_engineering_inspect": return OpcUaEngineeringInspect(arguments);
+                case "opcua_engineering_export": return OpcUaEngineeringExport(arguments);
+                case "drive_observe": return Startdrive(() => DriveObserve(arguments));
                 case "safety_inspect": return SafetyInspect(arguments);
+                case "access_inspect": return AccessInspect(arguments);
+                case "certificate_inspect": return CertificateInspect(arguments);
+                case "web_inspect": return WebInspect(arguments);
+                case "vci_workspace_inspect": return VciWorkspaceInspect(arguments);
+                case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
                 case "change_impact": return ChangeImpact(arguments);
                 case "engineering_read": return EngineeringRead(arguments);
                 case "fixture_sources": return FixtureSources(arguments);
+                case "plc_document_inventory": return PlcDocumentInventory(arguments);
+                case "plc_loadable_generate": return PlcLoadableGenerate(arguments);
                 case "change_prepare": return (arguments.Value<string>("kind") ?? "").StartsWith("library_", StringComparison.Ordinal) ? LibraryChangePrepare(arguments) : ChangePrepare(arguments);
                 case "change_apply": return (arguments.Value<string>("changeId") ?? "").StartsWith("lib-", StringComparison.Ordinal) ? LibraryChangeApply(arguments) : ChangeApply(arguments);
                 case "change_status": return (arguments.Value<string>("changeId") ?? "").StartsWith("lib-", StringComparison.Ordinal) ? LibraryChangeStatus(arguments) : ChangeStatus(arguments);
@@ -145,6 +161,8 @@ namespace TiaMcp.Openness.V21
                 case "simulation_download": return SimulationDownload(arguments);
                 case "simulation_provision_scratch_credential": return SimulationProvision(arguments);
                 case "simulation_discovery_baseline": return SimulationDiscoveryBaselineOperation(arguments);
+                case "plc_online_compare": return PlcOnlineCompare(arguments);
+                case "plc_station_upload": return PlcStationUpload(arguments);
                 case "object_resolve": return ObjectResolve(arguments);
                 case "target_capabilities": return TargetCapabilities(arguments);
                 default: throw new BridgeException("UnknownOperation", "Unknown worker operation: " + operation);
@@ -178,9 +196,12 @@ namespace TiaMcp.Openness.V21
                 Capability("start", "conditional", "Explicitly starts a worker-owned TIA instance without UI; disposal requests connection release. Siemens closes the instance when no other Openness client remains."),
                 Capability("catalog_query", "conditional", "Queries the installed hardware catalog of the attached V21 instance; an open project is required."),
                 Capability("scratch_create", "conditional", "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."),
-                Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade."),
+                Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade. readOnly opens a secondary project on which every mutation is refused."),
+                Capability("project_copy", "conditional", "Archives the saved open project and retrieves it into a new owned directory as a closed copy; the source is never saved or changed."),
+                Capability("plc_compare", "conditional", "Bounded offline PlcSoftware.CompareTo tree against another PLC in the project or an open library; no online compare."),
                 Capability("software_inspect", "conditional", "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."),
                 Capability("hardware_inspect", "conditional", "Offline hardware attributes, configured address ranges, network and exposed channel metadata; coverage varies by module."),
+                Capability("drive_observe", "conditional", "Offline SINAMICS drive objects, parameters, BICO references and telegrams through the optional Startdrive Openness assembly; absent Startdrive reports UnsupportedCapability."),
                 Capability("static_analysis", "conditional", "Native cross-reference call graphs, readers/writers, I/O associations and change impact. Indirect access and unresolved instance propagation remain explicit gaps."),
                 Capability("recoverable_changes", "conditional", "Prepare/apply with preview hashes, conflict detection, recovery archive, persistent journal and compile results. Supported source/XML and typed engineering subsets only."),
                 Capability("library_management", "conditional", "Managed global/project libraries, exact native type/version inspection, native copies, constrained authoring/update operations and durable resource journals. HMI products and native target qualification remain separate prerequisites."),
@@ -245,7 +266,7 @@ namespace TiaMcp.Openness.V21
             result["disconnectBehavior"] = _ownsPortal ? "Dispose this connection. Siemens closes the headless instance when this is its last attached Openness client; process exit is not verified. Only explicitly saved scratch data is retained." : "Dispose only this Openness attachment; the user-owned TIA instance remains open.";
             if ((_testSuiteScopeProbe || _testSuiteQualification) && _ownsPortal)
                 result["disconnectBehavior"] = "Dispose this connection and publicly close its exact worker-created scope-probe UI process. The qualification controller must independently verify its exit through the original retained handle.";
-            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(ProjectInfo));
+            result["projects"] = _portal == null ? new JArray() : new JArray(_portal.Projects.Select(p => { var info = ProjectInfo(p); info["readOnly"] = !p.IsPrimary; return info; }));
             result["capabilities"] = Capabilities();
             return result;
         }
@@ -340,6 +361,7 @@ namespace TiaMcp.Openness.V21
 
         private JObject BlockRead(JObject args)
         {
+            if (args.Value<string>("format") != null) return FormatRead(args, "block", "blockPath", "blockName");
             var selected = SelectBlock(args);
             if (selected.Block.Item.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "The selected block is know-how protected.");
             string directory = ArtifactDirectory(args);
@@ -685,12 +707,12 @@ namespace TiaMcp.Openness.V21
             return path;
         }
 
-        private static JObject FileArtifact(FileInfo file)
+        private static JObject FileArtifact(FileInfo file, string mediaType = "application/xml")
         {
             string hash;
             using (var stream = file.OpenRead())
             using (var sha = SHA256.Create()) hash = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
-            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = "application/xml" };
+            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = mediaType };
         }
 
         private sealed class HardwareEntry { internal DeviceItem Item; internal string Path; }
