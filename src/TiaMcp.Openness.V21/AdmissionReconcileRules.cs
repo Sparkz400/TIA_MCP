@@ -12,7 +12,7 @@ namespace TiaMcp.Openness.V21
         private static readonly HashSet<string> TargetKinds = new HashSet<string>(new[] {
             "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set",
             "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
-            "db_snapshot_create", "db_snapshot_load_actual" }, StringComparer.Ordinal);
+            "db_snapshot_create", "db_snapshot_load_actual", "testsuite_system_import" }, StringComparer.Ordinal);
 
         internal static bool OutcomeRecomputable(string kind) => !TargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);
 

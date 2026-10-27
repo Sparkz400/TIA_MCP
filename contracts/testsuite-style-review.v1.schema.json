@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://tia-mcp.local/contracts/testsuite-style-review.v1.schema.json",
-  "title": "Complete bounded style or application job review; no native authorization",
+  "title": "Complete bounded style, application or system job review; no native authorization",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "executionProfile", "runs", "stopSemantics"],
@@ -10,7 +10,8 @@
     "executionProfile": {"type": "string", "minLength": 1, "maxLength": 256},
     "stopSemantics": {"const": "stopBetweenRuns; active native calls are never cancelled"},
     "application": {"type": "object", "additionalProperties": false, "required": ["executionMode", "simulatorTicket", "wholeGroup"],
-      "properties": {"executionMode": {"enum": ["systemManaged", "externallyManaged"]}, "simulatorTicket": {"type": "string", "minLength": 1, "maxLength": 16384}, "wholeGroup": {"type": "boolean"}}},
+      "properties": {"executionMode": {"enum": ["systemManaged", "externallyManaged", "endpoint"]}, "simulatorTicket": {"type": "string", "minLength": 1, "maxLength": 16384}, "wholeGroup": {"type": "boolean"},
+        "serverAddress": {"type": "string", "minLength": 1, "maxLength": 2048, "pattern": "^opc\\.tcp://"}}},
     "runs": {
       "type": "array", "minItems": 1, "maxItems": 32,
       "items": {
@@ -18,11 +19,11 @@
         "properties": {
           "run": {"allOf": [
             {"$ref": "testsuite-run.v1.schema.json"},
-            {"properties": {"executionMode": {"enum": ["style", "systemManaged", "externallyManaged"]}, "blockers": {"maxItems": 0}}}
+            {"properties": {"executionMode": {"enum": ["style", "systemManaged", "externallyManaged", "endpoint"]}, "blockers": {"maxItems": 0}}}
           ]},
           "operation": {"allOf": [
             {"$ref": "engineering-operation.v1.schema.json#/$defs/plan"},
-            {"properties": {"operation": {"enum": ["testSuite.style.run", "testSuite.application.run"]}, "inputs": {"minItems": 2, "maxItems": 2}, "resources": {"minItems": 1, "maxItems": 1}}}
+            {"properties": {"operation": {"enum": ["testSuite.style.run", "testSuite.application.run", "testSuite.system.run"]}, "inputs": {"minItems": 2, "maxItems": 2}, "resources": {"minItems": 1, "maxItems": 1}}}
           ]}
         }
       }

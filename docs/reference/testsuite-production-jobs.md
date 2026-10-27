@@ -82,6 +82,24 @@ The native `TestResults` tree is retained losslessly in the existing raw format 
 
 Open gaps: production `RequireQualification` refuses on both Host and worker. System-managed mode still receives the owned instance's name, although Test Suite creates its own instance there. Checkpoint capture refuses projects that contain test sets, because sets have no export route. Preservation does not yet account for the intended `SetScope` change.
 
+## TS-06 system tests
+
+Compiled against the V21 PublicAPI only; nothing below has run natively. Ledger D06.
+
+| Entry | What it does |
+| --- | --- |
+| `testsuite_system_inventory` (read-only) | Lists the project's `SystemTestGroup`: test cases with `OPCUAServerAddress`, `OPCUAServerInterfaceType` and `OPCUAServerInterfaceFolderPath`, and the count, bounded by `maxItems` with `truncated`. `export=true` saves each listed case with `SystemTestCase.SaveToFile` as `.tst` and returns path and SHA-256. |
+| `change_prepare` kind `testsuite_system_import` | Strict import of a supplied `.tst` (`SystemTestCaseComposition.LoadFromFile`, `ImportOptions.None`, `TCLoadOptions.None`). Existing names refuse at prepare and apply; the native return value and `Find` readback must equal the reviewed names. See the [kind table](../guides/engineering-workflows.md). |
+| `testsuite_system_plan_prepare` | Same request as `testsuite_style_plan_prepare`, plus `simulatorTicket` (the `downloadTicket` of an owned `sim_create` instance), `serverAddress` (canonical `opc.tcp://<IPv4>:<port>/` of that instance) and `wholeGroup`. Definitions use the `system` (`.tst`) family. The review runs through the unchanged `testsuite_style_job_*` tools. |
+
+The review reuses the application binding with `executionMode: endpoint`. Each run is one native `SystemTestCaseExecutor.Run` call, chosen by [TestSuiteApplicationRun.Route](../../src/TiaMcp.Core/TestSuite/TestSuiteApplicationRun.cs): one case, a case list or the whole `SystemTestSystemGroup`. The operation is `testSuite.system.run`. Its required probes add `testsuite.systemService` and `simulator.ownedInstance`.
+
+System tests read and write live OPC UA nodes, so the target must be the owned PLCSIM instance. Observation and dispatch decode the ticket as for application tests, and `serverAddress` must be one of the instance's `ControllerIP` addresses; anything else refuses with `RuntimeTargetNotOwnedPlcsim`. Before the single Run, every reviewed case must re-export to its original bytes, and a whole-group run refuses unreviewed cases. `SetScope(serverAddress, ServerInterfaces.StandardSIMATIC)` is then written to every reviewed case after the checkpoint and is never replayed.
+
+Results use the same raw format and `TestSuiteApplicationRun.Captures`: one tree per Run, owned exactly only by a one-definition run. Warning and Information states, which include inconclusive runtime outcomes, never pass.
+
+Open gaps: execution stays disabled behind the same code-owned gate. Only the StandardSIMATIC interface is offered; UserDefined and SiOME need `SetScope(..., DirectoryInfo)` with a hash-pinned interface folder. The V21 API has no credential or security-policy argument, so only anonymous OPC UA endpoints are possible. Interface folders are neither exported nor imported. V21 has no system-test set type.
+
 ## Verification and integration handoff
 
 Evidence is isolated under `artifacts/ts03-production-20261016/`. The handoff (`artifacts/ts03-production-20261016/handoff.json`) records final commands, results, changed-file ownership and source hashes. Shared catalog handoff (`artifacts/ts03-production-20261016/shared-catalog-handoff.json`) records the pre/post hashes of append-only TS entries; unrelated current records were preserved. No shared Host startup, worker dispatch, project references, solution, WatchTable files, native reservations, frozen binaries or historical receipts were changed by this lane.
