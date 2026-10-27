@@ -147,7 +147,7 @@ def main():
     try:
         server=start_server();endpoint='https://127.0.0.1:'+str(server.server_port);c=client()
         check(server.socket.context.minimum_version==ssl.TLSVersion.TLSv1_2,'Loopback TLS fixture refuses protocols below TLS 1.2')
-        tools=c.request('tools/list')['tools'];check(len([t for t in tools if t['name'].startswith('runtime_web_')])==6,'Six runtime tools registered')
+        tools=c.request('tools/list')['tools'];check(len([t for t in tools if t['name'].startswith('runtime_web_')])==7,'Seven runtime tools registered')
         alias_root=out/'owner-alias';(alias_root/'runtime-web').mkdir(parents=True)
         marker=out/'owner-target.txt';marker.write_text('retained-owner-marker')
         os.link(marker,alias_root/'runtime-web/owner.lock');other=client(alias_root)
