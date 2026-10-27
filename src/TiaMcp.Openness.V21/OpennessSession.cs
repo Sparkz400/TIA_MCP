@@ -142,6 +142,8 @@ namespace TiaMcp.Openness.V21
                 case "change_impact": return ChangeImpact(arguments);
                 case "engineering_read": return EngineeringRead(arguments);
                 case "fixture_sources": return FixtureSources(arguments);
+                case "plc_document_inventory": return PlcDocumentInventory(arguments);
+                case "plc_loadable_generate": return PlcLoadableGenerate(arguments);
                 case "change_prepare": return (arguments.Value<string>("kind") ?? "").StartsWith("library_", StringComparison.Ordinal) ? LibraryChangePrepare(arguments) : ChangePrepare(arguments);
                 case "change_apply": return (arguments.Value<string>("changeId") ?? "").StartsWith("lib-", StringComparison.Ordinal) ? LibraryChangeApply(arguments) : ChangeApply(arguments);
                 case "change_status": return (arguments.Value<string>("changeId") ?? "").StartsWith("lib-", StringComparison.Ordinal) ? LibraryChangeStatus(arguments) : ChangeStatus(arguments);
@@ -352,6 +354,7 @@ namespace TiaMcp.Openness.V21
 
         private JObject BlockRead(JObject args)
         {
+            if (args.Value<string>("format") != null) return FormatRead(args, "block", "blockPath", "blockName");
             var selected = SelectBlock(args);
             if (selected.Block.Item.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "The selected block is know-how protected.");
             string directory = ArtifactDirectory(args);
@@ -697,12 +700,12 @@ namespace TiaMcp.Openness.V21
             return path;
         }
 
-        private static JObject FileArtifact(FileInfo file)
+        private static JObject FileArtifact(FileInfo file, string mediaType = "application/xml")
         {
             string hash;
             using (var stream = file.OpenRead())
             using (var sha = SHA256.Create()) hash = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
-            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = "application/xml" };
+            return new JObject { ["path"] = file.FullName, ["bytes"] = file.Length, ["sha256"] = hash, ["mediaType"] = mediaType };
         }
 
         private sealed class HardwareEntry { internal DeviceItem Item; internal string Path; }

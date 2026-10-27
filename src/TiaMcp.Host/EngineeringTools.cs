@@ -48,9 +48,19 @@ public sealed partial class TiaTools
         => Call("software_inspect", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "type_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect.")]
-    public Task<CallToolResult> TypeRead(CancellationToken cancellationToken, string? typeName = null, string? typePath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? scopePath = null)
-        => Call("type_read", new { typeName, typePath, projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its .udt external source file; both return SHA-256 hashed artifacts instead of parsed members.")]
+    public Task<CallToolResult> TypeRead(CancellationToken cancellationToken, string? typeName = null, string? typePath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? scopePath = null, string? format = null)
+        => Call("type_read", new { typeName, typePath, projectName, plcPath, scopePath, format, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "plc_document_inventory", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("List native PLC documents (PlcDocument below PLC data type groups) of a PLC or exact software scope, bounded by maxItems with explicit truncation. exportPaths exports those exact document paths as SIMATIC SD files with SHA-256 into the artifact directory. No project changes.")]
+    public Task<CallToolResult> PlcDocumentInventory(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null, int maxItems = 500, string[]? exportPaths = null)
+        => Call("plc_document_inventory", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems), exportPaths, artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "plc_loadable_generate", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Generate a native loadable file for exact non-unit blockPaths or exact software unitPaths with an explicit target (plc or plcSim) into the artifact directory with SHA-256. Refuses inconsistent objects instead of compiling. Never downloads, connects to a PLC/PLCSIM or changes runtime state.")]
+    public Task<CallToolResult> PlcLoadableGenerate(string target, CancellationToken cancellationToken, string[]? blockPaths = null, string[]? unitPaths = null, string? projectName = null, string? plcPath = null)
+        => Call("plc_loadable_generate", new { target, blockPaths, unitPaths, projectName, plcPath, artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "tag_table_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Export a selected tag table as unchanged native XML including constants and multilingual comments. Select tagTableName or tagTablePath from software_inspect.")]

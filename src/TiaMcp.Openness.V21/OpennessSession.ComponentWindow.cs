@@ -192,6 +192,7 @@ namespace TiaMcp.Openness.V21
                 !project.Path.FullName.StartsWith(Path.Combine(_componentWindowManifest.Value<string>("workspace"), "recovery") + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("ComponentResourceEscape", "Readback project is outside the admitted original/recovery resources.");
             var request = (JObject)(args["arguments"] as JObject ?? new JObject()).DeepClone();
+            if (request.Value<string>("format") != null) throw new BridgeException("InvalidRequest", "Component readback uses the default native XML export only.");
             if (request.Value<string>("projectName") != null && request.Value<string>("projectName") != project.Name ||
                 request.Value<string>("plcPath") != null && request.Value<string>("plcPath") != _componentWindowManifest.Value<string>("plcPath"))
                 throw new BridgeException("ComponentResourceEscape", "Readback selector escaped the admitted component project/PLC.");

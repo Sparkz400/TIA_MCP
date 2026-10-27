@@ -30,6 +30,7 @@ namespace TiaMcp.Openness.V21
                 case "hardware_inspect": case "connection_inspect": case "cax_export": case "technology_read": case "safety_inspect": case "call_graph": case "plc_alarm_inspect": case "hardware_gsd_export":
                 case "access_inspect": case "certificate_inspect": case "web_inspect": case "vci_workspace_inspect": case "opcua_engineering_inspect": case "opcua_engineering_export": case "safety_validation_inspect": case "drive_observe":
                 case "symbol_trace": case "change_impact": case "engineering_read": case "fixture_sources":
+                case "plc_document_inventory": case "plc_loadable_generate":
                 case "change_status": case "object_resolve": case "target_capabilities":
                 case "library_list": case "library_query": case "library_compare": case "library_export": case "library_capabilities": return;
                 default: _projectIndexes.Invalidate(operation); _indexRequests.Clear(); InvalidateProjectModels(operation); return;

@@ -3189,6 +3189,24 @@
       "obligations": [
         "D10"
       ]
+    },
+    {
+      "featureId": "plc.document_formats",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_document_inventory",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "plc_loadable_generate",
+      "obligations": [
+        "X11"
+      ]
     }
   ],
   "manualResiduals": [
