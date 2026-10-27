@@ -150,7 +150,10 @@ def validate_seeded_providers(nodes, technology, units):
         require(len(rows) == 1, "Seeded %s %s must appear exactly once" % (kind, name))
         return rows[0]
     unit_a, unit_b = one("softwareUnit", UNIT_A), one("softwareUnit", UNIT_B)
-    module = one("hardware", ENCODER_MODULE_NAME)["objectPath"]
+    # TIA names the module's submodule like the module itself; the top-level item is the module.
+    modules = sorted((node["objectPath"] for node in nodes if node["kind"] == "hardware" and node["name"] == ENCODER_MODULE_NAME), key=len)
+    require(modules and all(path.startswith(modules[0] + "/") for path in modules[1:]), "Seeded module %s is ambiguous: %r" % (ENCODER_MODULE_NAME, modules))
+    module = modules[0]
     require(units.get(unit_a["objectPath"]) == [[UNIT_B, unit_b["objectPath"]]], "Seeded unit relation did not resolve to unit B")
     require(units.get(unit_b["objectPath"]) == [], "Unit B must have no relation")
     targets = technology.get(one("technologyObject", ENCODER)["objectPath"], [])
@@ -350,7 +353,7 @@ def run(args):
         units = {}
         if report["plcPath"]:
             software = call("software_inspect", {"plcPath": report["plcPath"], "maxItems": 2000})
-            for unit in [row for row in software.get("units", []) if row.get("relations") is not None][:args.max_objects]:
+            for unit in [row for row in software.get("softwareScopes", []) if row.get("relations") is not None][:args.max_objects]:
                 graph = model("relationships", reference=exact_reference(snapshot, by_path[unit["path"]]), kinds=["unitRelation"], direction="out", depth=1, maxNodes=50, maxEdges=200)
                 require_complete_coverage(graph, "softwareUnitRelations", unit["path"])
                 units[unit["path"]] = validate_unit_edges(graph, unit["path"], unit["relations"], nodes)

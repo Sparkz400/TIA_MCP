@@ -89,7 +89,8 @@ class TechnologyAndUnitOracleTests(unittest.TestCase):
 class SeededFixtureTests(unittest.TestCase):
     MODULE = "/projects/Fx/devices/PLC/items/Rail/items/" + ENCODER_MODULE_NAME
     NODES = [{"kind": "softwareUnit", "name": UNIT_A, "objectPath": "/u/A"}, {"kind": "softwareUnit", "name": UNIT_B, "objectPath": "/u/B"},
-             {"kind": "hardware", "name": ENCODER_MODULE_NAME, "objectPath": MODULE}, {"kind": "technologyObject", "name": ENCODER, "objectPath": "/to/E"}]
+             {"kind": "hardware", "name": ENCODER_MODULE_NAME, "objectPath": MODULE},
+             {"kind": "hardware", "name": ENCODER_MODULE_NAME, "objectPath": MODULE + "/items/" + ENCODER_MODULE_NAME}, {"kind": "technologyObject", "name": ENCODER, "objectPath": "/to/E"}]
 
     def test_exact_seeded_relations_pass(self):
         validate_seeded_providers(self.NODES, {"/to/E": [self.MODULE + "/items/Channel"]}, {"/u/A": [[UNIT_B, "/u/B"]], "/u/B": []})
@@ -103,6 +104,9 @@ class SeededFixtureTests(unittest.TestCase):
                 ({"/to/E": [self.MODULE + "Other"]}, good_units)):
             with self.assertRaises(AssertionError):
                 validate_seeded_providers(self.NODES, technology, units)
+        foreign = self.NODES + [{"kind": "hardware", "name": ENCODER_MODULE_NAME, "objectPath": "/projects/Fx/devices/Other/items/" + ENCODER_MODULE_NAME + "_x"}]
+        with self.assertRaises(AssertionError):
+            validate_seeded_providers(foreign, good_technology, good_units)
 
     def test_partial_or_undeclared_coverage_fails(self):
         graph = {"providerScope": {"providers": ["softwareUnitRelations"]},
