@@ -2069,6 +2069,18 @@
       ]
     },
     {
+      "featureId": "opcua_engineering_inspect",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
+      "featureId": "opcua_engineering_export",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
       "featureId": "qualification_watch_authoring_source_negative",
       "obligations": [
         "D02"

@@ -13061,6 +13061,94 @@
       ]
     },
     {
+      "featureId": "opcua_engineering_inspect",
+      "domain": "opc_ua",
+      "title": "Inspect native OPC UA server engineering",
+      "mcpTools": [
+        "opcua_engineering_inspect"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PlcSoftware.GetService<OpcUaProvider>().CommunicationGroup.ServerInterfaceGroup: ServerInterfaces, SimaticInterfaces, ReferenceNamespaces, AccessControl.NamespaceAccessRestrictions and AccessControl.RoleMappings with NamespacePermissions; DeviceItem.GetAttributeInfos/GetAttribute on the CPU and its sub-items."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Server settings are the CPU and sub-item attributes whose native names contain OpcUa. V21 documents no fixed per-CPU attribute list, so settings exposed under other names are not reported; hardware_inspect reads all attributes.",
+          "Reads interface name, enabled, author, timestamps, SIMATIC/reference NodeId and generation flags, namespace access restrictions and role mappings with namespace permissions. Multilingual comments, legacy OPC UA users, certificates, client interfaces and per-node permissions are not read.",
+          "A missing provider or server interface group is reported as notExposed, not as proof that the CPU has no OPC UA server. maxItems bounds sub-items, attributes and rows together; truncation and native read failures stay explicit."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "S7-1500 CPU target profile whose PLC software exposes OpcUaProvider; other CPUs report only what Openness exposes"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "opcua_engineering_export",
+      "domain": "opc_ua",
+      "title": "Export native OPC UA XML into the offline NodeSet store",
+      "mcpTools": [
+        "opcua_engineering_export"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ServerInterface.Export(FileInfo), SimaticInterface.Export(FileInfo), ReferenceNamespace.Export(FileInfo); whole-server Project.HwUtilities.Find(\"OPCUAExportProvider\") as OpcUaExportProvider with Export(DeviceItem, FileInfo)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exports one category (server, serverInterface, simaticInterface or referenceNamespace), optionally one exact name, at most 32 files, into new files under the Host artifact directory with SHA-256. Per-item export failures are warnings; the remaining files are kept.",
+          "Each exported file is read back through the artifact boundary and hash check and registered as an ordinary opcua_inspect model record. Files that are not a valid NodeSet within the 16 MiB/20000-node bounds keep their artifact and report registrationError.",
+          "The whole-server utility identifier OPCUAExportProvider and the NodeSet dialect of each export come from Siemens documentation and are not natively observed. No import, node generation, online export or record provenance beyond the tool response."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "S7-1500 CPU target profile whose PLC software exposes OpcUaProvider; other CPUs report only what Openness exposes",
+        "Writable Host artifact directory on the TIA host"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "qualification_watch_authoring_source_negative",
       "domain": "qualification",
       "title": "Owned watch stale-source negative with checkpoint and restoration",

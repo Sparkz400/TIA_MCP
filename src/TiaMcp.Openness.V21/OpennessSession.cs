@@ -123,6 +123,8 @@ namespace TiaMcp.Openness.V21
                 case "block_interface": return BlockInterface(arguments);
                 case "hardware_inspect": return HardwareInspect(arguments);
                 case "technology_read": return TechnologyRead(arguments);
+                case "opcua_engineering_inspect": return OpcUaEngineeringInspect(arguments);
+                case "opcua_engineering_export": return OpcUaEngineeringExport(arguments);
                 case "safety_inspect": return SafetyInspect(arguments);
                 case "call_graph": return CallGraph(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);
