@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.44",
-    "catalogSha256": "4a0befae55ac8dfac739af8bc9a7f6cdeb89335b0f926a687c0425ed24873908",
+    "catalogSha256": "c06f054324ca68ad535ebbcd5f7e6d246a86a1804f367935935dfed462bb1e64",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -1358,7 +1358,9 @@
         "L04",
         "X11"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -13459,7 +13461,9 @@
       "owners": [
         "D01"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -13507,7 +13511,9 @@
       "owners": [
         "D01"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -15120,7 +15126,9 @@
         "X03",
         "D12"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -15199,7 +15207,9 @@
         "D12",
         "X03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -15297,7 +15307,9 @@
         "D12",
         "X03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -15346,7 +15358,9 @@
         "D12",
         "X03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -15424,7 +15438,9 @@
       "owners": [
         "D12"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.wave-kinds.probe.20261027"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -21174,6 +21190,21 @@
       "notRetained": [
         "artifacts/object-model-live-fourth.json"
       ]
+    },
+    {
+      "id": "local.wave-kinds.probe.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "559501c2b662f6d3fde8773133d445cc3b69ac31",
+      "retained": [
+        {
+          "path": "evidence/local.wave-kinds.probe.20261027.json",
+          "sha256": "c80008cdb27cfdf2a8457c0ee2a47697e65afd577fef2f7f57ed99319c638f26"
+        }
+      ],
+      "notRetained": []
     },
     {
       "id": "typed.builders.advanced-unit.20261012",

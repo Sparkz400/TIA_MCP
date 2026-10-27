@@ -2584,6 +2584,24 @@
         "One representative kind per reconciliation route qualifies the route's reconciliation, not every kind's native mutation; library transactions are covered by the library interruption records.",
         "The save-time rule trusts the checkpoint archive's file write time; the archive hash is verified, its timestamp is not."
       ]
+    },
+    {
+      "id": "local.wave-kinds.probe.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "559501c2b662f6d3fde8773133d445cc3b69ac31",
+        "passedScope": "Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off."
+      },
+      "artifacts": [
+        "evidence/local.wave-kinds.probe.20261027.json"
+      ],
+      "limitations": [
+        "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
+        "Web page settings were only probed for their refusal; no change kind activates web serving.",
+        "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
+      ]
     }
   ],
   "features": [
@@ -4038,7 +4056,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN found a single-instance DB and call sites from xref and SimaticML (local.wave-kinds.probe.20261027); not natively qualified.",
           "One exact FB or FC in one PLC. Instance DBs resolve through the shared native InstanceType/TypeInstance or unnamespaced InstanceOfName resolver; multi-instance owners are FBs the native xref reports as users, confirmed by an exact same-scope Static declaration (including arrays with literal bounds) in their exported interface, up to maxDepth 8.",
           "Call sites list native xref call locations plus exported SCL/LAD/FBD CallInfo with compile-unit ordinal, instance components and simple symbolic actual operands; expressions, wired logic and indirect operands stay unresolved.",
           "STL and GRAPH are an unqualified symbolic scan of exported Access/CallInfo per the V21 schemas with no binding reader; native xref Open/Actions/Transition/Interlock/Supervision rows are retained. Other languages are reported unsupported and skipped.",
@@ -4047,7 +4065,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16893,7 +16913,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN created a workspace (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: groupPath, name (unused in that group), rootPath (absolute, absent or an empty directory, not overlapping another workspace root), language (exact active project culture). The root directory is created if absent.",
           "Workspace.WorkspaceLanguage has no public setter, so the language is fixed at creation. Rename, root relocation, library policy (GlobalLibraryPath, DeleteUnusedTypeVersionFromLibrary) and user group create/delete are not implemented.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -16903,7 +16923,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16946,7 +16968,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted that workspace (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: workspacePath. The preview lists every mapping (with GetStatus/GetChildStatus) removed with the workspace; the mapped engineering objects stay.",
           "Whether TIA deletes files below the root is not established: every root file is backed up first and the observed file effect is reported, not required.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -16956,7 +16978,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18587,12 +18611,14 @@
           "Administrator preservation: V21 does not mark which rights are administrative, so every engineering function right an active non-anonymous project user holds before the change must still be held by one after it (AdministratorLockout). Device function rights can be revoked.",
           "Preview carries umacBefore/umacAfter (all roles with engineering and device rights, all principals with activation and role assignments); apply read-back must equal umacAfter exactly. Effective runtime rights, UMC server membership and CPU download are not evaluated.",
           "compile=true is mandatory and compiles all project devices. The change fingerprint adds the UMAC state; interruption reconciliation holds the outcome for review.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied create, grant (device right), assign, unassign and revoke (local.wave-kinds.probe.20261027); not natively qualified."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18680,7 +18706,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied with exact public readback (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: hardwarePath (CPU), usage (Tls, OpcUaClient, OpcUaClientServer, OpcUaServer or WebServer), subjectCommonName (max 64), subjectAlternativeNames [{type: Dns|Email|Uri|IP, value}] that replace the template defaults, validFromUtc and validUntilUtc. The signature algorithm stays the template default.",
           "V21 exposes no issuer or CA selection: TIA decides between self-signed and CA-signed; the readback reports the actual issuer. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Readback requires a public export of the new certificate with exactly the requested subject, UTC validity and alternative names. How TIA interprets template times and whether it adds names is unverified; a mismatch fails after the write and needs checkpoint recovery.",
@@ -18689,7 +18715,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18782,7 +18810,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN assigned PlcCommunicationCertificate and back (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: hardwarePath (store owner CPU), targetPath (that CPU or one of its subitems), attributeName, certificateId (null unassigns) and expectedCertificateId (the current Id or null). Drift from the expected current assignment refuses at prepare and apply; readback compares the attribute's certificate Id.",
           "Web server and OPC UA server assignments are separate attributes. Their exact V21 names, whether null unassigns, and per-service usage, key and SAN suitability are unverified. HW.CertificateSupportedService (runtime certificate management) is not used as an assignment route. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
@@ -18790,7 +18818,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18832,7 +18862,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted an unassigned certificate (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: hardwarePath and certificateId. Refused when a certificate-named attribute on the owning device holds the certificate, a runtime-managed supported service or UMC trusted id names its Id, or any such reference cannot be read (fail closed).",
           "Program, connection-DB and online references to the certificate Id are not scanned, and the device compile does not prove their absence. A deleted key pair is recoverable only through the project checkpoint. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
@@ -18840,7 +18870,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18931,12 +18963,14 @@
           "Apply sets the requested application's IsDefault, then clears any other default. Read-back must equal preview.webServerAfter exactly: the flag and every application's name, type and default flag. V21 exposes no web application create, delete or rename.",
           "Watch-table and display assignments, legacy and UMAC web user rights, certificates and online deployment are not covered; nothing is downloaded.",
           "compile=true is mandatory and compiles all project devices. The change fingerprint adds every web-capable CPU's WebserverActivate value and page settings; interruption reconciliation holds the outcome for review.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN refused WebServerNotActivated (refusal only) (local.wave-kinds.probe.20261027); not natively qualified."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4a0befae55ac8dfac739af8bc9a7f6cdeb89335b0f926a687c0425ed24873908",
-      "bytes": 1114762
+      "sha256": "c06f054324ca68ad535ebbcd5f7e6d246a86a1804f367935935dfed462bb1e64",
+      "bytes": 1117174
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -91697,7 +91697,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91735,7 +91743,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91773,7 +91789,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96687,7 +96711,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96835,7 +96867,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96872,7 +96912,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96909,7 +96957,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -101677,7 +101733,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.wave-kinds.probe.20261027",
+          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "artifacts": [
+            "evidence/local.wave-kinds.probe.20261027.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -116173,6 +116237,11 @@
       "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
     },
     {
+      "path": "evidence/local.wave-kinds.probe.20261027.json",
+      "state": "observed",
+      "sha256": "c80008cdb27cfdf2a8457c0ee2a47697e65afd577fef2f7f57ed99319c638f26"
+    },
+    {
       "path": "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
       "state": "observed",
       "sha256": "566204adf0d5fcb175beec54a7a72ee338372f4f4741d2c204290a5f291a3e0d"
@@ -116685,6 +116754,10 @@
     {
       "id": "local.units.v03",
       "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672"
+    },
+    {
+      "id": "local.wave-kinds.probe.20261027",
+      "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa"
     },
     {
       "id": "reviews.native.20261009",

@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.wave-kinds.probe.20261027",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-27T22:21:21+00:00",
+  "source": {
+    "commit": "559501c2b662f6d3fde8773133d445cc3b69ac31",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off.",
+  "limitations": [
+    "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
+    "Web page settings were only probed for their refusal; no change kind activates web serving.",
+    "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "5661bb07718a7c820ba22e0896dc89707e3561c6161d9d91f0c9467833cc31ff"
+    },
+    {
+      "name": "worker",
+      "files": 6,
+      "sha256": "32b8b0571924ae1c1864a811a6c15de8c4b2b20f610ba717ae8f94469542600e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "9d7c2c6bdc9f93b38173f6d63813b8ea33b0bd9c5110929c65a7ba2a687bbeb9",
+      "bytes": 523301,
+      "completed": true,
+      "steps": [
+        "start owned TIA wave probe",
+        "create owned scratch wave probe",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply certificate_create",
+        "apply certificate_assign",
+        "apply certificate_assign",
+        "apply certificate_delete",
+        "apply source_upsert",
+        "apply vci_workspace_create",
+        "apply vci_workspace_delete"
+      ],
+      "toolsPassed": [
+        "access_inspect",
+        "certificate_inspect",
+        "change_apply",
+        "change_prepare",
+        "instance_lookup",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "vci_workspace_inspect",
+        "web_inspect"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
