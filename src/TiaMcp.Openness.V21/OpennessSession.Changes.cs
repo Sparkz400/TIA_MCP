@@ -311,6 +311,15 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("This setting affects subsequent project block compilation. It does not start a simulator or download a program.");
                     break;
                 }
+                case "project_attributes_set":
+                    change.AttributeTarget = project;
+                    preview["attributeChanges"] = PrepareAttributes(project, ChangeObject(payload, "attributes"), ProjectWriteAttributes);
+                    effects.Add(new JObject { ["projectAttributes"] = new JArray(ChangeObject(payload, "attributes").Properties().Select(p => p.Name)) });
+                    break;
+                case "project_languages_set":
+                    effects.Add(new JObject { ["languageSettings"] = new JObject { ["before"] = ProjectLanguageView(project.LanguageSettings), ["after"] = PlanProjectLanguages(project, payload, out _, out _, out _, out _) } });
+                    ((JArray)preview["warnings"]).Add("Removing an active language can discard project texts in that language; the recovery archive is the only way back.");
+                    break;
                 case "source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -644,6 +653,13 @@ namespace TiaMcp.Openness.V21
                     if (settings.IsSimulationDuringBlockCompilationEnabled != payload.Value<bool>("enabled")) throw new BridgeException("MutationVerificationFailed", "Project simulation setting did not match the requested value.");
                     break;
                 }
+                case "project_attributes_set":
+                    ApplyAttributes(project, ChangeObject(payload, "attributes"), ProjectWriteAttributes);
+                    change.Readbacks.Add(new JObject { ["role"] = "project-attributes", ["after"] = new JObject(ChangeObject(payload, "attributes").Properties().Select(p => new JProperty(p.Name, ChangeScalar(project.GetAttribute(p.Name))))) });
+                    break;
+                case "project_languages_set":
+                    ApplyProjectLanguages(change, project);
+                    break;
                 case "source_upsert":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -1007,6 +1023,7 @@ namespace TiaMcp.Openness.V21
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
+            if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
             if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind == "hardware_cpu_memory_bytes");
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {

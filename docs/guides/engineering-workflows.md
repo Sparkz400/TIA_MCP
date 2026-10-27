@@ -76,6 +76,8 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 |---|---|---|
 | `plc_compile` | Empty `{}`; exact top-level `plcPath` | Checkpointed PLC-software compilation, `compile=true`; no parameter writes/imports. Generated native state may change. |
 | `project_simulation_enable` | `enabled: true` or `false` | Sets only `IsSimulationDuringBlockCompilationEnabled`, with checkpoint and compile. Does not start or download to a simulator. |
+| `project_attributes_set` | `attributes: {...}` with any of `Author`, `Copyright`, `Family`, `Version` | Project-scoped string attributes that native attribute info reports readable and writable; preview shows before/requested values and apply records verified readback. `Comment` is multilingual and not writable here. |
+| `project_languages_set` | Any of `addActive: [...]`, `removeActive: [...]`, `referenceLanguage`, `editingLanguage` (culture names such as `"en-US"`) | Languages must be supported by the project. Removing the current or requested reference/editing language is refused, and both must be active afterwards. Apply adds, sets, then removes, and verifies the full active/reference/editing readback. Removing a language can discard its texts; the checkpoint archive is the way back. |
 | `source_upsert` | `language: "SCL"` or `"STL"`/`"AWL"`, `source`, `expectedBlockNames: [...]` | Creates or updates the explicitly declared FB/FC/OB/DB set through an external source. Existing block languages must be preserved. |
 | `block_import_xml` | `xml`, `expectedBlockNames: [...]` | Native SimaticML import for standard FB/FC/OB/DBs; also supports exported LAD/FBD XML round trips. |
 | `graphical_operand_set` | `blockName` or `blockPath`, `networkId`, `accessUid`, `components: [...]` | Changes selected existing symbolic operand components in a standard LAD/FBD network. See the narrow scope below. |
@@ -115,6 +117,10 @@ Namespaced envelopes are validated separately from short names. Namespace reloca
 Use exact native namespace casing: same-name case-only namespace aliases are rejected conservatively rather than previewed as new objects. Four negative-only source/XML/type checks against the final Release binaries passed in `artifacts/object-model-namespace-guards.json`, with unchanged selected native payloads and no apply/save operation.
 
 The worker validates the import envelope and intended scope. It does not claim to be a complete SCL/STL compiler. TIA import/generation and compilation remain authoritative, and failures may leave a partially changed project with recovery artifacts.
+
+### Project metadata and languages
+
+The read-only `project_properties` tool returns one open project's author, multilingual comment, copyright, family, version, creation/modification times, last editor, size in KB, modified/primary state, used products, history entries, language settings (supported, active, reference, editing) and text categories. Each list is bounded by `maxItems` and reports truncation; `attributeAccess` shows the native access of the `project_attributes_set` allowlist. Read it before preparing either project kind. `project_simulation_enable`, `project_attributes_set` and `project_languages_set` are project-scoped: they select no PLC and do not require compilation, but `save: true` still requires `compile: true`, which compiles the PLC selected by the outer `plcPath`. These routes compile against the V21 public API and are not natively qualified.
 
 ### Deletion dependencies and user groups
 

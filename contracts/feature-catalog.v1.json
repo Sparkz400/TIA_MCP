@@ -2918,6 +2918,47 @@
       ]
     },
     {
+      "featureId": "project_properties",
+      "domain": "project",
+      "title": "Read project metadata, history, languages and text categories",
+      "mcpTools": [
+        "project_properties"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase Author/Comment/Copyright/Family/Version/CreationTime/LastModified/LastModifiedBy/Size/IsModified/IsPrimary, UsedProducts, HistoryEntries, TextCategories, GetAttributeInfos and LanguageSettings Languages/ActiveLanguages/ReferenceLanguage/EditingLanguage."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Each list (supported languages, comment items, used products, history entries in native order, text categories) is bounded by maxItems with explicit truncation; this is a point-in-time observation, not a revision guarantee."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "One selected open project"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "software_inspect",
       "domain": "inspection",
       "title": "Read exposed software scopes, types, tags and block identities",
@@ -5476,6 +5517,104 @@
         "PLCSIM Advanced V8 installed and usable",
         "Compatible simulated CPU/program",
         "No physical PLC route"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_attributes_set",
+      "domain": "project",
+      "title": "Set reviewed project attributes",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "project_attributes_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectBase GetAttributeInfos/GetAttribute/SetAttribute for Author, Copyright, Family and Version (System.String)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Allowlist Author, Copyright, Family and Version; each must be reported readable and writable by native attribute info. Comment is a MultilingualText without a scalar attribute route and is not writable here.",
+          "Preview shows before/requested values; apply verifies native type/value readback and records it. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Offline project and a verified recovery checkpoint (checkpointSave=true)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_languages_set",
+      "domain": "project",
+      "title": "Change project active, reference and editing languages",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "project_languages_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 LanguageSettings Languages.Find(CultureInfo), ActiveLanguages.Add/Remove/Contains and settable ReferenceLanguage/EditingLanguage."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Languages must be supported by the project; removing the current or requested reference/editing language is refused, and both must be active after the change. Apply adds, then sets reference/editing, then removes, and verifies the complete active/reference/editing readback.",
+          "Removing an active language may discard project texts in that language; only the recovery archive restores them. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "Offline project and a verified recovery checkpoint (checkpointSave=true)"
       ],
       "acceptanceCriteria": [
         "AC-identity",
