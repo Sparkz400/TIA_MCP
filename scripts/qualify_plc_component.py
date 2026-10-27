@@ -357,6 +357,14 @@ def verify_preserved_installation(before, after, caller, added):
             "Caller content outside the inserted network changed beyond the accepted following-ID shift.")
 
 
+def installed_objects(after, manifest, plc, existing):
+    """Snapshot keys of the independently specified additions: FB, instance DB, UDT and a new caller."""
+    added = ["block:" + select(after["inventory"]["blocks"], name, plc)["path"]
+             for name in (manifest["root"], manifest["instance"]) + (() if existing else (manifest["caller"],))]
+    added.append("type:" + select(after["inventory"]["types"], manifest["dependency"], plc)["path"])
+    return added
+
+
 def first_available_db_number(blocks):
     used = {block['number'] for block in blocks if block['kind'] in ('DB', 'GlobalDB', 'InstanceDB')}
     return next(number for number in range(1, 65536) if number not in used)
@@ -572,7 +580,8 @@ class ComponentRun:
         self.session.close()
         return archive, released
 
-    def consumer(self, archive, released):
+    def stage_consumer(self, archive, released):
+        """Fresh consumer scratch: exact source archive, unrelated peer FC, the existing caller if selected, and mapped tags."""
         self.session.start()
         scratch = self.call("tia_create_scratch", {"cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"})
         self.report["consumerScratch"] = scratch
@@ -602,29 +611,33 @@ class ComponentRun:
         tag.find("AttributeList/LogicalAddress").text = second["address"]
         objects.append(tag)
         self.apply("tag_table_import_xml", {"xml": ET.tostring(tags, encoding="unicode"), "expectedTableNames": [self.manifest["table"]]})
-        baseline = snapshot(self.call, self.output / "before-import")
+        return scratch, opened_library, plc
+
+    def select_caller(self, baseline, plc):
         caller = plc + "/blocks/" + self.manifest["caller"]
-        if existing:
+        if self.manifest["callerMode"] == "existing":
             require(select(baseline["inventory"]["blocks"], self.manifest["caller"], plc)["path"] == caller, "Existing caller must be in the initial checkpoint.")
             network, following = terminal_network(Path(baseline["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest["language"])
             self.report["callerInitialState"] = {"mode": "existing", "path": caller, "exists": True, "calledFromOb": False,
                 "insertAfterNetworkId": network, "followingObjectIds": following}
-            caller_recipe = {"mode": "existing", "blockPath": caller, "insertAfterNetworkId": network}
-        else:
-            require(not [b for b in baseline["inventory"]["blocks"] if b["name"].lower() == self.manifest["caller"].lower()],
-                    "Standalone caller must be absent from the initial checkpoint.")
-            self.report["callerInitialState"] = {"mode": "createStandaloneFc", "path": caller, "exists": False, "calledFromOb": False}
-            caller_recipe = {"mode": "createStandaloneFc", "name": self.manifest["caller"], "language": self.manifest["language"],
-                             "numberPolicy": "firstAvailable"}
+            return caller, {"mode": "existing", "blockPath": caller, "insertAfterNetworkId": network}, network
+        require(not [b for b in baseline["inventory"]["blocks"] if b["name"].lower() == self.manifest["caller"].lower()],
+                "Standalone caller must be absent from the initial checkpoint.")
+        self.report["callerInitialState"] = {"mode": "createStandaloneFc", "path": caller, "exists": False, "calledFromOb": False}
+        return caller, {"mode": "createStandaloneFc", "name": self.manifest["caller"], "language": self.manifest["language"],
+                        "numberPolicy": "firstAvailable"}, None
+
+    def recipe(self, scratch, library, released, plc, baseline, caller_recipe):
         table = select(baseline["inventory"]["tagTables"], self.manifest["table"], plc)
         mappings = [{"parameter": signal["parameter"], "direction": signal["direction"], "dataType": signal["dataType"],
             "tagPath": select(table["tags"], signal["name"])["path"]} for signal in self.manifest["signals"]]
-        payload = {"schemaVersion": 1, "action": "plc_component_plan", "planOnly": True, "source": self.source_ref(library),
+        return {"schemaVersion": 1, "action": "plc_component_plan", "planOnly": True, "source": self.source_ref(library),
             "selection": [released[self.manifest["root"]]], "target": {"projectName": scratch["project"]["name"], "plcPath": plc},
             "integration": {"dependencyPins": [released[self.manifest["dependency"]]],
                 "instanceDb": {"name": self.manifest["instance"], "numberPolicy": "firstAvailable"},
                 "caller": caller_recipe, "mappings": mappings}}
-        prepared = self.call("change_prepare", {"kind": "library_integrate", "payload": payload})
+
+    def review_plan(self, prepared, payload, caller, existing):
         self.report["plan"] = prepared; self.persist()
         plan = prepared["preview"]["integrationPlan"]
         require(not plan["blockers"] and plan["caller"]["initiallyAbsent"] is (not existing) and plan["caller"]["blockPath"] == caller,
@@ -642,6 +655,17 @@ class ComponentRun:
         self.report["sourceContentEvidenceAttempt"]["verified"] = True
         self.report["explicitSourceAttributesVerified"] = True; self.report["sourceContentPolicyVerified"] = True; self.persist()
         require(plan["steps"][0]["prepareArguments"]["payload"]["selection"] == payload["selection"], "Planned root pin differs.")
+        return plan
+
+    def consumer(self, archive, released):
+        scratch, opened_library, plc = self.stage_consumer(archive, released)
+        library = opened_library["libraryId"]
+        existing = self.manifest["callerMode"] == "existing"
+        baseline = snapshot(self.call, self.output / "before-import")
+        caller, caller_recipe, network = self.select_caller(baseline, plc)
+        payload = self.recipe(scratch, library, released, plc, baseline, caller_recipe)
+        prepared = self.call("change_prepare", {"kind": "library_integrate", "payload": payload})
+        self.review_plan(prepared, payload, caller, existing)
         initial = self.lifetime.begin(prepared, opened_library)
         self.component_id = initial["changeId"]
 
@@ -655,9 +679,7 @@ class ComponentRun:
         installed = drive_component(self.call, initial, review, self.retain)
         self.report["installed"] = installed; self.persist()
         after = snapshot(self.call, self.output / "after-install")
-        added = ["block:" + select(after["inventory"]["blocks"], name, plc)["path"]
-                 for name in (self.manifest["root"], self.manifest["instance"]) + (() if existing else (self.manifest["caller"],))]
-        added.append("type:" + select(after["inventory"]["types"], self.manifest["dependency"], plc)["path"])
+        added = installed_objects(after, self.manifest, plc, existing)
         verify_preserved_installation(baseline, after, caller, added)
         verify_component_call(Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest)
         if existing:

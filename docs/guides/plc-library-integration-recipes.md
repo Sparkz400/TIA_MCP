@@ -118,6 +118,16 @@ The import step's complete-project archive is taken before the first mutation. I
 
 This route is compiled against the V21 PublicAPI only and is not natively qualified as a production entry point. The qualification evidence covers the owned-scratch coordinator, not this Host-gated route.
 
+The native runner `scripts/qualify_library_integrate_apply.py` qualifies this route. **It is authored but unexecuted.** It starts the frozen Host with the flag, in owned TIA sessions and owned scratch projects only, and reuses the fixture and oracles of `qualify_plc_component.py`. For a new standalone FBD FC and for an existing FBD FC caller, it prepares the plan, requires `combinedApply.eligible` and applies once. It then checks by export and inventory that exactly the FB, the UDT, the instance DB (first free number) and the caller network were added and nothing else changed. It also checks the project library versions, a fresh reopen, a compile-only change with 0 errors, and `change_restore` of the initial checkpoint into a new location, which must show the pre-change inventory after retrieval and after reopen. With the flag, an FBD OB caller (built from the scratch `Main` and the peer FC's network) and a new LAD FC must be refused. A second Host without the flag must refuse the eligible plan. Each refusal must be `PlcIntegrationNotQualified`, with the plan still `prepared` and the project unchanged. Each new scratch gets de-DE as reference and editing language, because the fixture FB carries de-DE texts. Use a Debug worker that is registered in the Openness allow-list.
+
+```powershell
+python -B scripts/qualify_library_integrate_apply.py `
+  --host <frozen-host.exe> --worker <frozen-worker.exe> `
+  --artifacts <short-artifacts-dir> --timeout 600 --run-native
+```
+
+Expected outcome: `<short-artifacts-dir>/i<6 hex>/result.json` with `status: "passed"`, all five `steps` passed, and `combinedApplyVerified`, `refusalsVerified` and `noFlagRefusalVerified` true. `runtimeVerified` stays false. A failed step stops the run with `status: "failed"`; nothing is restored or replayed automatically. Offline checks of its oracles: `python -B scripts/test_qualify_library_integrate_apply.py`.
+
 ## Verification and remaining qualification
 
 The dedicated offline suite is `dotnet run --project tests/TiaMcp.PlcLibraryIntegration.Tests`. It covers pins, interface/direction/type consistency, collisions, scope/protection/read-only inputs, strict payload fields, insertion blockers, nonmutation of inputs, actual LAD/FBD compiler acceptance against retained profiles, and the application guard's source boundary. The Openness worker is also compiled against the installed V21 references. These checks do not run TIA or establish native installation success.
