@@ -37,7 +37,7 @@
       "properties": {
         "id": {"type": "string", "minLength": 1, "maxLength": 256}, "version": {"type": "integer", "minimum": 1},
         "language": {"enum": ["LAD", "FBD"]},
-        "kind": {"enum": ["powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter"]},
+        "kind": {"enum": ["powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter", "move", "math", "edge"]},
         "instruction": {"type": ["string", "null"]}, "dataType": {"type": ["string", "null"]},
         "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
         "route": {"enum": ["standard", "softwareUnit", "namespace"]},

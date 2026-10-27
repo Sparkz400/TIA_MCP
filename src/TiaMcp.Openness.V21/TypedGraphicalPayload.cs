@@ -31,14 +31,15 @@ namespace TiaMcp.Openness.V21
             {
                 var node = Object(token, "node", operation == "editNetwork" ? "key kind nativeUid operand" : "key kind operand inputCount comparison dataType calleePath instance instruction nativeUid negated allowSharedInstance");
                 Key(node, "key", true);
-                string kinds = operation == "editNetwork" ? (language == "LAD" ? "contact coil" : "assign") : language == "LAD" ? "powerrail contact coil branch compare call timer counter" : "and or not assign compare call timer counter";
+                string kinds = operation == "editNetwork" ? (language == "LAD" ? "contact coil" : "assign") : language == "LAD" ? "powerrail contact coil branch compare call timer counter move math edge" : "and or not assign compare call timer counter move math edge";
                 string kind = Choice(node, "kind", kinds, true);
                 Key(node, "operand", kind == "contact" || kind == "coil" || kind == "assign");
-                Key(node, "instance", kind == "timer" || kind == "counter");
+                Key(node, "instance", kind == "timer" || kind == "counter" || kind == "edge");
                 Text(node, "calleePath", 4096, kind == "call");
-                Text(node, "dataType", 256, kind == "compare");
+                Text(node, "dataType", 256, kind == "compare" || kind == "move" || kind == "math");
                 Choice(node, "comparison", "eq ne lt le gt ge", kind == "compare");
-                Choice(node, "instruction", kind == "timer" ? "TON TOF TP" : kind == "counter" ? "CTU CTD CTUD" : "TON TOF TP CTU CTD CTUD", kind == "timer" || kind == "counter");
+                Choice(node, "instruction", kind == "timer" ? "TON TOF TP TONR" : kind == "counter" ? "CTU CTD CTUD" : kind == "math" ? "ADD SUB MUL DIV" : kind == "edge" ? "R_TRIG F_TRIG" : "TON TOF TP TONR CTU CTD CTUD ADD SUB MUL DIV R_TRIG F_TRIG",
+                    kind == "timer" || kind == "counter" || kind == "math" || kind == "edge");
                 Integer(node, "inputCount", 0, 32, false);
                 NativeId(node, "nativeUid", operation == "editNetwork");
                 if (node["nativeUid"] != null && (operation == "insertNetwork" || operation == "createBlock")) Fail("nativeUid is only valid for a selected edit or replacement.");

@@ -15,19 +15,24 @@ namespace TiaMcp.Openness.V21
             if ((node.Kind == "powerrail" || node.Kind == "contact" || node.Kind == "coil" || node.Kind == "branch") && !lad
                 || (node.Kind == "and" || node.Kind == "or" || node.Kind == "not" || node.Kind == "assign") && lad)
                 Fail("GraphicalLanguageMismatch", "Instruction " + node.Kind + " is incompatible with " + language + " semantics.");
-            var allKinds = new[] { "powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter" };
+            var allKinds = new[] { "powerrail", "contact", "coil", "branch", "and", "or", "not", "assign", "compare", "call", "timer", "counter", "move", "math", "edge" };
             if (!allKinds.Contains(node.Kind, StringComparer.Ordinal)) Fail("GraphicalInstructionUnsupported", "Unsupported typed instruction kind: " + node.Kind);
             if (node.Comparison != null && node.Kind != "compare" || node.CalleePath != null && node.Kind != "call"
-                || node.Instruction != null && node.Kind != "timer" && node.Kind != "counter"
-                || node.DataType != null && node.Kind != "compare" && node.Kind != "timer" && node.Kind != "counter"
+                || node.Instruction != null && node.Kind != "timer" && node.Kind != "counter" && node.Kind != "math" && node.Kind != "edge"
+                || node.DataType != null && node.Kind != "compare" && node.Kind != "timer" && node.Kind != "counter" && node.Kind != "move" && node.Kind != "math"
                 || node.InputCount != 0 && !new[] { "and", "or", "not", "branch" }.Contains(node.Kind))
                 Fail("InvalidTypedGraphicalModel", "An instruction contains properties belonging to a different typed family.");
-            bool stateful = node.Kind == "timer" || node.Kind == "counter" || node.Kind == "call" && ResolveCallee(context, node.CalleePath).BlockType == "FB";
-            if ((node.Instance != null || node.AllowSharedInstance) && !stateful) Fail("GraphicalInstanceMismatch", "Instance storage is only valid for FB calls, timers and counters.");
+            bool stateful = node.Kind == "timer" || node.Kind == "counter" || node.Kind == "edge" || node.Kind == "call" && ResolveCallee(context, node.CalleePath).BlockType == "FB";
+            if ((node.Instance != null || node.AllowSharedInstance) && !stateful) Fail("GraphicalInstanceMismatch", "Instance storage is only valid for FB calls, timers, counters and edge detectors.");
             if (node.Kind == "compare" && (!NumericTypes.Contains(node.DataType ?? "") || !new[] { "eq", "ne", "lt", "le", "gt", "ge" }.Contains(node.Comparison, StringComparer.Ordinal)))
                 Fail("GraphicalComparisonUnsupported", "Comparisons require an explicit supported numeric type and eq/ne/lt/le/gt/ge operator; no implicit conversion is performed.");
-            if ((node.Kind == "timer" && !new[] { "TON", "TOF", "TP" }.Contains(node.Instruction, StringComparer.Ordinal)) || (node.Kind == "counter" && !new[] { "CTU", "CTD", "CTUD" }.Contains(node.Instruction, StringComparer.Ordinal)))
+            if ((node.Kind == "timer" && !new[] { "TON", "TOF", "TP", "TONR" }.Contains(node.Instruction, StringComparer.Ordinal)) || (node.Kind == "counter" && !new[] { "CTU", "CTD", "CTUD" }.Contains(node.Instruction, StringComparer.Ordinal))
+                || (node.Kind == "edge" && !new[] { "R_TRIG", "F_TRIG" }.Contains(node.Instruction, StringComparer.Ordinal)))
                 Fail("GraphicalInstructionUnsupported", "The stateful instruction variant is not supported.");
+            if (node.Kind == "math" && (!NumericTypes.Contains(node.DataType ?? "") || !new[] { "ADD", "SUB", "MUL", "DIV" }.Contains(node.Instruction, StringComparer.Ordinal)))
+                Fail("GraphicalArithmeticUnsupported", "Arithmetic requires ADD/SUB/MUL/DIV with one explicit numeric type for every operand and the result; no implicit conversion is performed.");
+            if (node.Kind == "move" && !ScalarTypes.Contains(node.DataType ?? ""))
+                Fail("GraphicalMoveUnsupported", "MOVE requires one explicit scalar type for its input and output; no implicit conversion is performed.");
             if (node.Negated && node.Kind != "contact") Fail("InvalidTypedGraphicalModel", "Negated is only valid for normally closed LAD contacts; use an explicit FBD not node.");
             var matches = (context.Profiles ?? new TypedGraphicalProfile[0]).Where(p => p != null && !p.ReaderOnly && p.Language == language && p.Kind == node.Kind
                 && (p.Instruction ?? "") == (node.Kind == "compare" ? node.Comparison : (node.Instruction ?? ""))
@@ -75,6 +80,9 @@ namespace TiaMcp.Openness.V21
                 foreach (var pin in profile.Pins ?? new TypedGraphicalPin[0]) pins.Add(pin);
             }
             else pins.AddRange(profile.Pins ?? new TypedGraphicalPin[0]);
+            // A MOVE/arithmetic overload has one exact type: every non-Bool pin carries it, so wires cannot convert.
+            if ((node.Kind == "move" || node.Kind == "math") && (pins.Count(p => p?.DataType == node.DataType) < 2 || pins.Any(p => p != null && p.DataType != "Bool" && p.DataType != node.DataType)))
+                Fail("GraphicalProfileUnavailable", "The " + node.Kind + " profile pins do not carry the exact requested type " + node.DataType + ".");
             if (pins.Count == 0 || pins.Any(p => p == null || string.IsNullOrWhiteSpace(p.Name) || !new[] { "input", "output", "inout" }.Contains(p.Direction) || !ScalarTypes.Contains(p.DataType ?? ""))
                 || pins.Select(p => p.Name).Distinct(StringComparer.Ordinal).Count() != pins.Count) Fail("GraphicalProfileUnavailable", "The instruction requires a valid, unambiguous typed pin contract.");
             return pins.ToDictionary(p => p.Name, StringComparer.Ordinal);
@@ -235,7 +243,7 @@ namespace TiaMcp.Openness.V21
             { Fail("GraphicalInstanceUnresolved", "An exact verified global or multi-instance declaration is required."); return null; }
             if (node.Kind == "call" && instance.CalleePath != node.CalleePath) Fail("GraphicalInstanceMismatch", "The instance declaration does not reference the selected exact FB identity.");
             string storageType = instance.Scope == "GlobalVariable" ? profile.GlobalInstanceType : profile.InstanceType;
-            if ((node.Kind == "timer" || node.Kind == "counter") && (string.IsNullOrWhiteSpace(storageType) || instance.DataType != storageType))
+            if ((node.Kind == "timer" || node.Kind == "counter" || node.Kind == "edge") && (string.IsNullOrWhiteSpace(storageType) || instance.DataType != storageType))
                 Fail("GraphicalInstanceMismatch", "Instruction instance storage must match the selected native profile exactly.");
             return instance;
         }
