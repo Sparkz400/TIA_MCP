@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj" />
     <Compile Include="../TiaMcp.Core/WatchTables/WatchTableDocument.cs" Link="WatchTableDocument.cs" />
+    <Compile Include="../TiaMcp.Core/WatchTables/WatchGroupManifest.cs" Link="WatchGroupManifest.cs" />
     <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />
     <Compile Include="../TiaMcp.Core/JournalFileReplacement.cs" Link="JournalFileReplacement.cs" />
     <Compile Include="../../scripts/native/ExpansionEvidence/TranslationCategoryWorkbook.cs" Link="TranslationCategoryWorkbook.cs" />
