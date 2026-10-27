@@ -957,6 +957,18 @@
       ]
     },
     {
+      "featureId": "change.block_number_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.block_attributes_set",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "obligations": [
         "L01",
@@ -1205,6 +1217,18 @@
     },
     {
       "featureId": "change.constant_delete",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_create",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.constant_create",
       "obligations": [
         "X11"
       ]

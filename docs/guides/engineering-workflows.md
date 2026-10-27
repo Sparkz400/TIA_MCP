@@ -86,6 +86,8 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `call_connection_set` | `blockName` or `blockPath`, `networkId`, `callUid`, `parameterName`, `targetAccessUid` | Reconnects one isolated LAD/FBD call parameter to an existing simple symbolic Access in the same network. |
 | `block_rename` | `blockName` or `blockPath`, `newName` | Renames one standard, unprotected block and verifies old/new names in the selected namespace. Compile checks affected references. |
 | `block_delete` | `blockName` or `blockPath`, optional `dependencyPolicy: "rejectReferenced"` | Deletes one standard, unprotected block only after conservative dependency checks at prepare and apply. The policy defaults to `rejectReferenced`; no cascade deletion is available. |
+| `block_number_set` | `blockName` or `blockPath`, `number` (1-65535) | Sets `AutoNumber=false` and `Number` on one standard, unprotected block and reads both back. A number used by another block of the same kind (FB, FC, OB or DB) in the PLC is rejected. |
+| `block_attributes_set` | `blockName` or `blockPath`, `attributes: {...}` | Writes `HeaderAuthor`, `HeaderFamily`, `HeaderName`, `HeaderVersion` on one standard, unprotected block; OBs also accept `PriorityNumber`, `CyclicTime`, `PhaseOffset` and `ProcessImagePartNumber`. Native attribute metadata must also report each one as writable. |
 | `type_source_upsert` | `source`, `expectedTypeNames: [...]` | SCL source containing only complete `TYPE` declarations. |
 | `plc_type_import_xml` | `xml`, `expectedTypeNames: [...]` | Native `SW.Types.PlcStruct` XML import. Protected existing types are rejected. |
 | `type_rename` | `typeName` or `typePath`, `newName` | Native rename of one unprotected UDT within its existing group, software scope and namespace. |
@@ -94,6 +96,8 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `tag_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing tag's exposed writable `Name`, `DataTypeName` and/or `LogicalAddress`. |
 | `constant_set` | `tagTableName` or `tagTablePath`, `memberName`, `attributes: {...}` | Edits an existing user constant's exposed writable `Name`, `DataTypeName` and/or `Value`. System constants are excluded. |
 | `tag_delete` / `constant_delete` | `tagTableName` or `tagTablePath`, `memberName`, `dependencyPolicy: "rejectReferenced"` | Deletes exactly one existing tag or user constant after dependency checks. |
+| `tag_create` | `tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `logicalAddress` | Creates one tag in an existing table. Names already used by a tag or constant in the software scope are rejected; a created safety tag fails verification. Readback is exact, so use native spelling such as `%M0.0`. |
+| `constant_create` | `tagTableName` or `tagTablePath`, `name`, `dataTypeName`, `value` | Creates one user constant in an existing table with the same scope-wide name collision check and exact readback. |
 | `group_create` | `groupKind: "blocks"`, `"types"` or `"tags"`, `groupPath`, `name`, optional `scopePath` | Creates a user group below the exact existing parent `groupPath`. |
 | `group_rename` | `groupKind`, `groupPath`, `name`, optional `scopePath` | Renames the exact existing user group to `name`; generated/root groups are excluded. |
 | `group_delete` | `groupKind`, `groupPath`, `dependencyPolicy: "rejectReferenced"`, optional `scopePath` | Deletes only an empty existing user group. |
