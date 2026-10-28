@@ -77,7 +77,8 @@ class Run(StateRun):
 
     def mapping(self, workspace, block):
         row = next(r for r in self.inspect()["workspaces"] if r["path"] == workspace)
-        rows = [m for m in row["mappedObjects"] if (m.get("object") or {}).get("objectPath", "").endswith("/blocks/" + block)]
+        # vci_workspace_inspect identifies a mapped object by its native object chain, ending in the block.
+        rows = [m for m in row["mappedObjects"] if (m.get("object") or [{}])[-1].get("Name") == block]
         return rows[0] if rows else None
 
     def state(self):
