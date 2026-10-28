@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.52",
+  "catalogVersion": "0.4.53",
   "targetTiaVersions": [
     21
   ],
@@ -3282,6 +3282,26 @@
         "PID_Compact 3.0, a virtual TO_PositioningAxis 10.0 and TO_OutputCam 10.0 only; other TO types and versions, measuring inputs and real drives or encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
         "Connections use the output-cam role with a PLC output tag; actor, sensor, torque, encoder and measuring-input roles and hardware or channel targets are only refused.",
         "Engineering only; nothing is downloaded and no motion or control behavior is observed."
+      ]
+    },
+    {
+      "id": "local.alarm_imports.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "532d58619f2fd25990666c4140542e16ba7c6467",
+        "passedScope": "scripts/qualify_alarm_imports.py on a frozen Debug build of cb8a661 (D:\\wp\\b34), 82/82 steps, in one owned scratch CPU 1511-1 PN V4.1 with an SCL FB holding a Program_Alarm and its instance DB: plc_alarm_class_import (the project's alarm-class DAT with one edited display name), plc_alarm_instance_text_import (the instance-text workbook with one edited en-US alarm text), plc_supervision_import (the PLC's supervision workbook re-imported unchanged with Override; it initializes ProDiag's global settings, a recorded side effect) and plc_supervision_settings_import (the ProDiag settings DAT with one edited category display name), each applied with checkpoint, compile and save, asserted previews and change_status; every program export and member and plc_alarm_inspect's alarm classes, instance texts, supervisions and settings differ in exactly the intended keys and show the edit in a fresh export; a fresh owned Portal reopen shows the identical state; one import per kind restored from its checkpoint equals the reopened state. Typed refusals (ArtifactChanged, InvalidArtifact, InvalidRequest, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.alarm_imports.20261028.json"
+      ],
+      "limitations": [
+        "Default alarm classes, one Program_Alarm instance and no ProDiag supervisions: plc_supervision_import re-imports an unchanged workbook; HMI consumers of the classes are not exercised.",
+        "plc_alarm_text_list_import is only refused: a scratch project has no user text list to export.",
+        "Engineering only; nothing is downloaded and no alarm is raised."
       ]
     }
   ],
@@ -23758,7 +23778,7 @@
         "limitations": [
           "The supplied workbook is imported as hash-bound opaque bytes; its layout and list entries are not interpreted. expectedTextListNames must name every imported list: None refuses existing names at prepare, Override replaces each supplied list's complete entry set. Readback verifies list names; entries, ranges, comments and languages are covered only by the retained fresh export and its content hash.",
           "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
-          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
           "Safety units, system text lists and the text-list library lifecycle (CreateFrom, delete, rename, master copies) are not covered.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
         ]
@@ -23811,13 +23831,15 @@
           "Updates texts of existing alarm instances in all workbook languages; instance creation and language activation are not part of this route. Workbook keys and inherited-text markers are not interpreted.",
           "Readback is the native result/log and a fresh All-option export; individual alarm texts are not verified.",
           "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
-          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_imports.20261028): the instance-text workbook of a Program_Alarm FB with one edited en-US alarm text imported and read back in a fresh export; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_imports.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23863,13 +23885,15 @@
           "Project-wide opaque DAT: schema, class limits and active-language overlap are left to the native import. Every PLC/HMI consumer of the classes is affected; apply compiles every device in the project.",
           "Readback is the native result, counts, first 500 messages and a fresh DAT export.",
           "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
-          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_imports.20261028): the project's alarm-class DAT with one edited display name imported and read back in a fresh export; changed hashes, relative paths, workbooks and import options refused; a stale preview refuses at apply; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_imports.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23913,13 +23937,15 @@
         "limitations": [
           "Project-wide opaque ProDiag settings DAT. A missing provider, LicenseNotFoundException or MissingProductsException refuses at prepare with the native message. ErrorRollback fails apply; the rollback itself is not trusted and the checkpoint remains the recovery route.",
           "Readback is the native result, counts, first 500 messages and a fresh DAT export; apply compiles every device in the project.",
-          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for the project (raw DAT bytes); XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_imports.20261028): the ProDiag settings DAT with one edited category display name imported and read back in a fresh export; import options refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_imports.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23964,13 +23990,15 @@
         "limitations": [
           "Global supervision workbook of one PLC or software unit; the per-ProDiag-FB provider and ImportSupervisionSettingsFromXlsx are not called. Workbook schema, supervision IDs and generated ProDiag objects are not interpreted. A missing provider or license/product error refuses at prepare with the native message.",
           "Failure fails apply; readback is the native result/log and a fresh supervision export.",
-          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Export determinism is unqualified: a nondeterministic export fails closed as StaleRevision before any write.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_imports.20261028): the PLC's own supervision workbook re-imported unchanged with Override (a scratch project has no ProDiag supervisions to edit); the first import initializes ProDiag's global settings; unknown import options refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_imports.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

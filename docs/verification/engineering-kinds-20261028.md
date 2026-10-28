@@ -27,6 +27,7 @@ nothing touched a user project, a PLC or PLCSIM.
 | [`qualify_project_settings.py`](../../scripts/qualify_project_settings.py) | `project_properties` metadata, languages, text categories, used products | `b24` | Passed, 50/50 steps | `local.project_settings.20261028` |
 | [`qualify_hardware_changes.py`](../../scripts/qualify_hardware_changes.py) | `hardware_inspect` items (complete attribute values, addresses, channels, ports, subnets), `device_inventory` rows, every PLC's program | `b27` | Passed, 127/127 steps | `local.hardware_changes.20261028` |
 | [`qualify_technology_changes.py`](../../scripts/qualify_technology_changes.py) | per technology object: identity, `technology_read` connections, native XML export | `b31` | Passed, 132/132 steps | `local.technology_changes.20261028` |
+| [`qualify_alarm_imports.py`](../../scripts/qualify_alarm_imports.py) | `plc_alarm_inspect` alarm classes, instance texts, supervisions, ProDiag settings, text lists | `b34` | Passed, 82/82 steps | `local.alarm_imports.20261028` |
 
 ## Findings
 
@@ -74,6 +75,10 @@ nothing touched a user project, a PLC or PLCSIM.
   (`VirtualAxis.Mode = 1`) with TO_OutputCam 10.0 children, and two PLC output tags. The runner sets a PID limit,
   connects an output cam to a tag and disconnects it, and deletes PID objects. `technology_read` is checked for exact
   selection, a missing path, a one-item inventory and prefixed parameters.
+- **Alarm imports:** an SCL FB with a `Program_Alarm` and its instance DB. Each import file is a native export edited
+  in one place: an alarm-class display name in the DAT, the en-US alarm text in the instance-text workbook and a
+  ProDiag category name in the settings DAT. The supervision workbook is re-imported unchanged, because a scratch
+  project has no ProDiag supervisions to edit.
 
 ## Verified
 
@@ -85,9 +90,26 @@ Catalog `0.4.53` verifies:
   (`local.hardware_changes.20261028`);
 - `change.to_create`, `_child_create`, `_parameters`, `_connect`, `_disconnect`, `_delete` and `technology_read`
   (`local.technology_changes.20261028`);
+- `change.plc_alarm_class_import`, `_instance_text_import`, `change.plc_supervision_import` and
+  `_settings_import` (`local.alarm_imports.20261028`);
 - `tag.member.crud` and `type.rename_delete`, whose kinds the X11 run (`local.plc_object_mutations.20261028`)
   already covers.
 
 `change.project_attributes_set` is recorded as unavailable on V21 (`availability: unsupported`).
 
 ## Limits
+
+- One owned scratch CPU 1511-1 PN V4.1 per runner (two CPUs for hardware); safety units and F-CPUs, other CPU
+  families, ET 200SP/MP, HMI, drive and GSD devices are not exercised.
+- Hardware: replacements only between firmware versions that keep addresses; no `acceptLoss`; port links only
+  between two CPUs, with no media redundancy.
+- Technology objects: PID_Compact, a virtual positioning axis and output cams; connections only from an output cam
+  to a PLC tag. Real drives and encoders are not exercised.
+- Alarms: `plc_supervision_import` re-imports an unchanged workbook; `plc_alarm_text_list_import` is only refused,
+  because a scratch project has no user text list to export.
+- Project settings: `project_attributes_set` cannot apply on V21; the copy is compared without program exports,
+  which TIA refuses in a read-only project.
+- Still open from these owners: the three D08 connection kinds (creating a second connection fails the worker's
+  preservation check; the cause is under investigation) and the six D04 OPC UA kinds (no Siemens-compatible
+  NodeSet on this PC).
+- Engineering only: nothing is downloaded, and no runtime, motion or alarm behavior is observed.
