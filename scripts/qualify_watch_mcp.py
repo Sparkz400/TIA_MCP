@@ -35,7 +35,7 @@ class Run:
     def __init__(self, args):
         self.args, self.root = args, args.root.resolve()
         self.root.mkdir(parents=True, exist_ok=False)
-        self.clients, self.lifetimes, self.client = [], [], None
+        self.clients, self.lifetimes, self.client, self.tool_calls = [], [], None, []
         self.comment_edit, comment_ref = None, None
         if getattr(args, "comment_input", None):
             self.comment_edit = read_comment_input(args.comment_input, args.mode)
@@ -115,6 +115,8 @@ class Run:
         # Retain the exact reply before decoding; a malformed/error body must
         # not erase the only response or bypass owned failure reconciliation.
         self.save("call-" + str(time.time_ns()) + "-" + name, response)
+        # Unit tests build runners with __new__, so the list may not exist yet.
+        self.__dict__.setdefault("tool_calls", []).append({"name": name, "isError": bool(response.get("isError"))})
         packet = response.get("structuredContent")
         if packet is None:
             content = "\n".join(c["text"] for c in response.get("content", []) if c["type"] == "text")
@@ -312,6 +314,11 @@ class Run:
         self.save("exact-cleanup", {"completed": True, "lifetimes": self.lifetimes, "hostCount": len(self.clients), "explicitNativeTermination": intervention, "coordinatorInterventionRequired": intervention, "normalLifecyclePassed": self.args.mode not in oracle.NATIVE_POINTS | oracle.HOST_POINTS})
         return verdict
 
+    def report(self, result):
+        # Written only after the whole execute() passed; scripts/curate_evidence.py reads it.
+        # Expected refusals stay listed as rejected calls.
+        return self.save("verification", {"completed": result["completed"], "mode": self.args.mode, "toolCalls": self.tool_calls})
+
 
 class ToolError(RuntimeError):
     def __init__(self, name, packet):
@@ -329,6 +336,7 @@ def main():
     run = Run(args)
     try:
         result = run.execute()
+        run.report(result)
         print(json.dumps({"completed": result["completed"], "mode": args.mode, "root": str(run.root)}), flush=True)
     except Exception as error:
         run.save("runner-failure", {"error": str(error), "automaticReplay": False})
