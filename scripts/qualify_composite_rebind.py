@@ -87,13 +87,19 @@ def owner(run, module):
     return rows[0]
 
 
+def identifier(run, item):
+    """TIA may give the reconfigured submodule a new hardware identifier, which its system constant Local~<module> reports."""
+    constant = "member:" + run.plc + "/tags/Default%20tag%20table/systemConstants/Local~" + item.rsplit("/", 1)[1]
+    return lambda category, key: category == "changed" and key == constant
+
+
 def motion(run, item):
     """hardware_channel_attributes OperatingMode = MotionControl, in the native representation hardware_inspect reports."""
     channel = next(c for c in run.current["view"]["hw:" + item]["channels"] if (c["type"], c["ioType"], c["number"]) == tuple(CHANNEL.values()))
     attribute = next(a for a in channel["attributes"] if a["name"] == "OperatingMode")
     value = next(v["value"] for v in attribute["nativeEnumValues"] if v["name"] == "MotionControl")
     run.apply("set %s channel 0 to MotionControl" % item.rsplit("/", 1)[1], "hardware_channel_attributes", {"hardwarePath": item, **CHANNEL, "attributes": {"OperatingMode": value}},
-              {"attributeChanges": [{"name": "OperatingMode", "after": value}]}, changed=["hw:" + item], check=lambda applied, state: require(
+              {"attributeChanges": [{"name": "OperatingMode", "after": value}]}, changed=["hw:" + item], tolerated=identifier(run, item), check=lambda applied, state: require(
                   [a["value"] for c in state["hw:" + item]["channels"] for a in c["attributes"] if a["name"] == "OperatingMode"] == [value] * len(state["hw:" + item]["channels"]),
                   "TIA does not report MotionControl on every channel of %s" % item))
     return {"before": attribute.get("value"), "after": value}
@@ -110,8 +116,8 @@ def coupled(run, item):
     """TIA puts the connected item's addresses into the servo process image (ProcessImage) and keeps the sensor's PROFIdrive
     interface tags RbAxis_Sensor<n>_Interface_AddressIn/Out (and so their tag table) in step, besides generated()."""
     table = run.plc + "/tags/Default%20tag%20table"
-    system = generated(run)
-    return lambda category, key: system(category, key) or category == "changed" and key in ("hw:" + item, "tagTable:" + table) or (
+    system, renumbered = generated(run), identifier(run, item)
+    return lambda category, key: system(category, key) or renumbered(category, key) or category == "changed" and key in ("hw:" + item, "tagTable:" + table) or (
         category in ("added", "removed") and key.startswith("member:" + table + "/tags/RbAxis_Sensor"))
 
 
