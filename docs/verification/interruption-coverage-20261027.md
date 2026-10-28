@@ -113,7 +113,8 @@ overall because of a qualifier fault in two other cases, which the rerun fixed
 `hmi_text_list_generate_set` and the Test Suite style jobs do not use the shared
 admission. They keep their own journals and `*_recover`/`*_reconcile` tools, owned
 by D02, D03, X07/X08 and D06. Their native interruption stays with those owners and
-is not claimed here.
+is not claimed here. On 28 October D02 qualified `watch_table_apply` at its three Host
+points and eight native worker-loss points ([record](review-criteria-and-watch-20261028.md)).
 
 ## Limits
 

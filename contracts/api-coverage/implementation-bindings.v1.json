@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "072bd5662f2391fe942e2f8b7944d9a352ad357e792d32f7b14ab09e3b6a3a0f",
-      "bytes": 1168892
+      "sha256": "c0f63bd38ed1e10372516cfcb9c838b6f5548a917eb3b36713dbeea293e12e7d",
+      "bytes": 1169057
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -106813,7 +106813,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -106845,7 +106845,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115184,7 +115184,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115330,7 +115330,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115448,7 +115448,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115478,7 +115478,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115508,7 +115508,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115538,7 +115538,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -115568,7 +115568,7 @@
       "evidenceRefs": [
         {
           "id": "local.watch.native.20261028",
-          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
           "artifacts": [
             "evidence/local.watch.native.20261028.json"
           ]
@@ -116911,7 +116911,7 @@
     {
       "path": "evidence/local.watch.native.20261028.json",
       "state": "observed",
-      "sha256": "ab4dbc339753858d09840c916f30e87c826af8eb8f1074501c9d7738de09b9d0"
+      "sha256": "5cf94421eec475147273983d700a64224cb52577d2552be3961609de3bb1fee5"
     },
     {
       "path": "evidence/local.wave-kinds.probe.20261027.json",
@@ -117534,7 +117534,7 @@
     },
     {
       "id": "local.watch.native.20261028",
-      "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c"
+      "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a"
     },
     {
       "id": "local.wave-kinds.probe.20261027",
