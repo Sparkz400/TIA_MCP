@@ -626,9 +626,10 @@ def phase_b(run, a):
 def phase_c(run, a):
     """library_save of a global library left dirty by a failed same-session change, then restore of that save."""
     h, p1 = run.h, a["p1"]
-    # A third CPU without its confidential-data password makes every later project compile fail.
+    # A third CPU without its confidential-data password makes every later project compile fail. Without compile the
+    # change may not save; the failing change's checkpointSave saves it into that change's recovery baseline.
     prepared = h.prepare("hardware_add", {"typeIdentifier": h.scratch["selectedCpu"]["typeIdentifier"], "deviceName": "ScratchStation3", "itemName": "ScratchPLC3"})
-    h.stage("apply hardware_add without compile", lambda: h.tool("change_apply", {**h.apply_args(prepared), "compile": False}))
+    h.stage("apply hardware_add without compile", lambda: h.tool("change_apply", {**h.apply_args(prepared), "compile": False, "save": False}))
     clean = run.library_view("G|", run.g, False)
     failing = h.prepare("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": run.g, "target": {"plcPath": p1},
                         "object": {"kind": "block", "objectPath": a["blocks"]["TiaMcp_EnableGate_DB"]}})
