@@ -257,6 +257,73 @@
     "applyError": {
       "type": "string",
       "minLength": 1
+    },
+    "cleanup": {
+      "type": "object",
+      "description": "library_cleanup: the maximum deletion set and the versions kept, with the reason for each.",
+      "required": ["cleanUpMode", "projectPath", "deleteVersions", "deleteTypes", "retainedScopeVersions", "retainedLibraryVersions", "policy"],
+      "properties": {
+        "cleanUpMode": {"enum": ["PreserveDefaultVersionOfUnusedTypes", "DeleteUnusedTypes"]},
+        "projectPath": {"type": ["string", "null"]},
+        "deleteVersions": {"type": "array", "minItems": 1, "maxItems": 1000, "items": {
+          "type": "object",
+          "required": ["typeGuid", "versionGuid", "typeName", "version", "state", "isDefault"],
+          "properties": {"typeGuid": {"type": "string", "minLength": 36, "maxLength": 36}, "versionGuid": {"type": "string", "minLength": 36, "maxLength": 36}}
+        }},
+        "deleteTypes": {"type": "array", "maxItems": 100, "items": {
+          "type": "object",
+          "required": ["typeGuid", "typeName"],
+          "properties": {"typeGuid": {"type": "string", "minLength": 36, "maxLength": 36}, "typeName": {"type": "string", "minLength": 1}},
+          "additionalProperties": false
+        }},
+        "retainedScopeVersions": {"type": "array", "maxItems": 1000, "items": {
+          "type": "object",
+          "required": ["typeGuid", "versionGuid", "typeName", "version", "state", "isDefault", "reason"],
+          "properties": {"reason": {"enum": ["embeddedInMasterCopy", "usedInProject", "dependencyOfRetainedVersion", "preservedDefaultOrHighest"]}}
+        }},
+        "retainedLibraryVersions": {
+          "type": "object",
+          "required": ["count", "sha256"],
+          "properties": {"count": {"type": "integer", "minimum": 0}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}(?![\\s\\S])"}},
+          "additionalProperties": false
+        },
+        "policy": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "harmonize": {
+      "type": "object",
+      "description": "library_harmonize: each affected instance's current and expected name and group path.",
+      "required": ["plcPath", "harmonizeNames", "harmonizePaths", "instances", "unaffectedObjects", "pathMapping"],
+      "properties": {
+        "plcPath": {"type": "string", "minLength": 1},
+        "harmonizeNames": {"type": "boolean"},
+        "harmonizePaths": {"type": "boolean"},
+        "instances": {"type": "array", "minItems": 1, "maxItems": 1000, "items": {
+          "type": "object",
+          "required": ["objectPath", "scopePath", "typeGuid", "versionGuid", "name", "expectedName", "groupPath", "expectedGroupPath", "changes"],
+          "properties": {
+            "objectPath": {"type": "string", "minLength": 1},
+            "scopePath": {"type": "string", "minLength": 1},
+            "typeGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+            "versionGuid": {"type": "string", "minLength": 36, "maxLength": 36},
+            "name": {"type": "string", "minLength": 1},
+            "expectedName": {"type": "string", "minLength": 1},
+            "groupPath": {"type": "string"},
+            "expectedGroupPath": {"type": "string"},
+            "changes": {"type": "array", "maxItems": 2, "uniqueItems": true, "items": {"enum": ["name", "path"]}}
+          },
+          "additionalProperties": false
+        }},
+        "unaffectedObjects": {
+          "type": "object",
+          "required": ["count", "sha256"],
+          "properties": {"count": {"type": "integer", "minimum": 0}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}(?![\\s\\S])"}},
+          "additionalProperties": false
+        },
+        "pathMapping": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
