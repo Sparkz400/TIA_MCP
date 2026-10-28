@@ -40,6 +40,7 @@ internal static class DocumentChecks
         ("Document cleared scalar uses native empty element without relaxing hashes", ClearedScalar),
         ("Document comments retain Unicode whitespace and CRLF", CommentValues),
         ("Document rename preserves opaque attributes", Rename),
+        ("Document adopts same-session export metadata and keeps the table", AdoptDocumentInfo),
         ("Document reorder preserves inter-row comments PI and whitespace slots", Reorder),
         ("Document duplicate allocates unique native IDs and preserves source", Duplicate),
         ("Document remove affects exact row only", Remove),
@@ -159,6 +160,18 @@ internal static class DocumentChecks
     }
     private static void Rename()
     { var expected = Parse(Bytes()); Table(expected).Element("AttributeList")!.Element("Name")!.Value = "New Ω"; var doc = Open(); doc.Rename("New Ω"); XmlEqual(expected, doc.ToBytes()); }
+    private static void AdoptDocumentInfo()
+    {
+        const string Stale = "<DocumentInfo><Created>2026-10-15T00:00:00Z</Created><ExportSetting>WithDefaults</ExportSetting><OpaqueInfo>  </OpaqueInfo></DocumentInfo>";
+        const string Current = "<DocumentInfo><Created>2026-10-28T07:19:50Z</Created><ExportSetting>WithDefaults</ExportSetting><InstalledProducts><Product><DisplayVersion>V21 Update 3</DisplayVersion></Product></InstalledProducts></DocumentInfo>";
+        var doc = Open(); doc.AdoptDocumentInfo(new WatchTableDocument(Bytes(ForceFixture.Replace(Stale, Current))));
+        byte[] expected = Bytes(Fixture.Replace(Stale, Current));
+        XmlEqual(Parse(expected), doc.ToBytes()); Equal(WatchTableDocument.SemanticHash(expected), WatchTableDocument.SemanticHash(doc.ToBytes()));
+        True(WatchTableDocument.SemanticHash(Bytes()) != WatchTableDocument.SemanticHash(doc.ToBytes()));
+        var same = Open(); same.AdoptDocumentInfo(Open()); True(same.ToBytes().SequenceEqual(Bytes()));
+        Refuse(() => Open().AdoptDocumentInfo(null!));
+        Refuse(() => Open(Fixture.Replace("PlcWatchTable", "PlcForceTable").Replace("<ModifyValue>FALSE</ModifyValue>", "<ForceIntention>true</ForceIntention>")).AdoptDocumentInfo(Open()));
+    }
     private static void Reorder()
     {
         var expected = Parse(Bytes()); var rows = Rows(expected); var replacements = rows.Reverse().Select(r => new XElement(r)).ToArray();

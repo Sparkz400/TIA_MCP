@@ -69,6 +69,7 @@ public sealed partial class WatchTableDispatcher
         string directory = Path.Combine(root, "watch", Guid.NewGuid().ToString("N")); Directory.CreateDirectory(directory);
         JsonObject templateSnapshot;
         EngineeringArtifactReference templateArtifact;
+        WatchTableDocument? session = null;
         if (args["template"] is JsonObject template)
         {
             var templateSelector = (JsonObject)selector.DeepClone();
@@ -86,10 +87,23 @@ public sealed partial class WatchTableDispatcher
             templateSnapshot = new JsonObject { ["origin"] = "packagedGenuineNativeCapture", ["profile"] = WatchTableNativeTemplate.Profile,
                 ["sourceSha256"] = WatchTableNativeTemplate.Sha256, ["artifact"] = JsonSerializer.SerializeToNode(templateArtifact, BridgeProtocol.Json),
                 ["nativeAuthoringQualified"] = false };
+            if (mode == "create")
+            {
+                var export = before["tables"]?.AsArray().FirstOrDefault()?["artifact"]?.AsObject()
+                    ?? throw new BridgeException("InvalidNativeBaseline", "Creation from the packaged template needs a same-session watch/force export for its export metadata.");
+                var exportArtifact = Artifact(export); byte[] exportBytes = ReadRecoverySnapshot(Resolve(exportArtifact));
+                if (WatchTableDocument.Hash(exportBytes) != exportArtifact.Sha256) throw new BridgeException("ArtifactChanged", "Captured export bytes changed.");
+                session = new WatchTableDocument(exportBytes); templateSnapshot["documentInfoSource"] = export.DeepClone();
+            }
         }
         var prototype = new WatchTableDocument(File.ReadAllBytes(Resolve(templateArtifact)));
         var document = new WatchTableDocument(mode == "create" ? prototype.ToBytes() : File.ReadAllBytes(Resolve(Artifact(before["target"]!["artifact"]!.AsObject()))));
-        if (mode == "create") { for (int i = document.Count - 1; i >= 0; i--) document.Remove(i); document.Rename(Text(destination, "tableName")); }
+        if (mode == "create")
+        {
+            for (int i = document.Count - 1; i >= 0; i--) document.Remove(i);
+            document.Rename(Text(destination, "tableName"));
+            if (session is not null) document.AdoptDocumentInfo(session);
+        }
         var cultures = before["peers"]?["languages"]?["active"]?.AsArray().Select(c => c!.GetValue<string>()).ToArray() ?? [];
         var edit = WatchTableAuthoring.Edit(document, prototype, generated, capture["selectors"]!.AsObject(),
             args["steps"]?.AsArray() ?? throw new BridgeException("InvalidRequest", "Explicit ordered authoring steps required."), cultures, mode == "create");
@@ -109,6 +123,7 @@ public sealed partial class WatchTableDispatcher
         var captures = new List<EngineeringArtifactReference> { Artifact(before["target"]!["artifact"]!.AsObject()) };
         if (before["receipt"] is JsonObject baselineReceipt) captures.Add(Artifact(baselineReceipt));
         if (templateSnapshot["receipt"] is JsonObject templateReceipt) captures.Add(Artifact(templateReceipt));
+        if (templateSnapshot["documentInfoSource"] is JsonObject infoSource) captures.Add(Artifact(infoSource));
         var plan = new EngineeringOperationPlan("watchAuthoring", observation,
             [new(EngineeringResourceKey.ForPath("project", observation.ProjectFilePath), "project", "reviewedWatchAuthoring:" + mode, "projectArchiveToNewLocation")],
             new[] { review, input, generationRef, templateArtifact }.Concat(sourceArtifacts).Concat(captures).Distinct().ToArray(),

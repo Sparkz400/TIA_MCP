@@ -12,10 +12,16 @@ import verify_watch_workflow as base
 
 FIXTURE = Path(__file__).resolve().parents[1] / 'fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml'
 REASON = 'Captured Output state of the selected FB instance: Active'
+# A same-session export from a later installation than the packaged template.
+EXPORT = FIXTURE.with_name('ForceTable.xml').read_bytes().replace(b'V21 Update 2', b'V21 Update 3')
 
 
-def candidate():
+def candidate(export=EXPORT):
     tree = expansion.document(FIXTURE.read_bytes())
+    index = list(tree).index(tree.find('DocumentInfo'))
+    info = base.xml(export).find('DocumentInfo')
+    info.tail = tree[index].tail
+    tree[index] = info
     base.table(tree).find('AttributeList/Name').text = subject.TABLE
     row = expansion.row_elements(tree)[0]
     row.find('AttributeList/ModifyValue').text = ''
@@ -35,7 +41,7 @@ def raw(tree):
 
 class ExactDelta(unittest.TestCase):
     def verify(self, tree):
-        return subject.exact_creation(FIXTURE.read_bytes(), raw(tree), ['en-GB'], REASON)
+        return subject.exact_creation(FIXTURE.read_bytes(), raw(tree), ['en-GB'], REASON, EXPORT)
 
     def test_exact_default_bool_creation(self):
         self.assertEqual(self.verify(candidate())['requiredProfiles'], subject.PROFILES)
@@ -76,11 +82,15 @@ class ExactDelta(unittest.TestCase):
         with self.assertRaises(base.VerificationError):
             self.verify(tree)
         with self.assertRaises(base.VerificationError):
-            subject.exact_creation(FIXTURE.read_bytes(), raw(candidate()) + b'<!--extra-->', ['en-GB'], REASON)
+            subject.exact_creation(FIXTURE.read_bytes(), raw(candidate()) + b'<!--extra-->', ['en-GB'], REASON, EXPORT)
 
     def test_template_bytes_are_pinned(self):
         with self.assertRaisesRegex(base.VerificationError, 'template hash'):
-            subject.exact_creation(FIXTURE.read_bytes() + b' ', raw(candidate()), ['en-GB'], REASON)
+            subject.exact_creation(FIXTURE.read_bytes() + b' ', raw(candidate()), ['en-GB'], REASON, EXPORT)
+
+    def test_template_export_metadata_refused(self):
+        with self.assertRaises(base.VerificationError):
+            self.verify(candidate(FIXTURE.read_bytes()))
 
 
 class Absence(unittest.TestCase):
