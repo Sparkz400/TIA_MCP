@@ -1,0 +1,86 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.watch.authoring.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T08:54:51+00:00",
+  "source": {
+    "commit": "26a09a7b9225b67102b84365c9f352048fe3bc50",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_watch_authoring.py (author3) and scripts/qualify_watch_exact_profile.py (exact1) on a frozen Debug build of 26a09a7 (D:\\wp\\b12, git-archived sources with source-manifest.json) in fresh owned scratch CPU 1511-1 PN V4.1 projects under TIA Portal V21 Update 3, active culture de-DE: watch_table_generate from the native FB/instance DB capture, watch_table_prepare_authoring creating root WT05_BoolCreation with one Active Bool row from the packaged template and the same-session export DocumentInfo, independent file-only review of the exact candidate, apply with native readback and six preserved peers, saved fresh reopen, checkpoint recovery to absence at a distinct destination with restored and original reconciliation; the re-pinned exact profile watch.create-owned-v21-1511-v41-de-active-bool.v1 matched (scopeMatched, no mismatches); qualification_watch_authoring_source_negative refused a real saved FB HeaderAuthor drift through the native VerifyWatchSource guard and restored every peer; three Host prepare collisions and a late stale-epoch apply were refused before checkpoint; every owned Portal/worker lifetime closed with exit proofs; independent oracles verify_watch_authoring and verify_watch_exact_profile passed.",
+  "limitations": [
+    "One created root table with one direct-instance Active Bool row and the default reason comment, from the packaged template; additions to existing tables, removal, reorder, explicit multilingual comments, other scalar types, populated watch peers, other CPUs, firmware and languages are not qualified. Production authoring stays disabled.",
+    "qualification_watch_authoring_source_reconcile only reconciles an unresolved source-negative admission; neither run left one, so it did not run and is not covered. Creation response loss (qualify_watch_authoring_loss.py) did not run.",
+    "Offline stored configuration only: no online modify, forcing, download or runtime behavior. The profile pins follow the installed products and must be re-derived after a TIA update; author1 (Update 2 pins, failed apply) and author2 (capture build 4cd016d) are not cited."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3e3b080b3323aa2ab8d2f4ef260d143ad240af09380db791ed791970e17cd0a2"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7ab7fcf05e3daf18adc18acbe12c57f0d4d7ec0418c4355836c5a617f5d9301d"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "5954faab6b0a4d32f4eb08f5ef0b7e54ecb11744a4553993a9755541ed7b4893",
+      "bytes": 1858,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_generate",
+        "watch_table_prepare_authoring",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "fe0bebb4a1c6b5602951fa8bc8e9454125d7ec0acca3c768ba7faea896cefbaa",
+      "bytes": 3057,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_authoring_source_negative",
+        "qualification_watch_compete",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_generate",
+        "watch_table_prepare_authoring",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_apply",
+        "watch_table_prepare_authoring"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.48",
+  "catalogVersion": "0.4.49",
   "targetTiaVersions": [
     21
   ],
@@ -2772,6 +2772,26 @@
         "One existing-row Bool ModifyValue edit (FALSE to TRUE) in an owned scratch table; clone/delete/reorder/comment edits, force tables, authoring, other CPUs, firmware and languages are not qualified.",
         "Each interruption point ran once; worker loss is a terminated worker process at the named point, not power loss, disk failure or a hung TIA without process exit.",
         "Offline stored configuration only: no online modify, forcing, download or runtime behavior. Trial bool2 (D:\\wp\\wt\\bool2) stopped after watch_table_recover because the runner's controller sources were edited mid-run; it is retained as failed and not cited."
+      ]
+    },
+    {
+      "id": "local.watch.authoring.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "26a09a7b9225b67102b84365c9f352048fe3bc50",
+        "passedScope": "scripts/qualify_watch_authoring.py (author3) and scripts/qualify_watch_exact_profile.py (exact1) on a frozen Debug build of 26a09a7 (D:\\wp\\b12, git-archived sources with source-manifest.json) in fresh owned scratch CPU 1511-1 PN V4.1 projects under TIA Portal V21 Update 3, active culture de-DE: watch_table_generate from the native FB/instance DB capture, watch_table_prepare_authoring creating root WT05_BoolCreation with one Active Bool row from the packaged template and the same-session export DocumentInfo, independent file-only review of the exact candidate, apply with native readback and six preserved peers, saved fresh reopen, checkpoint recovery to absence at a distinct destination with restored and original reconciliation; the re-pinned exact profile watch.create-owned-v21-1511-v41-de-active-bool.v1 matched (scopeMatched, no mismatches); qualification_watch_authoring_source_negative refused a real saved FB HeaderAuthor drift through the native VerifyWatchSource guard and restored every peer; three Host prepare collisions and a late stale-epoch apply were refused before checkpoint; every owned Portal/worker lifetime closed with exit proofs; independent oracles verify_watch_authoring and verify_watch_exact_profile passed."
+      },
+      "artifacts": [
+        "evidence/local.watch.authoring.20261028.json"
+      ],
+      "limitations": [
+        "One created root table with one direct-instance Active Bool row and the default reason comment, from the packaged template; additions to existing tables, removal, reorder, explicit multilingual comments, other scalar types, populated watch peers, other CPUs, firmware and languages are not qualified. Production authoring stays disabled.",
+        "qualification_watch_authoring_source_reconcile only reconciles an unresolved source-negative admission; neither run left one, so it did not run and is not covered. Creation response loss (qualify_watch_authoring_loss.py) did not run.",
+        "Offline stored configuration only: no online modify, forcing, download or runtime behavior. The profile pins follow the installed products and must be re-derived after a TIA update; author1 (Update 2 pins, failed apply) and author2 (capture build 4cd016d) are not cited."
       ]
     },
     {
@@ -13604,8 +13624,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.authoring.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13646,12 +13668,15 @@
         "status": "partial",
         "limitations": [
           "Exact project/PLC/group/name destination, absent creation snapshot, collision and source freshness checks; bounded add/remove/reorder and multilingual comments using genuine captured row grammar.",
-          "Full XML/row review uses the durable watch checkpoint, retained readback, saved reopen and explicit recovery path. Every new mutation profile remains production-gated pending native lifecycle evidence."
+          "Full XML/row review uses the durable watch checkpoint, retained readback, saved reopen and explicit recovery path. Every new mutation profile remains production-gated pending native lifecycle evidence.",
+          "2026-10-28: a created table built from the packaged template takes DocumentInfo from a same-session export, since readback carries the installed products; the exact WT-05 profile is pinned under V21 Update 3."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.authoring.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16145,8 +16170,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.authoring.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
