@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b5d9d37da9c6daee33c0834bfacdd05430a82e0f9af3322ad776682b29a19585",
-      "bytes": 1239780
+      "sha256": "a379a9ba288344e373c8318116dd983dfdfdbd851f22a0e0c7b03c7ff0ac5af2",
+      "bytes": 1258510
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2027,8 +2027,8 @@
     },
     {
       "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
-      "sha256": "eebde94262d7fc5f2e5961cbee228ecba12f1dcdeb8cac49b199c4f41eb412a7",
-      "bytes": 1140
+      "sha256": "5f28883307ab87b49ee668694a8df64e30040d2ef8185203e3bb5d1236ee92f3",
+      "bytes": 1880
     },
     {
       "path": "src/TiaMcp.Host/TestSuiteTools.cs",
@@ -10077,6 +10077,13 @@
           "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
         },
         {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Result",
           "line": 93,
@@ -11108,6 +11115,13 @@
           "line": 62,
           "endLine": 66,
           "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -23006,6 +23020,13 @@
           "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
         },
         {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Result",
           "line": 93,
@@ -28560,6 +28581,13 @@
           "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
         },
         {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Result",
           "line": 93,
@@ -32784,6 +32812,13 @@
           "line": 62,
           "endLine": 66,
           "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -39517,6 +39552,13 @@
           "sha256": "778483896be918a650878d7a508e70df23f735c7f2e8a6bae234474675706fcb"
         },
         {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "new",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "3a99dcb722cb52034cfa85dd945ee86ee6743a52be2e7e421202469671f852bc"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "new",
           "line": 93,
@@ -39534,26 +39576,36 @@
       "host": {
         "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "name": "Probe",
-        "line": 13,
-        "endLine": 19,
-        "sha256": "735fdf09d36311ca43c5c68950db4b764e0152c5819702d644e2a2346d27cec9"
+        "line": 14,
+        "endLine": 29,
+        "sha256": "5e15734fbd48bb159b1502af9f1d509f0450f640a39ab5c148a51f5f8de556cb"
       },
       "bridgeOperations": [
         "testsuite_scope_probe"
       ],
       "localCallNames": [
+        "BridgeException",
         "CallAsync",
         "Combine",
-        "InvalidOperationException",
+        "GetRawText",
+        "Result",
+        "Serialize",
         "not"
       ],
       "hostDelegationAnchors": [
         {
           "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
           "name": "Probe",
-          "line": 13,
-          "endLine": 19,
-          "sha256": "735fdf09d36311ca43c5c68950db4b764e0152c5819702d644e2a2346d27cec9"
+          "line": 14,
+          "endLine": 29,
+          "sha256": "5e15734fbd48bb159b1502af9f1d509f0450f640a39ab5c148a51f5f8de556cb"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
         }
       ],
       "workerRoutes": [
@@ -39587,6 +39639,41 @@
           "line": 14,
           "endLine": 38,
           "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+        },
+        {
+          "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
+          "name": "Result",
+          "line": 318,
+          "endLine": 323,
+          "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
+        },
+        {
+          "path": "src/TiaMcp.Host/CompositeEngineeringTools.cs",
+          "name": "Result",
+          "line": 62,
+          "endLine": 66,
+          "sha256": "a39b401abec4e981e47037a5e5317233c37719742331b4ea31a5233a1ed95711"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "Result",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "f75e54c1b8def5d1872352a7896f4393039865f5d510e0564a4f3dde66bc1418"
+        },
+        {
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Result",
+          "line": 93,
+          "endLine": 98,
+          "sha256": "5c6813004ae398a34fe7ebfc6a923269264624de84681743aa4988df92d7fde6"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
+          "name": "Serialize",
+          "line": 11,
+          "endLine": 18,
+          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -41138,6 +41225,13 @@
           "line": 99,
           "endLine": 99,
           "sha256": "778483896be918a650878d7a508e70df23f735c7f2e8a6bae234474675706fcb"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "new",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "3a99dcb722cb52034cfa85dd945ee86ee6743a52be2e7e421202469671f852bc"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -64039,6 +64133,13 @@
           "sha256": "778483896be918a650878d7a508e70df23f735c7f2e8a6bae234474675706fcb"
         },
         {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "new",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "3a99dcb722cb52034cfa85dd945ee86ee6743a52be2e7e421202469671f852bc"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "new",
           "line": 93,
@@ -65306,6 +65407,13 @@
           "line": 99,
           "endLine": 99,
           "sha256": "778483896be918a650878d7a508e70df23f735c7f2e8a6bae234474675706fcb"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "new",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "3a99dcb722cb52034cfa85dd945ee86ee6743a52be2e7e421202469671f852bc"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -70477,6 +70585,13 @@
           "line": 99,
           "endLine": 99,
           "sha256": "778483896be918a650878d7a508e70df23f735c7f2e8a6bae234474675706fcb"
+        },
+        {
+          "path": "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+          "name": "new",
+          "line": 31,
+          "endLine": 32,
+          "sha256": "3a99dcb722cb52034cfa85dd945ee86ee6743a52be2e7e421202469671f852bc"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -89762,6 +89877,7 @@
         "src/TiaMcp.Host/ProjectExplorerResources.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs"
       ],
       "schemaBindings": [
@@ -95090,7 +95206,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.definitions.20261028",
+          "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e",
+          "artifacts": [
+            "evidence/local.testsuite.definitions.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -95125,7 +95249,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.definitions.20261028",
+          "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e",
+          "artifacts": [
+            "evidence/local.testsuite.definitions.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96144,6 +96276,7 @@
         "src/TiaMcp.Core/VersionControl/VciModels.cs",
         "src/TiaMcp.Host/CompositeEngineeringTools.cs",
         "src/TiaMcp.Host/DbSnapshotTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
         "src/TiaMcp.Host/TranslationQualificationTools.cs",
@@ -99587,6 +99720,7 @@
         "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
         "src/TiaMcp.Host/CompositeEngineeringTools.cs",
         "src/TiaMcp.Host/DiscoveryTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs"
       ],
       "schemaBindings": [],
@@ -101029,6 +101163,7 @@
         "src/TiaMcp.Host/HostOptions.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs"
       ],
       "schemaBindings": [],
@@ -101990,6 +102125,7 @@
         "src/TiaMcp.Host/OpcUaEngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaTools.cs",
         "src/TiaMcp.Host/ProjectReviewTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationTools.cs",
         "src/TiaMcp.Host/WatchQualification.cs"
@@ -104256,6 +104392,7 @@
         "src/TiaMcp.Host/Security/CredentialVault.Operations.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
         "src/TiaMcp.Host/TranslationQualificationTools.cs",
@@ -104294,13 +104431,25 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Core/BridgeClient.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
+        "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
         "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
+        "src/TiaMcp.Host/CompositeEngineeringTools.cs",
         "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
+        "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/WatchQualification.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.scope-probe.20261028",
+          "profileSha256": "fc96bbe5ab2bd3e9a1be79c0cef2f04526fee906ed79e604c48a28f19dcc02b4",
+          "artifacts": [
+            "evidence/local.testsuite.scope-probe.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -104514,6 +104663,7 @@
         "src/TiaMcp.Host/Security/CredentialVault.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
         "src/TiaMcp.Host/TranslationQualificationTools.cs",
@@ -110148,7 +110298,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.definitions.20261028",
+          "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e",
+          "artifacts": [
+            "evidence/local.testsuite.definitions.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -110428,6 +110586,7 @@
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Core/WebApplicationWorkflowStore.cs",
         "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TestSuiteTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -110764,6 +110923,7 @@
         "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
         "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
         "src/TiaMcp.Core/WebApplicationWorkflowStore.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TestSuiteTools.cs",
         "src/TiaMcp.Host/TiaTools.cs"
       ],
@@ -110884,7 +111044,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.definitions.20261028",
+          "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e",
+          "artifacts": [
+            "evidence/local.testsuite.definitions.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -112041,6 +112209,7 @@
         "src/TiaMcp.Host/TeamcenterTools.cs",
         "src/TiaMcp.Host/TechnologyProfileTools.cs",
         "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
+        "src/TiaMcp.Host/TestSuiteScopeProbeTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
         "src/TiaMcp.Host/TranslationQualificationTools.cs",
@@ -114965,6 +115134,16 @@
       "sha256": "3db4631a0fba28a3d95dcd25e2c2fa50ebf12060e4edd6aecac450368896d333"
     },
     {
+      "path": "evidence/local.testsuite.definitions.20261028.json",
+      "state": "observed",
+      "sha256": "b622b4e86dbc77c04ded72744d4d9d152c3a10bf974fbd1e9e3ce8cc4d530773"
+    },
+    {
+      "path": "evidence/local.testsuite.scope-probe.20261028.json",
+      "state": "observed",
+      "sha256": "67b9ac17c1a2193567a14aa6d29d8db2155e881293f013723ab438b38d29fc14"
+    },
+    {
       "path": "evidence/local.typed.crossscope.engineering.20261028.json",
       "state": "observed",
       "sha256": "d0b2e1a16374baa2103789f78291b799cca8ffeca4fbe3133bf87cffcb2fb74a"
@@ -115679,6 +115858,14 @@
     {
       "id": "local.technology_changes.20261028",
       "profileSha256": "7291cb07a184b09fc806f5586415c24948165547da41ec5d4b17d4c03dce1ecd"
+    },
+    {
+      "id": "local.testsuite.definitions.20261028",
+      "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e"
+    },
+    {
+      "id": "local.testsuite.scope-probe.20261028",
+      "profileSha256": "fc96bbe5ab2bd3e9a1be79c0cef2f04526fee906ed79e604c48a28f19dcc02b4"
     },
     {
       "id": "local.typed.crossscope.engineering.20261028",
