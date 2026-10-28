@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.45",
-    "catalogSha256": "dbb3f44d073b82195cfef3db1e8c1e0d8d47ba688afe6e3656a4661c0761ea89",
+    "catalogSha256": "3d22704df9dabca73b7e9dcddfe0ec9926b839451de5b8caf96640d2e43735df",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -21657,7 +21657,7 @@
         },
         {
           "path": "docs/plans/typed-lad-fbd-todo.md",
-          "sha256": "3f12f0717e8e4d98468a3b1d649969927b56c30ead98153682df4e6bb61078f6"
+          "sha256": "7133bbe6e97260cda7932a35cf1db82a5584d972518bc2de4f0520a17b86c8fb"
         }
       ],
       "notRetained": [
