@@ -73,7 +73,7 @@ CRITERIA = {
         "AC-evidence": "This report."},
     "diagnostic_runtime_acquisition_export": {
         "AC-identity": "An unknown acquisition and an unknown format refuse.",
-        "AC-completeness": "JSON, Markdown and HTML exports of both acquisitions are schema-valid, hash-exact files; the JSON export carries the complete acquisition.",
+        "AC-completeness": "JSON, Markdown and HTML exports of both acquisitions are schema-valid, hash-exact files; the JSON export is the complete acquisition.",
         "AC-evidence": "This report."},
     "diagnostic_runtime_acquisition_compare": {
         "AC-identity": "Comparing an acquisition with itself refuses as MeasurementLineageMismatch, and a request with fields beyond reason refuses.",
@@ -180,7 +180,7 @@ class Lab:
                 raw = Path(exported["artifact"]["path"]).read_bytes()
                 require(hashlib.sha256(raw).hexdigest() == exported["id"] and len(raw) == exported["artifact"]["bytes"], "The %s export file differs from its receipt" % fmt)
                 if fmt == "json":
-                    require(json.loads(raw)["acquisition"] == document, "The JSON export lacks the complete acquisition")
+                    require(json.loads(raw) == document, "The JSON export is not the complete acquisition")
                 exports[fmt] = {"bytes": len(raw), "sha256": exported["id"]}
             return {"id": receipt["id"], "snapshotRef": capture["snapshotRef"], "rows": rows, "counts": counts, "exports": exports}
         result = h.stage("acquire and export " + label, run)
@@ -299,10 +299,10 @@ def body(h):
         lab.refuse("no acknowledgeWrite", "diagnostic_plcsim_write", lab.write("set Enable", enable, False, True, acknowledgeWrite=False), ["RuntimeAcknowledgementRequired"])
         outside = lab.write("an undeclared signal", enable, False, True)
         outside["writes"][0]["signalId"] = "missing"
-        lab.refuse("a signal outside the case", "diagnostic_plcsim_write", outside, ["InvalidRequest", "CaptureMismatch", "ObjectNotFound"])
+        lab.refuse("a signal outside the case", "diagnostic_plcsim_write", outside, ["RuntimeCaptureAssociationMismatch"])
         typed = lab.write("a wrong datatype", enable, False, True)
         typed["writes"][0]["datatype"] = "Int"
-        lab.refuse("a datatype that differs from the declaration", "diagnostic_plcsim_write", typed, ["InvalidRequest", "CaptureMismatch"])
+        lab.refuse("a datatype that differs from the declaration", "diagnostic_plcsim_write", typed, ["PlcsimCaptureInvalid", "RuntimeCaptureAssociationMismatch"])
         lab.written("with a wrong expected value", lab.write("Expect Enable true while it reads false.", enable, True, False), "preconditionMismatch")
         lab.written("set Enable", lab.write("Raise Enable to test the follows hypothesis.", enable, False, True), "written")
         lab.settled(True)
