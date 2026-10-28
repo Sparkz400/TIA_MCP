@@ -1,7 +1,7 @@
 """Qualify hardware_gsd_export natively on an I-device CPU 1511-1 PN in one owned scratch project.
 
 Phase A puts the CPU's X1 node on a subnet, then makes its PROFINET interface an I-device with hardware_attributes
-(InterfaceOperatingMode IoDevice) under checkpoint, device compile and save; the complete hardware, device-inventory and
+(InterfaceOperatingMode "IoController, IoDevice") under checkpoint, device compile and save; the complete hardware, device-inventory and
 program state must differ in exactly the intended keys. hardware_gsd_export then exports the I-device GSD from the item that
 reports gsdExportAvailable: every returned file must exist with its SHA-256, the GSDML must be well-formed XML naming the
 designation, and the export must change nothing. Typed refusals cover an invented path, an item without the service, a
@@ -21,16 +21,18 @@ from qualify_hardware_changes import Run
 from qualify_plc_object_mutations import coverage_gaps, diff
 
 DESIGNATION = "TiaMcpIDevice"
+# V21 refuses IoDevice alone on this CPU interface ("cannot be set to the value 2"): it stays an IO controller as well.
+IDEVICE = "IoController, IoDevice"
 CRITERIA = {
     "AC-identity": "refused: an invented hardware path, an item without GsdExportProvider, a missing designation and the interface before it is an I-device (and after it is switched back) "
-                   "are typed refusals that leave the complete state unchanged; hardware_attributes refuses an operating-mode value that is not one enum name.",
+                   "are typed refusals that leave the complete state unchanged; hardware_attributes refuses an operating-mode value naming an unknown mode.",
     "AC-completeness": "Every file the export returns exists with its SHA-256 and byte count, the result is not truncated, and the GSDML is well-formed XML naming the designation; "
                        "the fresh reopen and the restored copy export a GSDML of the same name.",
     "AC-evidence": "This report: binaries, tool calls, step results, snapshots with state.json, the exported files' hashes, sideEffects and limitations.",
 }
 LIMITATIONS = [
-    "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is an I-device only (InterfaceOperatingMode IoDevice) on a subnet without an IO controller; "
-    "no transfer areas, shared device or higher-level controller assignment are configured, and IoController plus IoDevice at once is not settable through one enum name.",
+    "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device (InterfaceOperatingMode \"IoController, IoDevice\"; V21 refuses IoDevice alone) "
+    "on a subnet without a higher-level IO controller; no transfer areas, shared device or controller assignment are configured.",
     "The GSDML content is Siemens output: the runner checks that it is well-formed XML naming the designation, not that another engineering tool imports it.",
     "Engineering only; nothing is downloaded and no PROFINET communication is observed.",
 ]
@@ -94,9 +96,9 @@ def phase_a(run, cpu, interface):
     run.h.stage("no item reports gsdExportAvailable before the I-device", lambda: require(exportable(run) == [], "Exportable before the I-device: %s" % exportable(run)) or [])
     refuse_export(run, "the interface before it is an I-device", {"hardwarePath": interface, "designation": DESIGNATION}, ["UnsupportedCapability"])
     run.apply("put ScratchPLC on GsdNet", "network_configure", {"hardwarePath": interface, "nodeName": "X1", "subnetName": "GsdNet"}, changed=["hw:" + interface])
-    run.refuse("hardware_attributes", "two operating modes in one value", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "IoController, IoDevice"}}, "InvalidRequest")
+    run.refuse("hardware_attributes", "an unknown name in an operating-mode set", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "IoController, SharedDevice"}}, "InvalidRequest")
     run.refuse("hardware_attributes", "an unknown operating mode", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "SharedDevice"}}, "InvalidRequest")
-    mode(run, interface, "IoDevice")
+    mode(run, interface, IDEVICE)
     paths = exportable(run)
     run.h.report["exportableAfter"] = paths
     require(paths == [interface], "Expected only the I-device interface to report gsdExportAvailable: %s" % paths)

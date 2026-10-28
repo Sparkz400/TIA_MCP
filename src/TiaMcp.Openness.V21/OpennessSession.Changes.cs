@@ -34,7 +34,7 @@ namespace TiaMcp.Openness.V21
         {
             "Name", "Author", "Comment", "InformationText", "PlantDesignation", "LocationIdentifier", "AdditionalInformation",
             "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay",
-            // A PROFINET interface's single InterfaceOperatingModes value (IoController or IoDevice): IoDevice makes the CPU an I-device.
+            // A PROFINET interface's InterfaceOperatingModes flags: "IoController, IoDevice" makes an S7-1500 CPU an I-device.
             "InterfaceOperatingMode"
         }, StringComparer.Ordinal);
         private static readonly HashSet<string> NetworkWriteAttributes = new HashSet<string>(new[]
