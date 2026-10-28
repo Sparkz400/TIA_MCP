@@ -71,11 +71,43 @@ runs, and every owned Portal and worker process has an exit proof.
 Verified (catalog `0.4.49`, 19 cells): `watch_table_generate`,
 `watch_table_prepare_authoring`, `qualification_watch_authoring_source_negative`.
 
-Not verified: `qualification_watch_authoring_source_reconcile`. It only reconciles a
-source-negative admission left in `dispatchIntent` or `outcomeUnknown`, and the exact-profile
-runner calls it only when the negative itself fails. Neither run left such an admission, and
-no runner has an interruption point inside the helper. Verifying it needs a worker-loss point
-in `watch_authoring_source_negative`.
+Not verified by these runs: `qualification_watch_authoring_source_reconcile`. It only
+reconciles a source-negative admission left in `dispatchIntent` or `outcomeUnknown`, and the
+exact-profile runner calls it only when the negative itself fails. Neither run left such an
+admission. It passed later the same day after an actual Host loss
+([below](#source-negative-reconciliation-after-host-loss)).
+
+## Source-negative reconciliation after Host loss
+
+Evidence [`local.watch.source_reconcile.20261028`](../../evidence/local.watch.source_reconcile.20261028.json).
+Runner [`scripts/qualify_watch_source_reconcile.py`](../../scripts/qualify_watch_source_reconcile.py),
+run `src3`, on a frozen Debug build in `D:\wp\b58`. A new qualification-only Host point,
+`host.watch_authoring_source_negative`, stops the Host after the admitted native dispatch of
+the helper returned and before the Host records the outcome. The worker had finished: the saved
+`HeaderAuthor` drift, the `StaleSource` refusal and the restoration are in the Host's
+interruption marker.
+
+What the run proves:
+
+- The Host exited 74; its worker and Portal exited 0. The shared admission stayed in
+  `dispatchIntent` and owned the project.
+- A second Host opened the original in a fresh owned Portal. A replay of the helper was refused
+  with `ResourceBusy` before any native effect.
+- `qualification_watch_authoring_source_reconcile` compared the retained pre-effect baseline with
+  the fresh snapshot: absent table, identical content and peers, new session and process. It
+  reconciled the project as `unchanged` without a native mutation.
+- A second reconcile was refused with `InvalidOperationState`, `engineering_operation_status`
+  read the admission as reconciled, and a fresh capture reproduced the original FB and
+  instance DB hashes.
+
+Fixed on the way: the two source-negative qualification tools passed bridge exceptions through,
+so a refusal reached the client as an untyped `McpToolError` (trial `src1`). They now return typed
+errors like every engineering tool. Trial `src2` stopped before starting a Host because of a wrong
+path. Neither trial is cited.
+
+A worker loss inside the helper, between the drift and the restoration, leaves a changed
+project. The reconciler refuses that by design (`ReconciliationIncomplete`); it needs checkpoint
+recovery instead and is not exercised.
 
 ## Still open
 
