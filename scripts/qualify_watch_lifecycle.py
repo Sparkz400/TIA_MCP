@@ -1,6 +1,8 @@
 """D02: the six watch-table lifecycle profiles natively, with exact owned lifetimes.
 
-One owned scratch CPU 1511-1 PN; the operations chain on the saved original project:
+One owned scratch CPU 1511-1 PN, seeded with the MilestoneWatch fixture (which registers the
+scratch for mutations after a reopen and leaves two root peer tables that must stay unchanged);
+the operations chain on the saved original project:
 create group, create a table in it, rename the group (the table must keep its content
 under the new path), rename the table, delete it, delete the group. Each operation is
 prepared, independently reviewed from the retained files (plan digest, inputs, an
@@ -22,6 +24,7 @@ import verify_watch_workflow as base
 from retained_native_lifecycle import require
 
 GROUP, GROUP2, TABLE, TABLE2 = 'WTL_Group', 'WTL_Renamed', 'WTL_Table', 'WTL_Moved'
+SEED = Path(__file__).resolve().parents[1] / 'fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml'
 TOOLS = {'createTable': ('watch_table_prepare_create', 'tableName'), 'renameTable': ('watch_table_prepare_rename', 'tableName'),
          'deleteTable': ('watch_table_prepare_delete', 'tableName'), 'createGroup': ('watch_table_group_prepare_create', 'groupName'),
          'renameGroup': ('watch_table_group_prepare_rename', 'groupName'), 'deleteGroup': ('watch_table_group_prepare_delete', 'groupName')}
@@ -148,6 +151,10 @@ class Run(owned.Run):
         require(scratch['completed'], 'Scratch creation incomplete')
         original = scratch['project']['path']
         self.plc = scratch['exports'][0]['block']['plcPath']
+        seed = self.root / 'seed.xml'
+        shutil.copyfile(SEED, seed)
+        self.call('qualification_watch_fixture_seed', {'inputPath': str(seed), 'inputSha256': workflow.digest(seed)}, 'seeded')
+        self.reopen(original)
         results, previous = [], None
         for index, (operation, group, name, new, refusals) in enumerate(STEPS, start=1):
             label = '%02d-%s' % (index, operation)
