@@ -80,7 +80,7 @@ class Run(StateRun):
             if destination is not None:
                 files["to:" + row["path"]] = destination / ("to-%03d.xml" % len(files))
                 files["to:" + row["path"]].write_bytes(raw)
-            state["to:" + row["path"]] = {**row, "connections": detail["hardwareConnections"], "payloadSha256": native_payload_hash(raw.decode("utf-8-sig"))}
+            state["to:" + row["path"]] = {**row, "connections": portable(detail["hardwareConnections"]), "payloadSha256": native_payload_hash(raw.decode("utf-8-sig"))}
         return state, files
 
     def state(self):
@@ -111,6 +111,13 @@ class Run(StateRun):
                                                           or family == "member" and "/systemConstants/" in key)
         self.finish(label, kind, prepared, tolerated=generated, **expected)
         return prepared
+
+
+def portable(value):
+    """Connection readbacks without the project path and per-session native identifiers, which a recovered copy changes."""
+    if isinstance(value, dict):
+        return {k: portable(v) for k, v in value.items() if k not in ("projectPath", "nativeIdentifier")}
+    return [portable(v) for v in value] if isinstance(value, list) else value
 
 
 def selected(run, path, payload):
@@ -148,8 +155,9 @@ def link(run, cam, tag, kind, restore=False):
     path = run.to("ToAxis", "children", "OutputCams", cam)
     payload = {"technologyPath": path, "role": "outputCam", **({"tagName": tag} if kind == "to_connect" else {})}
     def connections(applied, state):
-        rows = state["to:" + path]["connections"]
-        require((tag in json.dumps(rows)) == (kind == "to_connect"), "technology_read connections of %s: %s" % (cam, rows))
+        row = next(r for r in state["to:" + path]["connections"] if r["role"] == "outputCam")
+        connected = kind == "to_connect"
+        require(row["isConnected"] is connected and ((row.get("outputTag") or {}).get("kind") == "tag") is connected, "technology_read connection of %s: %s" % (cam, row))
     run.apply("%s %s %s %s" % ("connect" if kind == "to_connect" else "disconnect", cam, "to" if kind == "to_connect" else "from", tag), kind, payload,
               {"effects": [{"technologyObject": cam, "technologyPath": path, "action": kind}]},
               shown=selected(run, path, payload), changed=["to:" + path], check=connections, restore=restore)
