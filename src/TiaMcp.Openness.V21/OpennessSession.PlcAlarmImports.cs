@@ -196,8 +196,9 @@ namespace TiaMcp.Openness.V21
         }
 
         // Native evidence (28 October 2026): every export carries save times in docProps and zip headers, a DAT package names
-        // its single entry after the export file, and each XLSX export draws fresh random relationship IDs. Hash only the
-        // decompressed parts, DAT entries by position and XLSX relationship IDs renumbered by first use.
+        // its single entry after the export file and stamps its XML with CreationDate, and each XLSX export draws fresh random
+        // relationship IDs. Hash only the decompressed parts, DAT entries by position without CreationDate and XLSX
+        // relationship IDs renumbered by first use.
         private static string PlcAlarmContentHash(string file)
         {
             bool xlsx = file.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase);
@@ -216,6 +217,7 @@ namespace TiaMcp.Openness.V21
                         byte[] bytes = memory.ToArray();
                         if (xlsx) bytes = Encoding.UTF8.GetBytes(RelationshipIds.Replace(Encoding.UTF8.GetString(bytes),
                             match => match.Groups[1].Value + (ids.TryGetValue(match.Groups[2].Value, out var id) ? id : ids[match.Groups[2].Value] = "R" + ids.Count) + "\""));
+                        else bytes = Encoding.UTF8.GetBytes(CreationDate.Replace(Encoding.UTF8.GetString(bytes), ""));
                         using (var sha = SHA256.Create())
                             parts[xlsx ? entries[index].FullName : "#" + index] = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
                     }
@@ -224,5 +226,6 @@ namespace TiaMcp.Openness.V21
         }
 
         private static readonly Regex RelationshipIds = new Regex("((?:\\br:id|\\bId)=\")(R[0-9a-f]{16})\"", RegexOptions.CultureInvariant);
+        private static readonly Regex CreationDate = new Regex("\\sCreationDate=\"[^\"]*\"", RegexOptions.CultureInvariant);
     }
 }
