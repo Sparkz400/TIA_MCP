@@ -1,7 +1,7 @@
-"""Qualify the X01 project-level kinds natively in one owned scratch CPU 1511-1 PN: project attributes, project languages,
-project_copy and project_open with readOnly.
+"""Qualify the X01 project-level kinds natively in one owned scratch CPU 1511-1 PN: project languages, project_copy and
+project_open with readOnly. project_attributes_set must refuse every allowlisted attribute, which V21 declares read-only.
 
-Phase A applies project_attributes_set and project_languages_set with checkpoint, compile and save. Each preview is asserted
+Phase A applies project_languages_set with checkpoint, compile and save. Each preview is asserted
 against the request and project_properties, and a complete state (every block, type and tag-table export, every member and
 group path, and the project_properties metadata, languages, text categories and used products) must differ from the previous
 one in exactly the intended keys. A fresh Portal then reopens the saved project, which must show the identical state. Phase B
@@ -22,11 +22,13 @@ from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, matches, view
 
-KINDS = ("project_attributes_set", "project_languages_set")
+KINDS = ("project_languages_set",)
+# V21 native attribute info declares the whole project_attributes_set allowlist read-only.
+READ_ONLY = ("Author", "Copyright", "Family", "Version")
 # Point-in-time values that a save or a recovered copy changes by themselves.
 VOLATILE = ("lastModified", "lastModifiedBy", "sizeKb", "isModified")
 CRITERIA = {
-    "AC-identity": "refused: typed refusals of non-allowlisted attributes, unknown or unsupported cultures, removal of the reference or editing language, mutations of a read-only project and a missing copy source, each leaving the complete state unchanged.",
+    "AC-identity": "refused: typed refusals of read-only and non-allowlisted attributes, unknown or unsupported cultures, removal of the reference or editing language, mutations of a read-only project and a missing copy source, each leaving the complete state unchanged.",
     "AC-preview": "Every preview is asserted against the request and project_properties before apply; a wrong previewHash refuses at apply.",
     "AC-preserve": "applied: every program export and member, and the project metadata, languages, text categories and used products differ in exactly the intended keys; project_copy leaves the source unchanged and its copy equals it.",
     "AC-native": "applied + persisted: checkpoint, compile and save stages, change_status, project_properties readback and a fresh owned Portal reopen with identical state.",
@@ -35,7 +37,8 @@ CRITERIA = {
 }
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 project; multiuser, protected (UMAC) and upgraded projects are not exercised.",
-    "project_attributes_set writes Author, Copyright, Family and Version; the multilingual Comment is refused by design.",
+    "project_attributes_set cannot apply on V21: native attribute info declares Author, Copyright, Family and Version read-only, so each is refused "
+    "with AttributeNotWritable (asserted here); the multilingual Comment is refused by design.",
     "project_languages_set adds and removes one supported language and switches the editing language; texts in a removed language are not seeded, "
     "so their loss is not observed.",
     "project_copy copies a saved project; the UnsavedProject refusal is not exercised, because no read-only route leaves the source modified.",
@@ -87,14 +90,6 @@ class Run(StateRun):
         return prepared
 
 
-def attributes(run, values, restore=False):
-    before = run.current["view"]["project:properties"]
-    run.apply("set project %s" % ", ".join(values), "project_attributes_set", {"attributes": values},
-              {"effects": [{"projectAttributes": list(values)}],
-               "attributeChanges": [{"name": key, "before": before[key.lower()], "after": value} for key, value in values.items()]},
-              changed=["project:properties"], rows={"project:properties": {key.lower(): value for key, value in values.items()}}, restore=restore)
-
-
 def languages(run, label, payload, after, restore=False):
     current = run.current["view"]["project:languages"]
     run.apply(label, "project_languages_set", payload,
@@ -112,13 +107,15 @@ def pick_language(run):
 
 
 def phase_a(run):
+    access = run.current["view"]["project:attributeAccess"]
+    require(access == {name: "Read" for name in READ_ONLY}, "Expected the V21 read-only project attributes: %s" % access)
+    for name in READ_ONLY:
+        run.refuse("project_attributes_set", name + ", which V21 declares read-only", {"attributes": {name: "TiaMcp"}}, "AttributeNotWritable")
     run.refuse("project_attributes_set", "the multilingual Comment", {"attributes": {"Comment": "x"}}, "UnsupportedAttribute")
-    stale = run.prepare("set project Family (made stale below)", "project_attributes_set", {"attributes": {"Family": "Stale"}})
-    run.refuse_apply("project_attributes_set", "a wrong previewHash", {**stale, "previewHash": "0" * 64}, "PreviewMismatch")
-    attributes(run, {"Author": "TiaMcp Author", "Copyright": "TiaMcp Copyright", "Family": "TiaMcp Family", "Version": "1.2.3"})
-    run.refuse_apply("project_attributes_set", "a preview made stale by a later change", stale, "StaleRevision")
     settings = run.current["view"]["project:languages"]
     reference, culture = settings["reference"], pick_language(run)
+    stale = run.prepare("add %s (made stale below)" % culture, "project_languages_set", {"addActive": [culture]})
+    run.refuse_apply("project_languages_set", "a wrong previewHash", {**stale, "previewHash": "0" * 64}, "PreviewMismatch")
     run.refuse("project_languages_set", "an unknown culture", {"addActive": ["xx-INVALID"]}, "InvalidRequest")
     run.refuse("project_languages_set", "removing the reference language", {"removeActive": [reference]}, "LanguageInUse")
     run.refuse("project_languages_set", "an editing language that is not active", {"editingLanguage": culture}, "InvalidRequest")
@@ -126,6 +123,7 @@ def phase_a(run):
     active = sorted(settings["active"] + [culture])
     languages(run, "add %s as editing language" % culture, {"addActive": [culture], "editingLanguage": culture},
               {"active": active, "reference": reference, "editing": culture})
+    run.refuse_apply("project_languages_set", "a preview made stale by a later change", stale, "StaleRevision")
     languages(run, "edit in %s again" % settings["editing"], {"editingLanguage": settings["editing"]},
               {"active": active, "reference": reference, "editing": settings["editing"]})
     run.h.report["fixture"] = {"language": culture, "reference": reference}
@@ -150,7 +148,6 @@ def persisted(run):
 
 
 def phase_b(run):
-    attributes(run, {"Version": "2.0.0"}, restore=True)
     culture = run.h.report["fixture"]["language"]
     settings = run.current["view"]["project:languages"]
     languages(run, "remove %s" % culture, {"removeActive": [culture]},
@@ -180,7 +177,7 @@ def phase_c(run):
         require(mine == theirs, "The copy differs from its source: %s" % diff(theirs, mine))
         return len(mine)
     h.stage("the read-only copy equals its source", equal)
-    for kind, payload in (("project_attributes_set", {"attributes": {"Version": "9"}}), ("tag_create", {"tagTableName": "Default tag table", "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
+    for kind, payload in (("project_languages_set", {"editingLanguage": run.current["view"]["project:languages"]["reference"]}), ("tag_create", {"tagTableName": "Default tag table", "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
         run.refuse(kind, "a read-only project", payload, "ReadOnlyProject")
     h.report["copy"] = {"opened": opened, "result": copied}
 
