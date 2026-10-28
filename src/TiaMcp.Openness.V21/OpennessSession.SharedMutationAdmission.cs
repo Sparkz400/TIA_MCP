@@ -296,6 +296,7 @@ namespace TiaMcp.Openness.V21
                 else
                 {
                     string path = ChangeText(args, "path", 4096), expected = ChangeText(args, "expectedSha256", 64);
+                    if (!ProjectPathIsAbsolute(path) || !File.Exists(path)) throw new BridgeException("PackageInvalid", "An existing absolute native library/archive path on the TIA host is required.");
                     if (!string.Equals(ChangeFileHash(path), expected, StringComparison.OrdinalIgnoreCase)) throw new BridgeException("PackageChanged", "Library source marker changed.");
                     bool archive = string.Equals(Path.GetExtension(path), ".zal21", StringComparison.OrdinalIgnoreCase);
                     add("library", archive ? path : Path.GetDirectoryName(Path.GetFullPath(path)), "readSourceAndCompanions");

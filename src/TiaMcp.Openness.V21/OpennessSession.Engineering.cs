@@ -78,6 +78,7 @@ namespace TiaMcp.Openness.V21
             var budget = new ScanBudget(50000);
             string hardwarePath = args.Value<string>("hardwarePath");
             var items = DeviceItems(project, budget).Where(item => hardwarePath == null || item.Path == hardwarePath).Take(max + 1).ToArray();
+            if (hardwarePath != null && items.Length == 0 && !budget.Truncated) throw new BridgeException("HardwareNotFound", "No hardware item matches hardwarePath.");
             var output = new JArray();
             foreach (var entry in items.Take(max))
             {

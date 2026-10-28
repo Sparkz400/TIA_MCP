@@ -34,6 +34,7 @@ namespace TiaMcp.Openness.V21
             var technologyMembership = new TechnologyBlockMembership();
             foreach (var technologyEntry in technologyEntries) technologyMembership.AddTechnology(technologyEntry.Item, technologyEntry.Path);
             var scopes = SoftwareScopes(plc, budget, warnings).Where(scope => string.IsNullOrWhiteSpace(args.Value<string>("scopePath")) || scope.Path == args.Value<string>("scopePath")).ToList();
+            if (!string.IsNullOrWhiteSpace(args.Value<string>("scopePath"))) RequireOne(scopes.Count, budget, "PLC or software-unit scope");
             var result = Envelope();
             var units = new JArray();
             var blocks = new JArray();
