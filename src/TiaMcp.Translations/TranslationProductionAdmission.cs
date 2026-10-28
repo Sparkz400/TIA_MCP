@@ -75,10 +75,8 @@ internal static class TranslationProductionAdmission
         Require(changed.Length <= 1, "TranslationAdmissionScopeUnqualified", "The finite proposal permits only no-op or one exact Main OB1 comment replacement.");
         if (changed.Length == 1)
         {
-            string[] view = changed[0].ViewPath.Split('\\');
-            Require(changed[0].Category == "<BlockCommentCategoryData>" && view.Length == 5 &&
-                view[0] == Path.GetFileNameWithoutExtension(target.ProjectFilePath) && view[2] == "Programmbausteine" &&
-                view[3] == "Main" && view[4] == "Bausteinkommentar", "TranslationAdmissionScopeUnqualified", "Only the exact captured Main OB1 block-comment field is eligible.");
+            Require(changed[0].Category == "<BlockCommentCategoryData>" && TranslationNativeComparison.MainCommentView(changed[0].ViewPath, target.ProjectFilePath),
+                "TranslationAdmissionScopeUnqualified", "Only the exact captured Main OB1 block-comment field is eligible.");
         }
         return new(Contract, Clone(binaries), operation.Plan.Resources.Single().ResourceKey,
             target.Reference.Snapshot.TiaVersion, target.HardwareIdentity, target.NativeIdentity, target.ProfileSha256,

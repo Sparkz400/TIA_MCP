@@ -63,6 +63,18 @@ Each list returns at most `maxItems` keys, with its count and a truncation flag.
 
 Limits: the multi-target layout is unobserved. The reader expects one column per target between the `<source>*` and `ref="0"` headers and fails closed on any other layout (`readError`, or comparison `unavailable`). Category rows are matched by the observed `<Identifier>` label form, and any other label makes the comparison unavailable. Earlier PLC owner exports omitted project-level texts such as alarm classes. HMI owner coverage is unobserved. The tool never imports, saves or activates languages.
 
+## V21 Update 3 behavior (28 October 2026)
+
+Native runs under TIA Portal V21 Update 3 showed five differences from the 16 October packet. Each is handled as follows ([record](../verification/translation-native-20261028.md)):
+
+- **Category leakage still holds.** On the seeded fixture, a `HwcnCommentTextCategoryData` request on the PLC returned all six PLC rows, five of them outside the category; the alarm-class request leaked the same way. Restricted category/object profiles stay disabled, and imports keep using the whole-project export. The populated-Main control is now inconclusive: its sentinels are the English default OB interface comments, which an English-UI scratch stores under en-US rather than the de-DE source.
+- **Reference language follows the TIA UI.** A new scratch takes the UI language (en-US here) as reference. `qualification_translation_fixture` now activates de-DE, makes it reference and editing language, adds en-GB and deactivates every other language before seeding.
+- **View paths follow the TIA UI.** `ExportProjectTexts` writes `Program blocks\Main\Block comment` under an English UI and `Programmbausteine\Main\Bausteinkommentar` under a German one. The peer comparer and the admission descriptor accept exactly these two label sets for the Main OB1 block comment.
+- **Read-only interface comments.** The whole-project export now lists Main's read-only interface comments (`Initial_Call`, `Remanence`). Importing them back unchanged logs "is read-only and therefore cannot update value" once per row and returns `Warning`. The adapter accepts `Warning` only when the log has exactly that warning, on rows the candidate leaves unchanged, between "Text import started." and "Text import completed with warnings."; any other entry is refused. The full readback after import still proves every row. The messages follow the UI language; only the English text was observed, so a German UI fails closed.
+- **Rows are sorted by source text.** A changed source moves its row, so the profile check refuses a source-drifted export (`TranslationScopeMismatch`) before the content comparison would (`StaleWorkbook`). Both refusals happen before dispatch.
+
+The Host also no longer assumes the Siemens API under `C:\Program Files`: like the worker, it reads the registered `Siemens.Engineering.Base` location, which the admission binary inventory hashes.
+
 ## Qualification boundary
 
 The sequential coordinator freezes source and binary packages, holds declared foreign-store locks through exact owned process termination, and admits only its own disposable fixture. The populated Main category control demonstrated leakage: hardware/alarm category requests returned three block-comment rows. Restricted category/object profiles therefore remain disabled. The narrow import packet uses the legacy **whole-project bilingual export** and compares every exported row; it does not rely on category filtering.

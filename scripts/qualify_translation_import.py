@@ -19,7 +19,18 @@ from verify_translation_populated_category_probe import decode, compare, populat
 from verify_watch_workflow import canonical_sha
 
 REPO = Path(__file__).resolve().parents[1]
+# The export sorts rows by source text, so a changed source can also move its row: the profile check then refuses first.
+STALE_CODES = ('StaleWorkbook', 'TranslationScopeMismatch')
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
+
+
+def portal_check(before, after, owned):
+    """The owned Portal must have exited. Other lanes start and end their own Portals on this machine; these runners
+    never terminate a process, so a foreign Portal that ended meanwhile is recorded, not treated as a failure."""
+    remaining = {p['processId'] for p in after['processes']}
+    require(owned not in remaining, 'The owned Portal remains after detach')
+    ended = sorted({p['processId'] for p in before['processes']} - remaining)
+    return {'ownedPortalExited': True, 'foreignPortalsEnded': ended, 'preexistingPreserved': not ended}
 
 
 def category_verdict(result):
@@ -62,7 +73,11 @@ class Run:
         self.args, self.root = args, args.root.resolve()
         self.failure_case = getattr(args, 'failure_case', None)
         self.same_instance = getattr(args, 'same_instance', False)
+        self.before_checkpoint = getattr(args, 'interrupt_before_checkpoint', False)
+        self.stop_after_noop = getattr(args, 'stop_after_noop', False)
         self.forward_key = None
+        require(not self.before_checkpoint or not (self.same_instance or self.failure_case or args.resume_root or self.stop_after_noop),
+                'The pre-checkpoint interruption needs its own fresh fixture; its resume run reconciles it')
         require(not self.same_instance or not self.failure_case and not args.resume_root, 'Same-instance qualification requires its own new fixture and bounded case list')
         require(self.failure_case is None or self.failure_case in FAILURE_CASES, 'Unsupported bounded failure case')
         require(not self.failure_case or not args.resume_root, 'Failure packet requires a fresh isolated fixture; accepted trials are never resumed or replayed')
@@ -82,10 +97,14 @@ class Run:
             'resumeOperation': args.resume_operation,
             'failureCase': self.failure_case,
             'sameInstance': self.same_instance,
+            'interruptBeforeCheckpoint': self.before_checkpoint,
+            'stopAfterNoop': self.stop_after_noop,
             'effects': ('One newly owned offline bilingual scratch; seven exact forward cases on the same full instance key, at most five explicitly reviewed reverse Main target operations, at most ten imports and twelve distinct checkpoint restorations, read-only reconciliation and exact cleanup.') if self.same_instance else
                 ('One newly owned offline bilingual scratch; one reviewed Main comment operation interrupted at ' + self.failure_case +
                 '; one checkpoint restoration to a distinct absent directory, read-only reconciliation and exact cleanup. Accepted no-op/edit trials are not repeated.')
-                if self.failure_case else 'One newly owned offline bilingual scratch; category probes, two reviewed imports, separate checkpoint restorations and read-only reconciliation.'})
+                if self.failure_case else ('One newly owned offline bilingual scratch; category probes and one no-op operation interrupted after acquisition, '
+                'before checkpoint and before any import; a later run reconciles it read-only.') if self.before_checkpoint else
+                'One newly owned offline bilingual scratch; category probes, two reviewed imports, separate checkpoint restorations and read-only reconciliation.'})
 
     def failure_trial(self, selector, edit, project, report):
         """Exactly one unattempted operation; a failed/unknown response never triggers replay."""
@@ -99,7 +118,7 @@ class Run:
         request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
         options = {'interruptBeforeDispatch': True} if self.failure_case == 'before-dispatch' else {'driftSourceAfterCheckpoint': True} if self.failure_case == 'source-drift' else {} if self.failure_case == 'restore-reply' else {'loseReplyAfterStage': self.failure_case.removesuffix('-reply')}
         applied = self.call('qualification_translation_apply', {**request, **options}, expect_error=self.failure_case != 'restore-reply')
-        if self.failure_case == 'source-drift': require('StaleWorkbook' in json.dumps(applied), 'The actual changed source was not refused as stale before dispatch')
+        if self.failure_case == 'source-drift': require(any(code in json.dumps(applied) for code in STALE_CODES), 'The actual changed source was not refused as stale before dispatch')
         status = self.call('qualification_translation_status', {'operationId': op['id']})
         require(status['state'] == ('succeeded' if self.failure_case == 'restore-reply' else 'outcomeUnknown') and len(status['checkpoints']) == 1, 'Interrupted native operation must retain unknown outcome and original checkpoint')
         self.call('qualification_translation_apply', {**request, 'revision': status['revision']}, expect_error=True)
@@ -121,6 +140,17 @@ class Run:
         report['trials'].append({'name': self.failure_case, 'id': op['id'], 'unknownRevision': status['revision'], 'finalRevision': done['revision'],
             'recoveryPath': str(destination), 'expectedImports': 0 if self.failure_case in ('before-dispatch', 'source-drift') else 1,
             'originalDisposition': done['reconciliation'][0]['disposition'], 'collisionMarker': marker_before})
+
+    def before_checkpoint_trial(self, selector, report):
+        """One unattempted no-op interrupted before its checkpoint; only reconcile_before_checkpoint in a later run may close it."""
+        prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'before-checkpoint-' + self.root.name})
+        op = prepared['operation']
+        self.call('qualification_translation_apply', {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision'],
+                                                      'interruptBeforeCheckpoint': True}, expect_error=True)
+        status = self.call('qualification_translation_status', {'operationId': op['id']})
+        require(status['state'] == 'outcomeUnknown' and status['revision'] == 2 and not status['checkpoints'] and
+                [e['gate'] for e in status['evidence']] == ['interruption.1'], 'Pre-checkpoint interruption must retain only acquired/unknown history')
+        report['trials'].append({'name': 'before-checkpoint', 'id': op['id'], 'unknownRevision': status['revision'], 'imports': 0})
 
     def same_instance_trials(self, selector, edit, project, original_target, report):
         report['reverseTrials'] = []
@@ -236,8 +266,10 @@ class Run:
                 self.save('edit-oracle', {'original': rows[0], 'requested': edit, 'scope': 'one existing nonempty en-GB target'})
                 if self.same_instance: self.same_instance_trials(selector, edit, project, rows[0]['target']['text'], report)
                 elif self.failure_case: self.failure_trial(selector, edit, project, report)
-                for label, change in ([] if self.failure_case or self.same_instance else [('noop', {}), ('edit', edit)]):
+                elif self.before_checkpoint: self.before_checkpoint_trial(selector, report)
+                for label, change in ([] if self.failure_case or self.same_instance or self.before_checkpoint else [('noop', {}), ('edit', edit)]):
                     if any(t['name'] == label for t in report['trials']): continue
+                    if label == 'edit' and self.stop_after_noop: break
                     prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
                     op = prepared['operation']
                     request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
@@ -260,8 +292,7 @@ class Run:
                     if label == 'noop': self.call('project_open', {'path': project})
                 self.call('tia_detach')
                 after = self.call('tia_discover')
-                require(sorted(before['processes'], key=lambda x: x['processId']) == sorted(after['processes'], key=lambda x: x['processId']), 'Preexisting Portal set changed')
-                report['preexistingPreserved'] = True
+                report.update(portal_check(before, after, started['processId']))
                 report['completed'] = True
             except BaseException as error:
                 report['failure'] = {'type': type(error).__name__, 'message': str(error)}
@@ -287,6 +318,8 @@ def main():
     parser.add_argument('--failure-case', choices=FAILURE_CASES,
                         help='Run only one remaining interruption/lost-response case on a fresh fixture; do not repeat accepted trials')
     parser.add_argument('--same-instance', action='store_true', help='One new fixture, seven exact forward cases, bounded reviewed reverse transitions, full unchanged-instance checks')
+    parser.add_argument('--interrupt-before-checkpoint', action='store_true', help='Fresh fixture: interrupt one no-op after acquisition, before checkpoint; resume reconciles it')
+    parser.add_argument('--stop-after-noop', action='store_true', help='Run only the no-op trial, so a later run can resume the closed fixture for the edit')
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
     require(args.execute, 'Explicit coordinator execution required')

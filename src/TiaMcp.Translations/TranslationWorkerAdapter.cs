@@ -100,6 +100,34 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
         return new(id, "unqualified-explicit", source[..^1], rows.ToArray(), AllowSharedStringToInline: true);
     }
     internal static byte[] JsonBytes<T>(T value) => Encoding.UTF8.GetBytes(CanonicalJson.Serialize(Node(value)));
+    // V21 Update 3 exports read-only OB interface comments (Main Initial_Call/Remanence); importing them back unchanged
+    // logs one read-only warning each. Only that exact log shape, on rows the candidate leaves unchanged, is accepted;
+    // the full readback after import still proves every row. The messages follow the TIA UI language (English observed).
+    internal static bool OnlyUnchangedReadOnlyWarnings(byte[] log, TranslationWorkbook before, TranslationWorkbook after, string culture)
+    {
+        (string?, string?)[] entries;
+        try
+        {
+            using var reader = System.Xml.XmlReader.Create(new MemoryStream(log), new System.Xml.XmlReaderSettings { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null });
+            entries = System.Xml.Linq.XDocument.Load(reader).Root!.Elements("LogEntry").Select(e => ((string?)e.Attribute("type"), (string?)e.Element("Message"))).ToArray();
+        }
+        catch (System.Xml.XmlException) { return false; }
+        if (entries.Length < 3 || entries[0] != ("Information", "Text import started.") || entries[^1] != ("Warning", "Text import completed with warnings.")) return false;
+        foreach (var (type, message) in entries[1..^1])
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(message ?? "", "^Object in row [0-9]+ with internal ID '([^']+)' is read-only and therefore cannot update value\\.$");
+            if (type != "Warning" || !match.Success) return false;
+            string key = match.Groups[1].Value;
+            try
+            {
+                var (sourceBefore, targetBefore) = before.Read(key, culture);
+                var (sourceAfter, targetAfter) = after.Read(key, culture);
+                if (sourceBefore != sourceAfter || targetBefore != targetAfter) return false;
+            }
+            catch (BridgeException) { return false; }
+        }
+        return true;
+    }
     private sealed class Session(TranslationWorkerAdapter owner, TranslationImportContext context, string lease) : ITranslationImportSession
     {
         private bool closed, failed;
@@ -149,7 +177,12 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             // Preserve the original vendor result before reading its fields. The durable
             // result is the typed operation binding; the original remains content-addressed.
             var returned = JsonNode.Parse(raw)!;
-            bool accepted = returned["state"]!.GetValue<string>() == "Info" && returned["updateSourceLanguage"]!.GetValue<bool>() == context.UpdateSourceLanguage &&
+            string state = returned["state"]!.GetValue<string>();
+            bool accepted = (state == "Info" || state == "Warning" && baseline != null && OnlyUnchangedReadOnlyWarnings(log,
+                    TranslationWorkbook.Open(baseline.Workbook, NativeProfile(baseline.Workbook), baseline.Target.Reference, Sha256(baseline.Workbook)),
+                    TranslationWorkbook.Open(exactCandidate, NativeProfile(exactCandidate), baseline.Target.Reference, Sha256(exactCandidate)),
+                    baseline.Scope.TargetCulture)) &&
+                returned["updateSourceLanguage"]!.GetValue<bool>() == context.UpdateSourceLanguage &&
                 returned["operationId"]!.GetValue<string>() == context.Operation.Id && returned["planSha256"]!.GetValue<string>() == context.Operation.PlanSha256 &&
                 returned["candidateSha256"]!.GetValue<string>() == context.CandidateSha256;
             return new(JsonBytes(new TranslationImportResultReceipt(context.Operation.Id, context.Operation.PlanSha256, ProjectKey,

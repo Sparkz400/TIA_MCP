@@ -1,0 +1,70 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.native.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T16:57:53+00:00",
+  "source": {
+    "commit": "d0bc0b1bd9cc0bc5bb8ed58e1b32bad3e6179f8d",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The six translation_native_* tools in default mode (no qualification flag) on byte-identical copies of the tr07 Host and worker (bf12c29) with an exact admission built by scripts/build_translation_admission.py from the verified same-instance packet; runner from f8c5788 (D:\\wp\\tr08). Worker and Portal loss at checkpointIntent and inside the native import, and Host loss during the import, each reconciled from a fresh Host without replay; then refusals of an uninstalled or malformed profile and an unknown operation before dispatch, capture, offline review, approval and candidate, admitted prepare, forged-plan and stale-revision refusals, one import with readback, preservation, compile, save and fresh reopen, replay and existing-destination refusals, checkpoint recovery to a new directory, read-only reconciliation (verifiedApplied/verifiedRestored) and a changed-baseline refusal.",
+  "limitations": [
+    "The installed admission is instance-bound: it admits one scratch project and one Main OB1 comment edit and was installed only into the test deployment; no shipped package contains a registry.",
+    "A Host lost at dispatchIntent can only be reconciled read-only; a partial original would stay unresolved. The Update 3 read-only-row warning is matched in its English wording only."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 29,
+      "sha256": "65e88701db987441e6ccc0b42f1cc0e9a6c6857114bcc5fd5af92c0bfb4cb78c"
+    },
+    {
+      "name": "worker",
+      "files": 9,
+      "sha256": "389588e634ae7ccbe839f7f6d0c8ff89432b7a66094d2f21b38ae2839a75861b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "native.json",
+      "sha256": "9ff3885ac10ca5bff69d0a28d6cf65b2799f96e73b832fc4d4ddd5f3a68f2a3d",
+      "bytes": 10516,
+      "completed": true,
+      "steps": [
+        "p2: completed",
+        "verifier si-verification.json: completed"
+      ],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "project_open",
+        "tia_detach",
+        "tia_discover",
+        "tia_start",
+        "translation_approve",
+        "translation_candidate",
+        "translation_inspect",
+        "translation_native_apply",
+        "translation_native_capture",
+        "translation_native_prepare",
+        "translation_native_reconcile",
+        "translation_native_recover",
+        "translation_native_status",
+        "translation_prepare"
+      ],
+      "toolsRejected": [
+        "translation_native_apply",
+        "translation_native_capture",
+        "translation_native_prepare",
+        "translation_native_recover",
+        "translation_native_status"
+      ]
+    }
+  ]
+}

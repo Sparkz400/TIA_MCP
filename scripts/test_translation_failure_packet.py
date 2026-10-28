@@ -118,7 +118,7 @@ class FailurePacketChecks(unittest.TestCase):
             with self.subTest(damage=damage), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 admission = {'failureCase': 'import-reply', 'kind': 'translation-failure-qualification', 'artifactRoot': str(root), 'resumeOperation': None}
-                result = {'completed': True, 'productionEnabled': False, 'automaticReplay': False, 'preexistingPreserved': True,
+                result = {'completed': True, 'productionEnabled': False, 'automaticReplay': False, 'preexistingPreserved': True, 'ownedPortalExited': True,
                           'trials': [{'name': 'import-reply'}]}
                 if damage == 'not-completed': result['completed'] = False
                 elif damage == 'production-enabled': result['productionEnabled'] = True

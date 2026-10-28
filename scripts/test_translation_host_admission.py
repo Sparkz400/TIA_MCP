@@ -195,7 +195,8 @@ def main():
         for bad in ({"loseReplyAfterStage": "invalid"},
                     {"loseReplyAfterStage": "import", "interruptBeforeDispatch": True},
                     {"loseReplyAfterStage": "save", "driftSourceAfterCheckpoint": True},
-                    {"interruptBeforeDispatch": True, "driftSourceAfterCheckpoint": True}):
+                    {"interruptBeforeDispatch": True, "driftSourceAfterCheckpoint": True},
+                    {"interruptBeforeCheckpoint": True, "interruptBeforeDispatch": True}):
             reject("qualification_translation_apply", {**plan, **bad}, "TranslationQualificationCaseInvalid")
         no_operations("qualification")
         stop()
