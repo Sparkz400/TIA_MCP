@@ -27,7 +27,8 @@ internal static partial class Program
         // sim_state is verified only by a record that exercised all four actions (powerOn, run, stop, powerOff).
         Check.Equal("verified", startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("status").GetString());
         var startupEvidence = startup.GetProperty("evidence").EnumerateArray().ToDictionary(e => e.GetProperty("id").GetString()!);
-        Check.Equal("passed", startupEvidence["local.sim.state.20261024"].GetProperty("status").GetString());
+        var cited = startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("evidenceIds")[0].GetString()!;
+        Check.Equal("passed", startupEvidence[cited].GetProperty("status").GetString());
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(maxItems: 0); return Task.CompletedTask; });
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(implementationStatus: "perfect"); return Task.CompletedTask; });
         await Check.BridgeError("FeatureNotFound", () => { catalog.Query(featureId: "unknown"); return Task.CompletedTask; });
@@ -46,12 +47,12 @@ internal static partial class Program
             root => root["features"]![1]!["featureId"] = root["features"]![0]!["featureId"]!.GetValue<string>(),
             root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("invented-proof"),
             root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray(),
-            root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.sim.startup.v02"),
-            root => { root["features"]![0]!["qualification"]!["status"] = "failed";
-                root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.offline.v02"); },
+            root => Cited(Verified(root))["status"] = "failed",
+            // A failed qualification must cite a failed record; the bundled first feature cites a passed one.
+            root => root["features"]![0]!["qualification"]!["status"] = "failed",
             root => Cited(Verified(root))["status"] = "blocked",
             root => Cited(Verified(root))["status"] = "skipped",
-            root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "perfect",
+            root => Cited(root)["status"] = "perfect",
             root => root["features"]![0]!["implementation"]!["status"] = "not_implemented",
             root => root["features"]![0]!["acceptanceCriteria"] = new JsonArray("unknown-criterion")
         })

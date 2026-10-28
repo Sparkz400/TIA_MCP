@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.67",
+  "catalogVersion": "0.4.68",
   "targetTiaVersions": [
     21
   ],
@@ -103,181 +103,6 @@
       ]
     },
     {
-      "id": "vm.offline.licensed.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "DESKTOP-8ANVMF8",
-        "virtualization": "VMware Workstation, Windows 11",
-        "transport": "SSH with explicit same-user interactive-session relay",
-        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1",
-        "bundle": "tia-mcp-v21_20261008_095124_0f4f5a05",
-        "passedScope": "19 deployment stages: native scratch creation, standard SCL FC/FB/DB/OB generation, zero-error software compile, inventory, export, hashed artifact transfer, detach and fresh reconnect; separate idle SSH loss and independent-session checks"
-      },
-      "artifacts": [
-        "artifacts/deployment-vm-licensed.json",
-        "artifacts/ssh-transport-vm-final.json",
-        "artifacts/vm-access/deployment-final.json"
-      ],
-      "limitations": [
-        "This evidence does not qualify interrupted native writes, simulator execution, physical PLCs, safety or arbitrary project/device combinations.",
-        "Direct SSH service-session TIA startup failed on this VM; interactive mode requires the same engineering user to remain logged in.",
-        "Later binary revisions need matching evidence; this is not Siemens support certification."
-      ]
-    },
-    {
-      "id": "vm.deployment.20261008",
-      "status": "blocked",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "DESKTOP-8ANVMF8",
-        "virtualization": "VMware Workstation, Windows 11",
-        "transport": "SSH with explicit same-user interactive-session relay",
-        "passedScope": "MCP/catalog, native discovery, TIA startup, project creation, CPU catalog lookup, detach, shutdown and reconnect"
-      },
-      "artifacts": [
-        "artifacts/deployment-vm-interactive-ssh.json",
-        "artifacts/vm-access/deployment-relay.json",
-        "artifacts/vm-access/relay-receipts.json"
-      ],
-      "limitations": [
-        "CPU creation is blocked by a missing STEP 7 Professional license; guest compile/export and interrupted native-write recovery remain unverified.",
-        "Direct SSH service-session TIA startup failed on this VM; interactive mode requires the same engineering user to remain logged in.",
-        "Observed deployment only, not a Siemens support certification for arbitrary VM/OS/product combinations."
-      ]
-    },
-    {
-      "id": "local.offline.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0/4.1",
-        "languages": [
-          "SCL",
-          "STL",
-          "LAD",
-          "FBD"
-        ]
-      },
-      "artifacts": [
-        "artifacts/milestones-sixth.json",
-        "artifacts/smoke-integration.json"
-      ],
-      "limitations": [
-        "Historical milestone completed flag described engineering only; simulation execution was not passed.",
-        "Named fixture operations only; no universal CPU/instruction claim."
-      ]
-    },
-    {
-      "id": "local.hardware.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "technology": "PID_Compact3.0"
-      },
-      "artifacts": [
-        "artifacts/hardware-to-smoke-first.json",
-        "artifacts/hardware-to-smoke-final.json"
-      ],
-      "limitations": [
-        "One qualified DI module and PID type/version; one CPU display protection warning."
-      ]
-    },
-    {
-      "id": "local.safety.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511F-1PN",
-        "firmware": "4.1",
-        "language": "F_FBD"
-      },
-      "artifacts": [
-        "artifacts/safety-roundtrip-verified.json"
-      ],
-      "limitations": [
-        "Unchanged user F-block roundtrip only; no changed safety behavior or commissioning qualification."
-      ]
-    },
-    {
-      "id": "local.restart.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "persisted journal and archive retrieval"
-      },
-      "artifacts": [
-        "artifacts/recovery-restart.json"
-      ],
-      "limitations": [
-        "Owned scratch checkpoint only."
-      ]
-    },
-    {
-      "id": "local.guards.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "preview, revision and idempotency guards"
-      },
-      "artifacts": [
-        "artifacts/write-guards-final.json"
-      ],
-      "limitations": [
-        "Specific canonical scratch cases; broader unit-scope revision qualification remains distinct."
-      ]
-    },
-    {
-      "id": "local.sim.download.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "simulatorVersion": 8,
-        "cpu": "CPU1511",
-        "firmware": "4.0",
-        "operation": "virtual memory-card generation"
-      },
-      "artifacts": [
-        "artifacts/simulation-validation-first.json"
-      ],
-      "limitations": [
-        "Only simulation_download succeeded; overall execution run was blocked at power-on."
-      ]
-    },
-    {
-      "id": "local.sim.startup.v02",
-      "status": "failed",
-      "profile": {
-        "simulatorVersion": 8,
-        "operation": "PowerOn",
-        "errorCode": "ErrorLoadingDll"
-      },
-      "artifacts": [
-        "artifacts/simulator-startup-validation.json"
-      ],
-      "limitations": [
-        "Owned creation and cleanup passed. Empty native instance reproduced startup failure."
-      ]
-    },
-    {
-      "id": "local.package.v02",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "simulatorVersion": 8,
-        "operation": "packaged MCP initialize/discovery/status"
-      },
-      "artifacts": [
-        "artifacts/package-smoke.json"
-      ],
-      "limitations": [
-        "Local host only; no VM run."
-      ]
-    },
-    {
       "id": "local.catalog.v03",
       "status": "passed",
       "profile": {
@@ -289,463 +114,6 @@
       ],
       "limitations": [
         "Catalog reports recorded profiles only; does not probe target availability."
-      ]
-    },
-    {
-      "id": "local.capabilities.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": [
-          "CPU1511-1PN",
-          "CPU1511F-1PN"
-        ],
-        "operation": "observational capability metadata, service detection and protection boundaries"
-      },
-      "artifacts": [
-        "artifacts/target-capabilities-live.json",
-        "artifacts/target-capabilities-safety-live.json"
-      ],
-      "limitations": [
-        "Observed standard and F scratch copies only; per-target qualification remains unverified.",
-        "Source archives, native sample blocks and inventory unchanged. No automatic certificate for arbitrary objects."
-      ]
-    },
-    {
-      "id": "local.conformance.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "languages": [
-          "SCL",
-          "STL",
-          "LAD",
-          "FBD"
-        ],
-        "phase": "engineering",
-        "fixtures": 14,
-        "steps": 73
-      },
-      "artifacts": [
-        "artifacts/conformance/live-first/index.json"
-      ],
-      "limitations": [
-        "Compile/export/interface/native-reference and bounded graphical-preservation assertions only. Runtime vectors specified but not executed.",
-        "Two simple graphical networks; no general rewiring, other CPU family or full instruction-set qualification."
-      ]
-    },
-    {
-      "id": "local.units.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "software-unit namespace identities and prepared source/XML changes",
-        "phase": "engineering",
-        "steps": 46
-      },
-      "artifacts": [
-        "artifacts/object-model-live-fourth.json"
-      ],
-      "limitations": [
-        "Two software units and selected SCL FC/UDT fixtures, including duplicate short names in distinct namespaces.",
-        "Qualified preservation of unrelated root/unit/alternate-namespace block payloads and stale-preview rejection; no safety-unit or all-language unit qualification."
-      ]
-    },
-    {
-      "id": "local.analysis.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "operation": "read-only native call-graph regression",
-        "nativeCallSites": 5
-      },
-      "artifacts": [
-        "artifacts/analysis-regression-v03.json"
-      ],
-      "limitations": [
-        "Four expected caller/callee pairs; two TON/CTU native system instruction endpoints unresolved explicitly.",
-        "Observed calls used direct native FB identity; InstanceDB name fallback and duplicate-member native cases remain qualified only by pure tests."
-      ]
-    },
-    {
-      "id": "local.unit-recovery.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "software-unit archive restoration, reopen and stale-copy identity rejection",
-        "steps": 20
-      },
-      "artifacts": [
-        "artifacts/object-model-unit-recovery.json"
-      ],
-      "limitations": [
-        "Selected namespaced FCs in the isolated software-unit fixture; no universal native rollback or safety-unit recovery claim."
-      ]
-    },
-    {
-      "id": "local.index_paging.v03",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "generatedFunctions": 250,
-        "metadataRows": 311,
-        "packagedFollowupSteps": 20
-      },
-      "artifacts": [
-        "artifacts/project-index-native.json",
-        "artifacts/project-index-packaged-final.json",
-        "artifacts/project-index-store-tests.json"
-      ],
-      "limitations": [
-        "One generated offline fixture; pure50000-row tests do not qualify native50000-item traversal or VM latency.",
-        "Metadata revision only; external changes require explicit verification. No whole-project or PLC-logic freshness claim.",
-        "No incremental event subscription or cursor persistence across workers."
-      ]
-    },
-    {
-      "id": "local.layers.objects.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "scope": "PLC root",
-        "operations": [
-          "UDT read/rename/delete",
-          "tag address edit/delete",
-          "user constant value edit/delete",
-          "block/type/tag group create/rename/empty delete",
-          "referenced UDT deletion rejection",
-          "explicit array element start readback"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-layers-release.json"
-      ],
-      "limitations": [
-        "Only the completed objects-and-data section is qualified; this combined run later stopped in its call-inspection harness.",
-        "No cross-scope moves, recursive deletion, protected or safety edits, runtime behavior or universal attribute/type combinations."
-      ]
-    },
-    {
-      "id": "local.layers.graphical.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "scope": "PLC root",
-        "operations": [
-          "LAD native Access fragment replacement",
-          "FBD native Access fragment replacement",
-          "whole native XML preservation readback",
-          "checkpoint recovery and original XML comparison"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-layers-release.json"
-      ],
-      "limitations": [
-        "Only the completed lad-fbd-native-patch-preservation-and-recovery section is qualified; the combined run later stopped in its call-inspection harness.",
-        "Does not qualify network insertion, arbitrary instruction creation, every call shape, or runtime behavior."
-      ]
-    },
-    {
-      "id": "local.layers.calls.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "language": "SCL",
-        "operations": [
-          "simple FC symbolic argument edit",
-          "native call inspection",
-          "whole native XML preservation",
-          "immutable prepared preview"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-layers-calls.json"
-      ],
-      "limitations": [
-        "One FC argument in PLC root scope; graphical rewiring, FB instances and multi-instances require their own evidence.",
-        "This run does not establish runtime behavior or a separate save/reopen or recovery cycle for the call change."
-      ]
-    },
-    {
-      "id": "local.layers.hardware.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "modules": [
-          "6ES7 521-7BH00-0AB0/V1.0",
-          "6ES7 522-1BH10-0AA0/V1.1",
-          "6ES7 531-7QF00-0AB0/V1.0",
-          "6ES7 532-5ND00-0AB0/V1.1"
-        ],
-        "operations": [
-          "DI/DO/AI/AO plug",
-          "same-direction address conflict rejection",
-          "start byte relocation/readback/restore to zero",
-          "rename/delete"
-        ]
-      },
-      "artifacts": [
-        "artifacts/hardware-families-expanded.json"
-      ],
-      "limitations": [
-        "28 hardware applies compiled without errors; four intentional conflicts rejected before mutation.",
-        "Central modules only; writable channel parameters were not exposed through the allowlist, and distributed I/O was not qualified."
-      ]
-    },
-    {
-      "id": "local.layers.axis.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "technology": "TO_PositioningAxis10.0",
-        "initialParameters": {
-          "VirtualAxis.Mode": 1,
-          "_Properties.MotionType": 0
-        }
-      },
-      "artifacts": [
-        "artifacts/technology-families-expanded.json"
-      ],
-      "limitations": [
-        "Virtual positioning-axis subsection created with initial parameters, read back, compiled and deleted.",
-        "The overall run stopped on the separate encoder dependency failure; no physical axis connection or motion behavior qualification."
-      ]
-    },
-    {
-      "id": "local.layers.encoder-dependencies.20261008",
-      "status": "failed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "technology": "TO_ExternalEncoder10.0"
-      },
-      "artifacts": [
-        "artifacts/technology-families-expanded.json"
-      ],
-      "limitations": [
-        "Creation and parameter readback succeeded, but compilation rejected missing encoder telegram input/output addresses and incompatible telegram types.",
-        "Native disconnected hardware metadata and exact diagnostics were retained; checkpoint recovery succeeded. No connected encoder qualification."
-      ]
-    },
-    {
-      "id": "local.layers.calls-expanded.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.0",
-        "language": "SCL",
-        "scope": "PLC root",
-        "operations": [
-          "FC argument edit",
-          "FB global-instance argument edit",
-          "FB multi-instance argument edit",
-          "whole native XML preservation",
-          "three checkpoint recoveries with original XML and call metadata equality"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-layers-calls-expanded.json"
-      ],
-      "limitations": [
-        "Six applies compiled with zero errors/warnings; three selected input arguments changed from A to Alternate. Callee and instance DB payloads stayed unchanged.",
-        "Global FB instance components are exposed but resolution stays explicitly unresolved because of the native HasQuotes child; local multi-instance is symbolicOnly, not a resolved native object identity.",
-        "No graphical rewiring, instance retargeting, arbitrary expressions, runtime behavior or other CPU/instruction combination qualification."
-      ]
-    },
-    {
-      "id": "local.layers.units-expanded.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "scopes": [
-          "PLC root",
-          "software unit A",
-          "software unit B"
-        ],
-        "operations": [
-          "LAD/FBD unit operand edit",
-          "duplicate block-name ambiguity and wrong namespace rejection",
-          "unselected root/unit native XML preservation",
-          "distinct empty tag-table imports and unit-A roundtrip",
-          "cross-scope table selector rejection"
-        ]
-      },
-      "artifacts": [
-        "artifacts/object-model-expanded.json",
-        "artifacts/object-model-expanded-tag-name-collision.json"
-      ],
-      "limitations": [
-        "The successful focused report records 64 calls, 12 compiled/saved applies and five expected rejections.",
-        "The earlier table collision report is negative evidence only: this native configuration requires PLC-wide tag-table name uniqueness; failed import recovered.",
-        "Empty unit tables only; individual unit tag edits, cross-unit dependency changes, safety-unit routes and broader languages/profiles remain unqualified."
-      ]
-    },
-    {
-      "id": "local.layers.safety-comment.20261008",
-      "status": "failed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511F-1PN",
-        "firmware": "4.1",
-        "operation": "offline user F-FBD comment change"
-      },
-      "artifacts": [
-        "artifacts/safety-expanded.json",
-        "artifacts/safety-expanded-checkpoint-retrieval.json"
-      ],
-      "limitations": [
-        "Comment import compiled with zero errors/warnings, then generated protected DB1_C fingerprint collection failed; automatic change_restore rejected the missing post-change fingerprint.",
-        "Separate hash-verified archive retrieval into an empty owned instance passed original F-block XML and program/block signature equality. The retained failed project and journal were not replaced.",
-        "No safety logic, safety-unit, F-I/O or commissioning qualification."
-      ]
-    },
-    {
-      "id": "local.layers.safety-fingerprint-fix.20261008",
-      "status": "blocked",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "fresh native rerun after generated fingerprint correction"
-      },
-      "artifacts": [
-        "artifacts/safety-expanded-isolated-start-timeout.json",
-        "artifacts/safety-expanded-final.json",
-        "artifacts/engineering-layers-release-tests.log"
-      ],
-      "limitations": [
-        "Corrected source builds and passes the regression suite, including protected generated provenance guards and unchanged user-block fail-closed handling.",
-        "Both isolated-path and established Release-path tia_start calls timed out before any project-creation or mutation request. No cause was established; no native pass is claimed.",
-        "Exact owned empty headless instances were checked with native discovery before cleanup; no existing project was targeted."
-      ]
-    },
-    {
-      "id": "local.session.startup-requalified.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "operation": "Explicit empty worker-owned headless startup, native status, detach and discovery",
-        "executionContext": "Ordinary Windows user session"
-      },
-      "artifacts": [
-        "artifacts/engineering-gap-startup-probe.json",
-        "artifacts/safety-gap-requalified.json"
-      ],
-      "limitations": [
-        "The empty-session retry completed tia_start in 15.118 seconds; the completed safety fixture separately records three distinct owned process starts and saved-project reopens.",
-        "Earlier TimeoutOutcomeUnknown reports remain blocked historical evidence. This requalification establishes the observed working execution context, not a proven root cause or universal startup-time guarantee.",
-        "No existing user project, physical PLC, safety login or online operation was involved."
-      ]
-    },
-    {
-      "id": "local.layers.safety-requalified.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511F-1PN",
-        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1FL03-0AB0/V4.1",
-        "firmware": "4.1",
-        "language": "F_FBD",
-        "scope": "PLC root",
-        "block": "Main_Safety_RTG1",
-        "operations": [
-          "Existing user F-block comment edit",
-          "Post-compile native signatures and durable fingerprint readback",
-          "Guarded checkpoint recovery and unchanged recovered compile/save",
-          "Exact changed and recovered project readback after fresh owned TIA reopen"
-        ]
-      },
-      "artifacts": [
-        "artifacts/safety-gap-requalified.json",
-        "artifacts/safety-gap-native-preservation-audit.json"
-      ],
-      "limitations": [
-        "The 65-step completed run includes one expected standard-overwrite SafetyBoundary rejection. Comment edit and recovered unchanged import compiled with zero errors/warnings; host exit was zero.",
-        "The prior generated DB1_C inconsistent state was reproduced. The corrected policy recorded a durable post-change fingerprint and explicitly incomplete coverage; protected native system-group generated payloads remain excluded while owning safety signatures and native metadata are covered.",
-        "The strict retained-export audit verifies 40 readbacks across six user blocks and three distinct owned TIA processes, including comments, processing instructions, IDs, QName bindings and significant whitespace. Only top-level export provenance and serializer indentation are excluded.",
-        "The comment changed native XML while program and block signatures remained equal; no changed F-logic behavior, F_LAD/F_DB mutation, safety-unit, F-I/O, commissioning or arbitrary CPU qualification. Historical failed comment and blocked startup evidence remain retained."
-      ]
-    },
-    {
-      "id": "local.layers.graphical-reopen.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.0",
-        "firmware": "4.0",
-        "scope": "PLC root",
-        "fixtures": [
-          "LayerLAD",
-          "LayerFBD"
-        ],
-        "operations": [
-          "LAD/FBD native Access fragment replacement",
-          "Exact native XML readback and zero-error compile/save",
-          "Guarded checkpoint restore with verified archive SHA-256",
-          "Fresh owned TIA reopen of both applied and recovered saved project copies"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-gap-graphical.json",
-        "artifacts/engineering-gap-preservation-audit.json"
-      ],
-      "limitations": [
-        "The standalone 38-step run completed both selected graphical fixtures and exited zero. Each fixture has native apply compilation, unchanged non-selected native content, original recovery XML and independent applied/recovered save-reopen evidence.",
-        "The combined audit verifies retained export bytes, complete native payload equality, recovery archive hashes and three distinct process IDs per fixture; compilation evidence belongs to native apply, not the read-only reopens or offline audit.",
-        "Only the two selected root-scope Access replacements are qualified. Network insertion, arbitrary instruction creation, unit scopes, runtime behavior and broader CPU/instruction combinations remain unqualified."
-      ]
-    },
-    {
-      "id": "local.layers.calls-reopen.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.0",
-        "firmware": "4.0",
-        "language": "SCL",
-        "scope": "PLC root",
-        "fixtures": [
-          "LayerCaller",
-          "LayerInstanceCaller",
-          "LayerMultiCaller"
-        ],
-        "operations": [
-          "FC, FB global-instance and FB multi-instance input argument A to Alternate",
-          "Exact full caller and supporting block native XML readback",
-          "Guarded checkpoint recovery and verified archive SHA-256",
-          "Fresh owned TIA reopen of both applied and recovered saved project copies"
-        ]
-      },
-      "artifacts": [
-        "artifacts/engineering-gap-calls.json",
-        "artifacts/engineering-gap-preservation-audit.json"
-      ],
-      "limitations": [
-        "The standalone 93-step run completed all three call fixtures and exited zero. Native changed applies compiled with zero errors/warnings; callee/instance DB payloads and all unrelated call/instance metadata were preserved through recovery and both saved-copy reopens.",
-        "The combined five-fixture graphical/call audit verifies 40 full native XML equality pairs, five checkpoint archive hashes and three distinct process IDs per fixture. Reopens and the audit inspect retained state without an additional compilation.",
-        "Global FB instance resolution remains explicitly unresolved because of native HasQuotes metadata; local multi-instance remains symbolicOnly. Preservation does not establish exact instance target identity.",
-        "No graphical rewiring, instance retargeting, arbitrary expressions, safety/unit routes, runtime behavior or other CPU/instruction combinations are qualified."
       ]
     },
     {
@@ -790,167 +158,6 @@
       ]
     },
     {
-      "id": "local.library_intake.20261008",
-      "status": "passed",
-      "profile": {
-        "hostFramework": ".NET 10",
-        "tiaVersion": null,
-        "profile": "Synthetic mixed ZIP through actual stdio MCP host; restart, upload retry, staging, paging, cleanup and negative traversal",
-        "pureTests": 55,
-        "mcpSteps": 10,
-        "nativeCodeExecuted": false
-      },
-      "artifacts": [
-        "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
-      ],
-      "limitations": [
-        "Synthetic package only; no Siemens worker was configured or started.",
-        "Does not prove native library validity, vendor authenticity, project import, HMI behavior or runtime execution.",
-        "Pure rules tests do not replace native environment qualification."
-      ]
-    },
-    {
-      "id": "local.explorer.native-browser.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
-        "scope": "Owned offline scratch projects on the final packaged worker: 93-node PLC fixture, two-PLC 405-node/250-function fixture, 2,070-node/2,000-tag scale fixture, 74-node configured-I/O fixture and 31-node Classic Comfort HMI fixture; real browser-to-native trace plus contract, performance and relocation evidence",
-        "operations": [
-          "Native hierarchy and empty groups",
-          "Exact ancestry and all child pages",
-          "Software-unit duplicate names",
-          "Independent block inspection and native relationships",
-          "Metadata-only verification, bounded capture, release and disconnect invalidation",
-          "Hashed portable exports and read-only browser/protocol adapter",
-          "Native LAD/FBD previews matched original XML hashes",
-          "Exact tag-to-module configured I/O ownership in both directions",
-          "Separate HMI worker real screen detail integration",
-          "Full frozen-build regression and local bundle relocation/reconnect",
-          "Final binary native visit/depth bounds and scoped exhaustion",
-          "Same-final-bundle Classic Comfort screen owner/layer/rectangle inspection",
-          "Final 118 bridge checks and full frozen regression",
-          "Final 442-file bundle strict relocation and 13 launcher/reconnect stages",
-          "Native 2,000-tag full XML oracle, all search and child pages, exact details/graph/lifecycle",
-          "Live browser to actual stdio worker: exact six-field selection, native verify, independent block_read, stale-send rejection and hashed artifact transfer"
-        ]
-      },
-      "artifacts": [
-        "artifacts/project-explorer-native-live.json",
-        "artifacts/project-explorer-native-medium.json",
-        "artifacts/project-model-final-evidence.json",
-        "artifacts/project-explorer/browser-results.json",
-        "artifacts/project-explorer-native-packaged.json",
-        "artifacts/project-explorer-native-io-complete.json",
-        "artifacts/project-explorer-final-native-schema.json",
-        "artifacts/project-explorer-final-short-regression.log",
-        "artifacts/project-explorer-relocated-deployment.json",
-        "artifacts/project-explorer/hmi-native-browser-results.json",
-        "artifacts/project-explorer-final-native-complete.json",
-        "artifacts/project-explorer-final-medium.json",
-        "artifacts/project-explorer-native-io-final.json",
-        "artifacts/project-explorer-native-io-final-schema.json",
-        "artifacts/project-explorer-final-hmi.json",
-        "artifacts/project-explorer-final3-native-schema.json",
-        "artifacts/project-explorer-final2-full-regression.log",
-        "artifacts/project-explorer-final-traversal-guards-approved.log",
-        "artifacts/project-explorer-final-relocated-deployment.json",
-        "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-        "artifacts/project-explorer/final-hmi-browser-results.json",
-        "artifacts/project-explorer-native-large-tags.json",
-        "artifacts/project-explorer-release-native-schema.json",
-        "artifacts/project-explorer/browser-native-results.json",
-        "artifacts/project-explorer-native-large-recovery-stop.json",
-        "artifacts/project-explorer/large-native-browser-results.json"
-      ],
-      "limitations": [
-        "Scoped offline read qualification only; metadata is not a complete project/content revision.",
-        "Configured VM SSH probe timed out; remote release gate remains blocked.",
-        "Desktop MCP Apps product rendering remains unverified. Native HMI screen rendering and complete HMI content revision remain unavailable; no positive HMI binding is qualified by the zero-edge screen fixture.",
-        "Only the exact selected native hardware/CPU, Classic Comfort HMI and LAD/FBD fixture profiles are covered; no physical topology or live PLC runtime claim.",
-        "Large native acceptance passed on 2,070 nodes including 2,000 tags. The separate 1,000-function generation target reached the native 500,000-instance limit before capture; recovery preserved a separately verified 500-function saved project. This does not qualify a 1,000-function workload."
-      ]
-    },
-    {
-      "id": "local.library_plc_master.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "profile": "V21 standard PLC single FC master-copy lifecycle",
-        "hostSha256": "8e84c138072fe3711cec3b5bccab12bb0f65e6db8d62c58b2f7f2d6ee47c4508",
-        "workerSha256": "38c5a024cb3d2a3af77d4a3549acbd314787c35c8f1e9db9d7e9d597a71b202f",
-        "nativeSteps": 16,
-        "runtimeVerified": false
-      },
-      "artifacts": [
-        "artifacts/lq/nl_1d1cda41/qualification.json"
-      ],
-      "limitations": [
-        "Does not qualify typed FB/UDT version lifecycle, vendor packages, upgrades, HMI or runtime execution.",
-        "Recovery is intentional checkpoint retrieval after restart, not a crash injected during a Siemens call.",
-        "Single new FC master copy in fresh owned projects; does not qualify arbitrary existing-project preservation or every library operation.",
-        "Exact recorded build only; subsequent changes require their own regression checks."
-      ]
-    },
-    {
-      "id": "reviews.native.20261009",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "build": "59fb741484b34684a8e12fdf760777af",
-        "date": "2026-10-09"
-      },
-      "artifacts": [
-        "artifacts/continuation-20261009/reviews-native-01.json"
-      ],
-      "limitations": [
-        "Fresh owned V21 scratch project, one SCL implementation/comment change and bounded native relationships; offline comparison/search/health repeat after host and TIA exit. Five core groups separately cover negative inputs and incomplete content. No whole-project semantic equivalence or general health guarantee."
-      ]
-    },
-    {
-      "id": "reviews.native.diamond.20261012",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "build": "fa0067bcbd32499485b72d8ea1cef38a",
-        "date": "2026-10-12",
-        "fixture": "Four SCL functions with two diamond-call branches and an Int-to-DInt leaf edit",
-        "operations": [
-          "Twelve exact calls/dependsOn paths per before/after snapshot",
-          "Depth, path-count and edge-visit truncation",
-          "Complete original-peer payload preservation and exact leaf edit",
-          "Changed/recovered fresh reopen and checkpoint recovery",
-          "Persisted compare/search/health after offline host restart"
-        ]
-      },
-      "artifacts": [
-        "artifacts/p16r/rv02/result.json",
-        "artifacts/p16r/rv02-strict-audit.json",
-        "artifacts/p16r/rv02-dom-leaf-audit.json",
-        "artifacts/p16r/compile-diagnostics-audit-01.json"
-      ],
-      "limitations": [
-        "Exact frozen build and fresh owned offline fixture only. Static observed paths do not prove runtime effects or complete project dependency coverage.",
-        "The stricter qualification audit is separate from the review tool's own documented XML comparison policy; historical reports retain their original bytes and hashes.",
-        "No desktop rendering, physical PLC, runtime or later-binary qualification is implied."
-      ]
-    },
-    {
-      "id": "sim.creation.20261009",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "build": "59fb741484b34684a8e12fdf760777af",
-        "date": "2026-10-09"
-      },
-      "artifacts": [
-        "artifacts/continuation-20261009/creation-native-04.json"
-      ],
-      "limitations": [
-        "Empty CPU1511 powered to STOP. Live-worker adoption rejected, existing unowned observer adopted only after original worker exit, owned release confirmed and registry empty. A remaining observer kept registration alive; this does not qualify crash recovery when the native registration disappears or creation remains outcome-unknown."
-      ]
-    },
-    {
       "id": "typed.builders.advanced-unit.20261012",
       "status": "passed",
       "profile": {
@@ -983,31 +190,6 @@
       ]
     },
     {
-      "id": "hmi.readonly.unified-comfort.20261012",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "build": "fa0067bcbd32499485b72d8ea1cef38a",
-        "date": "2026-10-12",
-        "fixture": "Two Unified Comfort owners in an independently recovered seeder-owned project with same-named screens/tags, real integrated PLC endpoints and scalar DB members; clean compilation remains unqualified",
-        "passedScope": "Sixteen actual native inspections, fifty response/row/provider contracts, direct screen-to-tag-to-exact-PLC/DB binding chains, alarm references, event source, wrong-family/stale-target rejection and eight populated exact explorer tag/alarm graphs"
-      },
-      "artifacts": [
-        "artifacts/p16h/native-positive-02/derived-native-report.json",
-        "artifacts/p16h/bridge-positive-04.json",
-        "artifacts/p16h/bridge04-assessment.json",
-        "artifacts/p16h/bridge04-qualify_hmi.py",
-        "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-        "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-      ],
-      "limitations": [
-        "Native bridge archive retrieval still returns directory access denial, including the shorter fresh target; read-only comparison used the separately verified owned derived project. Bridge recovery is not qualified.",
-        "Original reports remain unchanged. A strict reassessment rejects the derived candidate's nominally successful compiler summaries because nested Error-state password diagnostics remain; clean compilation is not qualified.",
-        "This exact read-only profile does not qualify Classic, RT Professional, HMI mutation, full preservation, interrupted-operation recovery, native screen rendering or runtime execution.",
-        "Every production HMI operation remains unavailable; actual capability responses retain operation-specific preservation and recovery prerequisites."
-      ]
-    },
-    {
       "id": "explorer.hmi.browser.20261012",
       "status": "passed",
       "profile": {
@@ -1026,31 +208,6 @@
         "Original frozen export browser failure is retained; corrected current renderer was repacked from the identical verified native snapshot.",
         "Historical read-only explorer rendering is distinct from native HMI screen visual acceptance, live freshness, operation recovery or runtime execution.",
         "This uses project-local Playwright and the portable offline viewer; actual desktop MCP Apps host rendering remains unqualified."
-      ]
-    },
-    {
-      "id": "explorer.native.thousand-functions.20261012",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "date": "2026-10-12",
-        "build": "fa0067bcbd32499485b72d8ea1cef38a",
-        "fixture": "Exactly 1,000 generated SCL functions in ten batches with a final fresh native reopen",
-        "passedScope": "Complete native metadata identities and search/child pagination, 30 independently checked source samples, full baseline peer preservation, twelve exact owned lifetimes, authored calls/instances/reads/writes, last-function details and hash-verified JSON/HTML exports",
-        "browser": "Six portable-viewer Chromium checks using the exact native snapshot and separately hash-bound current UI; 1,000 search results, fewer than 70 rendered rows, exact selection, relationships/evidence/SVG and light/dark layouts",
-        "snapshotId": "37d82fc435c8422a95166e60c83551c5"
-      },
-      "artifacts": [
-        "artifacts/p16r/sc01/result.json",
-        "artifacts/p16r/sc01-audit-final-01.json",
-        "artifacts/p16r/compile-diagnostics-audit-01.json",
-        "artifacts/p16r/scale-browser-01/result.json",
-        "artifacts/p16r/scale-browser-02/result.json"
-      ],
-      "limitations": [
-        "Complete global relationship coverage remains unqualified at the existing provider traversal bound; authored-edge acceptance and complete metadata coverage are separate gates.",
-        "Generated source logic is sampled at first/middle/last function per batch; no all-function payload or runtime proof is claimed.",
-        "Native evidence applies to the exact frozen build. Browser evidence applies to separately recorded current renderer hashes, not actual desktop MCP Apps host rendering."
       ]
     },
     {
@@ -3771,6 +2928,733 @@
         "One owned scratch CPU 1511-1 PN V4.1 and the packaged single-rule style fixture; SetScope's return is retained but is not complete effective-scope proof.",
         "No style executor runs and no license is checked; the probe Host flag enables no production profile."
       ]
+    },
+    {
+      "id": "local.milestones.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "scripts/validate_milestones.py --skip-simulation on a frozen Debug build of 2d5aa7c (D:\\wp\\b65, git-archived sources with source-manifest.json) in owned scratch projects; re-run of local.milestones.reopen.20261028 and local.milestones.network.20261028, whose raw reports were lost (206 steps): graphical_operand_set on a LAD and an FBD block, block_rename, block_delete after a DependencyExists refusal, type_source_upsert (UDT), source_upsert (SCL and STL), block_import_xml (LAD and FBD) and network_configure (offline PROFINET address/subnet mask with configured-hardware preservation verified), each with preview, apply with checkpoint, compile and save, reopen in a fresh Portal and checkpoint restore."
+      },
+      "artifacts": [
+        "evidence/local.milestones.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; no software units, namespaces or safety. Simulation steps were skipped.",
+        "network_configure preservation is checked by the runner over program exports and network node attributes only; the worker's configured-hardware preservation stage does not run for that kind.",
+        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
+      ]
+    },
+    {
+      "id": "local.hostonly.access-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_access_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (42 recorded checks); re-run of local.hostonly.access-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.access-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.automationml.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_automationml_host_mcp.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (69 recorded checks); re-run of local.hostonly.automationml.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.automationml.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native AML import/export, inheritance expansion, device identity, catalog, compile or runtime."
+      ]
+    },
+    {
+      "id": "local.hostonly.composite-engineering.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_composite_engineering_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (179 recorded checks); re-run of local.hostonly.composite-engineering.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.connection-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_connection_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (33 recorded checks); re-run of local.hostonly.connection-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.connection-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.db-snapshot-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_db_snapshot_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (30 recorded checks); re-run of local.hostonly.db-snapshot-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.db-snapshot-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/qualify_diagnostic_experiments_offline.py, scripts/qualify_repeated_diagnostic_experiments_offline.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (135 recorded checks); re-run of local.hostonly.diagnostic-experiments.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, OPC UA server or device is involved and none is qualified.",
+        "Synthetic measurements only; no native or runtime acquisition (diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export are not covered), causal diagnosis or fix proof."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/qualify_diagnostic_ua_binding.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (2104 recorded checks); re-run of local.hostonly.diagnostic-ua.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
+        "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
+      ]
+    },
+    {
+      "id": "local.hostonly.diagnostics.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/qualify_trace_diagnostics_offline.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (123 recorded checks); re-run of local.hostonly.diagnostics.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.diagnostics.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, SIMATIC AX or device is involved and none is qualified.",
+        "Synthetic and independently authored measurements and reviews; no native trace acquisition, device-validated trace settings, live observability, causal diagnosis or fix proof.",
+        "trace_capabilities reports documented routes without a target probe; trace_prepare is a manual handoff and creates no native trace configuration."
+      ]
+    },
+    {
+      "id": "local.hostonly.drive-profile-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_drive_profile_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (79 recorded checks); re-run of local.hostonly.drive-profile-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.drive-profile-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.graph.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_graph_host_mcp.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (43 recorded checks); re-run of local.hostonly.graph.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.graph.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native GRAPH schema, import, compilation, rendering or runtime behavior."
+      ]
+    },
+    {
+      "id": "local.hostonly.hmi-component-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_hmi_component_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (1102 recorded checks); re-run of local.hostonly.hmi-component-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.hmi-component-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.opcua.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_opcua_host_mcp.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (53 recorded checks); re-run of local.hostonly.opcua.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.opcua.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Offline NodeSet documents only; no native OPC UA engineering, endpoint, runtime, security or compatibility certification."
+      ]
+    },
+    {
+      "id": "local.hostonly.public-certificate-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_public_certificate_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (68 recorded checks); re-run of local.hostonly.public-certificate-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.public-certificate-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.runtime-handoff.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_runtime_handoff_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (110 recorded checks); re-run of local.hostonly.runtime-handoff.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.safety-evidence-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_safety_evidence_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (87 recorded checks); re-run of local.hostonly.safety-evidence-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.safety-evidence-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.software-unit-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_software_unit_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (34 recorded checks); re-run of local.hostonly.software-unit-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.software-unit-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.technology-profile-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_technology_profile_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (193 recorded checks); re-run of local.hostonly.technology-profile-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.technology-profile-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.testsuite-result.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_testsuite_result_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (55 recorded checks); re-run of local.hostonly.testsuite-result.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.testsuite-result.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.hostonly.translation.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_translation_host_mcp.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (6 recorded checks); re-run of local.hostonly.translation.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.translation.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "Synthetic workbook profiles; no Siemens export/import, language activation, category leakage resolution or translation_native_* route."
+      ]
+    },
+    {
+      "id": "local.hostonly.vci.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_vci_host_mcp.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (72 recorded checks); re-run of local.hostonly.vci.20261027, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.vci.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
+        "No native VCI workspace, mapping, export/import, project reconstruction or remote Git publication."
+      ]
+    },
+    {
+      "id": "local.hostonly.web-application-review.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e1b0a42e9a519c1bc7b331cfe86b6039026b78af",
+        "passedScope": "scripts/test_web_application_host.py on the Release Host built by scripts/Test-Offline.ps1 -Suite Managed -Configuration Release from a clean detached worktree of e1b0a42 (D:/wp/hr2) with absent native workers (77 recorded checks); re-run of local.hostonly.web-application-review.20261028, whose raw report was lost, with the same runner and fixtures."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.web-application-review.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
+        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
+      ]
+    },
+    {
+      "id": "local.sim.state.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "scripts/validate_milestones.py with simulation and --trust-owned-empty-cpu-certificate on a frozen Debug build of 2d5aa7c (D:/wp/b65, git-archived sources with source-manifest.json) in a new owned scratch (244 steps, simulationVerified): full engineering phase, owned CPU 1511 PLCSIM Advanced instance, download, runtime credential provisioning, power-on, RUN, stimulus test, then sim_state stop and powerOff; re-run of local.sim.state.20261024, whose raw report was lost."
+      },
+      "artifacts": [
+        "evidence/local.sim.state.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
+        "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
+      ]
+    },
+    {
+      "id": "local.remote-io.full-route.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "scripts/qualify_remote_io.py --scope full --module ai on a frozen Debug build of 2d5aa7c (D:/wp/b65, git-archived sources with source-manifest.json) in a new owned scratch: CPU 1511-1 PN V4.1 with a catalog-selected ET 200SP IM 155-6 PN ST and AI 4xU/I 2-wire ST; all gates passed with channelWriteQualified and fullRemoteIoRouteQualified (196 steps); re-run of local.remote-io.full-route.20261024, whose raw report was lost."
+      },
+      "artifacts": [
+        "evidence/local.remote-io.full-route.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Only the Smoothing channel setting is reviewed for channel writes, with the ET 200SP levels None/Weak/Medium/Strong; OperatingType, OperatingRange and InterferenceFrequencySuppression stay outside the allowlist.",
+        "One IM/AI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
+      ]
+    },
+    {
+      "id": "local.remote-io.lifecycle.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "scripts/qualify_remote_io.py --scope configured-module-lifecycle --module di on a frozen Debug build of 2d5aa7c (D:/wp/b65, git-archived sources with source-manifest.json) in a new owned scratch: CPU 1511-1 PN V4.1 with a catalog-selected ET 200SP IM 155-6 PN ST and DI 8x24VDC ST; all lifecycle gates passed (194 steps); re-run of local.remote-io.lifecycle.20261024, whose raw report was lost."
+      },
+      "artifacts": [
+        "evidence/local.remote-io.lifecycle.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Limited configured-module lifecycle profile only: channelWriteQualified and fullRemoteIoRouteQualified are false; the DI channels expose InputDelay as native read-only and no channel mutation occurred.",
+        "One IM/DI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
+      ]
+    },
+    {
+      "id": "local.safety_import.device-compile.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "2d74ebbbf9ad06d263ee369905e9a1c428b085c7",
+        "passedScope": "scripts/qualify_safety_changes.py on a frozen Debug build of 2d74ebb (D:/wp/b66, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF (66 steps): safety_import_xml now compiles every device instead of only the PLC software. The generated F-FBD block Main_Safety_RTG1 was re-imported with a filled comment text, with checkpoint, all-devices compile (device-path-v1 receipt, complete scope), save, change_status and an exact state diff limited to that block plus recorded F-compile side effects; every F-PLC block, including the F-compiler block DB1_C, read consistent right after the import (it read inconsistent after the earlier PLC-only compile, local.safety_import.20261028). A wrong previewHash was refused (PreviewMismatch), prepare refusals covered a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), the import persisted across a fresh Portal reopen and a second import was restored from its checkpoint. The safety reads, printout and safety_fparameter_set passed again in the same run."
+      },
+      "artifacts": [
+        "evidence/local.safety_import.device-compile.20261028.json"
+      ],
+      "limitations": [
+        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
+        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
+      ]
+    },
+    {
+      "id": "local.plc_object_mutations.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_object_mutations.20261028, whose raw report was lost: scripts/qualify_plc_object_mutations.py on a frozen Debug build of 2d5aa7c (D:/wp/b65) in one owned scratch CPU 1511-1 PN (V21), 369/369 steps: tag_set, tag_create, tag_delete, constant_set, constant_create, constant_delete, tag_table_import_xml, type_source_upsert, type_rename, type_delete, plc_type_import_xml, source_upsert (SCL), block_import_xml, block_rename, block_delete, block_number_set, block_attributes_set (HeaderAuthor/HeaderFamily on an FB), group_create, group_rename, group_delete, plc_compile and instance_db_create each applied with exact preview assertions, checkpoint, compile and save; a complete export of every block, type and table plus every tag, constant and group differed from the previous one in exactly the intended keys; unchanged type and DB reimports showed no difference; typed prepare-time refusals per kind left the inventory unchanged and PreviewMismatch, StaleRevision and compile=false were refused at apply; a fresh owned Portal reopened the saved project with the identical verified state; from the reopened state one more change per kind was applied and restored by change_restore into a new directory equal to the pre-change state; a deliberately failing tag address (%M20000.0) ended CompileFailed/recovery_required with its checkpoint retained and change_restore refused FingerprintUnavailable on the inconsistent block."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes, HeaderName and HeaderVersion are not written. Renamed and deleted groups were empty or held only a subgroup.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+        "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.access.qualify.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.access.qualify.20261028, whose raw report was lost: scripts/qualify_access_changes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65) in one owned scratch CPU 1511-1 PN (V21), 214/215 steps: webserver_page_set, certificate_create, certificate_assign, certificate_delete, certificate_import, umac_role_set, vci_workspace_create and vci_workspace_delete each applied with exact preview assertions, checkpoint, compile and save, change_status, and a complete before/after state (every block, type and tag-table export plus certificate_inspect, access_inspect, web_inspect and vci_workspace_inspect) that differs in exactly the intended keys, with recorded web activation side effects (TIA's web server certificate); typed refusals per kind changed nothing; a fresh owned Portal reopened the project with an identical state and every journal applied; one further change per kind was restored by change_restore to the exact pre-change state. Created WebServer certificates were re-issued by the compile with the requested common name and validity end kept."
+      },
+      "artifacts": [
+        "evidence/local.access.qualify.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN with its local certificate store; the global certificate store, other CPUs, HMI devices and UMC servers are not exercised.",
+        "certificate_assign writes only PlcCommunicationCertificate on the store-owning CPU; WebserverCertificate, OPC UA attributes and null unassignment are not written. certificate_inspect renders certificate attributes display-only, so the assigned Id is read back through typed refusals (AssignmentDrift currentCertificateId, CertificateInUse references).",
+        "Certificates are created with usage WebServer and one Dns alternative name. The persisted identity after the device compile is compared with the request and recorded under certificateIdentity; the wave 10 probe saw the compile re-issue a created certificate (CN-only subject, new serial and notBefore, the CPU address as alternative names), and a mismatch lists the kind under notQualified.",
+        "certificate_import imports the public DER of a certificate this run created and deleted; PEM, CA-issued and foreign certificates are not imported natively.",
+        "umac_role_set: one custom role, one device function right taken from the scratch's custom role and one active project user; engineering function rights are never granted or revoked (no read tool lists the available ones), so AdministratorLockout is not exercised; anonymous and UMC principals are untouched.",
+        "webserver_page_set writes webServerActive and systemWebPages; defaultApplication is only refused (stale or missing application), never written.",
+        "Switching web serving on or off is allowed to change the CPU's web- and certificate-named attributes and to add or remove certificates in its store; these side effects are recorded under sideEffects.",
+        "VCI workspaces are created in the root workspace group without mappings, with roots outside the artifact store and the project; change_restore never restores workspace files.",
+        "Not covered here: vci_mapping_add, vci_mapping_remove, vci_synchronize.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed.",
+        "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
+      ]
+    },
+    {
+      "id": "local.cpu_memory_bytes.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.cpu_memory_bytes.20261026, whose raw report was lost: scripts/qualify_cpu_memory_bytes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 51/51 steps, in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table."
+      },
+      "artifacts": [
+        "evidence/local.cpu_memory_bytes.rerun.20261028.json"
+      ],
+      "limitations": [
+        "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
+        "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_integrate.combined_apply.20261028, whose raw report was lost: scripts/qualify_library_integrate_apply.py on a frozen Debug build of 2d5aa7c (D:/wp/b65, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
+        "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
+        "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+      ]
+    },
+    {
+      "id": "local.plc_component.install.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.install.20261024, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/qualify_plc_component.py --run-native (author_new_source): fresh owned de-DE scratch authors TiaMcpComponentState UDT and TiaMcpComponentGate FB (simulation-capable), releases 1.0.0, publishes and archives; fresh owned consumer imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 (first available DB2, AutoNumber=false) and standalone FBD FC TiaMcpComponentCaller with call and Enable/Active tag bindings, full compile and save; complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.install.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Qualification-only route; production combined library_integrate apply stays disabled.",
+        "Standalone new FC caller only; existing-caller insertion remains rejected by V21 native ID renumbering (NativeIdPreservationUnsupported).",
+        "Storage is the captured component04 profile, bound by complete installed FB/UDT content equality for a freshly authored source; no other FB layouts.",
+        "native04/native05 artifacts are not on this machine; source reuse and the native05 recovery audit were not run."
+      ]
+    },
+    {
+      "id": "local.plc_component.runtime.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.runtime.20261024, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/component_runtime.py --run-native on the re-run installation (local.plc_component.install.rerun.20261028): saved installed project proven equal to its fresh-reopen snapshot, simulation-capable compilation enabled as its own change, OB1 Main call to TiaMcpComponentCaller as a separate reviewed source_upsert changing only OB1, then fresh owned PLCSIM Advanced V8 instance with verified card, generated-state save, scratch credential provisioning (owned empty-CPU trust) and restored-card check; ComponentEnable true/false/true/false drives ComponentActive on every edge. r05 continues r04 and r03 by recorded hash from the exact post-OB snapshot."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.runtime.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Wall-clock polling, not scan-accurate; one component (Bool Enable/Active) on CPU1511.",
+        "OB insertion is a separate operation with its own acceptance; it is not part of component installation.",
+        "r03 stopped at the CPU configuration password and r04 at an unloaded simulator tag list; both harness gaps were fixed and r05 continued from the same saved post-OB project."
+      ]
+    },
+    {
+      "id": "local.plc_component.existing_caller.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.existing_caller.20261025, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/qualify_plc_component.py --run-native --caller-mode existing (author_new_source, run b07): fresh owned de-DE scratch authors and releases TiaMcpComponentState UDT and TiaMcpComponentGate FB 1.0.0; a fresh consumer first creates the existing FBD FC TiaMcpComponentCaller (one network, block title after it) and an unrelated peer FC, then imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 from the captured storage profile and inserts the component call network after caller network 3 (typed insertNetwork). V21 renumbering matched the prediction exactly: inserted network 8, following block-title IDs 8->D and 9->E (+5); the native callerInsertion proof and the qualifier both reverse that one shift and recover the original caller exactly. Full compile and save, complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, first-import-checkpoint retrieval to a new location equal to the baseline and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.existing_caller.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Qualification-only route; production combined library_integrate apply stays disabled.",
+        "Existing FBD FC caller only, inserting after its last network; LAD, FB and OB callers are not qualified (OB callers are refused).",
+        "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
+        "Storage is the captured component04 profile; no other FB layouts.",
+        "Runtime not exercised: the caller is not called from an OB in this run."
+      ]
+    },
+    {
+      "id": "local.library_project_state.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_project_state.20261024, whose raw reports were lost: scripts/qualify_library_project_state.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 18/18 steps; a failed source change leaves an inconsistent block in the unsaved consumer project; library_instantiate is then refused at preparation (FingerprintUnavailable naming the inherited block) before any checkpoint, compile or save, and the project inventory is unchanged."
+      },
+      "artifacts": [
+        "evidence/local.library_project_state.rerun.20261028.json"
+      ],
+      "limitations": [
+        "The unsaved erroneous block comes from a failed source change; arbitrary unsaved user edits are not reproduced.",
+        "Protected (know-how) objects are not exercised: no MCP route applies protection."
+      ]
+    },
+    {
+      "id": "local.library_compatibility.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_compatibility.20261027, whose raw reports were lost: scripts/qualify_library_compatibility.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 41/41 steps; owned TIA V21 scratch projects: a Bool-only FB type and an FB type using LInt/LWord/LTime are authored and released 1.0.0 on a CPU 1511-1 PN and archived in a global library. In a consumer scratch with an added CPU 1214C DC/DC/DC: (1) library_upgrade of TIA's own shipped native V13 library (Predefined-Styles.al13) is refused before any native call (LibraryVersionUnsupported) and the copied source tree stays byte-identical. (2) A compiled, unsaved source change is pending; the library_instantiate preview reports unsavedTargetEdits {present: true, disposition: savedIntoCheckpointBaseline}, the apply saves it into the checkpoint baseline, and a fresh reopen contains both the edit and the instance. (3) A type whose source generation fails is discarded by TIA (EngineeringError, not in memory); a valid PLC data type generated with compile=false is inconsistent (isConsistent false) and library_instantiate is refused before any checkpoint or write (InheritedDiagnostics) with the native inventory unchanged; the reopen proves both types were discarded. (4) Into the S7-1200 the Bool-only type instantiates and compiles with 0 errors; the 64-bit type is checkpointed and instantiated but fails compilation (CompileFailed, 8 errors: LInt/LWord/LTime unknown on the CPU), completes no save, and a fresh reopen equals the saved inventory before the attempt. 41/41 steps."
+      },
+      "artifacts": [
+        "evidence/local.library_compatibility.rerun.20261028.json"
+      ],
+      "limitations": [
+        "No V20 library input exists on this PC, so V20 upgrades stay open until one is obtained. V14 SP1-V18 upgrades are covered by local.library_upgrades.20261024 and the five DMC V19 archives by local.library_vendor.20261024/20261025.",
+        "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
+        "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced. The inherited inconsistency is an uncompiled PLC data type; other inconsistent object kinds are not exercised.",
+        "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); the CPU-family mismatch surfaces as CompileFailed after checkpoint, not as a refusal at preparation. Firmware-version mismatches are not exercised. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_dependencies.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_dependencies.20261024 and local.library_dependencies.20261025, whose raw reports were lost: scripts/qualify_library_dependencies.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 82/82 steps; nested UDT (member and Array[0..2]) <- FB <- FB (multi-instance) closure compared with an independently authored graph for 1.0.0 and for 1.1.0 after the Child reference is removed; publishing the root carries its exact closure; installed exact dependency reused (identical version metadata, preview creates only the missing objects); two instance DBs keep one exact link; exact-version update is a no-op; refusals before mutation for a non-default older version, a removed reference that would strand Child (LibraryUpdateCleanupRisk), a downgrade below a newer project default, a same-name different-GUID dependency and a same-name unlinked dependency; fresh reopen keeps links and default. All 64 retained observations validate. local.library_dependencies.20261025 extended it, which adds the one-instance-per-device preview refusal and full block/type/tag-table refusal checks: nested UDT (member and array) <- FB <- FB closure against the authored graph before and after a removed reference; publishing the root carries its closure; installed exact dependency reused in the same scope; exact no-op update; refusals before mutation for a non-default older version, a reference removed by update, a downgrade below a newer project default, a same-name different-GUID and a same-name unlinked dependency; fresh reopen keeps links and default."
+      },
+      "artifacts": [
+        "evidence/local.library_dependencies.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One PLC with standard groups; multiple PLCs and software units are not exercised.",
+        "Siemens' version comparison covers metadata only; divergent content under an identical version GUID is not constructible through the public API.",
+        "No runtime execution, protected/F types or crash injection."
+      ]
+    },
+    {
+      "id": "local.library_formats.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_formats.20261024 and local.library_formats.20261025, whose raw reports were lost: scripts/qualify_library_formats.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 17/17 steps; read-only .zal21 archive and read-only .al21 directory each open as writable owned working copies, accept a persisted folder change and leave the source bytes and read-only state unchanged; an exclusively locked source is refused without registration or change; newer .zal22 is refused for open (LibraryUpgradeRequired) and upgrade (LibraryVersionUnsupported); a corrupt .zal21 and a lone .al21 marker are refused; a mixed ZIP (archive, complete directory, lone marker, loose SCL, README) classifies four candidates correctly and both complete library candidates open natively. All 12 retained observations validate. local.library_formats.20261025 extended it, with full block/type/tag-table refusal checks: read-only archive and directory sources give writable owned working copies and stay unchanged; an exclusively locked source is refused for its lock (the shared admission scope hashes the source first, so the refusal surfaces as an IOException naming the locked file) without registration or change; newer .zal22 open and upgrade, corrupt .zal21 and lone .al21 marker are refused; a mixed package classifies four candidates and both complete libraries open natively."
+      },
+      "artifacts": [
+        "evidence/local.library_formats.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Inputs are libraries created in the run; V14-V20 upgrades are separate evidence.",
+        "The locked source is simulated by an exclusive Windows handle, not a second TIA instance; its refusal surfaces as a generic EngineeringError."
+      ]
+    },
+    {
+      "id": "local.library_lifecycle.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_lifecycle.20261024, whose raw reports were lost: scripts/qualify_library_lifecycle.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 82/82 steps; edit then discard restores the released link; discard of a committed version refused; malformed and mixed type-policy flags refused before mutation; DoNotUse blocks publication; read-only SetForUpdate on a PLC data type refused (AttributeNotWritable) instead of half-applying; type folders created, renamed and deleted with duplicate and root refusals; publication into an existing global library; master copy creation and duplicate refusal; deletion refused for default/used and non-default global versions, permitted for an unused non-default project version; fresh consumer instantiates the final generation without block-number collisions; the master-copy deletion checkpoint is restored into a new location. All 77 retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_lifecycle.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Releases 1.1.0 and 1.2.0 reuse the original FB document; they are lifecycle generations, not behavior changes.",
+        "Folder moves are not offered; folders are created, renamed and deleted empty.",
+        "Version deletion is qualified only in project libraries."
+      ]
+    },
+    {
+      "id": "local.library_releases.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_releases.20261024 and local.library_releases.20261026, whose raw reports were lost: scripts/qualify_library_release_changes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 105/105 steps; owned TIA V21 scratch projects: FB type 1.0.0, implementation-changing 1.1.0 (negated output) and breaking-interface 2.0.0 (output Active renamed Ready) created from documents in one native type identity with distinct version GUIDs; released exports match independently authored expectations; consumer updated 1.0.0 -> 1.1.0 compiles with unrelated native exports unchanged; 2.0.0 update fails compilation at the stale caller Main ('The formal parameter Active is invalid') without saving; its admission is reconciled in a fresh session; the checkpoint is restored into a new location and the unsaved original reopened, both linked to exactly 1.1.0. All 61 retained library observations (19 original-byte lock receipts) validate against the library schemas. local.library_releases.20261026 extended it, owned TIA V21 scratch projects and fresh owned PLCSIM Advanced V8 CPU1511 instances: FB type 1.0.0, implementation-changing 1.1.0 (negated output, same interface) and breaking 2.0.0 (output Active renamed Ready) in one native type identity with distinct version GUIDs, authored with simulation support; released exports and both instance DBs match independently authored expectations at every stage. Consumer at 1.0.0 runs the authored truth table on PLCSIM (probe output, probe instance output, Main's instance output and UDT field); updated to exactly 1.1.0 it compiles, keeps both instance DB interfaces and unrelated native exports, and runs the inverted truth table. The 2.0.0 update fails compilation at exactly the stale callers Main (OB1) and TiaMcpReleaseProbe_Cycle (OB123) ('The formal parameter Active is invalid'), reaches no unrelated block and is not saved; its admission is returned; the checkpoint restores to a new location and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged. A fresh consumer at exactly 2.0.0 with both callers adapted to Ready compiles clean, exposes no stale Active member and runs the 2.0.0 truth table. 105/105 steps; all 67 retained library observations (21 original-byte lock receipts) validate against the library schemas."
+      },
+      "artifacts": [
+        "evidence/local.library_releases.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Behavior is asserted from native exports (body and interface), not executed on a CPU or PLCSIM.",
+        "Caller migration together with a breaking update is not offered; the breaking case is qualified as an expected compile failure plus recovery.",
+        "One PLC, standard groups; no software units, protected/F types or runtime."
+      ]
+    },
+    {
+      "id": "local.library_interruption.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_interruption.20261024 and local.library_interruption.20261025, whose raw reports were lost: scripts/qualify_library_interruption.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 55/55 steps; (1) a multi-resource library_create_master_copy (project checkpoint plus writable global library) has its worker killed while compiling; a fresh host reports outcome_unknown from the durable journal, a fresh owned session refuses replay, the shared admission is reconciled in that fresh session, and change_restore retrieves both resources into new locations: the recovered library holds only the pre-change master copy and the project holds its blocks; a repeated restore is an idempotent readback. (2) library_create_type has its worker killed while archiving its checkpoint; after reconciliation restore is refused because no checkpoint completed, the journal proves the native mutation never dispatched, and the saved original reopens without the type. local.library_interruption.20261025 extended it, a multi-resource library_create_master_copy (project plus writable global library) has its worker killed during the native mutation and during compile; each time a fresh host reports outcome_unknown, a fresh owned session refuses replay, the admission is reconciled and both resources restore to the pre-change state with an idempotent repeated restore. Killed during the project save after the global library was already saved, reconciliation holds the admission ('The global library differs from its pre-transaction checkpoint') and restore stays blocked (ResourceBusy) for a human decision. Killed while archiving its checkpoint, library_create_type cannot be restored (no checkpoint), the journal proves no native mutation was dispatched and the saved original reopens without the type in PLC types or the project library."
+      },
+      "artifacts": [
+        "evidence/local.library_interruption.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Two interruption points (compile and checkpoint archive); kills during native mutation and save are not exercised.",
+        "The original project and library after the compile-stage kill are left for inspection; only recovered copies are verified."
+      ]
     }
   ],
   "features": [
@@ -6031,7 +5915,7 @@
         "status": "verified",
         "evidenceIds": [
           "local.sim.creation.20261024",
-          "local.sim.state.20261024"
+          "local.sim.state.rerun.20261028"
         ]
       },
       "availability": {
@@ -6074,7 +5958,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.state.20261024"
+          "local.sim.state.rerun.20261028"
         ]
       },
       "availability": {
@@ -6246,8 +6130,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.state.20261024",
-          "local.sim.provision.20261024"
+          "local.sim.provision.20261024",
+          "local.sim.state.rerun.20261028"
         ]
       },
       "availability": {
@@ -6512,9 +6396,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6565,9 +6448,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6618,9 +6500,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6725,7 +6606,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6775,7 +6656,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6825,9 +6706,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6877,7 +6757,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6930,7 +6810,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6984,7 +6864,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -7038,9 +6918,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -7246,8 +7125,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.reopen.20261028",
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028"
         ]
       },
       "availability": {
@@ -7351,9 +7229,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024",
-          "local.remote-io.lifecycle.20261024",
-          "local.engineering.interruption-matrix.20261027"
+          "local.engineering.interruption-matrix.20261027",
+          "local.remote-io.full-route.rerun.20261028",
+          "local.remote-io.lifecycle.rerun.20261028"
         ]
       },
       "availability": {
@@ -7511,7 +7389,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.network.20261028"
+          "local.milestones.rerun.20261028"
         ]
       },
       "availability": {
@@ -7891,13 +7769,13 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "2026-10-28: natively qualified under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, with checkpoint, PLC compile and save, an exact diff limited to that block, fresh reopen and checkpoint restore; refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. After the import's PLC software compile, the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it."
+          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_import.20261028"
+          "local.safety_import.device-compile.20261028"
         ]
       },
       "availability": {
@@ -8285,7 +8163,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8337,7 +8215,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8383,12 +8261,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -9147,7 +9024,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9200,7 +9077,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9255,7 +9132,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9310,7 +9187,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9363,7 +9240,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9416,7 +9293,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9469,7 +9346,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9521,7 +9398,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9574,7 +9451,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9628,7 +9505,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9682,7 +9559,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9953,8 +9830,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024",
-          "local.remote-io.lifecycle.20261024"
+          "local.remote-io.full-route.rerun.20261028",
+          "local.remote-io.lifecycle.rerun.20261028"
         ]
       },
       "availability": {
@@ -10052,13 +9929,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_formats.20261025",
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10102,13 +9978,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_formats.20261024",
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10152,14 +10027,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_formats.20261024",
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
           "local.library.native-chain.20261028",
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10291,12 +10165,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_formats.20261024",
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10383,8 +10256,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -10426,8 +10299,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -10510,8 +10383,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.library_intake.20261024",
-          "local.hostonly.diagnostics.20261027",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -10553,7 +10426,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -10817,13 +10690,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10880,9 +10752,9 @@
         "evidenceIds": [
           "local.library_upgrades.20261024",
           "local.library_vendor.20261025",
-          "local.library_formats.20261025",
-          "local.library_compatibility.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_compatibility.rerun.20261028",
+          "local.library_formats.rerun.20261028"
         ]
       },
       "availability": {
@@ -10937,11 +10809,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10999,20 +10870,18 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025",
           "local.library_dmc_prerequisites.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
-          "local.library_compatibility.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_compatibility.rerun.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028",
+          "local.library_interruption.rerun.20261028"
         ]
       },
       "availability": {
@@ -11068,17 +10937,15 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025",
           "local.library_units.20261025",
-          "local.library_dependencies.20261025",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028",
+          "local.library_interruption.rerun.20261028"
         ]
       },
       "availability": {
@@ -11136,7 +11003,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028"
         ]
       },
       "availability": {
@@ -11189,7 +11056,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028"
         ]
       },
       "availability": {
@@ -11244,15 +11111,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_interruption.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028",
+          "local.library_interruption.rerun.20261028"
         ]
       },
       "availability": {
@@ -11308,15 +11174,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_interruption.20261024",
           "local.library_scopes.20261025",
-          "local.library_interruption.20261025",
           "local.library_protected.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028",
+          "local.library_interruption.rerun.20261028"
         ]
       },
       "availability": {
@@ -11370,13 +11234,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11430,15 +11293,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library.native-chain.20261028",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11492,11 +11354,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11550,13 +11411,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11610,11 +11470,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11668,11 +11527,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11726,11 +11584,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11887,14 +11744,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -12003,13 +11859,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_dependencies.20261024",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_preservation.20261028"
+          "local.library_preservation.20261028",
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -13047,8 +12902,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024",
-          "local.remote-io.lifecycle.20261024"
+          "local.remote-io.full-route.rerun.20261028",
+          "local.remote-io.lifecycle.rerun.20261028"
         ]
       },
       "availability": {
@@ -13101,8 +12956,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024",
-          "local.composite_rebind.20261028"
+          "local.composite_rebind.20261028",
+          "local.remote-io.full-route.rerun.20261028"
         ]
       },
       "availability": {
@@ -13151,7 +13006,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.cpu_memory_bytes.20261026"
+          "local.cpu_memory_bytes.rerun.20261028"
         ]
       },
       "availability": {
@@ -13464,8 +13319,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024",
-          "local.remote-io.lifecycle.20261024"
+          "local.remote-io.full-route.rerun.20261028",
+          "local.remote-io.lifecycle.rerun.20261028"
         ]
       },
       "availability": {
@@ -13513,7 +13368,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13556,7 +13411,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13599,7 +13454,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13641,7 +13496,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13685,7 +13540,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13728,7 +13583,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13771,7 +13626,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13817,7 +13672,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13862,7 +13717,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -13904,7 +13759,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -14484,9 +14339,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_component.install.20261024",
-          "local.plc_component.runtime.20261024",
-          "local.plc_component.existing_caller.20261025"
+          "local.plc_component.install.rerun.20261028",
+          "local.plc_component.runtime.rerun.20261028",
+          "local.plc_component.existing_caller.rerun.20261028"
         ]
       },
       "availability": {
@@ -15400,7 +15255,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15447,7 +15302,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15494,7 +15349,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15541,7 +15396,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15588,7 +15443,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15635,7 +15490,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15682,7 +15537,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15729,7 +15584,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15775,7 +15630,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -15821,7 +15676,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.translation.20261027"
+          "local.hostonly.translation.rerun.20261028"
         ]
       },
       "availability": {
@@ -16704,7 +16559,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16748,7 +16603,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16792,7 +16647,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16836,7 +16691,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16880,7 +16735,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16924,7 +16779,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -16968,7 +16823,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -17012,7 +16867,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.opcua.20261027"
+          "local.hostonly.opcua.rerun.20261028"
         ]
       },
       "availability": {
@@ -17589,7 +17444,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17634,7 +17489,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17679,7 +17534,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17724,7 +17579,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17769,7 +17624,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17814,7 +17669,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17859,7 +17714,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17904,7 +17759,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17949,7 +17804,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -17994,7 +17849,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -18039,7 +17894,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -18084,7 +17939,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18128,7 +17983,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18222,7 +18077,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18266,7 +18121,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18310,7 +18165,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18354,7 +18209,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.graph.20261027"
+          "local.hostonly.graph.rerun.20261028"
         ]
       },
       "availability": {
@@ -18445,7 +18300,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.vci.20261027"
+          "local.hostonly.vci.rerun.20261028"
         ]
       },
       "availability": {
@@ -18542,7 +18397,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -18597,7 +18452,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -18811,7 +18666,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostics.20261027"
+          "local.hostonly.diagnostics.rerun.20261028"
         ]
       },
       "availability": {
@@ -18853,7 +18708,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -18897,7 +18752,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -18941,7 +18796,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -18985,7 +18840,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -19029,7 +18884,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -19073,7 +18928,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.automationml.20261027"
+          "local.hostonly.automationml.rerun.20261028"
         ]
       },
       "availability": {
@@ -19116,7 +18971,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.testsuite-result.20261028"
+          "local.hostonly.testsuite-result.rerun.20261028"
         ]
       },
       "availability": {
@@ -19160,7 +19015,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.testsuite-result.20261028"
+          "local.hostonly.testsuite-result.rerun.20261028"
         ]
       },
       "availability": {
@@ -19501,7 +19356,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.software-unit-review.20261028"
+          "local.hostonly.software-unit-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -19545,7 +19400,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.software-unit-review.20261028"
+          "local.hostonly.software-unit-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -19589,7 +19444,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.connection-review.20261028"
+          "local.hostonly.connection-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -19633,7 +19488,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.connection-review.20261028"
+          "local.hostonly.connection-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -19878,7 +19733,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.db-snapshot-review.20261028"
+          "local.hostonly.db-snapshot-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -19922,7 +19777,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.db-snapshot-review.20261028"
+          "local.hostonly.db-snapshot-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20120,7 +19975,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.drive-profile-review.20261028"
+          "local.hostonly.drive-profile-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20164,7 +20019,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.drive-profile-review.20261028"
+          "local.hostonly.drive-profile-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20266,7 +20121,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20368,7 +20223,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20421,7 +20276,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20473,7 +20328,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20525,7 +20380,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20626,7 +20481,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20729,7 +20584,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.access-review.20261028"
+          "local.hostonly.access-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20773,7 +20628,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.access-review.20261028"
+          "local.hostonly.access-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20817,7 +20672,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.public-certificate-review.20261028"
+          "local.hostonly.public-certificate-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20861,7 +20716,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.public-certificate-review.20261028"
+          "local.hostonly.public-certificate-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20905,7 +20760,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.web-application-review.20261028"
+          "local.hostonly.web-application-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20949,7 +20804,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.web-application-review.20261028"
+          "local.hostonly.web-application-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -20993,7 +20848,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.technology-profile-review.20261028"
+          "local.hostonly.technology-profile-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -21037,7 +20892,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.technology-profile-review.20261028"
+          "local.hostonly.technology-profile-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -21081,7 +20936,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.safety-evidence-review.20261028"
+          "local.hostonly.safety-evidence-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -21125,7 +20980,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.safety-evidence-review.20261028"
+          "local.hostonly.safety-evidence-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -21175,7 +21030,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -21228,7 +21083,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.hmi-component-review.20261028"
+          "local.hostonly.hmi-component-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -21280,7 +21135,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.hmi-component-review.20261028"
+          "local.hostonly.hmi-component-review.rerun.20261028"
         ]
       },
       "availability": {
@@ -22313,7 +22168,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.composite-engineering.20261028"
+          "local.hostonly.composite-engineering.rerun.20261028"
         ]
       },
       "availability": {
@@ -22357,7 +22212,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.composite-engineering.20261028"
+          "local.hostonly.composite-engineering.rerun.20261028"
         ]
       },
       "availability": {
@@ -22401,7 +22256,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.composite-engineering.20261028"
+          "local.hostonly.composite-engineering.rerun.20261028"
         ]
       },
       "availability": {
@@ -22445,7 +22300,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.composite-engineering.20261028"
+          "local.hostonly.composite-engineering.rerun.20261028"
         ]
       },
       "availability": {
@@ -22489,7 +22344,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.composite-engineering.20261028"
+          "local.hostonly.composite-engineering.rerun.20261028"
         ]
       },
       "availability": {
@@ -22626,7 +22481,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22672,7 +22527,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22717,7 +22572,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22762,7 +22617,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22807,7 +22662,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22852,7 +22707,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.runtime-handoff.20261028"
+          "local.hostonly.runtime-handoff.rerun.20261028"
         ]
       },
       "availability": {
@@ -22945,7 +22800,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-experiments.20261027"
+          "local.hostonly.diagnostic-experiments.rerun.20261028"
         ]
       },
       "availability": {
@@ -22989,7 +22844,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-experiments.20261027"
+          "local.hostonly.diagnostic-experiments.rerun.20261028"
         ]
       },
       "availability": {
@@ -23033,7 +22888,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-experiments.20261027"
+          "local.hostonly.diagnostic-experiments.rerun.20261028"
         ]
       },
       "availability": {
@@ -23077,7 +22932,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-experiments.20261027"
+          "local.hostonly.diagnostic-experiments.rerun.20261028"
         ]
       },
       "availability": {
@@ -24099,7 +23954,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-ua.20261027"
+          "local.hostonly.diagnostic-ua.rerun.20261028"
         ]
       },
       "availability": {
@@ -24142,7 +23997,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-ua.20261027"
+          "local.hostonly.diagnostic-ua.rerun.20261028"
         ]
       },
       "availability": {
@@ -24185,7 +24040,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-ua.20261027"
+          "local.hostonly.diagnostic-ua.rerun.20261028"
         ]
       },
       "availability": {
@@ -24228,7 +24083,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hostonly.diagnostic-ua.20261027"
+          "local.hostonly.diagnostic-ua.rerun.20261028"
         ]
       },
       "availability": {

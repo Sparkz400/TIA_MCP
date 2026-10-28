@@ -1,0 +1,849 @@
+{
+  "description": "Catalog evidence records retired from contracts/feature-catalog.v1.json in catalog 0.4.68 (28 October 2026): no feature cited them, and none of their artifacts/ files existed on the qualification PC any more. Kept verbatim; docs and historical audits that name these IDs refer to these records.",
+  "retiredFromCatalog": "0.4.67",
+  "records": [
+    {
+      "id": "vm.offline.licensed.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "DESKTOP-8ANVMF8",
+        "virtualization": "VMware Workstation, Windows 11",
+        "transport": "SSH with explicit same-user interactive-session relay",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1",
+        "bundle": "tia-mcp-v21_20261008_095124_0f4f5a05",
+        "passedScope": "19 deployment stages: native scratch creation, standard SCL FC/FB/DB/OB generation, zero-error software compile, inventory, export, hashed artifact transfer, detach and fresh reconnect; separate idle SSH loss and independent-session checks"
+      },
+      "artifacts": [
+        "artifacts/deployment-vm-licensed.json",
+        "artifacts/ssh-transport-vm-final.json",
+        "artifacts/vm-access/deployment-final.json"
+      ],
+      "limitations": [
+        "This evidence does not qualify interrupted native writes, simulator execution, physical PLCs, safety or arbitrary project/device combinations.",
+        "Direct SSH service-session TIA startup failed on this VM; interactive mode requires the same engineering user to remain logged in.",
+        "Later binary revisions need matching evidence; this is not Siemens support certification."
+      ]
+    },
+    {
+      "id": "vm.deployment.20261008",
+      "status": "blocked",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "DESKTOP-8ANVMF8",
+        "virtualization": "VMware Workstation, Windows 11",
+        "transport": "SSH with explicit same-user interactive-session relay",
+        "passedScope": "MCP/catalog, native discovery, TIA startup, project creation, CPU catalog lookup, detach, shutdown and reconnect"
+      },
+      "artifacts": [
+        "artifacts/deployment-vm-interactive-ssh.json",
+        "artifacts/vm-access/deployment-relay.json",
+        "artifacts/vm-access/relay-receipts.json"
+      ],
+      "limitations": [
+        "CPU creation is blocked by a missing STEP 7 Professional license; guest compile/export and interrupted native-write recovery remain unverified.",
+        "Direct SSH service-session TIA startup failed on this VM; interactive mode requires the same engineering user to remain logged in.",
+        "Observed deployment only, not a Siemens support certification for arbitrary VM/OS/product combinations."
+      ]
+    },
+    {
+      "id": "local.offline.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0/4.1",
+        "languages": [
+          "SCL",
+          "STL",
+          "LAD",
+          "FBD"
+        ]
+      },
+      "artifacts": [
+        "artifacts/milestones-sixth.json",
+        "artifacts/smoke-integration.json"
+      ],
+      "limitations": [
+        "Historical milestone completed flag described engineering only; simulation execution was not passed.",
+        "Named fixture operations only; no universal CPU/instruction claim."
+      ]
+    },
+    {
+      "id": "local.hardware.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.1",
+        "technology": "PID_Compact3.0"
+      },
+      "artifacts": [
+        "artifacts/hardware-to-smoke-first.json",
+        "artifacts/hardware-to-smoke-final.json"
+      ],
+      "limitations": [
+        "One qualified DI module and PID type/version; one CPU display protection warning."
+      ]
+    },
+    {
+      "id": "local.safety.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511F-1PN",
+        "firmware": "4.1",
+        "language": "F_FBD"
+      },
+      "artifacts": [
+        "artifacts/safety-roundtrip-verified.json"
+      ],
+      "limitations": [
+        "Unchanged user F-block roundtrip only; no changed safety behavior or commissioning qualification."
+      ]
+    },
+    {
+      "id": "local.restart.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "persisted journal and archive retrieval"
+      },
+      "artifacts": [
+        "artifacts/recovery-restart.json"
+      ],
+      "limitations": [
+        "Owned scratch checkpoint only."
+      ]
+    },
+    {
+      "id": "local.guards.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "preview, revision and idempotency guards"
+      },
+      "artifacts": [
+        "artifacts/write-guards-final.json"
+      ],
+      "limitations": [
+        "Specific canonical scratch cases; broader unit-scope revision qualification remains distinct."
+      ]
+    },
+    {
+      "id": "local.sim.download.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "simulatorVersion": 8,
+        "cpu": "CPU1511",
+        "firmware": "4.0",
+        "operation": "virtual memory-card generation"
+      },
+      "artifacts": [
+        "artifacts/simulation-validation-first.json"
+      ],
+      "limitations": [
+        "Only simulation_download succeeded; overall execution run was blocked at power-on."
+      ]
+    },
+    {
+      "id": "local.sim.startup.v02",
+      "status": "failed",
+      "profile": {
+        "simulatorVersion": 8,
+        "operation": "PowerOn",
+        "errorCode": "ErrorLoadingDll"
+      },
+      "artifacts": [
+        "artifacts/simulator-startup-validation.json"
+      ],
+      "limitations": [
+        "Owned creation and cleanup passed. Empty native instance reproduced startup failure."
+      ]
+    },
+    {
+      "id": "local.package.v02",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "simulatorVersion": 8,
+        "operation": "packaged MCP initialize/discovery/status"
+      },
+      "artifacts": [
+        "artifacts/package-smoke.json"
+      ],
+      "limitations": [
+        "Local host only; no VM run."
+      ]
+    },
+    {
+      "id": "local.capabilities.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": [
+          "CPU1511-1PN",
+          "CPU1511F-1PN"
+        ],
+        "operation": "observational capability metadata, service detection and protection boundaries"
+      },
+      "artifacts": [
+        "artifacts/target-capabilities-live.json",
+        "artifacts/target-capabilities-safety-live.json"
+      ],
+      "limitations": [
+        "Observed standard and F scratch copies only; per-target qualification remains unverified.",
+        "Source archives, native sample blocks and inventory unchanged. No automatic certificate for arbitrary objects."
+      ]
+    },
+    {
+      "id": "local.conformance.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "languages": [
+          "SCL",
+          "STL",
+          "LAD",
+          "FBD"
+        ],
+        "phase": "engineering",
+        "fixtures": 14,
+        "steps": 73
+      },
+      "artifacts": [
+        "artifacts/conformance/live-first/index.json"
+      ],
+      "limitations": [
+        "Compile/export/interface/native-reference and bounded graphical-preservation assertions only. Runtime vectors specified but not executed.",
+        "Two simple graphical networks; no general rewiring, other CPU family or full instruction-set qualification."
+      ]
+    },
+    {
+      "id": "local.units.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "software-unit namespace identities and prepared source/XML changes",
+        "phase": "engineering",
+        "steps": 46
+      },
+      "artifacts": [
+        "artifacts/object-model-live-fourth.json"
+      ],
+      "limitations": [
+        "Two software units and selected SCL FC/UDT fixtures, including duplicate short names in distinct namespaces.",
+        "Qualified preservation of unrelated root/unit/alternate-namespace block payloads and stale-preview rejection; no safety-unit or all-language unit qualification."
+      ]
+    },
+    {
+      "id": "local.analysis.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "operation": "read-only native call-graph regression",
+        "nativeCallSites": 5
+      },
+      "artifacts": [
+        "artifacts/analysis-regression-v03.json"
+      ],
+      "limitations": [
+        "Four expected caller/callee pairs; two TON/CTU native system instruction endpoints unresolved explicitly.",
+        "Observed calls used direct native FB identity; InstanceDB name fallback and duplicate-member native cases remain qualified only by pure tests."
+      ]
+    },
+    {
+      "id": "local.unit-recovery.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "software-unit archive restoration, reopen and stale-copy identity rejection",
+        "steps": 20
+      },
+      "artifacts": [
+        "artifacts/object-model-unit-recovery.json"
+      ],
+      "limitations": [
+        "Selected namespaced FCs in the isolated software-unit fixture; no universal native rollback or safety-unit recovery claim."
+      ]
+    },
+    {
+      "id": "local.index_paging.v03",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "generatedFunctions": 250,
+        "metadataRows": 311,
+        "packagedFollowupSteps": 20
+      },
+      "artifacts": [
+        "artifacts/project-index-native.json",
+        "artifacts/project-index-packaged-final.json",
+        "artifacts/project-index-store-tests.json"
+      ],
+      "limitations": [
+        "One generated offline fixture; pure50000-row tests do not qualify native50000-item traversal or VM latency.",
+        "Metadata revision only; external changes require explicit verification. No whole-project or PLC-logic freshness claim.",
+        "No incremental event subscription or cursor persistence across workers."
+      ]
+    },
+    {
+      "id": "local.layers.objects.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "scope": "PLC root",
+        "operations": [
+          "UDT read/rename/delete",
+          "tag address edit/delete",
+          "user constant value edit/delete",
+          "block/type/tag group create/rename/empty delete",
+          "referenced UDT deletion rejection",
+          "explicit array element start readback"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-layers-release.json"
+      ],
+      "limitations": [
+        "Only the completed objects-and-data section is qualified; this combined run later stopped in its call-inspection harness.",
+        "No cross-scope moves, recursive deletion, protected or safety edits, runtime behavior or universal attribute/type combinations."
+      ]
+    },
+    {
+      "id": "local.layers.graphical.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "scope": "PLC root",
+        "operations": [
+          "LAD native Access fragment replacement",
+          "FBD native Access fragment replacement",
+          "whole native XML preservation readback",
+          "checkpoint recovery and original XML comparison"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-layers-release.json"
+      ],
+      "limitations": [
+        "Only the completed lad-fbd-native-patch-preservation-and-recovery section is qualified; the combined run later stopped in its call-inspection harness.",
+        "Does not qualify network insertion, arbitrary instruction creation, every call shape, or runtime behavior."
+      ]
+    },
+    {
+      "id": "local.layers.calls.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "language": "SCL",
+        "operations": [
+          "simple FC symbolic argument edit",
+          "native call inspection",
+          "whole native XML preservation",
+          "immutable prepared preview"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-layers-calls.json"
+      ],
+      "limitations": [
+        "One FC argument in PLC root scope; graphical rewiring, FB instances and multi-instances require their own evidence.",
+        "This run does not establish runtime behavior or a separate save/reopen or recovery cycle for the call change."
+      ]
+    },
+    {
+      "id": "local.layers.hardware.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.1",
+        "modules": [
+          "6ES7 521-7BH00-0AB0/V1.0",
+          "6ES7 522-1BH10-0AA0/V1.1",
+          "6ES7 531-7QF00-0AB0/V1.0",
+          "6ES7 532-5ND00-0AB0/V1.1"
+        ],
+        "operations": [
+          "DI/DO/AI/AO plug",
+          "same-direction address conflict rejection",
+          "start byte relocation/readback/restore to zero",
+          "rename/delete"
+        ]
+      },
+      "artifacts": [
+        "artifacts/hardware-families-expanded.json"
+      ],
+      "limitations": [
+        "28 hardware applies compiled without errors; four intentional conflicts rejected before mutation.",
+        "Central modules only; writable channel parameters were not exposed through the allowlist, and distributed I/O was not qualified."
+      ]
+    },
+    {
+      "id": "local.layers.axis.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.1",
+        "technology": "TO_PositioningAxis10.0",
+        "initialParameters": {
+          "VirtualAxis.Mode": 1,
+          "_Properties.MotionType": 0
+        }
+      },
+      "artifacts": [
+        "artifacts/technology-families-expanded.json"
+      ],
+      "limitations": [
+        "Virtual positioning-axis subsection created with initial parameters, read back, compiled and deleted.",
+        "The overall run stopped on the separate encoder dependency failure; no physical axis connection or motion behavior qualification."
+      ]
+    },
+    {
+      "id": "local.layers.encoder-dependencies.20261008",
+      "status": "failed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.1",
+        "technology": "TO_ExternalEncoder10.0"
+      },
+      "artifacts": [
+        "artifacts/technology-families-expanded.json"
+      ],
+      "limitations": [
+        "Creation and parameter readback succeeded, but compilation rejected missing encoder telegram input/output addresses and incompatible telegram types.",
+        "Native disconnected hardware metadata and exact diagnostics were retained; checkpoint recovery succeeded. No connected encoder qualification."
+      ]
+    },
+    {
+      "id": "local.layers.calls-expanded.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.0",
+        "language": "SCL",
+        "scope": "PLC root",
+        "operations": [
+          "FC argument edit",
+          "FB global-instance argument edit",
+          "FB multi-instance argument edit",
+          "whole native XML preservation",
+          "three checkpoint recoveries with original XML and call metadata equality"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-layers-calls-expanded.json"
+      ],
+      "limitations": [
+        "Six applies compiled with zero errors/warnings; three selected input arguments changed from A to Alternate. Callee and instance DB payloads stayed unchanged.",
+        "Global FB instance components are exposed but resolution stays explicitly unresolved because of the native HasQuotes child; local multi-instance is symbolicOnly, not a resolved native object identity.",
+        "No graphical rewiring, instance retargeting, arbitrary expressions, runtime behavior or other CPU/instruction combination qualification."
+      ]
+    },
+    {
+      "id": "local.layers.units-expanded.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "firmware": "4.1",
+        "scopes": [
+          "PLC root",
+          "software unit A",
+          "software unit B"
+        ],
+        "operations": [
+          "LAD/FBD unit operand edit",
+          "duplicate block-name ambiguity and wrong namespace rejection",
+          "unselected root/unit native XML preservation",
+          "distinct empty tag-table imports and unit-A roundtrip",
+          "cross-scope table selector rejection"
+        ]
+      },
+      "artifacts": [
+        "artifacts/object-model-expanded.json",
+        "artifacts/object-model-expanded-tag-name-collision.json"
+      ],
+      "limitations": [
+        "The successful focused report records 64 calls, 12 compiled/saved applies and five expected rejections.",
+        "The earlier table collision report is negative evidence only: this native configuration requires PLC-wide tag-table name uniqueness; failed import recovered.",
+        "Empty unit tables only; individual unit tag edits, cross-unit dependency changes, safety-unit routes and broader languages/profiles remain unqualified."
+      ]
+    },
+    {
+      "id": "local.layers.safety-comment.20261008",
+      "status": "failed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511F-1PN",
+        "firmware": "4.1",
+        "operation": "offline user F-FBD comment change"
+      },
+      "artifacts": [
+        "artifacts/safety-expanded.json",
+        "artifacts/safety-expanded-checkpoint-retrieval.json"
+      ],
+      "limitations": [
+        "Comment import compiled with zero errors/warnings, then generated protected DB1_C fingerprint collection failed; automatic change_restore rejected the missing post-change fingerprint.",
+        "Separate hash-verified archive retrieval into an empty owned instance passed original F-block XML and program/block signature equality. The retained failed project and journal were not replaced.",
+        "No safety logic, safety-unit, F-I/O or commissioning qualification."
+      ]
+    },
+    {
+      "id": "local.layers.safety-fingerprint-fix.20261008",
+      "status": "blocked",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "fresh native rerun after generated fingerprint correction"
+      },
+      "artifacts": [
+        "artifacts/safety-expanded-isolated-start-timeout.json",
+        "artifacts/safety-expanded-final.json",
+        "artifacts/engineering-layers-release-tests.log"
+      ],
+      "limitations": [
+        "Corrected source builds and passes the regression suite, including protected generated provenance guards and unchanged user-block fail-closed handling.",
+        "Both isolated-path and established Release-path tia_start calls timed out before any project-creation or mutation request. No cause was established; no native pass is claimed.",
+        "Exact owned empty headless instances were checked with native discovery before cleanup; no existing project was targeted."
+      ]
+    },
+    {
+      "id": "local.session.startup-requalified.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "operation": "Explicit empty worker-owned headless startup, native status, detach and discovery",
+        "executionContext": "Ordinary Windows user session"
+      },
+      "artifacts": [
+        "artifacts/engineering-gap-startup-probe.json",
+        "artifacts/safety-gap-requalified.json"
+      ],
+      "limitations": [
+        "The empty-session retry completed tia_start in 15.118 seconds; the completed safety fixture separately records three distinct owned process starts and saved-project reopens.",
+        "Earlier TimeoutOutcomeUnknown reports remain blocked historical evidence. This requalification establishes the observed working execution context, not a proven root cause or universal startup-time guarantee.",
+        "No existing user project, physical PLC, safety login or online operation was involved."
+      ]
+    },
+    {
+      "id": "local.layers.safety-requalified.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511F-1PN",
+        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1FL03-0AB0/V4.1",
+        "firmware": "4.1",
+        "language": "F_FBD",
+        "scope": "PLC root",
+        "block": "Main_Safety_RTG1",
+        "operations": [
+          "Existing user F-block comment edit",
+          "Post-compile native signatures and durable fingerprint readback",
+          "Guarded checkpoint recovery and unchanged recovered compile/save",
+          "Exact changed and recovered project readback after fresh owned TIA reopen"
+        ]
+      },
+      "artifacts": [
+        "artifacts/safety-gap-requalified.json",
+        "artifacts/safety-gap-native-preservation-audit.json"
+      ],
+      "limitations": [
+        "The 65-step completed run includes one expected standard-overwrite SafetyBoundary rejection. Comment edit and recovered unchanged import compiled with zero errors/warnings; host exit was zero.",
+        "The prior generated DB1_C inconsistent state was reproduced. The corrected policy recorded a durable post-change fingerprint and explicitly incomplete coverage; protected native system-group generated payloads remain excluded while owning safety signatures and native metadata are covered.",
+        "The strict retained-export audit verifies 40 readbacks across six user blocks and three distinct owned TIA processes, including comments, processing instructions, IDs, QName bindings and significant whitespace. Only top-level export provenance and serializer indentation are excluded.",
+        "The comment changed native XML while program and block signatures remained equal; no changed F-logic behavior, F_LAD/F_DB mutation, safety-unit, F-I/O, commissioning or arbitrary CPU qualification. Historical failed comment and blocked startup evidence remain retained."
+      ]
+    },
+    {
+      "id": "local.layers.graphical-reopen.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.0",
+        "firmware": "4.0",
+        "scope": "PLC root",
+        "fixtures": [
+          "LayerLAD",
+          "LayerFBD"
+        ],
+        "operations": [
+          "LAD/FBD native Access fragment replacement",
+          "Exact native XML readback and zero-error compile/save",
+          "Guarded checkpoint restore with verified archive SHA-256",
+          "Fresh owned TIA reopen of both applied and recovered saved project copies"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-gap-graphical.json",
+        "artifacts/engineering-gap-preservation-audit.json"
+      ],
+      "limitations": [
+        "The standalone 38-step run completed both selected graphical fixtures and exited zero. Each fixture has native apply compilation, unchanged non-selected native content, original recovery XML and independent applied/recovered save-reopen evidence.",
+        "The combined audit verifies retained export bytes, complete native payload equality, recovery archive hashes and three distinct process IDs per fixture; compilation evidence belongs to native apply, not the read-only reopens or offline audit.",
+        "Only the two selected root-scope Access replacements are qualified. Network insertion, arbitrary instruction creation, unit scopes, runtime behavior and broader CPU/instruction combinations remain unqualified."
+      ]
+    },
+    {
+      "id": "local.layers.calls-reopen.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU1511-1PN",
+        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.0",
+        "firmware": "4.0",
+        "language": "SCL",
+        "scope": "PLC root",
+        "fixtures": [
+          "LayerCaller",
+          "LayerInstanceCaller",
+          "LayerMultiCaller"
+        ],
+        "operations": [
+          "FC, FB global-instance and FB multi-instance input argument A to Alternate",
+          "Exact full caller and supporting block native XML readback",
+          "Guarded checkpoint recovery and verified archive SHA-256",
+          "Fresh owned TIA reopen of both applied and recovered saved project copies"
+        ]
+      },
+      "artifacts": [
+        "artifacts/engineering-gap-calls.json",
+        "artifacts/engineering-gap-preservation-audit.json"
+      ],
+      "limitations": [
+        "The standalone 93-step run completed all three call fixtures and exited zero. Native changed applies compiled with zero errors/warnings; callee/instance DB payloads and all unrelated call/instance metadata were preserved through recovery and both saved-copy reopens.",
+        "The combined five-fixture graphical/call audit verifies 40 full native XML equality pairs, five checkpoint archive hashes and three distinct process IDs per fixture. Reopens and the audit inspect retained state without an additional compilation.",
+        "Global FB instance resolution remains explicitly unresolved because of native HasQuotes metadata; local multi-instance remains symbolicOnly. Preservation does not establish exact instance target identity.",
+        "No graphical rewiring, instance retargeting, arbitrary expressions, safety/unit routes, runtime behavior or other CPU/instruction combinations are qualified."
+      ]
+    },
+    {
+      "id": "local.library_intake.20261008",
+      "status": "passed",
+      "profile": {
+        "hostFramework": ".NET 10",
+        "tiaVersion": null,
+        "profile": "Synthetic mixed ZIP through actual stdio MCP host; restart, upload retry, staging, paging, cleanup and negative traversal",
+        "pureTests": 55,
+        "mcpSteps": 10,
+        "nativeCodeExecuted": false
+      },
+      "artifacts": [
+        "artifacts/library-intake-qualification/intake_53d36a87/qualification.json"
+      ],
+      "limitations": [
+        "Synthetic package only; no Siemens worker was configured or started.",
+        "Does not prove native library validity, vendor authenticity, project import, HMI behavior or runtime execution.",
+        "Pure rules tests do not replace native environment qualification."
+      ]
+    },
+    {
+      "id": "local.explorer.native-browser.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "scope": "Owned offline scratch projects on the final packaged worker: 93-node PLC fixture, two-PLC 405-node/250-function fixture, 2,070-node/2,000-tag scale fixture, 74-node configured-I/O fixture and 31-node Classic Comfort HMI fixture; real browser-to-native trace plus contract, performance and relocation evidence",
+        "operations": [
+          "Native hierarchy and empty groups",
+          "Exact ancestry and all child pages",
+          "Software-unit duplicate names",
+          "Independent block inspection and native relationships",
+          "Metadata-only verification, bounded capture, release and disconnect invalidation",
+          "Hashed portable exports and read-only browser/protocol adapter",
+          "Native LAD/FBD previews matched original XML hashes",
+          "Exact tag-to-module configured I/O ownership in both directions",
+          "Separate HMI worker real screen detail integration",
+          "Full frozen-build regression and local bundle relocation/reconnect",
+          "Final binary native visit/depth bounds and scoped exhaustion",
+          "Same-final-bundle Classic Comfort screen owner/layer/rectangle inspection",
+          "Final 118 bridge checks and full frozen regression",
+          "Final 442-file bundle strict relocation and 13 launcher/reconnect stages",
+          "Native 2,000-tag full XML oracle, all search and child pages, exact details/graph/lifecycle",
+          "Live browser to actual stdio worker: exact six-field selection, native verify, independent block_read, stale-send rejection and hashed artifact transfer"
+        ]
+      },
+      "artifacts": [
+        "artifacts/project-explorer-native-live.json",
+        "artifacts/project-explorer-native-medium.json",
+        "artifacts/project-model-final-evidence.json",
+        "artifacts/project-explorer/browser-results.json",
+        "artifacts/project-explorer-native-packaged.json",
+        "artifacts/project-explorer-native-io-complete.json",
+        "artifacts/project-explorer-final-native-schema.json",
+        "artifacts/project-explorer-final-short-regression.log",
+        "artifacts/project-explorer-relocated-deployment.json",
+        "artifacts/project-explorer/hmi-native-browser-results.json",
+        "artifacts/project-explorer-final-native-complete.json",
+        "artifacts/project-explorer-final-medium.json",
+        "artifacts/project-explorer-native-io-final.json",
+        "artifacts/project-explorer-native-io-final-schema.json",
+        "artifacts/project-explorer-final-hmi.json",
+        "artifacts/project-explorer-final3-native-schema.json",
+        "artifacts/project-explorer-final2-full-regression.log",
+        "artifacts/project-explorer-final-traversal-guards-approved.log",
+        "artifacts/project-explorer-final-relocated-deployment.json",
+        "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
+        "artifacts/project-explorer/final-hmi-browser-results.json",
+        "artifacts/project-explorer-native-large-tags.json",
+        "artifacts/project-explorer-release-native-schema.json",
+        "artifacts/project-explorer/browser-native-results.json",
+        "artifacts/project-explorer-native-large-recovery-stop.json",
+        "artifacts/project-explorer/large-native-browser-results.json"
+      ],
+      "limitations": [
+        "Scoped offline read qualification only; metadata is not a complete project/content revision.",
+        "Configured VM SSH probe timed out; remote release gate remains blocked.",
+        "Desktop MCP Apps product rendering remains unverified. Native HMI screen rendering and complete HMI content revision remain unavailable; no positive HMI binding is qualified by the zero-edge screen fixture.",
+        "Only the exact selected native hardware/CPU, Classic Comfort HMI and LAD/FBD fixture profiles are covered; no physical topology or live PLC runtime claim.",
+        "Large native acceptance passed on 2,070 nodes including 2,000 tags. The separate 1,000-function generation target reached the native 500,000-instance limit before capture; recovery preserved a separately verified 500-function saved project. This does not qualify a 1,000-function workload."
+      ]
+    },
+    {
+      "id": "local.library_plc_master.20261008",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "profile": "V21 standard PLC single FC master-copy lifecycle",
+        "hostSha256": "8e84c138072fe3711cec3b5bccab12bb0f65e6db8d62c58b2f7f2d6ee47c4508",
+        "workerSha256": "38c5a024cb3d2a3af77d4a3549acbd314787c35c8f1e9db9d7e9d597a71b202f",
+        "nativeSteps": 16,
+        "runtimeVerified": false
+      },
+      "artifacts": [
+        "artifacts/lq/nl_1d1cda41/qualification.json"
+      ],
+      "limitations": [
+        "Does not qualify typed FB/UDT version lifecycle, vendor packages, upgrades, HMI or runtime execution.",
+        "Recovery is intentional checkpoint retrieval after restart, not a crash injected during a Siemens call.",
+        "Single new FC master copy in fresh owned projects; does not qualify arbitrary existing-project preservation or every library operation.",
+        "Exact recorded build only; subsequent changes require their own regression checks."
+      ]
+    },
+    {
+      "id": "reviews.native.20261009",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "build": "59fb741484b34684a8e12fdf760777af",
+        "date": "2026-10-09"
+      },
+      "artifacts": [
+        "artifacts/continuation-20261009/reviews-native-01.json"
+      ],
+      "limitations": [
+        "Fresh owned V21 scratch project, one SCL implementation/comment change and bounded native relationships; offline comparison/search/health repeat after host and TIA exit. Five core groups separately cover negative inputs and incomplete content. No whole-project semantic equivalence or general health guarantee."
+      ]
+    },
+    {
+      "id": "reviews.native.diamond.20261012",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "build": "fa0067bcbd32499485b72d8ea1cef38a",
+        "date": "2026-10-12",
+        "fixture": "Four SCL functions with two diamond-call branches and an Int-to-DInt leaf edit",
+        "operations": [
+          "Twelve exact calls/dependsOn paths per before/after snapshot",
+          "Depth, path-count and edge-visit truncation",
+          "Complete original-peer payload preservation and exact leaf edit",
+          "Changed/recovered fresh reopen and checkpoint recovery",
+          "Persisted compare/search/health after offline host restart"
+        ]
+      },
+      "artifacts": [
+        "artifacts/p16r/rv02/result.json",
+        "artifacts/p16r/rv02-strict-audit.json",
+        "artifacts/p16r/rv02-dom-leaf-audit.json",
+        "artifacts/p16r/compile-diagnostics-audit-01.json"
+      ],
+      "limitations": [
+        "Exact frozen build and fresh owned offline fixture only. Static observed paths do not prove runtime effects or complete project dependency coverage.",
+        "The stricter qualification audit is separate from the review tool's own documented XML comparison policy; historical reports retain their original bytes and hashes.",
+        "No desktop rendering, physical PLC, runtime or later-binary qualification is implied."
+      ]
+    },
+    {
+      "id": "sim.creation.20261009",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "build": "59fb741484b34684a8e12fdf760777af",
+        "date": "2026-10-09"
+      },
+      "artifacts": [
+        "artifacts/continuation-20261009/creation-native-04.json"
+      ],
+      "limitations": [
+        "Empty CPU1511 powered to STOP. Live-worker adoption rejected, existing unowned observer adopted only after original worker exit, owned release confirmed and registry empty. A remaining observer kept registration alive; this does not qualify crash recovery when the native registration disappears or creation remains outcome-unknown."
+      ]
+    },
+    {
+      "id": "hmi.readonly.unified-comfort.20261012",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "build": "fa0067bcbd32499485b72d8ea1cef38a",
+        "date": "2026-10-12",
+        "fixture": "Two Unified Comfort owners in an independently recovered seeder-owned project with same-named screens/tags, real integrated PLC endpoints and scalar DB members; clean compilation remains unqualified",
+        "passedScope": "Sixteen actual native inspections, fifty response/row/provider contracts, direct screen-to-tag-to-exact-PLC/DB binding chains, alarm references, event source, wrong-family/stale-target rejection and eight populated exact explorer tag/alarm graphs"
+      },
+      "artifacts": [
+        "artifacts/p16h/native-positive-02/derived-native-report.json",
+        "artifacts/p16h/bridge-positive-04.json",
+        "artifacts/p16h/bridge04-assessment.json",
+        "artifacts/p16h/bridge04-qualify_hmi.py",
+        "artifacts/p16h/bridge04-strict-compile-reassessment.json",
+        "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
+      ],
+      "limitations": [
+        "Native bridge archive retrieval still returns directory access denial, including the shorter fresh target; read-only comparison used the separately verified owned derived project. Bridge recovery is not qualified.",
+        "Original reports remain unchanged. A strict reassessment rejects the derived candidate's nominally successful compiler summaries because nested Error-state password diagnostics remain; clean compilation is not qualified.",
+        "This exact read-only profile does not qualify Classic, RT Professional, HMI mutation, full preservation, interrupted-operation recovery, native screen rendering or runtime execution.",
+        "Every production HMI operation remains unavailable; actual capability responses retain operation-specific preservation and recovery prerequisites."
+      ]
+    },
+    {
+      "id": "explorer.native.thousand-functions.20261012",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "date": "2026-10-12",
+        "build": "fa0067bcbd32499485b72d8ea1cef38a",
+        "fixture": "Exactly 1,000 generated SCL functions in ten batches with a final fresh native reopen",
+        "passedScope": "Complete native metadata identities and search/child pagination, 30 independently checked source samples, full baseline peer preservation, twelve exact owned lifetimes, authored calls/instances/reads/writes, last-function details and hash-verified JSON/HTML exports",
+        "browser": "Six portable-viewer Chromium checks using the exact native snapshot and separately hash-bound current UI; 1,000 search results, fewer than 70 rendered rows, exact selection, relationships/evidence/SVG and light/dark layouts",
+        "snapshotId": "37d82fc435c8422a95166e60c83551c5"
+      },
+      "artifacts": [
+        "artifacts/p16r/sc01/result.json",
+        "artifacts/p16r/sc01-audit-final-01.json",
+        "artifacts/p16r/compile-diagnostics-audit-01.json",
+        "artifacts/p16r/scale-browser-01/result.json",
+        "artifacts/p16r/scale-browser-02/result.json"
+      ],
+      "limitations": [
+        "Complete global relationship coverage remains unqualified at the existing provider traversal bound; authored-edge acceptance and complete metadata coverage are separate gates.",
+        "Generated source logic is sampled at first/middle/last function per batch; no all-function payload or runtime proof is claimed.",
+        "Native evidence applies to the exact frozen build. Browser evidence applies to separately recorded current renderer hashes, not actual desktop MCP Apps host rendering."
+      ]
+    }
+  ]
+}

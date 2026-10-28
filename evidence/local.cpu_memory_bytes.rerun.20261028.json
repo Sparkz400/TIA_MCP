@@ -1,0 +1,114 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.cpu_memory_bytes.rerun.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T21:49:44+00:00",
+  "source": {
+    "commit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.cpu_memory_bytes.20261026, whose raw report was lost: scripts/qualify_cpu_memory_bytes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 51/51 steps, in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table.",
+  "limitations": [
+    "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
+    "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
+    "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "47c8a0204495ee36cd92b8915fcaa1b36370558953d980fadca5d4ee931b2744"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9638fd24e9995071d13962276b90222396cd8555741587f959f8117953dc9f48"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "dcc8373b2af5b7bff1ac450ad14329df2eeebe3797942f91a48da3f6ffe39562",
+      "bytes": 426503,
+      "completed": true,
+      "steps": [
+        "start owned TIA cpu memory bytes",
+        "create owned scratch cpu memory bytes",
+        "prepare add CPU 1516-3 PN/DP",
+        "apply hardware_add",
+        "discover memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "discover memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP",
+        "refuse a non-CPU item",
+        "refuse the same enabled byte",
+        "refuse a byte above 65535",
+        "refuse a string flag",
+        "refuse an unchanged request",
+        "refuse enabling without a byte number",
+        "refuse a byte number of a disabled flag",
+        "refuse an attribute outside the subset",
+        "prepare enable memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "apply hardware_cpu_memory_bytes",
+        "read back memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "prepare enable memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP",
+        "apply hardware_cpu_memory_bytes",
+        "read back memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP",
+        "prepare compile a memory byte consumer in /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "apply source_upsert",
+        "prepare compile a memory byte consumer in /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP/plc/PLC15163PNDP",
+        "apply source_upsert",
+        "close changed session",
+        "start owned TIA reopen",
+        "reopen saved project",
+        "reopened memory bytes, blocks and tags",
+        "prepare move memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "apply hardware_cpu_memory_bytes",
+        "read back moved bytes",
+        "restore the move from its checkpoint",
+        "recovered memory bytes, blocks and tags",
+        "prepare hardware_cpu_memory_bytes",
+        "restore the refused byte",
+        "memory bytes after the native bound",
+        "prepare release the consumer in /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "apply source_upsert",
+        "prepare release the consumer in /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP/plc/PLC15163PNDP",
+        "apply source_upsert",
+        "prepare restore original memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "apply hardware_cpu_memory_bytes",
+        "read back original memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/ScratchStation/items/ScratchPLC",
+        "prepare restore original memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP",
+        "apply hardware_cpu_memory_bytes",
+        "read back original memory bytes on /projects/TiaMcpScratch_20261028_214601_d1d6446b/devices/Station15163PNDP/items/PLC15163PNDP",
+        "close recovered session",
+        "start owned TIA s7-1200 boundary",
+        "create owned scratch s7-1200 boundary",
+        "prepare hardware_add",
+        "refuse the S7-1200 CPU"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "engineering_read",
+        "hardware_catalog_search",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "project_open"
+      ]
+    }
+  ]
+}

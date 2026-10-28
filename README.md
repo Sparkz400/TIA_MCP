@@ -220,7 +220,7 @@ and screenshots belong in ignored `artifacts/` and `output/` directories.
 
 ## Documentation
 
-- [Documentation index](docs/README.md)
+- [Documentation index](docs/README.md) and [how qualification evidence is kept](docs/README.md#evidence-and-status)
 - [Project explorer](docs/guides/project-explorer.md) and [persistent reviews](docs/guides/project-reviews.md)
 - [Simulation](docs/guides/simulation.md) and [block testing](docs/guides/block-testing.md)
 - [Library management](docs/guides/library-management.md) and [HMI integration](docs/guides/hmi-integration.md)

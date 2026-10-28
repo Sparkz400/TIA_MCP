@@ -481,7 +481,7 @@ namespace TiaMcp.Openness.V21
             AddTargetFeature(features, "safety_printout", api, "partial", "Native safety printout through a Windows file printer only, optionally with activation-test XLSX reports; no validation or approval.");
             AddTargetFeature(features, "change.safety_fparameter_set", api, "partial", "Acknowledged writes of Failsafe_FDestinationAddress and Failsafe_FMonitoringtime on F-I/O owned by this safety PLC, with expected values, F-destination collision refusal, device compile, preservation and checkpoint.",
                 blocked: blocked, blocker: "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");
-            AddTargetFeature(features, "change.safety_import_xml", api, "partial", "Dedicated acknowledged F-LAD/F-FBD/F-DB import only; explicit group/scope, protection, native consistency and signature checks apply.",
+            AddTargetFeature(features, "change.safety_import_xml", api, "partial", "Dedicated acknowledged F-LAD/F-FBD/F-DB import only; explicit group/scope, protection, native consistency and signature checks apply. Apply compiles every device, so generated F-blocks such as the F-compiler DB stay consistent.",
                 applicable: importApplicable, blocked: blocked || generated || targetBlocker != null,
                 blocker: generated ? "Generated system-group objects are excluded from direct mutations." : targetBlocker ?? "The safety program requires login through the authorized TIA workflow; discovery does not log in or collect credentials.");
         }

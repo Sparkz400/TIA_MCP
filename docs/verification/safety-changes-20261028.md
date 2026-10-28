@@ -88,3 +88,18 @@ is consistent everywhere.
 
 Verified: `change.safety_import_xml` (6 cells). Every non-deferred D14 cell is now closed (matrix
 502 of 2,031 open, catalog `0.4.64`).
+
+## F-block import compiles every device
+
+The finding above is fixed: `safety_import_xml` now compiles every device, like
+`safety_fparameter_set`, instead of only the PLC software. The safety runner expects the
+all-devices compile receipt and requires every F-PLC block to read consistent right after the
+import.
+
+The run on a frozen Debug build of `2d74ebb` (`D:\wp\b66`) passed all 66 steps under the same
+license, F-CPU and F-I/O setup ([`local.safety_import.device-compile.20261028`](../../evidence/local.safety_import.device-compile.20261028.json)).
+`DB1_C` read consistent after both imports, and the reads, printout and `safety_fparameter_set`
+passed again. `change.safety_import_xml` now cites this record.
+
+New limit: like `safety_fparameter_set`, the import cannot apply in a project with a device that
+cannot be compiled, for example a Startdrive drive.
