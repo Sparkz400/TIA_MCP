@@ -111,8 +111,9 @@ def body(h):
         h.report["summary"] = {p["name"]: p["outcome"] for p in h.report.get("probes", [])}
 
 
-def fparameters(h, plc, scope):
-    """qualify_remote_io's route (local.remote-io.full-route.20261024) with the F-CPU as IO controller, then the F-parameter probes."""
+def topology(h, scope):
+    """qualify_remote_io's route (local.remote-io.full-route.20261024) with the F-CPU as IO controller: an ET 200SP station with
+    up to two F-DI modules. Returns the F-DI names that were plugged, by hardware path."""
     head = h.report["interfaceModule"] = catalog(h, "IM 155-6 PN ST", "PN ST", "6ES7 155-6")[0]
     require(head["typeIdentifier"] == "OrderNumber:6ES7 155-6AU02-0BN0/V6.4", "The generated-server contract requires the captured IM 155-6AU02 V6.4 profile.")
     change(h, "hardware_add", {"typeIdentifier": head["typeIdentifier"], "deviceName": REMOTE, "itemName": HEAD}, scope, compile=False)
@@ -156,8 +157,12 @@ def fparameters(h, plc, scope):
         require(outcome["prepared"], "The second F-DI was refused: %s" % outcome.get("error"))
         return outcome
     probe(h, "plug a second F-DI for the duplicate-address refusal", second)
+    return {r["name"]: r["path"] for r in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if r["name"] in (FDI, FDI2)}
 
-    paths = {r["name"]: r["path"] for r in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if r["name"] in (FDI, FDI2)}
+
+def fparameters(h, plc, scope):
+    """The F-parameter probes on the topology above."""
+    paths = topology(h, scope)
     inspected, modules = h.stage("safety_validation_inspect of the F-PLC", lambda: fio(h, plc))
     owned = {name: [p for p in modules if p == path or p.startswith(path + "/")] for name, path in paths.items()}
     require(len(owned.get(FDI, [])) == 1, "Expected one F-I/O item under the F-DI: %s" % owned)
