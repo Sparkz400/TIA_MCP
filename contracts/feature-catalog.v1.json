@@ -3438,6 +3438,24 @@
         "Engineering only; nothing is downloaded and runtime behavior is not observed.",
         "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
       ]
+    },
+    {
+      "id": "local.cpu_memory_bytes.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.cpu_memory_bytes.20261026, whose raw report was lost: scripts/qualify_cpu_memory_bytes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 51/51 steps, in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table."
+      },
+      "artifacts": [
+        "evidence/local.cpu_memory_bytes.rerun.20261028.json"
+      ],
+      "limitations": [
+        "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
+        "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
+      ]
     }
   ],
   "features": [
@@ -12812,7 +12830,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.cpu_memory_bytes.20261026"
+          "local.cpu_memory_bytes.rerun.20261028"
         ]
       },
       "availability": {
