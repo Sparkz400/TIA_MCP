@@ -5,9 +5,9 @@ premise: a TCP/IP-mode PLCSIM Advanced V8 instance serves a CPU's OPC UA and web
 the existing Host runtime client can reach. This is a gate, not curated evidence; it closes no
 matrix cell.
 
-**Result:** OPC UA passes end to end. The web server is reachable and answers the Web API, but no
-authenticated `runtime_web_connect` has run yet (it needs a web-server user and a protected
-credential).
+**Result:** the premise holds. OPC UA and the Web API both pass end to end through the Host's
+runtime tools. The web login was `Anonymous` because the CPU's web authentication is disabled;
+a named user with a password is still unexercised.
 
 ## Setup (operator)
 
@@ -53,13 +53,23 @@ validator should canonicalize, or the refusal and the reference should name the 
   `192.168.0.1`, valid 2026-10-28 to 2037-10-27, SHA256
   `0bdf8bc5a4306edaa9e9aad676f645ba7e797d7805681586483d72ce2496278b`.
 - Unauthenticated `Api.Ping` and `Api.Version` succeed; the Web API version is 6.
-- **Open:** `runtime_web_connect` needs a web-server user with a password, stored through the
-  [protected-credential CLI](../reference/protected-credentials.md), and a
-  `runtime_web_credential_binding` for this origin and pin.
+  `Api.GetAuthenticationMode` advertises only `disabled`: the project configures no web users.
+- **Credential.** `runtime_web_credential_binding` for `https://192.168.0.1`, that pin, user
+  `Anonymous` and mode `disabled`. The JSON string `""` (no secret) went into a throwaway vault
+  through `--credential-store create --stdin --vault-name <32-hex>` and was retired afterwards.
+- **`runtime_web_connect`**: `connected`, `peerVerified`, profile API 6 /
+  `siemens-v21-table-max` (131072-byte requests, 4 parallel, 200 sessions), session user
+  `Anonymous`, reads `permittedAtObservation`.
+- **`runtime_web_diagnostics`**: `operatingMode` `run` (`Plc.ReadOperatingMode`);
+  `projectInformation` project `Scratch`, TIA Portal `V21.0.0.0`.
+- **`runtime_web_browse`** of the root: `Tag_1` (`%M1.0`) and `Tag_2` (`%M2.0`), both Bool,
+  immediate children only.
+- **`runtime_web_disconnect`** then `runtime_web_status`: `closed`. The Host exited with code 0.
+
+A named-user login (`local` or `umc` mode, with a real password through the credential prompt)
+needs a project with web users; Task 4 provisions its own scratch program and covers it there.
 
 ## Next
 
-1. Run the authenticated web connect, or record why not.
-2. Switch *Online Access* back to Softbus and revert the adapter address (plan Task 0, Step 6).
-3. Tasks 1–2 (TCP/IP admission in the simulator worker, bindings for TCP/IP endpoints) can start;
-   the premise holds for OPC UA.
+1. Switch *Online Access* back to Softbus and revert the adapter address (plan Task 0, Step 6).
+2. Tasks 1–2 (TCP/IP admission in the simulator worker, bindings for TCP/IP endpoints) can start.
