@@ -114,6 +114,12 @@ def snapshot(call, names, directory, case=None):
     if include_peers:
         names = sorted(blocks)
     for ordinal, name in enumerate(dict.fromkeys(names)):
+        row = blocks.get(name) if blocks is not None else None
+        if row is not None and row.get("isKnowHowProtected") is True and "/systemGroups/" in row["path"]:
+            # TIA copies protected system FBs such as R_TRIG into System blocks; they cannot be exported, so their identity is kept.
+            identity = json.dumps({k: row.get(k) for k in ("path", "name", "number", "kind", "programmingLanguage", "isConsistent")}, sort_keys=True)
+            exports[name] = {"xml": "", "payloadSha256": hashlib.sha256(identity.encode()).hexdigest(), "block": row, "kind": "protectedSystemBlock"}
+            continue
         result = call("block_read", {"blockPath": blocks[name]["path"]} if blocks is not None else {"blockName": name})
         (directory / (str(ordinal).zfill(3) + ".xml")).write_bytes(result["xml"].encode("utf-8"))
         exports[name] = {"xml": result["xml"], "payloadSha256": native_hash(result["xml"]), "block": result["block"]}
