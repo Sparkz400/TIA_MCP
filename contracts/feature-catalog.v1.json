@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.63",
+  "catalogVersion": "0.4.65",
   "targetTiaVersions": [
     21
   ],
@@ -3565,6 +3565,27 @@
       ]
     },
     {
+      "id": "local.composite_rebind.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "a5fdadca9ffd56f0659bb88e71a8cf246329cb6f",
+        "passedScope": "scripts/qualify_composite_rebind.py on a frozen Debug build of a5fdadc (D:\\wp\\rb06), 57/57 steps, in one owned scratch CPU 1511-1 PN V4.1. Fixture, each change with checkpoint, compile and save, exact state diffs and named TIA side effects: a TM PosInput 2 V2.0 (RbEncA) plugged and its channel 0 set to OperatingMode MotionControl with hardware_channel_attributes, a virtual TO_PositioningAxis 10.0 (RbAxis) created and its sensor 0 connected to that channel with to_connect. A composite phase captured from a saved review declares that relationship. The replacement plugs a second TM PosInput 2 (RbEncB, same mode) and disconnects the sensor with to_disconnect; the after phase shows it disconnected. A composite review with the model correspondence RbEncA -> RbEncB (node IDs read from the saved reviews) makes composite_engineering_rebind_plan list exactly that broken connection (afterState disconnected, the correspondence ID, selectorCarriedOver) with a to_connect payload naming RbEncB, sensorIndex 0 and channel Technology/Complex/0. The payload is prepared unchanged, applied and read back; a third capture resolves sensor 0 to RbEncB and the plan from the before phase to it reports no broken connection. Without the correspondence the entry stays noDeclaredReplacement without a payload; a malformed handle (CompositeInvalidReference) and an altered receipt digest (CompositeIntegrityFailure) are refused."
+      },
+      "artifacts": [
+        "evidence/local.composite_rebind.20261028.json"
+      ],
+      "limitations": [
+        "One virtual TO_PositioningAxis 10.0 whose sensor 0 is the only connected slot, two TM PosInput 2 V2.0 and one model correspondence; AML correspondences through hardware mappings, actor, torque, encoder and measuring-input roles, conflicting replacements and truncation are tested offline only.",
+        "The replacement is declared, not inferred; the carried-over channel selector matches here because both modules share their type.",
+        "TIA couples native effects, recorded under sideEffects: OperatingMode applies to both TM channels and shrinks the module's output range (24 to 8 bytes) and may renumber the submodule's hardware identifier; a sensor connection puts the item's addresses into the servo process image and adds RbAxis_Sensor1_Interface_AddressIn/Out tags (PD_TEL83) with their system types; to_disconnect keeps those tags, so the next connection adds copies suffixed (1).",
+        "Engineering only; nothing is downloaded. Runs rb01-rb04 (runner and preservation fixes) and rb05 (passed, one side-effect record overwritten by a repeated step label) are retained and not cited."
+      ]
+    },
+    {
       "id": "local.plcsim_diagnostics.20261028",
       "status": "passed",
       "profile": {
@@ -3624,6 +3645,26 @@
         "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
         "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
         "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+      ]
+    },
+    {
+      "id": "local.safety_import.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "80b57a7f9b7ca8b1cfe5429f0961d4c98c0bb014",
+        "passedScope": "scripts/qualify_safety_changes.py (sf4) on a frozen Debug build of a2c2b11 (D:\\wp\\b64, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF: the full sf3 scope (safety reads, PDF printout, safety_fparameter_set) passed again, and safety_import_xml re-imported the generated F-FBD block Main_Safety_RTG1 with one filled comment text, with checkpoint, PLC compile and save, change_status, an exact state diff limited to that block except the recorded F-compiler block DB1_C (System blocks/STEP 7 Safety/Compiler blocks, know-how protected; its payload changes and it reads inconsistent after the import's PLC software compile until the next device compile), the comment in the native export, a wrong previewHash refused (PreviewMismatch), prepare refusals for a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), persistence across a fresh Portal reopen and a second import restored from its checkpoint into a new directory equal to the reopened state."
+      },
+      "artifacts": [
+        "evidence/local.safety_import.20261028.json"
+      ],
+      "limitations": [
+        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
+        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
       ]
     },
     {
@@ -7624,7 +7665,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. Actor, sensor, torque, encoder and measuring-input roles and hardware or channel targets are only refused.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. A sensor on a channel target is natively exercised by local.composite_rebind.20261028: a virtual TO_PositioningAxis 10.0 sensor on a TM PosInput 2 V2.0 channel in MotionControl mode compiles clean and reads back; TIA puts the item's addresses into the servo process image and adds the sensor's PROFIdrive interface tags. Actor, torque, encoder and measuring-input roles and module (DeviceItem) targets are only refused.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "One role slot per change: actor, sensor (with sensorIndex), torque, encoder, measuringInput or outputCam, named as in technology_read hardwareConnections rows. A null service or slot refuses the preview.",
           "Targets: hardwarePath (module, submodule or PROFIdrive telegram DeviceItem), hardwarePath with channelType/channelIoType/channelNumber (one native channel), hardwarePath with channelIndex (measuring input only) or tagName (one PLC tag). Unsupported role/target pairs refuse at prepare; native Siemens validation decides compatibility. ConnectOption.AllowAllModules, separate input/output modules, bit addresses and DB-member overloads are not exposed.",
@@ -7635,7 +7676,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -7679,7 +7721,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): the output-cam tag connection removed and read back; unconnected slots refused; reopen and checkpoint restore.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): the output-cam tag connection removed and read back; unconnected slots refused; reopen and checkpoint restore; the sensor of a virtual TO_PositioningAxis on a TM PosInput 2 channel in local.composite_rebind.20261028, where TIA keeps the sensor's interface tags.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "Uses the same role/sensorIndex slot selection as to_connect; a slot that is not connected refuses the preview.",
           "Apply verifies IsConnected=false; a remaining connection requires checkpoint recovery. A TO that is invalid without a connection fails the mandatory compilation and requires recovery.",
@@ -7689,7 +7731,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -7790,14 +7833,13 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Native observation (28 October 2026, local.safety_changes.20261028): on this machine TIA refuses the F-block import with 'No safety license available', so the apply is not qualified; its prepare refusals (missing acknowledgement, scope mismatch, standard block) passed. Qualifying the apply needs an activated STEP 7 Safety license."
+          "2026-10-28: natively qualified under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, with checkpoint, PLC compile and save, an exact diff limited to that block, fresh reopen and checkpoint restore; refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. After the import's PLC software compile, the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_import.20261028"
         ]
       },
       "availability": {
@@ -12990,7 +13032,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Reviewed channel settings in the allowlist; only Smoothing (ET 200SP None/Weak/Medium/Strong) is natively qualified, on the AI 4xU/I 2-wire ST V2.0. Other allowlisted names are module-specific and unqualified.",
+          "Reviewed channel settings in the allowlist; natively qualified are Smoothing (ET 200SP None/Weak/Medium/Strong) on the AI 4xU/I 2-wire ST V2.0 and OperatingMode MotionControl on a TM PosInput 2 V2.0 (local.composite_rebind.20261028). TIA applies OperatingMode to every channel of the module and resizes its address ranges, which preservation accepts for the selected item only (same start addresses), and may renumber the submodule's hardware identifier. Other allowlisted names are module-specific and unqualified.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -13001,7 +13043,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -22449,13 +22492,14 @@
           "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
           "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
           "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
-          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified.",
-          "Native observation (28 October 2026): over two native phases (local.composite_capture.20261028) the plan reports no broken connection, because no verified flow creates a declared TO hardware-module or channel connection: to_connect is qualified only for output cams to PLC tags. Qualification needs a fixture TO connected to a module or channel, for example TO_ExternalEncoder on a TM Count or an output cam on a TM Timer DIDQ channel."
+          "Natively qualified (local.composite_rebind.20261028): a virtual TO_PositioningAxis sensor on a TM PosInput 2 channel, disconnected after a second module was plugged, is planned back onto it through a declared model correspondence; the planned to_connect payload prepares unchanged, applies with compile and save and resolves in a third capture, where the plan reports no broken connection. AML correspondences, other roles, conflicting replacements and truncation are tested offline only."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.composite_rebind.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

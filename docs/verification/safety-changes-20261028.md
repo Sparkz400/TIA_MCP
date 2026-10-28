@@ -45,9 +45,8 @@ Verified: `safety_inspect`, `safety_validation_inspect`, `safety_printout`,
 - **The F-block import needs a license.** The first run (`sf1`, build `b61`) passed every read,
   refusal and the F-parameter change. It then failed `safety_import_xml`'s apply: TIA refused
   the import with "No safety license available". The F-compile and the F-parameter change work
-  without a license. `change.safety_import_xml` stays open. Its prepare refusals passed: a
-  missing acknowledgement, a scope mismatch and a standard block (`SafetyBoundary`). Qualifying
-  the apply needs an activated STEP 7 Safety license.
+  without a license. After the user activated a STEP 7 Safety license, the import passed
+  ([below](#f-block-import-with-a-safety-license)).
 - **F-monitoring time is not writable on this F-DI.** The ET 200SP F-DI does not declare
   `Failsafe_FMonitoringtime` writable, so only the F-destination address is qualified.
 - **Cyclic IO bandwidth is compile-derived.** The F-CPU interface's
@@ -62,3 +61,30 @@ Verified: `safety_inspect`, `safety_validation_inspect`, `safety_printout`,
 - One F-CPU, one ET 200SP station and two F-DI; other F-CPUs, F-I/O and firmware are not covered.
 - A printout or signature read does not validate, accept or approve a safety program.
 - `safety.logic_changes` and `safety.hardware` stay deferred backlog features.
+
+## F-block import with a safety license
+
+Evidence [`local.safety_import.20261028`](../../evidence/local.safety_import.20261028.json). Run `sf4`
+of the same runner, on a frozen Debug build in `D:\wp\b64`, with an activated STEP 7 Safety license.
+The full `sf3` scope passed again.
+
+`change.safety_import_xml` re-imported the generated F-FBD block `Main_Safety_RTG1` with one filled
+comment text:
+
+- The import ran with checkpoint, PLC compile and save, and `change_status` equal to the apply
+  result. The comment is in the native export.
+- An exact state diff is limited to that block, apart from one recorded side effect (next
+  paragraph).
+- A wrong `previewHash` was refused (`PreviewMismatch`), as were the prepare refusals for a
+  missing acknowledgement, a scope mismatch and a standard block (`SafetyBoundary`).
+- The import persisted across a fresh Portal reopen. A second import was restored from its
+  checkpoint into a new directory equal to the reopened state.
+
+Finding: the import's PLC software compile leaves the F-compiler block `DB1_C` (System
+blocks/STEP 7 Safety/Compiler blocks, know-how protected) changed and inconsistent. The next
+device compile, here the following F-parameter change, regenerates it as consistent. The kind does
+not run a device compile, so after a safety import the F-program needs a full compile before it
+is consistent everywhere.
+
+Verified: `change.safety_import_xml` (6 cells). Every non-deferred D14 cell is now closed (matrix
+502 of 2,031 open, catalog `0.4.64`).

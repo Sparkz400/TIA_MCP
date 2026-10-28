@@ -114,7 +114,7 @@ def capture(run, label, review_id):
         technology = domains["technology"]
         objects = sorted(o["path"] for o in h.tool("technology_read", {"plcPath": run.plc, "maxItems": 500})["technologyObjects"])
         sources = sorted(r["source"] for r in technology["records"])
-        require(technology["status"] == "native" and sources == objects and len(phase["technology"]) == len(objects) == 2, "Technology capture differs: %s / %s" % (sources, objects))
+        require(technology["status"] == "native" and sources == objects and len(phase["technology"]) == len(objects), "Technology capture differs: %s / %s" % (sources, objects))
         for record in technology["records"]:
             slots = [s for s in h.tool("technology_read", {"plcPath": run.plc, "technologyPath": record["source"], "maxItems": 2000})["hardwareConnections"] if s.get("status") != "notExposed"]
             page = h.tool("technology_profile_report", {"recordId": record["recordRef"], "section": "relationships", "count": 200})["rows"]
