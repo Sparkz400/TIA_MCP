@@ -82,8 +82,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         string folder = Path.Combine(Root, "translation-qualification"); Directory.CreateDirectory(folder);
         using (var file = new FileStream(Path.Combine(folder, operation.Id + ".json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read))
         { file.Write(TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths })); file.Flush(true); }
-        var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath,
-            options.ApiDirectory ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48").Binaries();
+        var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath, TranslationNativeTools.ApiDirectory(options)).Binaries();
         var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(operation.Plan.Inputs[0]);
         TranslationAdmissionKey? admissionKey = null; string? admissionRefusal = null;
         // Generalized cultures, owners and source mode are qualification evidence only; no production key exists for them.
@@ -93,15 +92,15 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         return new { operation, capture, review, approval, candidate, edits, admissionKey, admissionKeySha256 = admissionKey is null ? null : HashJson(admissionKey), admissionRefusal };
     }
     [McpServerTool(Name = "qualification_translation_apply", Destructive = true, OpenWorld = false)]
-    [Description("Explicit qualification runtime only: one durable import lifecycle; optional exact retained response-loss or pre-dispatch interruption case.")]
+    [Description("Explicit qualification runtime only: one durable import lifecycle; optional exact retained response-loss, pre-checkpoint or pre-dispatch interruption case.")]
     public Task<CallToolResult> Apply(string operationId, string planSha256, int revision,
         string? loseReplyAfterStage = null, bool interruptBeforeDispatch = false, bool driftSourceAfterCheckpoint = false,
-        CancellationToken cancellationToken = default) => RunApply(async () => {
+        bool interruptBeforeCheckpoint = false, CancellationToken cancellationToken = default) => RunApply(async () => {
         if (loseReplyAfterStage is not null && loseReplyAfterStage is not ("import" or "compile" or "save" or "reopen") ||
-            (loseReplyAfterStage is null ? 0 : 1) + (interruptBeforeDispatch ? 1 : 0) + (driftSourceAfterCheckpoint ? 1 : 0) > 1)
-            throw new BridgeException("TranslationQualificationCaseInvalid", "Choose exactly one supported lost-response stage or pre-dispatch interruption.");
+            (loseReplyAfterStage is null ? 0 : 1) + (interruptBeforeDispatch ? 1 : 0) + (driftSourceAfterCheckpoint ? 1 : 0) + (interruptBeforeCheckpoint ? 1 : 0) > 1)
+            throw new BridgeException("TranslationQualificationCaseInvalid", "Choose exactly one supported lost-response stage, pre-checkpoint or pre-dispatch interruption.");
         var adapter = Adapter(operationId);
-        if (loseReplyAfterStage is not null || interruptBeforeDispatch || driftSourceAfterCheckpoint)
+        if (loseReplyAfterStage is not null || interruptBeforeDispatch || driftSourceAfterCheckpoint || interruptBeforeCheckpoint)
         {
             var operation = Runner.Status(operationId);
             if (operation.Revision != revision || operation.PlanSha256 != planSha256 || operation.State != "prepared")
@@ -109,14 +108,16 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
             string folder = Path.Combine(Root, "translation-qualification"); Directory.CreateDirectory(folder);
             using var file = new FileStream(Path.Combine(folder, operationId + "-failure-injection.json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read);
             file.Write(TranslationWorkerAdapter.JsonBytes(new { operationId, planSha256, revision, loseReplyAfterStage,
-                interruptBeforeDispatch, driftSourceAfterCheckpoint, productionEnabled = false, automaticReplay = false })); file.Flush(true);
+                interruptBeforeDispatch, driftSourceAfterCheckpoint, interruptBeforeCheckpoint, productionEnabled = false, automaticReplay = false })); file.Flush(true);
         }
         adapter.DriftSourceAfterCheckpoint = driftSourceAfterCheckpoint;
         if (loseReplyAfterStage is not null) adapter.AfterNativeReturn = stage => {
             if (stage == loseReplyAfterStage) throw new IOException("Qualification: native " + stage + " returned and original response was retained; delivery interrupted.");
         };
-        var runner = interruptBeforeDispatch ? new TranslationImportWorkflow(Root, stage => {
-            if (stage == "checkpointRetained") throw new IOException("Qualification: interrupted after retained checkpoint and before dispatch intent.");
+        // "acquired" precedes the native lease and checkpoint: the exact history reconcile_before_checkpoint accepts.
+        var runner = interruptBeforeDispatch || interruptBeforeCheckpoint ? new TranslationImportWorkflow(Root, stage => {
+            if (interruptBeforeDispatch && stage == "checkpointRetained") throw new IOException("Qualification: interrupted after retained checkpoint and before dispatch intent.");
+            if (interruptBeforeCheckpoint && stage == "acquired") throw new IOException("Qualification: interrupted after acquisition and before checkpoint intent.");
         }) : Runner;
         return await runner.Apply(operationId, planSha256, revision, adapter, cancellationToken);
     });

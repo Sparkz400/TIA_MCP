@@ -1,0 +1,126 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety_changes.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T18:19:47+00:00",
+  "source": {
+    "commit": "03550988ef86947cd268f9c0d4ab4b09cf20cd69",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_safety_changes.py (sf3) on a frozen Debug build of 0355098 (D:\\wp\\b63, git-archived sources with source-manifest.json) in a fresh owned scratch under TIA Portal V21 Update 3: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess, whose generated scratch user holds ProtectionLevelFailsafeAccess (Full access including fail-safe; owned scratch only, user-approved), plus an ET 200SP station with two F-DI 8x24VDC HF on its IO system. safety_inspect and safety_validation_inspect named the exact F-PLC, its runtime group Main_Safety_RTG1, program signatures and both F-DI F-parameters, reported explicit gaps and truncation at maxItems 1, and refused the standard scratch PLC (UnsupportedCapability); safety_printout wrote a PDF whose bytes match the reported size and SHA-256 and refused the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest); safety_fparameter_set moved one F-DI's Failsafe_FDestinationAddress to a free address with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI, was refused for a non-allowlisted attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the non-writable Failsafe_FMonitoringtime and a wrong previewHash, persisted across a fresh Portal reopen (the compile-derived CalculatedBandwidthForCyclicIoData reads 0 after reopen and is recorded, not compared) and was restored from its checkpoint into a new directory equal to the reopened state; safety_import_xml was refused at prepare for a missing acknowledgement, a scope mismatch and a standard block.",
+  "limitations": [
+    "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI 8x24VDC HF in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only.",
+    "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
+    "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
+    "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b56c1aec0a1fb2b9a179cb4e8c20fea93a952eec34b0ea0cd8f8b6012d0071c4"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "a7465dda3577b7db4436f830c64407f652d3c3b245a28a82daa4800ad5f4d43a"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "835c7361d3b97f9569ee457755d06137c1160abe362b018db3e0fc4a5a0f34a0",
+      "bytes": 1026618,
+      "completed": true,
+      "steps": [
+        "start owned TIA safety changes",
+        "create owned scratch safety changes",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_move",
+        "apply hardware_move",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "snapshot baseline",
+        "safety_inspect of the F-PLC",
+        "safety_inspect with maxItems 1",
+        "safety_validation_inspect of the F-PLC",
+        "refuse safety_inspect of the standard PLC",
+        "refuse safety_validation_inspect of the standard PLC",
+        "safety_printout to PDF",
+        "refuse safety_printout with the absent XPS printer",
+        "refuse safety_printout with a layout name with a space",
+        "refuse safety_fparameter_set: a non-allowlisted Failsafe_ attribute",
+        "refuse safety_fparameter_set: a wrong expected value",
+        "refuse safety_fparameter_set: a missing safetyAcknowledged",
+        "refuse safety_fparameter_set: the other F-DI's F-destination address",
+        "refuse safety_fparameter_set: Failsafe_FMonitoringtime of this F-DI",
+        "refuse safety_import_xml: a missing safetyAcknowledged",
+        "refuse safety_import_xml: another expected block name",
+        "refuse safety_import_xml: the standard block TiaMcp_EnableGate",
+        "prepare move TiaMcpFdi1's F-destination address",
+        "refuse apply safety_fparameter_set: a wrong previewHash",
+        "apply safety_fparameter_set",
+        "change_status move TiaMcpFdi1's F-destination address",
+        "snapshot move TiaMcpFdi1's F-destination address",
+        "verify move TiaMcpFdi1's F-destination address",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "snapshot reopened",
+        "reopened state equals every verified change",
+        "prepare move TiaMcpFdi1's F-destination address again",
+        "apply safety_fparameter_set",
+        "change_status move TiaMcpFdi1's F-destination address again",
+        "snapshot move TiaMcpFdi1's F-destination address again",
+        "verify move TiaMcpFdi1's F-destination address again",
+        "restore move TiaMcpFdi1's F-destination address again",
+        "snapshot restored move TiaMcpFdi1's F-destination address again",
+        "restored move TiaMcpFdi1's F-destination address again equals the pre-change state"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "project_open",
+        "safety_inspect",
+        "safety_printout",
+        "safety_validation_inspect",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "safety_inspect",
+        "safety_printout",
+        "safety_validation_inspect"
+      ]
+    }
+  ]
+}

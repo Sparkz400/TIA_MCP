@@ -17,7 +17,7 @@ namespace TiaMcp.Openness.V21
         private static readonly byte[] ScratchRuntimeUserEntropy = Encoding.UTF8.GetBytes("TiaMcp.V21.ScratchRuntimeUser.v1");
 
         /// <summary>Only invoked immediately after creating a CPU in this worker's new scratch project.</summary>
-        private JObject ConfigureNewScratchRuntimeUser(Project project, DeviceItem cpu, string artifactDirectory)
+        private JObject ConfigureNewScratchRuntimeUser(Project project, DeviceItem cpu, string artifactDirectory, bool failsafeRuntimeAccess = false)
         {
             EnsureCurrentScratchProject(project);
             IEngineeringObject owner = cpu;
@@ -31,9 +31,10 @@ namespace TiaMcp.Openness.V21
                 ["reason"] = "This new device exposes no UmacDevice service; existing access settings were retained." };
             var umac = project.GetService<UmacConfigurator>() ?? throw new BridgeException("ScratchRuntimeUserUnavailable", "Project does not expose UmacConfigurator.");
             var available = umacDevice.AvailableDeviceFunctionRights.ToArray();
-            var fullAccess = available.Where(right => IsScratchFullAccessRight(right)).Take(2).ToArray();
+            // An F-CPU compiles only when a local user holds the fail-safe right; the caller opts in per new scratch device.
+            var fullAccess = available.Where(right => failsafeRuntimeAccess ? IsScratchFailsafeRight(right) : IsScratchFullAccessRight(right)).Take(2).ToArray();
             if (fullAccess.Length != 1)
-                throw new BridgeException("ScratchRuntimeRightUnresolved", "A unique standard Full access runtime right was not found; no user or role was created.",
+                throw new BridgeException("ScratchRuntimeRightUnresolved", "A unique " + (failsafeRuntimeAccess ? "Full access including fail-safe" : "standard Full access") + " runtime right was not found; no user or role was created.",
                     new JObject { ["cpuName"] = cpu.Name, ["availableRights"] = new JArray(available.Select(right => new JObject {
                         ["identifier"] = right.Identifier, ["name"] = right.Name, ["group"] = right.Group })) });
 
@@ -73,7 +74,7 @@ namespace TiaMcp.Openness.V21
                 File.WriteAllText(metadataPath, metadata.ToString(Formatting.Indented), new UTF8Encoding(false));
                 user.ProjectUserAuthenticationType = AuthenticationType.Password;
                 user.Comment = "Generated local runtime user for an isolated TiaMcp scratch CPU; password stored using Windows CurrentUser DPAPI.";
-                var role = umac.CustomRoles.Create(roleName, "Full access to one newly created isolated scratch CPU only.");
+                var role = umac.CustomRoles.Create(roleName, (failsafeRuntimeAccess ? "Full access including fail-safe" : "Full access") + " to one newly created isolated scratch CPU only.");
                 role.AssignDeviceFunctionRight(umacDevice, fullAccess[0]);
                 user.Roles.Add(role);
                 if (!user.IsActive) user.Activate();
@@ -105,6 +106,13 @@ namespace TiaMcp.Openness.V21
                 if (encrypted != null) Array.Clear(encrypted, 0, encrypted.Length);
                 if (characters != null) Array.Clear(characters, 0, characters.Length);
             }
+        }
+
+        private static bool IsScratchFailsafeRight(DeviceFunctionRight right)
+        {
+            // V21 Update 3 identifies it as ProtectionLevelFailsafeAccess (observed on a CPU 1511F-1 PN); the name is the localized fallback.
+            return string.Equals(right.Identifier, "ProtectionLevelFailsafeAccess", StringComparison.Ordinal) ||
+                string.Equals(right.Name, "Full access including fail-safe", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsScratchFullAccessRight(DeviceFunctionRight right)

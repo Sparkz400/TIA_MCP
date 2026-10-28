@@ -105,7 +105,8 @@ because the device compile then fails (below).
 - **`composite_engineering_rebind_plan`.** The plan acts only on before-phase TO hardware relationships that
   are declared (connected to one resolved module or channel). The verified `to_connect` route connects output
   cams to PLC tags only, so over the two native phases the plan reports no broken connection. Qualification
-  needs a fixture TO on a module or channel, such as TO_ExternalEncoder on a TM Count.
+  needs a fixture TO on a module or channel, such as TO_ExternalEncoder on a TM Count. Resolved later the same
+  day with a virtual axis on a TM PosInput 2 channel ([record](composite-rebind-20261028.md)).
 - **`hmi_text_list_author`, `hmi_text_list_generate_set`.** Both keep `AC-native`, because their output is
   meant for a native import. No worker route imports Unified text-list YAML: V21 offers
   `HmiTextListComposition.Import`, but the worker only exports Unified text lists and imports Classic XML.

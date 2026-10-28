@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.62",
+  "catalogVersion": "0.4.66",
   "targetTiaVersions": [
     21
   ],
@@ -3565,6 +3565,27 @@
       ]
     },
     {
+      "id": "local.composite_rebind.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "a5fdadca9ffd56f0659bb88e71a8cf246329cb6f",
+        "passedScope": "scripts/qualify_composite_rebind.py on a frozen Debug build of a5fdadc (D:\\wp\\rb06), 57/57 steps, in one owned scratch CPU 1511-1 PN V4.1. Fixture, each change with checkpoint, compile and save, exact state diffs and named TIA side effects: a TM PosInput 2 V2.0 (RbEncA) plugged and its channel 0 set to OperatingMode MotionControl with hardware_channel_attributes, a virtual TO_PositioningAxis 10.0 (RbAxis) created and its sensor 0 connected to that channel with to_connect. A composite phase captured from a saved review declares that relationship. The replacement plugs a second TM PosInput 2 (RbEncB, same mode) and disconnects the sensor with to_disconnect; the after phase shows it disconnected. A composite review with the model correspondence RbEncA -> RbEncB (node IDs read from the saved reviews) makes composite_engineering_rebind_plan list exactly that broken connection (afterState disconnected, the correspondence ID, selectorCarriedOver) with a to_connect payload naming RbEncB, sensorIndex 0 and channel Technology/Complex/0. The payload is prepared unchanged, applied and read back; a third capture resolves sensor 0 to RbEncB and the plan from the before phase to it reports no broken connection. Without the correspondence the entry stays noDeclaredReplacement without a payload; a malformed handle (CompositeInvalidReference) and an altered receipt digest (CompositeIntegrityFailure) are refused."
+      },
+      "artifacts": [
+        "evidence/local.composite_rebind.20261028.json"
+      ],
+      "limitations": [
+        "One virtual TO_PositioningAxis 10.0 whose sensor 0 is the only connected slot, two TM PosInput 2 V2.0 and one model correspondence; AML correspondences through hardware mappings, actor, torque, encoder and measuring-input roles, conflicting replacements and truncation are tested offline only.",
+        "The replacement is declared, not inferred; the carried-over channel selector matches here because both modules share their type.",
+        "TIA couples native effects, recorded under sideEffects: OperatingMode applies to both TM channels and shrinks the module's output range (24 to 8 bytes) and may renumber the submodule's hardware identifier; a sensor connection puts the item's addresses into the servo process image and adds RbAxis_Sensor1_Interface_AddressIn/Out tags (PD_TEL83) with their system types; to_disconnect keeps those tags, so the next connection adds copies suffixed (1).",
+        "Engineering only; nothing is downloaded. Runs rb01-rb04 (runner and preservation fixes) and rb05 (passed, one side-effect record overwritten by a repeated step label) are retained and not cited."
+      ]
+    },
+    {
       "id": "local.plcsim_diagnostics.20261028",
       "status": "passed",
       "profile": {
@@ -3582,6 +3603,115 @@
         "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus with the owned scratch's generated credential (first-use TLS trust under the owned-empty-CPU policy); one FB instance with two Bool signals and two Bool hypotheses. Numeric, cycle-synchronous and multi-instance captures are not exercised.",
         "Sequential polling: Enable and Active of one cycle are separate reads, and the counts depend on capture duration. Verdicts stay unresolved by design; no causation, scan atomicity or running-program identity is claimed.",
         "The provisioning comparison covers the offline project state the read tools expose; online state other than the card restore is not compared."
+      ]
+    },
+    {
+      "id": "local.gsd_transfer_areas.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "f0ca4850509c2cecc2d3de1c61d3ca7be5f4acfa",
+        "passedScope": "scripts/qualify_gsd_export.py on a frozen Debug build of f0ca485 (D:\\wp\\ta04, git-archived sources with source-manifest.json), 80/80 steps, in one owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: X1 put on subnet GsdNet; the PROFINET interface made an I-device with hardware_attributes (InterfaceOperatingMode 'IoController, IoDevice') without compile or save; hardware_transfer_area_create added the controller-device areas TiaMcpArea, TiaMcpSpare and TiaMcpTemp and hardware_transfer_area_delete removed TiaMcpTemp, each with asserted preview, checkpoint (which saved the mode), device compile, configured-hardware preservation including every I-device interface's transfer areas, save and change_status; hardware_inspect, device_inventory and the PLC's program state differ in exactly the intended keys, with the CPU's hardware-identifier system constants recorded as sideEffects. hardware_gsd_export then wrote GSDML.xml (7823 bytes, SHA-256 a1adccde...) from the only item reporting gsdExportAvailable and changed nothing. A fresh owned Portal reopen shows the identical state (except the compile-derived CalculatedBandwidthForCyclicIoData) and exports the byte-identical GSDML; from that state a create, a delete and the switch back to IoController are each restored from their checkpoints into copies equal to the reopened state, and the last copy exports the same GSDML. Typed refusals (HardwareNotFound, UnsupportedCapability, InvalidRequest, ObjectExists, ObjectNotFound) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.gsd_transfer_areas.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device on a subnet without a higher-level IO controller; no shared device or controller assignment.",
+        "Controller-device (CD) transfer areas only, with the direction (LocalToPartner), lengths (1 byte each way) and local output addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas and direction or length edits are not exercised.",
+        "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
+        "The GSDML is Siemens output: checked as well-formed XML naming the designation, not imported into another tool. Engineering only; nothing is downloaded and no PROFINET communication is observed."
+      ]
+    },
+    {
+      "id": "local.safety_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "bb82136f645da83584aea72093c12c9d04b23347",
+        "passedScope": "scripts/qualify_safety_changes.py (sf3) on a frozen Debug build of 0355098 (D:\\wp\\b63, git-archived sources with source-manifest.json) in a fresh owned scratch under TIA Portal V21 Update 3: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess, whose generated scratch user holds ProtectionLevelFailsafeAccess (Full access including fail-safe; owned scratch only, user-approved), plus an ET 200SP station with two F-DI 8x24VDC HF on its IO system. safety_inspect and safety_validation_inspect named the exact F-PLC, its runtime group Main_Safety_RTG1, program signatures and both F-DI F-parameters, reported explicit gaps and truncation at maxItems 1, and refused the standard scratch PLC (UnsupportedCapability); safety_printout wrote a PDF whose bytes match the reported size and SHA-256 and refused the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest); safety_fparameter_set moved one F-DI's Failsafe_FDestinationAddress to a free address with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI, was refused for a non-allowlisted attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the non-writable Failsafe_FMonitoringtime and a wrong previewHash, persisted across a fresh Portal reopen (the compile-derived CalculatedBandwidthForCyclicIoData reads 0 after reopen and is recorded, not compared) and was restored from its checkpoint into a new directory equal to the reopened state; safety_import_xml was refused at prepare for a missing acknowledgement, a scope mismatch and a standard block."
+      },
+      "artifacts": [
+        "evidence/local.safety_changes.20261028.json"
+      ],
+      "limitations": [
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI 8x24VDC HF in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only.",
+        "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
+        "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
+        "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+      ]
+    },
+    {
+      "id": "local.safety_import.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "80b57a7f9b7ca8b1cfe5429f0961d4c98c0bb014",
+        "passedScope": "scripts/qualify_safety_changes.py (sf4) on a frozen Debug build of a2c2b11 (D:\\wp\\b64, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF: the full sf3 scope (safety reads, PDF printout, safety_fparameter_set) passed again, and safety_import_xml re-imported the generated F-FBD block Main_Safety_RTG1 with one filled comment text, with checkpoint, PLC compile and save, change_status, an exact state diff limited to that block except the recorded F-compiler block DB1_C (System blocks/STEP 7 Safety/Compiler blocks, know-how protected; its payload changes and it reads inconsistent after the import's PLC software compile until the next device compile), the comment in the native export, a wrong previewHash refused (PreviewMismatch), prepare refusals for a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), persistence across a fresh Portal reopen and a second import restored from its checkpoint into a new directory equal to the reopened state."
+      },
+      "artifacts": [
+        "evidence/local.safety_import.20261028.json"
+      ],
+      "limitations": [
+        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
+        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
+      ]
+    },
+    {
+      "id": "local.translation.qualification.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ],
+        "sourceCommit": "bf12c293b89258dc95919ff59c373950a22dfc2f",
+        "passedScope": "The ten qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of bf12c29 (D:\\wp\\tr07) under TIA Portal V21 Update 3: one same-instance packet (seven forward failure cases, three reviewed reverse edits, 8 imports, 10 distinct restorations, final unattempted plan with the same key; independent verify_translation_admission.py passed), a fresh fixture with category probes and a pre-checkpoint interruption, its read-only reconciliation by a new Host after exact close with a no-op lifecycle, and a resumed closed fixture with the Main edit and a lost restore reply."
+      },
+      "artifacts": [
+        "evidence/local.translation.qualification.20261028.json"
+      ],
+      "limitations": [
+        "One owned CPU 1511-1 PN V4.1 scratch per packet, English TIA UI, de-DE reference and en-GB target, one PLC, target-only plain text; generalized culture pairs, several PLC owners, source-text mode, rich text, HMI and customer projects were not run.",
+        "Category leakage still holds: block-comment, hardware and alarm-class requests on the PLC each returned all six PLC rows; the populated-Main control is inconclusive on an English-UI scratch."
+      ]
+    },
+    {
+      "id": "local.translation.native.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ],
+        "sourceCommit": "bf12c293b89258dc95919ff59c373950a22dfc2f",
+        "passedScope": "The six translation_native_* tools in default mode (no qualification flag) on byte-identical copies of the tr07 Host and worker (bf12c29) with an exact admission built by scripts/build_translation_admission.py from the verified same-instance packet; runner from f8c5788 (D:\\wp\\tr08). Worker and Portal loss at checkpointIntent and inside the native import, and Host loss during the import, each reconciled from a fresh Host without replay; then refusals of an uninstalled or malformed profile and an unknown operation before dispatch, capture, offline review, approval and candidate, admitted prepare, forged-plan and stale-revision refusals, one import with readback, preservation, compile, save and fresh reopen, replay and existing-destination refusals, checkpoint recovery to a new directory, read-only reconciliation (verifiedApplied/verifiedRestored) and a changed-baseline refusal."
+      },
+      "artifacts": [
+        "evidence/local.translation.native.20261028.json"
+      ],
+      "limitations": [
+        "One owned CPU 1511-1 PN V4.1 scratch per packet, English TIA UI, de-DE reference and en-GB target, one PLC, target-only plain text; generalized culture pairs, several PLC owners, source-text mode, rich text, HMI and customer projects were not run.",
+        "The installed admission is instance-bound: it admits one scratch project and one Main OB1 comment edit and was installed only into the test deployment; no shipped package contains a registry.",
+        "A Host lost at dispatchIntent can only be reconciled read-only; a partial original would stay unresolved. The Update 3 read-only-row warning is matched in its English wording only."
       ]
     },
     {
@@ -4631,13 +4761,15 @@
         "limitations": [
           "Exact hardwarePath whose item exposes GsdExportProvider (hardware_inspect reports gsdExportAvailable); other items are refused as UnsupportedCapability.",
           "Siemens writes into a fresh artifact directory; up to 32 produced files are returned with SHA-256 and further files are reported as truncated. The GSD content is not validated by the bridge.",
-          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are now refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA), but the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment': a new I-device needs a transfer area, and no change kind creates one (V21 offers TransferAreaComposition.Create). Native qualification waits for that kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA); the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment' until change.hardware_transfer_area_create adds a transfer area.",
+          "Natively qualified (local.gsd_transfer_areas.20261028) on an I-device CPU 1511-1 PN V4.1 with two CD transfer areas and no higher-level IO controller: Siemens wrote one file, GSDML.xml (7823 bytes), byte-identical after a fresh reopen and in a checkpoint-restored copy; the export changes nothing and is withdrawn when the interface is switched back to IoController. The Host requires designation; a blank one is InvalidRequest."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4767,15 +4899,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Exact F-PLC, runtime group Main_Safety_RTG1 and program signatures, explicit gaps, truncation at maxItems 1; a standard PLC is refused (UnsupportedCapability).",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_changes.20261028"
         ]
       },
       "availability": {
@@ -4813,7 +4945,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Both F-DI listed with their F-parameters, explicit gaps; a standard PLC is refused (UnsupportedCapability).",
           "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
           "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
           "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
@@ -4822,8 +4954,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4859,7 +4993,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). A Microsoft Print to PDF printout whose bytes match the reported size and SHA-256; the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest) are refused.",
           "Only the two Windows file printers the API offers; the Print to PDF or XPS Document Writer queue must be installed (System.Drawing PrinterSettings.InstalledPrinters), otherwise PrinterUnavailable and nothing is printed. XPS output keeps whatever XPS/OpenXPS format the driver writes.",
           "documentLayout is passed through as a plain layout name (letters, digits, underscore); TIA decides whether it exists.",
           "PDF/XPS/XLSX/SimaticML files are written to the Host export directory and retained opaquely with SHA-256; content is not parsed or certified. A printout or report does not validate, accept or approve the safety program.",
@@ -4867,8 +5001,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7117,7 +7253,8 @@
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "failsafeRuntimeAccess (with configureScratchSecurity, new scratch devices only) gives the generated runtime role the F-CPU right Full access including fail-safe (ProtectionLevelFailsafeAccess) instead of Full access, which an F-CPU compile requires (local.safety_changes.20261028)."
         ]
       },
       "qualification": {
@@ -7547,7 +7684,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. Actor, sensor, torque, encoder and measuring-input roles and hardware or channel targets are only refused.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. A sensor on a channel target is natively exercised by local.composite_rebind.20261028: a virtual TO_PositioningAxis 10.0 sensor on a TM PosInput 2 V2.0 channel in MotionControl mode compiles clean and reads back; TIA puts the item's addresses into the servo process image and adds the sensor's PROFIdrive interface tags. Actor, torque, encoder and measuring-input roles and module (DeviceItem) targets are only refused.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "One role slot per change: actor, sensor (with sensorIndex), torque, encoder, measuringInput or outputCam, named as in technology_read hardwareConnections rows. A null service or slot refuses the preview.",
           "Targets: hardwarePath (module, submodule or PROFIdrive telegram DeviceItem), hardwarePath with channelType/channelIoType/channelNumber (one native channel), hardwarePath with channelIndex (measuring input only) or tagName (one PLC tag). Unsupported role/target pairs refuse at prepare; native Siemens validation decides compatibility. ConnectOption.AllowAllModules, separate input/output modules, bit addresses and DB-member overloads are not exposed.",
@@ -7558,7 +7695,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -7602,7 +7740,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): the output-cam tag connection removed and read back; unconnected slots refused; reopen and checkpoint restore.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): the output-cam tag connection removed and read back; unconnected slots refused; reopen and checkpoint restore; the sensor of a virtual TO_PositioningAxis on a TM PosInput 2 channel in local.composite_rebind.20261028, where TIA keeps the sensor's interface tags.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "Uses the same role/sensorIndex slot selection as to_connect; a slot that is not connected refuses the preview.",
           "Apply verifies IsConnected=false; a remaining connection requires checkpoint recovery. A TO that is invalid without a connection fails the mandatory compilation and requires recovery.",
@@ -7612,7 +7750,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -7712,20 +7851,21 @@
           "The recorded CPU1511F firmware4.1 F_FBD comment fixture passed post-compile fingerprint/signature readback, guarded recovery, recovered unchanged compile and both saved-copy reopens. Earlier failed comment and blocked startup records remain historical evidence.",
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "2026-10-28: natively qualified under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, with checkpoint, PLC compile and save, an exact diff limited to that block, fresh reopen and checkpoint restore; refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. After the import's PLC software compile, the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_import.20261028"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Requires an activated STEP 7 Safety license for the native F-block import."
         ]
       },
       "prerequisites": [
@@ -7763,7 +7903,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
           "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
           "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
@@ -7773,8 +7913,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12909,7 +13051,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Reviewed channel settings in the allowlist; only Smoothing (ET 200SP None/Weak/Medium/Strong) is natively qualified, on the AI 4xU/I 2-wire ST V2.0. Other allowlisted names are module-specific and unqualified.",
+          "Reviewed channel settings in the allowlist; natively qualified are Smoothing (ET 200SP None/Weak/Medium/Strong) on the AI 4xU/I 2-wire ST V2.0 and OperatingMode MotionControl on a TM PosInput 2 V2.0 (local.composite_rebind.20261028). TIA applies OperatingMode to every channel of the module and resizes its address ranges, which preservation accepts for the selected item only (same start addresses), and may renumber the submodule's hardware identifier. Other allowlisted names are module-specific and unqualified.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -12920,7 +13062,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.remote-io.full-route.20261024"
+          "local.remote-io.full-route.20261024",
+          "local.composite_rebind.20261028"
         ]
       },
       "availability": {
@@ -13126,6 +13269,110 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_create",
+      "domain": "hardware",
+      "title": "Create a controller-device transfer area on an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one controller-device (CD) transfer area with an exact name; a name already used on the interface (ignoring case) is refused as ObjectExists. TIA chooses its direction, lengths and local addresses, which the readback reports.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Other transfer-area types (F-CD, PROFIsafe, shared device, mapping rules), direction and length edits, and an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "domain": "hardware",
+      "title": "Delete a transfer area of an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one transfer area by exact name; an absent name is refused as ObjectNotFound. Program references to its local addresses are checked only by the mandatory device compile.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Transfer areas with mapping rules or partner addresses from an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
         ]
       },
       "availability": {
@@ -15946,12 +16193,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: seed and reopen the exact newly owned bilingual scratch.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Seeds de-DE reference/en-GB and the three block comments once per scratch (durable seed marker), whatever the TIA UI language."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15988,12 +16238,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: retained populated category controls and filtering matrix.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Category leakage still holds under Update 3: block-comment, hardware and alarm-class requests on the PLC each returned all six PLC rows; the populated-Main control is inconclusive on an English-UI scratch. Restricted profiles stay disabled."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16030,12 +16283,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: complete live bilingual text and peer capture.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Whole-project de-DE/en-GB capture of one PLC owner; generalized culture pairs, several PLC owners and source-text mode were not run natively."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16072,12 +16328,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Target-only no-op or one Main OB1 comment edit; source-text mode and the generalized selectors were not run natively."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16114,12 +16373,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: one durable import, readback, preservation, compile, save and fresh reopen.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Seven bounded failure cases (before dispatch, source drift, lost import/compile/save/reopen/restore replies), reviewed reverse edits and no-op/edit lifecycles; Update 3 import returns Warning for two unchanged read-only rows, accepted only in that exact shape."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16156,12 +16418,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: one original-checkpoint restoration to an absent reserved destination; optional retained reply-loss test.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: One restoration per operation into a new directory; an existing destination is refused without change."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16198,12 +16463,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: fresh original and restored observations, without import or restore replay.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Read-only fresh reopen of original and recovered copies, including a lost restore reply; no import or restore replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16240,12 +16508,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: retained operation state; never resumes native work.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Journal-only reads; never starts a worker."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16282,12 +16553,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: explicit fresh unchanged reconciliation after a pre-checkpoint worker fix, bound to original exact closed-process evidence.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Reached through the qualification-only interruptBeforeCheckpoint injection on a fresh fixture, then reconciled by a new Host and worker build after exact close of the first."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16324,12 +16598,15 @@
         "status": "implemented",
         "limitations": [
           "Qualification-session only: reopen an already reconciled fixture after exact prior process closure; verify current content without replaying the completed import.",
-          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration."
+          "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
+          "Natively qualified by local.translation.qualification.20261028: Resumed a closed fixture whose no-op lifecycle and checkpoint recovery were reconciled, then ran only the remaining edit."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.qualification.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16897,13 +17174,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16944,13 +17225,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16991,13 +17276,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17038,13 +17327,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17085,13 +17378,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17132,13 +17429,17 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only."
+          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
+          "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.translation.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22211,13 +22512,14 @@
           "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
           "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
           "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
-          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified.",
-          "Native observation (28 October 2026): over two native phases (local.composite_capture.20261028) the plan reports no broken connection, because no verified flow creates a declared TO hardware-module or channel connection: to_connect is qualified only for output cams to PLC tags. Qualification needs a fixture TO connected to a module or channel, for example TO_ExternalEncoder on a TM Count or an output cam on a TM Timer DIDQ channel."
+          "Natively qualified (local.composite_rebind.20261028): a virtual TO_PositioningAxis sensor on a TM PosInput 2 channel, disconnected after a second module was plugged, is planned back onto it through a declared model correspondence; the planned to_connect payload prepares unchanged, applies with compile and save and resolves in a third capture, where the plan reports no broken connection. AML correspondences, other roles, conflicting replacements and truncation are tested offline only."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.composite_rebind.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

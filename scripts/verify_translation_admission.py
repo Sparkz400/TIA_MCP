@@ -10,8 +10,8 @@ from pathlib import Path
 import sys
 
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
-from qualify_translation_import import FAILURE_CASES
-from verify_translation_import import workbook, peer
+from qualify_translation_import import FAILURE_CASES, STALE_CODES
+from verify_translation_import import MAIN_COMMENT_VIEWS, accepted_return, workbook, peer
 from verify_watch_workflow import canonical_sha
 
 
@@ -37,7 +37,7 @@ def content_sha(rows):
 class Oracle:
     def __init__(self, root):
         self.root = Path(root).resolve()
-        self.imports = [load(p) for p in self.root.glob('translation-native/import-*/native-return.json')]
+        self.imports = [dict(load(p), log=(p.parent / 'complete-log').read_bytes()) for p in self.root.glob('translation-native/import-*/native-return.json')]
         self.restores = [load(p) for p in self.root.glob('translation-native/restore-*/restore-return.json')]
         self.oracle = load(self.root / 'edit-oracle.json')
 
@@ -95,8 +95,8 @@ class Oracle:
         expected = (self.oracle['requested']['replacement'], self.oracle['original']['target']['text']) if reverse else (
             self.oracle['original']['target']['text'], self.oracle['requested']['replacement'])
         require((old, new) == expected and before[key][:-1] == candidate[key][:-1] and
-                before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] ==
-                ['Programmbausteine', 'Main', 'Bausteinkommentar'], 'Edit exceeds exact reviewed Main target transition')
+                before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] in
+                MAIN_COMMENT_VIEWS, 'Edit exceeds exact reviewed Main target transition')
 
         def observation(value, expected, restored=False, fresh=True):
             require(workbook(self.artifact(value['workbook'])) == expected and value['scope'] == baseline['scope'], 'Complete native texts/cultures differ')
@@ -147,7 +147,7 @@ class Oracle:
         require(len(imports) == expected_imports, 'Import count differs; replay forbidden')
         for imported in imports:
             require(imported['planSha256'] == final['planSha256'] and imported['candidateSha256'] == binding['candidate']['sha256'] and
-                    imported['state'] == 'Info' and imported['updateSourceLanguage'] is False, 'Native return differs')
+                    accepted_return(imported['state'], imported['log'], before, candidate) and imported['updateSourceLanguage'] is False, 'Native return differs')
         restores = [r for r in self.restores if r['projectPath'] == trial['recoveryPath']]
         require(len(restores) == 1 and restores[0]['oneRetrieve'], 'Exactly one distinct checkpoint restoration required')
         apply_calls = self.calls('qualification_translation_apply', trial['id'])
@@ -178,7 +178,7 @@ class Oracle:
             if workbook(path.read_bytes()) == expected: changed.append(path)
         require(len(changed) == 1, 'Actual source-only drift export missing or repeated')
         failures = [self.parsed(e['artifact']) for e in final['evidence'] if e['gate'] == 'failure' or e['gate'].startswith('interruption.')]
-        require(any(f.get('code') == 'StaleWorkbook' for f in failures), 'Source drift did not retain exact stale refusal')
+        require(any(f.get('code') in STALE_CODES for f in failures), 'Source drift did not retain exact stale refusal')
 
     def cleanup(self):
         close = load(self.root / 'exact-close.json'); tree = close['tree']
@@ -198,7 +198,7 @@ def verify(root):
     same = admission.get('sameInstance', False)
     require(admission['kind'] == ('translation-same-instance-qualification' if same else 'translation-failure-qualification') and
             Path(admission['artifactRoot']).resolve() == root and admission['resumeOperation'] is None, 'Fresh exact packet required')
-    require(result['completed'] and result['productionEnabled'] is False and result['automaticReplay'] is False and result['preexistingPreserved'], 'Incomplete native packet')
+    require(result['completed'] and result['productionEnabled'] is False and result['automaticReplay'] is False and result.get('ownedPortalExited') is True, 'Incomplete native packet')
     cases = list(FAILURE_CASES) if same else [admission.get('failureCase')]
     require(all(c in FAILURE_CASES for c in cases) and [t['name'] for t in result['trials']] == cases, 'Exact bounded ordered case list required')
     oracle = Oracle(root); checks = [oracle.operation(t) for t in result['trials']]

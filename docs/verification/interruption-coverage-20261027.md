@@ -117,6 +117,12 @@ is not claimed here. On 28 October D02 qualified `watch_table_apply` at its thre
 points and eight native worker-loss points ([record](review-criteria-and-watch-20261028.md)),
 and watch creation through `watch_table_apply` after a Host loss at the native apply
 (`local.watch.creation_loss.20261028`, [record](watch-authoring-update3-20261028.md#creation-response-loss)).
+The same day D03 qualified `translation_native_apply` in default mode against an installed
+exact admission. Worker and Portal loss at checkpoint intent and inside the native import,
+and Host loss during the import, each reconciled from a fresh Host without replay. Lost
+import, compile, save, reopen and restore replies and a pre-dispatch interruption were run
+on the same workflow in qualification mode (`local.translation.native.20261028`,
+`local.translation.qualification.20261028`, [record](translation-native-20261028.md)).
 
 ## Limits
 

@@ -23,7 +23,7 @@ namespace TiaMcp.Openness.V21
         }
 
         /// <summary>Called only immediately after device creation, never on discovered existing CPUs.</summary>
-        private JObject ConfigureNewScratchCpu(Project project, Device newlyCreatedDevice, string artifactDirectory)
+        private JObject ConfigureNewScratchCpu(Project project, Device newlyCreatedDevice, string artifactDirectory, bool failsafeRuntimeAccess = false)
         {
             EnsureCurrentScratchProject(project);
             var configured = new JArray();
@@ -36,7 +36,7 @@ namespace TiaMcp.Openness.V21
                 {
                     configured.Add(new JObject { ["cpuName"] = cpu.Name, ["configuration"] = before,
                         ["action"] = "Existing protected configuration retained; no password changed.",
-                        ["runtimeUser"] = ConfigureNewScratchRuntimeUser(project, cpu, artifactDirectory) });
+                        ["runtimeUser"] = ConfigureNewScratchRuntimeUser(project, cpu, artifactDirectory, failsafeRuntimeAccess) });
                     continue;
                 }
                 string credentialDirectory = Path.Combine(artifactDirectory, "scratch-credentials");
@@ -73,7 +73,7 @@ namespace TiaMcp.Openness.V21
                     File.WriteAllText(metadataPath, metadata.ToString(Formatting.Indented), new UTF8Encoding(false));
                     configured.Add(new JObject { ["cpuName"] = cpu.Name, ["configuration"] = service.MasterSecretConfiguration.ToString(),
                         ["credentialMetadataPath"] = metadataPath, ["credentialStorage"] = "Windows DPAPI CurrentUser", ["secretReturned"] = false,
-                        ["runtimeUser"] = ConfigureNewScratchRuntimeUser(project, cpu, artifactDirectory) });
+                        ["runtimeUser"] = ConfigureNewScratchRuntimeUser(project, cpu, artifactDirectory, failsafeRuntimeAccess) });
                 }
                 finally
                 {

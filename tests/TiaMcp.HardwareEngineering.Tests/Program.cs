@@ -53,6 +53,12 @@ var channel = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 0, ["
 Check("one exact channel", "hardware_channel_attributes", channel, rows => rows[1]["channels"][0]["attributes"]["ChannelActivation"] = false, true);
 Check("wrong channel rejected", "hardware_channel_attributes", channel, rows => rows[1]["channels"][1]["attributes"]["ChannelActivation"] = false, false);
 Check("channel collateral rejected", "hardware_channel_attributes", channel, rows => { rows[1]["channels"][0]["attributes"]["ChannelActivation"] = false; rows[1]["channels"][1]["attributes"]["ChannelActivation"] = false; }, false);
+var mode = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 0, ["channelType"] = "Digital", ["channelIoType"] = "Input", ["attributes"] = new JObject { ["OperatingMode"] = 269 } };
+void Modes(JArray rows) { foreach (var row in rows[1]["channels"]) row["attributes"]["OperatingMode"] = 277; }
+void Moded(JArray rows) { foreach (var row in rows[1]["channels"]) row["attributes"]["OperatingMode"] = 269; rows[1]["addresses"][0]["lengthBits"] = 8; }
+Check("operating mode couples the module's channels and address lengths", "hardware_channel_attributes", mode, Moded, true, Modes);
+Check("operating mode keeps start addresses", "hardware_channel_attributes", mode, rows => { Moded(rows); rows[1]["addresses"][0]["startAddress"] = 2; }, false, Modes);
+Check("operating mode keeps other modules", "hardware_channel_attributes", mode, rows => { Moded(rows); rows[0]["attributes"]["Comment"] = "lost"; }, false, Modes);
 var address = new JObject { ["hardwarePath"] = module, ["ioType"] = "Input", ["oldStartAddress"] = 0, ["startAddress"] = 64 };
 Check("address move", "hardware_address_set", address, rows => rows[1]["addresses"][0]["startAddress"] = 64, true);
 Check("address length rejected", "hardware_address_set", address, rows => { rows[1]["addresses"][0]["startAddress"] = 64; rows[1]["addresses"][0]["lengthBits"] = 32; }, false);
@@ -215,6 +221,19 @@ Check("port connect without captured port rejected", "hardware_port_connect", ne
 Check("self port link rejected", "hardware_port_connect", new JObject { ["hardwarePath"] = portA, ["partnerHardwarePath"] = portA }, _ => { }, false, FreePorts);
 Check("port disconnect unlinks both ends", "hardware_port_disconnect", portLink, rows => SetLinks(rows, false), true, LinkedPorts);
 Check("partial port disconnect rejected", "hardware_port_disconnect", portLink, rows => rows[4]["port"]["connectedPorts"] = new JArray(), false, LinkedPorts);
+JObject Area(string name, int start) => new JObject { ["name"] = name, ["type"] = "CD", ["direction"] = "PartnerToLocal", ["positionNumber"] = start, ["localToPartnerLength"] = 0, ["partnerToLocalLength"] = 1,
+    ["localAddresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = start, ["lengthBits"] = 8 }), ["partnerAddresses"] = new JArray() };
+void Areas(JArray rows, params JObject[] areas) => rows[2]["network"]["transferAreas"] = new JArray(areas);
+var areaCreate = new JObject { ["hardwarePath"] = controller, ["name"] = "Ta" };
+Check("transfer area create adds exactly the named area", "hardware_transfer_area_create", areaCreate, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)), true, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create without the area rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create of an existing area rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false, rows => Areas(rows, Area("Ta", 4)));
+Check("transfer area create changing another area rejected", "hardware_transfer_area_create", areaCreate, rows => Areas(rows, Area("Keep", 3), Area("Ta", 4)), false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create with collateral address rejected", "hardware_transfer_area_create", areaCreate, rows => { Areas(rows, Area("Keep", 2), Area("Ta", 4)); rows[1]["addresses"][0]["startAddress"] = 4; }, false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create on an uncaptured interface rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false);
+Check("transfer area delete removes exactly the named area", "hardware_transfer_area_delete", areaCreate, rows => Areas(rows, Area("Keep", 2)), true, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
+Check("transfer area delete keeping the area rejected", "hardware_transfer_area_delete", areaCreate, _ => { }, false, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
+Check("transfer area delete removing another area rejected", "hardware_transfer_area_delete", areaCreate, rows => Areas(rows), false, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
 const string child = module + "/items/Sub";
 var replace = new JObject { ["hardwarePath"] = module, ["typeIdentifier"] = "Catalog:DI32" };
 void WithChild(JArray rows) => rows.Add(Row(child, 1));
