@@ -1,8 +1,9 @@
 """Qualify the D11 PLC alarm import kinds natively in one owned scratch CPU 1511-1 PN.
 
 Phase A adds an FB with a Program_Alarm and its instance DB, then applies plc_alarm_class_import (an edited display name in
-the project's alarm-class DAT), plc_alarm_instance_text_import (an edited instance alarm text) and plc_supervision_import
-(the PLC's supervision workbook, unchanged) with checkpoint, compile and save. Each import file is a native export edited
+the project's alarm-class DAT), plc_alarm_instance_text_import (an edited instance alarm text), plc_supervision_import (the
+PLC's supervision workbook, unchanged) and plc_supervision_settings_import (an edited ProDiag category name) with checkpoint,
+compile and save. The first supervision import initializes ProDiag's global settings, which makes their export available. Each import file is a native export edited
 only in the named cell or element. Each preview is asserted against the request, and a complete state (every block, type and
 tag-table export, every member and group path, and plc_alarm_inspect's alarm classes, instance texts, supervisions and text
 lists) must differ from the previous one in exactly the intended keys. A fresh Portal then reopens the saved project, which
@@ -25,7 +26,7 @@ from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, view
 from typed_graphical_transport import artifact_bytes
 
-KINDS = ("plc_alarm_class_import", "plc_alarm_instance_text_import", "plc_supervision_import")
+KINDS = ("plc_alarm_class_import", "plc_alarm_instance_text_import", "plc_supervision_import", "plc_supervision_settings_import")
 FB = '''FUNCTION_BLOCK "AlFb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -52,8 +53,9 @@ CRITERIA = {
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 with the default alarm classes and one Program_Alarm instance; HMI consumers of the classes are not exercised.",
     "plc_supervision_import re-imports the PLC's own supervision workbook unchanged: a scratch project has no ProDiag supervisions to edit.",
-    "plc_alarm_text_list_import and plc_supervision_settings_import are not run: a scratch project has no user text list to export, and TIA reports "
-    "the ProDiag global settings as not initialized, so neither has a native file to start from.",
+    "TIA initializes ProDiag's global settings on the first supervision import (recorded under sideEffects); before that their export fails with "
+    "'Global settings are not initialized'. plc_supervision_settings_import edits one category display name.",
+    "plc_alarm_text_list_import is not run: a scratch project has no user text list to export, so it has no native file to start from.",
     "Engineering only; nothing is downloaded and no alarm is raised.",
 ]
 
@@ -151,7 +153,12 @@ class Run(StateRun):
         raw = artifact_bytes(self.h.tool, classes["artifact"])
         self.exports["classes"] = (classes["artifact"], raw)
         state["alarm:classes"] = dat_text(raw)
-        state["alarm:supervisionSettings"] = {k: result["supervisionSettingsExport"].get(k) for k in ("status", "nativeState")}
+        settings = result["supervisionSettingsExport"]
+        state["alarm:supervisionSettings"] = {k: settings.get(k) for k in ("status", "nativeState")}
+        if settings.get("artifact"):
+            raw = artifact_bytes(self.h.tool, settings["artifact"])
+            self.exports["settings"] = (settings["artifact"], raw)
+            state["alarm:supervisionSettings"]["text"] = dat_text(raw)
         return state
 
     def state(self):
@@ -207,7 +214,16 @@ def instance_text(run, text, restore=False):
 
 def supervisions(run, restore=False):
     payload = {**run.file("supervisions.xlsx", run.exports["supervisions"][1]), "importOption": "Override"}
-    run.apply("re-import the supervision workbook", "plc_supervision_import", payload, restore=restore)
+    run.apply("re-import the supervision workbook", "plc_supervision_import", payload, restore=restore,
+              tolerated=lambda category, key: category == "changed" and key == "alarm:supervisionSettings")
+
+
+def settings(run, old, new, restore=False):
+    element = '<DisplayName Culture="en-US">%s</DisplayName>'
+    payload = run.file("settings-%s.dat" % new.replace(" ", "-"), edit_dat(run.exports["settings"][1], element % old, element % new))
+    run.apply("rename ProDiag category %s to %s" % (old, new), "plc_supervision_settings_import", payload, changed=["alarm:supervisionSettings"],
+              check=lambda applied, state: require(element % new in state["alarm:supervisionSettings"]["text"], "The fresh settings export lacks %r" % new),
+              restore=restore)
 
 
 def phase_a(run):
@@ -228,6 +244,9 @@ def phase_a(run):
     run.refuse_apply("plc_alarm_class_import", "a preview made stale by a later import", stale, "StaleRevision")
     instance_text(run, "TiaMcpAlarm")
     supervisions(run)
+    require("settings" in run.exports, "The supervision import did not make the ProDiag settings exportable")
+    run.refuse("plc_supervision_settings_import", "an import option the provider lacks", {**run.file("settings.dat", run.exports["settings"][1]), "importOption": "Override"}, "InvalidRequest")
+    settings(run, "Category 4", "TiaMcp Category")
 
 
 def reopen(run):
@@ -247,6 +266,7 @@ def phase_b(run):
     classes(run, "AQ", "AR", restore=True)
     instance_text(run, "TiaMcpAgain", restore=True)
     supervisions(run, restore=True)
+    settings(run, "TiaMcp Category", "TiaMcp Again", restore=True)
 
 
 def body(h):
