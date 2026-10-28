@@ -19,6 +19,8 @@ from verify_translation_populated_category_probe import decode, compare, populat
 from verify_watch_workflow import canonical_sha
 
 REPO = Path(__file__).resolve().parents[1]
+# The export sorts rows by source text, so a changed source can also move its row: the profile check then refuses first.
+STALE_CODES = ('StaleWorkbook', 'TranslationScopeMismatch')
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
 
 
@@ -113,7 +115,7 @@ class Run:
         request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
         options = {'interruptBeforeDispatch': True} if self.failure_case == 'before-dispatch' else {'driftSourceAfterCheckpoint': True} if self.failure_case == 'source-drift' else {} if self.failure_case == 'restore-reply' else {'loseReplyAfterStage': self.failure_case.removesuffix('-reply')}
         applied = self.call('qualification_translation_apply', {**request, **options}, expect_error=self.failure_case != 'restore-reply')
-        if self.failure_case == 'source-drift': require('StaleWorkbook' in json.dumps(applied), 'The actual changed source was not refused as stale before dispatch')
+        if self.failure_case == 'source-drift': require(any(code in json.dumps(applied) for code in STALE_CODES), 'The actual changed source was not refused as stale before dispatch')
         status = self.call('qualification_translation_status', {'operationId': op['id']})
         require(status['state'] == ('succeeded' if self.failure_case == 'restore-reply' else 'outcomeUnknown') and len(status['checkpoints']) == 1, 'Interrupted native operation must retain unknown outcome and original checkpoint')
         self.call('qualification_translation_apply', {**request, 'revision': status['revision']}, expect_error=True)

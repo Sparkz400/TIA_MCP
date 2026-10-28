@@ -10,7 +10,7 @@ from pathlib import Path
 import sys
 
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
-from qualify_translation_import import FAILURE_CASES
+from qualify_translation_import import FAILURE_CASES, STALE_CODES
 from verify_translation_import import MAIN_COMMENT_VIEWS, accepted_return, workbook, peer
 from verify_watch_workflow import canonical_sha
 
@@ -178,7 +178,7 @@ class Oracle:
             if workbook(path.read_bytes()) == expected: changed.append(path)
         require(len(changed) == 1, 'Actual source-only drift export missing or repeated')
         failures = [self.parsed(e['artifact']) for e in final['evidence'] if e['gate'] == 'failure' or e['gate'].startswith('interruption.')]
-        require(any(f.get('code') == 'StaleWorkbook' for f in failures), 'Source drift did not retain exact stale refusal')
+        require(any(f.get('code') in STALE_CODES for f in failures), 'Source drift did not retain exact stale refusal')
 
     def cleanup(self):
         close = load(self.root / 'exact-close.json'); tree = close['tree']
