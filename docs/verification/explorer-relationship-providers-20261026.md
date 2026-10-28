@@ -123,6 +123,8 @@ yet registered. The other four exposed qualifier and seeder defects, all fixed i
 - coverage is reported as `providerCoverage`;
 - `software_inspect` lists units under `softwareScopes`, so the unit check had never run.
 
+On 28 October the runner started recording its tool calls and the fixture and read-only runs passed again on a release packaged from a frozen tree (`local.explorer.relationships.20261028`, [record](explorer-e1-20261028.md)).
+
 ## Native qualification step
 
 Run only when the TIA machine is free. Package the committed branch, then point

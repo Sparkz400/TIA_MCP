@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6308a834899a0d3b3ebd719a4807aa9fba88c76dfde71e13f53bc2ade6fa2d72",
-      "bytes": 1182866
+      "sha256": "590d488eb94c276a7ea009a32cbf6a25a436750df957ccfeb3d864be13653ee1",
+      "bytes": 1201335
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -89663,7 +89663,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91256,7 +91264,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97317,48 +97333,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.guards.v02",
-          "profileSha256": "e85bdcb4fa01ca603bb3d886825e3c5c4bac0e9ac0c6d151dd08a892d316fb73",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/write-guards-final.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
-          ]
-        },
-        {
-          "id": "local.layers.safety-requalified.20261008",
-          "profileSha256": "98fd123fd18130fe3a3810a271065d88ee8b32287476341951188c7a280fb517",
-          "artifacts": [
-            "artifacts/safety-gap-requalified.json",
-            "artifacts/safety-gap-native-preservation-audit.json"
-          ]
-        },
-        {
-          "id": "local.layers.graphical-reopen.20261008",
-          "profileSha256": "7abc60227ec42ca6ab1d89c630b6797d7563599a1674f965c3bfc7f09cb35b7d",
-          "artifacts": [
-            "artifacts/engineering-gap-graphical.json",
-            "artifacts/engineering-gap-preservation-audit.json"
-          ]
-        },
-        {
-          "id": "local.layers.calls-reopen.20261008",
-          "profileSha256": "ba75c38dd8e94790b5659ae8c5405c0b8900248690c5546cec5a9a9e96447ef3",
-          "artifacts": [
-            "artifacts/engineering-gap-calls.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -97429,24 +97407,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.guards.v02",
-          "profileSha256": "e85bdcb4fa01ca603bb3d886825e3c5c4bac0e9ac0c6d151dd08a892d316fb73",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/write-guards-final.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -97476,54 +97440,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.unit-recovery.v03",
-          "profileSha256": "89bab7c2d7934f55c52787d0c2033d9be3e6b397e13e3a1622b177c5e9947363",
-          "artifacts": [
-            "artifacts/object-model-unit-recovery.json"
-          ]
-        },
-        {
-          "id": "local.layers.safety-requalified.20261008",
-          "profileSha256": "98fd123fd18130fe3a3810a271065d88ee8b32287476341951188c7a280fb517",
-          "artifacts": [
-            "artifacts/safety-gap-requalified.json",
-            "artifacts/safety-gap-native-preservation-audit.json"
-          ]
-        },
-        {
-          "id": "local.layers.graphical-reopen.20261008",
-          "profileSha256": "7abc60227ec42ca6ab1d89c630b6797d7563599a1674f965c3bfc7f09cb35b7d",
-          "artifacts": [
-            "artifacts/engineering-gap-graphical.json",
-            "artifacts/engineering-gap-preservation-audit.json"
-          ]
-        },
-        {
-          "id": "local.layers.calls-reopen.20261008",
-          "profileSha256": "ba75c38dd8e94790b5659ae8c5405c0b8900248690c5546cec5a9a9e96447ef3",
-          "artifacts": [
-            "artifacts/engineering-gap-calls.json",
-            "artifacts/engineering-gap-preservation-audit.json"
-          ]
-        },
-        {
-          "id": "local.layers.encoder-connected.20261008",
-          "profileSha256": "5208c4f114a47ac2788321a707cc995891072394d45e9da95f1c069e0a1b0d5a",
-          "artifacts": [
-            "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
-            "artifacts/engineering-gap-encoder-requalified.json",
-            "artifacts/engineering-gap-encoder-native-edit-audit.json",
-            "artifacts/engineering-gap-encoder-preservation.json",
-            "artifacts/engineering-gap-evidence.json",
-            "artifacts/engineering-gap-encoder-preservation-audit.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -97553,10 +97473,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.restart.v02",
-          "profileSha256": "6b07c6a60cf50499b3bc198de0b2c73a38dc7791fab69d2963feb43317b30b7d",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/recovery-restart.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -97996,7 +97916,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -98668,7 +98596,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -98713,7 +98649,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -101046,19 +100990,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
-          "id": "local.layers.calls-reopen.20261008",
-          "profileSha256": "ba75c38dd8e94790b5659ae8c5405c0b8900248690c5546cec5a9a9e96447ef3",
-          "artifacts": [
-            "artifacts/engineering-gap-calls.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -101720,23 +101655,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
-          "id": "local.layers.encoder-connected.20261008",
-          "profileSha256": "5208c4f114a47ac2788321a707cc995891072394d45e9da95f1c069e0a1b0d5a",
-          "artifacts": [
-            "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
-            "artifacts/engineering-gap-encoder-requalified.json",
-            "artifacts/engineering-gap-encoder-native-edit-audit.json",
-            "artifacts/engineering-gap-encoder-preservation.json",
-            "artifacts/engineering-gap-evidence.json",
-            "artifacts/engineering-gap-encoder-preservation-audit.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -102132,6 +102054,13 @@
           "artifacts": [
             "evidence/local.wave-kinds.probe.20261027.json"
           ]
+        },
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102260,7 +102189,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102319,6 +102256,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102345,7 +102289,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102391,7 +102343,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102457,6 +102417,13 @@
           "artifacts": [
             "evidence/local.library.native-traversal.20261027.json"
           ]
+        },
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102513,13 +102480,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_plc_master.20261008",
-          "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
-          "artifacts": [
-            "artifacts/lq/nl_1d1cda41/qualification.json"
-          ]
-        },
-        {
           "id": "local.library_formats.20261025",
           "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df",
           "artifacts": [
@@ -102559,6 +102519,13 @@
           "profileSha256": "b449479f6e5be2bb959cc2520287565a1c9152d9f4edc1b96b9339c5e41c51f0",
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
+          ]
+        },
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -102960,6 +102927,13 @@
           "artifacts": [
             "evidence/local.library.native-chain.20261028.json"
           ]
+        },
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102986,7 +102960,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103161,17 +103143,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/object-model-live-fourth.json"
-          ]
-        },
-        {
-          "id": "local.unit-recovery.v03",
-          "profileSha256": "89bab7c2d7934f55c52787d0c2033d9be3e6b397e13e3a1622b177c5e9947363",
-          "artifacts": [
-            "artifacts/object-model-unit-recovery.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -103499,7 +103474,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103770,7 +103753,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103795,7 +103786,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103820,7 +103819,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103845,7 +103852,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103869,7 +103884,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103943,7 +103966,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.project_index.20261028",
+          "profileSha256": "ce1a843e273c5c19d23a89b68eab2c5e2d061813772ce7dc5f47f0c1e655c247",
+          "artifacts": [
+            "evidence/local.project_index.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -104022,12 +104053,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.index_paging.v03",
-          "profileSha256": "790b4680c159a9096226dd248237e17ca1ed4d14514655c7397102e6c0a8d501",
+          "id": "local.project_index.20261028",
+          "profileSha256": "ce1a843e273c5c19d23a89b68eab2c5e2d061813772ce7dc5f47f0c1e655c247",
           "artifacts": [
-            "artifacts/project-index-native.json",
-            "artifacts/project-index-packaged-final.json",
-            "artifacts/project-index-store-tests.json"
+            "evidence/local.project_index.20261028.json"
           ]
         }
       ],
@@ -104101,74 +104130,17 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
-          "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
-          ]
-        },
-        {
           "id": "local.explorer.relationship-scope.20261024",
           "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
           "artifacts": [
             "evidence/local.explorer.relationship-scope.20261024.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104210,65 +104182,17 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
-          "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
-          ]
-        },
-        {
           "id": "local.explorer.native-providers.20261026",
           "profileSha256": "657b700872d61c135f33bd20bbad0aa6ad71a2beac592a6d86121f8dd8e26ade",
           "artifacts": [
             "evidence/local.explorer.native-providers.20261026.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104310,58 +104234,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104403,67 +104279,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104505,67 +104324,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104607,67 +104369,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.relationship-scope.20261024",
+          "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.relationship-scope.20261024.json"
           ]
         },
         {
@@ -104682,6 +104387,20 @@
           "profileSha256": "b7b584015723d273ea56dd83418662fe1dd1af63b1c4b520022edbd923f99d59",
           "artifacts": [
             "evidence/local.explorer.native-providers.20261027.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
+          ]
+        },
+        {
+          "id": "local.explorer.relationships.20261028",
+          "profileSha256": "d2118de8b3a7bccf9ca977f510295e85c7823c2b9c9a8b339e52135e7b388cd9",
+          "artifacts": [
+            "evidence/local.explorer.relationships.20261028.json"
           ]
         }
       ],
@@ -104768,58 +104487,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104861,35 +104532,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104971,7 +104617,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -105836,7 +105490,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -111471,18 +111133,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -111761,11 +111415,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.capabilities.v03",
-          "profileSha256": "cbf40b101414a6a362d41f516d78b89ded6447e92c3551dd77de8dfefe24222e",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/target-capabilities-live.json",
-            "artifacts/target-capabilities-safety-live.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -113129,11 +112782,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
+            "evidence/local.read_contracts.20261028.json"
           ]
         }
       ],
@@ -115290,7 +114942,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115893,7 +115553,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.read_contracts.20261028",
+          "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
+          "artifacts": [
+            "evidence/local.read_contracts.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -116536,6 +116204,11 @@
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
     },
     {
+      "path": "evidence/local.explorer.e1.20261028.json",
+      "state": "observed",
+      "sha256": "a9280c5ae8e3357838c5428c61b7448e3018302db0e27f8dcbd8eebf3a763ef4"
+    },
+    {
       "path": "evidence/local.explorer.native-providers.20261026.json",
       "state": "observed",
       "sha256": "a8bdcc4d08901d59f3e39cf6f52d3dd21b72f8202c5bce2c5ffed680b8ebf69a"
@@ -116549,6 +116222,11 @@
       "path": "evidence/local.explorer.relationship-scope.20261024.json",
       "state": "observed",
       "sha256": "febb795362cd9751c16f6862010de30fa105a5288909da2613d5803522e4328d"
+    },
+    {
+      "path": "evidence/local.explorer.relationships.20261028.json",
+      "state": "observed",
+      "sha256": "f461719a8f9e5b9a535ff85f3ead196576767bf66824410c983a0547059e4ea7"
     },
     {
       "path": "evidence/local.hardware.20261024.json",
@@ -116856,6 +116534,16 @@
       "sha256": "5588a813ff4194511ffc818989050124dc29c8d4a9364e01d77e556f62b8ce88"
     },
     {
+      "path": "evidence/local.project_index.20261028.json",
+      "state": "observed",
+      "sha256": "4d67417f23fd66146f0395efd16d2daa3d3b063d5789b821ec8d01c00233cb81"
+    },
+    {
+      "path": "evidence/local.read_contracts.20261028.json",
+      "state": "observed",
+      "sha256": "3841523a6aaeb22f6c4ad144112317f97d982bcd3818e9b377bd2bf743fcb399"
+    },
+    {
       "path": "evidence/local.reliability.20261024.json",
       "state": "observed",
       "sha256": "fcec66b5d014bb2356bed9a04e8de4bd49d1a1e28940f1714994eac289932706"
@@ -117154,6 +116842,10 @@
       "profileSha256": "f9ef19dfc4c2f2c4064fd439d2b73e20e62f55b52c363c5ccb95a2ad60784525"
     },
     {
+      "id": "local.explorer.e1.20261028",
+      "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d"
+    },
+    {
       "id": "local.explorer.native-browser.20261008",
       "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3"
     },
@@ -117168,6 +116860,10 @@
     {
       "id": "local.explorer.relationship-scope.20261024",
       "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd"
+    },
+    {
+      "id": "local.explorer.relationships.20261028",
+      "profileSha256": "d2118de8b3a7bccf9ca977f510295e85c7823c2b9c9a8b339e52135e7b388cd9"
     },
     {
       "id": "local.guards.v02",
@@ -117496,6 +117192,14 @@
     {
       "id": "local.plc_object_mutations.20261028",
       "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12"
+    },
+    {
+      "id": "local.project_index.20261028",
+      "profileSha256": "ce1a843e273c5c19d23a89b68eab2c5e2d061813772ce7dc5f47f0c1e655c247"
+    },
+    {
+      "id": "local.read_contracts.20261028",
+      "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f"
     },
     {
       "id": "local.reliability.20261024",

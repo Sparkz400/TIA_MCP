@@ -83,6 +83,8 @@ native qualification.
   nested/empty groups, namespace collisions and budget exhaustion.
   `project_model_relationships` also needs `qualify_project_explorer_relationships.py
   --project <fixture> --require technologyConnections softwareUnitRelations`.
+  Closed on 28 October: [explorer E1](explorer-e1-20261028.md); `project_index` by
+  [read contracts](read-contracts-20261028.md).
 - **X02/L02 Libraries.** `library_list`, `library_query`, `library_close`,
   `library_open` and the `change.library_*` rows already cite retained, passing
   runs. They stay open for protected objects, software-unit relations and the
@@ -99,7 +101,8 @@ native qualification.
   not promote them from incidental use. They need a run that asserts each tool's
   own identity and completeness contract. `target_capabilities` and
   `object_resolve` have no current run. `engineering_operation_status` needs the
-  watch-table Bool ModifyValue lifecycle run.
+  watch-table Bool ModifyValue lifecycle run. Closed on 28 October except
+  `engineering_operation_status`: [read contracts](read-contracts-20261028.md).
 - **D13 Technology and D14 Safety.** `technology_read`, `change.to_*`,
   `safety_inspect` and `change.safety_import_xml` cite only unretained
   8 October records. They need fresh fixture runs with technology objects and a

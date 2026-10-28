@@ -89,7 +89,7 @@ the final run is evidence.
 
 ## Catalog
 
-Catalog `0.4.50` verifies the 19 change rows above, `change.library_integrate` (its PLC route from
+Catalog `0.4.52` verifies the 19 change rows above, `change.library_integrate` (its PLC route from
 `local.library_integrate.combined_apply.20261028`) and the umbrella row `library.types`, each with its qualified profile
 as first limitation: 123 matrix cells bound. The historical 8 October record `local.library_plc_master.20261008`
 has no retained summary and is no longer cited by these rows.

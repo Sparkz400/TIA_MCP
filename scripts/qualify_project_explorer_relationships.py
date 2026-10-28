@@ -186,6 +186,8 @@ def run(args):
     client, started, uncertain = None, False, False
 
     def save():
+        # Curated evidence lists the tools that answered without error (scripts/curate_evidence.py).
+        report["toolCalls"] = client.tool_calls if client is not None else []
         args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
 
     def call(name, arguments=None):

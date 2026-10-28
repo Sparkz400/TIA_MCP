@@ -19,6 +19,7 @@ import xml.etree.ElementTree as ET
 from smoke_mcp import Client, ROOT
 from qualify_project_index import initialize, require, validate_owned_status, generated_functions, source_for
 from qualify_deployment import McpClient, load_configuration
+from qualify_cpu_memory_bytes import version_key
 
 
 def transfer(client, artifact, destination):
@@ -271,14 +272,21 @@ def qualify(args):
             require(not args.config, "Local fixture helper cannot run against remote host paths")
             auth = run_root / "authorization.json"
             auth.write_text(json.dumps({"ownsPortalProcess": True, "creationTool": "tia_create_scratch", "projectPath": str(project_path), "processId": pid}), encoding="utf-8")
-            seeded = subprocess.run([str(args.seeder.resolve()), "seed", str(auth)], capture_output=True, text=True, timeout=180)
-            require(seeded.returncode == 0, seeded.stdout + seeded.stderr)
-            report["softwareUnitFixture"] = json.loads(seeded.stdout)
-            require(report["softwareUnitFixture"].get("completed") is True, "Software unit fixture did not compile")
+            report["seederSha256"] = hashlib.sha256(args.seeder.read_bytes()).hexdigest()
+            for mode in ("seed", "add-alternate-namespace") if args.namespace_collision else ("seed",):
+                seeded = subprocess.run([str(args.seeder.resolve()), mode, str(auth)], capture_output=True, text=True, timeout=180)
+                require(seeded.returncode == 0, seeded.stdout + seeded.stderr)
+                report["softwareUnitFixture" if mode == "seed" else "namespaceCollisionFixture"] = json.loads(seeded.stdout)
+                require(json.loads(seeded.stdout).get("completed") is True, "Software unit fixture did not compile: " + mode)
         if args.two_plcs:
             validate_owned_status(call("tia_session_status"), pid, project_path, require_owner=True)
             selected = scratch["selectedCpu"]
             cpu = selected if isinstance(selected, str) else selected.get("typeIdentifier")
+            if args.second_cpu:
+                entries = [e for e in call("hardware_catalog_search", {"filter": args.second_cpu.replace("CPU ", ""), "maxItems": 200})["entries"] if e.get("typeName") == args.second_cpu]
+                require(entries, "No catalog entry for " + args.second_cpu)
+                cpu = max(entries, key=version_key)["typeIdentifier"]
+                report["secondCpu"] = cpu
             require(cpu, "Scratch response has no selected native CPU identifier")
             prepared = call("change_prepare", {"kind": "hardware_add", "payload": {"typeIdentifier": cpu,
                             "itemName": "ExplorerPLC_B", "deviceName": "ExplorerStation_B", "configureScratchSecurity": True}})
@@ -324,6 +332,49 @@ def qualify(args):
         expected = {n["name"]: n for n in nodes if n["name"] in ("ExplorerEmpty", "ExplorerNested", "EmptyLeaf")}
         check("native empty groups and exact ancestry", len(expected) == 3 and all(n["origin"] == "native" for n in expected.values())
               and expected["EmptyLeaf"]["parentId"] == expected["ExplorerNested"]["nodeId"])
+        status = call("project_model", {"request": {"action": "status", "snapshotId": snapshot["snapshotId"]}}, "project_model status")
+        check("status names the captured snapshot and its metadata revision", status["snapshotId"] == snapshot["snapshotId"]
+              and status["metadataRevision"] == snapshot["metadataRevision"])
+        # E1: the tree must agree with independent native reads, not only with its own pages.
+        def same(label, captured, expected):
+            require(captured == expected, "%s: missing %s, extra %s" % (label, sorted(expected - captured)[:5], sorted(captured - expected)[:5]))
+            check(label + " (%d)" % len(expected), True)
+        plcs = sorted({n["objectPath"] for n in nodes if n["kind"] == "plc"})
+        report["independentTree"] = {}
+        for plc in plcs:
+            inspected = call("software_inspect", {"plcPath": plc, "maxItems": 2000}, "independent software_inspect")
+            require(inspected["completeness"]["scopeComplete"] is True, "Independent software inspection incomplete")
+            name = plc.rsplit("/", 1)[1]
+            for kind, rows in (("block", inspected["blocks"]), ("type", inspected["types"]), ("tagTable", inspected["tagTables"])):
+                same("%s %s paths equal software_inspect" % (name, kind), {n["objectPath"] for n in nodes if n["kind"] == kind and n.get("plcPath") == plc},
+                     {row["path"] for row in rows})
+            same("%s group paths equal software_inspect" % name,
+                 {n["objectPath"] for n in nodes if n["kind"] in ("blockGroup", "typeGroup", "tagGroup", "technologyGroup") and n.get("plcPath") == plc},
+                 {g for scope in inspected["softwareScopes"] for g in scope["groups"]})
+            unit_groups = [n for n in nodes if n["kind"] == "softwareUnitGroup" and n.get("plcPath") == plc]
+            unsupported = [c for c in snapshot["coverage"] if c["provider"] == "softwareUnits" and c["scope"] == plc and c["status"] == "unsupported"]
+            check(name + " has a native unit group or an explicit unsupported unit service", len(unit_groups) + len(unsupported) == 1)
+            report["independentTree"][plc] = {"blocks": len(inspected["blocks"]), "types": len(inspected["types"]), "tagTables": len(inspected["tagTables"]),
+                                              "unitService": "unsupported" if unsupported else "native"}
+        rows, cursor = [], None
+        while True:
+            page = call("device_inventory", {"pageSize": 200, **({"snapshotId": inventory_id, "cursor": cursor} if cursor else {})}, "independent device_inventory")
+            inventory_id, cursor = page["snapshot"]["snapshotId"], page["nextCursor"]
+            rows.extend(page["rows"])
+            if cursor is None:
+                break
+        require(page["snapshot"]["coverage"]["scopeComplete"] is True, "Independent device inventory incomplete")
+        same("device and device-item paths equal device_inventory", {n["objectPath"] for n in nodes if n["kind"] in ("device", "hardware")}, {row["path"] for row in rows})
+        if args.second_cpu:
+            check("the second CPU's missing unit service is reported unsupported, not empty",
+                  any(v["unitService"] == "unsupported" for v in report["independentTree"].values()))
+        if args.namespace_collision:
+            colliding = [n for n in nodes if n["kind"] == "block" and n["name"] == "TiaMcp_IsEnabled"]
+            by_scope = {}
+            for n in colliding:
+                by_scope.setdefault(n["scopePath"], set()).add(n["metadata"].get("namespace"))
+            check("same block name in two namespaces of one unit keeps both exact identities",
+                  len({n["objectPath"] for n in colliding}) == len(colliding) and any(len(spaces) == 2 for spaces in by_scope.values()))
         parents = {None, *(n.get("parentId") for n in nodes)}
         all_children = []
         for parent in parents:
@@ -434,6 +485,8 @@ if __name__ == "__main__":
     parser.add_argument("--server", default="tia-v21")
     parser.add_argument("--seeder", type=pathlib.Path)
     parser.add_argument("--two-plcs", action="store_true", help="Create a second PLC only in this newly owned fixture using prepared changes.")
+    parser.add_argument("--second-cpu", help="Catalog type name of the second PLC (newest version), e.g. 'CPU 1214C DC/DC/DC', whose PLC has no software-unit service; default: the scratch CPU.")
+    parser.add_argument("--namespace-collision", action="store_true", help="After --seeder, add a same-named block in a second namespace of one unit.")
     parser.add_argument("--typed-previews", action="store_true", help="Import/compile fixed LAD and FBD fixtures through prepared changes and verify exact native preview attachments.")
     parser.add_argument("--count", type=int, default=0, help="0 or 201..2000 native generated functions for measured medium/large profiles.")
     parser.add_argument("--batch-size", type=int, default=100, help="Requested batch 1..1000; split at the existing 100-declaration prepared-change ceiling, recorded in the report.")

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.50",
+  "catalogVersion": "0.4.52",
   "targetTiaVersions": [
     21
   ],
@@ -3101,6 +3101,86 @@
       ]
     },
     {
+      "id": "local.read_contracts.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "df30b58fb6dd731c292d97d28bdec34f7c4b41e2",
+        "passedScope": "scripts/qualify_read_contracts.py on a frozen Debug build of df30b58 (D:\\wp\\b13, git-archived sources with source-manifest.json), 152/152 steps. A first owned Portal refused an unknown cpuTypeIdentifier (CatalogItemNotFound) and named the partially created project; a second created a scratch CPU 1511-1 PN V4.1 from the exact identifier. Seeded through prepared changes: de-DE next to en-US, a UDT, an FB with a single-instance DB and multi-instances, its caller FC, an empty block group, a software unit with an FC, a released project-library FB type and an empty global library; later a CPU 1518-4 PN/DP. For each of 34 read features: a passed call whose response named exactly the requested project, PLC, scope, block, type, hardware item, device, library, version or change (checked against identities created or independently read in the run); typed refusals of unknown, ambiguous (second PLC, shared CPU/PLC name), stale (library revision, closed library, tampered inventory cursor, preview hash) or invalid selectors; and completeness flags that separated complete, empty-and-complete, truncated (maxItems/pageSize 1, maxXmlBlocks 1) and warning-qualified partial results; paged library queries and device inventories equalled their full reads; exported documents, loadables, inventories and text workbooks matched their reported SHA-256 and directories; change_prepare/apply/status/restore ended in a restore into a new directory without the change."
+      },
+      "artifacts": [
+        "evidence/local.read_contracts.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch project: CPU 1511-1 PN V4.1 with one software unit, plus CPU 1518-4 PN/DP added by hardware_add; no safety, technology objects, HMI, connections, VCI workspaces, PLC documents or know-how protection, so those content families are observed only as empty, complete results.",
+        "Truncation is shown with maxItems/pageSize 1 where the fixture has more than one row; connection_inspect, plc_document_inventory and vci_workspace_inspect have no rows to truncate here, and library_compare has a fixed 200-row bound that this fixture does not reach.",
+        "A refused cpuTypeIdentifier is reported after the scratch project was created, because Siemens needs an open project for catalog access; the partial project is named in the refusal and its Portal is discarded.",
+        "plc_loadable_generate is positive only on the CPU 1518; on the CPU 1511 it is refused (UnsupportedCapability), as Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8.",
+        "Engineering reads only; no runtime, online or physical-device observation."
+      ]
+    },
+    {
+      "id": "local.project_index.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "ce021daeaac7138a7ee80dd3545ceabff8f2f2cc",
+        "passedScope": "scripts/qualify_project_index.py on a frozen Debug build of ce021da (D:\\wp\\b14): owned scratch CPU 1511-1 PN V4.1 with 250 generated FCs, exhaustive pages without omissions or duplicates in stable order, cursor refusals (changed filters, tampering, another snapshot), metadata freshness verification after an external change by a read-only observer attached to the owned Portal, and reattachment."
+      },
+      "artifacts": [
+        "evidence/local.project_index.20261028.json"
+      ],
+      "limitations": [
+        "Metadata only: no block-logic freshness, runtime, remote transport or whole-project completeness claim.",
+        "One standard CPU fixture with generated SCL functions; software units, multiple PLCs and HMI are not part of this run."
+      ]
+    },
+    {
+      "id": "local.explorer.e1.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "fbf960f457ac161991323ac5b4063f0c3f9c0e36",
+        "passedScope": "scripts/qualify_project_explorer.py --two-plcs --second-cpu 'CPU 1214C DC/DC/DC' --seeder UnitSeeder --namespace-collision on a frozen Debug build of fbf960f (D:\\wp\\b16): owned scratch CPU 1511-1 PN V4.1 with nested and empty block groups, two software units with namespace presets, TiaMcp_IsEnabled in the PLC root, both units and a second namespace of unit A, plus a CPU 1214C DC/DC/DC V4.7 (163 nodes). Every PLC's captured blocks, types, tag tables and groups equal software_inspect, every device and device item equals device_inventory, every parent's paged children partition the tree without duplicates or omissions, the CPU 1214C's absent PlcUnitProvider is reported as unsupported coverage, identical names keep distinct exact identities, details agree with block_read and hardware_inspect, a 12-item capture reports partial coverage, and session-mismatched, released and disconnected selections are refused."
+      },
+      "artifacts": [
+        "evidence/local.explorer.e1.20261028.json"
+      ],
+      "limitations": [
+        "Offline engineering metadata only; no physical topology, online or runtime claim, and metadata verification does not certify content.",
+        "Relationship scope (exact authored edges, depth/edge bounds) is qualified by the default fixture run local.explorer.relationship-scope.20261024 and the provider run, not by this two-PLC fixture.",
+        "One machine and one small fixture; capture and query timings are observations, not latency guarantees."
+      ]
+    },
+    {
+      "id": "local.explorer.relationships.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "fbf960f457ac161991323ac5b4063f0c3f9c0e36",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py on release tia-mcp-v21_20261028_113957_7850e07e packaged from the frozen tree of fbf960f (D:\\wp\\b16): fresh owned scratch CPU 1511-1 PN V4.1 with an IM 155-6AU02 V6.4 head, one subnet and one IO system (prepared hardware_add, network_configure, network_io_assign), a TM PosInput module (prepared hardware_plug), and via UnitSeeder explorer-relations two software units with one relation and an external-encoder TO connected to the module channel. Configured-network edges equal the independent hardware_inspect oracle; technology-connection and software-unit-relation edges equal technology_read and software_inspect; subnet, watch/force-table and external-source collections captured; portable export retains the network evidence. A second run reopened the saved fixture read-only and repeated all checks."
+      },
+      "artifacts": [
+        "evidence/local.explorer.relationships.20261028.json"
+      ],
+      "limitations": [
+        "Configured offline engineering relationships only; no cables, ports, physical topology, online or runtime claim.",
+        "One fixture per provider: one subnet/IO system, one external-encoder TO and one unit relation; other TO types and relation kinds (NonUnitDB, TODB) are not covered."
+      ]
+    },
+    {
       "id": "local.library_preservation.20261028",
       "status": "passed",
       "profile": {
@@ -3392,14 +3472,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Natively qualified with an explicit CPU 1511-1 PN V4.1 identifier (local.read_contracts.20261028). An unknown identifier is refused after the project is created, because catalog access needs an open project; the refusal names the partial project and its Portal must be discarded.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Scratch compiler receipts now retain the exact PLC target alongside legacy flat diagnostics; SDK build and native qualification of this changed output remain required."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -3613,12 +3694,14 @@
           "Exactly one target: another PLC in the same project (targetPlcPath) or a library handle from library_list/library_open (libraryId). Cross-project PLC targets and master-copy targets are not exposed.",
           "The tree is bounded by maxItems (default 500, max 2000) and depth 64 with explicit truncation; names and states are Siemens output, not object identities or runtime equivalence.",
           "PlcSoftware.CompareToOnline is deliberately not exposed.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3695,13 +3778,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Each list (supported languages, comment items, used products, history entries in native order, text categories) is bounded by maxItems with explicit truncation; this is a point-in-time observation, not a revision guarantee."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3736,16 +3821,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.units.v03"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -3918,12 +4003,14 @@
           "generatedSource is limited to SCL/STL blocks (.scl/.awl), DBs (.db) and PLC data types (.udt), without dependencies; other languages are refused before the native call.",
           "The V21 API documents GenerateSource as writing a file. Any external source it leaves at the root of the scope's external-source group is deleted by exact new name and the group is re-verified, otherwise ProjectSideEffect is raised; user subgroups are not compared.",
           "Know-how protected objects are refused; F-blocks, generated system objects and language eligibility are decided by Siemens. Component-window readback refuses a format.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3961,12 +4048,14 @@
         "limitations": [
           "V21 exposes PlcDocument only below PLC data type groups (PLC and software/safety units); system type groups and block groups have no document composition.",
           "Listing is bounded by maxItems over a 50000-object lookup with explicit truncation; at most 100 exact exportPaths, each into a fresh hashed directory. A Failure export state aborts the request.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4004,12 +4093,14 @@
           "Requires an explicit target and exactly one of up to 100 exact non-unit blockPaths or software unitPaths; safety units are excluded.",
           "Refuses with CompileRequired when a selected block, or any block/type of a selected unit, is inconsistent; it never compiles, downloads or connects to a PLC or PLCSIM.",
           "The PublicAPI documents no file-name convention or project side effects for GenerateLoadable; the file is requested as 'loadable' in a fresh directory and every written file is hashed. LoadableProvider availability on the PLC software is not probed in advance.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified for Main of an added CPU 1518-4 PN/DP (local.read_contracts.20261028); on CPU 1511-1 PN the tool refuses with UnsupportedCapability, as Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8. plcSim targets and software-unit loadables are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4087,17 +4178,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Configured I/O controller/connector/subnet inspection added on 2026-10-09; bounded owner resolution uses native object equality. New association coverage requires its own native evidence; distributed-I/O creation and physical topology remain outside this read route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Port interconnections (NetworkInterface.Ports, NetworkPort.ConnectedPorts) and GSD identities (GsdDeviceItem/GsdDevice GsdId, GsdName, GsdType) are reported as configured offline data. Compiled against the V21 PublicAPI only; not natively qualified."
+          "Port interconnections (NetworkInterface.Ports, NetworkPort.ConnectedPorts) and GSD identities (GsdDeviceItem/GsdDevice GsdId, GsdName, GsdType) are reported as configured offline data."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.encoder-connected.20261008"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4225,7 +4316,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Text-list identities come from the object model; entries and per-culture texts only from the native XLSX export, which V21 offers for user text lists only. System text-list entries are not exposed.",
           "Worksheet rows are returned as exported cell text by column, bounded by maxItems; the Siemens column layout is not interpreted. Alarm-class and ProDiag-setting .dat exports are retained with SHA-256 but not parsed.",
           "Supervisions owned by individual ProDiag FBs are not exported; only the global PLC/unit supervision export is used.",
@@ -4233,8 +4324,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4574,7 +4667,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN found a single-instance DB and call sites from xref and SimaticML (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN found a single-instance DB and call sites from xref and SimaticML (local.wave-kinds.probe.20261027).",
           "One exact FB or FC in one PLC. Instance DBs resolve through the shared native InstanceType/TypeInstance or unnamespaced InstanceOfName resolver; multi-instance owners are FBs the native xref reports as users, confirmed by an exact same-scope Static declaration (including arrays with literal bounds) in their exported interface, up to maxDepth 8.",
           "Call sites list native xref call locations plus exported SCL/LAD/FBD CallInfo with compile-unit ordinal, instance components and simple symbolic actual operands; expressions, wired logic and indirect operands stay unresolved.",
           "STL and GRAPH are an unqualified symbolic scan of exported Access/CallInfo per the V21 schemas with no binding reader; native xref Open/Actions/Transition/Interlock/Supervision rows are retained. Other languages are reported unsupported and skipped.",
@@ -4582,9 +4676,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.wave-kinds.probe.20261027",
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4621,6 +4716,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "scope=calls inspects exported FC/FB arguments and symbolic instance/multi-instance relationships. Unresolved, indirect, branched and expression connections retain native evidence; exact instance target identity is not inferred.",
           "The calls scope has native FC, FB global-instance and FB multi-instance argument/identity-metadata readback on the linked PLC-root fixture; unresolved native identities remain explicit and broader targets are not qualified.",
@@ -4631,10 +4727,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.calls-reopen.20261008"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4754,16 +4849,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.guards.v02",
-          "local.conformance.v03",
-          "local.units.v03"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4799,6 +4893,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
@@ -4806,14 +4901,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.guards.v02",
-          "local.conformance.v03",
-          "local.units.v03",
-          "local.layers.safety-requalified.20261008",
-          "local.layers.graphical-reopen.20261008",
-          "local.layers.calls-reopen.20261008"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4849,6 +4939,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
@@ -4856,9 +4947,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.restart.v02"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -4894,6 +4985,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
@@ -4901,14 +4993,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.unit-recovery.v03",
-          "local.layers.safety-requalified.20261008",
-          "local.layers.graphical-reopen.20261008",
-          "local.layers.calls-reopen.20261008",
-          "local.layers.encoder-connected.20261008"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -5737,14 +5824,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.capabilities.v03"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -5780,16 +5868,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Paths identify current project/PLC/scope and include nonempty block/type namespaces; renamed or retrieved targets need fresh identities.",
           "Individual tag members, TO parameter members and native folder objects are not independent resolver kinds.",
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.units.v03",
-          "local.unit-recovery.v03"
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -8027,13 +8115,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity, paging and freshness natively qualified on one owned scratch CPU 1511-1 PN V4.1 with 250 generated FCs (local.project_index.20261028).",
           "Metadata capture and stable resumable pages implemented by project_index.",
           "Automatic incremental updates, whole-project/logic revision and cross-session cursor persistence remain unimplemented."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.project_index.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9277,6 +9368,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity, paging and freshness natively qualified on one owned scratch CPU 1511-1 PN V4.1 with 250 generated FCs (local.project_index.20261028).",
           "Metadata-only revision; no block-logic or whole-project freshness guarantee.",
           "Two snapshots, 50k visited items, 32MiB accounted payload each, expiring authenticated cursors.",
           "External changes require explicit recapture/verification. See docs/guides/project-index.md.",
@@ -9285,9 +9377,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.index_paging.v03"
+          "local.project_index.20261028"
         ]
       },
       "availability": {
@@ -9323,6 +9415,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Native evidence covers only the recorded V21 standard PLC single-FC master-copy lifecycle, fresh consumer compile/save/reopen and checkpoint recovery after restart; versioned types, HMI and arbitrary-project preservation remain unqualified.",
@@ -9330,15 +9423,15 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.library_plc_master.20261008",
           "local.library_formats.20261025",
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -9374,19 +9467,21 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library.native-traversal.20261027"
+          "local.library.native-traversal.20261027",
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -9422,12 +9517,13 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
@@ -9435,7 +9531,8 @@
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
-          "local.library.native-chain.20261028"
+          "local.library.native-chain.20261028",
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -9471,13 +9568,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9512,14 +9612,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Depth-first walk of native log messages bounded by maxItems (1..1000), depth 64 and 50 message parts, with explicit truncation. Message text is Siemens output and is not interpreted.",
           "Read-only by intent; the response reports projectModifiedByCheck if the native check marked a clean project modified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9554,18 +9656,20 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
           "local.library_formats.20261024",
           "local.library_releases.20261024",
           "local.library_releases.20261026",
           "local.library_protected.20261027",
-          "local.library_unit_relations.20261027"
+          "local.library_unit_relations.20261027",
+          "local.read_contracts.20261028"
         ]
       },
       "availability": {
@@ -9601,13 +9705,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -11314,6 +11421,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11327,13 +11435,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012",
-          "local.explorer.relationship-scope.20261024"
+          "local.explorer.relationship-scope.20261024",
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11368,6 +11473,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11380,12 +11486,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012",
-          "local.explorer.native-providers.20261026"
+          "local.explorer.native-providers.20261026",
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11420,6 +11524,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11429,11 +11534,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11468,6 +11571,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11477,11 +11581,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11516,6 +11618,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11526,12 +11629,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11566,6 +11666,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Configured-network, technology-connection and software-unit-relation providers natively qualified against hardware_inspect, technology_read and software_inspect on one fixture, including a read-only reopen (local.explorer.relationships.20261028); authored call/member edges and traversal bounds by local.explorer.relationship-scope.20261024.",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11578,14 +11679,13 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012",
+          "local.explorer.relationship-scope.20261024",
           "local.explorer.native-providers.20261026",
-          "local.explorer.native-providers.20261027"
+          "local.explorer.native-providers.20261027",
+          "local.explorer.e1.20261028",
+          "local.explorer.relationships.20261028"
         ]
       },
       "availability": {
@@ -11620,6 +11720,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11631,9 +11732,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11712,6 +11813,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11723,12 +11825,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11763,13 +11862,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Project-library-only native document export; exact type/version GUIDs and supported native format required.",
           "No global-library document export or source conversion is inferred. Exported file hashes are retained; import still requires native validation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14992,13 +15094,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "See docs/reference/device-inventory.md for capture bounds, unavailable fields and conditional interface coverage.",
           "Physical hardware comparison with TIA Online and diagnostics is pending; no universal device-family support claim."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15115,13 +15220,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "See docs/reference/device-inventory.md for capture bounds, unavailable fields and conditional interface coverage.",
           "Physical hardware comparison with TIA Online and diagnostics is pending; no universal device-family support claim."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16138,15 +16246,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Server settings are the CPU and sub-item attributes whose native names contain OpcUa. V21 documents no fixed per-CPU attribute list, so settings exposed under other names are not reported; hardware_inspect reads all attributes.",
           "Reads interface name, enabled, author, timestamps, SIMATIC/reference NodeId and generation flags, namespace access restrictions and role mappings with namespace permissions. Multilingual comments, legacy OPC UA users, certificates, client interfaces and per-node permissions are not read.",
           "A missing provider or server interface group is reported as notExposed, not as proof that the CPU has no OPC UA server. maxItems bounds sub-items, attributes and rows together; truncation and native read failures stay explicit."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16594,7 +16704,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Whole-project mode uses the three-argument overload, one bilingual workbook per target culture. The five-argument overload refuses null or empty owner lists natively, so category filtering requires explicit owners.",
           "Filtered exports are evidence only: earlier native probes showed category filtering leaking rows. The full all-category export of the same owners and targets always runs, and the Host reports leaked, dropped and changed rows by native key; see docs/reference/translation-native-import.md.",
           "The multi-target workbook layout is unobserved. The Host reader expects one column per target between the source and ref=\"0\" headers and fails closed on any other layout; category rows are matched by the observed \"<Identifier>\" label form, and any other label makes the comparison unavailable.",
@@ -16602,8 +16712,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17539,12 +17651,14 @@
           "Read-only bounded traversal (maxItems shared by groups, workspaces, mapped objects and supported formats; group depth 32) with explicit truncation and per-workspace/per-mapping warnings.",
           "Mapped-object identity is the native ancestor type/Name/Number chain, not a stable GUID. CompareState, IndividualObjectCompareDetails and child MappingState are native observations, not preservation, import or synchronization qualification.",
           "No export tool: V21 Workspace.ExportObject creates a MappedObject in the project and writes below the workspace RootPath, and MappedObject.Synchronize writes the user's workspace; neither is a project-neutral export into a worker-owned directory. Workspace creation/deletion, mapping add/remove and directed synchronization are separate prepared change kinds (change.vci_*), not part of this read-only tool.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18705,15 +18819,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Enumerates CommunicationManagement.Connections of all bounded hardware (50000-item lookup, maxItems rows) or one exact hardwarePath; owners are deduplicated by CommunicationManagement.OwnedBy. Which device items expose the service and whether a bilateral connection appears in both owners' tables are not natively observed.",
           "Typed properties are read by reflection over the public V21 CommunicationConnections members. Endpoint targets and interfaces resolve to hardware paths by native object equality only; unset, unreadable or unresolved endpoints carry an explicit reason.",
           "reviewSnapshot uses the connection_review snapshot and row shape (id = owner path + /connections/ + LocalConnectionName). Program-created connection descriptions, HMI software connection objects, consumers, resource/capacity rules and runtime communication are not covered."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19228,7 +19344,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Read-only and secret-free: password setters, password hashes, secrets and private keys are never read or returned.",
           "Output is shaped as access_review identity/snapshot observations bounded to its limits (512 entities, 64 rights and links per entity); truncation is reported as incomplete.",
           "Roles expose no activation state (enabled null). UMC group membership is resolved by the UMC server and is not exposed (UMC users report assignmentsComplete false).",
@@ -19236,8 +19352,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19328,15 +19446,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Certificate.Export output is accepted only when X509Certificate2.GetCertContentType reports one certificate without a private key; it is returned as re-encoded public DER and the export file is deleted. Native export format behavior is unverified.",
           "V21 exposes no per-certificate usage or web server/OPC UA assignment; association.usage is unspecified and assignment evidence is limited to certificate-named attributes and supported services.",
           "The global (project) certificate store is not exposed, only the CPU enable flag. No chain, revocation, trust or endpoint evaluation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19584,15 +19704,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results.",
           "Output is shaped as a web_application_review phase; the archive selector is always unavailable because page sources and archives are not read.",
           "webEnabled is taken only from an exposed Boolean attribute named WebserverActivate (name not verified on a native CPU); otherwise null.",
           "WebserverUserDefinedPages exposes only GenerateBlocks, which is never called; user-defined page settings appear only as web-named attributes. Legacy web users are reported by access_inspect."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.read_contracts.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
