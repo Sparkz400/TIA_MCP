@@ -92,9 +92,11 @@ def refuse_export(run, label, payload, codes):
 
 
 def coupled(interface):
-    """The interface's I-device attributes and device_inventory's rows of the station, CPU and interface follow the mode and its transfer areas."""
+    """The interface's I-device attributes, device_inventory's rows of the station, CPU and interface, and the CPU's hardware-identifier
+    system constants (TIA adds Local~PROFINET_interface_1~IODevice with the I-device) follow the mode and its transfer areas."""
     cpu = interface.rsplit("/items/", 1)[0]
-    return lambda category, key: category in ("changed", "added", "removed") and (key.startswith("hw:" + cpu) or key.startswith("inv:" + cpu.rsplit("/items/", 1)[0]))
+    return lambda category, key: category in ("changed", "added", "removed") and (key.startswith("hw:" + cpu) or key.startswith("inv:" + cpu.rsplit("/items/", 1)[0])
+                                                                                    or key.startswith("member:" + cpu + "/plc/") and "/systemConstants/" in key)
 
 
 def mode_uncompiled(run, interface, value):
