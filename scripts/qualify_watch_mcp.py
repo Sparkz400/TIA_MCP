@@ -311,9 +311,12 @@ class Run:
         assert verdict["completed"], verdict["issues"]
         intervention = (self.root / "coordinator-native-close.json").exists()
         self.save("exact-cleanup", {"completed": True, "lifetimes": self.lifetimes, "hostCount": len(self.clients), "explicitNativeTermination": intervention, "coordinatorInterventionRequired": intervention, "normalLifecyclePassed": self.args.mode not in oracle.NATIVE_POINTS | oracle.HOST_POINTS})
-        # scripts/curate_evidence.py reads this report; expected refusals stay listed as rejected calls.
-        self.save("verification", {"completed": verdict["completed"], "mode": self.args.mode, "toolCalls": self.tool_calls})
         return verdict
+
+    def report(self, result):
+        # Written only after the whole execute() passed; scripts/curate_evidence.py reads it.
+        # Expected refusals stay listed as rejected calls.
+        return self.save("verification", {"completed": result["completed"], "mode": self.args.mode, "toolCalls": self.tool_calls})
 
 
 class ToolError(RuntimeError):
@@ -332,6 +335,7 @@ def main():
     run = Run(args)
     try:
         result = run.execute()
+        run.report(result)
         print(json.dumps({"completed": result["completed"], "mode": args.mode, "root": str(run.root)}), flush=True)
     except Exception as error:
         run.save("runner-failure", {"error": str(error), "automaticReplay": False})

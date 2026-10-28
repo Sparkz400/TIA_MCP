@@ -162,7 +162,9 @@ class Run(workflow.Run):
 def run_owned(run):
     failure = None
     try:
-        return run.execute()
+        result = run.execute()
+        run.report(result)
+        return result
     except BaseException as error:
         failure = error
         try:
