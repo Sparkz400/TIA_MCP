@@ -269,7 +269,7 @@ def main():
                 applied = call("change_apply", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
                     "idempotencyKey": "f-roundtrip-" + uuid.uuid4().hex, "checkpointSave": True, "compile": True, "save": True})
                 require(applied.get("state") == "applied", "Safety import was not applied")
-                require_clean_compile(applied.get("compile"), expected_targets=[plc['path']])
+                require_clean_compile(applied.get("compile"))  # The import compiles every device; the receipt declares its scope.
                 after = call("safety_inspect", {**selector, "blockPath": block["path"], "maxItems": 1000})
                 require_signature_evidence(after)
                 coverage = require_applied_evidence(applied, after, block["path"])

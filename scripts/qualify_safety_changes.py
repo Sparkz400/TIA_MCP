@@ -51,7 +51,7 @@ LIMITATIONS = [
 
 
 class Run(HardwareRun):
-    plc_compiled = ("safety_import_xml",)  # safety_fparameter_set compiles all devices.
+    plc_compiled = ()  # Both safety kinds compile all devices.
 
     def args(self, kind, payload, **top):
         return {"kind": kind, "payload": payload, "plcPath": self.plc, **top}
@@ -154,8 +154,14 @@ def import_main(run, text, label, restore=False, stale=False):
     prepared = run.prepare(label, "safety_import_xml", payload)
     if stale:
         run.refuse_apply("safety_import_xml", "a wrong previewHash", {**prepared, "previewHash": "0" * 64}, "PreviewMismatch")
-    run.finish(label, "safety_import_xml", prepared, changed=[key], tolerated=side_effects(run), restore=restore,
-               check=lambda applied, state: require(text in h.tool("block_read", {"plcPath": run.plc, "blockName": MAIN})["xml"], "The comment is not in the export"))
+    prefix = "block:" + run.plc + "/blocks/"
+
+    def check(applied, state):
+        require(text in h.tool("block_read", {"plcPath": run.plc, "blockName": MAIN})["xml"], "The comment is not in the export")
+        # A PLC-only compile left the F-compiler block DB1_C inconsistent; the device compile must leave every F-PLC block consistent.
+        stale = sorted(k for k, v in state.items() if k.startswith(prefix) and v.get("isConsistent") is False)
+        require(not stale, "Blocks read inconsistent after the import: %s" % stale)
+    run.finish(label, "safety_import_xml", prepared, changed=[key], tolerated=side_effects(run), restore=restore, check=check)
 
 
 def refusals(run, di, di2, modules):
