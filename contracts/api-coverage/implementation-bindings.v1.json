@@ -114620,7 +114620,7 @@
     {
       "path": "evidence/local.graphical_changes.20261028.json",
       "state": "observed",
-      "sha256": "4d404a0457c423356bdbed76343ac8b8e24ec9d2f190e76eee24f8ca1cccacfa"
+      "sha256": "90db501c13d8a86483f034eba925e6a3920d75f4f56b7d74af7ce305ba1ad325"
     },
     {
       "path": "evidence/local.hardware.20261024.json",
