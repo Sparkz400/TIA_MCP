@@ -98,7 +98,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (!componentQualification) throw new ArgumentException("--watch-qualification requires --component-qualification.");
             if (watchQualificationPoint is not ("none" or "checkpoint.beforeArchive" or "checkpoint.afterArchive" or
                 "import.before" or "import.after" or "save.before" or "save.after" or "retrieve.before" or "retrieve.after" or
-                "host.watch_checkpoint" or "host.watch_apply_native" or "host.watch_restore_native"))
+                "host.watch_checkpoint" or "host.watch_apply_native" or "host.watch_restore_native" or
+                "host.watch_authoring_source_negative"))
                 throw new ArgumentException("Unknown watch qualification interruption point.");
         }
         if (testSuiteScopeProbe && (componentQualification || watchQualificationPoint is not null))
