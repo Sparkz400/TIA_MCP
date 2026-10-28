@@ -113,15 +113,16 @@ def compare_state(run, workspace, block, wanted):
     require(row is not None and row["compareState"] == wanted, "Mapping of %s is %s, expected %s" % (block, row and row["compareState"], wanted))
 
 
-def add(run, workspace, root, block, fmt, restore=False):
-    payload = {"workspacePath": workspace, "objectPath": run.plc + "/blocks/" + block, "mode": "export", "directory": "", "fileName": block, "format": fmt}
+def add(run, workspace, root, block, fmt, restore=False, file_name=None):
+    file_name = file_name or block
+    payload = {"workspacePath": workspace, "objectPath": run.plc + "/blocks/" + block, "mode": "export", "directory": "", "fileName": file_name, "format": fmt}
     before = inventory(root)
     def check(applied, state):
         compare_state(run, workspace, block, "Equal")
         files = inventory(root)
         require(set(before) < set(files) and all(files[name] == digest for name, digest in before.items()), "The export did not only add package files: %s" % sorted(set(files) ^ set(before)))
         run.h.report["files"]["add " + block] = sorted(set(files) - set(before))
-    run.apply("map %s by export" % block, "vci_mapping_add", payload, {"effects": [{"action": "exportObject", "directory": "", "fileName": block, "format": fmt}]},
+    run.apply("map %s by export" % block, "vci_mapping_add", payload, {"effects": [{"action": "exportObject", "directory": "", "fileName": file_name, "format": fmt}]},
               changed=["vciWorkspace:" + workspace], check=check, restore=restore)
 
 
@@ -213,7 +214,10 @@ def phase_b(run):
     edit_in_project(run, workspace, "VciKeep", "VciAgain")
     run.b0 = run.current
     synchronize(run, workspace, root, "VciKeep", "ProjectToWorkspace", [], restore=True)
-    add(run, workspace, root, "VciFc", fmt, restore=True)
+    # vci_mapping_remove keeps the package files, so a new export needs a new file name (the old one refuses with VciPackageCollision).
+    run.refuse("vci_mapping_add", "a package left by a removed mapping", {"workspacePath": workspace, "objectPath": run.plc + "/blocks/VciFc", "mode": "export",
+                                                                          "directory": "", "fileName": "VciFc", "format": fmt}, "VciPackageCollision")
+    add(run, workspace, root, "VciFc", fmt, restore=True, file_name="VciFcAgain")
     remove(run, workspace, root, "VciKeep", restore=True)
 
 
