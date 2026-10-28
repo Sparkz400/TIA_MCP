@@ -342,7 +342,7 @@ def qualify(args):
         plcs = sorted({n["objectPath"] for n in nodes if n["kind"] == "plc"})
         report["independentTree"] = {}
         for plc in plcs:
-            inspected = call("software_inspect", {"plcPath": plc, "maxItems": 50000}, "independent software_inspect")
+            inspected = call("software_inspect", {"plcPath": plc, "maxItems": 2000}, "independent software_inspect")
             require(inspected["completeness"]["scopeComplete"] is True, "Independent software inspection incomplete")
             name = plc.rsplit("/", 1)[1]
             for kind, rows in (("block", inspected["blocks"]), ("type", inspected["types"]), ("tagTable", inspected["tagTables"])):
