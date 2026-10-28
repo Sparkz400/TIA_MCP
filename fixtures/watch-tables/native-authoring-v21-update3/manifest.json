@@ -1,0 +1,110 @@
+{
+ "schemaVersion": 1,
+ "kind": "exact-profile-candidate-inputs",
+ "scopeOnly": true,
+ "productionApplyEnabled": false,
+ "nativeVersion": "TIA Portal V21 Update 3",
+ "hardware": "CPU 1511-1 PN, 6ES7 511-1AL03-0AB0/V4.1",
+ "activeCultures": [
+  "de-DE"
+ ],
+ "sourceRun": "author2",
+ "sourceCommit": "4cd016da6046727884bf78477678f1c337013cdc",
+ "sourceRunResult": "qualify_watch_authoring.py passed with verify_watch_authoring (create, readback, saved fresh reopen, checkpoint recovery, reconciliation)",
+ "exportBytesUnmodified": true,
+ "pins": {
+  "blockSha256": "326bc4096d5faf7491ea1f920bb273a58dba6b426cad743cd07c95631344674d",
+  "instanceSha256": "fff585da83be4a2e777d7a9b6057352268cd18534106592c090854e234d3c16a",
+  "forceTableSemanticSha256": "c7b378c7f45d04ecfb47dcaaa2bc047e97fb5cb474b514c86a0156acb81a309a",
+  "peerProfileSha256": "50ac10487b18714b28d10989603b1724cfe787c4d489d413c46680d5775847a1",
+  "candidateSemanticSha256": "badf398cad8dbf6b7f193e72d299155b5db774b9dca91e0b4114cbd13c7efac0"
+ },
+ "files": [
+  {
+   "path": "baseline/absent.txt",
+   "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+   "bytes": 44,
+   "role": "absence receipt, not native XML"
+  },
+  {
+   "path": "baseline/block-2.xml",
+   "sha256": "1890875ff334f4abb694ced7ccf69103c798c7f1caadee6ad73b38401971545d",
+   "bytes": 5882,
+   "role": "block peer export"
+  },
+  {
+   "path": "baseline/block-3.xml",
+   "sha256": "f8ed8e8e65d44252298fbaae6e10d55657e5be04e26cce565e5f5832c38917b1",
+   "bytes": 7481,
+   "role": "block peer export"
+  },
+  {
+   "path": "baseline/block-4.xml",
+   "sha256": "d5ef6c4f8a7fa4aa3abc83ddf32aaf518f7b4c12330884b4564d9fd87169fc02",
+   "bytes": 4787,
+   "role": "block peer export"
+  },
+  {
+   "path": "baseline/block-5.xml",
+   "sha256": "d119ef9ae2ed9ea7964495456efa6c371180de58e3f88d683a992ec28b4ec912",
+   "bytes": 6592,
+   "role": "block peer export"
+  },
+  {
+   "path": "baseline/force-0.xml",
+   "sha256": "c85a43d1686930faa50f7ee09f244aed3371a9059a1a67b36d4c6116873891a4",
+   "bytes": 2266,
+   "role": "empty force table export; DocumentInfo source"
+  },
+  {
+   "path": "baseline/snapshot.json",
+   "sha256": "d670545dcd2a0257e0334e8affb178c6bcfc64888f796a2e321050a8d65e02a9",
+   "bytes": 11960,
+   "role": "native baseline receipt (peers, hardware, languages, access)"
+  },
+  {
+   "path": "baseline/tags-6.xml",
+   "sha256": "2341c54e88da974a3636381ec69c934ef3cf24b719465ba21e90a17f270b17b7",
+   "bytes": 2238,
+   "role": "default tag table export"
+  },
+  {
+   "path": "creation.reviewed.xml",
+   "sha256": "55048d4003d6edfd6f6d80130a01ae1c9ede4a3d2fdf022e90377733efe0e733",
+   "bytes": 3177,
+   "role": "reviewed candidate"
+  },
+  {
+   "path": "profile-candidate-review.json",
+   "sha256": "349c8233402a417fdf913521c9b000cad3c37d7fdbde76e016d6d04ec70f692e",
+   "bytes": 39069,
+   "role": "raw review (watch/<id>/review.json) as prepared"
+  },
+  {
+   "path": "source/fb.xml",
+   "sha256": "64e0b128cb7ed9f24ac18d2f602daa3efc3d59718c80f4a1d5fbdc1c2c388a11",
+   "bytes": 7481,
+   "role": "generation capture of FB TiaMcp_EnableGate"
+  },
+  {
+   "path": "source/instance.xml",
+   "sha256": "d970492e5639bb8776faa1090028ab9682a31ba344af8fdf80e3b257d49a70f8",
+   "bytes": 4786,
+   "role": "generation capture of instance DB TiaMcp_EnableGate_DB"
+  }
+ ],
+ "independentReview": {
+  "given": "the exports in baseline/ and source/, creation.reviewed.xml, the packaged template and the hash definitions; not the review, this manifest or the code",
+  "recomputed": [
+   "blockSha256",
+   "candidateSemanticSha256",
+   "forceTableSemanticSha256",
+   "instanceSha256",
+   "peerProfileSha256"
+  ],
+  "mismatches": 0,
+  "method": "XDocument-based C# for the XML hashes; .NET Utf8JsonWriter and a separate Python serializer for the peer profile",
+  "documentInfoEqualsForceExport": true
+ },
+ "crossCheck": "Run author1 (same day, failed apply) gave identical block, instance, force-table and peer-profile hashes; its readback content hash equals candidateSemanticSha256."
+}

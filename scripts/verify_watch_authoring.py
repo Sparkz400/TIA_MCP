@@ -63,9 +63,15 @@ def snapshot(root, snap, before=None, candidate=None, project=None, fresh=False)
              and observation['sessionEpoch'] != before['observation']['sessionEpoch'], 'Fresh native process/session required')
 
 
-def exact_creation(template, candidate, active, reason):
+def exact_creation(template, candidate, active, reason, export):
     need(base.sha(template) == TEMPLATE_SHA, 'Genuine packaged template hash differs')
     expected = copy.deepcopy(expansion.document(template))
+    # The template names the installation that exported it; readback names this session's.
+    infos, current = expected.findall('DocumentInfo'), base.xml(export).findall('DocumentInfo')
+    need(len(infos) == len(current) == 1, 'One DocumentInfo per template and export required')
+    index = list(expected).index(infos[0])
+    expected[index] = copy.deepcopy(current[0])
+    expected[index].tail = infos[0].tail
     watch = base.table(expected)
     watch.find('AttributeList/Name').text = TABLE
     rows = expansion.row_elements(expected)
@@ -157,9 +163,12 @@ def reviewed_candidate(root, check_sources=True):
     need(review['template']['origin'] == 'packagedGenuineNativeCapture' and review['template']['sourceSha256'] == TEMPLATE_SHA,
          'Packaged template provenance required')
     snapshot(root, before)
+    exports = [t['artifact'] for t in before['tables'] if t['artifact'] == review['template'].get('documentInfoSource')]
+    need(len(exports) == 1, 'Export metadata must come from one same-session baseline export')
     candidate = artifact(root, review['input'])
     delta = exact_creation(artifact(root, review['template']['artifact']).read_bytes(), candidate.read_bytes(),
-                           before['peers']['languages']['active'], row['candidate']['reason'])
+                           before['peers']['languages']['active'], row['candidate']['reason'],
+                           artifact(root, exports[0]).read_bytes())
     need(review['edit']['documentIdMapping'] == delta['documentIdMapping'], 'Reviewed ID remapping differs from explicit transformation')
     need(review['edit']['before'] == {'name': TABLE, 'rows': []}, 'Creation has fabricated before rows')
     after = review['edit']['after']

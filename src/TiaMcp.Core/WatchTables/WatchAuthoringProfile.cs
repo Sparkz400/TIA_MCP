@@ -13,10 +13,13 @@ public static class WatchAuthoringProfile
     public const string Reason = "Captured Output state of the selected FB instance: Active";
     public const string NativeProfile = "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f";
     public const string Hardware = "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||";
-    public const string CandidateSemanticSha256 = "e165a74058d6a62c8bc7e2c8c8557b8490b86646af501156764225f2d25f4c54";
-    public const string PeerProfileSha256 = "f0edfe75037ca386fe1eb0989ac84bc12d853f232f2c5e5b00b8f2ce30350058";
-    private const string Fb = "18a064eb13d466bd4a39caeb967efbf2b491fc9d49d582d49e7ccea5756d4b84";
-    private const string Db = "1954fc56e24978d2bdfe9fce4bafb34487fe185b770f51e5674486cd590ae45b";
+    // Every export embeds DocumentInfo/InstalledProducts, so these pins follow the installation:
+    // V21 Update 3, fixtures/watch-tables/native-authoring-v21-update3.
+    public const string CandidateSemanticSha256 = "badf398cad8dbf6b7f193e72d299155b5db774b9dca91e0b4114cbd13c7efac0";
+    public const string PeerProfileSha256 = "50ac10487b18714b28d10989603b1724cfe787c4d489d413c46680d5775847a1";
+    private const string Fb = "326bc4096d5faf7491ea1f920bb273a58dba6b426cad743cd07c95631344674d";
+    private const string Db = "fff585da83be4a2e777d7a9b6057352268cd18534106592c090854e234d3c16a";
+    private const string ForceTable = "c7b378c7f45d04ecfb47dcaaa2bc047e97fb5cb474b514c86a0156acb81a309a";
 
     public static JsonObject Assess(JsonObject review, byte[] candidate)
     {
@@ -49,7 +52,7 @@ public static class WatchAuthoringProfile
                 Text(peers, "block:" + plc + "/blocks/TiaMcp_EnableGate_DB") == Db, "exactDirectInstanceDeclarations");
             var tables = before["tables"]!.AsArray();
             Require(tables.Count == 1 && tables[0]?["kind"]?.GetValue<string>() == "force" && tables[0]?["name"]?.GetValue<string>() == "Force table" &&
-                tables[0]?["group"]?.GetValue<string>() == "root" && tables[0]?["semanticSha256"]?.GetValue<string>() == "5d1c654e89ebb79ac649da01736e1657bdc099e6537ea08951f4d35ec113a64b" &&
+                tables[0]?["group"]?.GetValue<string>() == "root" && tables[0]?["semanticSha256"]?.GetValue<string>() == ForceTable &&
                 peers.Count == 10 && peers.Count(p => p.Key.StartsWith("block:", StringComparison.Ordinal)) == 4 &&
                 peers.Count(p => p.Key.StartsWith("tags:", StringComparison.Ordinal)) == 1 &&
                 peers.All(p => !p.Key.StartsWith("watch:", StringComparison.Ordinal)), "emptyForceAndSixPeerExports");

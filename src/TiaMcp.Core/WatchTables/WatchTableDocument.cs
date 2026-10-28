@@ -191,6 +191,16 @@ namespace TiaMcp.Core.WatchTables
             { while (!used.Add(next)) next++; id.Value = next.ToString("X", CultureInfo.InvariantCulture); }
         }
 
+        // A packaged template names the installation that exported it; native readback names the current one.
+        public void AdoptDocumentInfo(WatchTableDocument export)
+        {
+            Writable();
+            if (export == null) throw new InvalidDataException("A same-session native export is required.");
+            var info = document.Root.Element("DocumentInfo"); var current = export.document.Root.Element("DocumentInfo");
+            if (XNode.DeepEquals(info, current)) return;
+            info.ReplaceWith(new XElement(current)); edited = true;
+        }
+
         public void Remove(int ordinal) { Writable(); Row(ordinal).Remove(); edited = true; }
         public void Reorder(int[] ordinals)
         {

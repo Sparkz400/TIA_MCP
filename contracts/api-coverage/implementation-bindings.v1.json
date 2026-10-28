@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c0f63bd38ed1e10372516cfcb9c838b6f5548a917eb3b36713dbeea293e12e7d",
-      "bytes": 1169057
+      "sha256": "c154146efe3e335e86f18d590d6d96831cb7a89eea42c3357df81dd8b9093c5f",
+      "bytes": 1172008
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1617,8 +1617,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchAuthoringProfile.cs",
-      "sha256": "ff9d10827c303a72ea560fbb48f50168d1a10c69deb6467c6bf0a0635ddd25c9",
-      "bytes": 9604
+      "sha256": "2be75470634da8f8bedf1eb7073c30c2a59fe97ee72a7a0f4f8f1bcacdd76bfb",
+      "bytes": 9825
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchGroupManifest.cs",
@@ -1642,8 +1642,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.Authoring.cs",
-      "sha256": "fe1d974a53228120cb4d1fddaf020d0c17293d593a7422956621d43e405c6306",
-      "bytes": 14074
+      "sha256": "ce87f5dc2f634f24fc578d56b27e95d581d915dbc862743ca9f796f4fc8ddc80",
+      "bytes": 15095
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.ComponentWindow.cs",
@@ -1672,8 +1672,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDocument.cs",
-      "sha256": "592e4fd9e0085c3daea14bd0e4d4be6cabac8efc33122205bcb4c094dfe79ebc",
-      "bytes": 28149
+      "sha256": "db88f9b23c901ddc344282e98fa65b775edc2aa1007b590835d70bd125d31764",
+      "bytes": 28726
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableModels.cs",
@@ -106637,7 +106637,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.authoring.20261028",
+          "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a",
+          "artifacts": [
+            "evidence/local.watch.authoring.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115239,7 +115247,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.authoring.20261028",
+          "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a",
+          "artifacts": [
+            "evidence/local.watch.authoring.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115357,7 +115373,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.authoring.20261028",
+          "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a",
+          "artifacts": [
+            "evidence/local.watch.authoring.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -116909,6 +116933,11 @@
       "sha256": "cb31a8f857dfd7e795d0c394fff6a1659f76e919ed93e785e598870bf43a752d"
     },
     {
+      "path": "evidence/local.watch.authoring.20261028.json",
+      "state": "observed",
+      "sha256": "3538b8b3b20fae95e137ca58dc8598c626c85fd418e7ea8c98675da8cf08dab6"
+    },
+    {
       "path": "evidence/local.watch.native.20261028.json",
       "state": "observed",
       "sha256": "5cf94421eec475147273983d700a64224cb52577d2552be3961609de3bb1fee5"
@@ -117531,6 +117560,10 @@
     {
       "id": "local.units.v03",
       "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672"
+    },
+    {
+      "id": "local.watch.authoring.20261028",
+      "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a"
     },
     {
       "id": "local.watch.native.20261028",

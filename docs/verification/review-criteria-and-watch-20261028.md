@@ -106,3 +106,5 @@ Apart from formatting whitespace, that metadata is the only difference. The appl
 recovered and reconciled; no replay. Re-qualifying authoring needs two things: the
 candidate taking its `DocumentInfo` from a same-session export, and an independently
 reviewed re-pin of the profile under Update 3.
+
+Both are done; see [authoring under Update 3](watch-authoring-update3-20261028.md).
