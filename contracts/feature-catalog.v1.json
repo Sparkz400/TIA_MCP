@@ -2710,6 +2710,23 @@
         "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
       ]
+    },
+    {
+      "id": "local.milestones.network.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ba861fce777645490974e21be85c3e451b7fca59",
+        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build ba861fc (frozen D:\\wp\\b7) in owned scratch projects, the same 11 changes as local.milestones.reopen.20261028, now with network_configure as a hardware-rule kind: the offline PROFINET address/subnet-mask change of the scratch CPU's node applied with checkpoint, compile and save and reported configured_hardware_preservation_verified (only the requested node attributes changed in the configured-hardware manifest); change_status equals the apply result; the timestamp-free readback differs only in that node's address; a fresh owned Portal reopens the changed project identically; change_restore in the applying Portal returns the exact pre-change readback and the recovered project reopens identically in another fresh Portal. All other changes pass as in the earlier run."
+      },
+      "artifacts": [
+        "evidence/local.milestones.network.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; one node's Address and SubnetMask only; subnet connect/disconnect and other attributes are not run natively. Simulation steps were skipped.",
+        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
+      ]
     }
   ],
   "features": [
@@ -5430,7 +5447,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5482,7 +5500,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5534,7 +5553,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5738,7 +5758,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5950,7 +5971,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -6156,7 +6178,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -6401,18 +6424,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) for one node's Address and SubnetMask (local.milestones.network.20261028); subnet connect/disconnect and other attributes are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "Attribute preflight precedes subnet changes, but subsequent metadata/type changes or native failures can leave partial effects requiring checkpoint recovery.",
-          "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route. Not natively qualified.",
+          "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {

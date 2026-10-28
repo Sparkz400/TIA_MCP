@@ -143,3 +143,11 @@ Wave 9 total: 62 of 66 cases pass all four engineering gates; the 4 `existingglo
 cases have no profile. Evidence: `local.typed.wave9.engineering.20261028` (w9q5),
 `local.typed.wave9.engineering-early.20261028` (w9q, w9q4; outcome failed because both batches stopped),
 `local.typed.crossscope.engineering.20261028`.
+
+## network_configure — 28 October
+
+`network_configure` became a hardware-rule kind (configured-hardware preservation, fresh-session
+reconciliation). A milestones rerun on build ba861fc (`D:\wp\b7`) passed with no failures and the
+stage `configured_hardware_preservation_verified` on the offline address change, plus change_status,
+fresh-Portal reopen, restore and recovered reopen: `local.milestones.network.20261028`. The row is
+verified; bound cells 585 → 591.

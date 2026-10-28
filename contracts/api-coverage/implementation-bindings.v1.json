@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5415039d1605c260458a3ba118779d1205c32983bfeec8cb9323a3edf168e256",
-      "bytes": 1137286
+      "sha256": "1b75226d80e8956ad3053de678a3cfad82c14947a755fd2c5b60dfaf30b05561",
+      "bytes": 1139294
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -91324,6 +91324,13 @@
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
           ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -91376,6 +91383,13 @@
           "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
           ]
         }
       ],
@@ -91514,6 +91528,13 @@
           "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
           ]
         }
       ],
@@ -92477,6 +92498,13 @@
           "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
           ]
         }
       ],
@@ -95081,11 +95109,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
+            "evidence/local.milestones.network.20261028.json"
           ]
         }
       ],
@@ -96064,6 +96091,13 @@
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
           ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -96763,6 +96797,13 @@
           "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
           "artifacts": [
             "evidence/local.milestones.reopen.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.network.20261028",
+          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "artifacts": [
+            "evidence/local.milestones.network.20261028.json"
           ]
         }
       ],
@@ -116143,6 +116184,11 @@
       "sha256": "16cdd557fbd90bc4eea5ddea5931961daa238e42047c7cc8845abd4a34690d34"
     },
     {
+      "path": "evidence/local.milestones.network.20261028.json",
+      "state": "observed",
+      "sha256": "b3424921cf575f49cdf61fb24c2abce978ec9d645e7ff2005a202e996919589f"
+    },
+    {
       "path": "evidence/local.milestones.reopen.20261028.json",
       "state": "observed",
       "sha256": "af314cd5d2757d95cb7fff90aab441e9f090e2f6a986b9542f350a3ae44546dd"
@@ -116690,6 +116736,10 @@
     {
       "id": "local.milestones.20261024",
       "profileSha256": "b1b80295fcd905263658b5923350aa96f621a1fd63a5c64d357bd37babf1f3a1"
+    },
+    {
+      "id": "local.milestones.network.20261028",
+      "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc"
     },
     {
       "id": "local.milestones.reopen.20261028",
