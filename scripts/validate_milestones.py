@@ -154,6 +154,9 @@ def main():
         status = call("change_status", {"changeId": prepared["changeId"]}, "status " + name)
         assert status["state"] == "applied" and status["stages"] == applied["stages"], status
         assert status["afterFingerprint"] == applied["afterFingerprint"] and status["recoveryArchiveSha256"], status
+        if kind == "network_configure":
+            # Hardware-rule kinds run the worker's configured-hardware preservation check; require it ran.
+            assert "configured_hardware_preservation_verified" in applied["stages"], applied["stages"]
         after = snapshot("after " + label)
         record("preserved unrelated objects " + name, require_effects(before, after, expected, optional))
         return {"name": name, "prepared": prepared, "applied": applied, "arguments": arguments, "before": before, "after": after}
