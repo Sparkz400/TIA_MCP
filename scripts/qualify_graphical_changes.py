@@ -25,9 +25,9 @@ NS = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5"
 UIDS = {"LAD": {"call": "23", "argument": "21", "replaced": "21"}, "FBD": {"call": "24", "argument": "22", "replaced": "21"}}
 CRITERIA = {
     "AC-identity": "refused: unknown network, call, parameter and UId references, an SCL block, a language-mismatched or ID-colliding network and call_connection_set, each leaving the PLC software unchanged.",
-    "AC-preview": "Every preview is asserted against the request (payload, edit, effects naming the existing block) before apply.",
+    "AC-preview": "Every preview is asserted against the request (payload, edit, effects naming the existing block) before apply; a wrong previewHash refuses at apply per kind.",
     "AC-preserve": "applied: a complete snapshot differs only in the edited block; the native readback equals the prepared document (native_preservation_verified).",
-    "AC-native": "applied + persisted: checkpoint, compile, preservation and save stages and a fresh owned Portal reopen with identical state.",
+    "AC-native": "applied + persisted: checkpoint, compile, preservation and save stages, change_status equal to the apply result and a fresh owned Portal reopen with identical state.",
     "AC-recovery": "restored: change_restore in the applying Portal into a new directory equals the reopened state, per kind.",
     "AC-evidence": "This report: binaries, tool calls, step results, snapshots with state.json and limitations.",
 }
@@ -73,13 +73,24 @@ def symbol(name):
 TRUE = "<Constant><ConstantType>Bool</ConstantType><ConstantValue>TRUE</ConstantValue></Constant>"
 
 
-def edit(run, block, label, kind, payload, text, restore=False):
-    """One graphical change on block: only that block changes, and the native readback equals the prepared document."""
+def edit(run, block, label, kind, payload, text, restore=False, stale=False):
+    """One graphical change on block: only that block changes, the native readback equals the prepared document and
+    change_status reports the applied stages; stale=True first refuses a wrong previewHash, restore=True restores it."""
     key = run.blk(block)
-    _, applied = run.mutate(label, kind, payload, {"effects": [{"action": kind, "existingBlock": run.info(block)}], "edit": payload},
-                            changed=[key], xml={key: text}, restore=restore)
+    prepared = run.prepare(label, kind, payload, {"effects": [{"action": kind, "existingBlock": run.info(block)}], "edit": payload})
+    if stale:
+        run.refuse_apply(kind, "a wrong previewHash", prepared, "PreviewMismatch", previewHash="0" * 64)
+    _, applied = run.finish(label, kind, prepared, changed=[key], xml={key: text})
+    def status():
+        observed = run.h.tool("change_status", {"changeId": prepared["changeId"]})
+        require(observed["state"] == "applied" and observed["stages"] == applied["stages"] and observed["recoveryArchiveSha256"] == applied["recoveryArchiveSha256"],
+                "change_status differs from the apply result: %s" % observed["state"])
+        return observed["state"]
+    run.h.stage("change_status " + label, status)
     require("native_preservation_verified" in applied["stages"] and any(r["role"] == "structured-edit-readback" for r in applied["readbacks"]),
             "%s lacks its native preservation readback" % label)
+    if restore:
+        run.restore(label, kind, prepared)
 
 
 def edits(run, language, block):
@@ -87,12 +98,14 @@ def edits(run, language, block):
     key, uid = run.blk(block), UIDS[language]
     unit = network(run.xml(key))
     edit(run, block, "%s: move the Enable argument to EnableAlternate" % language, "call_parameter_set",
-         {"blockName": block, "networkId": unit, "callUid": uid["call"], "parameterName": "Enable", "components": ["EnableAlternate"]}, '<Component Name="EnableAlternate" />')
+         {"blockName": block, "networkId": unit, "callUid": uid["call"], "parameterName": "Enable", "components": ["EnableAlternate"]}, '<Component Name="EnableAlternate" />',
+         stale=language == "LAD")
     replacement = access(uid["replaced"], TRUE, "LiteralConstant") if language == "LAD" else access(uid["replaced"], symbol("Enable"))
     edit(run, block, "%s: replace Access %s in place" % (language, uid["replaced"]), "graphical_network_patch",
-         {"blockName": block, "networkId": unit, "upsertXml": [replacement], "removeUids": []}, "<ConstantValue>TRUE</ConstantValue>" if language == "LAD" else '<Component Name="Enable" />')
+         {"blockName": block, "networkId": unit, "upsertXml": [replacement], "removeUids": []}, "<ConstantValue>TRUE</ConstantValue>" if language == "LAD" else '<Component Name="Enable" />',
+         stale=language == "LAD")
     edit(run, block, "%s: insert a copy of the network" % language, "graphical_network_insert",
-         {"blockName": block, "afterNetworkId": unit, "compileUnitXml": copy_unit(run.xml(key), unit)}, "<SW.Blocks.CompileUnit")
+         {"blockName": block, "afterNetworkId": unit, "compileUnitXml": copy_unit(run.xml(key), unit)}, "<SW.Blocks.CompileUnit", stale=language == "LAD")
     run.h.stage("%s has two networks" % block, lambda: network(run.xml(key), 2) and 2)
 
 
