@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "purpose": "Native OPC UA server attribute names and defaults pinned for opcua_server_settings_set. Observations of one owned scratch, not qualification evidence.",
+  "purpose": "Native OPC UA server attribute names and defaults pinned for opcua_server_settings_set. Observations of owned scratches, not qualification evidence (see local.opcua.server-settings.20261028).",
   "source": {
     "runner": "scripts/probe_opcua_server_settings.py",
     "sourceCommit": "98093ae7323be5cfc015424caa61cc3fa66f2d74",
@@ -133,11 +133,6 @@
       }
     }
   },
-  "notExposedWhileOff": [
-    "port",
-    "guestAccess",
-    "autoAcceptClientCertificates"
-  ],
   "licenseValues": {
     "source": "PublicAPI V21 'TIA Portal Openness Hardware parameters.pdf', OpcUaPurchasedLicense (UInt64)",
     "values": {
@@ -150,14 +145,146 @@
   "pinned": {
     "serverEnabled": {
       "item": "opcua",
-      "attribute": "OpcUaServer"
+      "attribute": "OpcUaServer",
+      "type": "System.Boolean"
+    },
+    "port": {
+      "item": "opcua",
+      "attribute": "OpcUaPort",
+      "type": "System.UInt64",
+      "exposed": "while the server is on"
+    },
+    "autoAcceptClientCertificates": {
+      "item": "opcua",
+      "attribute": "OpcUaAutoAcceptAllClientCertificates",
+      "type": "System.Boolean",
+      "exposed": "while the server is on"
     },
     "runtimeLicense": {
       "item": "cpu",
-      "attribute": "OpcUaPurchasedLicense"
+      "attribute": "OpcUaPurchasedLicense",
+      "type": "System.UInt64"
     },
-    "port": null,
-    "guestAccess": null,
-    "autoAcceptClientCertificates": null
+    "guestAccess": null
+  },
+  "serverOn": {
+    "source": {
+      "runner": "scripts/qualify_opcua_server_settings.py",
+      "sourceCommit": "a2f3b3d34d148647ed48d9e9ffd97fc6ad9b4fe2",
+      "run": "uq_832c55bb",
+      "state": "after serverEnabled=true and runtimeLicense=SimaticOpcUaS71500Small, device compile and save"
+    },
+    "exposedOnlyWhileOn": {
+      "cpu": {
+        "OpcUaRequiredLicense": {
+          "type": "System.UInt64",
+          "value": 1
+        }
+      },
+      "opcua": {
+        "OpcUaAccessControl": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaAlarmsAndConditionsEnable": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaAutoAcceptAllClientCertificates": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaDeprecatedTypeDictionary": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaDiagnosticsClientRequestsFailedActive": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaDiagnosticsSamplingTimeErrorActive": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaDiagnosticsSecurityChecksFailedActive": {
+          "type": "System.Boolean",
+          "value": true
+        },
+        "OpcUaDiagnosticsServerStatusChangedActive": {
+          "type": "System.Boolean",
+          "value": true
+        },
+        "OpcUaDiagnosticsSessionStatusChangedActive": {
+          "type": "System.Boolean",
+          "value": true
+        },
+        "OpcUaDiagnosticsSubscriptionsStatusChangedActive": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaDiagnosticsSummarizeInterval": {
+          "type": "System.UInt64",
+          "value": 20
+        },
+        "OpcUaDiagnosticsSummarizeMessagesActive": {
+          "type": "System.Boolean",
+          "value": true
+        },
+        "OpcUaMaxMonitoredItems": {
+          "type": "System.UInt32",
+          "value": 1000
+        },
+        "OpcUaMaxRegisteredNodes": {
+          "type": "System.UInt32",
+          "value": 10000
+        },
+        "OpcUaMaxSessionTimeout": {
+          "type": "System.UInt32",
+          "value": 30
+        },
+        "OpcUaMaxSessions": {
+          "type": "System.UInt32",
+          "value": 10
+        },
+        "OpcUaMinimumPublishingInterval": {
+          "type": "System.UInt64",
+          "value": 1000
+        },
+        "OpcUaMinimumSamplingInterval": {
+          "type": "System.UInt64",
+          "value": 1000
+        },
+        "OpcUaPort": {
+          "type": "System.UInt64",
+          "value": 4840
+        },
+        "OpcUaSecurityPolicies": {
+          "type": "System.UInt64",
+          "value": 64
+        },
+        "OpcUaServerGDSPushActive": {
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaStandardServerInterface": {
+          "type": "System.Boolean",
+          "value": true
+        }
+      }
+    },
+    "changedByActivation": {
+      "cpu": [],
+      "opcua": [
+        "OpcUaServerCertificate"
+      ]
+    },
+    "requiredDeviceRight": {
+      "identifier": "OPCUAServerAccess",
+      "name": "OPC UA server access",
+      "group": "OPC UA"
+    }
+  },
+  "notAnAttribute": {
+    "guestAccess": "V21 models OPC UA guest access as the UMAC anonymous user holding the OPCUAServerAccess device right."
   }
 }

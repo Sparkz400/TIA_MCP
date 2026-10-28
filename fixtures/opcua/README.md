@@ -22,4 +22,4 @@ The next native fixture must capture independent PLC declarations and the real S
 
 ## Native server settings
 
-`server-settings-v21-1511-v41.json` pins the CPU OPC UA server attribute names that `opcua_server_settings_set` writes: `OpcUaServer` on the CPU's `OPC UA` sub-item and `OpcUaPurchasedLicense` on the CPU. It is a native capture of one owned scratch CPU 1511-1 PN V4.1 (TIA V21 Update 3) with the server off, plus the license value names from the V21 hardware parameter description. Port, guest access and automatic client-certificate acceptance were not exposed there and stay unpinned.
+`server-settings-v21-1511-v41.json` pins the CPU OPC UA server attribute names that `opcua_server_settings_set` writes: `OpcUaServer`, and while the server is on `OpcUaPort` and `OpcUaAutoAcceptAllClientCertificates`, on the CPU's `OPC UA` sub-item, and `OpcUaPurchasedLicense` on the CPU. It holds native captures of owned scratch CPUs 1511-1 PN V4.1 (TIA V21 Update 3) with the server off and on, plus the license value names from the V21 hardware parameter description. Guest access has no attribute: V21 models it as the UMAC anonymous user's `OPCUAServerAccess` right.

@@ -3443,6 +3443,25 @@
         "No Host or worker loss during lifecycle operations; offline stored configuration only, no monitoring, modify or forcing.",
         "Trial lc1 (D:\\wp\\wt\\lc1) stopped at the second apply with ProjectIsolationRequired because the unseeded scratch was no longer owned after a reopen; it is retained as failed and not cited."
       ]
+    },
+    {
+      "id": "local.opcua.server-settings.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a2f3b3d34d148647ed48d9e9ffd97fc6ad9b4fe2",
+        "passedScope": "scripts\\qualify_opcua_server_settings.py on build a2f3b3d (frozen D;C:\\Program Files\\Git\\wp\\rs05) in one owned scratch CPU 1511-1 PN V4.1 (V21 Update 3), 36\\36 steps; eleven typed refusals (unknown field, empty payload, bare value, stale expected, unknown license, scopePath, guest access, port and certificate acceptance while the server is off, port 0 and 65536, stale port) changed no CPU or OPC UA attribute; umac_role_set granted OPCUAServerAccess to the scratch runtime role; opcua_server_settings_set enabled the server with the Small license (checkpoint, device compile, save, native readback; only OpcUaServerCertificate changed besides the request), change_restore in the applying Portal returned every CPU and OPC UA sub-item attribute to the pre-change state, a second activation and a port 4840->4841 plus automatic certificate acceptance change applied with exactly those attribute changes, and a fresh owned Portal reopened the project with identical attributes and both journals applied."
+      },
+      "artifacts": [
+        "evidence/local.opcua.server-settings.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1; other CPUs and firmware are not exercised.",
+        "guestAccess is refused: V21 models guest access as the UMAC anonymous user holding OPCUAServerAccess, which neither this kind nor umac_role_set changes.",
+        "Offline project settings only: nothing is downloaded, no OPC UA client connects, and the server certificate TIA assigns at compile is not inspected.",
+        "runtimeLicense records the purchased license; no entitlement is verified."
+      ]
     }
   ],
   "features": [
@@ -19711,6 +19730,7 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): one custom role, one device function right and one active project user; engineering function rights and AdministratorLockout are not exercised.",
           "action=create takes roleName (the role gets an empty comment); grant/revoke take roleName with up to 64 engineeringRights identifiers and/or deviceRights {device, identifier}, device being a deviceRightScopes path from access_inspect; assign/unassign take roleName and userName. Any other field is refused.",
+          "A grant naming an unavailable device right is refused with ObjectNotFound whose details list the device's available rights (identifier, name, group); no inspection lists them otherwise.",
           "Custom roles only: a name matching a system role is refused for every action. The anonymous user, UMC users and groups, passwords, aliases, activation, authentication type, session timeouts and role rename/delete are never changed.",
           "Administrator preservation: V21 does not mark which rights are administrative, so every engineering function right an active non-anonymous project user holds before the change must still be held by one after it (AdministratorLockout). Device function rights can be revoked.",
           "Preview carries umacBefore/umacAfter (all roles with engineering and device rights, all principals with activation and role assignments); apply read-back must equal umacAfter exactly. Effective runtime rights, UMC server membership and CPU download are not evaluated.",
@@ -24531,7 +24551,7 @@
     {
       "featureId": "change.opcua_server_settings_set",
       "domain": "opc_ua",
-      "title": "Turn the CPU OPC UA server on or off and set its purchased runtime license from exact expected values",
+      "title": "Set the CPU OPC UA server state, port, certificate acceptance and purchased runtime license from exact expected values",
       "mcpTools": [
         "change_prepare",
         "change_apply",
@@ -24542,33 +24562,38 @@
       "api": {
         "status": "available",
         "reasons": [
-          "V21 public API: DeviceItem.GetAttribute/SetAttribute on the CPU's OPC UA sub-item (OpcUaServer, Boolean) and on the CPU (OpcUaPurchasedLicense, UInt64 0..3 NoLicense/SimaticOpcUaS71500Small/Medium/Large per the V21 hardware parameter description). Names pinned from a native capture on CPU 1511-1 PN V4.1 (fixtures/opcua/server-settings-v21-1511-v41.json)."
+          "V21 public API: DeviceItem.GetAttribute/SetAttribute on the CPU's OPC UA sub-item (OpcUaServer; while the server is on also OpcUaPort and OpcUaAutoAcceptAllClientCertificates) and on the CPU (OpcUaPurchasedLicense, UInt64 0..3 NoLicense/SimaticOpcUaS71500Small/Medium/Large per the V21 hardware parameter description). Names pinned from native captures on CPU 1511-1 PN V4.1 (fixtures/opcua/server-settings-v21-1511-v41.json)."
         ]
       },
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Payload fields serverEnabled, port, guestAccess, autoAcceptClientCertificates and runtimeLicense, each optional and each { expected, value }; expected must equal the current native value at prepare (ExpectedValueMismatch otherwise). Any other field is refused; passwords, certificates and users are never accepted.",
-          "Only serverEnabled (OpcUaServer) and runtimeLicense (OpcUaPurchasedLicense) have pinned native attributes. port, guestAccess and autoAcceptClientCertificates were not exposed on the captured scratch CPU with the server off and are refused with UnsupportedCapability; nothing is written.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 (V21 Update 3) (local.opcua.server-settings.20261028): activation with the Small license, port and automatic certificate acceptance, each with checkpoint, device compile, save, native readback, fresh-Portal reopen, and change_restore of the activation to the exact attribute state.",
+          "Payload fields serverEnabled, port (1..65535), autoAcceptClientCertificates, runtimeLicense and guestAccess, each optional and each { expected, value }; expected must equal the current native value at prepare (ExpectedValueMismatch otherwise). Any other field is refused; passwords, certificates and users are never accepted.",
+          "port and autoAcceptClientCertificates exist natively only while the server is on, so they are set in a later change than the activation; otherwise UnsupportedCapability. guestAccess is always refused: V21 models guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which neither this kind nor umac_role_set changes.",
+          "V21 refuses to compile an active OPC UA server unless a user holds the OPCUAServerAccess device right; grant it first with umac_role_set. Enabling the server makes TIA assign a server certificate at compile.",
           "runtimeLicense records the purchased license in the project; it neither verifies nor activates an entitlement.",
           "Apply writes serverEnabled first when enabling and last when disabling, then reads every requested attribute back. compile=true is mandatory and compiles all project devices. The change fingerprint adds every device item's pinned OPC UA server attribute values; interruption reconciliation holds the outcome for review.",
           "Offline project settings only: nothing is downloaded, and clients, server certificates and endpoint reachability are not checked."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua.server-settings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires an S7-1500 CPU whose OPC UA sub-item exposes a writable OpcUaServer attribute; native eligibility is checked at prepare."
+          "Requires an S7-1500 CPU whose OPC UA sub-item exposes a writable OpcUaServer attribute and, for an active server, a user with the OPCUAServerAccess device right; native eligibility is checked at prepare."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
         "Offline project with an exact top-level plcPath (no scopePath)",
         "S7-1500 CPU with an OPC UA sub-item",
+        "A project user holding the OPCUAServerAccess device right before the server is enabled",
         "compile=true and a verified recovery checkpoint"
       ],
       "acceptanceCriteria": [
