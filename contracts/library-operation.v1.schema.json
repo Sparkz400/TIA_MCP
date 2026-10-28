@@ -1811,7 +1811,8 @@
                   "$ref": "#/$defs/pin"
                 },
                 "minItems": 1,
-                "maxItems": 1
+                "maxItems": 100,
+                "description": "Release order: list a callee before every version that calls it, since TIA records dependencies between released versions."
               },
               "target": {
                 "type": "object"
@@ -1857,7 +1858,7 @@
                   "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
                 },
                 "minItems": 1,
-                "maxItems": 1
+                "maxItems": 100
               }
             },
             "required": [
