@@ -79,7 +79,17 @@ Engineering (four gates) and runtime qualification of the 66 cases have not run.
 
 Fixed: production combined apply now passes the natively captured storage profile, still bound by
 exact installed FB/UDT content equality, with an offline project instead of the qualification
-scratch. Rerun pending.
+scratch.
+3. `D:\wp\c\iaf4c3a`: `library_instantiate` applied, then the typed step's prepare refused
+   `CapturedStorageProfileUnavailable` (complete reference callee/type content differs). The
+   runner's scratches kept en-US active next to de-DE, so every `MultilingualText` in the installed
+   FB (4) and UDT (2) exported an extra empty `<Culture>en-US</Culture>` item, and every later
+   ID shifted. With those items removed and IDs renumbered, both exports equal the captured
+   component04 references exactly; nothing else differs.
+
+Fixed: the runner now makes each scratch exactly de-DE, like the qualification Host: a second
+`project_languages_set` removes every other active language. The content binding is unchanged.
+Rerun pending.
 
 ## Next slot
 

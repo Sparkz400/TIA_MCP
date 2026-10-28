@@ -49,6 +49,32 @@ class Previews(unittest.TestCase):
             subject.refusal(RuntimeError("lost"))
 
 
+class ScratchLanguages(unittest.TestCase):
+    @staticmethod
+    def apply(*after):
+        calls, states = [], list(after)
+        def apply(kind, payload):
+            calls.append((kind, payload))
+            return {"preview": {"effects": [{"languageSettings": {"after": states.pop(0)}}]}}
+        return calls, apply
+
+    def test_other_active_languages_are_removed_in_a_second_change(self):
+        calls, apply = self.apply({"active": ["de-DE", "en-US"], "reference": "de-DE", "editing": "de-DE"},
+                                  {"active": ["de-DE"], "reference": "de-DE", "editing": "de-DE"})
+        subject.german_only_scratch(apply)
+        self.assertEqual([("project_languages_set", {"addActive": ["de-DE"], "referenceLanguage": "de-DE", "editingLanguage": "de-DE"}),
+                          ("project_languages_set", {"removeActive": ["en-US"]})], calls)
+
+    def test_german_only_scratch_needs_one_change_and_any_other_end_state_fails(self):
+        calls, apply = self.apply({"active": ["de-DE"], "reference": "de-DE", "editing": "de-DE"})
+        subject.german_only_scratch(apply)
+        self.assertEqual(1, len(calls))
+        _, apply = self.apply({"active": ["de-DE", "en-US"], "reference": "de-DE", "editing": "de-DE"},
+                              {"active": ["de-DE", "en-US"], "reference": "de-DE", "editing": "de-DE"})
+        with self.assertRaisesRegex(RuntimeError, "not exactly de-DE"):
+            subject.german_only_scratch(apply)
+
+
 class Receipts(unittest.TestCase):
     def receipt(self, folder):
         archive = Path(folder) / "before.zap21"; archive.write_bytes(b"initial-checkpoint")

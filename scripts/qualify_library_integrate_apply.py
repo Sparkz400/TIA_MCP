@@ -39,6 +39,17 @@ def host_client(enabled):
     return lambda host, timeout, arguments: Client(host, timeout, [*arguments, *([FLAG] if enabled else [])])
 
 
+def german_only_scratch(apply):
+    """Make a new scratch exactly de-DE, the qualification Host's state: every other active language adds an empty
+    MultilingualTextItem (and shifts IDs) in the FB/UDT exports bound to the captured storage profile by exact content.
+    The current reference language cannot be removed in the same change, so the others go in a second one."""
+    def languages(result): return result["preview"]["effects"][0]["languageSettings"]["after"]
+    state = languages(apply("project_languages_set", {"addActive": ["de-DE"], "referenceLanguage": "de-DE", "editingLanguage": "de-DE"}))
+    others = [culture for culture in state["active"] if culture != "de-DE"]
+    if others: state = languages(apply("project_languages_set", {"removeActive": others}))
+    require(state == {"active": ["de-DE"], "reference": "de-DE", "editing": "de-DE"}, "Scratch languages are not exactly de-DE: " + str(state))
+
+
 def require_capabilities(capabilities, enabled):
     plc = capabilities.get("plcIntegration") or {}
     require(plc.get("applySupported") is enabled and ("combinedApply" in plc) is enabled,
@@ -145,9 +156,9 @@ class IntegrateApplyRun(ComponentRun):
 
     def call(self, tool, arguments=None):
         result = super().call(tool, arguments)
-        # The fixture FB document carries de-DE texts; only the qualification Host forces de-DE scratch projects.
+        # The fixtures and captured storage references are de-DE only; only the qualification Host forces that itself.
         if tool == "tia_create_scratch":
-            self.apply("project_languages_set", {"addActive": ["de-DE"], "referenceLanguage": "de-DE", "editingLanguage": "de-DE"})
+            german_only_scratch(self.apply)
         return result
 
     def step(self, name, operation):
