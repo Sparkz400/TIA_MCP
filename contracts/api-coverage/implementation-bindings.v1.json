@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3d22704df9dabca73b7e9dcddfe0ec9926b839451de5b8caf96640d2e43735df",
-      "bytes": 1134204
+      "sha256": "5415039d1605c260458a3ba118779d1205c32983bfeec8cb9323a3edf168e256",
+      "bytes": 1137286
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -92734,6 +92734,20 @@
           "artifacts": [
             "evidence/local.typed.route-transitive-effects.20261027.json"
           ]
+        },
+        {
+          "id": "local.typed.wave9.engineering.20261028",
+          "profileSha256": "0421a9b961ec7a4ca4b67799f5166a49bc867785e80b6cec6ccd88891638c976",
+          "artifacts": [
+            "evidence/local.typed.wave9.engineering.20261028.json"
+          ]
+        },
+        {
+          "id": "local.typed.crossscope.engineering.20261028",
+          "profileSha256": "f1d50b251170e08fd43219a72536a62b0391c30c205578a7dbddf9dd89fb64ed",
+          "artifacts": [
+            "evidence/local.typed.crossscope.engineering.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -116209,6 +116223,11 @@
       "sha256": "89faac5ac8f366beb59d81d0712ee5aa5db910fdd81fc28bdc6bbe8ee855c358"
     },
     {
+      "path": "evidence/local.typed.crossscope.engineering.20261028.json",
+      "state": "observed",
+      "sha256": "d0b2e1a16374baa2103789f78291b799cca8ffeca4fbe3133bf87cffcb2fb74a"
+    },
+    {
       "path": "evidence/local.typed.failed-source-recovery.20261026.json",
       "state": "observed",
       "sha256": "5eef551b604a58574a6c137c910f9fa9531488c256a50ce2642a1f28fa17c84e"
@@ -116347,6 +116366,11 @@
       "path": "evidence/local.typed.transitive-effects.20261026.json",
       "state": "observed",
       "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
+    },
+    {
+      "path": "evidence/local.typed.wave9.engineering.20261028.json",
+      "state": "observed",
+      "sha256": "cb31a8f857dfd7e795d0c394fff6a1659f76e919ed93e785e598870bf43a752d"
     },
     {
       "path": "evidence/local.wave-kinds.probe.20261027.json",
@@ -116764,6 +116788,10 @@
       "profileSha256": "0c9681f8682e09e9712f0b22d23cddd20e7993a134920e41e139f90dc9e7f1d3"
     },
     {
+      "id": "local.typed.crossscope.engineering.20261028",
+      "profileSha256": "f1d50b251170e08fd43219a72536a62b0391c30c205578a7dbddf9dd89fb64ed"
+    },
+    {
       "id": "local.typed.failed-source-recovery.20261026",
       "profileSha256": "e8012c73cb2c6b1a207236035b53032dfc82b97af2cadeb5e8e6b50fc12a2fa9"
     },
@@ -116874,6 +116902,10 @@
     {
       "id": "local.typed.transitive-effects.20261026",
       "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693"
+    },
+    {
+      "id": "local.typed.wave9.engineering.20261028",
+      "profileSha256": "0421a9b961ec7a4ca4b67799f5166a49bc867785e80b6cec6ccd88891638c976"
     },
     {
       "id": "local.unit-recovery.v03",

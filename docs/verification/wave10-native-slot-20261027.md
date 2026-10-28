@@ -126,3 +126,20 @@ Findings:
 Still open natively: the safety kinds (blocked as above), web deactivation after the preview fix,
 typed wave 9 builder qualification (66 cases), cross-scope call profiles (extraction pending) and
 `webserver_user_pages_generate`, `certificate_import`, `graph_edit` → `graph_import`.
+
+## Typed qualification — 28 October
+
+`scripts/qualify_typed_graphical.py --engineering-only`, worktree Debug builds, each case in a fresh owned scratch.
+
+| Batch | Result |
+| --- | --- |
+| Wave 9, `w9q` | 14 passed, then `typed-sub-int-lad` refused: TIA rejects the `Card=2` it exports on SUB/DIV |
+| Wave 9, `w9q2`/`w9q3` | SUB reference imported after dropping `Card`; the reader then saw the Card-less network as opaque (fixed: SUB/DIV match ignores `Card=2`) |
+| Wave 9, `w9q4` | 8 passed, then `typed-rtrig-lad` stopped exporting the protected R_TRIG system FB (fixed: identity-only snapshot) |
+| Wave 9, `w9q5` | 40 passed, including all 12 SUB/DIV cases |
+| Cross-scope, `xsqo` | 4 passed: cross-namespace and cross-unit numeric FC calls, LAD and FBD |
+
+Wave 9 total: 62 of 66 cases pass all four engineering gates; the 4 `existingglobal-rtrig/ftrig`
+cases have no profile. Evidence: `local.typed.wave9.engineering.20261028` (w9q5),
+`local.typed.wave9.engineering-early.20261028` (w9q, w9q4; outcome failed because both batches stopped),
+`local.typed.crossscope.engineering.20261028`.
