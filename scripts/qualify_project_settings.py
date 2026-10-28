@@ -39,8 +39,8 @@ LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 project; multiuser, protected (UMAC) and upgraded projects are not exercised.",
     "project_attributes_set cannot apply on V21: native attribute info declares Author, Copyright, Family and Version read-only, so each is refused "
     "with AttributeNotWritable (asserted here); the multilingual Comment is refused by design.",
-    "project_languages_set adds and removes one supported language and switches the editing language; texts in a removed language are not seeded, "
-    "so their loss is not observed.",
+    "project_languages_set adds and removes one supported language and switches the editing language. TIA adds or drops that culture's empty text "
+    "item in the project comment and in every program export (recorded under sideEffects); texts in a removed language are not seeded, so their loss is not observed.",
     "project_copy copies a saved project; the UnsavedProject refusal is not exercised, because no read-only route leaves the source modified.",
     "project_open readOnly: TIA opens the project as secondary; whether Siemens itself write-protects it is not established, the refusal is the worker's guard.",
 ]
@@ -83,7 +83,7 @@ class Run(StateRun):
         self.h.stage("snapshot " + label, take)
         state = {**view(taken["inventory"], taken["objects"]), **self.domains()}
         (destination / "state.json").write_text(json.dumps(state, indent=1), encoding="utf-8")
-        return {"view": state}
+        return {"view": state, "files": {key: row.get("file") for key, row in taken["objects"].items()}}
 
     def apply(self, label, kind, payload, preview, **expected):
         prepared = self.prepare(label, kind, payload, preview)
@@ -91,11 +91,29 @@ class Run(StateRun):
         return prepared
 
 
+def multilingual(category, key):
+    """Activating or removing a language adds or drops that culture's text item in every multilingual text: the
+    project comment and the program exports."""
+    return category == "changed" and (key == "project:properties" or key.split(":", 1)[0] in ("block", "type", "tagTable"))
+
+
 def languages(run, label, payload, after, restore=False):
-    current = run.current["view"]["project:languages"]
+    before = run.current["view"]
+    current = before["project:languages"]
+    def texts(applied, state):
+        old, new = dict(before["project:properties"]), dict(state["project:properties"])
+        kept = [item["culture"] for item in old.pop("comment") if item["culture"] in after["active"]]
+        expected = kept + [culture for culture in after["active"] if culture not in kept]
+        require([item["culture"] for item in new.pop("comment")] == expected and old == new,
+                "The project metadata changed beyond the comment's text items: %s -> %s" % (before["project:properties"], state["project:properties"]))
+        for key in diff(before, state)["changed"]:
+            if key.split(":", 1)[0] in ("block", "type", "tagTable"):
+                text = Path(run.current["files"][key]).read_text(encoding="utf-8-sig")
+                for culture in set(current["active"]) ^ set(after["active"]):
+                    require(("<Culture>%s</Culture>" % culture in text) == (culture in after["active"]), "%s does not show %s's text items as expected" % (key, culture))
     run.apply(label, "project_languages_set", payload,
               {"effects": [{"languageSettings": {"before": {k: current[k] for k in ("active", "reference", "editing")}, "after": after}}]},
-              changed=["project:languages"], rows={"project:languages": after}, restore=restore)
+              changed=["project:languages"], rows={"project:languages": after}, tolerated=multilingual, check=texts, restore=restore)
 
 
 def pick_language(run):
