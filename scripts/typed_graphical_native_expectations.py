@@ -52,7 +52,8 @@ NON_EXPANDABLE_CARD = re.compile(r'(<Part Name="(?:Sub|Div)"[^>]*>\s*)<TemplateV
 def adapt_reference_import(xml):
     """Drop the Card template value of SUB/DIV parts so TIA re-imports its own export.
 
-    Returns the adapted XML and the number of removed values; TIA's re-export restores them.
+    Returns the adapted XML and the number of removed values. TIA re-exports the import without them
+    (native w9q typed-sub-int-lad), so the adapted XML is also the qualification's topology oracle.
     """
     return NON_EXPANDABLE_CARD.subn(lambda m: m.group(1), xml)
 
