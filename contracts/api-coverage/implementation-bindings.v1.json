@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "bc742db58d4cf81cbc2211810c268bb715f309a05946dbaae58bdb9047985c3c",
-      "bytes": 1244875
+      "sha256": "6a46e5e0aaec5fd78cbed65cd581f38a9f815dd5c6abb1422ccd9f39731d79a1",
+      "bytes": 1250329
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2242,8 +2242,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/EngineeringSources.cs",
-      "sha256": "0f0b2f7f6cde097995cd82f1cf27cdf56e2b851164e8afeaad7b469f3ec37a19",
-      "bytes": 51242
+      "sha256": "25245a81d80590d815e91373959f1b840fae71821abe5796937954adc1b933dd",
+      "bytes": 52338
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
@@ -89566,7 +89566,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
+          "artifacts": [
+            "evidence/local.graphical_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -90343,18 +90351,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.calls-expanded.20261008",
-          "profileSha256": "d79065d9811fd188c3bcf6511b53f5406007836475349f0476577a2633f2b5d3",
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
           "artifacts": [
-            "artifacts/engineering-layers-calls-expanded.json"
-          ]
-        },
-        {
-          "id": "local.layers.calls-reopen.20261008",
-          "profileSha256": "ba75c38dd8e94790b5659ae8c5405c0b8900248690c5546cec5a9a9e96447ef3",
-          "artifacts": [
-            "artifacts/engineering-gap-calls.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.graphical_changes.20261028.json"
           ]
         }
       ],
@@ -91063,7 +91063,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
+          "artifacts": [
+            "evidence/local.graphical_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91104,18 +91112,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.graphical.20261008",
-          "profileSha256": "bb872dfbe8158c4b9de183eb28a1e860f18e7d8f86a1050d734e75cb7cc78cac",
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
-          ]
-        },
-        {
-          "id": "local.layers.graphical-reopen.20261008",
-          "profileSha256": "7abc60227ec42ca6ab1d89c630b6797d7563599a1674f965c3bfc7f09cb35b7d",
-          "artifacts": [
-            "artifacts/engineering-gap-graphical.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.graphical_changes.20261028.json"
           ]
         }
       ],
@@ -114618,6 +114618,11 @@
       "sha256": "caa0c90d571556fd6016186c3450f7569c7d31d2e39f83729d9e2474bb3f76b7"
     },
     {
+      "path": "evidence/local.graphical_changes.20261028.json",
+      "state": "observed",
+      "sha256": "4d404a0457c423356bdbed76343ac8b8e24ec9d2f190e76eee24f8ca1cccacfa"
+    },
+    {
       "path": "evidence/local.hardware.20261024.json",
       "state": "observed",
       "sha256": "e0b51d539feaafddb8ccbdf0bb2ba9d8d590af0ce408d150cc72ea777209d02a"
@@ -115308,6 +115313,10 @@
     {
       "id": "local.graph_changes.20261028",
       "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6"
+    },
+    {
+      "id": "local.graphical_changes.20261028",
+      "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3"
     },
     {
       "id": "local.guards.v02",
