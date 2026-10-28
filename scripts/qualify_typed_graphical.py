@@ -21,7 +21,7 @@ from block_test_runtime import NativeAudit, NativeToolError, canonical, digest, 
 from run_block_tests import apply_change, binary_manifest, save_json
 from run_conformance import native_document, structural_xml
 from smoke_mcp import Client, ROOT
-from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion, adapt_reference_culture, project_culture
+from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion, adapt_reference_culture, adapt_reference_import, project_culture
 from typed_graphical_transport import artifact_bytes
 from qualify_deployment import McpClient, load_configuration
 from typed_graphical_owned_session import TypedOwnedSession
@@ -222,6 +222,9 @@ def run_case(case, args, output):
         culture = project_culture(call("block_read", {"blockName": "Main"})["xml"])
         reference_xml, retargeted = adapt_reference_culture(reference_xml, culture)
         report["referenceCultureAdaptation"] = {"projectCulture": culture, "referenceItems": retargeted, "dependencyItems": 0}
+        reference_xml, removed = adapt_reference_import(reference_xml)
+        if removed:
+            report["referenceImportAdaptation"] = {"nonExpandableCardValuesRemoved": removed}
         for dependency in case.get("dependencySources", []):
             apply_change(call, "source_upsert", {**route, **dependency})
         for dependency in case.get("dependencyXmls", []):

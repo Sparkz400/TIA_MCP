@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from xml.etree import ElementTree as ET
 
-from typed_graphical_native_expectations import topology, adapt_reference_bindings, adapt_reference_culture, project_culture
+from typed_graphical_native_expectations import topology, adapt_reference_bindings, adapt_reference_culture, adapt_reference_import, project_culture
 from qualify_typed_graphical import selected_blocks, snapshot, read_graph, independent_behavior
 from block_test_program import generate_program, inspect_interface
 from block_test_executor import validate_suite
@@ -171,6 +171,17 @@ class IndependentTopologyTests(unittest.TestCase):
                         count += 1
         self.assertGreater(count, 0)
 
+
+
+class ReferenceImportAdaptationTests(unittest.TestCase):
+    def test_only_sub_and_div_lose_their_card_value(self):
+        root = pathlib.Path(__file__).resolve().parents[1] / "fixtures/typed-graphical/native"
+        for name, expected in (("Tgp_SubInt_LAD.xml", 1), ("Tgp_DivReal_FBD.xml", 1), ("Tgp_AddInt_LAD.xml", 0), ("Tgp_MulDInt_FBD.xml", 0)):
+            xml = (root / name).read_text(encoding="utf-8-sig")
+            adapted, removed = adapt_reference_import(xml)
+            self.assertEqual(expected, removed, name)
+            self.assertEqual(xml.count('Name="Card"') - expected, adapted.count('Name="Card"'), name)
+            self.assertEqual(xml.count('Name="SrcType"'), adapted.count('Name="SrcType"'), name)
 
 if __name__ == "__main__":
     unittest.main()
