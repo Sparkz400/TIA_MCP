@@ -2639,6 +2639,24 @@
         "network_configure preservation is checked by the runner over program exports and network node attributes only; the worker's configured-hardware preservation stage does not run for that kind.",
         "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
       ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc020684767dd1907a44a7aad35710d1317dd99e",
+        "passedScope": "scripts/qualify_library_integrate_apply.py on build 9ff587c (frozen D:\\wp\\b6, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.20261028.json"
+      ],
+      "limitations": [
+        "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
+        "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
+        "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+      ]
     }
   ],
   "features": [
@@ -9941,17 +9959,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified as a production route. The component qualification evidence covers the owned-scratch coordinator, not this Host-gated entry point.",
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.20261028).",
           "Off by default. Only a Host started with --enable-library-integrate-apply executes a prepared PLC library_integrate plan in change_apply; other Hosts refuse it with PlcIntegrationNotQualified exactly as before. With the flag, the preview states eligibility in combinedApply.",
           "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
-          "The new instance DB uses the shipped typed instance templates; callees they do not cover refuse at fresh typed preparation with InstanceCreationProfileUnavailable."
+          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.library_integrate.combined_apply.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
