@@ -21,9 +21,9 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     public Task<CallToolResult> Status(CancellationToken cancellationToken) => Call("sim_status", new { }, cancellationToken);
 
     [McpServerTool(Name = "sim_create", Destructive = false, OpenWorld = false)]
-    [Description("Create a uniquely named local PLCSIM Advanced instance owned by this session. Supply a fresh creationId (32 hex GUID characters) to inspect its durable receipt after a lost response; an existing ID is never replayed. Returns exact identity and a short-lived one-use downloadTicket for simulation_download. Does not activate a license trial.")]
-    public Task<CallToolResult> Create(CancellationToken cancellationToken, string cpuType = "CPU1511", string? creationId = null)
-        => Call("sim_create", new { cpuType, creationId, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
+    [Description("Create a uniquely named local PLCSIM Advanced instance owned by this session. Supply a fresh creationId (32 hex GUID characters) to inspect its durable receipt after a lost response; an existing ID is never replayed. Returns exact identity and a short-lived one-use downloadTicket for simulation_download. Does not activate a license trial. communicationInterface is Softbus (default) or TCPIP; TCPIP is refused with TcpIpModeRequired unless PLCSIM is already in TCP/IP single-adapter mode, and every later power-on, RUN, write and binding rechecks it. Network mode, adapters and IP addresses are operator settings and are never changed.")]
+    public Task<CallToolResult> Create(CancellationToken cancellationToken, string cpuType = "CPU1511", string? creationId = null, string communicationInterface = "Softbus")
+        => Call("sim_create", new { cpuType, creationId, communicationInterface, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
 
     [McpServerTool(Name = "sim_creation_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect a durable user-protected simulator creation receipt by the creationId supplied to sim_create. Reports the last recorded stage, exact registered identity and original worker exit. Does not adopt, power off or replay an instance creation; registration intent alone is not ownership proof.")]
