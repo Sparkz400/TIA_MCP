@@ -61,7 +61,7 @@ class Controller(unittest.TestCase):
     def test_plain_mcp_error_is_retained_before_normalized_failure(self):
         run = BaseRun.__new__(BaseRun)
         response = {'isError': True, 'content': [{'type': 'text', 'text': "'Author' is not supported by type 'FB'."}]}
-        run.client, run.save = Mock(), Mock()
+        run.client, run.save, run.tool_calls = Mock(), Mock(), []
         run.client.request.return_value = response
         with self.assertRaises(ToolError) as caught:
             run.call('qualification_watch_authoring_source_negative', {})
@@ -73,7 +73,7 @@ class Controller(unittest.TestCase):
     def test_malformed_success_is_retained_and_never_labelled_success(self):
         run = BaseRun.__new__(BaseRun)
         response = {'content': [{'type': 'text', 'text': 'truncated native reply'}]}
-        run.client, run.save = Mock(), Mock()
+        run.client, run.save, run.tool_calls = Mock(), Mock(), []
         run.client.request.return_value = response
         with self.assertRaises(ToolError) as caught:
             run.call('tool', {}, 'success')
@@ -85,12 +85,13 @@ class Controller(unittest.TestCase):
         run = BaseRun.__new__(BaseRun)
         packet = {'error': {'code': 'StaleSource'}}
         response = {'isError': True, 'structuredContent': packet}
-        run.client, run.save = Mock(), Mock()
+        run.client, run.save, run.tool_calls = Mock(), Mock(), []
         run.client.request.return_value = response
         with self.assertRaises(ToolError) as caught:
             run.call('tool')
         self.assertEqual(caught.exception.packet, packet)
         self.assertEqual(run.save.call_args.args[1], response)
+        self.assertEqual(run.tool_calls, [{'name': 'tool', 'isError': True}])
 
 
 if __name__ == '__main__':
