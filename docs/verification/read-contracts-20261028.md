@@ -99,9 +99,7 @@ catalog as history.
 
 Still open from the audit's 46 rows:
 
-- the eight `project_model*` rows: their E1 acceptance in the
-  [explorer plan](../plans/project-explorer-plan.md) needs `qualify_project_explorer.py --two-plcs` with
-  units, nested groups and budget exhaustion;
+- the eight `project_model*` rows, closed later the same day by the [explorer E1 run](explorer-e1-20261028.md);
 - `hardware_gsd_export`, which needs an I-device;
 - `library.types`, which binds no tool.
 

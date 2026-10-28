@@ -87,6 +87,8 @@ Extend native traversal in a dedicated `OpennessSession.ProjectModel.cs` and reu
 
 Acceptance: independent expected-tree fixtures match roots, ancestry and all paged children without duplicates or omissions. Cover two PLCs, software units, nested/empty groups, namespace collisions, unsupported software containers and budget exhaustion. Native scratch evidence verifies the supported subset against explicit expected objects.
 
+Passed natively on 28 October 2026 (`local.explorer.e1.20261028`, [record](../verification/explorer-e1-20261028.md)): a CPU 1511-1 PN with units, nested/empty groups and a same-name block in two namespaces of one unit, plus a CPU 1214C without a unit service, matched `software_inspect` and `device_inventory` exactly.
+
 ### E2 — Ship the read-only tree and detail viewer
 
 Create a separate `ui/project-explorer/` package with a transport-independent data client. Provide a virtualized tree, search/filter controls, breadcrumbs, detail tabs, keyboard navigation, loading/error states, refresh and an explicit send-selection action. Display offline values as declarations, not live PLC values.

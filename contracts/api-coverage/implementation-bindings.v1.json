@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "673fba6763726425f5bf699ed8cbe7ed642fd0413ce743568d693dade77de94b",
-      "bytes": 1185550
+      "sha256": "92de50559bf19b4999ab7fd4bcd9c3bd1a0bc5d4317f172aec12183ece3a74e3",
+      "bytes": 1190477
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -104007,74 +104007,17 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
-          "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
-          ]
-        },
-        {
           "id": "local.explorer.relationship-scope.20261024",
           "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
           "artifacts": [
             "evidence/local.explorer.relationship-scope.20261024.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104116,65 +104059,17 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
-          "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
-          ]
-        },
-        {
           "id": "local.explorer.native-providers.20261026",
           "profileSha256": "657b700872d61c135f33bd20bbad0aa6ad71a2beac592a6d86121f8dd8e26ade",
           "artifacts": [
             "evidence/local.explorer.native-providers.20261026.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104216,58 +104111,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104309,67 +104156,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104411,67 +104201,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104513,67 +104246,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.relationship-scope.20261024",
+          "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.hmi.browser.20261012",
-          "profileSha256": "d94cd5ba3a902e5d2c864b5f6ea047b7776079edc3f191f6109c1be5c2d9fff2",
-          "artifacts": [
-            "artifacts/p16h/browser-native-01/browser-results.json",
-            "artifacts/p16h/browser-current-01/browser-results.json",
-            "scripts/qualify_hmi_explorer_browser.mjs"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.relationship-scope.20261024.json"
           ]
         },
         {
@@ -104588,6 +104264,20 @@
           "profileSha256": "b7b584015723d273ea56dd83418662fe1dd1af63b1c4b520022edbd923f99d59",
           "artifacts": [
             "evidence/local.explorer.native-providers.20261027.json"
+          ]
+        },
+        {
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
+          "artifacts": [
+            "evidence/local.explorer.e1.20261028.json"
+          ]
+        },
+        {
+          "id": "local.explorer.relationships.20261028",
+          "profileSha256": "d2118de8b3a7bccf9ca977f510295e85c7823c2b9c9a8b339e52135e7b388cd9",
+          "artifacts": [
+            "evidence/local.explorer.relationships.20261028.json"
           ]
         }
       ],
@@ -104674,58 +104364,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
-          ]
-        },
-        {
-          "id": "hmi.readonly.unified-comfort.20261012",
-          "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb",
-          "artifacts": [
-            "artifacts/p16h/native-positive-02/derived-native-report.json",
-            "artifacts/p16h/bridge-positive-04.json",
-            "artifacts/p16h/bridge04-assessment.json",
-            "artifacts/p16h/bridge04-qualify_hmi.py",
-            "artifacts/p16h/bridge04-strict-compile-reassessment.json",
-            "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
-          ]
-        },
-        {
-          "id": "explorer.native.thousand-functions.20261012",
-          "profileSha256": "b6460bd047de295520e07823bf30f25fcfe1fbcbb32702385bce0266f433a1fd",
-          "artifacts": [
-            "artifacts/p16r/sc01/result.json",
-            "artifacts/p16r/sc01-audit-final-01.json",
-            "artifacts/p16r/compile-diagnostics-audit-01.json",
-            "artifacts/p16r/scale-browser-01/result.json",
-            "artifacts/p16r/scale-browser-02/result.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -104767,35 +104409,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.explorer.native-browser.20261008",
-          "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3",
+          "id": "local.explorer.e1.20261028",
+          "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
-            "artifacts/project-explorer-native-live.json",
-            "artifacts/project-explorer-native-medium.json",
-            "artifacts/project-model-final-evidence.json",
-            "artifacts/project-explorer/browser-results.json",
-            "artifacts/project-explorer-native-packaged.json",
-            "artifacts/project-explorer-native-io-complete.json",
-            "artifacts/project-explorer-final-native-schema.json",
-            "artifacts/project-explorer-final-short-regression.log",
-            "artifacts/project-explorer-relocated-deployment.json",
-            "artifacts/project-explorer/hmi-native-browser-results.json",
-            "artifacts/project-explorer-final-native-complete.json",
-            "artifacts/project-explorer-final-medium.json",
-            "artifacts/project-explorer-native-io-final.json",
-            "artifacts/project-explorer-native-io-final-schema.json",
-            "artifacts/project-explorer-final-hmi.json",
-            "artifacts/project-explorer-final3-native-schema.json",
-            "artifacts/project-explorer-final2-full-regression.log",
-            "artifacts/project-explorer-final-traversal-guards-approved.log",
-            "artifacts/project-explorer-final-relocated-deployment.json",
-            "artifacts/project-explorer/final-complete-worker-html-relocation-results.json",
-            "artifacts/project-explorer/final-hmi-browser-results.json",
-            "artifacts/project-explorer-native-large-tags.json",
-            "artifacts/project-explorer-release-native-schema.json",
-            "artifacts/project-explorer/browser-native-results.json",
-            "artifacts/project-explorer-native-large-recovery-stop.json",
-            "artifacts/project-explorer/large-native-browser-results.json"
+            "evidence/local.explorer.e1.20261028.json"
           ]
         }
       ],
@@ -116464,6 +116081,11 @@
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
     },
     {
+      "path": "evidence/local.explorer.e1.20261028.json",
+      "state": "observed",
+      "sha256": "a9280c5ae8e3357838c5428c61b7448e3018302db0e27f8dcbd8eebf3a763ef4"
+    },
+    {
       "path": "evidence/local.explorer.native-providers.20261026.json",
       "state": "observed",
       "sha256": "a8bdcc4d08901d59f3e39cf6f52d3dd21b72f8202c5bce2c5ffed680b8ebf69a"
@@ -116477,6 +116099,11 @@
       "path": "evidence/local.explorer.relationship-scope.20261024.json",
       "state": "observed",
       "sha256": "febb795362cd9751c16f6862010de30fa105a5288909da2613d5803522e4328d"
+    },
+    {
+      "path": "evidence/local.explorer.relationships.20261028.json",
+      "state": "observed",
+      "sha256": "f461719a8f9e5b9a535ff85f3ead196576767bf66824410c983a0547059e4ea7"
     },
     {
       "path": "evidence/local.hardware.20261024.json",
@@ -117087,6 +116714,10 @@
       "profileSha256": "f9ef19dfc4c2f2c4064fd439d2b73e20e62f55b52c363c5ccb95a2ad60784525"
     },
     {
+      "id": "local.explorer.e1.20261028",
+      "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d"
+    },
+    {
       "id": "local.explorer.native-browser.20261008",
       "profileSha256": "5072c22117d4a27ab3f0060f7c5bb9074e574615a043a912e392b6b5974a65b3"
     },
@@ -117101,6 +116732,10 @@
     {
       "id": "local.explorer.relationship-scope.20261024",
       "profileSha256": "3489d61dfeb96f7ebad303e3ad9d7537791ac80753a4046d353ab3befed6bbbd"
+    },
+    {
+      "id": "local.explorer.relationships.20261028",
+      "profileSha256": "d2118de8b3a7bccf9ca977f510295e85c7823c2b9c9a8b339e52135e7b388cd9"
     },
     {
       "id": "local.guards.v02",
