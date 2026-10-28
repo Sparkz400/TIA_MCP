@@ -6,7 +6,7 @@ using System.Linq;
 namespace TiaMcp.Core
 {
     /// <summary>Payload rules of opcua_server_settings_set. Attribute names are pinned from the native capture in
-    /// fixtures/opcua/server-settings-v21-1511-v41.json; a null name was not exposed there, so its field is refused.</summary>
+    /// fixtures/opcua/server-settings-v21-1511-v41.json; a null name has no attribute there, so its field is refused.</summary>
     public static class OpcUaServerSettings
     {
         public sealed class Setting
@@ -15,13 +15,15 @@ namespace TiaMcp.Core
             internal Setting(string field, bool onCpu, string attribute) { Field = field; OnCpu = onCpu; Attribute = attribute; }
         }
 
-        // OnCpu: the CPU device item; otherwise its "OPC UA" sub-item, the one that exposes OpcUaServer.
+        // OnCpu: the CPU device item; otherwise its "OPC UA" sub-item, the one that exposes OpcUaServer. That item exposes
+        // OpcUaPort and OpcUaAutoAcceptAllClientCertificates only while the server is on. V21 models guest access as the
+        // UMAC anonymous user holding the OPCUAServerAccess device right, not as an attribute.
         public static readonly Setting[] Settings =
         {
             new Setting("serverEnabled", false, "OpcUaServer"),
-            new Setting("port", false, null),
+            new Setting("port", false, "OpcUaPort"),
             new Setting("guestAccess", false, null),
-            new Setting("autoAcceptClientCertificates", false, null),
+            new Setting("autoAcceptClientCertificates", false, "OpcUaAutoAcceptAllClientCertificates"),
             new Setting("runtimeLicense", true, "OpcUaPurchasedLicense"),
         };
 

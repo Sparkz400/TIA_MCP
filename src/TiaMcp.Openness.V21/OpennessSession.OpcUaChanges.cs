@@ -249,7 +249,9 @@ namespace TiaMcp.Openness.V21
                 var requested = WebSetting(payload, setting.Field);
                 var item = owners[setting.OnCpu ? 0 : 1];
                 if (setting.Attribute == null || !item.GetAttributeInfos().Any(i => i.Name == setting.Attribute && (i.AccessMode & EngineeringAttributeAccessMode.Write) != 0))
-                    throw new BridgeException("UnsupportedCapability", setting.Field + " has no writable native attribute pinned for this CPU in V21 Openness; nothing was written.");
+                    throw new BridgeException("UnsupportedCapability", setting.Field == "guestAccess"
+                        ? "V21 models OPC UA guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which this kind and umac_role_set never change; nothing was written."
+                        : setting.Field + " has no writable native " + (setting.Attribute ?? "attribute") + " on this CPU; port and automatic certificate acceptance exist only while the server is on. Nothing was written.");
                 object current = item.GetAttribute(setting.Attribute);
                 string refusal = OpcUaServerSettings.Refusal(setting.Field, OpcUaPayloadValue(requested["expected"]), OpcUaPayloadValue(requested["value"]), current);
                 if (refusal == "InvalidRequest") throw new BridgeException(refusal, setting.Field + " needs { expected, value }: booleans, a port 1..65535, or a license name of " + string.Join(", ", OpcUaServerSettings.Licenses) + ".");

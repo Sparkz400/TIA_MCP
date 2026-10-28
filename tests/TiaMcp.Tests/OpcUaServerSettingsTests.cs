@@ -7,6 +7,9 @@ internal static class OpcUaServerSettingsTests
         Check.Equal("serverEnabled,port,guestAccess,autoAcceptClientCertificates,runtimeLicense",
             string.Join(",", Core.OpcUaServerSettings.Settings.Select(s => s.Field)));
         Check.Equal("OpcUaServer", Core.OpcUaServerSettings.Find("serverEnabled")!.Attribute);
+        Check.Equal("OpcUaPort", Core.OpcUaServerSettings.Find("port")!.Attribute);
+        Check.Equal("OpcUaAutoAcceptAllClientCertificates", Core.OpcUaServerSettings.Find("autoAcceptClientCertificates")!.Attribute);
+        Check.Equal(null, Core.OpcUaServerSettings.Find("guestAccess")!.Attribute);
         Check.Equal(true, Core.OpcUaServerSettings.Find("runtimeLicense")!.OnCpu);
         Check.Equal(null, Core.OpcUaServerSettings.Find("password"));
         Check.Equal((object)"SimaticOpcUaS71500Small", Core.OpcUaServerSettings.PayloadValue("runtimeLicense", 1UL));
