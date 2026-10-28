@@ -122,10 +122,13 @@ def umac_effect(payload):
 
 
 def identity_exact(request, row):
-    """Whether a persisted certificate carries exactly the requested common name, validity and alternative names."""
+    """Whether a persisted certificate carries the requested identity: exactly, or for WebServer usage the documented
+    compile re-issue (common name and validity end kept; subject, alternative names, notBefore and serial TIA's)."""
     names = lambda rows: sorted((item["type"], item["value"]) for item in rows or [])
-    return (row["subjectCommonName"] == request["subjectCommonName"] and row["notBeforeUtc"] == request["validFromUtc"]
-            and row["notAfterUtc"] == request["validUntilUtc"] and names(row["subjectAlternativeNames"]) == names(request["subjectAlternativeNames"]))
+    kept = row["subjectCommonName"] == request["subjectCommonName"] and row["notAfterUtc"] == request["validUntilUtc"]
+    if request.get("usage") == "WebServer":
+        return kept
+    return kept and row["notBeforeUtc"] == request["validFromUtc"] and names(row["subjectAlternativeNames"]) == names(request["subjectAlternativeNames"])
 
 
 def web_pages(entry):

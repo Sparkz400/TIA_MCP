@@ -45,6 +45,8 @@ namespace TiaMcp.Openness.V21
                 effect["request"] = CertificateCreateRequest(payload);
                 effect["issuer"] = "Chosen by TIA Portal; V21 Openness exposes no CA or self-signed selection. The readback reports the actual issuer.";
                 effect["signatureAlgorithm"] = "Template default of LocalCertificateStore.GetCertificateTemplate(usage).";
+                if ((string)effect["request"]["usage"] == "WebServer")
+                    warnings.Add("TIA re-issues a WebServer certificate when it compiles: the subject becomes the common name only, the alternative names become the CPU's own addresses and notBefore the compile time. The requested common name and validity end are kept and checked after save.");
             }
             else if (change.Kind == "certificate_import")
             {
@@ -152,8 +154,16 @@ namespace TiaMcp.Openness.V21
             var store = CertificateStore(ChangeHardware(project, change.Payload).Item);
             var certificate = store.Certificates.FirstOrDefault(c => c.Id == id) ?? throw new BridgeException("MutationVerificationFailed", "The created certificate is gone after compile and save.");
             var identity = PublicIdentity(ExportPublicDer(certificate, change.Directory)); identity["certificateId"] = id; identity["privateKeyPresent"] = certificate.HasPrivateKey;
-            change.Readbacks.Add(new JObject { ["role"] = "certificate-readback-after-save", ["certificate"] = identity });
-            RequireCreatedCertificate(CertificateCreateRequest(change.Payload), identity, certificate);
+            var readback = new JObject { ["role"] = "certificate-readback-after-save", ["certificate"] = identity };
+            change.Readbacks.Add(readback);
+            var request = CertificateCreateRequest(change.Payload);
+            if ((string)request["usage"] != "WebServer") { RequireCreatedCertificate(request, identity, certificate); return; }
+            // Natively (qualification ac_*, 28 October) compile re-issues a WebServer certificate: the subject becomes CN only,
+            // the alternative names become the CPU's own addresses, notBefore the compile time and the serial new. The
+            // requested common name and validity end are kept, and only those are required here.
+            readback["reissuedByTia"] = true;
+            if (certificate.SubjectCommonName != (string)request["subjectCommonName"] || (string)identity["notAfterUtc"] != (string)request["validUntilUtc"])
+                throw new BridgeException("MutationVerificationFailed", "The re-issued web server certificate lost the requested common name or validity end.", new JObject { ["readback"] = identity.DeepClone() });
         }
 
         private static void RequireCreatedCertificate(JObject request, JObject identity, Certificate created)
