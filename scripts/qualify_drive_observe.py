@@ -47,6 +47,7 @@ def body(h):
     before = run.state()
     def listing():
         result = h.tool("drive_observe", {"maxItems": 2000})
+        h.report["listing"] = result
         drives = [d for d in result["drives"] if d["hardwarePath"].startswith(run.path(DEVICE) + "/")]
         require(len(drives) == 1 and drives[0]["driveObjects"], "Expected one listed drive with drive objects: %s" % [d["hardwarePath"] for d in result["drives"]])
         require(all(re.fullmatch(r"DO\d+", o["snapshot"]["driveId"] if "snapshot" in o else o.get("driveId", "")) for o in drives[0]["driveObjects"]),
