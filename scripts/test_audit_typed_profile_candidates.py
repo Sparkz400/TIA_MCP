@@ -61,7 +61,8 @@ class CandidateAuditTests(unittest.TestCase):
             catalog["sources"][0].update(authoredSourcePath=authored.relative_to(ROOT).as_posix(),
                                          authoredSourceSha256=hashlib.sha256(authored.read_bytes()).hexdigest())
             entry = capture["fixtures"][0]
-            entry["sourcePath"] = str(pathlib.Path(tempfile.gettempdir()) / "other-checkout" / authored.relative_to(ROOT))
+            # Not the temp directory: Test-Offline.ps1 points TEMP inside this repository's artifacts.
+            entry["sourcePath"] = str(pathlib.Path(ROOT.anchor) / ("other-checkout-" + pathlib.Path(folder).name) / authored.relative_to(ROOT))
             for digest, passed in ((catalog["sources"][0]["authoredSourceSha256"], True), ("0" * 64, False)):
                 with self.subTest(passed=passed):
                     entry["fileSha256"] = digest
