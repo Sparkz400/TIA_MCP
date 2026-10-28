@@ -37,7 +37,10 @@ def run(path):
              or [c for receipt in report.get("hostExits", []) + report.get("cleanups", [])
                  for c in receipt.get("toolCalls", [])]
              or [{"name": st["tool"], "isError": st["isError"]}
-                 for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st])
+                 for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st]
+             # Owned-session runners keep each lifetime's audited calls as {tool, status}.
+             or [{"name": call["tool"], "isError": call.get("status") != "passed"}
+                 for session in report.get("sessions", []) if isinstance(session, dict) for call in session.get("calls", [])])
     steps = [step if isinstance(step, str) else step.get("name") or step.get("tool")
              for step in report.get("steps", [])] or list(report.get("checks", []))
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
