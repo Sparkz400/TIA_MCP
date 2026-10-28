@@ -183,5 +183,20 @@ class ReferenceImportAdaptationTests(unittest.TestCase):
             self.assertEqual(xml.count('Name="Card"') - expected, adapted.count('Name="Card"'), name)
             self.assertEqual(xml.count('Name="SrcType"'), adapted.count('Name="SrcType"'), name)
 
+    def test_wave9_sub_div_topology_oracle_is_the_card_less_import_form(self):
+        # Native w9q typed-sub-int-lad: TIA re-exports the adapted import without Card, and typed replacement emits none,
+        # so the topology oracle must be the adapted reference (no topologyXml bypasses it); the raw one would differ.
+        cases = json.loads((ROOT / "fixtures/typed-graphical/wave9-cases.v1.json").read_bytes())["cases"]
+        selected = [c for c in cases if any(n.get("instruction") in ("SUB", "DIV") for n in c["payload"]["model"]["nodes"])]
+        self.assertEqual(12, len(selected))
+        for case in selected:
+            with self.subTest(case=case["fixtureId"]):
+                self.assertNotIn("topologyXml", case)
+                xml = (ROOT / case["referenceXml"]).read_text(encoding="utf-8-sig")
+                adapted, removed = adapt_reference_import(xml)
+                self.assertEqual(1, removed)
+                self.assertEqual(re.sub(r'<TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>\s*', "", xml), adapted)
+                self.assertNotEqual(topology(xml), topology(adapted))
+
 if __name__ == "__main__":
     unittest.main()
