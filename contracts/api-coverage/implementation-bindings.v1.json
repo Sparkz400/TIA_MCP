@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "2e54010ffed676bc64955905e26f9c96fd96b8061341d56b1e8b07e17b29cc3a",
-      "bytes": 1144343
+      "sha256": "072bd5662f2391fe942e2f8b7944d9a352ad357e792d32f7b14ab09e3b6a3a0f",
+      "bytes": 1168892
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -89728,7 +89728,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.access-review.20261028",
+          "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d",
+          "artifacts": [
+            "evidence/local.hostonly.access-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -89795,7 +89803,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.access-review.20261028",
+          "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d",
+          "artifacts": [
+            "evidence/local.hostonly.access-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -89878,7 +89894,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.addin-selection.20261028",
+          "profileSha256": "7bb8e77a0111abe01ff25769a25ab4d2c466652ed03fbb011ef6480b318f6664",
+          "artifacts": [
+            "evidence/local.hostonly.addin-selection.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -89943,7 +89967,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.addin-selection.20261028",
+          "profileSha256": "7bb8e77a0111abe01ff25769a25ab4d2c466652ed03fbb011ef6480b318f6664",
+          "artifacts": [
+            "evidence/local.hostonly.addin-selection.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97464,7 +97496,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.composite-engineering.20261028",
+          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "artifacts": [
+            "evidence/local.hostonly.composite-engineering.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97549,7 +97589,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.composite-engineering.20261028",
+          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "artifacts": [
+            "evidence/local.hostonly.composite-engineering.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97616,7 +97664,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.composite-engineering.20261028",
+          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "artifacts": [
+            "evidence/local.hostonly.composite-engineering.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97718,7 +97774,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.composite-engineering.20261028",
+          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "artifacts": [
+            "evidence/local.hostonly.composite-engineering.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97783,7 +97847,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.composite-engineering.20261028",
+          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "artifacts": [
+            "evidence/local.hostonly.composite-engineering.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97873,7 +97945,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.connection-review.20261028",
+          "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210",
+          "artifacts": [
+            "evidence/local.hostonly.connection-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97940,7 +98020,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.connection-review.20261028",
+          "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210",
+          "artifacts": [
+            "evidence/local.hostonly.connection-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -98085,7 +98173,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.db-snapshot-review.20261028",
+          "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54",
+          "artifacts": [
+            "evidence/local.hostonly.db-snapshot-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -98152,7 +98248,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.db-snapshot-review.20261028",
+          "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54",
+          "artifacts": [
+            "evidence/local.hostonly.db-snapshot-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -100614,7 +100718,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.drive-profile-review.20261028",
+          "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd",
+          "artifacts": [
+            "evidence/local.hostonly.drive-profile-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -100681,7 +100793,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.drive-profile-review.20261028",
+          "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd",
+          "artifacts": [
+            "evidence/local.hostonly.drive-profile-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -101617,7 +101737,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.hmi-component-review.20261028",
+          "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5",
+          "artifacts": [
+            "evidence/local.hostonly.hmi-component-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -101684,7 +101812,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.hmi-component-review.20261028",
+          "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5",
+          "artifacts": [
+            "evidence/local.hostonly.hmi-component-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102794,7 +102930,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.multiuser-review.20261028",
+          "profileSha256": "f3a9de4d7fed817a570d65906cdebf7a5436ec98ec0236fa6ad0cfcd9b168853",
+          "artifacts": [
+            "evidence/local.hostonly.multiuser-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102859,7 +103003,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.multiuser-review.20261028",
+          "profileSha256": "f3a9de4d7fed817a570d65906cdebf7a5436ec98ec0236fa6ad0cfcd9b168853",
+          "artifacts": [
+            "evidence/local.hostonly.multiuser-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -105625,7 +105777,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.public-certificate-review.20261028",
+          "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34",
+          "artifacts": [
+            "evidence/local.hostonly.public-certificate-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -105692,7 +105852,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.public-certificate-review.20261028",
+          "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34",
+          "artifacts": [
+            "evidence/local.hostonly.public-certificate-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -106642,7 +106810,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -106666,7 +106842,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -107847,7 +108031,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -107901,7 +108093,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -107950,7 +108150,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -108017,7 +108225,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -108070,7 +108286,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -108135,7 +108359,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.runtime-handoff.20261028",
+          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "artifacts": [
+            "evidence/local.hostonly.runtime-handoff.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -110426,7 +110658,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.safety-evidence-review.20261028",
+          "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9",
+          "artifacts": [
+            "evidence/local.hostonly.safety-evidence-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -110512,7 +110752,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.safety-evidence-review.20261028",
+          "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9",
+          "artifacts": [
+            "evidence/local.hostonly.safety-evidence-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111171,7 +111419,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.software-unit-review.20261028",
+          "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545",
+          "artifacts": [
+            "evidence/local.hostonly.software-unit-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111238,7 +111494,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.software-unit-review.20261028",
+          "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545",
+          "artifacts": [
+            "evidence/local.hostonly.software-unit-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111440,7 +111704,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.teamcenter-review.20261028",
+          "profileSha256": "9702452b616402a6a30c196b47606c41449808c6822661e204943e1265ad292b",
+          "artifacts": [
+            "evidence/local.hostonly.teamcenter-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111505,7 +111777,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.teamcenter-review.20261028",
+          "profileSha256": "9702452b616402a6a30c196b47606c41449808c6822661e204943e1265ad292b",
+          "artifacts": [
+            "evidence/local.hostonly.teamcenter-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111604,7 +111884,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.technology-profile-review.20261028",
+          "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff",
+          "artifacts": [
+            "evidence/local.hostonly.technology-profile-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111669,7 +111957,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.technology-profile-review.20261028",
+          "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff",
+          "artifacts": [
+            "evidence/local.hostonly.technology-profile-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111887,7 +112183,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.testsuite-result.20261028",
+          "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19",
+          "artifacts": [
+            "evidence/local.hostonly.testsuite-result.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -111910,7 +112214,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.testsuite-result.20261028",
+          "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19",
+          "artifacts": [
+            "evidence/local.hostonly.testsuite-result.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -112430,7 +112742,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.testsuite-style-review.20261028",
+          "profileSha256": "1e4f5022738492d21f9e9c5abdd923ddcda962eaf684322997fbf432cc21804d",
+          "artifacts": [
+            "evidence/local.hostonly.testsuite-style-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -114861,7 +115181,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -114999,7 +115327,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115109,7 +115445,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115131,7 +115475,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115153,7 +115505,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115175,7 +115535,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115197,7 +115565,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115262,7 +115638,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.web-application-review.20261028",
+          "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1",
+          "artifacts": [
+            "evidence/local.hostonly.web-application-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115329,7 +115713,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.web-application-review.20261028",
+          "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1",
+          "artifacts": [
+            "evidence/local.hostonly.web-application-review.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115499,7 +115891,7 @@
     {
       "path": "artifacts/feature-catalog-live.json",
       "state": "observed",
-      "sha256": "1ab0b69a05480de025b54a7127ca98a63ca1dc1ba690b0c18e35dfc3c1a2e4e7"
+      "sha256": "7b02550d9cd3dc3fb192e003ee347e3b78fdc58440f431510bc10ee31cd5846f"
     },
     {
       "path": "artifacts/hardware-families-expanded.json",
@@ -116032,9 +116424,34 @@
       "sha256": "2bda53e582b528ae6829953f05f1284410270f1faad8a765b8fda15aeea76897"
     },
     {
+      "path": "evidence/local.hostonly.access-review.20261028.json",
+      "state": "observed",
+      "sha256": "a30ad77e39d4bb4e06af39a9086136033d853efa2d286946b39e9f196106495d"
+    },
+    {
+      "path": "evidence/local.hostonly.addin-selection.20261028.json",
+      "state": "observed",
+      "sha256": "cc85d4858b34b40dd3700f6888e22cc041320c8535204203ad2d0c2ad58d3f1f"
+    },
+    {
       "path": "evidence/local.hostonly.automationml.20261027.json",
       "state": "observed",
       "sha256": "97829e7e23ac8e1728579b0aab6b231064f6dc59d94470c447de9c22cc0a8300"
+    },
+    {
+      "path": "evidence/local.hostonly.composite-engineering.20261028.json",
+      "state": "observed",
+      "sha256": "9211a0f1761a6dad549826e5be6453f9c8a19828322eb4744420ab28a29e34f7"
+    },
+    {
+      "path": "evidence/local.hostonly.connection-review.20261028.json",
+      "state": "observed",
+      "sha256": "f2052cbd0f605a843576f0e4c39ab1296e9863ae232a28dca218caab4f32d569"
+    },
+    {
+      "path": "evidence/local.hostonly.db-snapshot-review.20261028.json",
+      "state": "observed",
+      "sha256": "f2df23bf0b3b762e8c0248ad9a8d94af129bf1ad3e52e0f96949f29e0565c20b"
     },
     {
       "path": "evidence/local.hostonly.diagnostic-experiments.20261027.json",
@@ -116052,14 +116469,69 @@
       "sha256": "f88aad47f22dab221cb07867408392bc293e10fe75e8c094d7efef4d98738ab7"
     },
     {
+      "path": "evidence/local.hostonly.drive-profile-review.20261028.json",
+      "state": "observed",
+      "sha256": "2e220f3d5f6d3564c5e19fa391d2cfe9b2c1b73d5bd1e444d6542566fc14dbe0"
+    },
+    {
       "path": "evidence/local.hostonly.graph.20261027.json",
       "state": "observed",
       "sha256": "084aed38041da4be21b439d65c3a19bf570daa8af11ecd3ebaeec7cebe1de0a6"
     },
     {
+      "path": "evidence/local.hostonly.hmi-component-review.20261028.json",
+      "state": "observed",
+      "sha256": "2f10b51050dbcad49e0b048f6dcf7248ec95dbb61211557c51943b61ef46fb72"
+    },
+    {
+      "path": "evidence/local.hostonly.multiuser-review.20261028.json",
+      "state": "observed",
+      "sha256": "decf68c970fc6fdb2a73cd59109755922ca295ed0ec9d58905386ce299d631e4"
+    },
+    {
       "path": "evidence/local.hostonly.opcua.20261027.json",
       "state": "observed",
       "sha256": "6ccee5b05988e9b5ef91fa3cf1713265486291fda670d92e3e731c1f7bf84544"
+    },
+    {
+      "path": "evidence/local.hostonly.public-certificate-review.20261028.json",
+      "state": "observed",
+      "sha256": "31909399a9c3b30fd3a6f59b2d65c39df95602c2b7e8cdc4a6760645d06a5783"
+    },
+    {
+      "path": "evidence/local.hostonly.runtime-handoff.20261028.json",
+      "state": "observed",
+      "sha256": "723231cd7215014a5572ab886371111e5ad90dc58cc50d330abf7790e5e96029"
+    },
+    {
+      "path": "evidence/local.hostonly.safety-evidence-review.20261028.json",
+      "state": "observed",
+      "sha256": "a57ecd93744a403a7a2b6edc0b47034f1482a36a5edb278568f25dc540c714b4"
+    },
+    {
+      "path": "evidence/local.hostonly.software-unit-review.20261028.json",
+      "state": "observed",
+      "sha256": "cdabacfb8191b86944becdcb6bbfbb20919aba60e6328ca83ff1aecdbeb95c79"
+    },
+    {
+      "path": "evidence/local.hostonly.teamcenter-review.20261028.json",
+      "state": "observed",
+      "sha256": "ad0268ca4c17593fa5ed7b59338db44215c31d111db673531a50b46acd740791"
+    },
+    {
+      "path": "evidence/local.hostonly.technology-profile-review.20261028.json",
+      "state": "observed",
+      "sha256": "741834812571409f4b3a2c3fbb3faa03c3b22d599a8b1c52adb5f2ee0a304172"
+    },
+    {
+      "path": "evidence/local.hostonly.testsuite-result.20261028.json",
+      "state": "observed",
+      "sha256": "0f7851237244c7f3ed022e6fee4db4effce4260fdd21715896d86e3974faa303"
+    },
+    {
+      "path": "evidence/local.hostonly.testsuite-style-review.20261028.json",
+      "state": "observed",
+      "sha256": "a8444b642477f91b1ad9fa8587723614f46027eea6357d979815a9d21198c333"
     },
     {
       "path": "evidence/local.hostonly.translation.20261027.json",
@@ -116070,6 +116542,11 @@
       "path": "evidence/local.hostonly.vci.20261027.json",
       "state": "observed",
       "sha256": "6dcef7003d53fee8ff211a3a87c779435dccfe4045a4b59da0d645f176292746"
+    },
+    {
+      "path": "evidence/local.hostonly.web-application-review.20261028.json",
+      "state": "observed",
+      "sha256": "3fe52f1d7b1e71a519e288f22cda892eaf791a1d2f11669a61c9f9437ed37774"
     },
     {
       "path": "evidence/local.library.native-chain.20261028.json",
@@ -116432,6 +116909,11 @@
       "sha256": "cb31a8f857dfd7e795d0c394fff6a1659f76e919ed93e785e598870bf43a752d"
     },
     {
+      "path": "evidence/local.watch.native.20261028.json",
+      "state": "observed",
+      "sha256": "ab4dbc339753858d09840c916f30e87c826af8eb8f1074501c9d7738de09b9d0"
+    },
+    {
       "path": "evidence/local.wave-kinds.probe.20261027.json",
       "state": "observed",
       "sha256": "c80008cdb27cfdf2a8457c0ee2a47697e65afd577fef2f7f57ed99319c638f26"
@@ -116555,8 +117037,28 @@
       "profileSha256": "b5718b9608393bfdb96fc85933f02c3c3dfc089d8a19bd9ee44146fcc8b96d9b"
     },
     {
+      "id": "local.hostonly.access-review.20261028",
+      "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d"
+    },
+    {
+      "id": "local.hostonly.addin-selection.20261028",
+      "profileSha256": "7bb8e77a0111abe01ff25769a25ab4d2c466652ed03fbb011ef6480b318f6664"
+    },
+    {
       "id": "local.hostonly.automationml.20261027",
       "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a"
+    },
+    {
+      "id": "local.hostonly.composite-engineering.20261028",
+      "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24"
+    },
+    {
+      "id": "local.hostonly.connection-review.20261028",
+      "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210"
+    },
+    {
+      "id": "local.hostonly.db-snapshot-review.20261028",
+      "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54"
     },
     {
       "id": "local.hostonly.diagnostic-experiments.20261027",
@@ -116571,12 +117073,56 @@
       "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67"
     },
     {
+      "id": "local.hostonly.drive-profile-review.20261028",
+      "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd"
+    },
+    {
       "id": "local.hostonly.graph.20261027",
       "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854"
     },
     {
+      "id": "local.hostonly.hmi-component-review.20261028",
+      "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5"
+    },
+    {
+      "id": "local.hostonly.multiuser-review.20261028",
+      "profileSha256": "f3a9de4d7fed817a570d65906cdebf7a5436ec98ec0236fa6ad0cfcd9b168853"
+    },
+    {
       "id": "local.hostonly.opcua.20261027",
       "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869"
+    },
+    {
+      "id": "local.hostonly.public-certificate-review.20261028",
+      "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34"
+    },
+    {
+      "id": "local.hostonly.runtime-handoff.20261028",
+      "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de"
+    },
+    {
+      "id": "local.hostonly.safety-evidence-review.20261028",
+      "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9"
+    },
+    {
+      "id": "local.hostonly.software-unit-review.20261028",
+      "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545"
+    },
+    {
+      "id": "local.hostonly.teamcenter-review.20261028",
+      "profileSha256": "9702452b616402a6a30c196b47606c41449808c6822661e204943e1265ad292b"
+    },
+    {
+      "id": "local.hostonly.technology-profile-review.20261028",
+      "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff"
+    },
+    {
+      "id": "local.hostonly.testsuite-result.20261028",
+      "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19"
+    },
+    {
+      "id": "local.hostonly.testsuite-style-review.20261028",
+      "profileSha256": "1e4f5022738492d21f9e9c5abdd923ddcda962eaf684322997fbf432cc21804d"
     },
     {
       "id": "local.hostonly.translation.20261027",
@@ -116585,6 +117131,10 @@
     {
       "id": "local.hostonly.vci.20261027",
       "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9"
+    },
+    {
+      "id": "local.hostonly.web-application-review.20261028",
+      "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1"
     },
     {
       "id": "local.index_paging.v03",
@@ -116981,6 +117531,10 @@
     {
       "id": "local.units.v03",
       "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672"
+    },
+    {
+      "id": "local.watch.native.20261028",
+      "profileSha256": "684f6a2d6b9b879f92b940078f8e6af3375e0197522089e8caf720e3cb7e769c"
     },
     {
       "id": "local.wave-kinds.probe.20261027",
