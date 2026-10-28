@@ -1,8 +1,9 @@
 """Write a committable evidence summary from local qualification reports.
 
-Raw reports stay in the ignored artifacts/ tree. The summary under evidence/
-keeps what a reviewer needs: source commit, binary tree hashes, each raw report's
-hash, its completion and the MCP tools that answered without error.
+Raw reports are copied into the main checkout's ignored artifacts/evidence/ store,
+which outlives every worktree. The summary under evidence/ keeps what a reviewer
+needs: source commit, binary tree hashes, each raw report's hash, its completion
+and the MCP tools that answered without error.
 """
 import argparse
 import datetime
@@ -10,6 +11,7 @@ import hashlib
 import json
 import pathlib
 import platform
+import shutil
 import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -54,6 +56,25 @@ def git(*arguments):
     return subprocess.run(["git", *arguments], cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip()
 
 
+def store_root():
+    """The main checkout's raw evidence store; removing a worktree deletes that worktree's artifacts/."""
+    return pathlib.Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent / "artifacts" / "evidence"
+
+
+def stored_path(store, evidence_id, run):
+    return store / evidence_id / f"{run['sha256']}-{run['report']}"
+
+
+def retain(summary, reports, store):
+    """Copy each raw report into the store under the hash its summary records."""
+    for path, entry in zip(reports, summary["runs"]):
+        target = stored_path(store, summary["evidenceId"], entry)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+        if file_sha256(target) != entry["sha256"]:
+            raise ValueError(f"{path} changed while it was curated")
+
+
 def summarize(evidence_id, reports, binaries, scope, limitations):
     runs = [run(p) for p in reports]
     return {"schema": SCHEMA, "evidenceId": evidence_id,
@@ -74,6 +95,7 @@ def main():
     parser.add_argument("--limitation", action="append", required=True)
     args = parser.parse_args()
     summary = summarize(args.id, args.report, args.binary, args.scope, args.limitation)
+    retain(summary, args.report, store_root())
     destination = ROOT / "evidence" / (args.id + ".json")
     destination.parent.mkdir(exist_ok=True)
     destination.write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")

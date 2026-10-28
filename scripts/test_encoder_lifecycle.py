@@ -39,6 +39,9 @@ class EncoderLifecycleTests(unittest.TestCase):
         self.folder = tempfile.TemporaryDirectory(prefix='encoder-lifecycle-', dir=ROOT / 'artifacts')
         self.addCleanup(self.folder.cleanup)
         self.root = Path(self.folder.name)
+        # Run directories stay inside this test's folder instead of piling up in artifacts/.
+        for runner in (qualifier, verifier):
+            runs = patch.object(runner, 'RUNS', self.root); runs.start(); self.addCleanup(runs.stop)
         self.binary = self.root / 'synthetic.exe'; self.binary.write_bytes(b'never executed')
         self.report_path = self.root / 'report.json'
         self.profile = json.loads((ROOT / 'fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json').read_text(encoding='utf-8'))

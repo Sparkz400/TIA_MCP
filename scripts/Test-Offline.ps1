@@ -124,6 +124,12 @@ try {
         python -B scripts/audit_retained_evidence.py --out (Join-Path $output 'retained-evidence.json')
         if ($LASTEXITCODE -ne 0) { throw 'Retained evidence integrity audit failed.' }
         $result.retainedEvidence = 'inventory-written; missing inputs remain unverified'
+        # Hosted runners have no local raw evidence store.
+        if (-not $env:GITHUB_ACTIONS) {
+            python -B scripts/audit_evidence_store.py
+            if ($LASTEXITCODE -ne 0) { throw 'Raw evidence store audit failed.' }
+            $result.evidenceStore = 'passed'
+        }
         python -B -m unittest discover -s scripts -p 'test_*.py'
         if ($LASTEXITCODE -ne 0) { throw 'Python offline tests failed.' }
         $result.python = 'passed'

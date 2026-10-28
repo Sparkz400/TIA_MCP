@@ -22,6 +22,8 @@ from encoder_lifecycle import new_session, sync_steps, finish_session
 from block_test_runtime import NativeToolError
 from run_block_tests import open_qualified_project, same_user_project_lock
 from engineering_preservation import require, native_payload, native_payload_hash
+
+RUNS = ROOT / "artifacts"
 from qualify_encoder_hardware import NAME, assert_parameter_edit, decode_native_artifact, parameter_map
 
 
@@ -55,7 +57,7 @@ def main():
         "binaries": {key: {"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                      for key, path in (("host", args.host), ("worker", args.worker))},
         "verifierSha256": hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()}
-    run_dir = ROOT / "artifacts" / ("encoder-verifier-" + uuid.uuid4().hex[:8])
+    run_dir = RUNS / ("encoder-verifier-" + uuid.uuid4().hex[:8])
     run_dir.mkdir(parents=True)
     report["runDirectory"] = str(run_dir)
 

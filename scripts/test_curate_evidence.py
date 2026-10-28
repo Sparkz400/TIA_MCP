@@ -3,10 +3,34 @@ import pathlib
 import tempfile
 import unittest
 
-from curate_evidence import run, tree
+from audit_evidence_store import audit
+from curate_evidence import SCHEMA, retain, run, stored_path, tree
 
 
 class CurateEvidenceTests(unittest.TestCase):
+    def test_retained_reports_are_audited_by_their_summary_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            report = root / "qualification.json"
+            report.write_text(json.dumps({"completed": True, "steps": []}), encoding="utf-8")
+            summary = {"schema": SCHEMA, "evidenceId": "local.x", "runs": [run(report)]}
+            (root / "evidence").mkdir()
+            (root / "evidence" / "local.x.json").write_text(json.dumps(summary), encoding="utf-8")
+            (root / "evidence" / "raw-reports-lost.json").write_text(json.dumps({"runs": []}), encoding="utf-8")
+            store = root / "store"
+            retain(summary, [report], store)
+            self.assertEqual(["local.x/qualification.json"], audit(root / "evidence", store, set())["retained"])
+            stored = stored_path(store, "local.x", summary["runs"][0])
+            stored.write_text("{}", encoding="utf-8")
+            self.assertEqual(["local.x/qualification.json"], audit(root / "evidence", store, set())["mismatched"])
+            stored.unlink()
+            self.assertEqual(["local.x/qualification.json"], audit(root / "evidence", store, set())["missing"])
+            lost = {("local.x", summary["runs"][0]["sha256"])}
+            self.assertEqual(["local.x/qualification.json"], audit(root / "evidence", store, lost)["lost"])
+            report.write_text("changed after hashing", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                retain(summary, [report], store)
+
     def test_run_keeps_completion_steps_and_tool_outcomes(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "report.json")

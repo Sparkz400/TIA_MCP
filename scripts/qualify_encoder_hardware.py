@@ -26,6 +26,7 @@ from encoder_endpoints import POLICY as ENDPOINT_POLICY, connection_attributes, 
 CPU = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
 NAME = "TiaMcp_EncoderConnected_Fixture"
 COMPILER_POLICY = "encoder-exact-compiler-targets-v2"
+RUNS = ROOT / "artifacts"
 
 
 def require_source_compiles(source):
@@ -253,7 +254,7 @@ def main():
     args = parser.parse_args()
     args.report = args.report.resolve()
     require(not args.report.exists(), "Choose a new report path; prior evidence is immutable")
-    run_dir = ROOT / "artifacts" / ("encoder-qualification-" + uuid.uuid4().hex[:8])
+    run_dir = RUNS / ("encoder-qualification-" + uuid.uuid4().hex[:8])
     run_dir.mkdir(parents=True)
     report = {"completed": False, "steps": [], "scope": "Worker-owned offline connected encoder fixture; no physical/runtime operations", "runDirectory": str(run_dir), "compilerTargetPolicy": COMPILER_POLICY, "endpointPolicy": ENDPOINT_POLICY, "softwarePeerPolicy": software_peers.POLICY, "hardwarePeerPolicy": hardware_peers.POLICY}
     report["selectedBinaries"] = {key: {"path": str(value.resolve()), "sha256": hashlib.sha256(value.read_bytes()).hexdigest()}
