@@ -54,7 +54,8 @@ namespace TiaMcp.Openness.V21
                             mapped["directory"] = mapping.DirectoryPath?.FullName; mapped["fileName"] = mapping.FileNameWithoutExtension; mapped["format"] = mapping.FileFormat;
                             var status = mapping.GetStatus();
                             mapped["compareState"] = status.CompareState.ToString(); mapped["compareDetails"] = status.IndividualObjectCompareDetails.ToString();
-                            mapped["childMappingState"] = mapping.GetChildStatus().MappingState.ToString();
+                            // Native evidence (28 October 2026): a mapped block has no child status (GetChildStatus returns null).
+                            mapped["childMappingState"] = mapping.GetChildStatus()?.MappingState.ToString();
                             var formats = new JArray(); mapped["supportedFormats"] = formats;
                             foreach (string format in workspace.GetSupportedFileFormats(mapping.EngineeringObject)) { if (!budget.Take()) return; formats.Add(format); }
                         }
@@ -352,7 +353,7 @@ namespace TiaMcp.Openness.V21
             if (requireInsideRoot && directory == null) throw new BridgeException("VciUnsafeRoot", "The mapped package lies outside the workspace root; its files cannot be backed up or verified.");
             return new JObject { ["object"] = QualificationNativeIdentity(mapping.EngineeringObject), ["directory"] = directory, ["nativeDirectory"] = mapping.DirectoryPath?.ToString(),
                 ["fileName"] = mapping.FileNameWithoutExtension, ["format"] = mapping.FileFormat, ["compareState"] = status.CompareState.ToString(),
-                ["compareDetails"] = status.IndividualObjectCompareDetails.ToString(), ["childMappingState"] = mapping.GetChildStatus().MappingState.ToString() };
+                ["compareDetails"] = status.IndividualObjectCompareDetails.ToString(), ["childMappingState"] = mapping.GetChildStatus()?.MappingState.ToString() };
         }
 
         // Relative to the root with '/' separators ("" is the root), or null outside it. A relative native value is read

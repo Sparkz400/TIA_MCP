@@ -140,9 +140,10 @@ namespace TiaMcp.Openness.V21
                 var created = CreateConnection(management.Connections, type, local, partnerTarget, partner);
                 if (created == null || created.ConnectionType.ToString() != type || !Equals(created.LocalInterface, local) || !Equals(created.PartnerTarget, partnerTarget) || !Equals(created.PartnerInterface, partner))
                     throw new BridgeException("MutationVerificationFailed", "The created connection's native type or endpoints differ from the request.");
+                string key = ConnectionKey(ConnectionRow(created, owner, hardware, new JArray()));
                 var after = ConnectionManifest(management, owner, hardware);
-                RequireConnectionsPreserved(before, after.Where(row => !Equals(row.Item1, created)));
-                change.Readbacks.Add(new JObject { ["role"] = "connection-created", ["connection"] = ConnectionReadback(after, created) });
+                RequireConnectionsPreserved(before, after.Where(row => ConnectionKey(row.Item2) != key));
+                change.Readbacks.Add(new JObject { ["role"] = "connection-created", ["connection"] = ConnectionReadback(after, key) });
                 return;
             }
             string name = ChangeText(payload, "connectionName", 256);
@@ -150,7 +151,8 @@ namespace TiaMcp.Openness.V21
             var matches = before.Where(row => row.Item2["properties"].Value<string>("LocalConnectionName") == name && (id == null || row.Item2["properties"].Value<string>("LocalConnectionId") == id)).Take(2).ToArray();
             if (matches.Length != 1) throw new BridgeException(matches.Length == 0 ? "ObjectNotFound" : "AmbiguousTarget", "No single connection of this owner has the exact connectionName" + (id == null ? "." : " and connectionId."));
             var selected = matches[0].Item1;
-            var others = before.Where(row => !Equals(row.Item1, selected)).ToList();
+            string selectedKey = ConnectionKey(matches[0].Item2);
+            var others = before.Where(row => ConnectionKey(row.Item2) != selectedKey).ToList();
             if (change.Kind == "connection_delete")
             {
                 if (effects != null) { effects.Add(new JObject { ["deleteConnection"] = matches[0].Item2.DeepClone() }); return; }
@@ -168,8 +170,8 @@ namespace TiaMcp.Openness.V21
             }
             ApplyAttributes(selected, attributes, ConnectionWriteAttributes);
             var updated = ConnectionManifest(management, owner, hardware);
-            RequireConnectionsPreserved(others, updated.Where(row => !Equals(row.Item1, selected)));
-            change.Readbacks.Add(new JObject { ["role"] = "connection-set", ["connection"] = ConnectionReadback(updated, selected) });
+            RequireConnectionsPreserved(others, updated.Where(row => ConnectionKey(row.Item2) != selectedKey));
+            change.Readbacks.Add(new JObject { ["role"] = "connection-set", ["connection"] = ConnectionReadback(updated, selectedKey) });
         }
 
         private static Connection CreateConnection(ConnectionComposition connections, string type, Node local, DeviceItem partnerTarget, Node partner)
@@ -220,9 +222,13 @@ namespace TiaMcp.Openness.V21
                     new JObject { ["onlyBefore"] = new JArray(before.Except(after).Select(JObject.Parse)), ["onlyAfter"] = new JArray(after.Except(before).Select(JObject.Parse)) });
         }
 
-        private static JObject ConnectionReadback(List<Tuple<Connection, JObject>> rows, Connection target)
+        // Native evidence (28 October 2026): Equals between V21 Connection objects reports different connections of one owner
+        // as equal, so connections are identified by their owner-scoped name and connection ID.
+        private static string ConnectionKey(JObject row) => row.Value<string>("id") + "#" + row["properties"]?.Value<string>("LocalConnectionId");
+
+        private static JObject ConnectionReadback(List<Tuple<Connection, JObject>> rows, string key)
         {
-            var matches = rows.Where(row => Equals(row.Item1, target)).Take(2).ToArray();
+            var matches = rows.Where(row => ConnectionKey(row.Item2) == key).Take(2).ToArray();
             if (matches.Length != 1) throw new BridgeException("MutationVerificationFailed", "The changed connection is not present exactly once in the owner's readback.");
             return matches[0].Item2;
         }

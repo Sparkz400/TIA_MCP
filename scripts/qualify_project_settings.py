@@ -1,5 +1,5 @@
-"""Qualify the X01 project-level kinds natively in one owned scratch CPU 1511-1 PN: project languages, project_copy and
-project_open with readOnly. project_attributes_set must refuse every allowlisted attribute, which V21 declares read-only.
+"""Qualify the X01 project-level kinds natively in one owned scratch CPU 1511-1 PN: project languages, the project's
+simulation-support setting (L03), project_copy and project_open with readOnly. project_attributes_set must refuse every allowlisted attribute, which V21 declares read-only.
 
 Phase A applies project_languages_set with checkpoint, compile and save. Each preview is asserted
 against the request and project_properties, and a complete state (every block, type and tag-table export, every member and
@@ -22,7 +22,7 @@ from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, matches, view
 
-KINDS = ("project_languages_set",)
+KINDS = ("project_languages_set", "project_simulation_enable")
 # V21 native attribute info declares the whole project_attributes_set allowlist read-only.
 READ_ONLY = ("Author", "Copyright", "Family", "Version")
 # Point-in-time values that a save or a recovered copy changes by themselves.
@@ -41,6 +41,7 @@ LIMITATIONS = [
     "with AttributeNotWritable (asserted here); the multilingual Comment is refused by design.",
     "project_languages_set adds and removes one supported language and switches the editing language. TIA adds or drops that culture's empty text "
     "item in the project comment and in every program export (recorded under sideEffects); texts in a removed language are not seeded, so their loss is not observed.",
+    "project_simulation_enable: no read tool exposes IsSimulationDuringBlockCompilationEnabled, so a fresh preparation's native before value is the readback.",
     "project_copy copies a saved project; the UnsavedProject refusal is not exercised, because no read-only route leaves the source modified.",
     "project_open readOnly: TIA opens the project as secondary and itself refuses exports there (block_read is reported as ReadOnlyProject), so the copy is "
     "compared with its source through software_inspect and project_properties, not through program exports; the change refusal is the worker's guard.",
@@ -57,7 +58,7 @@ def project(properties):
 
 class Run(StateRun):
     """The access runner's apply/refuse/restore gates over the PLC program and project_properties."""
-    plc_compiled = KINDS  # The project-scoped languages change still compiles the PLC software.
+    plc_compiled = KINDS  # The project-scoped changes still compile the PLC software.
 
     def __init__(self, h):
         super().__init__(h)
@@ -117,6 +118,20 @@ def languages(run, label, payload, after, restore=False):
               changed=["project:languages"], rows={"project:languages": after}, tolerated=multilingual, check=texts, restore=restore)
 
 
+def simulation_setting(run):
+    """IsSimulationDuringBlockCompilationEnabled as a fresh preparation reads it natively; no read tool exposes the setting."""
+    prepared = run.h.tool("change_prepare", run.args("project_simulation_enable", {"enabled": True}))
+    return prepared["preview"]["effects"][0]["before"]
+
+
+def simulation(run, enabled, restore=False):
+    current = simulation_setting(run)
+    require(current is (not enabled), "Expected the simulation setting %s before the change" % (not enabled))
+    run.apply("%s simulation support" % ("enable" if enabled else "disable"), "project_simulation_enable", {"enabled": enabled},
+              {"effects": [{"projectSetting": "IsSimulationDuringBlockCompilationEnabled", "before": current, "after": enabled}]},
+              check=lambda applied, state: require(simulation_setting(run) is enabled, "A fresh preparation does not read the new setting"), restore=restore)
+
+
 def pick_language(run):
     """A supported language that is not active, for the add/remove cycle."""
     settings = run.current["view"]["project:languages"]
@@ -146,7 +161,9 @@ def phase_a(run):
     run.refuse_apply("project_languages_set", "a preview made stale by a later change", stale, "StaleRevision")
     languages(run, "edit in %s again" % settings["editing"], {"editingLanguage": settings["editing"]},
               {"active": active, "reference": reference, "editing": settings["editing"]})
-    run.h.report["fixture"] = {"language": culture, "reference": reference}
+    run.h.report["fixture"] = {"language": culture, "reference": reference, "simulation": simulation_setting(run)}
+    run.refuse("project_simulation_enable", "no explicit enabled flag", {}, "InvalidRequest")
+    simulation(run, not run.h.report["fixture"]["simulation"])
 
 
 def reopen(run, path, label):
@@ -168,6 +185,7 @@ def persisted(run):
 
 
 def phase_b(run):
+    simulation(run, run.h.report["fixture"]["simulation"], restore=True)
     culture = run.h.report["fixture"]["language"]
     settings = run.current["view"]["project:languages"]
     languages(run, "remove %s" % culture, {"removeActive": [culture]},

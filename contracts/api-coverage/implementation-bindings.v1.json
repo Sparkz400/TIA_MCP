@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f85ef6b4f7256f9fd3d1a36462439edfc94a34944dfaaef277a10393800ef7d1",
-      "bytes": 1221907
+      "sha256": "c09bff30fe02dd6296fb6a863fdd7b5f6fec2cfaa46b52bacca7d4c80a83e685",
+      "bytes": 1234159
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2397,8 +2397,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
-      "sha256": "57f442b225a55d425a1698e242ac6309cbeb95d6d06a20ac90b91c2fc12bc62b",
-      "bytes": 17336
+      "sha256": "92138a2a5cd2606cfa64fd9b6d34a5d40cce078b6b66b5089a8f5d3aaf418af1",
+      "bytes": 17897
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuMemoryBytes.cs",
@@ -2797,8 +2797,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
-      "sha256": "f0594fed551d6240f510cc0ebd9ef33dd2a78f17f8dd04ae4ae231200e63ac53",
-      "bytes": 38490
+      "sha256": "4ef3ad0fdffb5d2e66246835e543003659a202fbf13c9b5310360bc2e13b052b",
+      "bytes": 38624
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -79953,8 +79953,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         },
@@ -79973,8 +79973,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         }
@@ -80004,8 +80004,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         },
@@ -80024,8 +80024,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         }
@@ -80055,8 +80055,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         },
@@ -80075,8 +80075,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             }
           ]
         }
@@ -82102,8 +82102,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
@@ -82437,8 +82437,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             },
             {
@@ -82730,8 +82730,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             },
             {
@@ -82794,8 +82794,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs",
               "name": "ConnectionEdit",
               "line": 107,
-              "endLine": 173,
-              "sha256": "3a1ccccca0ff431b307b478acb4c6005ee5e90c7f421358738f6cfd52f21ce62"
+              "endLine": 175,
+              "sha256": "abc0a4a06f5e251f28d8aee390d4a41e071af3947e650f664280f2294701c9bf"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TechnologySelection.cs",
@@ -87930,8 +87930,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             }
           ]
@@ -87950,8 +87950,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             }
           ]
@@ -87981,8 +87981,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             }
           ]
@@ -88001,8 +88001,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             }
           ]
@@ -88032,8 +88032,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             }
           ]
@@ -88052,8 +88052,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             }
           ]
@@ -88083,8 +88083,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             }
           ]
@@ -88103,8 +88103,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             }
           ]
@@ -88134,8 +88134,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 85,
-              "endLine": 192,
+              "line": 86,
+              "endLine": 193,
               "sha256": "027b0ca2d36f7ab532e643eb1971b0d8e8d8bf6128ee801f99a727e90c054578"
             }
           ]
@@ -88154,8 +88154,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "ApplyVciChange",
-              "line": 194,
-              "endLine": 264,
+              "line": 195,
+              "endLine": 265,
               "sha256": "a42f6ed07fde3745b7200e1f60718c42e3ebd1df58517794b61542d927f82528"
             }
           ]
@@ -89851,7 +89851,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.cax_export.20261028",
+          "profileSha256": "72b9ae9d7b66bcc54416444d43255aa13ece8d6d89fc2303091bdc3475873200",
+          "artifacts": [
+            "evidence/local.cax_export.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -90595,7 +90603,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.connection_changes.20261028",
+          "profileSha256": "0d7f7009a5184f547e8f5bdb861ae2a16593f15c0750e48b993e4ab8e97d1c94",
+          "artifacts": [
+            "evidence/local.connection_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -90630,7 +90646,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.connection_changes.20261028",
+          "profileSha256": "0d7f7009a5184f547e8f5bdb861ae2a16593f15c0750e48b993e4ab8e97d1c94",
+          "artifacts": [
+            "evidence/local.connection_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -90665,7 +90689,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.connection_changes.20261028",
+          "profileSha256": "0d7f7009a5184f547e8f5bdb861ae2a16593f15c0750e48b993e4ab8e97d1c94",
+          "artifacts": [
+            "evidence/local.connection_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -90976,7 +91008,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graph_changes.20261028",
+          "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6",
+          "artifacts": [
+            "evidence/local.graph_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -94499,11 +94539,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.project_simulation.20261028",
+          "profileSha256": "9392162d71a5f082674567325f6d2585ca5fc05529a2c25b0115669a4a52ca2e",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
+            "evidence/local.project_simulation.20261028.json"
           ]
         }
       ],
@@ -95595,7 +95634,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.vci_mappings.20261028",
+          "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513",
+          "artifacts": [
+            "evidence/local.vci_mappings.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -95630,7 +95677,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.vci_mappings.20261028",
+          "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513",
+          "artifacts": [
+            "evidence/local.vci_mappings.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -95665,7 +95720,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.vci_mappings.20261028",
+          "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513",
+          "artifacts": [
+            "evidence/local.vci_mappings.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -99737,7 +99800,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graph_changes.20261028",
+          "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6",
+          "artifacts": [
+            "evidence/local.graph_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -99792,7 +99863,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graph_changes.20261028",
+          "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6",
+          "artifacts": [
+            "evidence/local.graph_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -114413,6 +114492,16 @@
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
     },
     {
+      "path": "evidence/local.cax_export.20261028.json",
+      "state": "observed",
+      "sha256": "e63900d25fad6f4d2cd5262e62752672d0712429aed1f4aab19b2b7b52cdbe24"
+    },
+    {
+      "path": "evidence/local.connection_changes.20261028.json",
+      "state": "observed",
+      "sha256": "37824a1583a5eef5ed30546aea6a1f6d80f25c39fcaf559765d55c895b3cefbf"
+    },
+    {
       "path": "evidence/local.cpu_memory_bytes.20261026.json",
       "state": "observed",
       "sha256": "40986835f5ff0b4289a68cd1bd3e689e08637f261bf27eec1279e216051a602e"
@@ -114461,6 +114550,11 @@
       "path": "evidence/local.explorer.relationships.20261028.json",
       "state": "observed",
       "sha256": "f461719a8f9e5b9a535ff85f3ead196576767bf66824410c983a0547059e4ea7"
+    },
+    {
+      "path": "evidence/local.graph_changes.20261028.json",
+      "state": "observed",
+      "sha256": "caa0c90d571556fd6016186c3450f7569c7d31d2e39f83729d9e2474bb3f76b7"
     },
     {
       "path": "evidence/local.hardware.20261024.json",
@@ -114783,6 +114877,11 @@
       "sha256": "1b7128b763485ffe3be3a3aa853f6ffff797f857696b43f45d5b5e51f01d08bc"
     },
     {
+      "path": "evidence/local.project_simulation.20261028.json",
+      "state": "observed",
+      "sha256": "150e77d708ab5169d92140947885c1ad74a6f3ce3441e8339b29045c212d670e"
+    },
+    {
       "path": "evidence/local.read_contracts.20261028.json",
       "state": "observed",
       "sha256": "3841523a6aaeb22f6c4ad144112317f97d982bcd3818e9b377bd2bf743fcb399"
@@ -115003,6 +115102,11 @@
       "sha256": "cb31a8f857dfd7e795d0c394fff6a1659f76e919ed93e785e598870bf43a752d"
     },
     {
+      "path": "evidence/local.vci_mappings.20261028.json",
+      "state": "observed",
+      "sha256": "3d85e1cb639255382159d670644184e182311e62e58e1be12225ed1cfb9a2252"
+    },
+    {
       "path": "evidence/local.watch.authoring.20261028.json",
       "state": "observed",
       "sha256": "3538b8b3b20fae95e137ca58dc8598c626c85fd418e7ea8c98675da8cf08dab6"
@@ -115076,8 +115180,16 @@
       "profileSha256": "d95682c47ce156bf8c08b68d089ec48942a4d312e09dd46d123061e25dd63945"
     },
     {
+      "id": "local.cax_export.20261028",
+      "profileSha256": "72b9ae9d7b66bcc54416444d43255aa13ece8d6d89fc2303091bdc3475873200"
+    },
+    {
       "id": "local.conformance.v03",
       "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19"
+    },
+    {
+      "id": "local.connection_changes.20261028",
+      "profileSha256": "0d7f7009a5184f547e8f5bdb861ae2a16593f15c0750e48b993e4ab8e97d1c94"
     },
     {
       "id": "local.cpu_memory_bytes.20261026",
@@ -115122,6 +115234,10 @@
     {
       "id": "local.explorer.relationships.20261028",
       "profileSha256": "d2118de8b3a7bccf9ca977f510295e85c7823c2b9c9a8b339e52135e7b388cd9"
+    },
+    {
+      "id": "local.graph_changes.20261028",
+      "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6"
     },
     {
       "id": "local.guards.v02",
@@ -115464,6 +115580,10 @@
       "profileSha256": "86c997a3355baecb5592db8ddeeb758687b948886ad384bd5ae3a3d789caad59"
     },
     {
+      "id": "local.project_simulation.20261028",
+      "profileSha256": "9392162d71a5f082674567325f6d2585ca5fc05529a2c25b0115669a4a52ca2e"
+    },
+    {
       "id": "local.read_contracts.20261028",
       "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f"
     },
@@ -115670,6 +115790,10 @@
     {
       "id": "local.units.v03",
       "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672"
+    },
+    {
+      "id": "local.vci_mappings.20261028",
+      "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513"
     },
     {
       "id": "local.watch.authoring.20261028",

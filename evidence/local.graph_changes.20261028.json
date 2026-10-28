@@ -1,0 +1,106 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.graph_changes.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T15:08:05+00:00",
+  "source": {
+    "commit": "65a3606f6c8190f0ea5319c8ef4d018c32aa0406",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_graph_changes.py on a frozen Debug build of c8de3eb (D:\\wp\\b39), 38/38 steps, in one owned scratch CPU 1511-1 PN V4.1 with the authored native GRAPH seed FB (one step, one transition) imported through block_import_xml: graph_export returns the exact block software_inspect lists, retains the bytes of its native export (equal SHA-256) and leaves the project unchanged, refusing SCL and missing blocks; graph_edit renames step 1, and its result equals the source with every occurrence of the step name replaced (the step and its G7_StepPlus interface member) and nothing else, refusing a name an interface member uses (GraphEditDuplicate); graph_import applies the edited document with checkpoint, PLC compile and save, asserted preview and change_status, changing exactly the GRAPH block, whose native export carries the new name; a fresh owned Portal reopen shows the identical state and a second export, edit and import restored from its checkpoint equals the reopened state. Typed refusals (UnsupportedLanguage, BlockNotFound, XmlScopeMismatch, InvalidRequest, PreviewMismatch, StaleRevision) change nothing.",
+  "limitations": [
+    "One GRAPH FB with one step and one transition; branches, jumps, actions, interlocks and supervisions are not edited natively.",
+    "graph_edit: renameStep only natively; the other typed operations are covered by the offline GRAPH tests.",
+    "Engineering only; no sequence is executed and behavioral equivalence is not certified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "347d1f13b23c4ce74123e66b50aac18d06f28d7343c7f408815242e19629bbe1"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7ecd4e7de51f71d607c781fcd1f4137afedb751c2eae8ab795dd58236fdac003"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "c3ab5bdaf649953e390e8cc961b9187be3b1068036242e4e5629c5c79f0b9694",
+      "bytes": 484280,
+      "completed": true,
+      "steps": [
+        "start owned TIA graph changes",
+        "create owned scratch graph changes",
+        "snapshot baseline",
+        "prepare import the GRAPH seed",
+        "apply block_import_xml",
+        "change_status import the GRAPH seed",
+        "snapshot import the GRAPH seed",
+        "verify import the GRAPH seed",
+        "refuse graph_export: an SCL block",
+        "refuse graph_export: a missing block",
+        "graph_export of the seed",
+        "refuse graph_edit: a step name an interface member uses",
+        "graph_edit rename step 1",
+        "refuse graph_import: a block outside expectedBlockNames",
+        "refuse graph_import: both graphRef and path",
+        "prepare import the renamed step (made stale below)",
+        "refuse apply graph_import: a wrong previewHash",
+        "prepare import the renamed step",
+        "apply graph_import",
+        "change_status import the renamed step",
+        "snapshot import the renamed step",
+        "verify import the renamed step",
+        "refuse apply graph_import: a preview made stale by a later change",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "snapshot reopened",
+        "reopened state equals every verified change",
+        "graph_export of the reopened block",
+        "graph_edit rename step 1 again",
+        "prepare import the step renamed again",
+        "apply graph_import",
+        "change_status import the step renamed again",
+        "snapshot import the step renamed again",
+        "verify import the step renamed again",
+        "restore import the step renamed again",
+        "snapshot restored import the step renamed again",
+        "restored import the step renamed again equals the pre-change state"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "graph_artifact_read",
+        "graph_edit",
+        "graph_export",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "graph_edit",
+        "graph_export"
+      ]
+    }
+  ]
+}
