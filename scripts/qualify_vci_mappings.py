@@ -119,7 +119,7 @@ def add(run, workspace, root, block, fmt, restore=False):
         files = inventory(root)
         require(set(before) < set(files) and all(files[name] == digest for name, digest in before.items()), "The export did not only add package files: %s" % sorted(set(files) ^ set(before)))
         run.h.report["files"]["add " + block] = sorted(set(files) - set(before))
-    run.apply("map %s by export" % block, "vci_mapping_add", payload, {"effects": [{"action": "addMapping"}]},
+    run.apply("map %s by export" % block, "vci_mapping_add", payload, {"effects": [{"action": "exportObject", "directory": "", "fileName": block, "format": fmt}]},
               changed=["vciWorkspace:" + workspace], check=check, restore=restore)
 
 

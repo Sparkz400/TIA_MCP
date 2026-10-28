@@ -61,7 +61,7 @@ def body(h):
     def refused():
         before = run.state()
         error = h.call_error("cax_export", {"hardwarePath": run.path("TiaMcpMissing")})
-        require(error.get("code") in ("HardwareNotFound", "ObjectNotFound") and run.state() == before, "Expected a typed refusal of an unknown device: %s" % error)
+        require(error.get("code") == "DeviceNotFound" and run.state() == before, "Expected a typed refusal of an unknown device: %s" % error)
         return error
     h.stage("refuse cax_export: an unknown device", refused)
     run.mark("cax_export", "refused", "unknown device")
