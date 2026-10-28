@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.44",
+  "catalogVersion": "0.4.45",
   "targetTiaVersions": [
     21
   ],
@@ -2547,6 +2547,24 @@
         "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
         "Flat FB and UDT types only, InWork; no dependency chain, released versions or global library at this scale. The last 2 of 10,002 rows lie beyond the item budget and are reported as truncation, not returned.",
         "Growth runs that built the library (prepare/apply, checkpoint and memory per 100-type change up to 5,000 types) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
+      ]
+    },
+    {
+      "id": "local.library.native-chain.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "8ccca8f282e67ec0257c725330c2f02c8799f74c",
+        "passedScope": "Owned TIA Portal V21 Portal reopening the saved chain scale project of run scl08284524 (CPU 1511-1 PN V4.1, project library with 1,000 FB types Chain_0000..Chain_0999, each calling its predecessor). This run released the last 116 InWork versions (Chain_0884..Chain_0999) through library_release_version in 12 guarded changes of up to 10 versions in callee-first order (355-519 s per change), then queried library_query dependencies from Chain_0999: 1,000 nodes captured, scopeComplete=true, truncated=false, 22.8 s. Earlier releases of the same chain and the growth run are pinned by report hash in docs/verification/library-native-scale-20261027.md."
+      },
+      "artifacts": [
+        "evidence/local.library.native-chain.20261028.json"
+      ],
+      "limitations": [
+        "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
+        "One linear FB call chain in a project library; no global library, branching graphs or UDT dependencies at this scale. Versions 0..883 were released by earlier runs of the same project (pinned in the verification doc); TIA records library dependencies only between released versions.",
+        "Creation of the chain and the releases of Chain_0000..Chain_0883 (four earlier runs, single and batched releases) are measurements pinned in docs/verification/library-native-scale-20261027.md, not evidence records."
       ]
     },
     {
@@ -8961,7 +8979,8 @@
           "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library.native-traversal.20261027"
+          "local.library.native-traversal.20261027",
+          "local.library.native-chain.20261028"
         ]
       },
       "availability": {
@@ -10211,7 +10230,8 @@
           "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
-          "local.library_import_scale.20261027"
+          "local.library_import_scale.20261027",
+          "local.library.native-chain.20261028"
         ]
       },
       "availability": {

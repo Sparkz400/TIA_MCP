@@ -10,7 +10,7 @@ import json
 import time
 from pathlib import Path
 
-from library_native_harness import Harness, require
+from library_native_harness import Harness, identity, require
 
 BATCH = 100
 
@@ -96,7 +96,40 @@ def run(args):
         """Traverse a library an earlier run already built, without growing it again."""
         h.owned_portal("reopen")
         h.stage("open saved scale project", lambda: h.tool("project_open", {"path": str(args.reopen.resolve())}))
-        probe(h, h.project_library(), "reopened", args.full_paging)
+        library = h.project_library()
+        release_chain(h, library) if args.release_chain else probe(h, library, "reopened", args.full_paging)
+
+    def release_chain(h, library):
+        """TIA records library dependencies between released versions only: release Chain_0000.. in order, 100 per change, then close."""
+        chain = sorted((x for x in page_all_items(h, library) if x.get("kind") == "version" and x.get("typeName", "").startswith("Chain_")
+                        and x.get("state") == "InWork"), key=lambda x: x["typeName"])
+        require(chain, "No InWork chain versions to release")
+        h.report["releases"] = []
+        released = None
+        for start in range(0, len(chain), args.release_batch):
+            batch = chain[start:start + args.release_batch]  # names sort callee first, which is the release order
+            if stop.exists():
+                h.report["stoppedByRequest"] = batch[0]["typeName"]
+                break
+            started = time.perf_counter()
+            applied = h.apply("library_release_version", h.selected(library, batch, versionNumber="1.0.0", author="TIA MCP qualification",
+                              comment="Scale chain release"))
+            objects = applied["journal"]["result"]["objects"]
+            require([x["typeName"] for x in objects] == [x["typeName"] for x in batch], "Released versions differ from the batch")
+            released = objects[-1]
+            h.report["steps"][-1]["result"] = {"state": applied["state"], "released": len(objects)}
+            h.report["releases"].append({"first": batch[0]["typeName"], "last": batch[-1]["typeName"], "seconds": round(time.perf_counter() - started, 3)})
+            h.persist()
+            print("RELEASE " + json.dumps(h.report["releases"][-1]), flush=True)
+        if released is None:
+            return
+        started = time.perf_counter()
+        result = h.tool("library_query", {"request": {"libraryId": library, "query": "dependencies", "maxItems": 200, **identity(released)}})
+        h.report["chainDependencies"] = {"root": released["typeName"], "seconds": round(time.perf_counter() - started, 3),
+                                         "items": len(result["items"]), "totalCaptured": result.get("totalCaptured"),
+                                         "completeness": result.get("completeness"), "nextOffset": result.get("nextOffset")}
+        h.persist()
+        print("CHAIN " + json.dumps(h.report["chainDependencies"]), flush=True)
 
     def body(h):
         plc = h.owned_scratch("scale")
@@ -189,6 +222,8 @@ if __name__ == "__main__":
     parser.add_argument("--probe-every", type=int, default=10)
     parser.add_argument("--full-paging", action="store_true", help="Page the complete library at the final probe; periodic probes read one page.")
     parser.add_argument("--reopen", type=Path, help="Open this saved scale project and only probe its project library.")
+    parser.add_argument("--release-chain", action="store_true", help="With --reopen: release every InWork Chain_ type in order, then query the closure.")
+    parser.add_argument("--release-batch", type=int, default=100, help="Versions per release change (1..100); cost grows with chain depth.")
     parser.add_argument("--stop-file", type=Path, default=Path("artifacts/scale.stop"))
     arguments = parser.parse_args()
     arguments.runner = __file__

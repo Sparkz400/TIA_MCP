@@ -1,0 +1,80 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.native-chain.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T00:54:29+00:00",
+  "source": {
+    "commit": "8ccca8f282e67ec0257c725330c2f02c8799f74c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Owned TIA Portal V21 Portal reopening the saved chain scale project of run scl08284524 (CPU 1511-1 PN V4.1, project library with 1,000 FB types Chain_0000..Chain_0999, each calling its predecessor). This run released the last 116 InWork versions (Chain_0884..Chain_0999) through library_release_version in 12 guarded changes of up to 10 versions in callee-first order (355-519 s per change), then queried library_query dependencies from Chain_0999: 1,000 nodes captured, scopeComplete=true, truncated=false, 22.8 s. Earlier releases of the same chain and the growth run are pinned by report hash in docs/verification/library-native-scale-20261027.md.",
+  "limitations": [
+    "Observed timing on one Windows host (PCNico); not a cross-machine latency guarantee.",
+    "One linear FB call chain in a project library; no global library, branching graphs or UDT dependencies at this scale. Versions 0..883 were released by earlier runs of the same project (pinned in the verification doc); TIA records library dependencies only between released versions."
+  ],
+  "binaries": [
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "79df29a9c8a30abfe55a64a7f22a2989804a6d8904c5ec593d72956be0be62da"
+    },
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3ee773278f85e4d40f87d73582898bc2498655e91814a6d485a30ba62d9906f9"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "17feea910f61bbb6f3caea9d64929c38404525af28a0d39bb7dbf7c59585598d",
+      "bytes": 279593,
+      "completed": true,
+      "steps": [
+        "start owned TIA reopen",
+        "open saved scale project",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_release_version",
+        "apply library_release_version"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
