@@ -48,9 +48,10 @@ def fixture(language, culture):
     return xml.replace(output, '<Member Name="EnableAlternate" Datatype="Bool" Remanence="NonRetain" Accessibility="Public" />\n          ' + output)
 
 
-def network(xml):
+def network(xml, count=1):
+    """The first network's ID, after checking how many the block holds."""
     units = re.findall(r'<SW\.Blocks\.CompileUnit ID="([0-9A-F]+)"', xml)
-    require(len(units) == 1, "Expected one network, found %s" % units)
+    require(len(units) == count, "Expected %d networks, found %s" % (count, units))
     return units[0]
 
 
@@ -72,28 +73,43 @@ def symbol(name):
 TRUE = "<Constant><ConstantType>Bool</ConstantType><ConstantValue>TRUE</ConstantValue></Constant>"
 
 
-def edits(run, language, block, restore=False):
+def edit(run, block, label, kind, payload, text, restore=False):
+    """One graphical change on block: only that block changes, and the native readback equals the prepared document."""
+    key = run.blk(block)
+    _, applied = run.mutate(label, kind, payload, {"effects": [{"action": kind, "existingBlock": run.info(block)}], "edit": payload},
+                            changed=[key], xml={key: text}, restore=restore)
+    require("native_preservation_verified" in applied["stages"] and any(r["role"] == "structured-edit-readback" for r in applied["readbacks"]),
+            "%s lacks its native preservation readback" % label)
+
+
+def edits(run, language, block):
     """call_parameter_set, an in-place patch and a network insert on one fixture block."""
     key, uid = run.blk(block), UIDS[language]
     unit = network(run.xml(key))
-    existing = lambda kind: {"effects": [{"action": kind, "existingBlock": run.info(block)}]}
-    def edit(label, kind, payload, texts):
-        _, applied = run.mutate(label, kind, payload, {**existing(kind), "edit": payload}, changed=[key], xml={key: texts}, restore=restore)
-        require("native_preservation_verified" in applied["stages"] and any(r["role"] == "structured-edit-readback" for r in applied["readbacks"]),
-                "%s lacks its native preservation readback" % label)
-    edit("%s: move the Enable argument to EnableAlternate" % language, "call_parameter_set",
+    edit(run, block, "%s: move the Enable argument to EnableAlternate" % language, "call_parameter_set",
          {"blockName": block, "networkId": unit, "callUid": uid["call"], "parameterName": "Enable", "components": ["EnableAlternate"]}, '<Component Name="EnableAlternate" />')
     replacement = access(uid["replaced"], TRUE, "LiteralConstant") if language == "LAD" else access(uid["replaced"], symbol("Enable"))
-    edit("%s: replace Access %s in place" % (language, uid["replaced"]), "graphical_network_patch",
+    edit(run, block, "%s: replace Access %s in place" % (language, uid["replaced"]), "graphical_network_patch",
          {"blockName": block, "networkId": unit, "upsertXml": [replacement], "removeUids": []}, "<ConstantValue>TRUE</ConstantValue>" if language == "LAD" else '<Component Name="Enable" />')
-    copied = copy_unit(run.xml(key), unit)
-    edit("%s: insert a copy of the network" % language, "graphical_network_insert", {"blockName": block, "afterNetworkId": unit, "compileUnitXml": copied}, "<SW.Blocks.CompileUnit")
-    if not restore:
-        run.h.stage("%s has two networks" % block, lambda: require(len(re.findall(r"<SW\.Blocks\.CompileUnit ", run.xml(key))) == 2, "Inserted network missing") or 2)
+    edit(run, block, "%s: insert a copy of the network" % language, "graphical_network_insert",
+         {"blockName": block, "afterNetworkId": unit, "compileUnitXml": copy_unit(run.xml(key), unit)}, "<SW.Blocks.CompileUnit")
+    run.h.stage("%s has two networks" % block, lambda: network(run.xml(key), 2) and 2)
+
+
+def recover_each_kind(run):
+    """From the reopened state (two networks per block, LAD Enable fed by TRUE), one change per kind, each restored."""
+    lad, fbd = run.xml(run.blk("Tgp_FC_LAD")), run.xml(run.blk("Tgp_FC_FBD"))
+    edit(run, "Tgp_FC_FBD", "FBD: move the Enable argument back to Enable", "call_parameter_set",
+         {"blockName": "Tgp_FC_FBD", "networkId": network(fbd, 2), "callUid": "24", "parameterName": "Enable", "components": ["Enable"]}, '<Component Name="Enable" />', restore=True)
+    edit(run, "Tgp_FC_LAD", "LAD: replace the TRUE Access with EnableAlternate", "graphical_network_patch",
+         {"blockName": "Tgp_FC_LAD", "networkId": network(lad, 2), "upsertXml": [access("21", symbol("EnableAlternate"))], "removeUids": []}, '<Component Name="EnableAlternate" />', restore=True)
+    edit(run, "Tgp_FC_FBD", "FBD: insert a third network", "graphical_network_insert",
+         {"blockName": "Tgp_FC_FBD", "afterNetworkId": re.findall(r'<SW\.Blocks\.CompileUnit ID="([0-9A-F]+)"', fbd)[-1], "compileUnitXml": copy_unit(fbd, network(fbd, 2))},
+         "<SW.Blocks.CompileUnit", restore=True)
 
 
 def refusals(run):
-    lad, unit = run.blk("Tgp_FC_LAD"), None
+    lad = run.blk("Tgp_FC_LAD")
     unit = network(run.xml(lad))
     call = {"blockName": "Tgp_FC_LAD", "networkId": unit, "callUid": "23", "parameterName": "Enable", "components": ["EnableAlternate"]}
     run.refuse("call_parameter_set", "an unknown network", {**call, "networkId": "7F"}, "NetworkNotFound")
@@ -130,8 +146,7 @@ def body(h):
     for language in ("LAD", "FBD"):
         edits(run, language, "Tgp_FC_" + language)
     reopen(run)
-    for language in ("LAD", "FBD"):
-        edits(run, language, "Tgp_FC_" + language, restore=True)
+    recover_each_kind(run)
     gaps = coverage_gaps(run.coverage, KINDS)
     require(not gaps, "Kinds without applied, persisted, refused and restored evidence: %s" % gaps)
 
