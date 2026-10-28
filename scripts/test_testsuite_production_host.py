@@ -134,7 +134,7 @@ def main():
     finally:
         close(client)
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps({'checks': len(checks), 'names': checks, 'shutdowns': shutdowns,
+    args.report.write_text(json.dumps({'completed': True, 'checkCount': len(checks), 'checks': checks, 'shutdowns': shutdowns,
         'nativeExecuted': False, 'nativeQualified': False}, indent=2) + '\n', encoding='utf-8')
     print(f'PASS TS-03 actual Host: {len(checks)} checks, {len(shutdowns)} Host lifetimes, no native worker launched')
 
