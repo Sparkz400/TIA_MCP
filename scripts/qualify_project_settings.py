@@ -56,6 +56,7 @@ def project(properties):
 
 class Run(StateRun):
     """The access runner's apply/refuse/restore gates over the PLC program and project_properties."""
+    plc_compiled = KINDS  # The project-scoped languages change still compiles the PLC software.
 
     def __init__(self, h):
         super().__init__(h)
@@ -184,7 +185,7 @@ def phase_c(run):
 
 def body(h):
     run = Run(h)
-    h.owned_scratch("project settings")
+    run.plc = h.owned_scratch("project settings")
     run.project = h.tool("tia_session_status")["projects"][0]["path"]
     run.current = run.snap("baseline")
     phase_a(run)
