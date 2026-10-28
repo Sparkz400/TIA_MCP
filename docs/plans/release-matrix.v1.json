@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.68",
-    "catalogSha256": "25045c62dd9f179e03efe6ce8b96d46645859c8aad9c2819e81b1470e51d9e1d",
+    "catalogSha256": "ddbc213d4e43c6223e831b2b0be66946bc0adcb34c09c24542abaaf625a86764",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "d9cb98b2b4df28af0241526a8e0da8e364d0624f4fab9fd14eccd00536ae9ea7"
   },
@@ -4168,49 +4168,49 @@
         "D14"
       ],
       "evidenceIds": [
-        "local.safety_import.20261028"
+        "local.safety_import.device-compile.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.20261028"
+            "local.safety_import.device-compile.20261028"
           ]
         }
       ]
@@ -24194,18 +24194,18 @@
       "notRetained": []
     },
     {
-      "id": "local.safety_import.20261028",
+      "id": "local.safety_import.device-compile.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21,
         "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
         "firmware": "V4.1"
       },
-      "sourceCommit": "a2c2b11134395e472fe37c7a77f51554a6bc6b60",
+      "sourceCommit": "2d74ebbbf9ad06d263ee369905e9a1c428b085c7",
       "retained": [
         {
-          "path": "evidence/local.safety_import.20261028.json",
-          "sha256": "5efd40e0386011f1cfc8ec63cc046d8f5b51ba3b8ef0a5d6967ae45a9bd4a169"
+          "path": "evidence/local.safety_import.device-compile.20261028.json",
+          "sha256": "79707d843015f83c2bcfa1b994103c8f0eca7d10e5322c1bf0753dfc186eb69b"
         }
       ],
       "notRetained": []

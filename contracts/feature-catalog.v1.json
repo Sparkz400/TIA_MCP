@@ -3373,6 +3373,26 @@
         "Limited configured-module lifecycle profile only: channelWriteQualified and fullRemoteIoRouteQualified are false; the DI channels expose InputDelay as native read-only and no channel mutation occurred.",
         "One IM/DI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
       ]
+    },
+    {
+      "id": "local.safety_import.device-compile.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "2d74ebbbf9ad06d263ee369905e9a1c428b085c7",
+        "passedScope": "scripts/qualify_safety_changes.py on a frozen Debug build of 2d74ebb (D:/wp/b66, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF (66 steps): safety_import_xml now compiles every device instead of only the PLC software. The generated F-FBD block Main_Safety_RTG1 was re-imported with a filled comment text, with checkpoint, all-devices compile (device-path-v1 receipt, complete scope), save, change_status and an exact state diff limited to that block plus recorded F-compile side effects; every F-PLC block, including the F-compiler block DB1_C, read consistent right after the import (it read inconsistent after the earlier PLC-only compile, local.safety_import.20261028). A wrong previewHash was refused (PreviewMismatch), prepare refusals covered a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), the import persisted across a fresh Portal reopen and a second import was restored from its checkpoint. The safety reads, printout and safety_fparameter_set passed again in the same run."
+      },
+      "artifacts": [
+        "evidence/local.safety_import.device-compile.20261028.json"
+      ],
+      "limitations": [
+        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
+        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
+      ]
     }
   ],
   "features": [
@@ -7487,13 +7507,13 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "2026-10-28: natively qualified under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, with checkpoint, PLC compile and save, an exact diff limited to that block, fresh reopen and checkpoint restore; refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. After the import's PLC software compile, the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it."
+          "2026-10-28: the import compiles every device, not only the PLC software; a PLC-only compile had left the F-compiler block DB1_C inconsistent until the next device compile (local.safety_import.20261028). Natively qualified with the device compile under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.device-compile.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, every F-PLC block including DB1_C consistent right after the import, exact diff, fresh reopen, checkpoint restore and refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. A project with a device that cannot be compiled (for example a Startdrive drive) cannot apply it."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_import.20261028"
+          "local.safety_import.device-compile.20261028"
         ]
       },
       "availability": {
