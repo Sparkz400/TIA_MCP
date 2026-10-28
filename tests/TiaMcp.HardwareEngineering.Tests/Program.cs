@@ -124,6 +124,21 @@ Check("changed companion container rejected", "network_io_assign", companion, ro
 Check("changed diagnostic metadata rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["addresses"][0]["lengthBits"] = 16; }, false);
 Check("diagnostic ownership normalization rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows[5]["addresses"][0]["owners"] = new JArray(controller); }, false);
 Check("extra generated module rejected", "network_io_assign", companion, rows => { AssignedWithServer(rows); rows.Add(Row("/projects/P/devices/Remote/items/Extra", 2)); }, false);
+JObject NodeRow(string name, string subnet) => new JObject { ["name"] = name, ["type"] = "Ethernet", ["subnet"] = subnet, ["attributes"] = new JObject { ["Address"] = "192.168.0.1", ["SubnetMask"] = "255.255.255.0" } };
+void Nodes(JArray rows) { rows[2]["network"]["nodes"] = new JArray(NodeRow("PLC", "PN")); rows[3]["network"]["nodes"] = new JArray(NodeRow("IM", null)); }
+var configure = new JObject { ["hardwarePath"] = remote, ["nodeName"] = "IM", ["subnetName"] = "pn", ["attributes"] = new JObject { ["Address"] = "192.0.2.11" } };
+void Configured(JArray rows) { rows[3]["network"]["nodes"][0]["subnet"] = "PN"; rows[3]["network"]["nodes"][0]["attributes"]["Address"] = "192.0.2.11"; }
+Check("requested node address and existing subnet", "network_configure", configure, Configured, true, Nodes);
+Check("requested node address not applied rejected", "network_configure", configure, rows => rows[3]["network"]["nodes"][0]["subnet"] = "PN", false, Nodes);
+Check("unrequested node attribute rejected", "network_configure", configure, rows => { Configured(rows); rows[3]["network"]["nodes"][0]["attributes"]["SubnetMask"] = "255.255.0.0"; }, false, Nodes);
+Check("node on another subnet rejected", "network_configure", configure, rows => { Configured(rows); rows[3]["network"]["nodes"][0]["subnet"] = "Other"; }, false, Nodes);
+Check("other node's subnet change rejected", "network_configure", configure, rows => { Configured(rows); rows[2]["network"]["nodes"][0]["subnet"] = null; }, false, Nodes);
+Check("I/O-system subnet change rejected", "network_configure", configure, rows => { Configured(rows); rows[2]["network"]["controllers"][0]["system"]["subnet"] = "Other"; }, false, Nodes);
+Check("connector assignment by subnet connect rejected", "network_configure", configure, rows => { Configured(rows); rows[3]["network"]["connectors"][0]["system"] = SystemRef(); }, false, Nodes);
+var detach = new JObject { ["hardwarePath"] = controller, ["disconnect"] = true };
+Check("node disconnect", "network_configure", detach, rows => rows[2]["network"]["nodes"][0]["subnet"] = null, true, Nodes);
+Check("node still connected after disconnect rejected", "network_configure", detach, _ => { }, false, Nodes);
+Check("unnamed node among two rejected", "network_configure", detach, rows => rows[2]["network"]["nodes"][0]["subnet"] = null, false, rows => { Nodes(rows); ((JArray)rows[2]["network"]["nodes"]).Add(NodeRow("PLC2", "PN")); });
 void InvalidCompanion(string name, Action<JObject> mutate)
 {
     var payload = (JObject)companion.DeepClone(); mutate(payload);
@@ -239,8 +254,8 @@ Disposition("differing project without outcome holds", false, 5, false, null, "d
 Disposition("differing unsaved project holds", false, -1, false, null, "differs from its checkpoint");
 try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
 catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
-foreach (var kind in new[] { "hmi_engineering", "hardware_attributes", "network_configure", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
+foreach (var kind in new[] { "hmi_engineering", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
-foreach (var kind in new[] { "source_upsert", "hardware_plug", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
+foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
     if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
 Console.WriteLine($"{count} hardware preservation checks passed.");
