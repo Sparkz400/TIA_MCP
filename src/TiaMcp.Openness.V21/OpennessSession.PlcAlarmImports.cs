@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
@@ -192,16 +195,34 @@ namespace TiaMcp.Openness.V21
             catch (EngineeringException error) { return new JObject { ["exportFailed"] = error.GetType().FullName }; }
         }
 
-        // XLSX packages carry save times in docProps and zip headers; hash only the decompressed workbook parts. DAT stays opaque bytes.
+        // Native evidence (28 October 2026): every export carries save times in docProps and zip headers, a DAT package names
+        // its single entry after the export file, and each XLSX export draws fresh random relationship IDs. Hash only the
+        // decompressed parts, DAT entries by position and XLSX relationship IDs renumbered by first use.
         private static string PlcAlarmContentHash(string file)
         {
-            if (!file.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) return ChangeFileHash(file);
+            bool xlsx = file.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase);
+            ZipArchive archive;
+            try { archive = ZipFile.OpenRead(file); }
+            catch (InvalidDataException) { return ChangeFileHash(file); }
             var parts = new JObject();
-            using (var archive = ZipFile.OpenRead(file))
-                foreach (var entry in archive.Entries.Where(e => !e.FullName.StartsWith("docProps/", StringComparison.OrdinalIgnoreCase)).OrderBy(e => e.FullName, StringComparer.Ordinal))
-                    using (var stream = entry.Open()) using (var sha = SHA256.Create())
-                        parts[entry.FullName] = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+            var ids = new Dictionary<string, string>(StringComparer.Ordinal);
+            using (archive)
+            {
+                var entries = xlsx ? archive.Entries.Where(e => !e.FullName.StartsWith("docProps/", StringComparison.OrdinalIgnoreCase)).OrderBy(e => e.FullName, StringComparer.Ordinal).ToArray() : archive.Entries.ToArray();
+                for (int index = 0; index < entries.Length; index++)
+                    using (var stream = entries[index].Open()) using (var memory = new MemoryStream())
+                    {
+                        stream.CopyTo(memory);
+                        byte[] bytes = memory.ToArray();
+                        if (xlsx) bytes = Encoding.UTF8.GetBytes(RelationshipIds.Replace(Encoding.UTF8.GetString(bytes),
+                            match => match.Groups[1].Value + (ids.TryGetValue(match.Groups[2].Value, out var id) ? id : ids[match.Groups[2].Value] = "R" + ids.Count) + "\""));
+                        using (var sha = SHA256.Create())
+                            parts[xlsx ? entries[index].FullName : "#" + index] = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
+                    }
+            }
             return ChangeHash(parts.ToString(Formatting.None));
         }
+
+        private static readonly Regex RelationshipIds = new Regex("((?:\\br:id|\\bId)=\")(R[0-9a-f]{16})\"", RegexOptions.CultureInvariant);
     }
 }

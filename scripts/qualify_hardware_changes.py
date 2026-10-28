@@ -8,7 +8,8 @@ previous one in exactly the intended keys. TIA-coupled side effects are tolerate
 Portal then reopens the saved project, which must show the identical state. Phase B applies one more change per kind from
 that state and restores its checkpoint in the applying Portal; the recovered copy must equal the pre-change state. A second
 CPU is added and restored already in phase A, because generated CPU security is restricted to the worker's own new scratch
-(a reopened project refuses it with ScratchIsolationRequired). Typed refusals must change nothing.
+(a reopened project refuses it with ScratchIsolationRequired), and so is a port connection, because a second link between the
+two CPUs would form a ring. Typed refusals must change nothing.
 """
 from __future__ import annotations
 
@@ -250,6 +251,10 @@ def phase_a(run):
     link(run, "hardware_port_connect", 1)
     run.refuse("hardware_port_connect", "an already connected port", {"hardwarePath": ports(run, 1)[0], "partnerHardwarePath": ports(run, 1)[1]}, "InvalidRequest")
     link(run, "hardware_port_disconnect", 1)
+    # A second link between the two CPUs would form a ring, which fails compile without media redundancy, so the connect
+    # restore case runs here, while no link exists.
+    run.b0 = run.current
+    link(run, "hardware_port_connect", 1, restore=True)
     link(run, "hardware_port_connect", 2)
     # S7-1500 racks refuse gaps at compile, so only the last module is deleted.
     delete(run, "HwDi2")
@@ -271,7 +276,6 @@ def reopen(run):
 def phase_b(run):
     attributes(run, "HwDi", {"Comment": "HwAgain"}, restore=True)
     replace(run, "HwDi", MODULE_V2, MODULE, restore=True)
-    link(run, "hardware_port_connect", 1, restore=True)
     link(run, "hardware_port_disconnect", 2, restore=True)
     delete(run, "HwDi", restore=True)
 
