@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6e4888c3f8415e4e84155327f5a8140b305c1e7c7d372cad49c2c52f1a94ec4a",
-      "bytes": 1079889
+      "sha256": "b6f4e9e7dd36496f7aedbf7d78393e67be7792bfde7eac71ec6dd17572284297",
+      "bytes": 1081640
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -93293,6 +93293,13 @@
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
           ]
+        },
+        {
+          "id": "local.library.native-chain.20261028",
+          "profileSha256": "6e2f7f72cc625c3eabfcea9dc5f0ce15ad45e9baab4acf7b3e210cacc565a994",
+          "artifacts": [
+            "evidence/local.library.native-chain.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -100913,6 +100920,13 @@
           "profileSha256": "254c96f1d593c900f5ac0d970b6841aa7d7ca4f1c811022b78cf0e98e82b2a38",
           "artifacts": [
             "evidence/local.library.native-traversal.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library.native-chain.20261028",
+          "profileSha256": "6e2f7f72cc625c3eabfcea9dc5f0ce15ad45e9baab4acf7b3e210cacc565a994",
+          "artifacts": [
+            "evidence/local.library.native-chain.20261028.json"
           ]
         }
       ],
@@ -114251,6 +114265,11 @@
       "sha256": "6dcef7003d53fee8ff211a3a87c779435dccfe4045a4b59da0d645f176292746"
     },
     {
+      "path": "evidence/local.library.native-chain.20261028.json",
+      "state": "observed",
+      "sha256": "6f8e6a0239a010dfa25243f031f13bb82e74d3d4b54cc4c1bc3cdfb07ea430a2"
+    },
+    {
       "path": "evidence/local.library.native-traversal.20261027.json",
       "state": "observed",
       "sha256": "47c959cfaf7232654fc7c44578236570ff045ddd3886253602237205e99193aa"
@@ -114780,6 +114799,10 @@
     {
       "id": "local.layers.units-expanded.20261008",
       "profileSha256": "c875ccbae6d69db70bb5b6479b0c22e82d18aee4e99d388e9726e1f0eb3c2233"
+    },
+    {
+      "id": "local.library.native-chain.20261028",
+      "profileSha256": "6e2f7f72cc625c3eabfcea9dc5f0ce15ad45e9baab4acf7b3e210cacc565a994"
     },
     {
       "id": "local.library.native-traversal.20261027",
